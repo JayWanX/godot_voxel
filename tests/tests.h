@@ -3,8 +3,6 @@
 
 #include "../util/godot/macros.h"
 
-namespace voxel {
-
 namespace testing {
 class TestOptions;
 }
@@ -19,7 +17,6 @@ namespace noise_tests {
 void run_noise_tests();
 }
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_TESTS_H

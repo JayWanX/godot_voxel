@@ -34,8 +34,6 @@ namespace voxel {
 
 class AsyncDependencyTracker;
 
-namespace voxel {
-
 class VoxelNode;
 class VoxelInstancerRigidBody;
 class VoxelInstanceComponent;
@@ -500,7 +498,6 @@ private:
 #endif
 };
 
-} // namespace voxel
 } // namespace voxel
 
 VARIANT_ENUM_CAST(voxel::VoxelInstancer::UpMode);

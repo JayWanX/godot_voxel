@@ -14,17 +14,17 @@
 
 #include <utility>
 
+namespace voxel {
+
 // Data structures used internally in multipass generation.
 
 // Had to separate these structs outside `VoxelGeneratorMultipassCB`, because adding Godot virtual method bindings
 // required to #include `VoxelToolMultipassGenerator`, which already included the former to access its nested structs,
 // so it could not compile. So I moved the nested structs outside the class.
 
-namespace voxel {
 
 class IThreadedTask;
 
-namespace voxel {
 namespace VoxelGeneratorMultipassCBStructs {
 
 // Pass limit is pretty low because in practice not that many should be needed, and it gets expensive really quick
@@ -168,7 +168,6 @@ struct PassInput {
 };
 
 } // namespace VoxelGeneratorMultipassCBStructs
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_GENERATOR_MULTIPASS_CB_STRUCTS_H

@@ -23,8 +23,6 @@ namespace voxel {
 
 class AsyncDependencyTracker;
 
-namespace voxel {
-
 class VoxelTool;
 class VoxelSaveCompletionTracker;
 class VoxelTerrainMultiplayerSynchronizer;
@@ -386,7 +384,6 @@ private:
 #endif
 };
 
-} // namespace voxel
 } // namespace voxel
 
 VARIANT_ENUM_CAST(voxel::VoxelTerrain::DebugDrawFlag)

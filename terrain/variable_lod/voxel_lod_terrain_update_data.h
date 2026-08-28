@@ -17,11 +17,10 @@
 #include "../../engine/detail_rendering/detail_rendering.h"
 #endif
 
+
 namespace voxel {
 
 class AsyncDependencyTracker;
-
-namespace voxel {
 
 // Settings and states needed for the multi-threaded part of the update loop of VoxelLodTerrain.
 // See `VoxelLodTerrainUpdateTask` for more info.
@@ -360,7 +359,6 @@ struct VoxelLodTerrainUpdateData {
 	}
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_LOD_TERRAIN_UPDATE_DATA_H

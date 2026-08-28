@@ -7,12 +7,10 @@
 #include "../../util/tasks/threaded_task.h"
 #include "../voxel_generator.h"
 
+
 namespace voxel {
 
 class AsyncDependencyTracker;
-
-namespace voxel {
-
 class VoxelData;
 
 class GenerateBlockMultipassCBTask : public IThreadedTask {
@@ -52,7 +50,6 @@ private:
 	uint8_t _stage = 0;
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_GENERATE_BLOCK_MULTIPASS_CB_TASK_H

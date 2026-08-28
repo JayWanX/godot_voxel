@@ -8,7 +8,6 @@ VOXEL_GODOT_FORWARD_DECLARE(class Camera3D);
 VOXEL_GODOT_FORWARD_DECLARE(class MeshInstance3D);
 VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
 
-namespace voxel {
 
 namespace voxel {
 
@@ -52,7 +51,6 @@ private:
 	Basis _rotation_anim_basis;
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_VIEWER_H

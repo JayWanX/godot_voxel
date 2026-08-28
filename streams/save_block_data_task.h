@@ -6,11 +6,10 @@
 #include "../util/memory/memory.h"
 #include "../util/tasks/threaded_task.h"
 
+
 namespace voxel {
 
 class AsyncDependencyTracker;
-
-namespace voxel {
 
 class SaveBlockDataTask : public IThreadedTask {
 public:
@@ -68,7 +67,6 @@ private:
 	std::shared_ptr<AsyncDependencyTracker> _tracker;
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // SAVE_BLOCK_DATA_TASK_H

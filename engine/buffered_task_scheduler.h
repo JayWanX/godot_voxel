@@ -4,11 +4,10 @@
 #include "../util/containers/std_vector.h"
 #include "../util/thread/thread.h"
 
+
 namespace voxel {
 
 class IThreadedTask;
-
-namespace voxel {
 
 // Helper class to store tasks and schedule them in a single batch
 class BufferedTaskScheduler {
@@ -47,7 +46,6 @@ private:
 	Thread::ID _thread_id;
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_BUFFERED_TASK_SCHEDULER_H

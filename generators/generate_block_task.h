@@ -11,12 +11,10 @@
 #include "generate_block_gpu_task.h"
 #endif
 
+
 namespace voxel {
 
 class AsyncDependencyTracker;
-
-namespace voxel {
-
 class VoxelData;
 
 // Generic task to procedurally generate a block of voxels in a single pass
@@ -79,7 +77,6 @@ private:
 #endif
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // GENERATE_BLOCK_TASK_H

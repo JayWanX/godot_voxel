@@ -23,8 +23,6 @@ namespace voxel {
 class IThreadedTask;
 class AsyncDependencyTracker;
 
-namespace voxel {
-
 class VoxelBuffer;
 struct StreamingDependency;
 class VoxelData;
@@ -212,7 +210,6 @@ protected:
 	Mutex _shader_mutex;
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_GENERATOR_H

@@ -15,7 +15,6 @@
 #include "voxel_tool_multipass_generator.h" // Must be included so we can define GDVIRTUAL methods
 
 namespace voxel {
-namespace voxel {
 
 // TODO Prevent shared usage on more than one terrain, or find a way to support it
 // TODO Prevent usage on VoxelLodTerrain, or make it return empty blocks
@@ -190,7 +189,6 @@ private:
 	Mutex _internal_mutex;
 };
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_GENERATOR_MULTIPASS_CB_H
