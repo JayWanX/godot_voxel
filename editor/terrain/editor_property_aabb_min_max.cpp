@@ -108,7 +108,7 @@ void VOXEL_EditorPropertyAABBMinMax::setup(
 		_spinboxes[i]->set_min(p_min);
 		_spinboxes[i]->set_max(p_max);
 		_spinboxes[i]->set_step(p_step);
-		_spinboxes[i]->set_hide_slider(p_no_slider);
+		_spinboxes[i]->set_control_state(p_no_slider ? EditorSpinSlider::CONTROL_STATE_HIDE : EditorSpinSlider::CONTROL_STATE_DEFAULT);
 		_spinboxes[i]->set_allow_greater(true);
 		_spinboxes[i]->set_allow_lesser(true);
 		_spinboxes[i]->set_suffix(p_suffix);

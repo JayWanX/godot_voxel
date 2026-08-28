@@ -145,7 +145,7 @@ void for_each_model_instance(const Data &vox_data, F f) {
 
 struct ModelInstance {
 	// Model with baked rotation
-	UniquePtr<VoxelBuffer> voxels;
+	UniquePtr<voxel::VoxelBuffer> voxels;
 	// Lowest corner position
 	Vector3i position;
 };
@@ -180,12 +180,12 @@ void extract_model_instances(const Data &vox_data, StdVector<ModelInstance> &out
 		// TODO Optimization: implement transformation for VoxelBuffers so we can avoid using a temporary copy.
 		// Didn't do it yet because VoxelBuffers also have metadata and the `transform_3d_array_zxy` function only works
 		// on arrays.
-		UniquePtr<VoxelBuffer> voxels = make_unique_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_DEFAULT);
+		UniquePtr<voxel::VoxelBuffer> voxels = make_unique_instance<voxel::VoxelBuffer>(voxel::VoxelBuffer::ALLOCATOR_DEFAULT);
 		voxels->create(dst_size);
-		voxels->decompress_channel(VoxelBuffer::CHANNEL_COLOR);
+		voxels->decompress_channel(voxel::VoxelBuffer::CHANNEL_COLOR);
 
 		Span<uint8_t> dst_color_indices;
-		ERR_FAIL_COND(!voxels->get_channel_as_bytes(VoxelBuffer::CHANNEL_COLOR, dst_color_indices));
+		ERR_FAIL_COND(!voxels->get_channel_as_bytes(voxel::VoxelBuffer::CHANNEL_COLOR, dst_color_indices));
 
 		CRASH_COND(src_color_indices.size() != dst_color_indices.size());
 		memcpy(dst_color_indices.data(), src_color_indices.data(), dst_color_indices.size() * sizeof(uint8_t));
@@ -197,7 +197,7 @@ void extract_model_instances(const Data &vox_data, StdVector<ModelInstance> &out
 	});
 }
 
-bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_origin, VoxelBuffer &out_voxels) {
+bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_origin, voxel::VoxelBuffer &out_voxels) {
 	// Determine total size
 	const ModelInstance &first_instance = instances[0];
 	Box3i bounding_box(first_instance.position, first_instance.voxels->get_size());
@@ -218,8 +218,8 @@ bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_o
 	);
 
 	out_voxels.create(bounding_box.size + Vector3iUtil::create(VoxelMesherCubes::PADDING * 2));
-	out_voxels.set_channel_depth(VoxelBuffer::CHANNEL_COLOR, VoxelBuffer::DEPTH_8_BIT);
-	out_voxels.decompress_channel(VoxelBuffer::CHANNEL_COLOR);
+	out_voxels.set_channel_depth(voxel::VoxelBuffer::CHANNEL_COLOR, voxel::VoxelBuffer::DEPTH_8_BIT);
+	out_voxels.decompress_channel(voxel::VoxelBuffer::CHANNEL_COLOR);
 
 	for (unsigned int instance_index = 0; instance_index < instances.size(); ++instance_index) {
 		const ModelInstance &mi = instances[instance_index];
@@ -229,7 +229,7 @@ bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_o
 				Vector3i(),
 				mi.voxels->get_size(),
 				mi.position - bounding_box.position + Vector3iUtil::create(VoxelMesherCubes::PADDING),
-				VoxelBuffer::CHANNEL_COLOR
+				voxel::VoxelBuffer::CHANNEL_COLOR
 		);
 	}
 
@@ -281,7 +281,7 @@ Error VoxelVoxMeshImporter::_voxel_import(
 		// TODO Optimization: this approach uses a lot of memory, might fail on scenes with a large bounding box.
 		// One workaround would be to mesh the scene incrementally in chunks, giving up greedy meshing beyond 256 or so.
 		Vector3i bounding_box_origin;
-		VoxelBuffer voxels(VoxelBuffer::ALLOCATOR_DEFAULT);
+		voxel::VoxelBuffer voxels(voxel::VoxelBuffer::ALLOCATOR_DEFAULT);
 		const bool single_grid_succeeded =
 				make_single_voxel_grid(to_span_const(model_instances), bounding_box_origin, voxels);
 		ERR_FAIL_COND_V(!single_grid_succeeded, ERR_CANT_CREATE);

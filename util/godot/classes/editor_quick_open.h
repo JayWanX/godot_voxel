@@ -9,4 +9,6 @@
 #include <editor/gui/editor_quick_open_dialog.h>
 #endif
 
+#endif // VOXEL_GODOT
+
 #endif // VOXEL_GODOT_EDITOR_QUICK_OPEN_H

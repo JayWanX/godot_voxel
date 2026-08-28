@@ -3,7 +3,7 @@
 
 namespace voxel {
 
-namespace voxel::magica {
+namespace magica {
 
 Ref<Mesh> build_mesh(
 		const VoxelBuffer &voxels,

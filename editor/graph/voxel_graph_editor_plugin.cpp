@@ -19,6 +19,9 @@
 #include "voxel_graph_editor_window.h"
 #include "voxel_graph_function_inspector_plugin.h"
 
+#include <editor/editor_node.h>
+#include <editor/gui/editor_bottom_panel.h>
+
 #ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
@@ -55,7 +58,7 @@ void VoxelGraphEditorPlugin::init() {
 			VoxelGraphEditor::SIGNAL_POPOUT_REQUESTED,
 			callable_mp(this, &VoxelGraphEditorPlugin::_on_graph_editor_popout_requested)
 	);
-	_bottom_panel_button = add_control_to_bottom_panel(_graph_editor, VOXEL_TTR("Voxel Graph"));
+	_bottom_panel_button = EditorNode::get_bottom_panel()->add_item(VOXEL_TTR("Voxel Graph"), _graph_editor);
 	_bottom_panel_button->hide();
 
 	// TODO Move this to `_enter_tree` and remove it on `_exit_tree`?
@@ -353,7 +356,7 @@ void VoxelGraphEditorPlugin::undock_graph_editor() {
 	ERR_FAIL_COND(_graph_editor_window != nullptr);
 	VOXEL_PRINT_VERBOSE("Undock voxel graph editor");
 
-	remove_control_from_bottom_panel(_graph_editor);
+	EditorNode::get_bottom_panel()->remove_item(_graph_editor);
 	_bottom_panel_button = nullptr;
 
 	_graph_editor->set_popout_button_enabled(false);
@@ -384,7 +387,7 @@ void VoxelGraphEditorPlugin::dock_graph_editor() {
 
 	_graph_editor->set_popout_button_enabled(true);
 
-	_bottom_panel_button = add_control_to_bottom_panel(_graph_editor, VOXEL_TTR("Voxel Graph"));
+	_bottom_panel_button = EditorNode::get_bottom_panel()->add_item(VOXEL_TTR("Voxel Graph"), _graph_editor);
 
 	_bottom_panel_button->show();
 	make_bottom_panel_item_visible(_graph_editor);
