@@ -4,10 +4,6 @@
 #include "../util/godot/core/gdvirtual.h"
 #include "voxel_generator.h"
 
-#ifdef VOXEL_GODOT_EXTENSION
-// GodotCpp wants the full definition of the class in GDVIRTUAL
-#include "../storage/voxel_buffer_gd.h"
-#endif
 
 namespace voxel {
 

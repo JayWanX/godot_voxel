@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <editor/import/editor_import_plugin.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_import_plugin.hpp>
-using namespace godot;
 #endif
 
 #include "../core/version.h"
@@ -45,22 +42,6 @@ struct KeyValueWrapper {
 		return Variant();
 	}
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-
-	const Dictionary &_dict;
-
-	inline bool try_get(const String key, Variant &out_value) const {
-		if (_dict.has(key)) {
-			out_value = _dict[key];
-			return true;
-		}
-		return false;
-	}
-
-	inline Variant get(const String key) const {
-		return _dict.get(key, Variant());
-	}
-
 #endif
 };
 
@@ -71,16 +52,10 @@ struct StringListWrapper {
 	inline void append(const String s) {
 		_list.push_back(s);
 	}
-#elif defined(VOXEL_GODOT_EXTENSION)
-	TypedArray<String> &_array;
-	inline void append(const String s) {
-		_array.append(s);
-	}
 #endif
 };
 
-// Wraps up differences between compiling as a module and compiling as a GDExtension.
-// There are too many annoying differences for this to be done in-place.
+// Wraps EditorImportPlugin to isolate engine API differences.
 class VOXEL_EditorImportPlugin : public EditorImportPlugin {
 	GDCLASS(VOXEL_EditorImportPlugin, EditorImportPlugin)
 public:
@@ -115,32 +90,6 @@ public:
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
 	bool can_import_threaded() const override;
-#endif
-
-#elif defined(VOXEL_GODOT_EXTENSION)
-	String _get_importer_name() const override;
-	String _get_visible_name() const override;
-	PackedStringArray _get_recognized_extensions() const override;
-	String _get_preset_name(int32_t p_idx) const override;
-	int32_t _get_preset_count() const override;
-	String _get_save_extension() const override;
-	String _get_resource_type() const override;
-	float _get_priority() const override;
-	int32_t _get_import_order() const override;
-	TypedArray<Dictionary> _get_import_options(const String &path, int32_t preset_index) const override;
-	bool _get_option_visibility(const String &path, const StringName &option_name, const Dictionary &options)
-			const override;
-
-	Error _import(
-			const String &source_file,
-			const String &save_path,
-			const Dictionary &options,
-			const TypedArray<String> &platform_variants,
-			const TypedArray<String> &gen_files
-	) const override;
-
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
-	bool _can_import_threaded() const override;
 #endif
 
 #endif

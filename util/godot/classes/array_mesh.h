@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/resources/mesh.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/array_mesh.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

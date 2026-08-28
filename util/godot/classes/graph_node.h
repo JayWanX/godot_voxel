@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/gui/graph_node.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/graph_node.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

@@ -10,13 +10,6 @@
 #include <editor/plugins/editor_plugin.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-// Header includes required due to implementation being required inside the `GDCLASS` macro for virtual methods...
-#include "camera_3d.h"
-#include "input_event.h"
-
-#include <godot_cpp/classes/editor_plugin.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {
@@ -37,13 +30,6 @@ public:
 	String get_plugin_name() const override;
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	bool _handles(Object *p_object) const override;
-	void _edit(Object *p_object) override;
-	void _make_visible(bool visible) override;
-	int32_t _forward_3d_gui_input(Camera3D *p_camera, const Ref<InputEvent> &p_event) override;
-	void _save_external_data() override;
-	String _get_plugin_name() const override;
 #endif
 
 protected:
@@ -55,7 +41,6 @@ protected:
 	virtual String _voxel_get_plugin_name() const;
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods() {}
 };
 

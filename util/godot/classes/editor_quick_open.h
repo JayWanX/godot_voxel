@@ -1,4 +1,4 @@
-#ifndef VOXEL_GODOT_EDITOR_QUICK_OPEN_H
+#if !defined(VOXEL_GODOT_EDITOR_QUICK_OPEN_H)
 #define VOXEL_GODOT_EDITOR_QUICK_OPEN_H
 
 #if defined(VOXEL_GODOT)
@@ -7,12 +7,6 @@
 #include <editor/editor_quick_open.h>
 #else
 #include <editor/gui/editor_quick_open_dialog.h>
-#endif
-
-// TODO GDX: EditorQuickOpen is not exposed!
-// #elif defined(VOXEL_GODOT_EXTENSION)
-// #include <godot_cpp/classes/editor_quick_open.hpp>
-// using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_EDITOR_QUICK_OPEN_H

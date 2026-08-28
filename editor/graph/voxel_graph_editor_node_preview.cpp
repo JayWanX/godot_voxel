@@ -89,7 +89,7 @@ void VoxelGraphEditorNodePreview::update_from_buffer(const pg::Runtime::Buffer &
 	PackedByteArray image_data;
 	image_data.resize(buffer.size * sizeof(float));
 	{
-		// Not using `set_pixel` because it is a lot slower, especially through GDExtension
+		// Not using `set_pixel` because it is a lot slower.
 		float *image_data_w = reinterpret_cast<float *>(image_data.ptrw());
 		for (unsigned int i = 0; i < buffer.size; ++i) {
 			image_data_w[i] = buffer.data[i];

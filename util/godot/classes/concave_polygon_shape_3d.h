@@ -14,9 +14,6 @@
 #include <scene/resources/3d/concave_polygon_shape_3d.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/concave_polygon_shape3d.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

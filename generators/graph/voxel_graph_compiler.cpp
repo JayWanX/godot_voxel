@@ -2,7 +2,7 @@
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_unordered_set.h"
-#include "../../util/godot/core/array.h" // for `varray` in GDExtension builds
+#include "../../util/godot/core/array.h" // for `varray`
 #include "../../util/macros.h"
 #include "../../util/profiling.h"
 #include "../../util/string/expression_parser.h"

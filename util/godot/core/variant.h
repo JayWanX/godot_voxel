@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/variant/variant.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/variant/variant.hpp>
-using namespace godot;
 #endif
 
 #include "../../containers/span.h"

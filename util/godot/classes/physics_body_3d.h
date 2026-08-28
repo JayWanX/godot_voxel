@@ -10,9 +10,6 @@
 #include <scene/3d/physics/physics_body_3d.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/physics_body3d.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_PHYSICS_BODY_3D_H

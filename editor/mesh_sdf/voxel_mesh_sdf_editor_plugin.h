@@ -13,7 +13,6 @@ protected:
 	void _voxel_parse_begin(Object *p_object) override;
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` is not optional.
 	static void _bind_methods() {}
 };
 
@@ -30,7 +29,6 @@ protected:
 private:
 	void _notification(int p_what);
 
-	// When compiling with GodotCpp, `_bind_methods` is not optional.
 	static void _bind_methods() {}
 
 	Ref<VoxelMeshSDFInspectorPlugin> _inspector_plugin;

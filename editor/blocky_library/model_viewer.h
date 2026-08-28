@@ -3,7 +3,7 @@
 
 #include "../../util/godot/classes/control.h"
 
-// Required in header for GDExtension builds, due to how virtual methods are implemented
+// Required in header for virtual method declarations.
 #include "../../util/godot/classes/input_event.h"
 
 #include "../../util/godot/macros.h"
@@ -30,14 +30,11 @@ public:
 
 #if defined(VOXEL_GODOT)
 	void gui_input(const Ref<InputEvent> &p_event) override;
-#elif defined(VOXEL_GODOT_EXTENSION)
-	void _gui_input(const Ref<InputEvent> &p_event) override;
 #endif
 
 private:
 	void update_camera();
 
-	// When compiling with GodotCpp, `_bind_methods` isn't optional.
 	static void _bind_methods() {}
 
 	Camera3D *_camera = nullptr;

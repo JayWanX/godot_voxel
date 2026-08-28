@@ -10,9 +10,6 @@
 #include <scene/3d/physics/area_3d.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/area3d.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_AREA_3D_H

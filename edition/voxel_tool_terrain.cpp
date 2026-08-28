@@ -345,9 +345,6 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 							err.error != Callable::CallError::CALL_OK,
 							String("Callable failed at {0}").format(varray(key))
 					);
-#elif defined(VOXEL_GODOT_EXTENSION)
-					// TODO GDX: No way to detect or report errors when calling a Callable. Do I need to?
-					callback.call(key, v);
 #endif
 				}
 		);

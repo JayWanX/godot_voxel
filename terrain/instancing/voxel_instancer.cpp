@@ -3271,12 +3271,6 @@ PackedStringArray VoxelInstancer::get_configuration_warnings() const {
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#elif defined(VOXEL_GODOT_EXTENSION)
-PackedStringArray VoxelInstancer::_get_configuration_warnings() const {
-	PackedStringArray warnings;
-	get_configuration_warnings(warnings);
-	return warnings;
-}
 #endif
 
 void VoxelInstancer::get_configuration_warnings(PackedStringArray &warnings) const {

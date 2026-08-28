@@ -85,10 +85,6 @@
 #include "generators/simple/voxel_generator_waves.h"
 #endif
 
-#ifdef VOXEL_GODOT_EXTENSION
-#include "engine/voxel_engine_updater.h"
-#include "util/thread/godot_thread_helper.h"
-#endif
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 #include "util/noise/fast_noise_2.h"
@@ -142,48 +138,6 @@
 #include "editor/mesh_sdf/voxel_mesh_sdf_editor_plugin.h"
 #endif
 
-#ifdef VOXEL_GODOT_EXTENSION
-#include "editor/about_window.h"
-#include "editor/blocky_library/axes_3d_control.h"
-#include "editor/blocky_library/model_viewer.h"
-#include "editor/blocky_library/types/voxel_blocky_type_attribute_combination_selector.h"
-#include "editor/blocky_library/types/voxel_blocky_type_editor_inspector_plugin.h"
-#include "editor/blocky_library/types/voxel_blocky_type_library_editor_inspector_plugin.h"
-#include "editor/blocky_library/types/voxel_blocky_type_library_ids_dialog.h"
-#include "editor/blocky_library/types/voxel_blocky_type_variant_list_editor.h"
-#include "editor/blocky_library/types/voxel_blocky_type_viewer.h"
-#include "editor/blocky_library/voxel_blocky_model_editor_inspector_plugin.h"
-#include "editor/blocky_library/voxel_blocky_model_viewer.h"
-#include "editor/fast_noise_lite/fast_noise_lite_editor_inspector_plugin.h"
-#include "editor/fast_noise_lite/fast_noise_lite_viewer.h"
-#include "editor/graph/editor_property_text_change_on_submit.h"
-#include "editor/graph/voxel_graph_editor.h"
-#include "editor/graph/voxel_graph_editor_inspector_plugin.h"
-#include "editor/graph/voxel_graph_editor_io_dialog.h"
-#include "editor/graph/voxel_graph_editor_node.h"
-#include "editor/graph/voxel_graph_editor_node_preview.h"
-#include "editor/graph/voxel_graph_editor_shader_dialog.h"
-#include "editor/graph/voxel_graph_editor_window.h"
-#include "editor/graph/voxel_graph_function_inspector_plugin.h"
-#include "editor/graph/voxel_graph_node_dialog.h"
-#include "editor/graph/voxel_graph_node_inspector_wrapper.h"
-#include "editor/graph/voxel_range_analysis_dialog.h"
-#include "editor/mesh_sdf/voxel_mesh_sdf_viewer.h"
-#include "editor/multipass/voxel_generator_multipass_cache_viewer.h"
-#include "editor/noise/chart_view.h"
-#include "editor/noise/noise_analysis_window.h"
-#include "editor/spot_noise/spot_noise_editor_inspector_plugin.h"
-#include "editor/spot_noise/spot_noise_viewer.h"
-#include "editor/terrain/editor_property_aabb_min_max.h"
-#include "editor/terrain/voxel_terrain_editor_task_indicator.h"
-
-#ifdef VOXEL_ENABLE_INSTANCER
-#include "editor/instance_library/voxel_instance_library_inspector_plugin.h"
-#include "editor/instance_library/voxel_instance_library_multimesh_item_inspector_plugin.h"
-#include "editor/instancer/voxel_instancer_stat_view.h"
-#endif
-
-#endif // VOXEL_GODOT_EXTENSION
 
 #endif // TOOLS_ENABLED
 
@@ -375,11 +329,6 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		ClassDB::register_class<VoxelVoxLoader>();
 #endif
 
-#ifdef VOXEL_GODOT_EXTENSION
-		// TODO GDX: I don't want to expose these classes, but there is no way not to expose them
-		ClassDB::register_class<VOXEL_GodotThreadHelper>();
-		ClassDB::register_class<VoxelEngineUpdater>();
-#endif
 
 		print_size_reminders();
 
@@ -390,8 +339,6 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 						   RenderingDevice::get_singleton()->limit_get(RenderingDevice::LIMIT_MAX_TEXTURE_ARRAY_LAYERS))
 			);
 		}
-#else
-		// TODO GDX: Not possible to access the default `RenderingDevice` to query its limits
 #endif
 
 #ifdef VOXEL_GODOT
@@ -404,7 +351,6 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		// ClassDB::add_compatibility_class("VoxelInstanceLibraryItemBase", "VoxelInstanceLibraryItem");
 #endif
 		// Setup engine after classes are registered.
-		// This is necessary when using GDExtension because classes can't be instantiated until they are registered.
 
 		voxel::godot::StringNames::create_singleton();
 		VoxelMemoryPool::create_singleton();
@@ -447,85 +393,6 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
 		VoxelGraphEditorNodePreview::load_resources();
 
-#if defined(VOXEL_GODOT_EXTENSION)
-		// In GDExtension we have to explicitely register all classes deriving from Object even if they are not exposed
-
-		ClassDB::register_internal_class<VOXEL_EditorPlugin>();
-		ClassDB::register_internal_class<VOXEL_EditorImportPlugin>();
-		ClassDB::register_internal_class<VOXEL_EditorInspectorPlugin>();
-		ClassDB::register_internal_class<VOXEL_EditorProperty>();
-		ClassDB::register_internal_class<VOXEL_Axes3DControl>();
-		ClassDB::register_internal_class<VOXEL_ModelViewer>();
-		ClassDB::register_internal_class<VOXEL_EditorPropertyAABBMinMax>();
-		ClassDB::register_internal_class<VOXEL_EditorPropertyTextChangeOnSubmit>();
-		ClassDB::register_internal_class<VOXEL_ControlSizer>();
-
-		ClassDB::register_internal_class<VOXEL_FastNoiseLiteEditorPlugin>();
-		ClassDB::register_internal_class<VOXEL_FastNoiseLiteEditorInspectorPlugin>();
-		ClassDB::register_internal_class<VOXEL_FastNoiseLiteViewer>();
-		ClassDB::register_internal_class<VOXEL_ChartView>();
-		ClassDB::register_internal_class<VOXEL_NoiseAnalysisWindow>();
-
-		ClassDB::register_internal_class<VOXEL_SpotNoiseEditorPlugin>();
-		ClassDB::register_internal_class<VOXEL_SpotNoiseEditorInspectorPlugin>();
-		ClassDB::register_internal_class<VOXEL_SpotNoiseViewer>();
-
-		ClassDB::register_internal_class<VoxelAboutWindow>();
-		ClassDB::register_internal_class<VoxelTerrainEditorInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelTerrainEditorPlugin>();
-		ClassDB::register_internal_class<VoxelTerrainEditorTaskIndicator>();
-
-		ClassDB::register_internal_class<VoxelBlockyModelViewer>();
-		ClassDB::register_internal_class<VoxelBlockyLibraryEditorPlugin>();
-		ClassDB::register_internal_class<VoxelBlockyModelEditorInspectorPlugin>();
-
-		ClassDB::register_internal_class<VoxelBlockyTypeViewer>();
-		ClassDB::register_internal_class<VoxelBlockyTypeEditorInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelBlockyTypeLibraryIDSDialog>();
-		ClassDB::register_internal_class<VoxelBlockyTypeLibraryEditorInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelBlockyTypeAttributeCombinationSelector>();
-		ClassDB::register_internal_class<VoxelBlockyTypeVariantListEditor>();
-
-		ClassDB::register_internal_class<VoxelGraphEditorInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelGraphFunctionInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelGraphEditorNodePreview>();
-		ClassDB::register_internal_class<VoxelGraphEditorNode>();
-		ClassDB::register_internal_class<VoxelGraphEditor>();
-		ClassDB::register_internal_class<VoxelGraphEditorPlugin>();
-		ClassDB::register_internal_class<VoxelGraphEditorShaderDialog>();
-		ClassDB::register_internal_class<VoxelGraphEditorIODialog>();
-		ClassDB::register_internal_class<VoxelGraphNodeInspectorWrapper>();
-		ClassDB::register_internal_class<VoxelGraphNodeDialog>();
-		ClassDB::register_internal_class<VoxelRangeAnalysisDialog>();
-
-		ClassDB::register_internal_class<VoxelGeneratorMultipassEditorPlugin>();
-		ClassDB::register_internal_class<VoxelGeneratorMultipassEditorInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelGeneratorMultipassCacheViewer>();
-
-#ifdef VOXEL_ENABLE_MESH_SDF
-		ClassDB::register_internal_class<VoxelMeshSDFViewer>();
-		ClassDB::register_internal_class<VoxelMeshSDFEditorPlugin>();
-		ClassDB::register_internal_class<VoxelMeshSDFInspectorPlugin>();
-#endif
-
-#ifdef VOXEL_ENABLE_INSTANCER
-		ClassDB::register_internal_class<VoxelInstancerEditorPlugin>();
-		ClassDB::register_internal_class<VoxelInstancerStatView>();
-
-		ClassDB::register_internal_class<VoxelInstanceLibraryEditorPlugin>();
-		ClassDB::register_internal_class<VoxelInstanceLibraryInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelInstanceLibraryMultiMeshItemEditorPlugin>();
-		ClassDB::register_internal_class<VoxelInstanceLibraryMultiMeshItemInspectorPlugin>();
-		ClassDB::register_internal_class<VoxelInstanceLibraryListEditor>();
-#endif
-
-#ifdef VOXEL_ENABLE_VOX
-		ClassDB::register_internal_class<magica::VoxelVoxEditorPlugin>();
-		ClassDB::register_internal_class<magica::VoxelVoxMeshImporter>();
-		ClassDB::register_internal_class<magica::VoxelVoxSceneImporter>();
-#endif
-
-#endif // VOXEL_GODOT_EXTENSION
 
 		EditorPlugins::add_by_type<VoxelGraphEditorPlugin>();
 		EditorPlugins::add_by_type<VoxelTerrainEditorPlugin>();
@@ -616,21 +483,3 @@ void uninitialize_voxel_module(ModuleInitializationLevel p_level) {
 #endif // TOOLS_ENABLED
 }
 
-#ifdef VOXEL_GODOT_EXTENSION
-extern "C" {
-// Library entry point
-GDExtensionBool GDE_EXPORT voxel_library_init(
-		GDExtensionInterfaceGetProcAddress p_get_proc_address,
-		GDExtensionClassLibraryPtr p_library,
-		GDExtensionInitialization *r_initialization
-) {
-	godot::GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
-
-	init_obj.register_initializer(initialize_voxel_module);
-	init_obj.register_terminator(uninitialize_voxel_module);
-	init_obj.set_minimum_library_initialization_level(godot::MODULE_INITIALIZATION_LEVEL_SCENE);
-
-	return init_obj.init();
-}
-}
-#endif

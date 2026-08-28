@@ -151,12 +151,6 @@ PackedStringArray VoxelModifier::get_configuration_warnings() const {
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#elif defined(VOXEL_GODOT_EXTENSION)
-PackedStringArray VoxelModifier::_get_configuration_warnings() const {
-	PackedStringArray warnings;
-	get_configuration_warnings(warnings);
-	return warnings;
-}
 #endif
 
 void VoxelModifier::get_configuration_warnings(PackedStringArray &warnings) const {

@@ -11,7 +11,7 @@ STATUS = "release"
 import os
 
 
-def generate_version_header(is_module):
+def generate_version_header():
     # 生成 constants/version.gen.h 头文件。
     # 该头文件被 C++ 侧引用，用于在运行期暴露模块版本信息。
     git_hash = get_git_commit_hash()
@@ -21,7 +21,7 @@ def generate_version_header(is_module):
         "minor": MINOR,
         "patch": PATCH,
         "status": STATUS,
-        "edition": "Module" if is_module else "GDExtension",
+        "edition": "Module",
         "git_hash": git_hash
     }
 

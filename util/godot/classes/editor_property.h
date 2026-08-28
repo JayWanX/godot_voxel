@@ -11,9 +11,6 @@
 #include <editor/inspector/editor_inspector.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_property.hpp>
-using namespace godot;
 #endif
 
 #include "../../containers/span.h"
@@ -21,7 +18,7 @@ using namespace godot;
 namespace voxel::godot {
 
 // This obscure method is actually used to get the XYZW tinting colors for controls that expose coordinates.
-// In modules, this is `_get_property_colors`, but it is not exposed in GDExtension.
+// In modules, this is `_get_property_colors`.
 Span<const Color> editor_property_get_colors(EditorProperty &self);
 
 class VOXEL_EditorProperty : public EditorProperty {
@@ -29,14 +26,12 @@ class VOXEL_EditorProperty : public EditorProperty {
 public:
 #if defined(VOXEL_GODOT)
 	void update_property() override;
-#elif defined(VOXEL_GODOT_EXTENSION)
-	void _update_property() override;
 #endif
 
 #ifdef VOXEL_GODOT
 protected:
 #endif
-	// This method is protected in core, but public in GDExtension...
+	// This method is protected in core, but still overridable.
 	void _set_read_only(bool p_read_only) override;
 
 protected:
@@ -44,7 +39,6 @@ protected:
 	virtual void _voxel_set_read_only(bool p_read_only);
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods() {}
 };
 

@@ -21,31 +21,6 @@ void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r
 	r_result.resize(result.size());
 	memcpy(r_result.data(), result.ptr(), result.size() * sizeof(Vector2i));
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-
-	// PackedVector2iArray doesn't exist, so have to convert to float. Internally Godot allocates another array and
-	// converts back to ints. Then allocates another float array and converts results to floats, returns it, and then
-	// we finally convert back to ints... so much for not having added `PackedVector2iArray`.
-
-	PackedVector2Array sizes;
-	sizes.resize(p_sizes.size());
-	Vector2 *sizes_data = sizes.ptrw();
-	VOXEL_ASSERT_RETURN(sizes_data != nullptr);
-	for (unsigned int i = 0; i < p_sizes.size(); ++i) {
-		sizes_data[i] = p_sizes[i];
-	}
-
-	Dictionary result = Geometry2D::get_singleton()->make_atlas(sizes);
-	PackedVector2Array positions = result["points"];
-	r_size = result["size"];
-
-	r_result.resize(positions.size());
-	const Vector2 *positions_data = positions.ptr();
-	VOXEL_ASSERT_RETURN(positions_data != nullptr);
-	for (unsigned int i = 0; i < r_result.size(); ++i) {
-		r_result[i] = to_vec2i(positions_data[i]);
-	}
-
 #endif
 }
 
@@ -56,13 +31,6 @@ void geometry_2d_clip_polygons( //
 ) {
 #if defined(VOXEL_GODOT)
 	Vector<Vector<Vector2>> result = Geometry2D::clip_polygons(polygon_a, polygon_b);
-	output.resize(result.size());
-	for (unsigned int i = 0; i < output.size(); ++i) {
-		output[i] = result[i];
-	}
-
-#elif defined(VOXEL_GODOT_EXTENSION)
-	TypedArray<PackedVector2Array> result = Geometry2D::get_singleton()->clip_polygons(polygon_a, polygon_b);
 	output.resize(result.size());
 	for (unsigned int i = 0; i < output.size(); ++i) {
 		output[i] = result[i];

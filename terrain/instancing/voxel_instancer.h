@@ -65,7 +65,7 @@ public:
 	// I didn't want this enum to be here on the C++ side, because it prevents forward-declaring the class it is in.
 	// However Godot is forcing me to.
 	// `VARIANT_ENUM_CAST(ns1::ns2::Enum)` assumes the enum is in a class, so it generates its name as being `ns2.Enum`,
-	// which confuses docs and GDExtension dumps. There doesn't seem to be a way to register that enum as global either.
+	// which confuses docs. There doesn't seem to be a way to register that enum as global either.
 	using UpMode = voxel::UpMode;
 
 	VoxelInstancer();
@@ -165,8 +165,6 @@ public:
 #ifdef TOOLS_ENABLED
 #if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#elif defined(VOXEL_GODOT_EXTENSION)
-	PackedStringArray _get_configuration_warnings() const override;
 #endif
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif

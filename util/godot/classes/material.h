@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/resources/material.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/material.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

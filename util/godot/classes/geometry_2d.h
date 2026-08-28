@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/math/geometry_2d.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/geometry2d.hpp>
-using namespace godot;
 #endif
 
 #include "../../containers/span.h"

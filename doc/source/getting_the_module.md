@@ -1,18 +1,12 @@
 Getting Voxel Tools
 =====================
 
-This project exists in two editions:
-
-- [Module](#module): bundled as a custom build of Godot Engine and custom export templates. This is the primary way it was developped for a long time.
-- [GDExtension](#gdextension): a native add-on that can be added to your project, and will work with an official build of Godot (4.4.1 or later). This is more recent so it had less testing so far.
-
-Each one comes with its own advantages and drawbacks, but generally offer the same functionality.
-
+This project is a [Module](#module) that gets bundled into a custom build of Godot Engine and custom export templates.
 
 Module
 --------
 
-The following section applies if you use the Module edition of Voxel Tools.
+The following section applies to the Module edition of Voxel Tools.
 
 ### Precompiled builds
 
@@ -93,72 +87,6 @@ Once you have a template build, tell Godot to use it in the Export configuration
 ![Screenshot of Godot export configuration window with a custom template assigned for Windows](images/export_template_window.webp)
 
 
-GDExtension
--------------
-
-Godot 4 introduced [GDExtension](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/what_is_gdextension.html), a native API allowing C++ plugins to be added to a project without requiring a custom build of the engine.
-
-Voxel Tools can also compile as a GDExtension, although it is a recent addition, and has gone through less testing, so it might have bugs that are not present in the Module edition.
-
-### Differences
-
-Module and GDExtension editions aim to be compatible. However, there are a few important differences (list non exhaustive):
-
-- `FastNoise2` is not included
-- There are some technical drawbacks, some of which [are listed here](https://github.com/Voxel/godot_voxel/issues/442)
-
-
-### Release builds
-
-Plugin packages can be found in Releases: [https://github.com/Voxel/godot_voxel/releases](https://github.com/Voxel/godot_voxel/releases).
-They usually contain the word `GDExtension` in the title.
-
-The project follows a continuous development cycle, so "releases" are merely snapshots of development versions. Because Github requires an account to download latest development versions from Github Actions, releases are published for convenience.
-
-
-### Development builds
-
-There are development builds of the GDExtension available on [Github Actions](https://github.com/Voxel/godot_voxel/actions/workflows/extension_ci.yml) as we try to keep the module compiling with GodotCpp, however they lack testing and might crash. Use at your own risk.
-
-
-### Building yourself
-
-If the provided binaries don't include the platform or options you need, or if you need customizations, you can still make your own build.
-See [Development](development.md#gdextension)
-
-
-### Exporting
-
-Exporting your game with Godot's regular templates should work out of the box.
-
-You can check which platforms are provided by the extension in the config file at `addons/voxel/voxel.gdextension`:
-
-- Windows x86_64
-- Linux x86_64
-- Mac OS x86_64 (universal)
-- Mac OS arm64 (universal)
-- iOS arm64
-- Android x86_64
-- Android arm64
-
-If what you need is not in this list, you may try [Building yourself](development.md#gdextension).
-
-
-#### Stripping out icons
-
-Currently, editor icons have to be registered in the GDExtension config file and cannot be excluded with a `.gdignore` file. That means when you export your game, those icons will be needlessly included in your game.
-
-You can exclude the contents of the `addons/voxel/editor` folder in your export configurations.
-
-
-Switching between Module and GDExtension
-------------------------------------------
-
-If you start using GDExtension in a project that was using the Module edition, you should use an official version of Godot Engine, or one that does not include the module, otherwise classes will conflict.
-
-If you want to switch back to using the Module edition, you can remove all files related to GDExtension in `addons/voxel/` and then start the editor. Alternatively, you can also change the file extension of `addons/voxel/voxel.gdextension` so that Godot no longer detects it.
-
-
 C# support
 --------------
 
@@ -182,7 +110,7 @@ Voxel Tools does some sanity checks when running some virtual methods, such as c
 You may turn off those checks in Project Settings: `voxel/ownership_checks`
 
 
-### GDExtension and `C#`
+### C# and module-defined classes
 
 C# support of extensions implemented in C++ is not well defined at the moment.
 

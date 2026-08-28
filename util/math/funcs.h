@@ -5,9 +5,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/math/math_funcs.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/core/math.hpp>
-using namespace godot;
 #endif
 
 #include "constants.h"

@@ -20,17 +20,6 @@ void get_shader_parameter_list(const RID &shader_rid, StdVector<ShaderParameterI
 		out_parameters.push_back(pi);
 	}
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	const Array properties = RenderingServer::get_singleton()->get_shader_parameter_list(shader_rid);
-	const String type_key = "type";
-	const String name_key = "name";
-	for (int i = 0; i < properties.size(); ++i) {
-		Dictionary d = properties[i];
-		ShaderParameterInfo pi;
-		pi.type = Variant::Type(int(d[type_key]));
-		pi.name = d[name_key];
-		out_parameters.push_back(pi);
-	}
 #endif
 }
 
@@ -51,9 +40,6 @@ String get_current_rendering_method_name() {
 	VOXEL_ASSERT_RETURN_V(os != nullptr, "");
 	return os->get_current_rendering_method();
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	VOXEL_PRINT_WARNING("Unable to get current rendering method, Godot doesn't expose it.");
-	return "";
 #endif
 
 #endif
@@ -93,9 +79,6 @@ String get_current_rendering_driver_name() {
 	VOXEL_ASSERT_RETURN_V(os != nullptr, "");
 	return os->get_current_rendering_driver_name();
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	VOXEL_PRINT_WARNING("Unable to get current rendering driver name, Godot doesn't expose it.");
-	return "";
 #endif
 
 #endif

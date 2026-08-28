@@ -3,8 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/os/memory.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/core/memory.hpp>
 #endif
 
 #include <memory>

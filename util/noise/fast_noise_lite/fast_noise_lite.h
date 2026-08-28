@@ -19,17 +19,13 @@ namespace voxel {
 // - `real_t` is used everywhere, instead of just coordinates. That means builds with `float=64` might be slower,
 //   especially in cases where such precision isn't necessary *for the use case of noise generation*.
 //
-// - Using it from a GDExtension has a lot more indirection and so will be much slower than a local implementation that
-//   can benefit from inlining. That could be solved with `get_noise_series(Vector3 *positions, float *noises)`, but no
-//   conventional Godot API allow to implement such a pattern without performance impact.
-//
 // - Domain warp is not exposed as its own thing, so can't generate from (x,y,z) coordinates in a single call
 //
 // - The internal instance of the FastNoiseLite object is not accessible, and it doesn't have the access changes present
 //   in the module's version, so it is not possible to do range analysis more precisely. This is important for
 //   `VoxelGeneratorGraph`.
 //
-// - Does not use GDVirtual, so it can only be extended by modules, and cannot be extended with GDExtensions
+// - Does not use `GDVirtual`, so it cannot be extended by scripts.
 //
 class VOXEL_FastNoiseLite : public Resource {
 	GDCLASS(VOXEL_FastNoiseLite, Resource)

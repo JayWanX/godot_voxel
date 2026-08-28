@@ -1,4 +1,4 @@
-#ifndef VOXEL_MESHER_CUBES_H
+#if !defined(VOXEL_MESHER_CUBES_H)
 #define VOXEL_MESHER_CUBES_H
 
 #include "../../util/math/vector2f.h"
@@ -51,13 +51,9 @@ public:
 	void set_palette(Ref<VoxelColorPalette> palette);
 	Ref<VoxelColorPalette> get_palette() const;
 
-	// TODO GDX: Resource::duplicate() cannot be overriden (while it can in modules).
+	// TODO: Resource::duplicate() cannot be overriden.
 	// This will lead to performance degradation and maybe unexpected behavior
-	// #if defined(VOXEL_GODOT)
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
-	// #elif defined(VOXEL_GODOT_EXTENSION)
-	// 	Ref<Resource> duplicate(bool p_subresources = false) const;
-	// #endif
 
 	int get_used_channels_mask() const override;
 

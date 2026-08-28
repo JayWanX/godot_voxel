@@ -7,7 +7,7 @@
 namespace voxel {
 
 // Copied from Godot core.
-// TODO GodotCpp now has these functions too, include instead? Or keep using our own custom set?
+// TODO Godot 核心已提供类似函数，考虑替换或保留自定义实现
 
 inline uint32_t hash_djb2_one_32(uint32_t p_in, uint32_t p_prev = 5381) {
 	return ((p_prev << 5) + p_prev) ^ p_in;

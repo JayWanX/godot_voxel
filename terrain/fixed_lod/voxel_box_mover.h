@@ -47,9 +47,6 @@ public:
 private:
 #if defined(VOXEL_GODOT)
 	Vector3 _b_get_motion(Vector3 p_pos, Vector3 p_motion, AABB p_aabb, Node *p_terrain_node);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	// TODO GDX: it seems binding a method taking a `Node*` fails to compile. It is supposed to be working.
-	Vector3 _b_get_motion(Vector3 p_pos, Vector3 p_motion, AABB p_aabb, Object *p_terrain_node);
 #endif
 
 	bool _b_intersects(AABB p_aabb, Object *p_terrain_node) const;

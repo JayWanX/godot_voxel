@@ -17,10 +17,6 @@ using RenderingServerEnums = RenderingServer;
 #include <servers/rendering/rendering_server_enums.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/rendering_server.hpp>
-using namespace godot;
-using RenderingServerEnums = RenderingServer;
 #endif
 
 #include "../../containers/std_vector.h"
@@ -38,8 +34,6 @@ inline void free_rendering_server_rid(RenderingServer &rs, const RID &rid) {
 	rs.free_rid(rid);
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	rs.free_rid(rid);
 #endif
 }
 

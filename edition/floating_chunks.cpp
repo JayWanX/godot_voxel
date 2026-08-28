@@ -339,7 +339,7 @@ Array separate_floating_chunks(
 	//
 	// Since 7dbc458bb4f3e0cc94e5070bd33bde41d214c98d it's no longer possible to quickly check if a
 	// shader has a uniform by name using Shader's parameter cache. Now it seems the only way is to get the whole list
-	// of parameters and find into it, which is slow, tedious to write and different between modules and GDExtension.
+	// of parameters and find into it, which is slow and tedious to write.
 
 	uint32_t materials_to_instance_mask = 0;
 	{

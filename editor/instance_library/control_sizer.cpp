@@ -20,8 +20,6 @@ void VOXEL_ControlSizer::set_target_control(Control *control) {
 
 #ifdef VOXEL_GODOT
 void VOXEL_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VOXEL_ControlSizer::_gui_input(const Ref<InputEvent> &p_event) {
 #endif
 
 	Ref<InputEventMouseButton> mb = p_event;
@@ -85,7 +83,7 @@ void VOXEL_ControlSizer::_notification(int p_what) {
 }
 
 void VOXEL_ControlSizer::cache_theme() {
-	// TODO I'd like to cache this, but `BIND_THEME_ITEM_CUSTOM` is not exposed to GDExtension...
+	// TODO I'd like to cache this theme icon lookup.
 	// TODO Have a framework-level StringName cache singleton
 	_hover_icon = get_theme_icon("v_grabber", "SplitContainer");
 }

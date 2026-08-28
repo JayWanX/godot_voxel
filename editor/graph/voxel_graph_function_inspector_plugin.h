@@ -21,7 +21,6 @@ public:
 private:
 	void _on_edit_io_button_pressed(Ref<pg::VoxelGraphFunction> graph);
 
-	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods();
 
 	VoxelGraphEditorPlugin *_listener = nullptr;

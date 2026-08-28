@@ -3,8 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/variant/typed_array.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/variant/typed_array.hpp>
 #endif
 
 #include "../../containers/span.h"

@@ -14,8 +14,6 @@
 #include <core/object/gdvirtual.gen.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/core/gdvirtual.gen.inc>
 #endif
 
 #endif // VOXEL_GODOT_GDVIRTUAL_H

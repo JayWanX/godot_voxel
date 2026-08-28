@@ -176,7 +176,6 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 	add_child(_function_file_dialog);
 
 	// TODO Replace QuickOpen with listing of project functions directly in the dialog
-	// TODO GDX: EditorQuickOpen is not exposed to extensions
 #ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
 	_function_quick_open_dialog = memnew(EditorQuickOpen);
@@ -224,7 +223,6 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 				item.id = ID_FUNCTION_BROWSE;
 				_items.push_back(item);
 			}
-			// TODO GDX: EditorQuickOpen is not exposed to extensions
 #ifdef VOXEL_GODOT
 			{
 				Item item;
@@ -342,11 +340,8 @@ void VoxelGraphNodeDialog::on_filter_text_changed(String new_text) {
 void VoxelGraphNodeDialog::on_filter_gui_input(Ref<InputEvent> event) {
 	Ref<InputEventKey> key_event = event;
 	if (key_event.is_valid()) {
-		// TODO GDX: `Control::gui_input()` is not exposed to GDExtension, can't forward events.
-		// This is what `VisualShaderEditor::_sbox_input` does.
-		// `_gui_input` is exposed, but that's only for user implementation, not for calling directly...
-		// Also `gui_input` is a name already taken in GDScript, so if it gets exposed some day, it will need a
-		// different name.
+		// Can't call `gui_input()` directly to forward events, so handle keys manually
+		// (as `VisualShaderEditor::_sbox_input` does).
 		//
 		// _tree->gui_input(key_event);
 

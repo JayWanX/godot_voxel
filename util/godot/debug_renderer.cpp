@@ -25,7 +25,7 @@ Ref<Mesh> create_debug_wirecube(Color color) {
 	copy_to(positions, Span<const Vector3>(positions_raw, 8));
 
 	PackedColorArray colors;
-	// Not pre-resizing because writing to arrays have different syntax between Godot modules and GodotCpp.
+	// 不预先调整数组大小，改为逐项追加写入。
 	for (int i = 0; i < positions.size(); ++i) {
 		colors.push_back(color);
 	}

@@ -3,10 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/string/ustring.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/global_constants.hpp> // For `Error`
-#include <godot_cpp/variant/string.hpp>
-using namespace godot;
 #endif
 
 #include "../../string/std_string.h"
@@ -52,7 +48,6 @@ String join_comma_separated(Span<const T> items) {
 
 #endif
 
-// Exists in core but isn't exposed to GDExtension
 inline bool is_resource_file(const String &path) {
 	return path.begins_with("res://") && path.find("::") == -1;
 }
@@ -70,10 +65,6 @@ inline Error parse_utf8(String &s, Span<const char> utf8) {
 #else
 	return s.parse_utf8(utf8.data(), utf8.size());
 #endif
-#elif defined(VOXEL_GODOT_EXTENSION)
-	s.parse_utf8(utf8.data(), utf8.size());
-	// The Godot API doesn't return anything, impossible to tell if parsing succeeded.
-	return OK;
 #endif
 }
 
@@ -86,7 +77,6 @@ inline String ptr2s(const void *p) {
 // `TTR` means "tools translate", which is for editor-only localized messages.
 // Godot does not define the TTR macro for translation of messages in release builds. However, there are some non-editor
 // code that can produce errors in this module, and we still want them to compile properly.
-// TODO GDX: `TTR` is missing from `GodotCpp`.
 #if defined(VOXEL_GODOT) && defined(TOOLS_ENABLED)
 #define VOXEL_TTR(msg) TTR(msg)
 #else

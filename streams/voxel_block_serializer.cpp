@@ -8,7 +8,7 @@
 #include "../util/profiling.h"
 #include "../util/string/format.h"
 
-#if defined(VOXEL_GODOT) || defined(VOXEL_GODOT_EXTENSION)
+#if defined(VOXEL_GODOT)
 #include "../storage/metadata/voxel_metadata_factory.h"
 #include "../storage/metadata/voxel_metadata_variant.h"
 #endif
@@ -385,7 +385,7 @@ namespace legacy {
 bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 	// In v3, metadata was always a Godot Variant. In v4, metadata uses an independent format.
 
-#if defined(VOXEL_GODOT) || defined(VOXEL_GODOT_EXTENSION)
+#if defined(VOXEL_GODOT)
 
 	// Constants used at the time of this version
 	const unsigned int channel_count = 8;
@@ -476,10 +476,6 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 			VOXEL_ASSERT_RETURN_V(L::convert_metadata_item(mr, mw), false);
 		}
 	}
-
-#else
-	VOXEL_PRINT_ERROR("Cannot migrate block from v3 to v4, Godot Engine is required");
-	return false;
 
 #endif
 	return true;

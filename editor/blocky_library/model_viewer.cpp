@@ -65,8 +65,6 @@ Node *VOXEL_ModelViewer::get_viewer_root_node() const {
 
 #if defined(VOXEL_GODOT)
 void VOXEL_ModelViewer::gui_input(const Ref<InputEvent> &p_event) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VOXEL_ModelViewer::_gui_input(const Ref<InputEvent> &p_event) {
 #endif
 	Ref<InputEventMouseMotion> mm = p_event;
 	if (mm.is_valid()) {

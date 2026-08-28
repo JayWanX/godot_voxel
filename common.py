@@ -1,7 +1,7 @@
 import glob
 
 
-def register_scons_options(env, is_extension):
+def register_scons_options(env):
     from SCons.Script import BoolVariable, Variables, Help
 
     env_vars = Variables()
@@ -18,19 +18,17 @@ def register_scons_options(env, is_extension):
     env_vars.Add(BoolVariable("voxel_mesh_sdf", "Build with mesh voxelization support", True))
     env_vars.Add(BoolVariable("voxel_vox", "Build with support for loading .vox files", True))
     
-    if not is_extension:
-        env_vars.Add(BoolVariable("tracy", "Build with enabled Tracy Profiler integration", False))
-        env_vars.Add(BoolVariable("voxel_fast_noise_2", "Build FastNoise2 support (x86-only)", True))
-        env_vars.Add(BoolVariable("voxel_werror", "Explicitely enable warninngs as errors for module code only", False))
+    env_vars.Add(BoolVariable("tracy", "Build with enabled Tracy Profiler integration", False))
+    env_vars.Add(BoolVariable("voxel_fast_noise_2", "Build FastNoise2 support (x86-only)", True))
+    env_vars.Add(BoolVariable("voxel_werror", "Explicitely enable warninngs as errors for module code only", False))
 
     env_vars.Update(env)
 
     Help(env_vars.GenerateHelpText(env))
 
 
-# Gets sources and configurations that are common to compiling as a module and an extension.
+# Gets sources and configurations that are common to building this module.
 # For module-specific configuration, see `SCsub`.
-# For extension-specific configuration, see `SConstruct`.
 def get_sources(env, is_editor_build):
     env.Append(CPPPATH=["."])
 

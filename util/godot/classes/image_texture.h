@@ -10,9 +10,6 @@
 #include <scene/resources/image_texture.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/image_texture.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_IMAGE_TEXTURE_H

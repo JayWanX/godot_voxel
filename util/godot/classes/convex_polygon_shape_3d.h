@@ -10,9 +10,6 @@
 #include <scene/resources/3d/convex_polygon_shape_3d.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/convex_polygon_shape3d.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_CONVEX_POLYGON_SHAPE_3D_H

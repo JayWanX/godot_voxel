@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/os/os.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/os.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {
@@ -19,8 +16,6 @@ inline PackedStringArray get_command_line_arguments() {
 	}
 	return args;
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return OS::get_singleton()->get_cmdline_args();
 #endif
 }
 

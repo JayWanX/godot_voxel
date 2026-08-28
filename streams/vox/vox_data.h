@@ -10,9 +10,6 @@
 #include "../../util/math/vector3i.h"
 #include "../../util/memory/memory.h"
 
-#if defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/global_constants.hpp> // For `Error`
-#endif
 
 namespace voxel::magica {
 

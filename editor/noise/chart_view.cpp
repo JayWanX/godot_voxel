@@ -98,7 +98,7 @@ void VOXEL_ChartView::on_draw() {
 	if (_visual_points.size() != _points.size()) {
 		_visual_points.resize(_points.size());
 	}
-	// Note, writing to an index has different syntax between Godot core and GDExtensions
+	// Write through a Span to the underlying packed array.
 	Span<Vector2> visual_points = to_span(_visual_points);
 	for (int i = 0; i < _points.size(); ++i) {
 		visual_points[i] = m.xform(_points[i]);

@@ -37,8 +37,6 @@ unsigned int float_to_string_null_terminated(const TFloat x, Span<char> s, const
 
 template <typename TFloat>
 unsigned int float_to_string(const TFloat x, Span<char> s, const unsigned int precision) {
-	// This fails to compile on iOS GDExtension prior to 16.3, apparently float versions of `to_chars` aren't supported.
-	//
 	// char *begin = s.data();
 	// char *end = s.data() + s.size();
 	// const std::to_chars_result res = std::to_chars(begin, end, x, std::chars_format::general);

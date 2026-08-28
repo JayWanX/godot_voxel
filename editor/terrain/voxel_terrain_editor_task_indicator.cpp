@@ -73,9 +73,7 @@ void VoxelTerrainEditorTaskIndicator::create_stat(StatID id, String short_name, 
 
 namespace {
 
-// TODO Optimize: these String formatting functions are extremely slow in GDExtension, due to indirection costs,
-// extra calls and unnecessary allocations caused by workarounds for missing APIs. It would just be more portable to
-// format a local `std::string` and convert to `String` at the end.
+// TODO Optimize: format a local `std::string` and convert to `String` at the end to reduce allocations.
 
 String with_commas(int64_t n) {
 	String res = "";

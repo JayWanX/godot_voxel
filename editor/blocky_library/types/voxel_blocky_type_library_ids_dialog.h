@@ -16,7 +16,6 @@ public:
 	void set_library(Ref<VoxelBlockyTypeLibrary> library);
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` isn't optional.
 	static void _bind_methods() {}
 
 	// Ref<VoxelBlockyTypeLibrary> _library;

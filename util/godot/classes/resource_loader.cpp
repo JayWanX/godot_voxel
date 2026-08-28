@@ -13,16 +13,12 @@ PackedStringArray get_recognized_extensions_for_type(const String &type_name) {
 	}
 	return extensions_array;
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return ResourceLoader::get_singleton()->get_recognized_extensions_for_type(type_name);
 #endif
 }
 
 Ref<Resource> load_resource(const String &path) {
 #if defined(VOXEL_GODOT)
 	return ResourceLoader::load(path);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return ResourceLoader::get_singleton()->load(path);
 #endif
 }
 

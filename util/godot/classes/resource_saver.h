@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/io/resource_saver.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/resource_saver.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {
@@ -14,8 +11,6 @@ inline Error save_resource(const Ref<Resource> &resource, const String &path = "
 		ResourceSaver::SaverFlags flags = ResourceSaver::FLAG_NONE) {
 #if defined(VOXEL_GODOT)
 	return ResourceSaver::save(resource, path, flags);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return ResourceSaver::get_singleton()->save(resource, path, flags);
 #endif
 }
 

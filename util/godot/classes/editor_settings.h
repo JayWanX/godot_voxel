@@ -11,9 +11,6 @@
 #include <editor/settings/editor_settings.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_settings.hpp>
-using namespace godot;
 #endif
 
 #include "shortcut.h"

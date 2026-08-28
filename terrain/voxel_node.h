@@ -66,8 +66,6 @@ public:
 #ifdef TOOLS_ENABLED
 #if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#elif defined(VOXEL_GODOT_EXTENSION)
-	PackedStringArray _get_configuration_warnings() const override;
 #endif
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif

@@ -96,8 +96,6 @@ void VOXEL_FastNoiseLiteViewer::update_context_menu() {
 
 #ifdef VOXEL_GODOT
 void VOXEL_FastNoiseLiteViewer::gui_input(const Ref<InputEvent> &p_event) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VOXEL_FastNoiseLiteViewer::_gui_input(const Ref<InputEvent> &p_event) {
 #endif
 	if (_context_menu == nullptr) {
 		return;

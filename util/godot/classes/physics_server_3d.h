@@ -17,12 +17,6 @@
 using PhysicsServer3DEnums = PhysicsServer3D;
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-
-#include <godot_cpp/classes/physics_server3d.hpp>
-using namespace godot;
-using PhysicsServer3DEnums = godot::PhysicsServer3D;
-
 #endif
 
 namespace voxel::godot {
@@ -35,8 +29,6 @@ inline void free_physics_server_rid(PhysicsServer3D &ps, const RID &rid) {
 	ps.free_rid(rid);
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	ps.free_rid(rid);
 #endif
 }
 

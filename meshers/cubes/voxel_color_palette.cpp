@@ -27,8 +27,7 @@ Color VoxelColorPalette::get_color(int index) const {
 
 PackedColorArray VoxelColorPalette::get_colors() const {
 	PackedColorArray dst;
-	// Not resizing up-front to make code portable, because in GDExtension writing to packed arrays has different
-	// syntax.
+	// Not resizing up-front.
 	for (unsigned int i = 0; i < _colors.size(); ++i) {
 		dst.push_back(_colors[i]);
 	}
@@ -51,8 +50,7 @@ void VoxelColorPalette::clear() {
 
 PackedInt32Array VoxelColorPalette::_b_get_data() const {
 	PackedInt32Array colors;
-	// Not resizing up-front to make code portable, because in GDExtension writing to packed arrays has different
-	// syntax.
+	// Not resizing up-front.
 	for (size_t i = 0; i < _colors.size(); ++i) {
 		colors.push_back(_colors[i].to_u32());
 	}

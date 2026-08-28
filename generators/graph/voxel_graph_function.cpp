@@ -2,7 +2,7 @@
 #include "../../constants/voxel_string_names.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/godot/classes/object.h"
-#include "../../util/godot/core/array.h" // for `varray` in GDExtension builds
+#include "../../util/godot/core/array.h" // for `varray`
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
@@ -831,8 +831,7 @@ PackedInt32Array VoxelGraphFunction::get_node_ids() const {
 	PackedInt32Array ids;
 	{
 		_graph.for_each_node_id([&ids](int id) {
-			// Not resizing up-front, because the code to assign elements is different between Godot modules and
-			// GDExtension
+			// Not resizing up-front.
 			ids.append(id);
 		});
 	}
@@ -1132,7 +1131,6 @@ bool load_graph_from_variant_data(ProgramGraph &graph, Dictionary data, String r
 	Array connections_data = data["connections"];
 	const NodeTypeDB &type_db = NodeTypeDB::get_singleton();
 
-	// Can't iterate using `next()`, because in GDExtension, there doesn't seem to be a way to do so.
 	const Array nodes_data_keys = nodes_data.keys();
 
 	for (int nodes_data_key_index = 0; nodes_data_key_index < nodes_data_keys.size(); ++nodes_data_key_index) {
@@ -1191,7 +1189,6 @@ bool load_graph_from_variant_data(ProgramGraph &graph, Dictionary data, String r
 			node->autoconnect_default_inputs = auto_connect_v;
 		}
 
-		// Can't iterate using `next()`, because in GDExtension, there doesn't seem to be a way to do so.
 		const Array node_data_keys = node_data.keys();
 
 		for (int node_data_key_index = 0; node_data_key_index < node_data_keys.size(); ++node_data_key_index) {

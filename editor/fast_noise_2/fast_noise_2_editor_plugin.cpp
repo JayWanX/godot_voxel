@@ -173,8 +173,7 @@ private:
 
 FastNoise2EditorPlugin::FastNoise2EditorPlugin() {}
 
-// TODO GDX: Can't initialize EditorPlugins in their constructor when they access EditorNode.
-// See https://github.com/godotengine/godot-cpp/issues/1179
+// EditorNode isn't ready during plugin construction, so defer work to `init()`.
 void FastNoise2EditorPlugin::init() {
 	Control *base_control = get_editor_interface()->get_base_control();
 

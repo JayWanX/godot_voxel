@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <servers/rendering/rendering_device.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/rendering_device.hpp>
-using namespace godot;
 #endif
 
 #include "../macros.h"
@@ -17,8 +14,7 @@ namespace voxel::godot {
 
 void free_rendering_device_rid(RenderingDevice &rd, RID rid);
 
-// TODO GDX: For some reason, the API exposed to scripts and extensions is not exposed to modules...
-// This forces me to copy implementations to keep my code the same in both module and extension targets
+// The script-facing RenderingDevice API differs from the module one, so reimplement here.
 
 Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShaderSource &p_source, bool p_allow_cache);
 PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSPIRV &p_spirv, String name = "");

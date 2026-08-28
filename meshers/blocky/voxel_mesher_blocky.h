@@ -1,4 +1,4 @@
-#ifndef VOXEL_MESHER_BLOCKY_H
+#if !defined(VOXEL_MESHER_BLOCKY_H)
 #define VOXEL_MESHER_BLOCKY_H
 
 #include "../../util/godot/classes/mesh.h"
@@ -57,15 +57,11 @@ public:
 
 	void build(VoxelMesher::Output &output, const VoxelMesher::Input &input) override;
 
-	// TODO GDX: Resource::duplicate() cannot be overriden (while it can in modules).
+	// TODO: Resource::duplicate() cannot be overriden.
 	// This will lead to performance degradation and maybe unexpected behavior.
 	// The way it works has also changed in Godot 4.5 so I gave up trying to implement it.
 	//
-	// #if defined(VOXEL_GODOT)
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
-	// #elif defined(VOXEL_GODOT_EXTENSION)
-	// 	Ref<Resource> duplicate(bool p_subresources = false) const;
-	// #endif
 
 	int get_used_channels_mask() const override;
 
@@ -96,7 +92,7 @@ public:
 		}
 	};
 
-#ifdef TOOLS_ENABLED
+#if defined(TOOLS_ENABLED)
 	void get_configuration_warnings(PackedStringArray &out_warnings) const override;
 #endif
 

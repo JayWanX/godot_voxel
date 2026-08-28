@@ -23,7 +23,6 @@ protected:
 			const bool p_wide) override;
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` isn't optional.
 	static void _bind_methods() {}
 
 	EditorInterface *_editor_interface = nullptr;

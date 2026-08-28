@@ -27,7 +27,7 @@
 /* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
-// Voxel: added the `godot` namespace, adapted so it can compile with GodotCpp
+// 添加 godot 命名空间封装，以适配模块构建
 
 #ifndef VOXEL_RANDOM_PCG_H
 #define VOXEL_RANDOM_PCG_H

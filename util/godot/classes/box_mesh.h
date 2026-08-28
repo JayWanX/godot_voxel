@@ -10,9 +10,6 @@
 #include <scene/resources/3d/primitive_meshes.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/box_mesh.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_BOX_MESH_H

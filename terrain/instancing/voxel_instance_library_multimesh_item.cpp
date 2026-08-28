@@ -327,7 +327,6 @@ void VoxelInstanceLibraryMultiMeshItem::_get_property_list(List<PropertyInfo> *p
 
 bool VoxelInstanceLibraryMultiMeshItem::_get(const StringName &p_name, Variant &r_ret) const {
 	if (_scene.is_valid()) {
-		// TODO GDX: GDExtension does not have `StringName::operator==(const char*)`
 		const String property_name = p_name;
 
 		if (property_name == "scene_mesh") {
@@ -471,9 +470,6 @@ bool setup_from_template(Node *root, VoxelInstanceLibraryMultiMeshItem::Settings
 
 #if defined(VOXEL_GODOT)
 void VoxelInstanceLibraryMultiMeshItem::setup_from_template(Node *root) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VoxelInstanceLibraryMultiMeshItem::setup_from_template(Object *root_o) {
-	Node *root = Object::cast_to<Node>(root_o);
 #endif
 	ERR_FAIL_COND(!voxel::setup_from_template(root, _manual_settings));
 	notify_listeners(IInstanceLibraryItemListener::CHANGE_VISUAL);

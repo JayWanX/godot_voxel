@@ -54,7 +54,7 @@ public:
 	StringName _voxel_debug_vt_position;
 #endif
 
-	// These are usually in CoreStringNames, but when compiling as a GDExtension, we don't have access to them
+	// Redeclared rather than referencing CoreStringNames for consistency.
 	StringName changed;
 	StringName frame_post_draw;
 

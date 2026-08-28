@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/io/dir_access.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/dir_access.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

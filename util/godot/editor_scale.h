@@ -11,11 +11,6 @@
 #include <editor/themes/editor_scale.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#define EDSCALE voxel::get_editor_scale()
-namespace voxel {
-float get_editor_scale();
-}
 #endif
 
 #endif // VOXEL_GODOT_EDITOR_SCALE_H

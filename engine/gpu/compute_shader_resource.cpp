@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/rd_texture_format.h"
 #include "../../util/godot/classes/rd_texture_view.h"
 #include "../../util/godot/classes/rendering_device.h"
-#include "../../util/godot/core/array.h" // for `varray` in GDExtension builds
+#include "../../util/godot/core/array.h" // for `varray`
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 #include "../voxel_engine.h"
@@ -126,7 +126,6 @@ void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const
 	data_array.append(image.get_data());
 
 	rid = voxel::godot::texture_create(rd, **texture_format, **texture_view, data_array);
-	// RID::is_null() is not available in GDExtension
 	ERR_FAIL_COND_MSG(!rid.is_valid(), "Failed to create texture");
 }
 

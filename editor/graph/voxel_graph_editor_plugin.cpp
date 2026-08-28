@@ -30,8 +30,7 @@ using namespace voxel::godot;
 
 VoxelGraphEditorPlugin::VoxelGraphEditorPlugin() {}
 
-// TODO GDX: Can't initialize EditorPlugins in their constructor when they access EditorNode.
-// See https://github.com/godotengine/godot-cpp/issues/1179
+// EditorNode isn't ready during plugin construction, so defer work to `init()`.
 void VoxelGraphEditorPlugin::init() {
 	// EditorInterface *ed = get_editor_interface();
 	_graph_editor = memnew(VoxelGraphEditor);

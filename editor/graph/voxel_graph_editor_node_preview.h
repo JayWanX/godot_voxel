@@ -46,7 +46,6 @@ public:
 private:
 	static const int RESOLUTION = 128;
 
-	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods() {}
 
 	TextureRect *_texture_rect = nullptr;

@@ -21,7 +21,7 @@ bool is_mesh_empty(Span<const Array> surfaces) {
 }
 
 void scale_vec3_array(PackedVector3Array &array, float scale) {
-	// Getting raw pointer because between GDExtension and modules, syntax and performance of operator[] differs.
+	// Getting raw pointer for performance.
 	Vector3 *array_data = array.ptrw();
 	const int count = array.size();
 	for (int i = 0; i < count; ++i) {
@@ -30,7 +30,7 @@ void scale_vec3_array(PackedVector3Array &array, float scale) {
 }
 
 void offset_vec3_array(PackedVector3Array &array, Vector3 offset) {
-	// Getting raw pointer because between GDExtension and modules, syntax and performance of operator[] differs.
+	// Getting raw pointer for performance.
 	Vector3 *array_data = array.ptrw();
 	const int count = array.size();
 	for (int i = 0; i < count; ++i) {

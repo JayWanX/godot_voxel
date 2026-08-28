@@ -10,9 +10,6 @@
 #include <servers/display/display_server.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/display_server.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_DISPLAY_SERVER_H

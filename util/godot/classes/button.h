@@ -4,9 +4,6 @@
 #if defined(VOXEL_GODOT)
 #include <core/version.h>
 #include <scene/gui/button.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/button.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {
@@ -20,8 +17,6 @@ inline void set_button_icon(Button &button, Ref<Texture2D> icon) {
 	button.set_button_icon(icon);
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	button.set_button_icon(icon);
 #endif
 }
 

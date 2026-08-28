@@ -45,29 +45,6 @@ void get_graph_edit_connections(const GraphEdit &self, StdVector<GraphEditConnec
 	}
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	Array list = self.get_connection_list();
-	const int count = list.size();
-
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 1
-	const String from_key = "from";
-	const String to_key = "to";
-#else
-	const String from_key = "from_node";
-	const String to_key = "to_node";
-#endif
-	const String from_port_key = "from_port";
-	const String to_port_key = "to_port";
-
-	for (int i = 0; i < count; ++i) {
-		Dictionary d = list[i];
-		GraphEditConnection con;
-		con.from = d[from_key];
-		con.from_port = d[from_port_key];
-		con.to = d[to_key];
-		con.to_port = d[to_port_key];
-		out_connections.push_back(con);
-	}
 #endif
 }
 
@@ -116,18 +93,6 @@ GraphEditConnection get_graph_edit_closest_connection_at_point(
 	connection.from_port = gd_connection->from_port;
 	connection.to = gd_connection->to_node;
 	connection.to_port = gd_connection->to_port;
-	return connection;
-
-#elif defined(VOXEL_GODOT_EXTENSION)
-	const Dictionary gd_connection = self.get_closest_connection_at_point(point, max_distance);
-	if (gd_connection.is_empty()) {
-		return GraphEditConnection();
-	}
-	GraphEditConnection connection;
-	connection.from = gd_connection["from_node"];
-	connection.from_port = gd_connection["from_port"];
-	connection.to = gd_connection["to_node"];
-	connection.to_port = gd_connection["to_port"];
 	return connection;
 
 #endif

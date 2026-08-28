@@ -16,8 +16,6 @@ public:
 
 #ifdef VOXEL_GODOT
 	void gui_input(const Ref<InputEvent> &p_event) override;
-#elif defined(VOXEL_GODOT_EXTENSION)
-	void _gui_input(const Ref<InputEvent> &p_event) override;
 #endif
 
 private:

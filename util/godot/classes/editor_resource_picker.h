@@ -11,9 +11,6 @@
 #include <editor/inspector/editor_resource_picker.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_resource_picker.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_EDITOR_RESOURCE_PICKER_H

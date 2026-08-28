@@ -26,8 +26,6 @@ namespace voxel {
 
 VoxelTerrainEditorPlugin::VoxelTerrainEditorPlugin() {}
 
-// TODO GDX: Can't initialize EditorPlugins in their constructor when they access EditorNode.
-// See https://github.com/godotengine/godot-cpp/issues/1179
 void VoxelTerrainEditorPlugin::init() {
 	MenuButton *menu_button = memnew(MenuButton);
 	menu_button->set_text(VOXEL_TTR("Terrain"));

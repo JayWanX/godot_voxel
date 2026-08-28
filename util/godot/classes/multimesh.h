@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/resources/multimesh.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/multi_mesh.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

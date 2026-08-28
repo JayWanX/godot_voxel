@@ -19,12 +19,6 @@ void VOXEL_EditorProperty::update_property() {
 	_voxel_update_property();
 }
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-
-void VOXEL_EditorProperty::_update_property() {
-	_voxel_update_property();
-}
-
 #endif
 
 void VOXEL_EditorProperty::_set_read_only(bool p_read_only) {

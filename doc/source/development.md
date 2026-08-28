@@ -7,7 +7,7 @@ It may be useful if you want to contribute, or write custom C++ code for your ga
 The source code can be found on [Github](https://github.com/Voxel/godot_voxel).
 
 !!! note
-    While this project can compile both as a module or an extension, this documentation mainly refers to module development. The project is primarily worked on as a module, and GDExtension is a more recent addition. It may have some specific differences, but overall most things work the same.
+    This documentation refers to module development. The project is primarily worked on as a module.
 
 
 Building
@@ -48,35 +48,6 @@ If you cloned Godot and Voxel Tools, you can use git to update your local code.
 !!! note
 	Since you are pulling from two projects developped by different people, it's probable that on occasion your build won't compile, your project won't open, or your Voxel Tools won't work properly or even crash Godot. To minimize downtime, save your successful builds. Move them out of the build folder and rename them with the version number (e.g. godot-3.2+ee5ba3e.exe). This way, you can continue to use previously working builds until the Godot or Voxel developers fix whatever is broken. It is generally desired by all that code published to repositories will at least build, but stuff happens.
 
-
-### Build as a GDExtension
-
-!!! warning
-    This feature is under development and is not ready for production. It has bugs and can crash the engine. Check the [issue tracker](https://github.com/Voxel/godot_voxel/issues/333) for work in progress.
-
-This module can compile as a GDExtension library. This allows to distribute it as a library file (`.dll`, `.so`...) without having to recompile Godot Engine.
-You should read Godot's documentation about GDExtension:
-
-- [On Godot Docs](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/index.html)
-- [GodotCpp Repository](https://github.com/godotengine/godot-cpp)
-
-To compile the library:
-
-- Download a copy of [GodotCpp](https://github.com/godotengine/godot-cpp)
-- In the voxel's root directory, write the path to GodotCpp at the beginning of the `SConstruct` script, or set the environment variable `GODOT_CPP_PATH` from command line.
-- Open the same kind of console you would use to compile Godot, change directory to voxel's root folder, and run `scons` there. It will use the `SConstruct` file instead of `SCsub`.
-
-Example of build command on Windows (unoptimized debug build for use in editor):
-```
-scons platform=windows target=debug -j4
-```
-
-The built library will be placed inside the `project/addons/voxel/bin/` folder. `project/` contains a Godot 4 project. It is then possible to open it to test the extension.
-
-By default, the GDExtension config file of this project is setup for debug builds. You may want to modify `voxel.gdextension` for your needs.
-When doing release packages, the config file is replaced with `voxel.gdextension-release` instead, which is pre-configured with non-dev version of the library for all platforms.
-
-There are known issues with GDExtension, check the [issue tracker](https://github.com/Voxel/godot_voxel/issues/333).
 
 #### Web builds
 
@@ -262,7 +233,7 @@ For the most part, use `clang-format` and follow most of Godot conventions.
 - Private wrapper functions can be used to adapt to the Godot script API and are prefixed with `_b_`.
 - Use Clang-format to automate most of these rules (there should be a file included at the root of the C++ project)
 - Prefer comments with `//` only
-- Some virtual functions from wrapper classes are prefixed with `_voxel_` to encapsulate signature differences when compiling as a module or as a GDExtension.
+- Some virtual functions from wrapper classes are prefixed with `_voxel_` to encapsulate signature differences.
 
 ### File structure
 
@@ -289,7 +260,7 @@ For the most part, use `clang-format` and follow most of Godot conventions.
 - Use `uint32_t`, `uint16_t`, `uint8_t` in case integer size matters.
 - If possible, use forward declarations in headers instead of including files
 - `#include` what you use, don't assume a header transitively includes things. This has been broadly ignored for a while, but new code should attempt to follow it. `util/godot` micro-headers are an exception.
-- Don't do `using namespace` in headers (Except with `godot::`, but that's only to help supporting GDExtension using the same codebase, since Godot core does not have this namespace).
+- Don't do `using namespace` in headers (Except with `godot::`, which is only used to mirror the codebase's own namespace convention).
 - `mutable` must ONLY be used for thread synchronization primitives. Do not use it with "cache data" to make getters `const`, as it can be misleading in a multi-threaded context.
 - Use `VOXEL_NEW` and `VOXEL_DELETE` instead of `new` and `delete` on types that don't derive from Godot `Object`. This is intented for code that may be independent from Godot, yet be tracked in Godot's default allocator when used.
 - Use `VOXEL_ALLOC` and `VOXEL_FREE` instead of `malloc` and `free`. This is intented for code that may be independent from Godot, yet be tracked in Godot's default allocator when used.
@@ -323,12 +294,11 @@ In performance-critical areas which run a lot:
 - Use `memnew` and `memdelete` instead of `new` and `delete` on types derived from Godot `Object`
 - Don't leave random prints. For verbose mode you may also use `VOXEL_PRINT_VERBOSE()` instead of `print_verbose()`.
 - Use `int` as argument for functions exposed to scripts if they don't need to exceed 2^31, even if they are never negative, so errors are clearer if the user makes a mistake
-- If possible, keep Godot usage to a minimum, to make the code more portable, and sometimes faster for GDExtension builds. Some areas use custom equivalents defined in `util/`.
+- If possible, keep Godot usage to a minimum, to make the code more portable, and sometimes faster. Some areas use custom equivalents defined in `util/`.
 
-Compiling as a module or an extension is both supported, so it involves some restrictions:
+Compiling involves some restrictions:
 
 - Don't include Godot headers directly. Use headers from `util/godot`.
-- Only use APIs that are available to GDExtensions (or the script API). If they exist in both but are different, use wrappers defined in `util/godot`.
 
 ### Namespaces
 
@@ -477,10 +447,6 @@ This way so internally some of the work is actually done in the voxel module's b
 !!! note
     Tracy has a concept of frame mark, which is usually provided by the application, to tell the profiler when each frame begins. Godot doesn't have a hook for us to insert that call at the right time, so the frame mark was hacked into `VoxelEngine` process function. This allows to see frames of the main thread in the timeline, but they might be offset from their real beginning.
 
-#### In GDExtension build
-
-Not supported at the moment, but with a few tweaks of the build system it could be made to work.
-
 
 ### How to add profiler scopes
 
@@ -539,7 +505,7 @@ By default, features are all enabled, unless specified otherwise. To turn off a 
 
 SCons flag               | C++ Macro                       | Description
 ------------------------ | ------------------------------- | -------------------------------------------------------------
-`voxel_fast_noise_2`     | `VOXEL_ENABLE_FAST_NOISE_2`     | Integrated support for SIMD CPU noise using FastNoise2. It is optional in case it causes problem on some compilers or platforms. **Not available in GDExtension builds**.
+`voxel_fast_noise_2`     | `VOXEL_ENABLE_FAST_NOISE_2`     | Integrated support for SIMD CPU noise using FastNoise2. It is optional in case it causes problem on some compilers or platforms (x86 only).
 `voxel_tests`            | `VOXEL_TESTS`                   | Unit tests. They will run on startup if the `--run_voxel_tests` command line argument is passed, or if `VoxelEngine.run_tests()` is called.
 `voxel_smooth_meshing`   | `VOXEL_ENABLE_SMOOTH_MESHING`   | Smooth voxel meshers and some associated features. Turning this off also turns off modifiers, which depend on it.
 `voxel_modifiers`        | `VOXEL_ENABLE_MODIFIERS`        | `VoxelModifier` experimental feature support.
@@ -558,7 +524,6 @@ SCons flag               | C++ Macro                       | Description
 
 - `MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE`: this one must be defined to prevent conflict with Godot's own version of MeshOptimizer. See [https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624](https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624)
 - `VOXEL_GODOT`: must be defined when compiling this project as a module.
-- `VOXEL_GODOT_EXTENSION`: must be defined when compiling this project as a GDExtension.
 
 
 Shaders
@@ -582,7 +547,7 @@ Currently, C++ code generating shaders is intertwined with the contents of those
 Using the module from another module
 ----------------------------------------
 
-Writing a custom C++ module directly in Godot is the easiest way to access features of Godot and the voxel engine directly, which can be better for performance and more stable than a GDExtension. You can do this too if you want to create a custom generator, mesher, stream, or just use components of the module, without having to modify the module directly.
+Writing a custom C++ module directly in Godot is the easiest way to access features of Godot and the voxel engine directly. You can do this too if you want to create a custom generator, mesher, stream, or just use components of the module, without having to modify the module directly.
 
 You can include files from the voxel module by using `modules/voxel/` in your includes:
 

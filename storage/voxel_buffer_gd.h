@@ -237,7 +237,7 @@ public:
 	static Ref<Image> debug_print_sdf_z_slice(const voxel::VoxelBuffer &buffer, float scale, int z);
 
 private:
-	// In GDExtension, `create` is defined by `GDCLASS`, preventing anyone from binding a `create` function directly
+	// `create` is defined by `GDCLASS`, preventing direct binding of a `create` function
 	void _b_create(int x, int y, int z) {
 		create(x, y, z);
 	}

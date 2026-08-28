@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/gui/graph_edit.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/graph_edit.hpp>
-using namespace godot;
 #endif
 
 #include "../../containers/std_vector.h"

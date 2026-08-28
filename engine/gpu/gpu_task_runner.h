@@ -17,9 +17,6 @@
 #include <atomic>
 
 VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice)
-#ifdef VOXEL_GODOT_EXTENSION
-using namespace godot;
-#endif
 
 namespace voxel {
 

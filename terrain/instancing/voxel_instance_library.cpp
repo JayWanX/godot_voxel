@@ -8,10 +8,6 @@
 #include "../../util/godot/core/class_db.h"
 #endif
 
-#ifdef VOXEL_GODOT_EXTENSION
-#include "../../util/godot/core/array.h"
-#include "../../util/string/format.h"
-#endif
 
 namespace voxel {
 
@@ -321,7 +317,7 @@ void VoxelInstanceLibrary::_get_property_list(List<PropertyInfo> *p_list) const 
 PackedInt32Array VoxelInstanceLibrary::_b_get_all_item_ids() const {
 	PackedInt32Array ids;
 	ids.resize(_items.size());
-	// Doing this because in GDExtension builds assigning items has different syntax than modules... and it's faster
+	// Using raw pointer writes for speed.
 	int *ids_w = ids.ptrw();
 	int i = 0;
 	for (auto it = _items.begin(); it != _items.end(); ++it) {

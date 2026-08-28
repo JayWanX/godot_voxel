@@ -14,7 +14,6 @@ protected:
 	String _voxel_get_plugin_name() const override;
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods() {}
 };
 

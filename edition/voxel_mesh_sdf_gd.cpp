@@ -11,8 +11,7 @@
 #include "../util/profiling.h"
 #include "../util/string/format.h"
 #include "mesh_sdf.h"
-// Necessary when compiling with GodotCpp because it is used in a registered method argument, and the type must be
-// defined
+// 注册方法参数需显式定义类型
 #include "../util/godot/classes/scene_tree.h"
 
 using namespace voxel::godot;
@@ -166,12 +165,7 @@ void VoxelMeshSDF::bake() {
 	_max_pos = box_max_pos;
 }
 
-#ifdef VOXEL_GODOT_EXTENSION
-void VoxelMeshSDF::bake_async(Object *scene_tree_o) {
-	SceneTree *scene_tree = Object::cast_to<SceneTree>(scene_tree_o);
-#else
 void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
-#endif
 	VOXEL_ASSERT_RETURN(scene_tree != nullptr);
 	VoxelEngineUpdater::ensure_existence(scene_tree);
 

@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/io/resource_loader.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/resource_loader.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

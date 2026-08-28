@@ -10,9 +10,6 @@
 #include <editor/gui/editor_file_dialog.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_file_dialog.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

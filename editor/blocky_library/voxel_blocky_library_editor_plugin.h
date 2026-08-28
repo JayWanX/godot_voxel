@@ -16,7 +16,6 @@ private:
 	void init();
 	void _notification(int p_what);
 
-	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods() {}
 
 	VoxelBlockyTypeLibraryIDSDialog *_type_library_ids_dialog = nullptr;

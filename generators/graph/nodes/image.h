@@ -168,7 +168,7 @@ void register_image_nodes(Span<NodeType> types) {
 			Runtime::Buffer &out = ctx.get_output(0);
 			const Params p = ctx.get_params<Params>();
 			const Image &im = *p.image;
-			// Cache image size to reduce API calls in GDExtension
+			// Cache image size to reduce API calls.
 			const int w = im.get_width();
 			const int h = im.get_height();
 #ifdef DEBUG_ENABLED

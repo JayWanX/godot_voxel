@@ -1959,9 +1959,7 @@ void VoxelInstanceGenerator::get_configuration_warnings(PackedStringArray &warni
 }
 
 void VoxelInstanceGenerator::_validate_property(PropertyInfo &p_property) const {
-	// In core, `PropertyInfo.name` is a String so `operator == "literal"` works.
-	// But in GodotCpp, it is a StringName, which does not have such operator.
-	// So I had to use StringNames to make the code compile in both scenarios without hurting performance.
+	// 统一使用 StringNames 进行比较，兼顾安全性与性能。
 	const VoxelStringNames &sn = VoxelStringNames::get_singleton();
 
 	if (p_property.name == sn.jitter) {

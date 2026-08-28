@@ -10,8 +10,7 @@ namespace voxel {
 
 VoxelBlockyLibraryEditorPlugin::VoxelBlockyLibraryEditorPlugin() {}
 
-// TODO GDX: Can't initialize EditorPlugins in their constructor when they access EditorNode.
-// See https://github.com/godotengine/godot-cpp/issues/1179
+// EditorNode isn't ready during plugin construction, so defer work to `init()`.
 void VoxelBlockyLibraryEditorPlugin::init() {
 	EditorUndoRedoManager *undo_redo = get_undo_redo();
 	EditorInterface *editor_interface = get_editor_interface();

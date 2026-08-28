@@ -10,9 +10,6 @@
 #include <scene/resources/3d/primitive_meshes.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/point_mesh.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_POINT_MESH_H

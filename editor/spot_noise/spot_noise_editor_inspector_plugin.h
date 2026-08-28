@@ -13,7 +13,6 @@ protected:
 	void _voxel_parse_begin(Object *p_object) override;
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` isn't optional.
 	static void _bind_methods() {}
 };
 

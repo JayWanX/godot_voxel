@@ -4,32 +4,24 @@ namespace voxel::godot {
 
 #if defined(VOXEL_GODOT)
 bool VOXEL_EditorInspectorPlugin::can_handle(Object *p_object) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-bool VOXEL_EditorInspectorPlugin::_can_handle(Object *p_object) const {
 #endif
 	return _voxel_can_handle(p_object);
 }
 
 #if defined(VOXEL_GODOT)
 void VOXEL_EditorInspectorPlugin::parse_begin(Object *p_object) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VOXEL_EditorInspectorPlugin::_parse_begin(Object *p_object) {
 #endif
 	_voxel_parse_begin(p_object);
 }
 
 #if defined(VOXEL_GODOT)
 void VOXEL_EditorInspectorPlugin::parse_end(Object *p_object) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VOXEL_EditorInspectorPlugin::_parse_end(Object *p_object) {
 #endif
 	_voxel_parse_end(p_object);
 }
 
 #if defined(VOXEL_GODOT)
 void VOXEL_EditorInspectorPlugin::parse_group(Object *p_object, const String &p_group) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VOXEL_EditorInspectorPlugin::_parse_group(Object *p_object, const String &p_group) {
 #endif
 	_voxel_parse_group(p_object, p_group);
 }
@@ -42,16 +34,6 @@ bool VOXEL_EditorInspectorPlugin::parse_property(
 		const PropertyHint p_hint,
 		const String &p_hint_text,
 		const BitField<PropertyUsageFlags> p_usage,
-		const bool p_wide
-) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-bool VOXEL_EditorInspectorPlugin::_parse_property(
-		Object *p_object,
-		Variant::Type p_type,
-		const String &p_path,
-		PropertyHint p_hint,
-		const String &p_hint_text,
-		BitField<PropertyUsageFlags> p_usage,
 		const bool p_wide
 ) {
 #endif

@@ -18,8 +18,6 @@ PackedByteArray compress(const PackedByteArray &self, const FileAccess::Compress
 
 	return compressed;
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return self.compress(p_mode);
 #endif
 }
 
@@ -47,8 +45,6 @@ PackedByteArray decompress(
 
 	return decompressed;
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return self.decompress(buffer_size, p_mode);
 #endif
 }
 

@@ -5,11 +5,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/object/ref_counted.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-// Ref<T> is not available if you only include ref_counted.hpp and no derived class.
-// ref.hpp, on the other hand, includes ref_counted.hpp.
-#include <godot_cpp/classes/ref.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/config/project_settings.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/project_settings.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

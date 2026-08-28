@@ -10,9 +10,6 @@
 #include <scene/3d/physics/joints/hinge_joint_3d.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/hinge_joint3d.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_JOINT_3D_H

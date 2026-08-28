@@ -132,12 +132,6 @@ PackedStringArray VoxelNode::get_configuration_warnings() const {
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#elif defined(VOXEL_GODOT_EXTENSION)
-PackedStringArray VoxelNode::_get_configuration_warnings() const {
-	PackedStringArray warnings;
-	get_configuration_warnings(warnings);
-	return warnings;
-}
 #endif
 
 static String channel_mask_to_string(const uint32_t mask) {

@@ -1,5 +1,4 @@
-Voxel GDExtension Project
+Voxel Module Test Project
 ===========================
 
-This is a basic project for the voxel GDExtension. When compiling as an extension (instead of a module), this is where the binaries should be installed. A configuration file is also provided, using the same file structure as regular plugins, so the project can also be used as a test.
-
+This is a basic project used to test the Voxel module. It must be opened with a custom Godot build that includes the module.

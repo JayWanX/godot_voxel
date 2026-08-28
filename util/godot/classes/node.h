@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/main/node.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/node.hpp>
-using namespace godot;
 #endif
 
 #include "../../containers/std_vector.h"
@@ -21,8 +18,6 @@ template <typename T>
 inline T *get_node_typed(const Node &self, const NodePath &path) {
 #if defined(VOXEL_GODOT)
 	return Object::cast_to<T>(self.get_node(path));
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return self.get_node<T>(path);
 #endif
 }
 

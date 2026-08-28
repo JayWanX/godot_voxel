@@ -7,10 +7,6 @@
 #include "../../../util/godot/core/string.h"
 #include "../../../util/godot/core/string_name.h"
 #include "../../../util/godot/core/typed_array.h"
-#ifdef VOXEL_GODOT_EXTENSION
-// For `MAKE_RESOURCE_TYPE_HINT`
-#include "../../../util/godot/classes/object.h"
-#endif
 #include "../../../util/math/ortho_basis.h"
 #include "../../../util/profiling.h"
 #include "../../../util/string/format.h"
@@ -899,7 +895,6 @@ bool VoxelBlockyType::VariantKey::parse_from_array(const Array &array) {
 		VOXEL_ASSERT_RETURN_V(name_v.get_type() == Variant::STRING_NAME, false);
 		VOXEL_ASSERT_RETURN_V(value_v.get_type() == Variant::INT, false);
 
-		// TODO GDX: Variant has no operator to convert to 8-bit integers in GodotCpp
 		const int value = value_v;
 		VOXEL_ASSERT_RETURN_V(value >= 0 && value < VoxelBlockyAttribute::MAX_VALUES, false);
 

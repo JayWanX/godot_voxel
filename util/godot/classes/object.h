@@ -5,21 +5,10 @@
 #include <core/object/object.h>
 // The `GDCLASS` macro isn't compiling when inheriting `Object`, unless `class_db.h` is also included
 #include <core/object/class_db.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/object.hpp>
-// The `GDCLASS` macro isn't compiling when inheriting `Object`, unless `class_db.hpp` is also included
-#include <godot_cpp/core/class_db.hpp>
-using namespace godot;
 #endif
 
 #include "../../containers/std_vector.h"
 
-#ifdef VOXEL_GODOT_EXTENSION
-// TODO GDX: `MAKE_RESOURCE_TYPE_HINT` is not available in GodotCpp
-// Helper macro to use with PROPERTY_HINT_ARRAY_TYPE for arrays of specific resources:
-// PropertyInfo(Variant::ARRAY, "fallbacks", PROPERTY_HINT_ARRAY_TYPE, MAKE_RESOURCE_TYPE_HINT("Font")
-#define MAKE_RESOURCE_TYPE_HINT(m_type) vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, m_type)
-#endif
 
 namespace voxel::godot {
 
@@ -32,7 +21,7 @@ uint64_t get_deep_hash(
 		uint64_t hash = 0
 );
 
-// Getting property info in Godot modules and GDExtension has a different API, with the same information.
+// Unified representation of property info.
 struct PropertyInfoWrapper {
 	Variant::Type type;
 	String name;

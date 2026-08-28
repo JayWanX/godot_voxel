@@ -10,9 +10,6 @@
 #include <scene/resources/image_texture.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/image_texture3d.hpp>
-using namespace godot;
 #endif
 
 #include "../core/typed_array.h"

@@ -47,7 +47,6 @@ protected:
 	};
 
 private:
-	// When compiling with GodotCpp, `_bind_methods` is not optional.
 	static void _bind_methods() {}
 };
 

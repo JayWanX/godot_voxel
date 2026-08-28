@@ -13,7 +13,7 @@
 #include "../../streams/load_block_data_task.h"
 #include "../../streams/save_block_data_task.h"
 #include "../../util/containers/container_funcs.h"
-#include "../../util/godot/classes/base_material_3d.h" // For property hint in release mode in GDExtension...
+#include "../../util/godot/classes/base_material_3d.h" // For property hint in release mode
 #include "../../util/godot/classes/concave_polygon_shape_3d.h"
 #include "../../util/godot/classes/engine.h"
 #include "../../util/godot/classes/mesh_instance_3d.h"
@@ -2397,8 +2397,7 @@ PackedInt32Array VoxelTerrain::_b_get_viewer_network_peer_ids_in_area(Vector3i a
 
 	PackedInt32Array peer_ids;
 	peer_ids.resize(viewer_ids.size());
-	// Using direct access because when compiling with GodotCpp the array access syntax is different, also it is a bit
-	// faster
+	// 使用直接访问以获得更高性能
 	int32_t *peer_ids_data = peer_ids.ptrw();
 	VOXEL_ASSERT_RETURN_V(peer_ids_data != nullptr, peer_ids);
 	for (size_t i = 0; i < viewer_ids.size(); ++i) {

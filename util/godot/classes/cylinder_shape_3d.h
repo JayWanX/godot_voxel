@@ -10,9 +10,6 @@
 #include <scene/resources/3d/cylinder_shape_3d.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/cylinder_shape_3d.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_CYLINDER_SHAPE_3D_H

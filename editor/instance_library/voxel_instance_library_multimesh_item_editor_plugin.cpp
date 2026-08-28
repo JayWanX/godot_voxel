@@ -13,8 +13,7 @@ namespace voxel {
 
 VoxelInstanceLibraryMultiMeshItemEditorPlugin::VoxelInstanceLibraryMultiMeshItemEditorPlugin() {}
 
-// TODO GDX: Can't initialize EditorPlugins in their constructor when they access EditorNode.
-// See https://github.com/godotengine/godot-cpp/issues/1179
+// EditorNode isn't ready during plugin construction, so defer work to `init()`.
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::init() {
 	Control *base_control = get_editor_interface()->get_base_control();
 
@@ -69,9 +68,6 @@ void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_notification(int p_what) {
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_on_update_from_scene_button_pressed(
 		VoxelInstanceLibraryMultiMeshItem *item
 ) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_on_update_from_scene_button_pressed(Object *item_o) {
-	VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(item_o);
 #endif
 	_item.reference_ptr(item);
 	ERR_FAIL_COND(_item.is_null());

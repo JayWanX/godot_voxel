@@ -338,11 +338,6 @@ void VoxelGraphEditor::set_voxel_node(VoxelNode *node) {
 	}
 }
 
-#ifdef VOXEL_GODOT_EXTENSION
-void VoxelGraphEditor::_process(double delta) {
-	process(delta);
-}
-#endif
 
 void VoxelGraphEditor::_notification(int p_what) {
 	switch (p_what) {
@@ -726,8 +721,6 @@ void VoxelGraphEditor::remove_connection(
 
 #if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_delete_nodes_request(TypedArray<StringName> node_names) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VoxelGraphEditor::_on_graph_edit_delete_nodes_request(Array node_names) {
 #endif
 	// The `node_names` argument is the result of Godot issue #61112. While it is less convenient than just getting
 	// the nodes themselves, it also has the downside of being always empty if you choose to not show "close" buttons
@@ -1008,9 +1001,6 @@ void VoxelGraphEditor::_on_node_dialog_node_selected(int id) {
 
 #if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_node_selected(Node *p_node) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VoxelGraphEditor::_on_graph_edit_node_selected(Object *p_node_o) {
-	Node *p_node = Object::cast_to<Node>(p_node_o);
 #endif
 	VoxelGraphEditorNode *node = Object::cast_to<VoxelGraphEditorNode>(p_node);
 	emit_signal(SIGNAL_NODE_SELECTED, node->get_generator_node_id());
@@ -1018,9 +1008,6 @@ void VoxelGraphEditor::_on_graph_edit_node_selected(Object *p_node_o) {
 
 #if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_node_deselected(Node *p_node) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-void VoxelGraphEditor::_on_graph_edit_node_deselected(Object *p_node_o) {
-	// Node *p_node = Object::cast_to<Node>(p_node_o);
 #endif
 	// Just checking if nothing is selected _now_ is unreliable, because the user could have just selected another
 	// node, and I don't know when `GraphEdit` will update the `selected` flags in the current call stack.

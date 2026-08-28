@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/3d/visual_instance_3d.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/geometry_instance3d.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

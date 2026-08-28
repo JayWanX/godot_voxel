@@ -6,7 +6,7 @@ Generates coherent and fractal noise using the [FastNoiseLite](https://github.co
 
 ## Description: 
 
-This is an alternative implementation of [FastNoiseLite](https://docs.godotengine.org/en/stable/classes/class_fastnoiselite.html), based on the same library. Some differences include different default values, and use of period instead of frequency in fractal parameters. It is also used in the voxel module in order to bypass the overhead of Godot calls in GDExtension builds.
+This is an alternative implementation of [FastNoiseLite](https://docs.godotengine.org/en/stable/classes/class_fastnoiselite.html), based on the same library. Some differences include different default values, and use of period instead of frequency in fractal parameters.
 
 ## Properties: 
 

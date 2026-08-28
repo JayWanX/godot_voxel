@@ -357,7 +357,6 @@ private:
 	Array _b_debug_print_sdf_top_down(Vector3i center, Vector3i extents);
 	int _b_debug_get_mesh_block_count() const;
 	int _b_debug_get_data_block_count() const;
-	// TODO GDX: Can't bind functions returning a `godot::Error` enum
 	int /*Error*/ _b_debug_dump_as_scene(String fpath, bool include_instancer) const;
 
 	bool _b_is_area_meshed(AABB aabb, int lod_index) const;

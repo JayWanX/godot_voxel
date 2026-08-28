@@ -110,7 +110,7 @@ Making a flat plane also has a shortcut node, `SdfPlane`, which outputs the SDF 
 A flat plane is simple but a bit boring, so one typical way to generate a terrain is adding good old fractal noise. You can do this in 2D (heightmap) or 3D (volumetric).
 The 2D approach is simpler, as we only need to take our previous setup, and add 2D noise to the result. Also, since noise is generated in the range [-1 to 1], we also need a multiplier to make it larger (`sdf = y - height + noise2d(x, y) * noise_multiplier`).
 
-There are several types of noise available, each with their own parameters. At time of writing, `FastNoise2D` noise is the best option. `Noise2D` works too but it is slightly slower (in particular when using Voxel Tools as a GDExtension).
+There are several types of noise available, each with their own parameters. At time of writing, `FastNoise2D` noise is the best option. `Noise2D` works too but it is slightly slower.
 After you create this node, a new `FastNoiseLite` resource must be created in its parameters.
 
 ![Voxel graph 2D noise](images/voxel_graph_noise2d.webp)

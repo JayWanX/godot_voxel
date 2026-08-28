@@ -11,9 +11,6 @@
 #include <editor/inspector/editor_inspector.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_inspector.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_EDITOR_INSPECTOR_H

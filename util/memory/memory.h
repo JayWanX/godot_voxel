@@ -9,19 +9,8 @@
 #include <core/os/memory.h>
 
 // Use Godot's allocator.
-// In modules, memnew and memdelete work for anything. However in GDExtension it might not be the case...
 #define VOXEL_NEW(t) memnew(t)
 #define VOXEL_DELETE(t) memdelete(t)
-#define VOXEL_ALLOC(size) memalloc(size)
-#define VOXEL_REALLOC(p, size) memrealloc(p, size)
-#define VOXEL_FREE(p) memfree(p)
-
-#elif defined(VOXEL_GODOT_EXTENSION)
-
-#include <godot_cpp/core/memory.hpp>
-
-#define VOXEL_NEW(t) memnew(t)
-#define VOXEL_DELETE(t) ::godot::memdelete(t)
 #define VOXEL_ALLOC(size) memalloc(size)
 #define VOXEL_REALLOC(p, size) memrealloc(p, size)
 #define VOXEL_FREE(p) memfree(p)

@@ -4,20 +4,12 @@
 // Must be used in global space.
 #if defined(VOXEL_GODOT)
 #define VOXEL_GODOT_FORWARD_DECLARE(m_class) m_class;
-#elif defined(VOXEL_GODOT_EXTENSION)
-#define VOXEL_GODOT_FORWARD_DECLARE(m_class)                                                                              \
-	namespace godot {                                                                                                  \
-	m_class;                                                                                                           \
-	}
 #endif
 
 // Must be used in global space.
 #if defined(VOXEL_GODOT)
 #define VOXEL_GODOT_NAMESPACE_BEGIN
 #define VOXEL_GODOT_NAMESPACE_END
-#elif defined(VOXEL_GODOT_EXTENSION)
-#define VOXEL_GODOT_NAMESPACE_BEGIN namespace godot {
-#define VOXEL_GODOT_NAMESPACE_END }
 #endif
 
 // TODO Waiting for a fix, Godot's Variant() can't be constructed from `size_t` on JavaScript and OSX builds.

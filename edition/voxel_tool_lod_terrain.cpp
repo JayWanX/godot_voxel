@@ -330,9 +330,6 @@ void VoxelToolLodTerrain::set_raycast_binary_search_iterations(int iterations) {
 
 #if defined(VOXEL_GODOT)
 Array VoxelToolLodTerrain::separate_floating_chunks(AABB world_box, Node *parent_node) {
-#elif defined(VOXEL_GODOT_EXTENSION)
-Array VoxelToolLodTerrain::separate_floating_chunks(AABB world_box, Object *parent_node_o) {
-	Node *parent_node = Object::cast_to<Node>(parent_node_o);
 #endif
 	ERR_FAIL_COND_V(_terrain == nullptr, Array());
 	ERR_FAIL_COND_V(!math::is_valid_size(world_box.size), Array());

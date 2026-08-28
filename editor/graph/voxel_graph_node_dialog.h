@@ -72,7 +72,6 @@ private:
 	EditorFileDialog *_function_file_dialog = nullptr;
 #ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-	// TODO GDX: EditorQuickOpen is not exposed!
 	EditorQuickOpen *_function_quick_open_dialog = nullptr;
 #endif
 #endif

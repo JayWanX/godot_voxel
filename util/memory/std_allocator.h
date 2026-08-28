@@ -20,8 +20,7 @@ extern std::atomic_uint64_t g_deallocated;
 } // namespace StdDefaultAllocatorCounters
 #endif
 
-// Default allocator matching standard library requirements.
-// When compiling with Godot or GDExtension, it will use Godot's default allocator.
+// Default allocator matching standard library requirements, backed by Godot's allocator.
 template <class T>
 struct StdDefaultAllocator {
 	typedef T value_type;

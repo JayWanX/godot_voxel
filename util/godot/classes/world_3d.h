@@ -10,9 +10,6 @@
 #include <scene/resources/3d/world_3d.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/world3d.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_WORLD_3D_H

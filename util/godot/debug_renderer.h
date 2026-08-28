@@ -29,8 +29,6 @@ public:
 	void clear();
 
 private:
-	// TODO GDX: Can't access RenderingServer in the constructor of a registered class.
-	// We have to somehow defer initialization to later. See https://github.com/godotengine/godot-cpp/issues/1179
 	void init();
 	bool _initialized = false;
 

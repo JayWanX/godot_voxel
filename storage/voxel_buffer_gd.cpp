@@ -687,7 +687,7 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 		Variant v = get_as_variant(it->value);
 
 #if defined(VOXEL_GODOT)
-		// TODO Use template version? Could get closer to GodotCpp
+		// TODO 可考虑改用模板版本
 		const Variant key = it->key;
 		const Variant *args[2] = { &key, &v };
 		Callable::CallError err;
@@ -697,11 +697,6 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))
 		);
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-		// TODO Error reporting? GodotCpp doesn't expose anything
-		// callback.call(it->key, v);
-		// TODO GodotCpp is missing the implementation of `Callable::call`.
-		VOXEL_PRINT_ERROR("Unable to call Callable, go moan at https://github.com/godotengine/godot-cpp/issues/802");
 #endif
 	}
 }
@@ -715,7 +710,7 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Vect
 		Variant v = get_as_variant(meta);
 
 #if defined(VOXEL_GODOT)
-		// TODO Use template version? Could get closer to GodotCpp
+		// TODO 可考虑改用模板版本
 		const Variant key = rel_pos;
 		const Variant *args[2] = { &key, &v };
 		Callable::CallError err;
@@ -725,9 +720,6 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Vect
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))
 		);
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-		// Can't do error-reporting the same way we do in modules.
-		callback.call(rel_pos, v);
 #endif
 	});
 }

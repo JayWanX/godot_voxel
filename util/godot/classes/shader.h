@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/resources/shader.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/shader.hpp>
-using namespace godot;
 #endif
 
 #ifdef TOOLS_ENABLED

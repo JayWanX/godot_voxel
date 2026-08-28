@@ -195,7 +195,7 @@ void write_graph_nodes_doc_xml(
 			}
 
 			{
-				// Doing this so the code is the same with GDExtension...
+				// Writing through a raw pointer.
 				String *lines_p = lines.ptrw();
 				for (int line_index = 0; line_index < lines.size(); ++line_index) {
 					String s = lines[line_index];

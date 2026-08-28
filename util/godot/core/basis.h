@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/math/basis.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/variant/basis.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot::BasisUtility {

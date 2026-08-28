@@ -10,9 +10,6 @@
 #include <editor/editor_interface.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_interface.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_EDITOR_INTERFACE_H

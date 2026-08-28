@@ -7,7 +7,6 @@
 #include "../../util/macros.h"
 #include "../../util/math/conv.h"
 #include "../../util/math/funcs.h"
-// TODO GDX: String has no `operator+=`
 #include "../../util/containers/container_funcs.h"
 #include "../../util/godot/core/string.h"
 #include "../../util/profiling.h"

@@ -8,7 +8,7 @@
 #include "../../util/godot/object_weak_ref.h"
 #include "voxel_terrain_editor_inspector_plugin.h"
 
-// When compiling with GodotCpp, it isn't possible to forward-declare these, due to how virtual methods are implemented.
+// 这里必须包含头文件而不能前置声明，因其涉及虚方法的实现。
 #include "../../util/godot/classes/camera_3d.h"
 #include "../../util/godot/classes/input_event.h"
 

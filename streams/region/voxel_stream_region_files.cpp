@@ -252,7 +252,7 @@ bool u8_from_json_variant(const Variant &v, uint8_t &i) {
 	ERR_FAIL_COND_V(v.get_type() != Variant::INT && v.get_type() != Variant::FLOAT, false);
 	int n = v;
 	ERR_FAIL_COND_V(n < 0 || n > 255, false);
-	// Constructing an `int` first because when compiling with GodotCpp, the conversion isn't working directly
+	// 先转为 int 便于范围校验
 	i = int(v);
 	return true;
 }

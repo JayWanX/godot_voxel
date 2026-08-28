@@ -65,9 +65,6 @@ public:
 	bool is_pinned_hint() const;
 	void set_popout_button_enabled(bool enable);
 
-#ifdef VOXEL_GODOT_EXTENSION
-	void _process(double delta) override;
-#endif
 
 private:
 	void _notification(int p_what);
@@ -115,12 +112,6 @@ private:
 	void _on_graph_edit_delete_nodes_request(TypedArray<StringName> node_names);
 	void _on_graph_edit_node_selected(Node *p_node);
 	void _on_graph_edit_node_deselected(Node *p_node);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	// TODO GDX: TypedArray isn't available.
-	void _on_graph_edit_delete_nodes_request(Array node_names);
-	// TODO GDX: Can't bind methods taking a child class of `Object*`
-	void _on_graph_edit_node_selected(Object *p_node_o);
-	void _on_graph_edit_node_deselected(Object *p_node_o);
 #endif
 
 	void _on_menu_id_pressed(int id);

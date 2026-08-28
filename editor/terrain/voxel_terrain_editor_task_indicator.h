@@ -30,7 +30,6 @@ private:
 		STAT_COUNT
 	};
 
-	// When compiling with GodotCpp, `_bind_methods` is not optional.
 	static void _bind_methods() {}
 
 	void create_stat(StatID id, String short_name, String long_name);

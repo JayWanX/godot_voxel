@@ -5,10 +5,6 @@
 #include <core/io/file_access.h>
 #include <core/variant/variant.h>
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include "../classes/file_access.h"
-#include <godot_cpp/variant/packed_byte_array.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {

@@ -63,12 +63,7 @@ public:
 // Bakes the SDF asynchronously using threads of the job system.
 // TODO A reference to the SceneTree should not be necessary!
 // It is currently needed to ensure `VoxelServerUpdater` gets created so it can tick the task system...
-// TODO GDX: it seems binding a method taking a `SceneTree*` fails to compile. It is supposed to be working.
-#ifdef VOXEL_GODOT_EXTENSION
-	void bake_async(Object *scene_tree_o);
-#else
 	void bake_async(SceneTree *scene_tree);
-#endif
 
 	// Accesses baked SDF data.
 	// WARNING: don't modify this buffer. Only read from it.

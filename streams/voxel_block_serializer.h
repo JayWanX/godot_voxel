@@ -9,9 +9,6 @@
 #include <cstdint>
 
 VOXEL_GODOT_FORWARD_DECLARE(class FileAccess)
-#ifdef VOXEL_GODOT_EXTENSION
-using namespace godot;
-#endif
 
 namespace voxel {
 

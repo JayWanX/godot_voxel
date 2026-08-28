@@ -37,11 +37,6 @@ void get_node_groups(const Node &node, StdVector<StringName> &out_groups) {
 		out_groups.push_back(g.name);
 	}
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	TypedArray<StringName> groups = node.get_groups();
-	for (int i = 0; i < groups.size(); ++i) {
-		out_groups.push_back(groups[i]);
-	}
 #endif
 }
 

@@ -98,11 +98,8 @@ public:
 	void set_collider_group_names(TypedArray<StringName> names);
 	TypedArray<StringName> get_collider_group_names() const;
 
-	// TODO GDX: it seems binding a method taking a `Node*` fails to compile. It is supposed to be working.
-#if defined(VOXEL_GODOT)
+	#if defined(VOXEL_GODOT)
 	void setup_from_template(Node *root);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	void setup_from_template(Object *root_o);
 #endif
 
 	void set_scene(Ref<PackedScene> scene);

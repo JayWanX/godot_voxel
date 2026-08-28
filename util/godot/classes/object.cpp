@@ -1,9 +1,6 @@
 #include "object.h"
 #include "../../hash_funcs.h"
 #include "../../profiling.h"
-#ifdef VOXEL_GODOT_EXTENSION
-#include "undo_redo.h"
-#endif
 
 namespace voxel::godot {
 
@@ -18,19 +15,6 @@ void get_property_list(const Object &obj, StdVector<PropertyInfoWrapper> &out_pr
 		pi.type = property.type;
 		pi.name = property.name;
 		pi.usage = property.usage;
-		out_properties.push_back(pi);
-	}
-#elif defined(VOXEL_GODOT_EXTENSION)
-	const Array properties = obj.get_property_list();
-	const String type_key = "type";
-	const String name_key = "name";
-	const String usage_key = "usage";
-	for (int i = 0; i < properties.size(); ++i) {
-		Dictionary d = properties[i];
-		PropertyInfoWrapper pi;
-		pi.type = Variant::Type(int(d[type_key]));
-		pi.name = d[name_key];
-		pi.usage = d[usage_key];
 		out_properties.push_back(pi);
 	}
 #endif
@@ -73,26 +57,6 @@ void set_object_edited(Object &obj) {
 #if defined(VOXEL_GODOT)
 	obj.set_edited(true);
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	// TODO GDX: Object::set_edited is not exposed, and nested resource saving is an unexplained problem
-	// See https://github.com/godotengine/godot-proposals/discussions/7168
-
-	// WARN_PRINT(String("Can't mark {0} as edited for saving, Object.set_edited() is not exposed to GDExtension. You "
-	// 				  "will have to manually save using the floppy icon in the inspector.")
-	// 				   .format(obj.get_class()));
-
-	// A dirty workaround is to call a method without side-effects with a temporary UndoRedo instance, which should
-	// internally call `set_edited` in the editor, if the object is a resource...
-	// See
-	// https://github.com/godotengine/godot/blob/da5f39889f155658cef7f7ec3cc1abb94e17d815/core/object/undo_redo.cpp#L372
-
-	UndoRedo *ur = memnew(UndoRedo);
-	ur->create_action("Dummy Action");
-	Callable callable = callable_mp(&obj, &Object::is_blocking_signals);
-	ur->add_do_method(callable);
-	ur->add_undo_method(callable);
-	ur->commit_action();
-	memdelete(ur);
 #endif
 }
 

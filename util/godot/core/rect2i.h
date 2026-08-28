@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/math/rect2i.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/variant/rect2i.hpp>
-using namespace godot;
 #endif
 
 namespace voxel {

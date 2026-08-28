@@ -16,8 +16,6 @@ public:
 
 #if defined(VOXEL_GODOT)
 	void _on_update_from_scene_button_pressed(VoxelInstanceLibraryMultiMeshItem *item);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	void _on_update_from_scene_button_pressed(Object *item_o);
 #endif
 
 protected:

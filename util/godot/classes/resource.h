@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/io/resource.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/resource.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {
@@ -34,8 +31,6 @@ inline void get_resource_configuration_warnings(
 			const String w = context + warnings[i];
 #if defined(VOXEL_GODOT)
 			warnings.write[i] = w;
-#elif defined(VOXEL_GODOT_EXTENSION)
-			warnings[i] = w;
 #endif
 		}
 	}

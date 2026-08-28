@@ -10,9 +10,6 @@
 #include <editor/gui/editor_spin_slider.h>
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/editor_spin_slider.hpp>
-using namespace godot;
 #endif
 
 #endif // VOXEL_GODOT_EDITOR_SPIN_SLIDER_H

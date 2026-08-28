@@ -19,13 +19,10 @@ public:
 
 	void set_model(Ref<VoxelBlockyModel> model);
 
-	// TODO GDX: `EditorUndoRedoManager` isn't a singleton yet in GDExtension, so it has to be injected
+	// `EditorUndoRedoManager` isn't a singleton, so it has to be injected.
 	void set_undo_redo(EditorUndoRedoManager *urm);
 
-	// TODO GDX: `SceneTree::get_process_time` is not exposed, can't get delta time from `_notification`
-#ifdef VOXEL_GODOT_EXTENSION
-	void _process(double delta) override;
-#endif
+	// TODO: `SceneTree::get_process_time` is not exposed, can't get delta time from `_notification`
 
 private:
 	void update_model();

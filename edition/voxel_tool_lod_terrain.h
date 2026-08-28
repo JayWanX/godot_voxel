@@ -46,11 +46,8 @@ public:
 	void do_hemisphere(Vector3 center, float radius, Vector3 flat_direction, float smoothness);
 	float get_voxel_f_interpolated(Vector3 position) const override;
 
-	// TODO GDX: it seems binding a method taking a `Node*` fails to compile. It is supposed to be working.
-#if defined(VOXEL_GODOT)
+	#if defined(VOXEL_GODOT)
 	Array separate_floating_chunks(AABB world_box, Node *parent_node);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	Array separate_floating_chunks(AABB world_box, Object *parent_node_o);
 #endif
 
 #ifdef VOXEL_ENABLE_MESH_SDF

@@ -29,9 +29,6 @@
 #endif
 
 VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice);
-#ifdef VOXEL_GODOT_EXTENSION
-using namespace godot;
-#endif
 
 namespace voxel {
 
@@ -161,9 +158,9 @@ public:
 	static void create_singleton(Config config);
 	static void destroy_singleton();
 
-	// This is a separate initialization step due to GDExtension limitations.
-	// It must be called when RenderingServer singleton is available (which is not the case with GDExtension during
-	// class registrations, contrary to modules).
+	// This is a separate initialization step.
+	// It must be called when RenderingServer singleton is available (which is not the case during
+	// class registrations).
 	// See https://github.com/godotengine/godot-cpp/issues/1180
 	void try_initialize_gpu_features();
 

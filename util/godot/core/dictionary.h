@@ -3,10 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/variant/dictionary.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/variant/dictionary.hpp>
-#include <godot_cpp/variant/variant.hpp>
-using namespace godot;
 #endif
 
 namespace voxel::godot {
@@ -22,16 +18,6 @@ inline bool try_get(const Dictionary &d, const Variant &key, T &out_value) {
 	// Because multiple C++ types match Variant types, and Variant types match multiple C++ types, and silently convert
 	// between them.
 	out_value = *v;
-	return true;
-#elif defined(VOXEL_GODOT_EXTENSION)
-	Variant v = d.get(key, Variant());
-	// TODO GDX: there is no way, in a single lookup, to differenciate an inexistent key and an existing key with the
-	// value `null`. So we have to do a second lookup to check what NIL meant.
-	if (v.get_type() == Variant::NIL) {
-		out_value = T();
-		return d.has(key);
-	}
-	out_value = v;
 	return true;
 #endif
 }

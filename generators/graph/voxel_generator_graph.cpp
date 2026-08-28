@@ -2439,14 +2439,12 @@ void VoxelGeneratorGraph::get_configuration_warnings(PackedStringArray &out_warn
 		_main_function->get_configuration_warnings(out_warnings);
 
 		if (_main_function->get_nodes_count() == 0) {
-			// Making a `String` explicitely because in GDExtension `get_class_static` is a `const char*`
 			out_warnings.append(String(VoxelGeneratorGraph::get_class_static()) + " is empty.");
 			return;
 		}
 	}
 
 	if (!is_good()) {
-		// Making a `String` explicitely because in GDExtension `get_class_static` is a `const char*`
 		out_warnings.append(String(VoxelGeneratorGraph::get_class_static()) + " contains errors.");
 		return;
 	}

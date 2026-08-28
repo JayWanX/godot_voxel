@@ -282,11 +282,6 @@ void VoxelBlockyModelViewer::_notification(int p_what) {
 }
 #endif
 
-#ifdef VOXEL_GODOT_EXTENSION
-void VoxelBlockyModelViewer::_process(double delta) {
-	process(delta);
-}
-#endif
 
 void VoxelBlockyModelViewer::process(float delta) {
 	if (_rotation_anim_basis.is_equal_approx(Basis())) {

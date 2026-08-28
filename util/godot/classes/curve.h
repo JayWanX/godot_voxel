@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <scene/resources/curve.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/classes/curve.hpp>
-using namespace godot;
 #endif
 
 #include "../../math/interval.h"

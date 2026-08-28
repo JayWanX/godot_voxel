@@ -3,9 +3,6 @@
 
 #if defined(VOXEL_GODOT)
 #include <core/math/transform_3d.h>
-#elif defined(VOXEL_GODOT_EXTENSION)
-#include <godot_cpp/variant/transform3d.hpp>
-using namespace godot;
 #endif
 
 namespace voxel {

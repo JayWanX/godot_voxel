@@ -13,7 +13,6 @@ class VoxelVoxLoader : public RefCounted {
 	GDCLASS(VoxelVoxLoader, RefCounted);
 
 public:
-	// TODO GDX: Can't bind functions returning a `godot::Error` enum
 	static int /*Error*/ load_from_file(
 			String fpath,
 			Ref<godot::VoxelBuffer> p_voxels,

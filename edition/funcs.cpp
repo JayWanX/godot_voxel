@@ -8,9 +8,6 @@
 #include "../util/profiling.h"
 #include "../util/string/format.h"
 
-#ifdef VOXEL_GODOT_EXTENSION
-using namespace godot;
-#endif
 
 namespace voxel {
 
@@ -299,9 +296,6 @@ void run_blocky_random_tick(
 				// Examples I found in the engine are inconsistent
 				ERR_FAIL_COND_V(error.error != Callable::CallError::CALL_OK, false);
 		// Return if it fails, we don't want an error spam
-#elif VOXEL_GODOT_EXTENSION
-				// TODO GDX: No way to detect or report errors when calling a Callable. Do I need to?
-				cd->callable.call(pos, val);
 #endif
 				return true;
 			}

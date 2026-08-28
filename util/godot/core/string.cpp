@@ -8,7 +8,7 @@ namespace voxel::godot {
 
 PackedStringArray to_godot(const StdVector<std::string_view> &svv) {
 	PackedStringArray psa;
-	// Not resizing up-front, because in Godot core writing elements uses different code than GDExtension.
+	// Not resizing up-front.
 	for (unsigned int i = 0; i < svv.size(); ++i) {
 		psa.append(to_godot(svv[i]));
 	}
@@ -17,7 +17,7 @@ PackedStringArray to_godot(const StdVector<std::string_view> &svv) {
 
 PackedStringArray to_godot(const StdVector<StdString> &sv) {
 	PackedStringArray psa;
-	// Not resizing up-front, because in Godot core writing elements uses different code than GDExtension.
+	// Not resizing up-front.
 	for (unsigned int i = 0; i < sv.size(); ++i) {
 		psa.append(to_godot(sv[i]));
 	}

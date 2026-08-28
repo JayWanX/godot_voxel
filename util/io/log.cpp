@@ -55,8 +55,6 @@ void print_line(const char *cstr) {
 
 #if defined(VOXEL_GODOT)
 	::print_line(cstr);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	::godot::UtilityFunctions::print(cstr);
 #endif
 
 #endif
@@ -69,8 +67,6 @@ void print_line(const FwdConstStdString &s) {
 void print_warning(const char *message, const char *func, const char *file, int line) {
 #if defined(VOXEL_GODOT)
 	_err_print_error(func, file, line, message, false, ERR_HANDLER_WARNING);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	::godot::_err_print_error(func, file, line, message, false, true);
 #endif
 }
 

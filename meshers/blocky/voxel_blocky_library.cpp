@@ -1,10 +1,6 @@
 #include "voxel_blocky_library.h"
 #include "../../constants/voxel_string_names.h"
 
-#ifdef VOXEL_GODOT_EXTENSION
-// For `MAKE_RESOURCE_TYPE_HINT`
-#include "../../util/godot/classes/object.h"
-#endif
 
 #include "../../util/godot/classes/time.h"
 #include "../../util/godot/core/array.h"

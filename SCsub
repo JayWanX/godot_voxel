@@ -1,7 +1,6 @@
 
 # 这是以"模块(module)"方式构建此引擎的 SCons 入口脚本。
 # 它必须集成进 Godot 的源码树中才能运行，无法独立执行，详见根目录 `README`。
-# 若要以 GDExtension 方式构建，参见 `SConstruct`。
 
 # env：Godot 引擎编译主环境（含编译器、平台、目标等配置）。
 # env_modules：专用于引擎内置模块的编译环境。
@@ -11,8 +10,8 @@ Import("env_modules")
 import common
 import voxel_version
 
-# 生成版本头文件（传入 True 表示以"模块"版本号生成，见 voxel_version.py）。
-voxel_version.generate_version_header(True)
+# 生成版本头文件。
+voxel_version.generate_version_header()
 
 # 注意：使用 FastNoise2 需要 C++17，且只在 x86 架构下可用。
 FAST_NOISE_2_SRC = env["voxel_fast_noise_2"]
@@ -50,7 +49,7 @@ if env["voxel_sqlite"]:
 	# if not env_sqlite.msvc:
 	#     env_sqlite.Append(CXXFLAGS=["-Wno-discarded-qualifiers"])
 
-	# TODO 增强：SQLite 在 Godot 与 GodotCpp 两种目标里的集成方式不应重复。
+	# TODO 增强：统一 SQLite 在模块构建中的集成方式。
 	# 被迫这样做是因为下面这行只适用于 Godot 自身的构建系统！
 	env_sqlite.add_source_files(env.modules_sources, ["thirdparty/sqlite/sqlite3.c"])
 

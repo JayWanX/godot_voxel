@@ -10,7 +10,7 @@
 #include "../../streams/load_all_blocks_data_task.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_set.h"
-#include "../../util/godot/classes/base_material_3d.h" // For property hint in release mode in GDExtension...
+#include "../../util/godot/classes/base_material_3d.h" // For property hint in release mode
 #include "../../util/godot/classes/camera_3d.h"
 #include "../../util/godot/classes/concave_polygon_shape_3d.h"
 #include "../../util/godot/classes/engine.h"

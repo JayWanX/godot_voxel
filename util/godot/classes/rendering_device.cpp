@@ -20,8 +20,6 @@ void free_rendering_device_rid(RenderingDevice &rd, RID rid) {
 	rd.free_rid(rid);
 #endif
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	rd.free_rid(rid);
 #endif
 }
 
@@ -46,9 +44,6 @@ Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShade
 	}
 	return bytecode;
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	Ref<RDShaderSource> source_ref(&p_source);
-	return rd.shader_compile_spirv_from_source(source_ref, p_allow_cache);
 #endif
 }
 
@@ -84,9 +79,6 @@ PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSP
 
 	return rd.shader_compile_binary_from_spirv(stage_data, name);
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	Ref<RDShaderSPIRV> spirv_data_ref(&p_spirv);
-	return rd.shader_compile_binary_from_spirv(spirv_data_ref, name);
 #endif
 }
 
@@ -128,10 +120,6 @@ RID texture_create(
 
 	return rd.texture_create(tf, tv, data);
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	Ref<RDTextureFormat> format_ref(&p_format);
-	Ref<RDTextureView> view_ref(&p_view);
-	return rd.texture_create(format_ref, view_ref, p_data);
 #endif
 }
 
@@ -141,8 +129,6 @@ RID uniform_set_create(RenderingDevice &rd, Array uniforms, RID shader, int shad
 	// Can't access the version of that method taking an `Array` because it is private...
 	return rd.call(SNAME("uniform_set_create"), uniforms, shader, shader_set);
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return rd.uniform_set_create(uniforms, shader, shader_set);
 #endif
 }
 
@@ -171,9 +157,6 @@ RID sampler_create(RenderingDevice &rd, const RDSamplerState &sampler_state) {
 
 	return rd.sampler_create(ss);
 
-#elif defined(VOXEL_GODOT_EXTENSION)
-	Ref<RDSamplerState> sampler_state_ref(&sampler_state);
-	return rd.sampler_create(sampler_state_ref);
 #endif
 }
 
@@ -192,16 +175,12 @@ Error update_storage_buffer(
 
 #if defined(VOXEL_GODOT)
 	return rd.buffer_update(rid, offset, size, pba.ptr(), RenderingDevice::BARRIER_MASK_ALL_BARRIERS);
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return rd.buffer_update(rid, offset, size, pba, RenderingDevice::BARRIER_MASK_ALL_BARRIERS);
 #endif
 
 #else // Godot 4.3 and later
 
 #if defined(VOXEL_GODOT)
 	return rd.buffer_update(rid, offset, size, pba.ptr());
-#elif defined(VOXEL_GODOT_EXTENSION)
-	return rd.buffer_update(rid, offset, size, pba);
 #endif
 
 #endif

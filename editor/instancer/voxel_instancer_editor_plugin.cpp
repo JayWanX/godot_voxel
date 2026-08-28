@@ -24,8 +24,7 @@ enum MenuItemID { //
 
 VoxelInstancerEditorPlugin::VoxelInstancerEditorPlugin() {}
 
-// TODO GDX: Can't initialize EditorPlugins in their constructor when they access EditorNode.
-// See https://github.com/godotengine/godot-cpp/issues/1179
+// EditorNode isn't ready during plugin construction, so defer work to `init()`.
 void VoxelInstancerEditorPlugin::init() {
 	MenuButton *menu_button = memnew(MenuButton);
 	menu_button->set_text(VoxelInstancer::get_class_static());
