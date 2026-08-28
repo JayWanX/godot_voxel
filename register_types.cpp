@@ -362,7 +362,7 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 #ifdef TOOLS_ENABLED
 		CheckRefCountDoesNotChange::set_enabled(config.ownership_checks);
 #endif
-		VoxelEngine::create_singleton(config.inner);
+		voxel::VoxelEngine::create_singleton(config.inner);
 
 		voxel::godot::VoxelEngine::create_singleton();
 		voxel::godot::add_singleton("VoxelEngine", voxel::godot::VoxelEngine::get_singleton());

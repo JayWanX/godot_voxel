@@ -405,7 +405,7 @@ Ref<VoxelRaycastResult> raycast_generic(
 		res = raycast_blocky(voxel_data, **mesher_blocky, ray_origin, ray_dir, max_distance, p_collision_mask);
 
 	} else if (try_get_as(mesher, mesher_cubes)) {
-		res = raycast_nonzero(voxel_data, ray_origin, ray_dir, max_distance, VoxelBuffer::CHANNEL_COLOR);
+		res = raycast_nonzero(voxel_data, ray_origin, ray_dir, max_distance, voxel::VoxelBuffer::CHANNEL_COLOR);
 
 	} else {
 		res = raycast_sdf(voxel_data, ray_origin, ray_dir, max_distance, binary_search_iterations, normal_enabled);
