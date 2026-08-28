@@ -13,15 +13,15 @@ VOXEL_GODOT_FORWARD_DECLARE(class SubViewport);
 
 namespace voxel {
 
-class VOXEL_Axes3DControl;
+class Voxel_Axes3DControl;
 
 // Basic SubViewport embedded in a Control for viewing 3D stuff.
 // Implements camera controls orbitting around the origin.
 // Godot has `MeshEditor` but it is specialized for Mesh resources without access to the hierarchy.
-class VOXEL_ModelViewer : public Control {
-	GDCLASS(VOXEL_ModelViewer, Control)
+class Voxel_ModelViewer : public Control {
+	GDCLASS(Voxel_ModelViewer, Control)
 public:
-	VOXEL_ModelViewer();
+	Voxel_ModelViewer();
 
 	void set_camera_distance(float d);
 
@@ -41,7 +41,7 @@ private:
 	float _pitch = 0.f;
 	float _yaw = 0.f;
 	float _distance = 1.9f;
-	VOXEL_Axes3DControl *_axes_3d_control = nullptr;
+	Voxel_Axes3DControl *_axes_3d_control = nullptr;
 	SubViewport *_viewport;
 };
 

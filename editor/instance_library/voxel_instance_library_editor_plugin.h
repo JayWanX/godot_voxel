@@ -12,8 +12,8 @@ VOXEL_GODOT_FORWARD_DECLARE(class AcceptDialog)
 
 namespace voxel {
 
-class VoxelInstanceLibraryEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VoxelInstanceLibraryEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class VoxelInstanceLibraryEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(VoxelInstanceLibraryEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	VoxelInstanceLibraryEditorPlugin();
 

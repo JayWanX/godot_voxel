@@ -4,7 +4,7 @@
 #include "voxel_engine.h"
 
 namespace voxel {
-class VOXEL_ThreadedTask;
+class Voxel_ThreadedTask;
 } // namespace voxel
 
 namespace voxel::godot {
@@ -36,7 +36,7 @@ public:
 	String get_version_git_hash() const;
 
 	Dictionary get_stats() const;
-	void schedule_task(Ref<VOXEL_ThreadedTask> task);
+	void schedule_task(Ref<Voxel_ThreadedTask> task);
 
 	int get_thread_count() const;
 	void set_thread_count(int count);

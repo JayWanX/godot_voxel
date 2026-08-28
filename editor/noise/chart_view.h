@@ -10,10 +10,10 @@ VOXEL_GODOT_FORWARD_DECLARE(class Line2D)
 
 namespace voxel {
 
-class VOXEL_ChartView : public Control {
-	GDCLASS(VOXEL_ChartView, Control)
+class Voxel_ChartView : public Control {
+	GDCLASS(Voxel_ChartView, Control)
 public:
-	VOXEL_ChartView();
+	Voxel_ChartView();
 
 	void set_points(Span<const Vector2> points);
 	void auto_fit_view(Vector2 margin_ratios);

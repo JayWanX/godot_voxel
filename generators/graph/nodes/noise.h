@@ -84,7 +84,7 @@ void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const FastNoiseLite
 	}
 }
 
-void add_fast_noise_lite_gradient_state_config(ShaderGenContext &ctx, const VOXEL_FastNoiseLiteGradient &fnl) {
+void add_fast_noise_lite_gradient_state_config(ShaderGenContext &ctx, const Voxel_FastNoiseLiteGradient &fnl) {
 	ctx.add_format(
 			"fnl_state warp_state = fnlCreateState({});\n"
 			"warp_state.domain_warp_type = {};\n"
@@ -105,7 +105,7 @@ void add_fast_noise_lite_gradient_state_config(ShaderGenContext &ctx, const VOXE
 	);
 }
 
-void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const VOXEL_FastNoiseLite &fnl) {
+void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const Voxel_FastNoiseLite &fnl) {
 	// TODO Add missing options
 	ctx.add_format(
 			"fnl_state state = fnlCreateState({});\n"
@@ -129,7 +129,7 @@ void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const VOXEL_FastNoi
 			fnl.get_cellular_return_type(),
 			fnl.get_cellular_jitter()
 	);
-	Ref<VOXEL_FastNoiseLiteGradient> fnlg = fnl.get_warp_noise();
+	Ref<Voxel_FastNoiseLiteGradient> fnlg = fnl.get_warp_noise();
 	if (fnlg.is_valid()) {
 		add_fast_noise_lite_gradient_state_config(ctx, **fnlg);
 	}
@@ -314,7 +314,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const VOXEL_FastNoiseLite *noise;
+			const Voxel_FastNoiseLite *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_2D];
@@ -325,15 +325,15 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.outputs.push_back(NodeType::Port("out"));
 		t.params.push_back(
 				NodeType::Param(
-						"noise", VOXEL_FastNoiseLite::get_class_static(), &create_resource_to_variant<VOXEL_FastNoiseLite>
+						"noise", Voxel_FastNoiseLite::get_class_static(), &create_resource_to_variant<Voxel_FastNoiseLite>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(Voxel_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -363,10 +363,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(Voxel_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -396,7 +396,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const VOXEL_FastNoiseLite *noise;
+			const Voxel_FastNoiseLite *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_3D];
@@ -408,15 +408,15 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.outputs.push_back(NodeType::Port("out"));
 		t.params.push_back(
 				NodeType::Param(
-						"noise", VOXEL_FastNoiseLite::get_class_static(), &create_resource_to_variant<VOXEL_FastNoiseLite>
+						"noise", Voxel_FastNoiseLite::get_class_static(), &create_resource_to_variant<Voxel_FastNoiseLite>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(Voxel_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -448,10 +448,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(Voxel_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -484,7 +484,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const VOXEL_FastNoiseLiteGradient *noise;
+			const Voxel_FastNoiseLiteGradient *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_GRADIENT_2D];
@@ -497,16 +497,16 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.params.push_back(
 				NodeType::Param(
 						"noise",
-						VOXEL_FastNoiseLiteGradient::get_class_static(),
-						&create_resource_to_variant<VOXEL_FastNoiseLiteGradient>
+						Voxel_FastNoiseLiteGradient::get_class_static(),
+						&create_resource_to_variant<Voxel_FastNoiseLiteGradient>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
-									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
+									   .format(varray(Voxel_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			Params p;
@@ -542,10 +542,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
-									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
+									   .format(varray(Voxel_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			ctx.require_lib_code("vg_fnl", g_fast_noise_lite_shader);
@@ -566,7 +566,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const VOXEL_FastNoiseLiteGradient *noise;
+			const Voxel_FastNoiseLiteGradient *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_GRADIENT_3D];
@@ -581,16 +581,16 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.params.push_back(
 				NodeType::Param(
 						"noise",
-						VOXEL_FastNoiseLiteGradient::get_class_static(),
-						&create_resource_to_variant<VOXEL_FastNoiseLiteGradient>
+						Voxel_FastNoiseLiteGradient::get_class_static(),
+						&create_resource_to_variant<Voxel_FastNoiseLiteGradient>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
-									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
+									   .format(varray(Voxel_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			Params p;
@@ -632,10 +632,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<Voxel_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
-									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
+									   .format(varray(Voxel_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			ctx.require_lib_code("vg_fnl", g_fast_noise_lite_shader);

@@ -15,17 +15,17 @@ Span<const Color> editor_property_get_colors(EditorProperty &self) {
 
 #if defined(VOXEL_GODOT)
 
-void VOXEL_EditorProperty::update_property() {
+void Voxel_EditorProperty::update_property() {
 	_voxel_update_property();
 }
 
 #endif
 
-void VOXEL_EditorProperty::_set_read_only(bool p_read_only) {
+void Voxel_EditorProperty::_set_read_only(bool p_read_only) {
 	_voxel_set_read_only(p_read_only);
 }
 
-void VOXEL_EditorProperty::_voxel_update_property() {}
-void VOXEL_EditorProperty::_voxel_set_read_only(bool p_read_only) {}
+void Voxel_EditorProperty::_voxel_update_property() {}
+void Voxel_EditorProperty::_voxel_set_read_only(bool p_read_only) {}
 
 } // namespace voxel::godot

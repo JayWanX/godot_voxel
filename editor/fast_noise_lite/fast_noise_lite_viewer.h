@@ -13,10 +13,10 @@ VOXEL_GODOT_FORWARD_DECLARE(class PopupMenu)
 
 namespace voxel {
 
-class VOXEL_NoiseAnalysisWindow;
+class Voxel_NoiseAnalysisWindow;
 
-class VOXEL_FastNoiseLiteViewer : public Control {
-	GDCLASS(VOXEL_FastNoiseLiteViewer, Control)
+class Voxel_FastNoiseLiteViewer : public Control {
+	GDCLASS(Voxel_FastNoiseLiteViewer, Control)
 public:
 	static const int PREVIEW_WIDTH = 300;
 	static const int PREVIEW_HEIGHT = 150;
@@ -25,12 +25,12 @@ public:
 		MENU_ANALYZE = 0
 	};
 
-	VOXEL_FastNoiseLiteViewer();
+	Voxel_FastNoiseLiteViewer();
 
-	void set_noise(Ref<VOXEL_FastNoiseLite> noise);
-	void set_noise_gradient(Ref<VOXEL_FastNoiseLiteGradient> noise_gradient);
+	void set_noise(Ref<Voxel_FastNoiseLite> noise);
+	void set_noise_gradient(Ref<Voxel_FastNoiseLiteGradient> noise_gradient);
 
-	void set_noise_analysis_window(VOXEL_NoiseAnalysisWindow *win) {
+	void set_noise_analysis_window(Voxel_NoiseAnalysisWindow *win) {
 		_noise_analysis_window = win;
 	}
 
@@ -49,12 +49,12 @@ private:
 
 	static void _bind_methods();
 
-	Ref<VOXEL_FastNoiseLite> _noise;
-	Ref<VOXEL_FastNoiseLiteGradient> _noise_gradient;
+	Ref<Voxel_FastNoiseLite> _noise;
+	Ref<Voxel_FastNoiseLiteGradient> _noise_gradient;
 	float _time_before_update = -1.f;
 	TextureRect *_texture_rect = nullptr;
 	PopupMenu *_context_menu = nullptr;
-	VOXEL_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
+	Voxel_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
 };
 
 } // namespace voxel

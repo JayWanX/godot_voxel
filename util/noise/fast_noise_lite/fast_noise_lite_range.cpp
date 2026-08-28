@@ -35,81 +35,81 @@ Interval fnl_single_cellular_value_3d(const fast_noise_lite::FastNoiseLite &fn, 
 	return Interval{ -1, 1 };
 }
 
-Interval get_fnl_cellular_range_2d(const VOXEL_FastNoiseLite &noise) {
+Interval get_fnl_cellular_range_2d(const Voxel_FastNoiseLite &noise) {
 	// There are many combinations with Cellular noise so instead of implementing them with intervals,
 	// I used empiric tests to figure out some bounds.
 
 	// Value mode must be handled separately.
 
 	switch (noise.get_cellular_distance_function()) {
-		case VOXEL_FastNoiseLite::CELLULAR_DISTANCE_EUCLIDEAN:
+		case Voxel_FastNoiseLite::CELLULAR_DISTANCE_EUCLIDEAN:
 			switch (noise.get_cellular_return_type()) {
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
 					return Interval{ -1.f, 0.08f };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
 					return Interval{ -0.92f, 0.35 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
 					return Interval{ -0.92f, 0.1 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
 					return Interval{ -1, 0.15 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
 					return Interval{ -1, 0 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
 					return Interval{ -1, 0 };
 				default:
 					ERR_FAIL_V(Interval(-1, 1));
 			}
 			break;
 
-		case VOXEL_FastNoiseLite::CELLULAR_DISTANCE_EUCLIDEAN_SQ:
+		case Voxel_FastNoiseLite::CELLULAR_DISTANCE_EUCLIDEAN_SQ:
 			switch (noise.get_cellular_return_type()) {
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
 					return Interval{ -1, 0.2 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
 					return Interval{ -1, 0.8 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
 					return Interval{ -1, 0.2 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
 					return Interval{ -1, 0.7 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
 					return Interval{ -1, 0 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
 					return Interval{ -1, 0 };
 				default:
 					ERR_FAIL_V(Interval(-1, 1));
 			}
 
-		case VOXEL_FastNoiseLite::CELLULAR_DISTANCE_MANHATTAN:
+		case Voxel_FastNoiseLite::CELLULAR_DISTANCE_MANHATTAN:
 			switch (noise.get_cellular_return_type()) {
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
 					return Interval{ -1, 0.75 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
 					return Interval{ -0.9, 0.8 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
 					return Interval{ -0.8, 0.8 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
 					return Interval{ -1.0, 0.5 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
 					return Interval{ -1.0, 0.7 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
 					return Interval{ -1.0, 0.0 };
 				default:
 					ERR_FAIL_V(Interval(-1, 1));
 			}
 
-		case VOXEL_FastNoiseLite::CELLULAR_DISTANCE_HYBRID:
+		case Voxel_FastNoiseLite::CELLULAR_DISTANCE_HYBRID:
 			switch (noise.get_cellular_return_type()) {
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE:
 					return Interval{ -1, 1.75 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2:
 					return Interval{ -0.9, 2.3 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_ADD:
 					return Interval{ -0.9, 1.9 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_SUB:
 					return Interval{ -1.0, 1.85 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_MUL:
 					return Interval{ -1.0, 3.4 };
-				case VOXEL_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
+				case Voxel_FastNoiseLite::CELLULAR_RETURN_DISTANCE_2_DIV:
 					return Interval{ -1.0, 0.0 };
 				default:
 					ERR_FAIL_V(Interval(-1, 1));
@@ -118,7 +118,7 @@ Interval get_fnl_cellular_range_2d(const VOXEL_FastNoiseLite &noise) {
 	return Interval{ -1.f, 1.f };
 }
 
-Interval get_fnl_cellular_range_3d(const VOXEL_FastNoiseLite &noise) {
+Interval get_fnl_cellular_range_3d(const Voxel_FastNoiseLite &noise) {
 	// There are many combinations with Cellular noise so instead of implementing them with intervals,
 	// I used empiric tests to figure out some bounds.
 
@@ -227,7 +227,7 @@ Interval fnl_single_opensimplex2s_3d(
 	);
 }
 
-Interval fnl_single_cellular_3d(const VOXEL_FastNoiseLite &noise, Interval x, Interval y, Interval z) {
+Interval fnl_single_cellular_3d(const Voxel_FastNoiseLite &noise, Interval x, Interval y, Interval z) {
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 	if (fn.mCellularReturnType == fast_noise_lite::FastNoiseLite::CellularReturnType_CellValue) {
 		return fnl_single_cellular_value_3d(fn, x, y, z);
@@ -235,7 +235,7 @@ Interval fnl_single_cellular_3d(const VOXEL_FastNoiseLite &noise, Interval x, In
 	return get_fnl_cellular_range_3d(noise);
 }
 
-Interval fnl_single_cellular_2d(const VOXEL_FastNoiseLite &noise, Interval x, Interval y) {
+Interval fnl_single_cellular_2d(const Voxel_FastNoiseLite &noise, Interval x, Interval y) {
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 	if (fn.mCellularReturnType == fast_noise_lite::FastNoiseLite::CellularReturnType_CellValue) {
 		return fnl_single_cellular_value_2d(fn, x, y);
@@ -300,7 +300,7 @@ Interval fnl_single_value_3d(
 	);
 }
 
-Interval fnl_gen_noise_single_2d(const VOXEL_FastNoiseLite &noise, const int seed, Interval x, Interval y) {
+Interval fnl_gen_noise_single_2d(const Voxel_FastNoiseLite &noise, const int seed, Interval x, Interval y) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
@@ -330,7 +330,7 @@ Interval fnl_gen_noise_single_2d(const VOXEL_FastNoiseLite &noise, const int see
 	}
 }
 
-Interval fnl_gen_noise_single_3d(const VOXEL_FastNoiseLite &noise, int seed, Interval x, Interval y, Interval z) {
+Interval fnl_gen_noise_single_3d(const Voxel_FastNoiseLite &noise, int seed, Interval x, Interval y, Interval z) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
@@ -352,7 +352,7 @@ Interval fnl_gen_noise_single_3d(const VOXEL_FastNoiseLite &noise, int seed, Int
 	}
 }
 
-Interval fnl_gen_fractal_fbm_2d(const VOXEL_FastNoiseLite &p_noise, Interval x, Interval y) {
+Interval fnl_gen_fractal_fbm_2d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
@@ -376,7 +376,7 @@ Interval fnl_gen_fractal_fbm_2d(const VOXEL_FastNoiseLite &p_noise, Interval x, 
 	return sum;
 }
 
-Interval fnl_gen_fractal_fbm_3d(const VOXEL_FastNoiseLite &p_noise, Interval x, Interval y, Interval z) {
+Interval fnl_gen_fractal_fbm_3d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y, Interval z) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
@@ -401,7 +401,7 @@ Interval fnl_gen_fractal_fbm_3d(const VOXEL_FastNoiseLite &p_noise, Interval x, 
 	return sum;
 }
 
-Interval fnl_gen_fractal_ridged_2d(const VOXEL_FastNoiseLite &p_noise, Interval x, Interval y) {
+Interval fnl_gen_fractal_ridged_2d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
@@ -425,7 +425,7 @@ Interval fnl_gen_fractal_ridged_2d(const VOXEL_FastNoiseLite &p_noise, Interval 
 	return sum;
 }
 
-Interval fnl_gen_fractal_ridged_3d(const VOXEL_FastNoiseLite &p_noise, Interval x, Interval y, Interval z) {
+Interval fnl_gen_fractal_ridged_3d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y, Interval z) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
@@ -450,20 +450,20 @@ Interval fnl_gen_fractal_ridged_3d(const VOXEL_FastNoiseLite &p_noise, Interval 
 	return sum;
 }
 
-Interval fnl_get_noise_2d(const VOXEL_FastNoiseLite &noise, Interval x, Interval y) {
+Interval fnl_get_noise_2d(const Voxel_FastNoiseLite &noise, Interval x, Interval y) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
 	fnl_transform_noise_coordinate_2d(fn, x, y);
 
 	switch (noise.get_fractal_type()) {
-		case VOXEL_FastNoiseLite::FRACTAL_NONE:
+		case Voxel_FastNoiseLite::FRACTAL_NONE:
 			return fnl_gen_noise_single_2d(noise, noise.get_seed(), x, y);
-		case VOXEL_FastNoiseLite::FRACTAL_FBM:
+		case Voxel_FastNoiseLite::FRACTAL_FBM:
 			return fnl_gen_fractal_fbm_2d(noise, x, y);
-		case VOXEL_FastNoiseLite::FRACTAL_RIDGED:
+		case Voxel_FastNoiseLite::FRACTAL_RIDGED:
 			return fnl_gen_fractal_ridged_2d(noise, x, y);
-		case VOXEL_FastNoiseLite::FRACTAL_PING_PONG:
+		case Voxel_FastNoiseLite::FRACTAL_PING_PONG:
 			// TODO Ping pong
 			return Interval(-1.f, 1.f);
 		default:
@@ -472,20 +472,20 @@ Interval fnl_get_noise_2d(const VOXEL_FastNoiseLite &noise, Interval x, Interval
 	}
 }
 
-Interval fnl_get_noise_3d(const VOXEL_FastNoiseLite &noise, Interval x, Interval y, Interval z) {
+Interval fnl_get_noise_3d(const Voxel_FastNoiseLite &noise, Interval x, Interval y, Interval z) {
 	// Same logic as in the FastNoiseLite internal function
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
 	fnl_transform_noise_coordinate_3d(fn, x, y, z);
 
 	switch (noise.get_fractal_type()) {
-		case VOXEL_FastNoiseLite::FRACTAL_NONE:
+		case Voxel_FastNoiseLite::FRACTAL_NONE:
 			return fnl_gen_noise_single_3d(noise, noise.get_seed(), x, y, z);
-		case VOXEL_FastNoiseLite::FRACTAL_FBM:
+		case Voxel_FastNoiseLite::FRACTAL_FBM:
 			return fnl_gen_fractal_fbm_3d(noise, x, y, z);
-		case VOXEL_FastNoiseLite::FRACTAL_RIDGED:
+		case Voxel_FastNoiseLite::FRACTAL_RIDGED:
 			return fnl_gen_fractal_ridged_3d(noise, x, y, z);
-		case VOXEL_FastNoiseLite::FRACTAL_PING_PONG:
+		case Voxel_FastNoiseLite::FRACTAL_PING_PONG:
 			// TODO Ping pong
 			return Interval(-1.f, 1.f);
 		default:
@@ -496,8 +496,8 @@ Interval fnl_get_noise_3d(const VOXEL_FastNoiseLite &noise, Interval x, Interval
 
 } // namespace
 
-Interval get_fnl_range_2d(const VOXEL_FastNoiseLite &noise, Interval x, Interval y) {
-	Ref<VOXEL_FastNoiseLiteGradient> grad = noise.get_warp_noise();
+Interval get_fnl_range_2d(const Voxel_FastNoiseLite &noise, Interval x, Interval y) {
+	Ref<Voxel_FastNoiseLiteGradient> grad = noise.get_warp_noise();
 	if (grad.is_valid()) {
 		math::Interval2 gr = get_fnl_gradient_range_2d(**grad, x, y);
 		x.add_interval(gr.x);
@@ -506,8 +506,8 @@ Interval get_fnl_range_2d(const VOXEL_FastNoiseLite &noise, Interval x, Interval
 	return fnl_get_noise_2d(noise, x, y);
 }
 
-Interval get_fnl_range_3d(const VOXEL_FastNoiseLite &noise, Interval x, Interval y, Interval z) {
-	Ref<VOXEL_FastNoiseLiteGradient> grad = noise.get_warp_noise();
+Interval get_fnl_range_3d(const Voxel_FastNoiseLite &noise, Interval x, Interval y, Interval z) {
+	Ref<Voxel_FastNoiseLiteGradient> grad = noise.get_warp_noise();
 	if (grad.is_valid()) {
 		math::Interval3 gr = get_fnl_gradient_range_3d(**grad, x, y, z);
 		x.add_interval(gr.x);
@@ -517,7 +517,7 @@ Interval get_fnl_range_3d(const VOXEL_FastNoiseLite &noise, Interval x, Interval
 	return fnl_get_noise_3d(noise, x, y, z);
 }
 
-math::Interval2 get_fnl_gradient_range_2d(const VOXEL_FastNoiseLiteGradient &noise, Interval x, Interval y) {
+math::Interval2 get_fnl_gradient_range_2d(const Voxel_FastNoiseLiteGradient &noise, Interval x, Interval y) {
 	// TODO More precise analysis
 	const float amp = Math::abs(noise.get_amplitude());
 	return math::Interval2{
@@ -526,7 +526,7 @@ math::Interval2 get_fnl_gradient_range_2d(const VOXEL_FastNoiseLiteGradient &noi
 	};
 }
 
-math::Interval3 get_fnl_gradient_range_3d(const VOXEL_FastNoiseLiteGradient &noise, Interval x, Interval y, Interval z) {
+math::Interval3 get_fnl_gradient_range_3d(const Voxel_FastNoiseLiteGradient &noise, Interval x, Interval y, Interval z) {
 	// TODO More precise analysis
 	const float amp = Math::abs(noise.get_amplitude());
 	return math::Interval3{

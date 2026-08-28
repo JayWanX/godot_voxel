@@ -8,18 +8,18 @@
 
 namespace voxel {
 
-VOXEL_ControlSizer::VOXEL_ControlSizer() {
+Voxel_ControlSizer::Voxel_ControlSizer() {
 	set_default_cursor_shape(Control::CURSOR_VSIZE);
 	const real_t editor_scale = EDSCALE;
 	set_custom_minimum_size(Vector2(0, editor_scale * 5));
 }
 
-void VOXEL_ControlSizer::set_target_control(Control *control) {
+void Voxel_ControlSizer::set_target_control(Control *control) {
 	_target_control.set(control);
 }
 
 #ifdef VOXEL_GODOT
-void VOXEL_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
+void Voxel_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
 #endif
 
 	Ref<InputEventMouseButton> mb = p_event;
@@ -54,7 +54,7 @@ void VOXEL_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
 	}
 }
 
-void VOXEL_ControlSizer::_notification(int p_what) {
+void Voxel_ControlSizer::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_MOUSE_ENTER: {
 			_mouse_inside = true;
@@ -82,12 +82,12 @@ void VOXEL_ControlSizer::_notification(int p_what) {
 	}
 }
 
-void VOXEL_ControlSizer::cache_theme() {
+void Voxel_ControlSizer::cache_theme() {
 	// TODO I'd like to cache this theme icon lookup.
 	// TODO Have a framework-level StringName cache singleton
 	_hover_icon = get_theme_icon("v_grabber", "SplitContainer");
 }
 
-void VOXEL_ControlSizer::_bind_methods() {}
+void Voxel_ControlSizer::_bind_methods() {}
 
 } // namespace voxel

@@ -8,8 +8,8 @@ namespace voxel {
 
 class VoxelGraphEditorPlugin;
 
-class VoxelGraphFunctionInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelGraphFunctionInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelGraphFunctionInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelGraphFunctionInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 public:
 	bool _voxel_can_handle(const Object *obj) const override;
 	bool _voxel_parse_property(Object *p_object, const Variant::Type p_type, const String &p_path,

@@ -1,4 +1,4 @@
-# VOXEL_SpotNoise
+# Voxel_SpotNoise
 
 Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 

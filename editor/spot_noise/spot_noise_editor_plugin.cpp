@@ -4,14 +4,14 @@
 
 namespace voxel {
 
-VOXEL_SpotNoiseEditorPlugin::VOXEL_SpotNoiseEditorPlugin() {
-	Ref<VOXEL_SpotNoiseEditorInspectorPlugin> plugin;
+Voxel_SpotNoiseEditorPlugin::Voxel_SpotNoiseEditorPlugin() {
+	Ref<Voxel_SpotNoiseEditorInspectorPlugin> plugin;
 	plugin.instantiate();
 	add_inspector_plugin(plugin);
 }
 
-String VOXEL_SpotNoiseEditorPlugin::_voxel_get_plugin_name() const {
-	return VOXEL_SpotNoiseEditorPlugin::get_class_static();
+String Voxel_SpotNoiseEditorPlugin::_voxel_get_plugin_name() const {
+	return Voxel_SpotNoiseEditorPlugin::get_class_static();
 }
 
 } // namespace voxel

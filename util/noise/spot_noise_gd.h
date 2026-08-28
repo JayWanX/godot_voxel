@@ -5,8 +5,8 @@
 
 namespace voxel {
 
-class VOXEL_SpotNoise : public Resource {
-	GDCLASS(VOXEL_SpotNoise, Resource);
+class Voxel_SpotNoise : public Resource {
+	GDCLASS(Voxel_SpotNoise, Resource);
 
 public:
 	int get_seed() const;

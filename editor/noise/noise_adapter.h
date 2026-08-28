@@ -16,7 +16,7 @@ struct NoiseAdapter {
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 	Ref<FastNoise2> fn2;
 #endif
-	Ref<VOXEL_FastNoiseLite> fnl;
+	Ref<Voxel_FastNoiseLite> fnl;
 
 	void unset() {
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
@@ -40,7 +40,7 @@ struct NoiseAdapter {
 	}
 #endif
 
-	void set(Ref<VOXEL_FastNoiseLite> noise) {
+	void set(Ref<Voxel_FastNoiseLite> noise) {
 		unset();
 		fnl = noise;
 	}

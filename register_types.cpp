@@ -269,10 +269,10 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		ClassDB::register_abstract_class<VoxelToolBuffer>();
 		ClassDB::register_abstract_class<VoxelToolMultipassGenerator>();
 		ClassDB::register_class<voxel::godot::VoxelBlockSerializer>();
-		ClassDB::register_class<VOXEL_FastNoiseLite>();
-		ClassDB::register_class<VOXEL_FastNoiseLiteGradient>();
-		ClassDB::register_class<VOXEL_SpotNoise>();
-		ClassDB::register_class<VOXEL_ThreadedTask>();
+		ClassDB::register_class<Voxel_FastNoiseLite>();
+		ClassDB::register_class<Voxel_FastNoiseLiteGradient>();
+		ClassDB::register_class<Voxel_SpotNoise>();
+		ClassDB::register_class<Voxel_ThreadedTask>();
 		ClassDB::register_class<VoxelTerrainMultiplayerSynchronizer>();
 		ClassDB::register_class<VoxelAStarGrid3D>();
 
@@ -396,8 +396,8 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 
 		EditorPlugins::add_by_type<VoxelGraphEditorPlugin>();
 		EditorPlugins::add_by_type<VoxelTerrainEditorPlugin>();
-		EditorPlugins::add_by_type<VOXEL_FastNoiseLiteEditorPlugin>();
-		EditorPlugins::add_by_type<VOXEL_SpotNoiseEditorPlugin>();
+		EditorPlugins::add_by_type<Voxel_FastNoiseLiteEditorPlugin>();
+		EditorPlugins::add_by_type<Voxel_SpotNoiseEditorPlugin>();
 		EditorPlugins::add_by_type<VoxelBlockyLibraryEditorPlugin>();
 		EditorPlugins::add_by_type<VoxelGeneratorMultipassEditorPlugin>();
 

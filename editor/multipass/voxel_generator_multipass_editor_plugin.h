@@ -6,8 +6,8 @@
 
 namespace voxel {
 
-class VoxelGeneratorMultipassEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VoxelGeneratorMultipassEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class VoxelGeneratorMultipassEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(VoxelGeneratorMultipassEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	VoxelGeneratorMultipassEditorPlugin();
 

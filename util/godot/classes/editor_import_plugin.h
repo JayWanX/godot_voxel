@@ -56,8 +56,8 @@ struct StringListWrapper {
 };
 
 // Wraps EditorImportPlugin to isolate engine API differences.
-class VOXEL_EditorImportPlugin : public EditorImportPlugin {
-	GDCLASS(VOXEL_EditorImportPlugin, EditorImportPlugin)
+class Voxel_EditorImportPlugin : public EditorImportPlugin {
+	GDCLASS(Voxel_EditorImportPlugin, EditorImportPlugin)
 public:
 #if defined(VOXEL_GODOT)
 	String get_importer_name() const override;

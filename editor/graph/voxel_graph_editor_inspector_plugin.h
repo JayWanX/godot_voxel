@@ -9,8 +9,8 @@ namespace voxel {
 // Because the default behavior of `EditorPropertyText` is to call the setter on every character typed, which is a
 // nightmare when editing an Expression node: inputs change constantly as the code is written which has much higher
 // chance of messing up existing connections, and creates individual UndoRedo actions as well.
-class VoxelGraphEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelGraphEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelGraphEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelGraphEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 protected:
 	bool _voxel_can_handle(const Object *obj) const override;
 	bool _voxel_parse_property(Object *p_object, const Variant::Type p_type, const String &p_path,

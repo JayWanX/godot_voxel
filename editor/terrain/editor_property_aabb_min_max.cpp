@@ -10,7 +10,7 @@
 
 namespace voxel {
 
-VOXEL_EditorPropertyAABBMinMax::VOXEL_EditorPropertyAABBMinMax() {
+Voxel_EditorPropertyAABBMinMax::Voxel_EditorPropertyAABBMinMax() {
 	GridContainer *grid = memnew(GridContainer);
 	grid->set_columns(4);
 	add_child(grid);
@@ -30,7 +30,7 @@ VOXEL_EditorPropertyAABBMinMax::VOXEL_EditorPropertyAABBMinMax() {
 		EditorSpinSlider *sb = memnew(EditorSpinSlider);
 		sb->set_flat(true);
 		sb->set_h_size_flags(SIZE_EXPAND_FILL);
-		sb->connect("value_changed", callable_mp(this, &VOXEL_EditorPropertyAABBMinMax::_on_value_changed));
+		sb->connect("value_changed", callable_mp(this, &Voxel_EditorPropertyAABBMinMax::_on_value_changed));
 		_spinboxes[i] = sb;
 
 		add_focusable(sb);
@@ -48,13 +48,13 @@ VOXEL_EditorPropertyAABBMinMax::VOXEL_EditorPropertyAABBMinMax() {
 	set_bottom_editor(grid);
 }
 
-void VOXEL_EditorPropertyAABBMinMax::_voxel_set_read_only(bool p_read_only) {
+void Voxel_EditorPropertyAABBMinMax::_voxel_set_read_only(bool p_read_only) {
 	for (unsigned int i = 0; i < _spinboxes.size(); i++) {
 		_spinboxes[i]->set_read_only(p_read_only);
 	}
 };
 
-void VOXEL_EditorPropertyAABBMinMax::_on_value_changed(double val) {
+void Voxel_EditorPropertyAABBMinMax::_on_value_changed(double val) {
 	if (_ignore_value_change) {
 		return;
 	}
@@ -70,7 +70,7 @@ void VOXEL_EditorPropertyAABBMinMax::_on_value_changed(double val) {
 	emit_changed(get_edited_property(), p, "");
 }
 
-void VOXEL_EditorPropertyAABBMinMax::_voxel_update_property() {
+void Voxel_EditorPropertyAABBMinMax::_voxel_update_property() {
 	const AABB val = get_edited_object()->get(get_edited_property());
 
 	_ignore_value_change = true;
@@ -85,7 +85,7 @@ void VOXEL_EditorPropertyAABBMinMax::_voxel_update_property() {
 	_ignore_value_change = false;
 }
 
-void VOXEL_EditorPropertyAABBMinMax::_notification(int p_what) {
+void Voxel_EditorPropertyAABBMinMax::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE:
 		case NOTIFICATION_THEME_CHANGED: {
@@ -97,7 +97,7 @@ void VOXEL_EditorPropertyAABBMinMax::_notification(int p_what) {
 	}
 }
 
-void VOXEL_EditorPropertyAABBMinMax::setup(
+void Voxel_EditorPropertyAABBMinMax::setup(
 		double p_min,
 		double p_max,
 		double p_step,
@@ -115,6 +115,6 @@ void VOXEL_EditorPropertyAABBMinMax::setup(
 	}
 }
 
-void VOXEL_EditorPropertyAABBMinMax::_bind_methods() {}
+void Voxel_EditorPropertyAABBMinMax::_bind_methods() {}
 
 } // namespace voxel

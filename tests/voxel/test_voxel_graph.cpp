@@ -212,7 +212,7 @@ void load_graph_with_expression(VoxelGraphFunction &g) {
 	g.add_connection(n_expression, 0, out_sdf, 0);
 }
 
-void load_graph_with_expression_and_noises(VoxelGraphFunction &g, Ref<VOXEL_FastNoiseLite> *out_zfnl) {
+void load_graph_with_expression_and_noises(VoxelGraphFunction &g, Ref<Voxel_FastNoiseLite> *out_zfnl) {
 	//                       SdfPreview
 	//                      /
 	//     X --- FastNoise2D
@@ -239,7 +239,7 @@ void load_graph_with_expression_and_noises(VoxelGraphFunction &g, Ref<VOXEL_Fast
 	var_names.push_back("c");
 	g.set_expression_node_inputs(n_expr, var_names);
 
-	Ref<VOXEL_FastNoiseLite> zfnl;
+	Ref<Voxel_FastNoiseLite> zfnl;
 	zfnl.instantiate();
 	g.set_node_param(n_fn2d, 0, zfnl);
 
@@ -349,7 +349,7 @@ void test_voxel_graph_generator_expressions() {
 }
 
 void test_voxel_graph_generator_expressions_2() {
-	Ref<VOXEL_FastNoiseLite> zfnl;
+	Ref<Voxel_FastNoiseLite> zfnl;
 	{
 		Ref<VoxelGeneratorGraph> generator_debug;
 		{
@@ -1460,10 +1460,10 @@ void test_voxel_graph_unused_single_texture_output() {
 		const uint32_t n_plane = func->create_node(VoxelGraphFunction::NODE_SDF_PLANE, Vector2());
 
 		const uint32_t n_noise = func->create_node(VoxelGraphFunction::NODE_FAST_NOISE_2D, Vector2());
-		Ref<VOXEL_FastNoiseLite> fnl;
+		Ref<Voxel_FastNoiseLite> fnl;
 		fnl.instantiate();
 		fnl->set_period(1024);
-		fnl->set_fractal_type(VOXEL_FastNoiseLite::FRACTAL_RIDGED);
+		fnl->set_fractal_type(Voxel_FastNoiseLite::FRACTAL_RIDGED);
 		fnl->set_fractal_octaves(5);
 		func->set_node_param(n_noise, 0, fnl);
 
@@ -2186,7 +2186,7 @@ void test_voxel_graph_many_subdivisions() {
 		const uint32_t n_out_sdf = g.create_node(VoxelGraphFunction::NODE_OUTPUT_SDF, Vector2(0, 0));
 		const uint32_t n_noise = g.create_node(VoxelGraphFunction::NODE_FAST_NOISE_3D, Vector2());
 
-		Ref<VOXEL_FastNoiseLite> noise;
+		Ref<Voxel_FastNoiseLite> noise;
 		noise.instantiate();
 		g.set_node_param(n_noise, 0, noise);
 

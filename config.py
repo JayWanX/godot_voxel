@@ -84,10 +84,10 @@ def get_doc_classes():
         "VoxelToolTerrain",
         "VoxelViewer",
         "VoxelVoxLoader",
-        "VOXEL_FastNoiseLite",
-        "VOXEL_FastNoiseLiteGradient",
-        "VOXEL_SpotNoise",
-        "VOXEL_ThreadedTask",
+        "Voxel_FastNoiseLite",
+        "Voxel_FastNoiseLiteGradient",
+        "Voxel_SpotNoise",
+        "Voxel_ThreadedTask",
     ]
 
 

@@ -8,21 +8,21 @@
 
 namespace voxel {
 
-VOXEL_FastNoiseLiteEditorPlugin::VOXEL_FastNoiseLiteEditorPlugin() {}
+Voxel_FastNoiseLiteEditorPlugin::Voxel_FastNoiseLiteEditorPlugin() {}
 
-String VOXEL_FastNoiseLiteEditorPlugin::_voxel_get_plugin_name() const {
-	return VOXEL_FastNoiseLite::get_class_static();
+String Voxel_FastNoiseLiteEditorPlugin::_voxel_get_plugin_name() const {
+	return Voxel_FastNoiseLite::get_class_static();
 }
 
-void VOXEL_FastNoiseLiteEditorPlugin::_notification(int p_what) {
+void Voxel_FastNoiseLiteEditorPlugin::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
 			Control *base_control = get_editor_interface()->get_base_control();
 
-			_noise_analysis_window = memnew(VOXEL_NoiseAnalysisWindow);
+			_noise_analysis_window = memnew(Voxel_NoiseAnalysisWindow);
 			base_control->add_child(_noise_analysis_window);
 
-			Ref<VOXEL_FastNoiseLiteEditorInspectorPlugin> plugin;
+			Ref<Voxel_FastNoiseLiteEditorInspectorPlugin> plugin;
 			plugin.instantiate();
 			plugin->set_noise_analysis_window(_noise_analysis_window);
 			add_inspector_plugin(plugin);

@@ -7,8 +7,8 @@
 
 namespace voxel {
 
-VOXEL_EditorPropertyTextChangeOnSubmit::VOXEL_EditorPropertyTextChangeOnSubmit() {
-	using Self = VOXEL_EditorPropertyTextChangeOnSubmit;
+Voxel_EditorPropertyTextChangeOnSubmit::Voxel_EditorPropertyTextChangeOnSubmit() {
+	using Self = Voxel_EditorPropertyTextChangeOnSubmit;
 	_line_edit = memnew(LineEdit);
 	add_child(_line_edit);
 	add_focusable(_line_edit);
@@ -18,7 +18,7 @@ VOXEL_EditorPropertyTextChangeOnSubmit::VOXEL_EditorPropertyTextChangeOnSubmit()
 	_line_edit->connect("focus_entered", callable_mp(this, &Self::_on_line_edit_focus_entered));
 }
 
-void VOXEL_EditorPropertyTextChangeOnSubmit::_voxel_update_property() {
+void Voxel_EditorPropertyTextChangeOnSubmit::_voxel_update_property() {
 	Object *obj = get_edited_object();
 	ERR_FAIL_COND(obj == nullptr);
 	_ignore_changes = true;
@@ -26,18 +26,18 @@ void VOXEL_EditorPropertyTextChangeOnSubmit::_voxel_update_property() {
 	_ignore_changes = false;
 }
 
-void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_entered() {
+void Voxel_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_entered() {
 	_changed = false;
 }
 
-void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_changed(String new_text) {
+void Voxel_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_changed(String new_text) {
 	if (_ignore_changes) {
 		return;
 	}
 	_changed = true;
 }
 
-void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_submitted(String text) {
+void Voxel_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_submitted(String text) {
 	if (_ignore_changes) {
 		return;
 	}
@@ -47,7 +47,7 @@ void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_submitted(String
 	}
 }
 
-void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_exited() {
+void Voxel_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_exited() {
 	if (_changed) {
 		_changed = false;
 
@@ -63,6 +63,6 @@ void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_exited() {
 	}
 }
 
-void VOXEL_EditorPropertyTextChangeOnSubmit::_bind_methods() {}
+void Voxel_EditorPropertyTextChangeOnSubmit::_bind_methods() {}
 
 } // namespace voxel

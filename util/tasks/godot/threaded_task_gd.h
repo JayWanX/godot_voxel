@@ -7,10 +7,10 @@
 
 namespace voxel {
 
-class VOXEL_ThreadedTaskInternal;
+class Voxel_ThreadedTaskInternal;
 
-class VOXEL_ThreadedTask : public RefCounted {
-	GDCLASS(VOXEL_ThreadedTask, RefCounted)
+class Voxel_ThreadedTask : public RefCounted {
+	GDCLASS(Voxel_ThreadedTask, RefCounted)
 public:
 	void run(int thread_index);
 	int get_priority();
@@ -29,7 +29,7 @@ private:
 	static void _bind_methods();
 
 	// Created upon scheduling, owned by the task runner
-	VOXEL_ThreadedTaskInternal *_scheduled_task = nullptr;
+	Voxel_ThreadedTaskInternal *_scheduled_task = nullptr;
 	bool _completed = false;
 };
 

@@ -1,4 +1,4 @@
-# VOXEL_FastNoiseLite
+# Voxel_FastNoiseLite
 
 Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
@@ -13,20 +13,20 @@ This is an alternative implementation of [FastNoiseLite](https://docs.godotengin
 
 Type                                                                      | Name                                                         | Default                            
 ------------------------------------------------------------------------- | ------------------------------------------------------------ | -----------------------------------
-[CellularDistanceFunction](VOXEL_FastNoiseLite.md#enumerations)              | [cellular_distance_function](#i_cellular_distance_function)  | CELLULAR_DISTANCE_EUCLIDEAN_SQ (1) 
+[CellularDistanceFunction](Voxel_FastNoiseLite.md#enumerations)              | [cellular_distance_function](#i_cellular_distance_function)  | CELLULAR_DISTANCE_EUCLIDEAN_SQ (1) 
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [cellular_jitter](#i_cellular_jitter)                        | 1.0                                
-[CellularReturnType](VOXEL_FastNoiseLite.md#enumerations)                    | [cellular_return_type](#i_cellular_return_type)              | CELLULAR_RETURN_DISTANCE (1)       
+[CellularReturnType](Voxel_FastNoiseLite.md#enumerations)                    | [cellular_return_type](#i_cellular_return_type)              | CELLULAR_RETURN_DISTANCE (1)       
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [fractal_gain](#i_fractal_gain)                              | 0.5                                
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [fractal_lacunarity](#i_fractal_lacunarity)                  | 2.0                                
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)      | [fractal_octaves](#i_fractal_octaves)                        | 3                                  
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [fractal_ping_pong_strength](#i_fractal_ping_pong_strength)  | 2.0                                
-[FractalType](VOXEL_FastNoiseLite.md#enumerations)                           | [fractal_type](#i_fractal_type)                              | FRACTAL_FBM (1)                    
+[FractalType](Voxel_FastNoiseLite.md#enumerations)                           | [fractal_type](#i_fractal_type)                              | FRACTAL_FBM (1)                    
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [fractal_weighted_strength](#i_fractal_weighted_strength)    | 0.0                                
-[NoiseType](VOXEL_FastNoiseLite.md#enumerations)                             | [noise_type](#i_noise_type)                                  | TYPE_OPEN_SIMPLEX_2 (0)            
+[NoiseType](Voxel_FastNoiseLite.md#enumerations)                             | [noise_type](#i_noise_type)                                  | TYPE_OPEN_SIMPLEX_2 (0)            
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [period](#i_period)                                          | 64.0                               
-[RotationType3D](VOXEL_FastNoiseLite.md#enumerations)                        | [rotation_type_3d](#i_rotation_type_3d)                      | ROTATION_3D_NONE (0)               
+[RotationType3D](Voxel_FastNoiseLite.md#enumerations)                        | [rotation_type_3d](#i_rotation_type_3d)                      | ROTATION_3D_NONE (0)               
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)      | [seed](#i_seed)                                              | 0                                  
-[VOXEL_FastNoiseLiteGradient](VOXEL_FastNoiseLiteGradient.md)                   | [warp_noise](#i_warp_noise)                                  |                                    
+[Voxel_FastNoiseLiteGradient](Voxel_FastNoiseLiteGradient.md)                   | [warp_noise](#i_warp_noise)                                  |                                    
 <p></p>
 
 ## Methods: 
@@ -84,7 +84,7 @@ enum **CellularReturnType**:
 
 ## Property Descriptions
 
-### [CellularDistanceFunction](VOXEL_FastNoiseLite.md#enumerations)<span id="i_cellular_distance_function"></span> **cellular_distance_function** = CELLULAR_DISTANCE_EUCLIDEAN_SQ (1)
+### [CellularDistanceFunction](Voxel_FastNoiseLite.md#enumerations)<span id="i_cellular_distance_function"></span> **cellular_distance_function** = CELLULAR_DISTANCE_EUCLIDEAN_SQ (1)
 
 *(This property has no documentation)*
 
@@ -92,7 +92,7 @@ enum **CellularReturnType**:
 
 *(This property has no documentation)*
 
-### [CellularReturnType](VOXEL_FastNoiseLite.md#enumerations)<span id="i_cellular_return_type"></span> **cellular_return_type** = CELLULAR_RETURN_DISTANCE (1)
+### [CellularReturnType](Voxel_FastNoiseLite.md#enumerations)<span id="i_cellular_return_type"></span> **cellular_return_type** = CELLULAR_RETURN_DISTANCE (1)
 
 *(This property has no documentation)*
 
@@ -112,7 +112,7 @@ enum **CellularReturnType**:
 
 *(This property has no documentation)*
 
-### [FractalType](VOXEL_FastNoiseLite.md#enumerations)<span id="i_fractal_type"></span> **fractal_type** = FRACTAL_FBM (1)
+### [FractalType](Voxel_FastNoiseLite.md#enumerations)<span id="i_fractal_type"></span> **fractal_type** = FRACTAL_FBM (1)
 
 *(This property has no documentation)*
 
@@ -120,7 +120,7 @@ enum **CellularReturnType**:
 
 *(This property has no documentation)*
 
-### [NoiseType](VOXEL_FastNoiseLite.md#enumerations)<span id="i_noise_type"></span> **noise_type** = TYPE_OPEN_SIMPLEX_2 (0)
+### [NoiseType](Voxel_FastNoiseLite.md#enumerations)<span id="i_noise_type"></span> **noise_type** = TYPE_OPEN_SIMPLEX_2 (0)
 
 *(This property has no documentation)*
 
@@ -128,7 +128,7 @@ enum **CellularReturnType**:
 
 *(This property has no documentation)*
 
-### [RotationType3D](VOXEL_FastNoiseLite.md#enumerations)<span id="i_rotation_type_3d"></span> **rotation_type_3d** = ROTATION_3D_NONE (0)
+### [RotationType3D](Voxel_FastNoiseLite.md#enumerations)<span id="i_rotation_type_3d"></span> **rotation_type_3d** = ROTATION_3D_NONE (0)
 
 *(This property has no documentation)*
 
@@ -136,7 +136,7 @@ enum **CellularReturnType**:
 
 *(This property has no documentation)*
 
-### [VOXEL_FastNoiseLiteGradient](VOXEL_FastNoiseLiteGradient.md)<span id="i_warp_noise"></span> **warp_noise**
+### [Voxel_FastNoiseLiteGradient](Voxel_FastNoiseLiteGradient.md)<span id="i_warp_noise"></span> **warp_noise**
 
 *(This property has no documentation)*
 

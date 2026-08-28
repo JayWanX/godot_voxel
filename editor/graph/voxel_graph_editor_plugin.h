@@ -17,8 +17,8 @@ class VoxelNode;
 class VoxelGraphEditorWindow;
 class VoxelGraphEditorIODialog;
 
-class VoxelGraphEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VoxelGraphEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class VoxelGraphEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(VoxelGraphEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	VoxelGraphEditorPlugin();
 

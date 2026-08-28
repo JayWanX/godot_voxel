@@ -8,11 +8,11 @@
 namespace voxel::tests {
 
 void test_fnl_range() {
-	Ref<VOXEL_FastNoiseLite> noise;
+	Ref<Voxel_FastNoiseLite> noise;
 	noise.instantiate();
-	noise->set_noise_type(VOXEL_FastNoiseLite::TYPE_OPEN_SIMPLEX_2S);
-	noise->set_fractal_type(VOXEL_FastNoiseLite::FRACTAL_NONE);
-	// noise->set_fractal_type(VOXEL_FastNoiseLite::FRACTAL_FBM);
+	noise->set_noise_type(Voxel_FastNoiseLite::TYPE_OPEN_SIMPLEX_2S);
+	noise->set_fractal_type(Voxel_FastNoiseLite::FRACTAL_NONE);
+	// noise->set_fractal_type(Voxel_FastNoiseLite::FRACTAL_FBM);
 	noise->set_fractal_octaves(1);
 	noise->set_fractal_lacunarity(2.0);
 	noise->set_fractal_gain(0.5);
@@ -51,7 +51,7 @@ void test_fnl_range() {
 }
 
 void test_spot_noise() {
-	Ref<VOXEL_SpotNoise> noise;
+	Ref<Voxel_SpotNoise> noise;
 	noise.instantiate();
 	const float cell_size = 42.f;
 	noise->set_cell_size(cell_size);

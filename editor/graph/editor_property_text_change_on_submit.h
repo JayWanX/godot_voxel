@@ -12,10 +12,10 @@ namespace voxel {
 // This is not always desired. Instead, this editor should emit a change only when enter is pressed, or when the
 // editor looses focus.
 // Note: Godot's default string editor for LineEdit is `EditorPropertyText`
-class VOXEL_EditorPropertyTextChangeOnSubmit : public voxel::godot::VOXEL_EditorProperty {
-	GDCLASS(VOXEL_EditorPropertyTextChangeOnSubmit, voxel::godot::VOXEL_EditorProperty)
+class Voxel_EditorPropertyTextChangeOnSubmit : public voxel::godot::Voxel_EditorProperty {
+	GDCLASS(Voxel_EditorPropertyTextChangeOnSubmit, voxel::godot::Voxel_EditorProperty)
 public:
-	VOXEL_EditorPropertyTextChangeOnSubmit();
+	Voxel_EditorPropertyTextChangeOnSubmit();
 
 protected:
 	void _voxel_update_property() override;

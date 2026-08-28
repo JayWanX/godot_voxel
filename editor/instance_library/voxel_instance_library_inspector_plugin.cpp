@@ -38,7 +38,7 @@ bool VoxelInstanceLibraryInspectorPlugin::_voxel_parse_property(
 		list_editor->set_library(library);
 		add_custom_control(list_editor);
 
-		VOXEL_ControlSizer *sizer = memnew(VOXEL_ControlSizer);
+		Voxel_ControlSizer *sizer = memnew(Voxel_ControlSizer);
 		sizer->set_target_control(list_editor);
 		add_custom_control(sizer);
 	}

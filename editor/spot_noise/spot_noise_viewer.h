@@ -9,15 +9,15 @@ VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
 
 namespace voxel {
 
-class VOXEL_SpotNoiseViewer : public Control {
-	GDCLASS(VOXEL_SpotNoiseViewer, Control)
+class Voxel_SpotNoiseViewer : public Control {
+	GDCLASS(Voxel_SpotNoiseViewer, Control)
 public:
 	static const int PREVIEW_WIDTH = 300;
 	static const int PREVIEW_HEIGHT = 150;
 
-	VOXEL_SpotNoiseViewer();
+	Voxel_SpotNoiseViewer();
 
-	void set_noise(Ref<VOXEL_SpotNoise> noise);
+	void set_noise(Ref<Voxel_SpotNoise> noise);
 
 private:
 	void _on_noise_changed();
@@ -27,7 +27,7 @@ private:
 
 	static void _bind_methods();
 
-	Ref<VOXEL_SpotNoise> _noise;
+	Ref<Voxel_SpotNoise> _noise;
 	float _time_before_update = -1.f;
 	TextureRect *_texture_rect = nullptr;
 };

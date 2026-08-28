@@ -14,19 +14,19 @@ VOXEL_GODOT_FORWARD_DECLARE(class OptionButton)
 
 namespace voxel {
 
-class VOXEL_ChartView;
+class Voxel_ChartView;
 
 // This is an experimental tool to check noise properties empirically,
 // by sampling it a lot of times and seeing what the minimum and maximum values are.
-class VOXEL_NoiseAnalysisWindow : public AcceptDialog {
-	GDCLASS(VOXEL_NoiseAnalysisWindow, AcceptDialog)
+class Voxel_NoiseAnalysisWindow : public AcceptDialog {
+	GDCLASS(Voxel_NoiseAnalysisWindow, AcceptDialog)
 public:
-	VOXEL_NoiseAnalysisWindow();
+	Voxel_NoiseAnalysisWindow();
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 	void set_noise(Ref<FastNoise2> noise);
 #endif
-	void set_noise(Ref<VOXEL_FastNoiseLite> noise);
+	void set_noise(Ref<Voxel_FastNoiseLite> noise);
 
 private:
 	enum Dimension { //
@@ -50,7 +50,7 @@ private:
 	SpinBox *_area_size_spinbox = nullptr;
 	SpinBox *_samples_count_spinbox = nullptr;
 
-	VOXEL_ChartView *_chart_view = nullptr;
+	Voxel_ChartView *_chart_view = nullptr;
 
 	ProgressBar *_progress_bar = nullptr;
 

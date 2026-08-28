@@ -5,10 +5,10 @@
 
 namespace voxel {
 
-class VOXEL_SpotNoiseEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VOXEL_SpotNoiseEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class Voxel_SpotNoiseEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(Voxel_SpotNoiseEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
-	VOXEL_SpotNoiseEditorPlugin();
+	Voxel_SpotNoiseEditorPlugin();
 
 protected:
 	String _voxel_get_plugin_name() const override;

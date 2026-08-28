@@ -238,7 +238,7 @@ Inputs: `x`, `y`
 Outputs: `out`
 Parameters: `noise`
 
-Returns computation of 2D noise at coordinates `(x, y)` using the FastNoiseLite library. The `noise` parameter is specified with an instance of the [VOXEL_FastNoiseLite](api/VOXEL_FastNoiseLite.md) resource.
+Returns computation of 2D noise at coordinates `(x, y)` using the FastNoiseLite library. The `noise` parameter is specified with an instance of the [Voxel_FastNoiseLite](api/Voxel_FastNoiseLite.md) resource.
 Note: this node might be a little faster than `Noise2D`.
 
 ### FastNoise2_2D
@@ -263,7 +263,7 @@ Inputs: `x`, `y`, `z`
 Outputs: `out`
 Parameters: `noise`
 
-Returns computation of 3D noise at coordinates `(x, y, z)` using the FastNoiseLite library. The `noise` parameter is specified with an instance of the [VOXEL_FastNoiseLite](api/VOXEL_FastNoiseLite.md) resource.
+Returns computation of 3D noise at coordinates `(x, y, z)` using the FastNoiseLite library. The `noise` parameter is specified with an instance of the [Voxel_FastNoiseLite](api/Voxel_FastNoiseLite.md) resource.
 Note: this node might be a little faster than `Noise3D`.
 
 ### FastNoiseGradient2D

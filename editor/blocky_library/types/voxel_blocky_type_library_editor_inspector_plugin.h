@@ -8,8 +8,8 @@ namespace voxel {
 
 class VoxelBlockyTypeLibraryIDSDialog;
 
-class VoxelBlockyTypeLibraryEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelBlockyTypeLibraryEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelBlockyTypeLibraryEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelBlockyTypeLibraryEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 public:
 	void set_ids_dialog(VoxelBlockyTypeLibraryIDSDialog *ids_dialog);
 

@@ -8,8 +8,8 @@ VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
 
 namespace voxel {
 
-class VoxelBlockyModelEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelBlockyModelEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelBlockyModelEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelBlockyModelEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 public:
 	// `EditorUndoRedoManager` isn't a singleton, so it has to be injected.
 	void set_undo_redo(EditorUndoRedoManager *urm);

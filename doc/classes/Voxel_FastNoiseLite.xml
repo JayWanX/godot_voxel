@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VOXEL_FastNoiseLite" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="Voxel_FastNoiseLite" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		Generates coherent and fractal noise using the [url=https://github.com/Auburn/FastNoiseLite]FastNoiseLite[/url] library.
 	</brief_description>
@@ -38,11 +38,11 @@
 		</method>
 	</methods>
 	<members>
-		<member name="cellular_distance_function" type="int" setter="set_cellular_distance_function" getter="get_cellular_distance_function" enum="VOXEL_FastNoiseLite.CellularDistanceFunction" default="1">
+		<member name="cellular_distance_function" type="int" setter="set_cellular_distance_function" getter="get_cellular_distance_function" enum="Voxel_FastNoiseLite.CellularDistanceFunction" default="1">
 		</member>
 		<member name="cellular_jitter" type="float" setter="set_cellular_jitter" getter="get_cellular_jitter" default="1.0">
 		</member>
-		<member name="cellular_return_type" type="int" setter="set_cellular_return_type" getter="get_cellular_return_type" enum="VOXEL_FastNoiseLite.CellularReturnType" default="1">
+		<member name="cellular_return_type" type="int" setter="set_cellular_return_type" getter="get_cellular_return_type" enum="Voxel_FastNoiseLite.CellularReturnType" default="1">
 		</member>
 		<member name="fractal_gain" type="float" setter="set_fractal_gain" getter="get_fractal_gain" default="0.5">
 		</member>
@@ -52,19 +52,19 @@
 		</member>
 		<member name="fractal_ping_pong_strength" type="float" setter="set_fractal_ping_pong_strength" getter="get_fractal_ping_pong_strength" default="2.0">
 		</member>
-		<member name="fractal_type" type="int" setter="set_fractal_type" getter="get_fractal_type" enum="VOXEL_FastNoiseLite.FractalType" default="1">
+		<member name="fractal_type" type="int" setter="set_fractal_type" getter="get_fractal_type" enum="Voxel_FastNoiseLite.FractalType" default="1">
 		</member>
 		<member name="fractal_weighted_strength" type="float" setter="set_fractal_weighted_strength" getter="get_fractal_weighted_strength" default="0.0">
 		</member>
-		<member name="noise_type" type="int" setter="set_noise_type" getter="get_noise_type" enum="VOXEL_FastNoiseLite.NoiseType" default="0">
+		<member name="noise_type" type="int" setter="set_noise_type" getter="get_noise_type" enum="Voxel_FastNoiseLite.NoiseType" default="0">
 		</member>
 		<member name="period" type="float" setter="set_period" getter="get_period" default="64.0">
 		</member>
-		<member name="rotation_type_3d" type="int" setter="set_rotation_type_3d" getter="get_rotation_type_3d" enum="VOXEL_FastNoiseLite.RotationType3D" default="0">
+		<member name="rotation_type_3d" type="int" setter="set_rotation_type_3d" getter="get_rotation_type_3d" enum="Voxel_FastNoiseLite.RotationType3D" default="0">
 		</member>
 		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="0">
 		</member>
-		<member name="warp_noise" type="VOXEL_FastNoiseLiteGradient" setter="set_warp_noise" getter="get_warp_noise">
+		<member name="warp_noise" type="Voxel_FastNoiseLiteGradient" setter="set_warp_noise" getter="get_warp_noise">
 		</member>
 	</members>
 	<constants>

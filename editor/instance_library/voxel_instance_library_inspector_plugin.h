@@ -10,8 +10,8 @@ namespace voxel {
 
 class VoxelInstanceLibraryEditorPlugin;
 
-class VoxelInstanceLibraryInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelInstanceLibraryInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelInstanceLibraryInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelInstanceLibraryInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 public:
 	Control *icon_provider = nullptr;
 	VoxelInstanceLibraryEditorPlugin *plugin = nullptr;

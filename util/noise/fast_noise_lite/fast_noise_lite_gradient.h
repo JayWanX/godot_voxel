@@ -14,8 +14,8 @@ namespace voxel {
 // Note: FastNoiseLite provides this with the same class, but then its unclear which applies to what,
 // so I made two classes, each with a specific purpose.
 //
-class VOXEL_FastNoiseLiteGradient : public Resource {
-	GDCLASS(VOXEL_FastNoiseLiteGradient, Resource)
+class Voxel_FastNoiseLiteGradient : public Resource {
+	GDCLASS(Voxel_FastNoiseLiteGradient, Resource)
 
 	typedef ::fast_noise_lite::FastNoiseLite _FastNoise;
 
@@ -43,7 +43,7 @@ public:
 		ROTATION_3D_IMPROVE_XZ_PLANES = _FastNoise::RotationType3D_ImproveXZPlanes
 	};
 
-	VOXEL_FastNoiseLiteGradient();
+	Voxel_FastNoiseLiteGradient();
 
 	void set_noise_type(NoiseType type);
 	NoiseType get_noise_type() const;
@@ -121,8 +121,8 @@ private:
 
 } // namespace voxel
 
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLiteGradient::NoiseType);
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLiteGradient::FractalType);
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLiteGradient::RotationType3D);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLiteGradient::NoiseType);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLiteGradient::FractalType);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLiteGradient::RotationType3D);
 
 #endif // VOXEL_FAST_NOISE_LITE_GRADIENT_H

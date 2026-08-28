@@ -176,7 +176,7 @@ VoxelBlockyModelViewer::VoxelBlockyModelViewer() {
 
 	const float editor_scale = EDSCALE;
 
-	VOXEL_ModelViewer *viewer = memnew(VOXEL_ModelViewer);
+	Voxel_ModelViewer *viewer = memnew(Voxel_ModelViewer);
 	viewer->set_h_size_flags(Container::SIZE_EXPAND_FILL);
 	viewer->set_v_size_flags(Container::SIZE_EXPAND_FILL);
 	viewer->set_custom_minimum_size(Vector2(100, 150 * editor_scale));

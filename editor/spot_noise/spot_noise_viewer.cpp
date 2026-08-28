@@ -13,7 +13,7 @@
 
 namespace voxel {
 
-VOXEL_SpotNoiseViewer::VOXEL_SpotNoiseViewer() {
+Voxel_SpotNoiseViewer::Voxel_SpotNoiseViewer() {
 	set_custom_minimum_size(Vector2(0, EDSCALE * PREVIEW_HEIGHT));
 
 	_texture_rect = memnew(TextureRect);
@@ -22,19 +22,19 @@ VOXEL_SpotNoiseViewer::VOXEL_SpotNoiseViewer() {
 	add_child(_texture_rect);
 }
 
-void VOXEL_SpotNoiseViewer::set_noise(Ref<VOXEL_SpotNoise> noise) {
+void Voxel_SpotNoiseViewer::set_noise(Ref<Voxel_SpotNoise> noise) {
 	if (_noise == noise) {
 		return;
 	}
 
 	if (_noise.is_valid()) {
-		_noise->disconnect("changed", callable_mp(this, &VOXEL_SpotNoiseViewer::_on_noise_changed));
+		_noise->disconnect("changed", callable_mp(this, &Voxel_SpotNoiseViewer::_on_noise_changed));
 	}
 
 	_noise = noise;
 
 	if (_noise.is_valid()) {
-		_noise->connect("changed", callable_mp(this, &VOXEL_SpotNoiseViewer::_on_noise_changed));
+		_noise->connect("changed", callable_mp(this, &Voxel_SpotNoiseViewer::_on_noise_changed));
 		set_process(true);
 		update_preview();
 
@@ -44,11 +44,11 @@ void VOXEL_SpotNoiseViewer::set_noise(Ref<VOXEL_SpotNoise> noise) {
 	}
 }
 
-void VOXEL_SpotNoiseViewer::_on_noise_changed() {
+void Voxel_SpotNoiseViewer::_on_noise_changed() {
 	_time_before_update = 0.5f;
 }
 
-void VOXEL_SpotNoiseViewer::_notification(int p_what) {
+void Voxel_SpotNoiseViewer::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS: {
 			if (_time_before_update > 0.f) {
@@ -98,7 +98,7 @@ void draw_grid(Image &im, float cell_size, Color color) {
 } // namespace
 
 // TODO Use thread?
-void VOXEL_SpotNoiseViewer::update_preview() {
+void Voxel_SpotNoiseViewer::update_preview() {
 	const Vector2i preview_size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 
 	Ref<Image> im = godot::create_empty_image(preview_size.x, preview_size.y, false, Image::FORMAT_L8);
@@ -121,6 +121,6 @@ void VOXEL_SpotNoiseViewer::update_preview() {
 	_texture_rect->set_texture(tex);
 }
 
-void VOXEL_SpotNoiseViewer::_bind_methods() {}
+void Voxel_SpotNoiseViewer::_bind_methods() {}
 
 } // namespace voxel

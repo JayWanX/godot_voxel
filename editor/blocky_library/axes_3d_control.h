@@ -7,8 +7,8 @@ namespace voxel {
 
 // Displays 3D axes in a Control node using only 2D drawing.
 // Similar to `ViewportRotationControl`, but much smaller to fit in smaller editors.
-class VOXEL_Axes3DControl : public Control {
-	GDCLASS(VOXEL_Axes3DControl, Control)
+class Voxel_Axes3DControl : public Control {
+	GDCLASS(Voxel_Axes3DControl, Control)
 public:
 	void set_basis_3d(Basis basis);
 

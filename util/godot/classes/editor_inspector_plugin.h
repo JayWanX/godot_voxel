@@ -15,8 +15,8 @@
 
 namespace voxel::godot {
 
-class VOXEL_EditorInspectorPlugin : public EditorInspectorPlugin {
-	GDCLASS(VOXEL_EditorInspectorPlugin, EditorInspectorPlugin)
+class Voxel_EditorInspectorPlugin : public EditorInspectorPlugin {
+	GDCLASS(Voxel_EditorInspectorPlugin, EditorInspectorPlugin)
 public:
 #if defined(VOXEL_GODOT)
 	bool can_handle(Object *p_object) override;

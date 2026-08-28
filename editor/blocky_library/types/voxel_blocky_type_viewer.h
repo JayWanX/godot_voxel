@@ -12,8 +12,8 @@ namespace voxel {
 class VoxelBlockyTypeAttributeCombinationSelector;
 
 // 3D viewer specialized to inspect blocky types.
-class VoxelBlockyTypeViewer : public VOXEL_ModelViewer {
-	GDCLASS(VoxelBlockyTypeViewer, VOXEL_ModelViewer)
+class VoxelBlockyTypeViewer : public Voxel_ModelViewer {
+	GDCLASS(VoxelBlockyTypeViewer, Voxel_ModelViewer)
 public:
 	VoxelBlockyTypeViewer();
 

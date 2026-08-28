@@ -6,8 +6,8 @@
 
 namespace voxel {
 
-class VOXEL_SpotNoiseEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VOXEL_SpotNoiseEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class Voxel_SpotNoiseEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(Voxel_SpotNoiseEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 protected:
 	bool _voxel_can_handle(const Object *p_object) const override;
 	void _voxel_parse_begin(Object *p_object) override;

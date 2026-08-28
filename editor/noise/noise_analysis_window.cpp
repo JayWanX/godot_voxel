@@ -16,7 +16,7 @@
 
 namespace voxel {
 
-VOXEL_NoiseAnalysisWindow::VOXEL_NoiseAnalysisWindow() {
+Voxel_NoiseAnalysisWindow::Voxel_NoiseAnalysisWindow() {
 	set_title(VOXEL_TTR("Noise Analysis"));
 	set_min_size(Vector2(300.f * EDSCALE, 0));
 
@@ -103,7 +103,7 @@ VOXEL_NoiseAnalysisWindow::VOXEL_NoiseAnalysisWindow() {
 	{
 		_calculate_button = memnew(Button);
 		_calculate_button->set_text(VOXEL_TTR("Calculate"));
-		_calculate_button->connect("pressed", callable_mp(this, &VOXEL_NoiseAnalysisWindow::_on_calculate_button_pressed));
+		_calculate_button->connect("pressed", callable_mp(this, &Voxel_NoiseAnalysisWindow::_on_calculate_button_pressed));
 		vbox_container->add_child(_calculate_button);
 	}
 
@@ -122,7 +122,7 @@ VOXEL_NoiseAnalysisWindow::VOXEL_NoiseAnalysisWindow() {
 		vbox_container->add_child(label);
 	}
 
-	_chart_view = memnew(VOXEL_ChartView);
+	_chart_view = memnew(Voxel_ChartView);
 	_chart_view->set_custom_minimum_size(Vector2(0, 150.0 * EDSCALE));
 	_chart_view->set_v_size_flags(Control::SIZE_EXPAND_FILL);
 	vbox_container->add_child(_chart_view);
@@ -167,12 +167,12 @@ VOXEL_NoiseAnalysisWindow::VOXEL_NoiseAnalysisWindow() {
 }
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
-void VOXEL_NoiseAnalysisWindow::set_noise(Ref<FastNoise2> noise) {
+void Voxel_NoiseAnalysisWindow::set_noise(Ref<FastNoise2> noise) {
 	_adapter.set(noise);
 }
 #endif
 
-void VOXEL_NoiseAnalysisWindow::set_noise(Ref<VOXEL_FastNoiseLite> noise) {
+void Voxel_NoiseAnalysisWindow::set_noise(Ref<Voxel_FastNoiseLite> noise) {
 	_adapter.set(noise);
 }
 
@@ -187,7 +187,7 @@ StdVector<Vector3> &get_tls_precomputed_unit_vectors_3d() {
 }
 } // namespace
 
-void VOXEL_NoiseAnalysisWindow::_on_calculate_button_pressed() {
+void Voxel_NoiseAnalysisWindow::_on_calculate_button_pressed() {
 	ERR_FAIL_COND(_adapter.is_null());
 
 	_analysis_params.dimension = Dimension(_dimension_option_button->get_selected_id());
@@ -241,7 +241,7 @@ void VOXEL_NoiseAnalysisWindow::_on_calculate_button_pressed() {
 	set_process(true);
 }
 
-void VOXEL_NoiseAnalysisWindow::_notification(int p_what) {
+void Voxel_NoiseAnalysisWindow::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS:
 			process();
@@ -250,7 +250,7 @@ void VOXEL_NoiseAnalysisWindow::_notification(int p_what) {
 		case NOTIFICATION_VISIBILITY_CHANGED:
 			if (!is_visible()) {
 				// Release reference when the window is closed
-				set_noise(Ref<VOXEL_FastNoiseLite>());
+				set_noise(Ref<Voxel_FastNoiseLite>());
 			}
 			break;
 
@@ -259,7 +259,7 @@ void VOXEL_NoiseAnalysisWindow::_notification(int p_what) {
 	}
 }
 
-void VOXEL_NoiseAnalysisWindow::process() {
+void Voxel_NoiseAnalysisWindow::process() {
 	ERR_FAIL_COND(_adapter.is_null());
 	ERR_FAIL_COND(_analysis_params.step_count <= 0);
 
@@ -370,6 +370,6 @@ void VOXEL_NoiseAnalysisWindow::process() {
 	}
 }
 
-void VOXEL_NoiseAnalysisWindow::_bind_methods() {}
+void Voxel_NoiseAnalysisWindow::_bind_methods() {}
 
 } // namespace voxel

@@ -5,8 +5,8 @@
 
 namespace voxel {
 
-class VoxelTerrainEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelTerrainEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelTerrainEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelTerrainEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 protected:
 	bool _voxel_can_handle(const Object *p_object) const override;
 	bool _voxel_parse_property(Object *p_object, const Variant::Type p_type, const String &p_path,

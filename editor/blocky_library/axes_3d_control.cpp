@@ -3,20 +3,20 @@
 
 namespace voxel {
 
-void VOXEL_Axes3DControl::set_basis_3d(Basis basis) {
+void Voxel_Axes3DControl::set_basis_3d(Basis basis) {
 	if (basis != _basis) {
 		_basis = basis;
 		queue_redraw();
 	}
 }
 
-void VOXEL_Axes3DControl::_notification(int p_what) {
+void Voxel_Axes3DControl::_notification(int p_what) {
 	if (p_what == NOTIFICATION_DRAW) {
 		draw();
 	}
 }
 
-void VOXEL_Axes3DControl::draw() {
+void Voxel_Axes3DControl::draw() {
 	const Vector3 x_axis_3d = _basis.get_column(Vector3::AXIS_X);
 	const Vector3 y_axis_3d = _basis.get_column(Vector3::AXIS_Y);
 	const Vector3 z_axis_3d = _basis.get_column(Vector3::AXIS_Z);

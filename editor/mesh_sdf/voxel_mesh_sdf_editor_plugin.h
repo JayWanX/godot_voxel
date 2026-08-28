@@ -6,8 +6,8 @@
 
 namespace voxel {
 
-class VoxelMeshSDFInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelMeshSDFInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelMeshSDFInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelMeshSDFInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 protected:
 	bool _voxel_can_handle(const Object *p_object) const override;
 	void _voxel_parse_begin(Object *p_object) override;
@@ -16,8 +16,8 @@ private:
 	static void _bind_methods() {}
 };
 
-class VoxelMeshSDFEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VoxelMeshSDFEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class VoxelMeshSDFEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(VoxelMeshSDFEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	VoxelMeshSDFEditorPlugin();
 

@@ -9,11 +9,11 @@
 namespace voxel {
 
 // Alternative to the default AABB editor which presents it as a minimum and maximum point
-class VOXEL_EditorPropertyAABBMinMax : public voxel::godot::VOXEL_EditorProperty {
-	GDCLASS(VOXEL_EditorPropertyAABBMinMax, voxel::godot::VOXEL_EditorProperty);
+class Voxel_EditorPropertyAABBMinMax : public voxel::godot::Voxel_EditorProperty {
+	GDCLASS(Voxel_EditorPropertyAABBMinMax, voxel::godot::Voxel_EditorProperty);
 
 public:
-	VOXEL_EditorPropertyAABBMinMax();
+	Voxel_EditorPropertyAABBMinMax();
 
 	void setup(double p_min, double p_max, double p_step, bool p_no_slider, const String &p_suffix = String());
 

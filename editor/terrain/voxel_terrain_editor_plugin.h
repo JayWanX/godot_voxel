@@ -21,8 +21,8 @@ class VoxelAboutWindow;
 class VoxelNode;
 class VoxelTerrainEditorTaskIndicator;
 
-class VoxelTerrainEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VoxelTerrainEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class VoxelTerrainEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(VoxelTerrainEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	VoxelTerrainEditorPlugin();
 

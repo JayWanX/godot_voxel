@@ -13,7 +13,7 @@ I try to minimize breaking changes, but there are usually a few in each release 
 - Improvements
     - Added compute shader caching (thanks to chalecampb #866)
     - `VoxelNode`: exposes `get_voxel_tool` instead of it being repeated in its child classes.
-    - `VOXEL_FastNoiseLite`: Editor: added support for noise analysis window, formerly present only on `FastNoise2` (This is mainly a debug tool for internal development of graph generators).
+    - `Voxel_FastNoiseLite`: Editor: added support for noise analysis window, formerly present only on `FastNoise2` (This is mainly a debug tool for internal development of graph generators).
     - Editor: range analysis debugging now also shows actual min/max on outputs connected to `SdfPreview` nodes. This is mainly to investigate internal bugs.
 
 - Fixes
@@ -44,7 +44,7 @@ I try to minimize breaking changes, but there are usually a few in each release 
         - Added `intersects` method to check if an AABB overlaps with blocky voxels.
     - `VoxelGeneratorGraph`: 
         - Editor: added `Add Node` item to the context menu
-        - Added support for domain warp on `FastNoiseLite` and `VOXEL_FastNoiseLite` resources when using GPU (previously required to prepend `FastNoiseLiteGradient` noise)
+        - Added support for domain warp on `FastNoiseLite` and `Voxel_FastNoiseLite` resources when using GPU (previously required to prepend `FastNoiseLiteGradient` noise)
         - Added methods to get the index of node inputs and output by their name
         - Added `generate_image_from_sdf`
         - Added `raycast_sdf_approx` to find where surface is from a ray
@@ -150,7 +150,7 @@ I try to minimize breaking changes, but there are usually a few in each release 
     - `VoxelToolLodTerrain`: fixed `do_graph` tended to produce boxes when the transform was scaled and `sdf_strength` was not 1
     - `VoxelViewer`: reparenting (`remove_child` followed by `add_child`) should no longer reload terrain around the viewer
     - `VoxelAStarGrid3D`: fixed crash if `find_path` is called without setting a terrain first
-    - `VOXEL_SpotNoise`: fixed `get_spot_positions_in_area` functions were not working outside of the (0,0) cell
+    - `Voxel_SpotNoise`: fixed `get_spot_positions_in_area` functions were not working outside of the (0,0) cell
 
 - Breaking changes
     - `VoxelGeneratorGraph`: `SdfSphere` node: `radius` is now an input instead of a parameter (compat breakage only occurs if you used a script to set it: replace `set_node_param(id, 0, radius)` with `set_node_default_input(id, 3, radius)`)
@@ -274,7 +274,7 @@ Primarily developped with Godot 4.3.
 
 Primarily developped with Godot 4.2.
 
-- Added `VOXEL_SpotNoise`, exposing the same algorithm as the `SpotNoise2D` and `SpotNoise3D` nodes of graph generators
+- Added `Voxel_SpotNoise`, exposing the same algorithm as the `SpotNoise2D` and `SpotNoise3D` nodes of graph generators
 - Saving with `save_all_modified_blocks` now automatically flushes eventual caches implemented by `VoxelStream` upon completion
 - Added `VoxelStreamMemory`, which stores in memory instead of the filesystem. This is mainly for testing purposes.
 - More memory allocations are now tracked by Godot (you might notice `OS.get_static_memory_usage()` returns slightly more)
@@ -458,7 +458,7 @@ Godot 4 is required from this version.
     - Added `FastNoise2` for faster SIMD noise
     - Added experimental support functions to help setting up basic multiplayer with `VoxelTerrain` (might change in the future)
     - Improved support for 64-bit floats
-    - Added `VOXEL_ThreadedTask` to allow running custom tasks using the thread pool system
+    - Added `Voxel_ThreadedTask` to allow running custom tasks using the thread pool system
     - Added `VoxelMeshSDF` to bake SDF from meshes, which can be used in voxel sculpting.
     - Mesh resources are now fully built on threads with the Godot Vulkan renderer
     - Editor: terrain bounds are now shown in the inspector as min/max instead of position/size
@@ -576,7 +576,7 @@ Godot 4 is required from this version.
         - renamed `_emerge_block` => `_load_voxel_block`
         - renamed `_immerge_block` => `_save_voxel_block`
     - `VoxelGeneratorGraph`: the `Select` node's `threshold` port is now a parameter instead.
-    - `FastNoiseLite` was renamed `VOXEL_FastNoiseLite`, as now Godot 4 comes with its own implementation, with a few differences.
+    - `FastNoiseLite` was renamed `Voxel_FastNoiseLite`, as now Godot 4 comes with its own implementation, with a few differences.
     - Removed `VoxelStreamBlockFiles`
 
 - Known issues

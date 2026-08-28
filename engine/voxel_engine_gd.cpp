@@ -195,7 +195,7 @@ void VoxelEngine::set_thread_count(int count) {
 	voxel::VoxelEngine::get_singleton().set_thread_count(static_cast<uint32_t>(count));
 }
 
-void VoxelEngine::schedule_task(Ref<VOXEL_ThreadedTask> task) {
+void VoxelEngine::schedule_task(Ref<Voxel_ThreadedTask> task) {
 	ERR_FAIL_COND(task.is_null());
 	ERR_FAIL_COND_MSG(task->is_scheduled(), "Cannot schedule again a task that is already scheduled");
 	voxel::VoxelEngine::get_singleton().push_async_task(task->create_task());

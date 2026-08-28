@@ -21,8 +21,8 @@ namespace voxel::godot {
 // In modules, this is `_get_property_colors`.
 Span<const Color> editor_property_get_colors(EditorProperty &self);
 
-class VOXEL_EditorProperty : public EditorProperty {
-	GDCLASS(VOXEL_EditorProperty, EditorProperty)
+class Voxel_EditorProperty : public EditorProperty {
+	GDCLASS(Voxel_EditorProperty, EditorProperty)
 public:
 #if defined(VOXEL_GODOT)
 	void update_property() override;

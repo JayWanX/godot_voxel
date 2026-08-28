@@ -15,7 +15,7 @@ namespace voxel {
 VoxelBlockyTypeViewer::VoxelBlockyTypeViewer() {
 	const float editor_scale = EDSCALE;
 
-	VOXEL_ModelViewer *model_viewer = this;
+	Voxel_ModelViewer *model_viewer = this;
 	model_viewer->set_h_size_flags(Container::SIZE_EXPAND_FILL);
 	model_viewer->set_v_size_flags(Container::SIZE_EXPAND_FILL);
 	model_viewer->set_custom_minimum_size(Vector2(100, 150 * editor_scale));

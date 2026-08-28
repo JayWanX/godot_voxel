@@ -5,15 +5,15 @@ namespace voxel::godot {
 
 #if defined(VOXEL_GODOT)
 
-String VOXEL_EditorImportPlugin::get_importer_name() const {
+String Voxel_EditorImportPlugin::get_importer_name() const {
 	return _voxel_get_importer_name();
 }
 
-String VOXEL_EditorImportPlugin::get_visible_name() const {
+String Voxel_EditorImportPlugin::get_visible_name() const {
 	return _voxel_get_visible_name();
 }
 
-void VOXEL_EditorImportPlugin::get_recognized_extensions(List<String> *p_extensions) const {
+void Voxel_EditorImportPlugin::get_recognized_extensions(List<String> *p_extensions) const {
 	VOXEL_ASSERT_RETURN(p_extensions != nullptr);
 	const PackedStringArray extensions = _voxel_get_recognized_extensions();
 	for (const String &extension : extensions) {
@@ -21,31 +21,31 @@ void VOXEL_EditorImportPlugin::get_recognized_extensions(List<String> *p_extensi
 	}
 }
 
-String VOXEL_EditorImportPlugin::get_preset_name(int p_idx) const {
+String Voxel_EditorImportPlugin::get_preset_name(int p_idx) const {
 	return _voxel_get_preset_name(p_idx);
 }
 
-int VOXEL_EditorImportPlugin::get_preset_count() const {
+int Voxel_EditorImportPlugin::get_preset_count() const {
 	return _voxel_get_preset_count();
 }
 
-String VOXEL_EditorImportPlugin::get_save_extension() const {
+String Voxel_EditorImportPlugin::get_save_extension() const {
 	return _voxel_get_save_extension();
 }
 
-String VOXEL_EditorImportPlugin::get_resource_type() const {
+String Voxel_EditorImportPlugin::get_resource_type() const {
 	return _voxel_get_resource_type();
 }
 
-float VOXEL_EditorImportPlugin::get_priority() const {
+float Voxel_EditorImportPlugin::get_priority() const {
 	return _voxel_get_priority();
 }
 
-int VOXEL_EditorImportPlugin::get_import_order() const {
+int Voxel_EditorImportPlugin::get_import_order() const {
 	return _voxel_get_import_order();
 }
 
-void VOXEL_EditorImportPlugin::get_import_options(
+void Voxel_EditorImportPlugin::get_import_options(
 		const String &p_path,
 		List<ImportOption> *r_options,
 		int p_preset
@@ -59,7 +59,7 @@ void VOXEL_EditorImportPlugin::get_import_options(
 	}
 }
 
-bool VOXEL_EditorImportPlugin::get_option_visibility(
+bool Voxel_EditorImportPlugin::get_option_visibility(
 		const String &p_path,
 		const String &p_option,
 		const HashMap<StringName, Variant> &p_options
@@ -67,7 +67,7 @@ bool VOXEL_EditorImportPlugin::get_option_visibility(
 	return _voxel_get_option_visibility(p_path, p_option, KeyValueWrapper{ p_options });
 }
 
-Error VOXEL_EditorImportPlugin::import(
+Error Voxel_EditorImportPlugin::import(
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 		ResourceUID::ID p_source_id,
 #endif
@@ -90,56 +90,56 @@ Error VOXEL_EditorImportPlugin::import(
 }
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
-bool VOXEL_EditorImportPlugin::can_import_threaded() const {
+bool Voxel_EditorImportPlugin::can_import_threaded() const {
 	return _voxel_can_import_threaded();
 }
 #endif
 
 #endif
 
-String VOXEL_EditorImportPlugin::_voxel_get_importer_name() const {
+String Voxel_EditorImportPlugin::_voxel_get_importer_name() const {
 	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "<unnamed>";
 }
 
-String VOXEL_EditorImportPlugin::_voxel_get_visible_name() const {
+String Voxel_EditorImportPlugin::_voxel_get_visible_name() const {
 	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "<unnamed>";
 }
-PackedStringArray VOXEL_EditorImportPlugin::_voxel_get_recognized_extensions() const {
+PackedStringArray Voxel_EditorImportPlugin::_voxel_get_recognized_extensions() const {
 	VOXEL_PRINT_ERROR("Method is not implemented");
 	return PackedStringArray();
 }
 
-String VOXEL_EditorImportPlugin::_voxel_get_preset_name(int p_idx) const {
+String Voxel_EditorImportPlugin::_voxel_get_preset_name(int p_idx) const {
 	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "<unnamed>";
 }
 
-int VOXEL_EditorImportPlugin::_voxel_get_preset_count() const {
+int Voxel_EditorImportPlugin::_voxel_get_preset_count() const {
 	VOXEL_PRINT_ERROR("Method is not implemented");
 	return 0;
 }
 
-String VOXEL_EditorImportPlugin::_voxel_get_save_extension() const {
+String Voxel_EditorImportPlugin::_voxel_get_save_extension() const {
 	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "";
 }
 
-String VOXEL_EditorImportPlugin::_voxel_get_resource_type() const {
+String Voxel_EditorImportPlugin::_voxel_get_resource_type() const {
 	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "";
 }
 
-float VOXEL_EditorImportPlugin::_voxel_get_priority() const {
+float Voxel_EditorImportPlugin::_voxel_get_priority() const {
 	return 1.0;
 }
 
-int VOXEL_EditorImportPlugin::_voxel_get_import_order() const {
+int Voxel_EditorImportPlugin::_voxel_get_import_order() const {
 	return IMPORT_ORDER_DEFAULT;
 }
 
-void VOXEL_EditorImportPlugin::_voxel_get_import_options(
+void Voxel_EditorImportPlugin::_voxel_get_import_options(
 		StdVector<ImportOptionWrapper> &p_out_options,
 		const String &p_path,
 		int p_preset_index
@@ -147,7 +147,7 @@ void VOXEL_EditorImportPlugin::_voxel_get_import_options(
 	VOXEL_PRINT_ERROR("Method is not implemented");
 }
 
-bool VOXEL_EditorImportPlugin::_voxel_get_option_visibility(
+bool Voxel_EditorImportPlugin::_voxel_get_option_visibility(
 		const String &p_path,
 		const StringName &p_option_name,
 		const KeyValueWrapper p_options
@@ -156,7 +156,7 @@ bool VOXEL_EditorImportPlugin::_voxel_get_option_visibility(
 	return false;
 }
 
-Error VOXEL_EditorImportPlugin::_voxel_import(
+Error Voxel_EditorImportPlugin::_voxel_import(
 		const String &p_source_file,
 		const String &p_save_path,
 		const KeyValueWrapper p_options,
@@ -167,7 +167,7 @@ Error VOXEL_EditorImportPlugin::_voxel_import(
 	return ERR_METHOD_NOT_FOUND;
 }
 
-bool VOXEL_EditorImportPlugin::_voxel_can_import_threaded() const {
+bool Voxel_EditorImportPlugin::_voxel_can_import_threaded() const {
 	// According to docs
 	// https://docs.godotengine.org/en/stable/classes/class_editorimportplugin.html#class-editorimportplugin-private-method-can-import-threaded
 	return true;

@@ -9,8 +9,8 @@ VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
 
 namespace voxel {
 
-class VoxelInstanceLibraryMultiMeshItemEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VoxelInstanceLibraryMultiMeshItemEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class VoxelInstanceLibraryMultiMeshItemEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(VoxelInstanceLibraryMultiMeshItemEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	VoxelInstanceLibraryMultiMeshItemEditorPlugin();
 

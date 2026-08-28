@@ -7,10 +7,10 @@
 namespace voxel {
 
 // Implements similar logic as the middle resizing handle of SplitContainer, but works on a target control instead
-class VOXEL_ControlSizer : public Control {
-	GDCLASS(VOXEL_ControlSizer, Control)
+class Voxel_ControlSizer : public Control {
+	GDCLASS(Voxel_ControlSizer, Control)
 public:
-	VOXEL_ControlSizer();
+	Voxel_ControlSizer();
 
 	void set_target_control(Control *control);
 

@@ -103,10 +103,10 @@ nav:
     - api/VoxelToolTerrain.md
     - api/VoxelViewer.md
     - api/VoxelVoxLoader.md
-    - api/VOXEL_FastNoiseLite.md
-    - api/VOXEL_FastNoiseLiteGradient.md
-    - api/VOXEL_SpotNoise.md
-    - api/VOXEL_ThreadedTask.md
+    - api/Voxel_FastNoiseLite.md
+    - api/Voxel_FastNoiseLiteGradient.md
+    - api/Voxel_SpotNoise.md
+    - api/Voxel_ThreadedTask.md
     # </generated_class_list>
   - 'Serialization formats':
     - 'specs/block_format_v1.md'

@@ -9,7 +9,7 @@
 
 namespace voxel {
 
-VOXEL_FastNoiseLite::VOXEL_FastNoiseLite() {
+Voxel_FastNoiseLite::Voxel_FastNoiseLite() {
 	_fn.SetNoiseType(static_cast<_FastNoise::NoiseType>(_noise_type));
 	_fn.SetSeed(_seed);
 	_fn.SetFrequency(1.f / _period);
@@ -28,7 +28,7 @@ VOXEL_FastNoiseLite::VOXEL_FastNoiseLite() {
 	_fn.SetRotationType3D(static_cast<_FastNoise::RotationType3D>(_rotation_type_3d));
 }
 
-void VOXEL_FastNoiseLite::set_noise_type(NoiseType type) {
+void Voxel_FastNoiseLite::set_noise_type(NoiseType type) {
 	if (_noise_type == type) {
 		return;
 	}
@@ -37,11 +37,11 @@ void VOXEL_FastNoiseLite::set_noise_type(NoiseType type) {
 	emit_changed();
 }
 
-VOXEL_FastNoiseLite::NoiseType VOXEL_FastNoiseLite::get_noise_type() const {
+Voxel_FastNoiseLite::NoiseType Voxel_FastNoiseLite::get_noise_type() const {
 	return _noise_type;
 }
 
-void VOXEL_FastNoiseLite::set_seed(int seed) {
+void Voxel_FastNoiseLite::set_seed(int seed) {
 	if (_seed == seed) {
 		return;
 	}
@@ -50,11 +50,11 @@ void VOXEL_FastNoiseLite::set_seed(int seed) {
 	emit_changed();
 }
 
-int VOXEL_FastNoiseLite::get_seed() const {
+int Voxel_FastNoiseLite::get_seed() const {
 	return _seed;
 }
 
-void VOXEL_FastNoiseLite::set_period(float p) {
+void Voxel_FastNoiseLite::set_period(float p) {
 	if (p < 0.0001f) {
 		p = 0.0001f;
 	}
@@ -66,33 +66,33 @@ void VOXEL_FastNoiseLite::set_period(float p) {
 	emit_changed();
 }
 
-float VOXEL_FastNoiseLite::get_period() const {
+float Voxel_FastNoiseLite::get_period() const {
 	return _period;
 }
 
-void VOXEL_FastNoiseLite::set_warp_noise(Ref<VOXEL_FastNoiseLiteGradient> warp_noise) {
+void Voxel_FastNoiseLite::set_warp_noise(Ref<Voxel_FastNoiseLiteGradient> warp_noise) {
 	if (_warp_noise == warp_noise) {
 		return;
 	}
 
 	if (_warp_noise.is_valid()) {
-		_warp_noise->disconnect("changed", callable_mp(this, &VOXEL_FastNoiseLite::_on_warp_noise_changed));
+		_warp_noise->disconnect("changed", callable_mp(this, &Voxel_FastNoiseLite::_on_warp_noise_changed));
 	}
 
 	_warp_noise = warp_noise;
 
 	if (_warp_noise.is_valid()) {
-		_warp_noise->connect("changed", callable_mp(this, &VOXEL_FastNoiseLite::_on_warp_noise_changed));
+		_warp_noise->connect("changed", callable_mp(this, &Voxel_FastNoiseLite::_on_warp_noise_changed));
 	}
 
 	emit_changed();
 }
 
-Ref<VOXEL_FastNoiseLiteGradient> VOXEL_FastNoiseLite::get_warp_noise() const {
+Ref<Voxel_FastNoiseLiteGradient> Voxel_FastNoiseLite::get_warp_noise() const {
 	return _warp_noise;
 }
 
-void VOXEL_FastNoiseLite::set_fractal_type(FractalType type) {
+void Voxel_FastNoiseLite::set_fractal_type(FractalType type) {
 	if (_fractal_type == type) {
 		return;
 	}
@@ -101,11 +101,11 @@ void VOXEL_FastNoiseLite::set_fractal_type(FractalType type) {
 	emit_changed();
 }
 
-VOXEL_FastNoiseLite::FractalType VOXEL_FastNoiseLite::get_fractal_type() const {
+Voxel_FastNoiseLite::FractalType Voxel_FastNoiseLite::get_fractal_type() const {
 	return _fractal_type;
 }
 
-void VOXEL_FastNoiseLite::set_fractal_octaves(int octaves) {
+void Voxel_FastNoiseLite::set_fractal_octaves(int octaves) {
 	ERR_FAIL_COND(octaves <= 0);
 	if (octaves > MAX_OCTAVES) {
 		octaves = MAX_OCTAVES;
@@ -118,11 +118,11 @@ void VOXEL_FastNoiseLite::set_fractal_octaves(int octaves) {
 	emit_changed();
 }
 
-int VOXEL_FastNoiseLite::get_fractal_octaves() const {
+int Voxel_FastNoiseLite::get_fractal_octaves() const {
 	return _fractal_octaves;
 }
 
-void VOXEL_FastNoiseLite::set_fractal_lacunarity(float lacunarity) {
+void Voxel_FastNoiseLite::set_fractal_lacunarity(float lacunarity) {
 	if (_fractal_lacunarity == lacunarity) {
 		return;
 	}
@@ -131,11 +131,11 @@ void VOXEL_FastNoiseLite::set_fractal_lacunarity(float lacunarity) {
 	emit_changed();
 }
 
-float VOXEL_FastNoiseLite::get_fractal_lacunarity() const {
+float Voxel_FastNoiseLite::get_fractal_lacunarity() const {
 	return _fractal_lacunarity;
 }
 
-void VOXEL_FastNoiseLite::set_fractal_gain(float gain) {
+void Voxel_FastNoiseLite::set_fractal_gain(float gain) {
 	if (_fractal_gain == gain) {
 		return;
 	}
@@ -144,11 +144,11 @@ void VOXEL_FastNoiseLite::set_fractal_gain(float gain) {
 	emit_changed();
 }
 
-float VOXEL_FastNoiseLite::get_fractal_gain() const {
+float Voxel_FastNoiseLite::get_fractal_gain() const {
 	return _fractal_gain;
 }
 
-void VOXEL_FastNoiseLite::set_fractal_ping_pong_strength(float s) {
+void Voxel_FastNoiseLite::set_fractal_ping_pong_strength(float s) {
 	if (_fractal_ping_pong_strength == s) {
 		return;
 	}
@@ -157,11 +157,11 @@ void VOXEL_FastNoiseLite::set_fractal_ping_pong_strength(float s) {
 	emit_changed();
 }
 
-float VOXEL_FastNoiseLite::get_fractal_ping_pong_strength() const {
+float Voxel_FastNoiseLite::get_fractal_ping_pong_strength() const {
 	return _fractal_ping_pong_strength;
 }
 
-void VOXEL_FastNoiseLite::set_fractal_weighted_strength(float s) {
+void Voxel_FastNoiseLite::set_fractal_weighted_strength(float s) {
 	if (_fractal_weighted_strength == s) {
 		return;
 	}
@@ -170,11 +170,11 @@ void VOXEL_FastNoiseLite::set_fractal_weighted_strength(float s) {
 	emit_changed();
 }
 
-float VOXEL_FastNoiseLite::get_fractal_weighted_strength() const {
+float Voxel_FastNoiseLite::get_fractal_weighted_strength() const {
 	return _fractal_weighted_strength;
 }
 
-void VOXEL_FastNoiseLite::set_cellular_distance_function(CellularDistanceFunction cdf) {
+void Voxel_FastNoiseLite::set_cellular_distance_function(CellularDistanceFunction cdf) {
 	if (cdf == _cellular_distance_function) {
 		return;
 	}
@@ -183,11 +183,11 @@ void VOXEL_FastNoiseLite::set_cellular_distance_function(CellularDistanceFunctio
 	emit_changed();
 }
 
-VOXEL_FastNoiseLite::CellularDistanceFunction VOXEL_FastNoiseLite::get_cellular_distance_function() const {
+Voxel_FastNoiseLite::CellularDistanceFunction Voxel_FastNoiseLite::get_cellular_distance_function() const {
 	return _cellular_distance_function;
 }
 
-void VOXEL_FastNoiseLite::set_cellular_return_type(CellularReturnType rt) {
+void Voxel_FastNoiseLite::set_cellular_return_type(CellularReturnType rt) {
 	if (_cellular_return_type == rt) {
 		return;
 	}
@@ -196,11 +196,11 @@ void VOXEL_FastNoiseLite::set_cellular_return_type(CellularReturnType rt) {
 	emit_changed();
 }
 
-VOXEL_FastNoiseLite::CellularReturnType VOXEL_FastNoiseLite::get_cellular_return_type() const {
+Voxel_FastNoiseLite::CellularReturnType Voxel_FastNoiseLite::get_cellular_return_type() const {
 	return _cellular_return_type;
 }
 
-void VOXEL_FastNoiseLite::set_cellular_jitter(float jitter) {
+void Voxel_FastNoiseLite::set_cellular_jitter(float jitter) {
 	jitter = math::clamp(jitter, 0.f, 1.f);
 	if (_cellular_jitter == jitter) {
 		return;
@@ -210,11 +210,11 @@ void VOXEL_FastNoiseLite::set_cellular_jitter(float jitter) {
 	emit_changed();
 }
 
-float VOXEL_FastNoiseLite::get_cellular_jitter() const {
+float Voxel_FastNoiseLite::get_cellular_jitter() const {
 	return _cellular_jitter;
 }
 
-void VOXEL_FastNoiseLite::set_rotation_type_3d(RotationType3D type) {
+void Voxel_FastNoiseLite::set_rotation_type_3d(RotationType3D type) {
 	if (_rotation_type_3d == type) {
 		return;
 	}
@@ -223,71 +223,71 @@ void VOXEL_FastNoiseLite::set_rotation_type_3d(RotationType3D type) {
 	emit_changed();
 }
 
-VOXEL_FastNoiseLite::RotationType3D VOXEL_FastNoiseLite::get_rotation_type_3d() const {
+Voxel_FastNoiseLite::RotationType3D Voxel_FastNoiseLite::get_rotation_type_3d() const {
 	return _rotation_type_3d;
 }
 
-void VOXEL_FastNoiseLite::_on_warp_noise_changed() {
+void Voxel_FastNoiseLite::_on_warp_noise_changed() {
 	emit_changed();
 }
 
-void VOXEL_FastNoiseLite::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("set_noise_type", "type"), &VOXEL_FastNoiseLite::set_noise_type);
-	ClassDB::bind_method(D_METHOD("get_noise_type"), &VOXEL_FastNoiseLite::get_noise_type);
+void Voxel_FastNoiseLite::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_noise_type", "type"), &Voxel_FastNoiseLite::set_noise_type);
+	ClassDB::bind_method(D_METHOD("get_noise_type"), &Voxel_FastNoiseLite::get_noise_type);
 
-	ClassDB::bind_method(D_METHOD("set_seed", "seed"), &VOXEL_FastNoiseLite::set_seed);
-	ClassDB::bind_method(D_METHOD("get_seed"), &VOXEL_FastNoiseLite::get_seed);
+	ClassDB::bind_method(D_METHOD("set_seed", "seed"), &Voxel_FastNoiseLite::set_seed);
+	ClassDB::bind_method(D_METHOD("get_seed"), &Voxel_FastNoiseLite::get_seed);
 
-	ClassDB::bind_method(D_METHOD("set_period", "period"), &VOXEL_FastNoiseLite::set_period);
-	ClassDB::bind_method(D_METHOD("get_period"), &VOXEL_FastNoiseLite::get_period);
+	ClassDB::bind_method(D_METHOD("set_period", "period"), &Voxel_FastNoiseLite::set_period);
+	ClassDB::bind_method(D_METHOD("get_period"), &Voxel_FastNoiseLite::get_period);
 
-	ClassDB::bind_method(D_METHOD("set_warp_noise", "gradient_noise"), &VOXEL_FastNoiseLite::set_warp_noise);
-	ClassDB::bind_method(D_METHOD("get_warp_noise"), &VOXEL_FastNoiseLite::get_warp_noise);
+	ClassDB::bind_method(D_METHOD("set_warp_noise", "gradient_noise"), &Voxel_FastNoiseLite::set_warp_noise);
+	ClassDB::bind_method(D_METHOD("get_warp_noise"), &Voxel_FastNoiseLite::get_warp_noise);
 
-	ClassDB::bind_method(D_METHOD("set_fractal_type", "type"), &VOXEL_FastNoiseLite::set_fractal_type);
-	ClassDB::bind_method(D_METHOD("get_fractal_type"), &VOXEL_FastNoiseLite::get_fractal_type);
+	ClassDB::bind_method(D_METHOD("set_fractal_type", "type"), &Voxel_FastNoiseLite::set_fractal_type);
+	ClassDB::bind_method(D_METHOD("get_fractal_type"), &Voxel_FastNoiseLite::get_fractal_type);
 
-	ClassDB::bind_method(D_METHOD("set_fractal_octaves", "octaves"), &VOXEL_FastNoiseLite::set_fractal_octaves);
-	ClassDB::bind_method(D_METHOD("get_fractal_octaves"), &VOXEL_FastNoiseLite::get_fractal_octaves);
+	ClassDB::bind_method(D_METHOD("set_fractal_octaves", "octaves"), &Voxel_FastNoiseLite::set_fractal_octaves);
+	ClassDB::bind_method(D_METHOD("get_fractal_octaves"), &Voxel_FastNoiseLite::get_fractal_octaves);
 
-	ClassDB::bind_method(D_METHOD("set_fractal_lacunarity", "lacunarity"), &VOXEL_FastNoiseLite::set_fractal_lacunarity);
-	ClassDB::bind_method(D_METHOD("get_fractal_lacunarity"), &VOXEL_FastNoiseLite::get_fractal_lacunarity);
+	ClassDB::bind_method(D_METHOD("set_fractal_lacunarity", "lacunarity"), &Voxel_FastNoiseLite::set_fractal_lacunarity);
+	ClassDB::bind_method(D_METHOD("get_fractal_lacunarity"), &Voxel_FastNoiseLite::get_fractal_lacunarity);
 
-	ClassDB::bind_method(D_METHOD("set_fractal_gain", "gain"), &VOXEL_FastNoiseLite::set_fractal_gain);
-	ClassDB::bind_method(D_METHOD("get_fractal_gain"), &VOXEL_FastNoiseLite::get_fractal_gain);
-
-	ClassDB::bind_method(
-			D_METHOD("set_fractal_ping_pong_strength", "strength"), &VOXEL_FastNoiseLite::set_fractal_ping_pong_strength
-	);
-	ClassDB::bind_method(D_METHOD("get_fractal_ping_pong_strength"), &VOXEL_FastNoiseLite::get_fractal_ping_pong_strength);
+	ClassDB::bind_method(D_METHOD("set_fractal_gain", "gain"), &Voxel_FastNoiseLite::set_fractal_gain);
+	ClassDB::bind_method(D_METHOD("get_fractal_gain"), &Voxel_FastNoiseLite::get_fractal_gain);
 
 	ClassDB::bind_method(
-			D_METHOD("set_fractal_weighted_strength", "strength"), &VOXEL_FastNoiseLite::set_fractal_weighted_strength
+			D_METHOD("set_fractal_ping_pong_strength", "strength"), &Voxel_FastNoiseLite::set_fractal_ping_pong_strength
 	);
-	ClassDB::bind_method(D_METHOD("get_fractal_weighted_strength"), &VOXEL_FastNoiseLite::get_fractal_weighted_strength);
+	ClassDB::bind_method(D_METHOD("get_fractal_ping_pong_strength"), &Voxel_FastNoiseLite::get_fractal_ping_pong_strength);
+
+	ClassDB::bind_method(
+			D_METHOD("set_fractal_weighted_strength", "strength"), &Voxel_FastNoiseLite::set_fractal_weighted_strength
+	);
+	ClassDB::bind_method(D_METHOD("get_fractal_weighted_strength"), &Voxel_FastNoiseLite::get_fractal_weighted_strength);
 
 	ClassDB::bind_method(
 			D_METHOD("set_cellular_distance_function", "cell_distance_func"),
-			&VOXEL_FastNoiseLite::set_cellular_distance_function
+			&Voxel_FastNoiseLite::set_cellular_distance_function
 	);
-	ClassDB::bind_method(D_METHOD("get_cellular_distance_function"), &VOXEL_FastNoiseLite::get_cellular_distance_function);
+	ClassDB::bind_method(D_METHOD("get_cellular_distance_function"), &Voxel_FastNoiseLite::get_cellular_distance_function);
 
 	ClassDB::bind_method(
-			D_METHOD("set_cellular_return_type", "return_type"), &VOXEL_FastNoiseLite::set_cellular_return_type
+			D_METHOD("set_cellular_return_type", "return_type"), &Voxel_FastNoiseLite::set_cellular_return_type
 	);
-	ClassDB::bind_method(D_METHOD("get_cellular_return_type"), &VOXEL_FastNoiseLite::get_cellular_return_type);
+	ClassDB::bind_method(D_METHOD("get_cellular_return_type"), &Voxel_FastNoiseLite::get_cellular_return_type);
 
-	ClassDB::bind_method(D_METHOD("set_cellular_jitter", "return_type"), &VOXEL_FastNoiseLite::set_cellular_jitter);
-	ClassDB::bind_method(D_METHOD("get_cellular_jitter"), &VOXEL_FastNoiseLite::get_cellular_jitter);
+	ClassDB::bind_method(D_METHOD("set_cellular_jitter", "return_type"), &Voxel_FastNoiseLite::set_cellular_jitter);
+	ClassDB::bind_method(D_METHOD("get_cellular_jitter"), &Voxel_FastNoiseLite::get_cellular_jitter);
 
-	ClassDB::bind_method(D_METHOD("set_rotation_type_3d", "type"), &VOXEL_FastNoiseLite::set_rotation_type_3d);
-	ClassDB::bind_method(D_METHOD("get_rotation_type_3d"), &VOXEL_FastNoiseLite::get_rotation_type_3d);
+	ClassDB::bind_method(D_METHOD("set_rotation_type_3d", "type"), &Voxel_FastNoiseLite::set_rotation_type_3d);
+	ClassDB::bind_method(D_METHOD("get_rotation_type_3d"), &Voxel_FastNoiseLite::get_rotation_type_3d);
 
-	ClassDB::bind_method(D_METHOD("get_noise_2d", "x", "y"), &VOXEL_FastNoiseLite::_b_get_noise_2d);
-	ClassDB::bind_method(D_METHOD("get_noise_3d", "x", "y", "z"), &VOXEL_FastNoiseLite::_b_get_noise_3d);
+	ClassDB::bind_method(D_METHOD("get_noise_2d", "x", "y"), &Voxel_FastNoiseLite::_b_get_noise_2d);
+	ClassDB::bind_method(D_METHOD("get_noise_3d", "x", "y", "z"), &Voxel_FastNoiseLite::_b_get_noise_3d);
 
-	ClassDB::bind_method(D_METHOD("get_noise_2dv", "position"), &VOXEL_FastNoiseLite::_b_get_noise_2dv);
-	ClassDB::bind_method(D_METHOD("get_noise_3dv", "position"), &VOXEL_FastNoiseLite::_b_get_noise_3dv);
+	ClassDB::bind_method(D_METHOD("get_noise_2dv", "position"), &Voxel_FastNoiseLite::_b_get_noise_2dv);
+	ClassDB::bind_method(D_METHOD("get_noise_3dv", "position"), &Voxel_FastNoiseLite::_b_get_noise_3dv);
 
 	ADD_PROPERTY(
 			PropertyInfo(
@@ -313,7 +313,7 @@ void VOXEL_FastNoiseLite::_bind_methods() {
 					Variant::OBJECT,
 					"warp_noise",
 					PROPERTY_HINT_RESOURCE_TYPE,
-					VOXEL_FastNoiseLiteGradient::get_class_static()
+					Voxel_FastNoiseLiteGradient::get_class_static()
 			),
 			"set_warp_noise",
 			"get_warp_noise"

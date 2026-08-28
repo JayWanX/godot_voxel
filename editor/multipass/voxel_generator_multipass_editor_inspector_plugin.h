@@ -5,8 +5,8 @@
 
 namespace voxel {
 
-class VoxelGeneratorMultipassEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelGeneratorMultipassEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelGeneratorMultipassEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelGeneratorMultipassEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 protected:
 	bool _voxel_can_handle(const Object *p_object) const override;
 	void _voxel_parse_begin(Object *p_object) override;

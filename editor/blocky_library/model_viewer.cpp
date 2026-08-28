@@ -12,7 +12,7 @@
 
 namespace voxel {
 
-VOXEL_ModelViewer::VOXEL_ModelViewer() {
+Voxel_ModelViewer::Voxel_ModelViewer() {
 	_pitch = math::deg_to_rad(-28.f);
 	_yaw = math::deg_to_rad(-37.f);
 
@@ -41,7 +41,7 @@ VOXEL_ModelViewer::VOXEL_ModelViewer() {
 	viewport_container->set_anchors_and_offsets_preset(Control::PRESET_FULL_RECT);
 	add_child(viewport_container);
 
-	_axes_3d_control = memnew(VOXEL_Axes3DControl);
+	_axes_3d_control = memnew(Voxel_Axes3DControl);
 	_axes_3d_control->set_anchors_preset(Control::PRESET_BOTTOM_LEFT);
 	//_axes_3d_control->set_size(editor_scale * Vector2(32, 32));
 	_axes_3d_control->set_offset(SIDE_LEFT, 0);
@@ -54,17 +54,17 @@ VOXEL_ModelViewer::VOXEL_ModelViewer() {
 	update_camera();
 }
 
-void VOXEL_ModelViewer::set_camera_distance(float d) {
+void Voxel_ModelViewer::set_camera_distance(float d) {
 	_distance = d;
 	update_camera();
 }
 
-Node *VOXEL_ModelViewer::get_viewer_root_node() const {
+Node *Voxel_ModelViewer::get_viewer_root_node() const {
 	return _viewport;
 }
 
 #if defined(VOXEL_GODOT)
-void VOXEL_ModelViewer::gui_input(const Ref<InputEvent> &p_event) {
+void Voxel_ModelViewer::gui_input(const Ref<InputEvent> &p_event) {
 #endif
 	Ref<InputEventMouseMotion> mm = p_event;
 	if (mm.is_valid()) {
@@ -80,7 +80,7 @@ void VOXEL_ModelViewer::gui_input(const Ref<InputEvent> &p_event) {
 	}
 }
 
-void VOXEL_ModelViewer::update_camera() {
+void Voxel_ModelViewer::update_camera() {
 	Basis basis;
 	basis.set_euler(Vector3(_pitch, _yaw, 0));
 	const Vector3 forward = -basis.get_column(Vector3::AXIS_Z);

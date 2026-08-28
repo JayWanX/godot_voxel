@@ -7,8 +7,8 @@
 namespace voxel::magica {
 
 // Imports a vox file as a single mesh, where all contents of the vox scene is merged
-class VoxelVoxMeshImporter : public voxel::godot::VOXEL_EditorImportPlugin {
-	GDCLASS(VoxelVoxMeshImporter, voxel::godot::VOXEL_EditorImportPlugin)
+class VoxelVoxMeshImporter : public voxel::godot::Voxel_EditorImportPlugin {
+	GDCLASS(VoxelVoxMeshImporter, voxel::godot::Voxel_EditorImportPlugin)
 protected:
 	String _voxel_get_importer_name() const override;
 	String _voxel_get_visible_name() const override;

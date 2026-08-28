@@ -125,7 +125,7 @@
 		<output name="out"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Returns computation of 2D noise at coordinates [code](x, y)[/code] using the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [VOXEL_FastNoiseLite] resource.
+			Returns computation of 2D noise at coordinates [code](x, y)[/code] using the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [Voxel_FastNoiseLite] resource.
 			Note: this node might be a little faster than [graph_node Noise2D].
 		</description>
 	</node>
@@ -155,7 +155,7 @@
 		<output name="out"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Returns computation of 3D noise at coordinates [code](x, y, z)[/code] using the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [VOXEL_FastNoiseLite] resource.
+			Returns computation of 3D noise at coordinates [code](x, y, z)[/code] using the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [Voxel_FastNoiseLite] resource.
 			Note: this node might be a little faster than [graph_node Noise3D].
 		</description>
 	</node>

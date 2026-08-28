@@ -5,10 +5,10 @@
 
 namespace voxel {
 
-class VOXEL_NoiseAnalysisWindow;
+class Voxel_NoiseAnalysisWindow;
 
-class FastNoise2EditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(FastNoise2EditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class FastNoise2EditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(FastNoise2EditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	FastNoise2EditorPlugin();
 
@@ -23,7 +23,7 @@ private:
 
 	static void _bind_methods() {}
 
-	VOXEL_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
+	Voxel_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
 };
 
 } // namespace voxel

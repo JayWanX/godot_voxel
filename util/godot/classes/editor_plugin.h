@@ -14,8 +14,8 @@
 
 namespace voxel::godot {
 
-class VOXEL_EditorPlugin : public EditorPlugin {
-	GDCLASS(VOXEL_EditorPlugin, EditorPlugin)
+class Voxel_EditorPlugin : public EditorPlugin {
+	GDCLASS(Voxel_EditorPlugin, EditorPlugin)
 public:
 #if defined(VOXEL_GODOT)
 	bool handles(Object *p_object) const override;

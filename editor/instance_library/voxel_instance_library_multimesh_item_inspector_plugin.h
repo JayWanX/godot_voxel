@@ -7,8 +7,8 @@ namespace voxel {
 
 class VoxelInstanceLibraryMultiMeshItemEditorPlugin;
 
-class VoxelInstanceLibraryMultiMeshItemInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
-	GDCLASS(VoxelInstanceLibraryMultiMeshItemInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
+class VoxelInstanceLibraryMultiMeshItemInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
+	GDCLASS(VoxelInstanceLibraryMultiMeshItemInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 public:
 	VoxelInstanceLibraryMultiMeshItemEditorPlugin *listener = nullptr;
 

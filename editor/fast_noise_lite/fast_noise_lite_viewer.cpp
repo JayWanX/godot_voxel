@@ -17,7 +17,7 @@
 
 namespace voxel {
 
-VOXEL_FastNoiseLiteViewer::VOXEL_FastNoiseLiteViewer() {
+Voxel_FastNoiseLiteViewer::Voxel_FastNoiseLiteViewer() {
 	set_custom_minimum_size(Vector2(0, EDSCALE * PREVIEW_HEIGHT));
 
 	_texture_rect = memnew(TextureRect);
@@ -26,20 +26,20 @@ VOXEL_FastNoiseLiteViewer::VOXEL_FastNoiseLiteViewer() {
 	add_child(_texture_rect);
 }
 
-void VOXEL_FastNoiseLiteViewer::set_noise(Ref<VOXEL_FastNoiseLite> noise) {
+void Voxel_FastNoiseLiteViewer::set_noise(Ref<Voxel_FastNoiseLite> noise) {
 	if (_noise == noise) {
 		return;
 	}
 
 	if (_noise.is_valid()) {
-		_noise->disconnect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
+		_noise->disconnect("changed", callable_mp(this, &Voxel_FastNoiseLiteViewer::_on_noise_changed));
 	}
 
 	_noise = noise;
 
 	if (_noise.is_valid()) {
-		set_noise_gradient(Ref<VOXEL_FastNoiseLiteGradient>());
-		_noise->connect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
+		set_noise_gradient(Ref<Voxel_FastNoiseLiteGradient>());
+		_noise->connect("changed", callable_mp(this, &Voxel_FastNoiseLiteViewer::_on_noise_changed));
 		set_process(true);
 		update_preview();
 
@@ -51,20 +51,20 @@ void VOXEL_FastNoiseLiteViewer::set_noise(Ref<VOXEL_FastNoiseLite> noise) {
 	update_context_menu();
 }
 
-void VOXEL_FastNoiseLiteViewer::set_noise_gradient(Ref<VOXEL_FastNoiseLiteGradient> noise_gradient) {
+void Voxel_FastNoiseLiteViewer::set_noise_gradient(Ref<Voxel_FastNoiseLiteGradient> noise_gradient) {
 	if (_noise_gradient == noise_gradient) {
 		return;
 	}
 
 	if (_noise_gradient.is_valid()) {
-		_noise_gradient->disconnect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
+		_noise_gradient->disconnect("changed", callable_mp(this, &Voxel_FastNoiseLiteViewer::_on_noise_changed));
 	}
 
 	_noise_gradient = noise_gradient;
 
 	if (_noise_gradient.is_valid()) {
-		set_noise(Ref<VOXEL_FastNoiseLite>());
-		_noise_gradient->connect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
+		set_noise(Ref<Voxel_FastNoiseLite>());
+		_noise_gradient->connect("changed", callable_mp(this, &Voxel_FastNoiseLiteViewer::_on_noise_changed));
 		set_process(true);
 		update_preview();
 
@@ -76,13 +76,13 @@ void VOXEL_FastNoiseLiteViewer::set_noise_gradient(Ref<VOXEL_FastNoiseLiteGradie
 	update_context_menu();
 }
 
-void VOXEL_FastNoiseLiteViewer::update_context_menu() {
+void Voxel_FastNoiseLiteViewer::update_context_menu() {
 	if (_noise.is_valid()) {
 		if (_context_menu == nullptr) {
 			_context_menu = memnew(PopupMenu);
 			_context_menu->add_item("Analyze...", MENU_ANALYZE);
 			_context_menu->connect(
-					"id_pressed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::on_context_menu_id_pressed)
+					"id_pressed", callable_mp(this, &Voxel_FastNoiseLiteViewer::on_context_menu_id_pressed)
 			);
 			add_child(_context_menu);
 		}
@@ -95,7 +95,7 @@ void VOXEL_FastNoiseLiteViewer::update_context_menu() {
 }
 
 #ifdef VOXEL_GODOT
-void VOXEL_FastNoiseLiteViewer::gui_input(const Ref<InputEvent> &p_event) {
+void Voxel_FastNoiseLiteViewer::gui_input(const Ref<InputEvent> &p_event) {
 #endif
 	if (_context_menu == nullptr) {
 		return;
@@ -109,7 +109,7 @@ void VOXEL_FastNoiseLiteViewer::gui_input(const Ref<InputEvent> &p_event) {
 	}
 }
 
-void VOXEL_FastNoiseLiteViewer::on_context_menu_id_pressed(int id) {
+void Voxel_FastNoiseLiteViewer::on_context_menu_id_pressed(int id) {
 	switch (id) {
 		case MENU_ANALYZE:
 			ERR_FAIL_COND(_noise_analysis_window == nullptr);
@@ -124,11 +124,11 @@ void VOXEL_FastNoiseLiteViewer::on_context_menu_id_pressed(int id) {
 	}
 }
 
-void VOXEL_FastNoiseLiteViewer::_on_noise_changed() {
+void Voxel_FastNoiseLiteViewer::_on_noise_changed() {
 	_time_before_update = 0.5f;
 }
 
-void VOXEL_FastNoiseLiteViewer::_notification(int p_what) {
+void Voxel_FastNoiseLiteViewer::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS: {
 			if (_time_before_update > 0.f) {
@@ -142,7 +142,7 @@ void VOXEL_FastNoiseLiteViewer::_notification(int p_what) {
 }
 
 // TODO Use thread?
-void VOXEL_FastNoiseLiteViewer::update_preview() {
+void Voxel_FastNoiseLiteViewer::update_preview() {
 	const Vector2i preview_size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 
 	Ref<Image> im;
@@ -184,6 +184,6 @@ void VOXEL_FastNoiseLiteViewer::update_preview() {
 	_texture_rect->set_texture(tex);
 }
 
-void VOXEL_FastNoiseLiteViewer::_bind_methods() {}
+void Voxel_FastNoiseLiteViewer::_bind_methods() {}
 
 } // namespace voxel

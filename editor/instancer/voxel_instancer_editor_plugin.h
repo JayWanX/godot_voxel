@@ -11,8 +11,8 @@ namespace voxel {
 class VoxelInstancer;
 class VoxelInstancerStatView;
 
-class VoxelInstancerEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
-	GDCLASS(VoxelInstancerEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
+class VoxelInstancerEditorPlugin : public voxel::godot::Voxel_EditorPlugin {
+	GDCLASS(VoxelInstancerEditorPlugin, voxel::godot::Voxel_EditorPlugin)
 public:
 	VoxelInstancerEditorPlugin();
 

@@ -27,8 +27,8 @@ namespace voxel {
 //
 // - Does not use `GDVirtual`, so it cannot be extended by scripts.
 //
-class VOXEL_FastNoiseLite : public Resource {
-	GDCLASS(VOXEL_FastNoiseLite, Resource)
+class Voxel_FastNoiseLite : public Resource {
+	GDCLASS(Voxel_FastNoiseLite, Resource)
 
 	typedef ::fast_noise_lite::FastNoiseLite _FastNoise;
 
@@ -74,7 +74,7 @@ public:
 		CELLULAR_RETURN_DISTANCE_2_DIV = _FastNoise::CellularReturnType_Distance2Div
 	};
 
-	VOXEL_FastNoiseLite();
+	Voxel_FastNoiseLite();
 
 	// Properties
 
@@ -87,8 +87,8 @@ public:
 	void set_period(float p);
 	float get_period() const;
 
-	void set_warp_noise(Ref<VOXEL_FastNoiseLiteGradient> warp_noise);
-	Ref<VOXEL_FastNoiseLiteGradient> get_warp_noise() const;
+	void set_warp_noise(Ref<Voxel_FastNoiseLiteGradient> warp_noise);
+	Ref<Voxel_FastNoiseLiteGradient> get_warp_noise() const;
 
 	void set_fractal_type(FractalType type);
 	FractalType get_fractal_type() const;
@@ -193,15 +193,15 @@ private:
 
 	RotationType3D _rotation_type_3d = ROTATION_3D_NONE;
 
-	Ref<VOXEL_FastNoiseLiteGradient> _warp_noise;
+	Ref<Voxel_FastNoiseLiteGradient> _warp_noise;
 };
 
 } // namespace voxel
 
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::NoiseType);
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::FractalType);
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::RotationType3D);
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::CellularDistanceFunction);
-VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::CellularReturnType);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLite::NoiseType);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLite::FractalType);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLite::RotationType3D);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLite::CellularDistanceFunction);
+VARIANT_ENUM_CAST(voxel::Voxel_FastNoiseLite::CellularReturnType);
 
 #endif // VOXEL_FAST_NOISE_LITE_H
