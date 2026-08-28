@@ -25,7 +25,7 @@
 
 class Image;
 
-namespace zylann {
+namespace voxel {
 
 // Can't call it FastNoise? because FastNoise is a namespace already
 class FastNoise2 : public Resource {
@@ -242,12 +242,12 @@ private:
 	FastNoise::SmartNode<> _generator;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::FastNoise2::SIMDLevel);
-VARIANT_ENUM_CAST(zylann::FastNoise2::NoiseType);
-VARIANT_ENUM_CAST(zylann::FastNoise2::FractalType);
-VARIANT_ENUM_CAST(zylann::FastNoise2::CellularDistanceFunction);
-VARIANT_ENUM_CAST(zylann::FastNoise2::CellularReturnType);
+VARIANT_ENUM_CAST(voxel::FastNoise2::SIMDLevel);
+VARIANT_ENUM_CAST(voxel::FastNoise2::NoiseType);
+VARIANT_ENUM_CAST(voxel::FastNoise2::FractalType);
+VARIANT_ENUM_CAST(voxel::FastNoise2::CellularDistanceFunction);
+VARIANT_ENUM_CAST(voxel::FastNoise2::CellularReturnType);
 
 #endif // VOXEL_FAST_NOISE_2_H

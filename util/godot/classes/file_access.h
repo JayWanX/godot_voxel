@@ -1,10 +1,10 @@
-#ifndef ZN_GODOT_FILE_ACCESS_H
-#define ZN_GODOT_FILE_ACCESS_H
+#ifndef VOXEL_GODOT_FILE_ACCESS_H
+#define VOXEL_GODOT_FILE_ACCESS_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/io/file_access.h>
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include "../core/packed_arrays.h"
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/global_constants.hpp> // For `Error`
@@ -13,20 +13,20 @@ using namespace godot;
 
 #include "../../containers/span.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 inline bool file_exists(const String &path) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return FileAccess::exists(path);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	return FileAccess::file_exists(path);
 #endif
 }
 
 inline Ref<FileAccess> open_file(const String path, FileAccess::ModeFlags mode_flags, Error &out_error) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return FileAccess::open(path, mode_flags, &out_error);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Ref<FileAccess> file = FileAccess::open(path, mode_flags);
 	out_error = FileAccess::get_open_error();
 	if (out_error != ::godot::OK) {
@@ -38,9 +38,9 @@ inline Ref<FileAccess> open_file(const String path, FileAccess::ModeFlags mode_f
 }
 
 inline uint64_t get_buffer(FileAccess &f, Span<uint8_t> dst) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return f.get_buffer(dst.data(), dst.size());
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	PackedByteArray bytes = f.get_buffer(dst.size());
 	copy_to(dst, bytes);
 	return bytes.size();
@@ -48,9 +48,9 @@ inline uint64_t get_buffer(FileAccess &f, Span<uint8_t> dst) {
 }
 
 inline void store_buffer(FileAccess &f, Span<const uint8_t> src) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	f.store_buffer(src.data(), src.size());
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	PackedByteArray bytes;
 	copy_to(bytes, src);
 	f.store_buffer(bytes);
@@ -58,13 +58,13 @@ inline void store_buffer(FileAccess &f, Span<const uint8_t> src) {
 }
 
 inline String get_as_text(FileAccess &f) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return f.get_as_utf8_string();
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	return f.get_as_text();
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_FILE_ACCESS_H
+#endif // VOXEL_GODOT_FILE_ACCESS_H

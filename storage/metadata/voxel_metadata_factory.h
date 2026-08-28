@@ -5,7 +5,7 @@
 #include "voxel_metadata.h"
 #include <cstdint>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Registry of custom metadata types, used to deserialize them from saved data.
 class VoxelMetadataFactory {
@@ -26,7 +26,7 @@ public:
 	void add_constructor_by_type(uint8_t type) {
 		add_constructor(type, []() { //
 			// Doesn't compile if I directly return the newed instance
-			ICustomVoxelMetadata *c = ZN_NEW(T);
+			ICustomVoxelMetadata *c = VOXEL_NEW(T);
 			return c;
 		});
 	}
@@ -42,6 +42,6 @@ private:
 	FixedArray<ConstructorFunc, VoxelMetadata::CUSTOM_TYPES_MAX_COUNT> _constructors;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_METADATA_FACTORY_H

@@ -5,7 +5,7 @@
 #include "../voxel_blocky_library_base.h"
 #include "voxel_blocky_type.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Library exposing an array of types, for a more high-level system similar to Minecraft blocks. Indices in this array
 // don't matter, but names do. Models, rotations and voxel IDs are automatically generated based on attributes of each
@@ -105,6 +105,6 @@ private:
 	StdVector<VoxelID> _id_map;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TYPE_LIBRARY_H

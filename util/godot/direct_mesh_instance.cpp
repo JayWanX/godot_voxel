@@ -3,7 +3,7 @@
 #include "classes/material.h"
 #include "classes/world_3d.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 DirectMeshInstance::DirectMeshInstance() {
 	// Nothing here. It is a thin RID wrapper,
@@ -35,7 +35,7 @@ void DirectMeshInstance::create() {
 
 void DirectMeshInstance::destroy() {
 	if (_mesh_instance.is_valid()) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		RenderingServer &vs = *RenderingServer::get_singleton();
 		free_rendering_server_rid(vs, _mesh_instance);
 		_mesh_instance = RID();
@@ -54,7 +54,7 @@ void DirectMeshInstance::set_world(World3D *world) {
 }
 
 void DirectMeshInstance::set_transform(Transform3D world_transform) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(!_mesh_instance.is_valid());
 	RenderingServer &vs = *RenderingServer::get_singleton();
 	vs.instance_set_transform(_mesh_instance, world_transform);
@@ -142,4 +142,4 @@ void DirectMeshInstance::operator=(DirectMeshInstance &&src) {
 	src._mesh.unref();
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

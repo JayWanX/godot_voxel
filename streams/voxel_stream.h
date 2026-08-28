@@ -15,7 +15,7 @@
 
 #include <cstdint>
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBuffer;
 #ifdef VOXEL_ENABLE_INSTANCER
@@ -170,8 +170,8 @@ private:
 	RWLock _parameters_lock;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelStream::ResultCode);
+VARIANT_ENUM_CAST(voxel::VoxelStream::ResultCode);
 
 #endif // VOXEL_STREAM_H

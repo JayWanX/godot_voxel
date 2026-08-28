@@ -10,14 +10,14 @@
 #include "../../util/string/format.h"
 #include "../noise/noise_analysis_window.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
-ZN_FastNoiseLiteViewer::ZN_FastNoiseLiteViewer() {
+VOXEL_FastNoiseLiteViewer::VOXEL_FastNoiseLiteViewer() {
 	set_custom_minimum_size(Vector2(0, EDSCALE * PREVIEW_HEIGHT));
 
 	_texture_rect = memnew(TextureRect);
@@ -26,20 +26,20 @@ ZN_FastNoiseLiteViewer::ZN_FastNoiseLiteViewer() {
 	add_child(_texture_rect);
 }
 
-void ZN_FastNoiseLiteViewer::set_noise(Ref<ZN_FastNoiseLite> noise) {
+void VOXEL_FastNoiseLiteViewer::set_noise(Ref<VOXEL_FastNoiseLite> noise) {
 	if (_noise == noise) {
 		return;
 	}
 
 	if (_noise.is_valid()) {
-		_noise->disconnect("changed", callable_mp(this, &ZN_FastNoiseLiteViewer::_on_noise_changed));
+		_noise->disconnect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
 	}
 
 	_noise = noise;
 
 	if (_noise.is_valid()) {
-		set_noise_gradient(Ref<ZN_FastNoiseLiteGradient>());
-		_noise->connect("changed", callable_mp(this, &ZN_FastNoiseLiteViewer::_on_noise_changed));
+		set_noise_gradient(Ref<VOXEL_FastNoiseLiteGradient>());
+		_noise->connect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
 		set_process(true);
 		update_preview();
 
@@ -51,20 +51,20 @@ void ZN_FastNoiseLiteViewer::set_noise(Ref<ZN_FastNoiseLite> noise) {
 	update_context_menu();
 }
 
-void ZN_FastNoiseLiteViewer::set_noise_gradient(Ref<ZN_FastNoiseLiteGradient> noise_gradient) {
+void VOXEL_FastNoiseLiteViewer::set_noise_gradient(Ref<VOXEL_FastNoiseLiteGradient> noise_gradient) {
 	if (_noise_gradient == noise_gradient) {
 		return;
 	}
 
 	if (_noise_gradient.is_valid()) {
-		_noise_gradient->disconnect("changed", callable_mp(this, &ZN_FastNoiseLiteViewer::_on_noise_changed));
+		_noise_gradient->disconnect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
 	}
 
 	_noise_gradient = noise_gradient;
 
 	if (_noise_gradient.is_valid()) {
-		set_noise(Ref<ZN_FastNoiseLite>());
-		_noise_gradient->connect("changed", callable_mp(this, &ZN_FastNoiseLiteViewer::_on_noise_changed));
+		set_noise(Ref<VOXEL_FastNoiseLite>());
+		_noise_gradient->connect("changed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::_on_noise_changed));
 		set_process(true);
 		update_preview();
 
@@ -76,13 +76,13 @@ void ZN_FastNoiseLiteViewer::set_noise_gradient(Ref<ZN_FastNoiseLiteGradient> no
 	update_context_menu();
 }
 
-void ZN_FastNoiseLiteViewer::update_context_menu() {
+void VOXEL_FastNoiseLiteViewer::update_context_menu() {
 	if (_noise.is_valid()) {
 		if (_context_menu == nullptr) {
 			_context_menu = memnew(PopupMenu);
 			_context_menu->add_item("Analyze...", MENU_ANALYZE);
 			_context_menu->connect(
-					"id_pressed", callable_mp(this, &ZN_FastNoiseLiteViewer::on_context_menu_id_pressed)
+					"id_pressed", callable_mp(this, &VOXEL_FastNoiseLiteViewer::on_context_menu_id_pressed)
 			);
 			add_child(_context_menu);
 		}
@@ -94,24 +94,24 @@ void ZN_FastNoiseLiteViewer::update_context_menu() {
 	}
 }
 
-#ifdef ZN_GODOT
-void ZN_FastNoiseLiteViewer::gui_input(const Ref<InputEvent> &p_event) {
-#elif defined(ZN_GODOT_EXTENSION)
-void ZN_FastNoiseLiteViewer::_gui_input(const Ref<InputEvent> &p_event) {
+#ifdef VOXEL_GODOT
+void VOXEL_FastNoiseLiteViewer::gui_input(const Ref<InputEvent> &p_event) {
+#elif defined(VOXEL_GODOT_EXTENSION)
+void VOXEL_FastNoiseLiteViewer::_gui_input(const Ref<InputEvent> &p_event) {
 #endif
 	if (_context_menu == nullptr) {
 		return;
 	}
 	Ref<InputEventMouseButton> mb = p_event;
 	if (mb.is_valid()) {
-		if (mb->get_button_index() == ZN_GODOT_MouseButton_RIGHT && mb->is_pressed()) {
+		if (mb->get_button_index() == VOXEL_GODOT_MouseButton_RIGHT && mb->is_pressed()) {
 			_context_menu->set_position(mb->get_global_position());
 			_context_menu->popup();
 		}
 	}
 }
 
-void ZN_FastNoiseLiteViewer::on_context_menu_id_pressed(int id) {
+void VOXEL_FastNoiseLiteViewer::on_context_menu_id_pressed(int id) {
 	switch (id) {
 		case MENU_ANALYZE:
 			ERR_FAIL_COND(_noise_analysis_window == nullptr);
@@ -121,16 +121,16 @@ void ZN_FastNoiseLiteViewer::on_context_menu_id_pressed(int id) {
 			break;
 
 		default:
-			ZN_PRINT_ERROR(format("Unknown ID pressed: {}", id));
+			VOXEL_PRINT_ERROR(format("Unknown ID pressed: {}", id));
 			break;
 	}
 }
 
-void ZN_FastNoiseLiteViewer::_on_noise_changed() {
+void VOXEL_FastNoiseLiteViewer::_on_noise_changed() {
 	_time_before_update = 0.5f;
 }
 
-void ZN_FastNoiseLiteViewer::_notification(int p_what) {
+void VOXEL_FastNoiseLiteViewer::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS: {
 			if (_time_before_update > 0.f) {
@@ -144,7 +144,7 @@ void ZN_FastNoiseLiteViewer::_notification(int p_what) {
 }
 
 // TODO Use thread?
-void ZN_FastNoiseLiteViewer::update_preview() {
+void VOXEL_FastNoiseLiteViewer::update_preview() {
 	const Vector2i preview_size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 
 	Ref<Image> im;
@@ -186,6 +186,6 @@ void ZN_FastNoiseLiteViewer::update_preview() {
 	_texture_rect->set_texture(tex);
 }
 
-void ZN_FastNoiseLiteViewer::_bind_methods() {}
+void VOXEL_FastNoiseLiteViewer::_bind_methods() {}
 
-} // namespace zylann
+} // namespace voxel

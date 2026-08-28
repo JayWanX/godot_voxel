@@ -4,7 +4,7 @@
 #include "../util/godot/core/random_pcg.h"
 #include "voxel_tool.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTerrain;
 class VoxelBlockyLibraryBase;
@@ -91,6 +91,6 @@ private:
 	RandomPCG _random;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_TOOL_TERRAIN_H

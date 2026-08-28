@@ -1,5 +1,5 @@
-#ifndef ZN_PROGRAM_GRAPH_H
-#define ZN_PROGRAM_GRAPH_H
+#ifndef VOXEL_PROGRAM_GRAPH_H
+#define VOXEL_PROGRAM_GRAPH_H
 
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_vector.h"
@@ -11,7 +11,7 @@
 
 #include <string_view>
 
-namespace zylann {
+namespace voxel {
 
 // Generic graph representing a program
 class ProgramGraph : NonCopyable {
@@ -103,7 +103,7 @@ public:
 	inline void for_each_node_const(F f) const {
 		for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
 			const Node *node = it->second;
-			ZN_ASSERT_CONTINUE(node != nullptr);
+			VOXEL_ASSERT_CONTINUE(node != nullptr);
 			f(*node);
 		}
 	}
@@ -112,7 +112,7 @@ public:
 	inline void for_each_node(F f) {
 		for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
 			Node *node = it->second;
-			ZN_ASSERT_CONTINUE(node != nullptr);
+			VOXEL_ASSERT_CONTINUE(node != nullptr);
 			f(*node);
 		}
 	}
@@ -121,7 +121,7 @@ public:
 	inline uint32_t find_node(F f) const {
 		for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
 			const Node *node = it->second;
-			ZN_ASSERT_CONTINUE(node != nullptr);
+			VOXEL_ASSERT_CONTINUE(node != nullptr);
 			if (f(*node)) {
 				return it->first;
 			}
@@ -165,16 +165,16 @@ struct ProgramGraphPortLocationHasher {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
 // For STL
 namespace std {
 template <>
-struct hash<zylann::ProgramGraph::PortLocation> {
-	size_t operator()(const zylann::ProgramGraph::PortLocation &v) const {
-		return zylann::ProgramGraphPortLocationHasher::hash(v);
+struct hash<voxel::ProgramGraph::PortLocation> {
+	size_t operator()(const voxel::ProgramGraph::PortLocation &v) const {
+		return voxel::ProgramGraphPortLocationHasher::hash(v);
 	}
 };
 } // namespace std
 
-#endif // ZN_PROGRAM_GRAPH_H
+#endif // VOXEL_PROGRAM_GRAPH_H

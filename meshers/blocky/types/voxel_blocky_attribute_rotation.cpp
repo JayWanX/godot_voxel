@@ -1,11 +1,11 @@
 #include "voxel_blocky_attribute_rotation.h"
 #include "../../../constants/voxel_string_names.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Full-on orthogonal rotation is actually hard to use directly as a single property... there cannot be straightforward
 // unique names for all 24 values, as well as the raw integer values. It may always need an intermediary tool or helper
@@ -73,4 +73,4 @@ void VoxelBlockyAttributeRotation::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -1,4 +1,4 @@
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 // Module specific
 #include "register_types.h"
 #endif
@@ -85,7 +85,7 @@
 #include "generators/simple/voxel_generator_waves.h"
 #endif
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 #include "engine/voxel_engine_updater.h"
 #include "util/thread/godot_thread_helper.h"
 #endif
@@ -142,7 +142,7 @@
 #include "editor/mesh_sdf/voxel_mesh_sdf_editor_plugin.h"
 #endif
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 #include "editor/about_window.h"
 #include "editor/blocky_library/axes_3d_control.h"
 #include "editor/blocky_library/model_viewer.h"
@@ -183,7 +183,7 @@
 #include "editor/instancer/voxel_instancer_stat_view.h"
 #endif
 
-#endif // ZN_GODOT_EXTENSION
+#endif // VOXEL_GODOT_EXTENSION
 
 #endif // TOOLS_ENABLED
 
@@ -196,65 +196,65 @@
 
 // This is used to have an idea of the memory footprint of various objects as Godot and Voxel development progresses.
 void print_size_reminders() {
-	using namespace zylann;
+	using namespace voxel;
 	using namespace voxel;
 
 	// Note, this only logs the base size each of these classes. They can often have a bigger memory
 	// footprint due to dynamically-allocated members (arrays, dictionaries, RIDs referring to even more data in
 	// RenderingServer...)
 
-	ZN_PRINT_VERBOSE(format("Size of Variant: {}", sizeof(Variant)));
-	ZN_PRINT_VERBOSE(format("Size of Object: {}", sizeof(Object)));
-	ZN_PRINT_VERBOSE(format("Size of RefCounted: {}", sizeof(RefCounted)));
-	ZN_PRINT_VERBOSE(format("Size of Node: {}", sizeof(Node)));
-	ZN_PRINT_VERBOSE(format("Size of Node3D: {}", sizeof(Node3D)));
-	ZN_PRINT_VERBOSE(format("Size of MeshInstance3D: {}", sizeof(MeshInstance3D)));
-	ZN_PRINT_VERBOSE(format("Size of GeometryInstance3D: {}", sizeof(MeshInstance3D)));
-	ZN_PRINT_VERBOSE(format("Size of Resource: {}", sizeof(Resource)));
-	ZN_PRINT_VERBOSE(format("Size of Mesh: {}", sizeof(Mesh)));
-	ZN_PRINT_VERBOSE(format("Size of ArrayMesh: {}", sizeof(ArrayMesh)));
+	VOXEL_PRINT_VERBOSE(format("Size of Variant: {}", sizeof(Variant)));
+	VOXEL_PRINT_VERBOSE(format("Size of Object: {}", sizeof(Object)));
+	VOXEL_PRINT_VERBOSE(format("Size of RefCounted: {}", sizeof(RefCounted)));
+	VOXEL_PRINT_VERBOSE(format("Size of Node: {}", sizeof(Node)));
+	VOXEL_PRINT_VERBOSE(format("Size of Node3D: {}", sizeof(Node3D)));
+	VOXEL_PRINT_VERBOSE(format("Size of MeshInstance3D: {}", sizeof(MeshInstance3D)));
+	VOXEL_PRINT_VERBOSE(format("Size of GeometryInstance3D: {}", sizeof(MeshInstance3D)));
+	VOXEL_PRINT_VERBOSE(format("Size of Resource: {}", sizeof(Resource)));
+	VOXEL_PRINT_VERBOSE(format("Size of Mesh: {}", sizeof(Mesh)));
+	VOXEL_PRINT_VERBOSE(format("Size of ArrayMesh: {}", sizeof(ArrayMesh)));
 
-	ZN_PRINT_VERBOSE(format("Size of CanvasItem: {}", sizeof(CanvasItem)));
-	ZN_PRINT_VERBOSE(format("Size of Node2D: {}", sizeof(Node2D)));
-	ZN_PRINT_VERBOSE(format("Size of Sprite2D: {}", sizeof(Sprite2D)));
-	ZN_PRINT_VERBOSE(format("Size of Control: {}", sizeof(Control)));
+	VOXEL_PRINT_VERBOSE(format("Size of CanvasItem: {}", sizeof(CanvasItem)));
+	VOXEL_PRINT_VERBOSE(format("Size of Node2D: {}", sizeof(Node2D)));
+	VOXEL_PRINT_VERBOSE(format("Size of Sprite2D: {}", sizeof(Sprite2D)));
+	VOXEL_PRINT_VERBOSE(format("Size of Control: {}", sizeof(Control)));
 
-	ZN_PRINT_VERBOSE(format("Size of RWLock: {}", sizeof(zylann::RWLock)));
-	ZN_PRINT_VERBOSE(format("Size of Mutex: {}", sizeof(zylann::Mutex)));
-	ZN_PRINT_VERBOSE(format("Size of BinaryMutex: {}", sizeof(zylann::BinaryMutex)));
+	VOXEL_PRINT_VERBOSE(format("Size of RWLock: {}", sizeof(voxel::RWLock)));
+	VOXEL_PRINT_VERBOSE(format("Size of Mutex: {}", sizeof(voxel::Mutex)));
+	VOXEL_PRINT_VERBOSE(format("Size of BinaryMutex: {}", sizeof(voxel::BinaryMutex)));
 
-	ZN_PRINT_VERBOSE(format("Size of godot::VoxelBuffer: {}", sizeof(voxel::godot::VoxelBuffer)));
-	ZN_PRINT_VERBOSE(format("Size of VoxelBuffer: {}", sizeof(VoxelBuffer)));
-	ZN_PRINT_VERBOSE(format("Size of VoxelMeshBlock: {}", sizeof(VoxelMeshBlock)));
-	ZN_PRINT_VERBOSE(format("Size of VoxelTerrain: {}", sizeof(VoxelTerrain)));
-	ZN_PRINT_VERBOSE(format("Size of VoxelLodTerrain: {}", sizeof(VoxelLodTerrain)));
+	VOXEL_PRINT_VERBOSE(format("Size of godot::VoxelBuffer: {}", sizeof(voxel::godot::VoxelBuffer)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelBuffer: {}", sizeof(VoxelBuffer)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelMeshBlock: {}", sizeof(VoxelMeshBlock)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelTerrain: {}", sizeof(VoxelTerrain)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelLodTerrain: {}", sizeof(VoxelLodTerrain)));
 #ifdef VOXEL_ENABLE_INSTANCER
-	ZN_PRINT_VERBOSE(format("Size of VoxelInstancer: {}", sizeof(VoxelInstancer)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelInstancer: {}", sizeof(VoxelInstancer)));
 #endif
-	ZN_PRINT_VERBOSE(format("Size of VoxelDataMap: {}", sizeof(VoxelDataMap)));
-	ZN_PRINT_VERBOSE(format("Size of VoxelData: {}", sizeof(VoxelData)));
-	ZN_PRINT_VERBOSE(format("Size of VoxelMesher::Output: {}", sizeof(VoxelMesher::Output)));
-	ZN_PRINT_VERBOSE(format("Size of VoxelEngine::BlockMeshOutput: {}", sizeof(VoxelEngine::BlockMeshOutput)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelDataMap: {}", sizeof(VoxelDataMap)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelData: {}", sizeof(VoxelData)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelMesher::Output: {}", sizeof(VoxelMesher::Output)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelEngine::BlockMeshOutput: {}", sizeof(VoxelEngine::BlockMeshOutput)));
 #ifdef VOXEL_ENABLE_MODIFIERS
-	ZN_PRINT_VERBOSE(format("Size of VoxelModifierStack: {}", sizeof(VoxelModifierStack)));
+	VOXEL_PRINT_VERBOSE(format("Size of VoxelModifierStack: {}", sizeof(VoxelModifierStack)));
 #endif
-	ZN_PRINT_VERBOSE(format("Size of AsyncDependencyTracker: {}", sizeof(AsyncDependencyTracker)));
+	VOXEL_PRINT_VERBOSE(format("Size of AsyncDependencyTracker: {}", sizeof(AsyncDependencyTracker)));
 }
 
 void initialize_voxel_module(ModuleInitializationLevel p_level) {
-	using namespace zylann;
-	using namespace zylann::godot;
+	using namespace voxel;
+	using namespace voxel::godot;
 	using namespace voxel;
 
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
-#ifdef ZN_DEBUG_LOG_FILE_ENABLED
+#ifdef VOXEL_DEBUG_LOG_FILE_ENABLED
 		open_log_file();
 #endif
 
 		// TODO Enhancement: can I prevent users from instancing `VoxelEngine`?
 		// This class is used as a singleton so it's not really abstract.
 		// Should I use `register_abstract_class` anyways?
-		ClassDB::register_class<zylann::voxel::godot::VoxelEngine>();
+		ClassDB::register_class<voxel::godot::VoxelEngine>();
 
 		// Misc
 
@@ -283,8 +283,8 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		ClassDB::register_class<pg::VoxelGraphFunction>();
 
 		// Storage
-		ClassDB::register_class<zylann::voxel::godot::VoxelBuffer>();
-		ClassDB::register_class<zylann::voxel::godot::VoxelFormat>();
+		ClassDB::register_class<voxel::godot::VoxelBuffer>();
+		ClassDB::register_class<voxel::godot::VoxelFormat>();
 
 		// Nodes
 		ClassDB::register_abstract_class<VoxelNode>();
@@ -314,11 +314,11 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		// And this can happen in a thread, causing crashes due to the concurrent access
 		ClassDB::register_abstract_class<VoxelToolBuffer>();
 		ClassDB::register_abstract_class<VoxelToolMultipassGenerator>();
-		ClassDB::register_class<zylann::voxel::godot::VoxelBlockSerializer>();
-		ClassDB::register_class<ZN_FastNoiseLite>();
-		ClassDB::register_class<ZN_FastNoiseLiteGradient>();
-		ClassDB::register_class<ZN_SpotNoise>();
-		ClassDB::register_class<ZN_ThreadedTask>();
+		ClassDB::register_class<voxel::godot::VoxelBlockSerializer>();
+		ClassDB::register_class<VOXEL_FastNoiseLite>();
+		ClassDB::register_class<VOXEL_FastNoiseLiteGradient>();
+		ClassDB::register_class<VOXEL_SpotNoise>();
+		ClassDB::register_class<VOXEL_ThreadedTask>();
 		ClassDB::register_class<VoxelTerrainMultiplayerSynchronizer>();
 		ClassDB::register_class<VoxelAStarGrid3D>();
 
@@ -337,9 +337,9 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 #endif
 
 #ifdef VOXEL_ENABLE_MODIFIERS
-		ClassDB::register_abstract_class<zylann::voxel::godot::VoxelModifier>();
-		ClassDB::register_class<zylann::voxel::godot::VoxelModifierSphere>();
-		ClassDB::register_class<zylann::voxel::godot::VoxelModifierMesh>();
+		ClassDB::register_abstract_class<voxel::godot::VoxelModifier>();
+		ClassDB::register_class<voxel::godot::VoxelModifierSphere>();
+		ClassDB::register_class<voxel::godot::VoxelModifierMesh>();
 #endif
 
 #ifdef VOXEL_ENABLE_SQLITE
@@ -375,17 +375,17 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		ClassDB::register_class<VoxelVoxLoader>();
 #endif
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 		// TODO GDX: I don't want to expose these classes, but there is no way not to expose them
-		ClassDB::register_class<ZN_GodotThreadHelper>();
+		ClassDB::register_class<VOXEL_GodotThreadHelper>();
 		ClassDB::register_class<VoxelEngineUpdater>();
 #endif
 
 		print_size_reminders();
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 		if (RenderingDevice::get_singleton() != nullptr) {
-			ZN_PRINT_VERBOSE(
+			VOXEL_PRINT_VERBOSE(
 					format("TextureArray max layers: {}",
 						   RenderingDevice::get_singleton()->limit_get(RenderingDevice::LIMIT_MAX_TEXTURE_ARRAY_LAYERS))
 			);
@@ -394,7 +394,7 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		// TODO GDX: Not possible to access the default `RenderingDevice` to query its limits
 #endif
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 		// Compatibility with older version
 		// ClassDB::add_compatibility_class("VoxelLibrary", "VoxelBlockyLibrary");
 		// ClassDB::add_compatibility_class("Voxel", "VoxelBlockyModel");
@@ -406,23 +406,23 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		// Setup engine after classes are registered.
 		// This is necessary when using GDExtension because classes can't be instantiated until they are registered.
 
-		zylann::godot::StringNames::create_singleton();
+		voxel::godot::StringNames::create_singleton();
 		VoxelMemoryPool::create_singleton();
 		VoxelStringNames::create_singleton();
 		pg::NodeTypeDB::create_singleton();
 
-		const zylann::voxel::godot::VoxelEngine::Config config =
-				zylann::voxel::godot::VoxelEngine::get_config_from_godot();
+		const voxel::godot::VoxelEngine::Config config =
+				voxel::godot::VoxelEngine::get_config_from_godot();
 #ifdef TOOLS_ENABLED
 		CheckRefCountDoesNotChange::set_enabled(config.ownership_checks);
 #endif
 		VoxelEngine::create_singleton(config.inner);
 
-		zylann::voxel::godot::VoxelEngine::create_singleton();
-		zylann::godot::add_singleton("VoxelEngine", zylann::voxel::godot::VoxelEngine::get_singleton());
+		voxel::godot::VoxelEngine::create_singleton();
+		voxel::godot::add_singleton("VoxelEngine", voxel::godot::VoxelEngine::get_singleton());
 
-		VoxelMetadataFactory::get_singleton().add_constructor_by_type<zylann::voxel::godot::VoxelMetadataVariant>(
-				zylann::voxel::godot::METADATA_TYPE_VARIANT
+		VoxelMetadataFactory::get_singleton().add_constructor_by_type<voxel::godot::VoxelMetadataVariant>(
+				voxel::godot::METADATA_TYPE_VARIANT
 		);
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
@@ -430,13 +430,13 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 #endif
 
 #ifdef VOXEL_TESTS
-		const PackedStringArray command_line_arguments = zylann::godot::get_command_line_arguments();
+		const PackedStringArray command_line_arguments = voxel::godot::get_command_line_arguments();
 		const String tests_cmd = "--run_voxel_tests";
 
 		for (int i = 0; i < command_line_arguments.size(); ++i) {
 			const String arg = command_line_arguments[i];
 			if (arg == tests_cmd) {
-				zylann::voxel::tests::run_voxel_tests(zylann::testing::TestOptions());
+				voxel::tests::run_voxel_tests(voxel::testing::TestOptions());
 				break;
 			}
 		}
@@ -447,28 +447,28 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
 		VoxelGraphEditorNodePreview::load_resources();
 
-#if defined(ZN_GODOT_EXTENSION)
+#if defined(VOXEL_GODOT_EXTENSION)
 		// In GDExtension we have to explicitely register all classes deriving from Object even if they are not exposed
 
-		ClassDB::register_internal_class<ZN_EditorPlugin>();
-		ClassDB::register_internal_class<ZN_EditorImportPlugin>();
-		ClassDB::register_internal_class<ZN_EditorInspectorPlugin>();
-		ClassDB::register_internal_class<ZN_EditorProperty>();
-		ClassDB::register_internal_class<ZN_Axes3DControl>();
-		ClassDB::register_internal_class<ZN_ModelViewer>();
-		ClassDB::register_internal_class<ZN_EditorPropertyAABBMinMax>();
-		ClassDB::register_internal_class<ZN_EditorPropertyTextChangeOnSubmit>();
-		ClassDB::register_internal_class<ZN_ControlSizer>();
+		ClassDB::register_internal_class<VOXEL_EditorPlugin>();
+		ClassDB::register_internal_class<VOXEL_EditorImportPlugin>();
+		ClassDB::register_internal_class<VOXEL_EditorInspectorPlugin>();
+		ClassDB::register_internal_class<VOXEL_EditorProperty>();
+		ClassDB::register_internal_class<VOXEL_Axes3DControl>();
+		ClassDB::register_internal_class<VOXEL_ModelViewer>();
+		ClassDB::register_internal_class<VOXEL_EditorPropertyAABBMinMax>();
+		ClassDB::register_internal_class<VOXEL_EditorPropertyTextChangeOnSubmit>();
+		ClassDB::register_internal_class<VOXEL_ControlSizer>();
 
-		ClassDB::register_internal_class<ZN_FastNoiseLiteEditorPlugin>();
-		ClassDB::register_internal_class<ZN_FastNoiseLiteEditorInspectorPlugin>();
-		ClassDB::register_internal_class<ZN_FastNoiseLiteViewer>();
-		ClassDB::register_internal_class<ZN_ChartView>();
-		ClassDB::register_internal_class<ZN_NoiseAnalysisWindow>();
+		ClassDB::register_internal_class<VOXEL_FastNoiseLiteEditorPlugin>();
+		ClassDB::register_internal_class<VOXEL_FastNoiseLiteEditorInspectorPlugin>();
+		ClassDB::register_internal_class<VOXEL_FastNoiseLiteViewer>();
+		ClassDB::register_internal_class<VOXEL_ChartView>();
+		ClassDB::register_internal_class<VOXEL_NoiseAnalysisWindow>();
 
-		ClassDB::register_internal_class<ZN_SpotNoiseEditorPlugin>();
-		ClassDB::register_internal_class<ZN_SpotNoiseEditorInspectorPlugin>();
-		ClassDB::register_internal_class<ZN_SpotNoiseViewer>();
+		ClassDB::register_internal_class<VOXEL_SpotNoiseEditorPlugin>();
+		ClassDB::register_internal_class<VOXEL_SpotNoiseEditorInspectorPlugin>();
+		ClassDB::register_internal_class<VOXEL_SpotNoiseViewer>();
 
 		ClassDB::register_internal_class<VoxelAboutWindow>();
 		ClassDB::register_internal_class<VoxelTerrainEditorInspectorPlugin>();
@@ -525,12 +525,12 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		ClassDB::register_internal_class<magica::VoxelVoxSceneImporter>();
 #endif
 
-#endif // ZN_GODOT_EXTENSION
+#endif // VOXEL_GODOT_EXTENSION
 
 		EditorPlugins::add_by_type<VoxelGraphEditorPlugin>();
 		EditorPlugins::add_by_type<VoxelTerrainEditorPlugin>();
-		EditorPlugins::add_by_type<ZN_FastNoiseLiteEditorPlugin>();
-		EditorPlugins::add_by_type<ZN_SpotNoiseEditorPlugin>();
+		EditorPlugins::add_by_type<VOXEL_FastNoiseLiteEditorPlugin>();
+		EditorPlugins::add_by_type<VOXEL_SpotNoiseEditorPlugin>();
 		EditorPlugins::add_by_type<VoxelBlockyLibraryEditorPlugin>();
 		EditorPlugins::add_by_type<VoxelGeneratorMultipassEditorPlugin>();
 
@@ -555,7 +555,7 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 #ifdef TOOLS_ENABLED
 		// TODO Any way to define a custom command line argument that closes Godot afterward?
 
-		const PackedStringArray command_line_arguments = zylann::godot::get_command_line_arguments();
+		const PackedStringArray command_line_arguments = voxel::godot::get_command_line_arguments();
 		const String doc_tool_cmd = "--voxel_doc_tool";
 
 		for (int i = 0; i < command_line_arguments.size(); ++i) {
@@ -578,31 +578,31 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 }
 
 void uninitialize_voxel_module(ModuleInitializationLevel p_level) {
-	using namespace zylann;
+	using namespace voxel;
 	using namespace voxel;
 
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
-		zylann::godot::remove_singleton("VoxelEngine");
+		voxel::godot::remove_singleton("VoxelEngine");
 
 		// At this point, the GDScript module has nullified GDScriptLanguage::singleton!!
 		// That means it's impossible to free scripts still referenced by VoxelEngine. And that can happen, because
 		// users can write custom generators, which run inside threads, and these threads are hosted in the engine
-		// singleton... See https://github.com/Zylann/godot_voxel/issues/189
+		// singleton... See https://github.com/Voxel/godot_voxel/issues/189
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 		VoxelMesherTransvoxel::free_static_resources();
 #endif
 		VoxelStringNames::destroy_singleton();
 		pg::NodeTypeDB::destroy_singleton();
-		zylann::voxel::godot::VoxelEngine::destroy_singleton();
+		voxel::godot::VoxelEngine::destroy_singleton();
 		VoxelEngine::destroy_singleton();
 
 		// Do this last as VoxelEngine might still be holding some refs to voxel blocks
 		VoxelMemoryPool::destroy_singleton();
 
-		zylann::godot::StringNames::destroy_singleton();
+		voxel::godot::StringNames::destroy_singleton();
 
-#ifdef ZN_DEBUG_LOG_FILE_ENABLED
+#ifdef VOXEL_DEBUG_LOG_FILE_ENABLED
 		close_log_file();
 #endif
 	}
@@ -616,7 +616,7 @@ void uninitialize_voxel_module(ModuleInitializationLevel p_level) {
 #endif // TOOLS_ENABLED
 }
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 extern "C" {
 // Library entry point
 GDExtensionBool GDE_EXPORT voxel_library_init(

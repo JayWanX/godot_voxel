@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_EDITOR_SCALE_H
-#define ZN_GODOT_EDITOR_SCALE_H
+#ifndef VOXEL_GODOT_EDITOR_SCALE_H
+#define VOXEL_GODOT_EDITOR_SCALE_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 #include <core/version.h>
 
@@ -11,11 +11,11 @@
 #include <editor/themes/editor_scale.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
-#define EDSCALE zylann::get_editor_scale()
-namespace zylann {
+#elif defined(VOXEL_GODOT_EXTENSION)
+#define EDSCALE voxel::get_editor_scale()
+namespace voxel {
 float get_editor_scale();
 }
 #endif
 
-#endif // ZN_GODOT_EDITOR_SCALE_H
+#endif // VOXEL_GODOT_EDITOR_SCALE_H

@@ -10,7 +10,7 @@
 #include "generate_instances_block_task.h"
 #include "instancer_quick_reloading_cache.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 LoadInstanceChunkTask::LoadInstanceChunkTask(
 		std::shared_ptr<InstancerTaskOutputQueue> output_queue,
@@ -42,17 +42,17 @@ LoadInstanceChunkTask::LoadInstanceChunkTask(
 		_up_mode(up_mode) //
 {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(_output_queue != nullptr);
-	ZN_ASSERT(_instance_block_size > 0);
-	ZN_ASSERT(_data_block_size > 0);
+	VOXEL_ASSERT(_output_queue != nullptr);
+	VOXEL_ASSERT(_instance_block_size > 0);
+	VOXEL_ASSERT(_data_block_size > 0);
 	if (_instance_block_size < _data_block_size) {
-		ZN_PRINT_ERROR("_instance_block_size < _data_block_size is not supported");
+		VOXEL_PRINT_ERROR("_instance_block_size < _data_block_size is not supported");
 	}
 #endif
 }
 
 void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	struct Layer {
 		int id = -1;
@@ -64,12 +64,12 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 
 	// Try loading saved blocks
 	if (_stream.is_valid()) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		const unsigned int data_factor = _instance_block_size / _data_block_size;
 		const Box3i data_box(_render_grid_position * data_factor, Vector3iUtil::create(data_factor));
 
-		ZN_ASSERT(data_factor <= 2);
+		VOXEL_ASSERT(data_factor <= 2);
 		FixedArray<VoxelStream::InstancesQueryData, 8> queries;
 
 		// Create queries
@@ -100,7 +100,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 					auto it = _quick_reload_cache->map.find(query.position_in_blocks);
 
 					if (it != _quick_reload_cache->map.end()) {
-						ZN_PROFILE_SCOPE_NAMED("Instance quick reload");
+						VOXEL_PROFILE_SCOPE_NAMED("Instance quick reload");
 						UniquePtr<InstanceBlockData> data;
 						if (it->second != nullptr) {
 							data = make_unique_instance<InstanceBlockData>();
@@ -189,7 +189,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 						// So we need to adjust their relative position.
 						const Vector3f rel =
 								to_vec3f((query.position_in_blocks - data_min_block_pos) * data_block_size_at_lod);
-						ZN_ASSERT(dst_index0 <= layer.transforms.size());
+						VOXEL_ASSERT(dst_index0 <= layer.transforms.size());
 						for (auto it = layer.transforms.begin() + dst_index0; it != layer.transforms.end(); ++it) {
 							it->origin += rel;
 						}
@@ -201,7 +201,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 
 	// Generate the rest
 	if (_mesh_arrays.size() != 0 && _library.is_valid()) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		// TODO Cache memory
 		StdVector<VoxelInstanceLibrary::PackedItem> items;
@@ -233,7 +233,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 					if (vertices.size() != 0) {
 						// Trigger a separate task because it may run in parallel, while the current one may not (until
 						// we figure out how to make VoxelStream I/Os parallel enough)
-						GenerateInstancesBlockTask *task = ZN_NEW(GenerateInstancesBlockTask);
+						GenerateInstancesBlockTask *task = VOXEL_NEW(GenerateInstancesBlockTask);
 						task->mesh_block_grid_position = _render_grid_position;
 						task->layer_id = item.id;
 						task->mesh_block_size = static_cast<int>(_instance_block_size) << _lod_index;
@@ -276,4 +276,4 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

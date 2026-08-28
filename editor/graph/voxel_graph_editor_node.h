@@ -5,10 +5,10 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/classes/graph_node.h"
 
-ZN_GODOT_FORWARD_DECLARE(class ColorRect)
-ZN_GODOT_FORWARD_DECLARE(class Label)
+VOXEL_GODOT_FORWARD_DECLARE(class ColorRect)
+VOXEL_GODOT_FORWARD_DECLARE(class Label)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGraphEditorNodePreview;
 struct GraphEditorAdapter;
@@ -79,6 +79,6 @@ private:
 	bool _is_comment = false;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_NODE_H

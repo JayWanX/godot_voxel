@@ -9,7 +9,7 @@
 #include "../variable_lod/voxel_lod_terrain.h"
 #include "voxel_terrain.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -273,7 +273,7 @@ void collect_boxes(
 		const uint32_t collision_nask,
 		StdVector<AABB> &potential_boxes
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const Vector3i minp = math::floor_to_int(query_box.position);
 	const Vector3i maxp = math::ceil_to_int(query_box.position + query_box.size);
@@ -301,7 +301,7 @@ Vector3 VoxelBoxMover::get_motion(
 		const Transform3D &terrain_transform,
 		const VoxelMesher &mesher
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Transform to local in case the volume is transformed
 	const Transform3D to_world = terrain_transform;
@@ -329,7 +329,7 @@ Vector3 VoxelBoxMover::get_motion(
 	collect_boxes(terrain_data, mesher, expanded_box, _collision_mask, potential_boxes);
 
 	const real_t margin = 0.001;
-	const Vector3 slided_motion1 = zylann::voxel::get_motion(box, input_motion, to_span(potential_boxes), margin);
+	const Vector3 slided_motion1 = voxel::get_motion(box, input_motion, to_span(potential_boxes), margin);
 	Vector3 final_motion = slided_motion1;
 
 	_has_stepped_up = false;
@@ -363,7 +363,7 @@ Vector3 VoxelBoxMover::get_motion(
 		const Vector3 momotion(input_motion.x, slided_motion1.y, input_motion.z);
 
 		// Do a second attempt at moving
-		Vector3 slided_motion2 = zylann::voxel::get_motion(mobox, momotion, to_span(potential_boxes), margin);
+		Vector3 slided_motion2 = voxel::get_motion(mobox, momotion, to_span(potential_boxes), margin);
 
 		const real_t epsilon = 0.0001;
 		{
@@ -443,12 +443,12 @@ bool VoxelBoxMover::intersects(
 	// Collect potential collisions with the terrain (broad phase)
 	collect_boxes(terrain_data, mesher, aabb, _collision_mask, potential_boxes);
 
-	return zylann::voxel::intersects(to_span(potential_boxes), aabb);
+	return voxel::intersects(to_span(potential_boxes), aabb);
 }
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 Vector3 VoxelBoxMover::_b_get_motion(Vector3 pos, Vector3 motion, AABB aabb, Node *terrain_node) {
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 Vector3 VoxelBoxMover::_b_get_motion(Vector3 pos, Vector3 motion, AABB aabb, Object *terrain_node) {
 #endif
 	ERR_FAIL_COND_V(terrain_node == nullptr, Vector3());
@@ -490,4 +490,4 @@ void VoxelBoxMover::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("has_stepped_up"), &VoxelBoxMover::has_stepped_up);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

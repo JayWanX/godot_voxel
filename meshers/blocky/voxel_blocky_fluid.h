@@ -9,9 +9,9 @@
 #include "blocky_baked_library.h"
 #include <cstdint>
 
-ZN_GODOT_FORWARD_DECLARE(class Material);
+VOXEL_GODOT_FORWARD_DECLARE(class Material);
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace blocky {
 struct MaterialIndexer;
@@ -58,6 +58,6 @@ private:
 	bool _dip_when_flowing_down = false;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_FLUID_H

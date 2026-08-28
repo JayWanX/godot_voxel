@@ -5,7 +5,7 @@
 #include "control.h"
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 template <typename F>
 void for_each_node_depth_first(Node *parent, F f) {
@@ -30,14 +30,14 @@ void set_nodes_owner_except_root(Node *root, Node *owner) {
 }
 
 void get_node_groups(const Node &node, StdVector<StringName> &out_groups) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	List<Node::GroupInfo> gi;
 	node.get_groups(&gi);
 	for (const Node::GroupInfo &g : gi) {
 		out_groups.push_back(g.name);
 	}
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	TypedArray<StringName> groups = node.get_groups();
 	for (int i = 0; i < groups.size(); ++i) {
 		out_groups.push_back(groups[i]);
@@ -46,8 +46,8 @@ void get_node_groups(const Node &node, StdVector<StringName> &out_groups) {
 }
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
-Node::AutoTranslateMode to_godot_auto_translate_mode(const AutoTranslateMode zn_mode) {
-	switch (zn_mode) {
+Node::AutoTranslateMode to_godot_auto_translate_mode(const AutoTranslateMode voxel_mode) {
+	switch (voxel_mode) {
 		case AUTO_TRANSLATE_MODE_INHERIT:
 			return Node::AUTO_TRANSLATE_MODE_INHERIT;
 		case AUTO_TRANSLATE_MODE_ALWAYS:
@@ -55,7 +55,7 @@ Node::AutoTranslateMode to_godot_auto_translate_mode(const AutoTranslateMode zn_
 		case AUTO_TRANSLATE_MODE_DISABLED:
 			return Node::AUTO_TRANSLATE_MODE_DISABLED;
 		default:
-			ZN_PRINT_ERROR("Unhandled enum");
+			VOXEL_PRINT_ERROR("Unhandled enum");
 			return Node::AUTO_TRANSLATE_MODE_INHERIT;
 	}
 }
@@ -83,4 +83,4 @@ void set_node_auto_translate_mode(Node &node, const AutoTranslateMode mode) {
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

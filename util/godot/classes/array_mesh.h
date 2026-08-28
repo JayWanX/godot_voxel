@@ -1,14 +1,14 @@
-#ifndef ZN_GODOT_ARRAY_MESH_H
-#define ZN_GODOT_ARRAY_MESH_H
+#ifndef VOXEL_GODOT_ARRAY_MESH_H
+#define VOXEL_GODOT_ARRAY_MESH_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/resources/mesh.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/array_mesh.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // TODO The following functions should be able to work on `Mesh`,
 // but the script/extension API exposes some methods only on `ArrayMesh`, even though they exist on `Mesh` internally...
@@ -33,6 +33,6 @@ Array generate_debug_seams_wireframe_surface(const ArrayMesh &src_mesh, int surf
 
 #endif
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_ARRAY_MESH_H
+#endif // VOXEL_GODOT_ARRAY_MESH_H

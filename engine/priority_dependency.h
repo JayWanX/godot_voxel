@@ -7,7 +7,7 @@
 #include <atomic>
 #include <memory>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Information to calculate the priority of a voxel task having a specific location
 struct PriorityDependency {
@@ -48,6 +48,6 @@ struct PriorityDependency {
 	TaskPriority evaluate(uint8_t lod_index, uint8_t band2_priority, float *out_closest_distance_sq);
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // PRIORITY_DEPENDENCY_H

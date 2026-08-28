@@ -38,7 +38,7 @@ def get_sources(env, is_editor_build):
         # The MeshOptimizer library in this module is different to the official one.
         # Godot 4 includes an official version, which means they would both conflict at linking time.
         # To prevent this clash we wrap the entire library within an additional namespace.
-        "MESHOPTIMIZER_ZYLANN_WRAP_LIBRARY_IN_NAMESPACE",
+        "MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE",
     ])
     
     tests_enabled = env["voxel_tests"]

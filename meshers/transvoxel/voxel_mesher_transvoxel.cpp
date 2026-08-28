@@ -17,9 +17,9 @@
 #include "../../util/string/format.h"
 #endif
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 Ref<ShaderMaterial> g_minimal_shader_material;
@@ -80,7 +80,7 @@ int VoxelMesherTransvoxel::get_used_channels_mask() const {
 			mask |= (1 << VoxelBuffer::CHANNEL_INDICES);
 			break;
 		default:
-			ZN_PRINT_ERROR("Unhandled texture mode");
+			VOXEL_PRINT_ERROR("Unhandled texture mode");
 			break;
 	}
 
@@ -145,7 +145,7 @@ void remap_vertex_array(
 		return;
 	}
 	dst_data.resize(unique_vertex_count);
-	zylannmeshopt::meshopt_remapVertexBuffer(
+	voxelmeshopt::meshopt_remapVertexBuffer(
 			&dst_data[0], &src_data[0], src_data.size(), sizeof(T), remap_indices.data()
 	);
 }
@@ -156,7 +156,7 @@ void simplify(
 		float p_target_ratio,
 		float p_error_threshold
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Gather and check input
 
@@ -175,10 +175,10 @@ void simplify(
 
 	// Simplify
 	{
-		ZN_PROFILE_SCOPE_NAMED("meshopt_simplify");
+		VOXEL_PROFILE_SCOPE_NAMED("meshopt_simplify");
 
-		// TODO See build script about the `zylannmeshopt::` namespace
-		const unsigned int lod_index_count = zylannmeshopt::meshopt_simplify(
+		// TODO See build script about the `voxelmeshopt::` namespace
+		const unsigned int lod_index_count = voxelmeshopt::meshopt_simplify(
 				&lod_indices[0],
 				reinterpret_cast<const unsigned int *>(src_mesh.indices.data()),
 				src_mesh.indices.size(),
@@ -188,7 +188,7 @@ void simplify(
 				target_index_count,
 				p_error_threshold,
 				// Crucial for chunk borders, see https://github.com/zeux/meshoptimizer/issues/311
-				zylannmeshopt::meshopt_SimplifyLockBorder,
+				voxelmeshopt::meshopt_SimplifyLockBorder,
 				&lod_error
 		);
 
@@ -204,7 +204,7 @@ void simplify(
 	remap_indices.clear();
 	remap_indices.resize(src_mesh.vertices.size());
 
-	const unsigned int unique_vertex_count = zylannmeshopt::meshopt_optimizeVertexFetchRemap(
+	const unsigned int unique_vertex_count = voxelmeshopt::meshopt_optimizeVertexFetchRemap(
 			&remap_indices[0], lod_indices.data(), lod_indices.size(), src_mesh.vertices.size()
 	);
 
@@ -216,7 +216,7 @@ void simplify(
 
 	dst_mesh.indices.resize(lod_indices.size());
 	// TODO Not sure if arguments are correct
-	zylannmeshopt::meshopt_remapIndexBuffer(
+	voxelmeshopt::meshopt_remapIndexBuffer(
 			reinterpret_cast<unsigned int *>(dst_mesh.indices.data()),
 			lod_indices.data(),
 			lod_indices.size(),
@@ -237,7 +237,7 @@ static VoxelMesherTransvoxel::TexturingMode check_texturing_mode(
 		case VoxelMesherTransvoxel::TEXTURES_MIXEL4_S4: {
 			const VoxelBuffer::Depth indices_depth = vb.get_channel_depth(VoxelBuffer::CHANNEL_INDICES);
 			if (indices_depth != VoxelBuffer::DEPTH_16_BIT) {
-				ZN_PRINT_ERROR_ONCE(format(
+				VOXEL_PRINT_ERROR_ONCE(format(
 						"The Indices channel is set to {} bits, but 16 bits are necessary to use the Mixel4 texturing "
 						"mode.",
 						VoxelBuffer::get_depth_byte_count(indices_depth)
@@ -246,7 +246,7 @@ static VoxelMesherTransvoxel::TexturingMode check_texturing_mode(
 			}
 			const VoxelBuffer::Depth weights_depth = vb.get_channel_depth(VoxelBuffer::CHANNEL_WEIGHTS);
 			if (weights_depth != VoxelBuffer::DEPTH_16_BIT) {
-				ZN_PRINT_ERROR_ONCE(format(
+				VOXEL_PRINT_ERROR_ONCE(format(
 						"The Weights channel is set to {} bits, but 16 bits are necessary to use the Mixel4 texturing "
 						"mode.",
 						VoxelBuffer::get_depth_byte_count(weights_depth)
@@ -258,7 +258,7 @@ static VoxelMesherTransvoxel::TexturingMode check_texturing_mode(
 		case VoxelMesherTransvoxel::TEXTURES_SINGLE_S4: {
 			const VoxelBuffer::Depth indices_depth = vb.get_channel_depth(VoxelBuffer::CHANNEL_INDICES);
 			if (indices_depth != VoxelBuffer::DEPTH_8_BIT) {
-				ZN_PRINT_WARNING_ONCE(
+				VOXEL_PRINT_WARNING_ONCE(
 						format("The Indices channel is set to {} bits, but only 8 bits are required to use the Single "
 							   "texturing mode.",
 							   VoxelBuffer::get_depth_byte_count(indices_depth))
@@ -271,7 +271,7 @@ static VoxelMesherTransvoxel::TexturingMode check_texturing_mode(
 			break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown texture mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown texture mode");
 			break;
 	}
 #endif
@@ -279,7 +279,7 @@ static VoxelMesherTransvoxel::TexturingMode check_texturing_mode(
 }
 
 void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher::Input &input) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	static thread_local transvoxel::Cache tls_cache;
 	// static thread_local FixedArray<transvoxel::MeshArrays, Cube::SIDE_COUNT> tls_transition_mesh_arrays;
@@ -353,10 +353,10 @@ void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher
 	if (_transitions_enabled && input.lod_hint) {
 		// We combine transition meshes with the regular mesh, because it results in less draw calls than if they were
 		// separate. This only requires a vertex shader trick to discard them when neighbors change.
-		ZN_ASSERT(combined_mesh_arrays != nullptr);
+		VOXEL_ASSERT(combined_mesh_arrays != nullptr);
 
 		for (int dir = 0; dir < Cube::SIDE_COUNT; ++dir) {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 
 			transvoxel::build_transition_mesh(
 					voxels,
@@ -394,7 +394,7 @@ void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher
 			output.mesh_flags |= (RenderingServerEnums::ARRAY_CUSTOM_RG_FLOAT << Mesh::ARRAY_FORMAT_CUSTOM1_SHIFT);
 			break;
 		default:
-			ZN_PRINT_ERROR("Unhandled texture mode");
+			VOXEL_PRINT_ERROR("Unhandled texture mode");
 			break;
 	}
 }
@@ -444,7 +444,7 @@ Ref<ArrayMesh> VoxelMesherTransvoxel::build_transition_mesh(Ref<godot::VoxelBuff
 }
 
 void VoxelMesherTransvoxel::set_texturing_mode(TexturingMode mode) {
-	ZN_ASSERT_RETURN(mode >= 0 && mode < TEXTURES_MODE_COUNT);
+	VOXEL_ASSERT_RETURN(mode >= 0 && mode < TEXTURES_MODE_COUNT);
 	if (mode != _texture_mode) {
 		_texture_mode = mode;
 		emit_changed();
@@ -587,4 +587,4 @@ void VoxelMesherTransvoxel::_bind_methods() {
 	BIND_CONSTANT(TEXTURES_BLEND_4_OVER_16);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

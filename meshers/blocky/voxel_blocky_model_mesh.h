@@ -3,7 +3,7 @@
 
 #include "voxel_blocky_model.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Model using a mesh for visuals
 class VoxelBlockyModelMesh : public VoxelBlockyModel {
@@ -37,6 +37,6 @@ private:
 
 void rotate_mesh_arrays(Span<Vector3f> vertices, Span<Vector3f> normals, Span<float> tangents, const Basis3f &basis);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_MESH_H

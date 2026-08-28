@@ -69,5 +69,5 @@ jobs:
 
       - name: Print
         run: |
-          cd project/addons/zylann.voxel/bin
+          cd project/addons/voxel/bin
           ls -l

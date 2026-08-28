@@ -6,7 +6,7 @@
 #include "../util/math/ortho_basis.h"
 #include <cstdint>
 
-namespace zylann::voxel {
+namespace voxel {
 
 inline void clip_copy_region_coord(int &src_min, int &src_max, const int src_size, int &dst_min, const int dst_size) {
 	// Clamp source and shrink destination for moved borders
@@ -96,7 +96,7 @@ void fill_3d_region_zxy(Span<T> dst, Vector3i dst_size, Vector3i dst_min, Vector
 	}
 
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN(Vector3iUtil::get_volume_u64(area_size) <= dst.size());
+	VOXEL_ASSERT_RETURN(Vector3iUtil::get_volume_u64(area_size) <= dst.size());
 #endif
 
 	if (area_size == dst_size) {
@@ -162,11 +162,11 @@ inline float u16_to_snorm(uint16_t v) {
 }
 
 inline uint8_t snorm_to_u8(float v) {
-	return zylann::math::clamp(static_cast<int>(128.f * v + 128.f), 0, 0xff);
+	return voxel::math::clamp(static_cast<int>(128.f * v + 128.f), 0, 0xff);
 }
 
 inline uint16_t snorm_to_u16(float v) {
-	return zylann::math::clamp(static_cast<int>(0x8000 * v + 0x8000), 0, 0xffff);
+	return voxel::math::clamp(static_cast<int>(0x8000 * v + 0x8000), 0, 0xffff);
 }
 
 } // namespace legacy
@@ -186,11 +186,11 @@ Vector3i transform_3d_array_zxy(
 		math::OrthoBasis basis,
 		Vector3i *out_transform_origin = nullptr
 ) {
-	ZN_ASSERT_RETURN_V(Vector3iUtil::is_unit_vector(basis.x), src_size);
-	ZN_ASSERT_RETURN_V(Vector3iUtil::is_unit_vector(basis.y), src_size);
-	ZN_ASSERT_RETURN_V(Vector3iUtil::is_unit_vector(basis.z), src_size);
-	ZN_ASSERT_RETURN_V(src_grid.size() == Vector3iUtil::get_volume_u64(src_size), src_size);
-	ZN_ASSERT_RETURN_V(dst_grid.size() == Vector3iUtil::get_volume_u64(src_size), src_size);
+	VOXEL_ASSERT_RETURN_V(Vector3iUtil::is_unit_vector(basis.x), src_size);
+	VOXEL_ASSERT_RETURN_V(Vector3iUtil::is_unit_vector(basis.y), src_size);
+	VOXEL_ASSERT_RETURN_V(Vector3iUtil::is_unit_vector(basis.z), src_size);
+	VOXEL_ASSERT_RETURN_V(src_grid.size() == Vector3iUtil::get_volume_u64(src_size), src_size);
+	VOXEL_ASSERT_RETURN_V(dst_grid.size() == Vector3iUtil::get_volume_u64(src_size), src_size);
 
 	Vector3i dst_size;
 	const Vector3i origin = get_3d_array_transform_origin(basis, src_size, &dst_size);
@@ -217,6 +217,6 @@ Vector3i transform_3d_array_zxy(
 	return dst_size;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_STORAGE_FUNCS_H

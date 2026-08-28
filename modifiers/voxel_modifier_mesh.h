@@ -4,7 +4,7 @@
 #include "../edition/voxel_mesh_sdf_gd.h"
 #include "voxel_modifier_sdf.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelModifierMesh : public VoxelModifierSdf {
 public:
@@ -31,6 +31,6 @@ private:
 	float _isolevel;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MODIFIER_MESH_H

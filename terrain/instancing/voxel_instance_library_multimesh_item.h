@@ -15,7 +15,7 @@
 // I had to include this because of GDVIRTUAL, otherwise it complains with a narrowing conversion warning
 #include "voxel_instancer.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstancer;
 
@@ -99,9 +99,9 @@ public:
 	TypedArray<StringName> get_collider_group_names() const;
 
 	// TODO GDX: it seems binding a method taking a `Node*` fails to compile. It is supposed to be working.
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	void setup_from_template(Node *root);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	void setup_from_template(Object *root_o);
 #endif
 
@@ -235,8 +235,8 @@ private:
 	float _collision_distance = -1.f;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelInstanceLibraryMultiMeshItem::RemovalBehavior)
+VARIANT_ENUM_CAST(voxel::VoxelInstanceLibraryMultiMeshItem::RemovalBehavior)
 
 #endif // VOXEL_INSTANCE_LIBRARY_MULTIMESH_ITEM_H

@@ -5,7 +5,7 @@
 #include "compute_shader_resource.h"
 #include <memory>
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct ComputeShaderParameter {
 	unsigned int binding = 0;
@@ -19,6 +19,6 @@ struct ComputeShaderParameters {
 
 void add_uniform_params(const StdVector<ComputeShaderParameter> &params, Array &uniforms, const RID filtering_sampler);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_COMPUTE_SHADER_PARAMETERS_H

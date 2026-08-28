@@ -1,7 +1,7 @@
 #include "editor_property.h"
 #include "../../containers/fixed_array.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 Span<const Color> editor_property_get_colors(EditorProperty &self) {
 	static FixedArray<Color, 4> s_colors;
@@ -13,25 +13,25 @@ Span<const Color> editor_property_get_colors(EditorProperty &self) {
 	return to_span(s_colors);
 }
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
-void ZN_EditorProperty::update_property() {
-	_zn_update_property();
+void VOXEL_EditorProperty::update_property() {
+	_voxel_update_property();
 }
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 
-void ZN_EditorProperty::_update_property() {
-	_zn_update_property();
+void VOXEL_EditorProperty::_update_property() {
+	_voxel_update_property();
 }
 
 #endif
 
-void ZN_EditorProperty::_set_read_only(bool p_read_only) {
-	_zn_set_read_only(p_read_only);
+void VOXEL_EditorProperty::_set_read_only(bool p_read_only) {
+	_voxel_set_read_only(p_read_only);
 }
 
-void ZN_EditorProperty::_zn_update_property() {}
-void ZN_EditorProperty::_zn_set_read_only(bool p_read_only) {}
+void VOXEL_EditorProperty::_voxel_update_property() {}
+void VOXEL_EditorProperty::_voxel_set_read_only(bool p_read_only) {}
 
-} // namespace zylann::godot
+} // namespace voxel::godot

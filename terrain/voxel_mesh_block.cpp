@@ -7,7 +7,7 @@
 #include "../util/profiling.h"
 #include "free_mesh_task.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelMeshBlock::VoxelMeshBlock(Vector3i bpos) {
 	position = bpos;
@@ -128,7 +128,7 @@ void VoxelMeshBlock::set_parent_visible(bool parent_visible) {
 }
 
 void VoxelMeshBlock::set_parent_transform(const Transform3D &parent_transform) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (_mesh_instance.is_valid() || _static_body.is_valid()) {
 		const Transform3D local_transform(Basis(), _position_in_voxels);
@@ -219,7 +219,7 @@ Ref<ConcavePolygonShape3D> make_collision_shape_from_mesher_output(
 		const VoxelMesher::Output &mesher_output,
 		const VoxelMesher &mesher
 ) {
-	using namespace zylann::godot;
+	using namespace voxel::godot;
 
 	Ref<ConcavePolygonShape3D> shape;
 
@@ -268,4 +268,4 @@ Ref<ConcavePolygonShape3D> make_collision_shape_from_mesher_output(
 	return shape;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

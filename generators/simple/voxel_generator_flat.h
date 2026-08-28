@@ -7,7 +7,7 @@
 #include "../../util/thread/rw_lock.h"
 #include "../voxel_generator.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGeneratorFlat : public VoxelGenerator {
 	GDCLASS(VoxelGeneratorFlat, VoxelGenerator)
@@ -46,6 +46,6 @@ private:
 	RWLock _parameters_lock;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_FLAT_H

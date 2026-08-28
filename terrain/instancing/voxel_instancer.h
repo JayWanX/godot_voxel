@@ -28,9 +28,9 @@
 // out.
 #define VOXEL_INSTANCER_USE_SPECIALIZED_FLOATING_INSTANCE_REMOVAL_IMPLEMENTATION
 
-ZN_GODOT_FORWARD_DECLARE(class PhysicsBody3D);
+VOXEL_GODOT_FORWARD_DECLARE(class PhysicsBody3D);
 
-namespace zylann {
+namespace voxel {
 
 class AsyncDependencyTracker;
 
@@ -66,7 +66,7 @@ public:
 	// However Godot is forcing me to.
 	// `VARIANT_ENUM_CAST(ns1::ns2::Enum)` assumes the enum is in a class, so it generates its name as being `ns2.Enum`,
 	// which confuses docs and GDExtension dumps. There doesn't seem to be a way to register that enum as global either.
-	using UpMode = zylann::voxel::UpMode;
+	using UpMode = voxel::UpMode;
 
 	VoxelInstancer();
 	~VoxelInstancer();
@@ -163,9 +163,9 @@ public:
 	// Editor
 
 #ifdef TOOLS_ENABLED
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	PackedStringArray _get_configuration_warnings() const override;
 #endif
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
@@ -310,7 +310,7 @@ private:
 
 		inline void call(const Transform3D &t) const {
 #ifdef DEV_ENABLED
-			ZN_ASSERT(callback != nullptr);
+			VOXEL_ASSERT(callback != nullptr);
 #endif
 			(*callback)(context, t);
 		}
@@ -397,7 +397,7 @@ private:
 		bool distance_colliders_active = false;
 		// Position in mesh block coordinate system
 		Vector3i grid_position;
-		zylann::godot::DirectMultiMeshInstance multimesh_instance;
+		voxel::godot::DirectMultiMeshInstance multimesh_instance;
 		// For physics we use nodes because it's easier to manage.
 		// Such instances may be less numerous.
 		// If the item associated to this block has no collisions, this will be empty.
@@ -487,7 +487,7 @@ private:
 
 	struct FadingOutBlock {
 		float progress = 0.f;
-		zylann::godot::DirectMultiMeshInstance multimesh_instance;
+		voxel::godot::DirectMultiMeshInstance multimesh_instance;
 	};
 
 	StdVector<FadingInBlock> _fading_in_blocks;
@@ -496,16 +496,16 @@ private:
 	bool _fading_enabled = false;
 
 #ifdef TOOLS_ENABLED
-	zylann::godot::DebugRenderer _debug_renderer;
+	voxel::godot::DebugRenderer _debug_renderer;
 	bool _gizmos_enabled = false;
 	uint8_t _debug_draw_flags = 0;
 #endif
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelInstancer::UpMode);
-VARIANT_ENUM_CAST(zylann::voxel::VoxelInstancer::DebugDrawFlag);
+VARIANT_ENUM_CAST(voxel::VoxelInstancer::UpMode);
+VARIANT_ENUM_CAST(voxel::VoxelInstancer::DebugDrawFlag);
 
 #endif // VOXEL_INSTANCER_H

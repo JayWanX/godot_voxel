@@ -5,7 +5,7 @@
 #include <float.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Nicolas Capens. Advanced Rasterization. 2004
@@ -290,4 +290,4 @@ meshopt_CoverageStatistics meshopt_analyzeCoverage(const unsigned int* indices, 
 	return result;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

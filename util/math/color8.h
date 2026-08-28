@@ -1,9 +1,9 @@
-#ifndef ZYLANN_COLOR8_H
-#define ZYLANN_COLOR8_H
+#ifndef VOXEL_COLOR8_H
+#define VOXEL_COLOR8_H
 
 #include "color.h"
 
-namespace zylann {
+namespace voxel {
 
 // Color with 8-bit components. Lighter to store than its floating-point counterpart.
 struct Color8 {
@@ -94,6 +94,6 @@ struct Color8 {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_COLOR8_H
+#endif // VOXEL_COLOR8_H

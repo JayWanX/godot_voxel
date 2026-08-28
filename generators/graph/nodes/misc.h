@@ -1,6 +1,6 @@
 #include "../node_type_db.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 inline float select(float a, float b, float threshold, float t) {
 	return t < threshold ? a : b;
@@ -140,10 +140,10 @@ void register_misc_nodes(Span<NodeType> types) {
 		t.params.push_back(expression_param);
 		t.outputs.push_back(NodeType::Port("out"));
 		t.compile_func = [](CompileContext &ctx) {
-			ctx.make_error(ZN_TTR("Internal error, expression wasn't expanded"));
+			ctx.make_error(VOXEL_TTR("Internal error, expression wasn't expanded"));
 		};
 		t.is_pseudo_node = true;
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

@@ -19,7 +19,7 @@
 #include "../generators/generate_block_gpu_task.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelData;
 
@@ -82,7 +82,7 @@ public:
 
 private:
 #ifdef VOXEL_ENABLE_GPU
-	void gather_voxels_gpu(zylann::ThreadedTaskContext &ctx);
+	void gather_voxels_gpu(voxel::ThreadedTaskContext &ctx);
 #endif
 	void gather_voxels_cpu();
 	void build_mesh();
@@ -119,6 +119,6 @@ Ref<ArrayMesh> build_mesh( //
 // Builds a triangles mesh resource from a single surface. If the surface is empty, returns null.
 Ref<ArrayMesh> build_mesh(Array surface);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESH_BLOCK_TASK_H

@@ -6,7 +6,7 @@
 #include "../../util/memory/memory.h"
 #include "../../util/thread/mutex.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct InstanceBlockData;
 
@@ -19,6 +19,6 @@ struct InstancerQuickReloadingCache {
 	Mutex mutex;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCER_QUICK_RELOADING_CACHE_H

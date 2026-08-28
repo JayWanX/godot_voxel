@@ -1,10 +1,10 @@
-#ifndef ZN_MATH_BASIS3F_H
-#define ZN_MATH_BASIS3F_H
+#ifndef VOXEL_MATH_BASIS3F_H
+#define VOXEL_MATH_BASIS3F_H
 
 #include "quaternionf.h"
 #include "vector3f.h"
 
-namespace zylann {
+namespace voxel {
 
 // 3x3 matrix specialized at representing a 3D basis.
 // Ported from Godot Engine using always 32-bit floats.
@@ -52,7 +52,7 @@ struct Basis3f {
 		// Rotation matrix from axis and angle, see
 		// https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_angle
 		// #ifdef DEBUG_ENABLED
-		// 		ZN_ASSERT_RETURN(math::is_normalized(p_axis));
+		// 		VOXEL_ASSERT_RETURN(math::is_normalized(p_axis));
 		// #endif
 		const Vector3f axis_sq(p_axis.x * p_axis.x, p_axis.y * p_axis.y, p_axis.z * p_axis.z);
 		rows[0][0] = axis_sq.x + cosine * (1.0f - axis_sq.x);
@@ -79,7 +79,7 @@ struct Basis3f {
 
 	inline void set_column(unsigned int p_index, const Vector3f &p_value) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_index < 3);
+		VOXEL_ASSERT(p_index < 3);
 #endif
 		// Set actual basis axis column (we store transposed as rows to match Godot's storage).
 		rows[0][p_index] = p_value.x;
@@ -89,7 +89,7 @@ struct Basis3f {
 
 	inline Vector3f get_column(unsigned int p_index) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_index < 3);
+		VOXEL_ASSERT(p_index < 3);
 #endif
 		return Vector3f(rows[0][p_index], rows[1][p_index], rows[2][p_index]);
 	}
@@ -222,6 +222,6 @@ inline Vector3f rotated(const Vector3f v, const Vector3f axis, float cosine, flo
 }
 
 } // namespace math
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_MATH_BASIS3F_H
+#endif // VOXEL_MATH_BASIS3F_H

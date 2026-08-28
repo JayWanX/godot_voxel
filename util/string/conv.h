@@ -1,5 +1,5 @@
-#ifndef ZN_STRING_CONV_H
-#define ZN_STRING_CONV_H
+#ifndef VOXEL_STRING_CONV_H
+#define VOXEL_STRING_CONV_H
 
 #include "../containers/span.h"
 #include "../math/funcs.h"
@@ -7,7 +7,7 @@
 #include <limits>
 #include <string_view>
 
-namespace zylann {
+namespace voxel {
 
 namespace conv_detail {
 
@@ -37,6 +37,6 @@ unsigned int float64_to_string(const double x, Span<char> s);
 // Converts characters to integer. Returns the number of characters read, or -1 in case of failure.
 int string_base10_to_int32(std::string_view s, int32_t &out_x);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_STRING_CONV_H
+#endif // VOXEL_STRING_CONV_H

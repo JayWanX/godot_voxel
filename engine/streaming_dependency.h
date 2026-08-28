@@ -4,7 +4,7 @@
 #include "../generators/voxel_generator.h"
 #include "../streams/voxel_stream.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Shared dependency needed by some asynchronous tasks.
 // It may be passed with a shared_ptr.
@@ -30,6 +30,6 @@ struct StreamingDependency {
 	}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_STREAMING_DEPENDENCY_H

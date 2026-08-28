@@ -19,7 +19,7 @@
 #include "../../util/godot/debug_renderer.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
 class AsyncDependencyTracker;
 
@@ -366,7 +366,7 @@ private:
 
 	Ref<Material> _material_override;
 
-	zylann::godot::ObjectUniquePtr<VoxelDataBlockEnterInfo> _data_block_enter_info_obj;
+	voxel::godot::ObjectUniquePtr<VoxelDataBlockEnterInfo> _data_block_enter_info_obj;
 
 	// References to external nodes.
 #ifdef VOXEL_ENABLE_INSTANCER
@@ -380,15 +380,15 @@ private:
 	bool _debug_draw_enabled = false;
 	uint8_t _debug_draw_flags = 0;
 
-	zylann::godot::DebugRenderer _debug_renderer;
+	voxel::godot::DebugRenderer _debug_renderer;
 
 	bool _debug_draw_shadow_occluders = false;
 #endif
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelTerrain::DebugDrawFlag)
+VARIANT_ENUM_CAST(voxel::VoxelTerrain::DebugDrawFlag)
 
 #endif // VOXEL_TERRAIN_H

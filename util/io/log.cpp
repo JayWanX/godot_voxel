@@ -2,14 +2,14 @@
 #include "../godot/core/print_string.h"
 #include "../string/format.h"
 
-#ifdef ZN_DEBUG_LOG_FILE_ENABLED
+#ifdef VOXEL_DEBUG_LOG_FILE_ENABLED
 #include "../thread/mutex.h"
 #include <fstream>
 #endif
 
-namespace zylann {
+namespace voxel {
 
-#ifdef ZN_DEBUG_LOG_FILE_ENABLED
+#ifdef VOXEL_DEBUG_LOG_FILE_ENABLED
 
 namespace {
 Mutex g_log_file_mutex;
@@ -20,7 +20,7 @@ std::ofstream g_log_ofs;
 void open_log_file() {
 	MutexLock mlock(g_log_file_mutex);
 	g_log_to_file = true;
-	g_log_ofs.open("zn_log.txt", std::ios::binary | std::ios::trunc);
+	g_log_ofs.open("voxel_log.txt", std::ios::binary | std::ios::trunc);
 }
 
 void close_log_file() {
@@ -43,7 +43,7 @@ bool is_verbose_output_enabled() {
 }
 
 void print_line(const char *cstr) {
-#ifdef ZN_DEBUG_LOG_FILE_ENABLED
+#ifdef VOXEL_DEBUG_LOG_FILE_ENABLED
 	if (g_log_to_file) {
 		MutexLock mlock(g_log_file_mutex);
 		if (g_log_to_file) {
@@ -53,9 +53,9 @@ void print_line(const char *cstr) {
 	}
 #else
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	::print_line(cstr);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	::godot::UtilityFunctions::print(cstr);
 #endif
 
@@ -67,9 +67,9 @@ void print_line(const FwdConstStdString &s) {
 }
 
 void print_warning(const char *message, const char *func, const char *file, int line) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	_err_print_error(func, file, line, message, false, ERR_HANDLER_WARNING);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	::godot::_err_print_error(func, file, line, message, false, true);
 #endif
 }
@@ -98,4 +98,4 @@ void flush_stdout() {
 	_err_flush_stdout();
 }
 
-} // namespace zylann
+} // namespace voxel

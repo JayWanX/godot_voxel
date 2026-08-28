@@ -2,17 +2,17 @@
 #include "../math/conv.h"
 #include "spot_noise.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../godot/core/class_db.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
-int ZN_SpotNoise::get_seed() const {
+int VOXEL_SpotNoise::get_seed() const {
 	return _seed;
 }
 
-void ZN_SpotNoise::set_seed(int seed) {
+void VOXEL_SpotNoise::set_seed(int seed) {
 	if (seed == _seed) {
 		return;
 	}
@@ -20,11 +20,11 @@ void ZN_SpotNoise::set_seed(int seed) {
 	emit_changed();
 }
 
-float ZN_SpotNoise::get_cell_size() const {
+float VOXEL_SpotNoise::get_cell_size() const {
 	return _cell_size;
 }
 
-void ZN_SpotNoise::set_cell_size(float cell_size) {
+void VOXEL_SpotNoise::set_cell_size(float cell_size) {
 	cell_size = math::max(cell_size, 0.01f);
 	if (cell_size == _cell_size) {
 		return;
@@ -33,11 +33,11 @@ void ZN_SpotNoise::set_cell_size(float cell_size) {
 	emit_changed();
 }
 
-float ZN_SpotNoise::get_spot_radius() const {
+float VOXEL_SpotNoise::get_spot_radius() const {
 	return _spot_radius;
 }
 
-void ZN_SpotNoise::set_spot_radius(float r) {
+void VOXEL_SpotNoise::set_spot_radius(float r) {
 	r = math::max(r, 0.01f);
 	if (r == _spot_radius) {
 		return;
@@ -46,11 +46,11 @@ void ZN_SpotNoise::set_spot_radius(float r) {
 	emit_changed();
 }
 
-float ZN_SpotNoise::get_jitter() const {
+float VOXEL_SpotNoise::get_jitter() const {
 	return _jitter;
 }
 
-void ZN_SpotNoise::set_jitter(float jitter) {
+void VOXEL_SpotNoise::set_jitter(float jitter) {
 	jitter = math::clamp(jitter, 0.f, 1.f);
 	if (jitter == _jitter) {
 		return;
@@ -59,23 +59,23 @@ void ZN_SpotNoise::set_jitter(float jitter) {
 	emit_changed();
 }
 
-float ZN_SpotNoise::get_noise_2d(real_t x, real_t y) const {
+float VOXEL_SpotNoise::get_noise_2d(real_t x, real_t y) const {
 	return SpotNoise::spot_noise_2d(Vector2f(x, y), _cell_size, _spot_radius, _jitter, _seed);
 }
 
-float ZN_SpotNoise::get_noise_3d(real_t x, real_t y, real_t z) const {
+float VOXEL_SpotNoise::get_noise_3d(real_t x, real_t y, real_t z) const {
 	return SpotNoise::spot_noise_3d(Vector3f(x, y, z), _cell_size, _spot_radius, _jitter, _seed);
 }
 
-float ZN_SpotNoise::get_noise_2dv(Vector2 pos) const {
+float VOXEL_SpotNoise::get_noise_2dv(Vector2 pos) const {
 	return SpotNoise::spot_noise_2d(Vector2f(pos.x, pos.y), _cell_size, _spot_radius, _jitter, _seed);
 }
 
-float ZN_SpotNoise::get_noise_3dv(Vector3 pos) const {
+float VOXEL_SpotNoise::get_noise_3dv(Vector3 pos) const {
 	return SpotNoise::spot_noise_3d(Vector3f(pos.x, pos.y, pos.z), _cell_size, _spot_radius, _jitter, _seed);
 }
 
-PackedVector2Array ZN_SpotNoise::get_spot_positions_in_area_2d(Rect2 rect) const {
+PackedVector2Array VOXEL_SpotNoise::get_spot_positions_in_area_2d(Rect2 rect) const {
 	PackedVector2Array positions;
 	const Rect2 norm_rect(rect.position / _cell_size, rect.size / _cell_size);
 	const Vector2i cminp = to_vec2i(norm_rect.position.floor());
@@ -93,7 +93,7 @@ PackedVector2Array ZN_SpotNoise::get_spot_positions_in_area_2d(Rect2 rect) const
 	return positions;
 }
 
-PackedVector3Array ZN_SpotNoise::get_spot_positions_in_area_3d(AABB aabb) const {
+PackedVector3Array VOXEL_SpotNoise::get_spot_positions_in_area_3d(AABB aabb) const {
 	PackedVector3Array positions;
 	const AABB norm_aabb(aabb.position / _cell_size, aabb.size / _cell_size);
 	const Vector3i cminp = to_vec3i(norm_aabb.position.floor());
@@ -113,30 +113,30 @@ PackedVector3Array ZN_SpotNoise::get_spot_positions_in_area_3d(AABB aabb) const 
 	return positions;
 }
 
-void ZN_SpotNoise::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ZN_SpotNoise::set_seed);
-	ClassDB::bind_method(D_METHOD("get_seed"), &ZN_SpotNoise::get_seed);
+void VOXEL_SpotNoise::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_seed", "seed"), &VOXEL_SpotNoise::set_seed);
+	ClassDB::bind_method(D_METHOD("get_seed"), &VOXEL_SpotNoise::get_seed);
 
-	ClassDB::bind_method(D_METHOD("set_cell_size", "cell_size"), &ZN_SpotNoise::set_cell_size);
-	ClassDB::bind_method(D_METHOD("get_cell_size"), &ZN_SpotNoise::get_cell_size);
+	ClassDB::bind_method(D_METHOD("set_cell_size", "cell_size"), &VOXEL_SpotNoise::set_cell_size);
+	ClassDB::bind_method(D_METHOD("get_cell_size"), &VOXEL_SpotNoise::get_cell_size);
 
-	ClassDB::bind_method(D_METHOD("set_spot_radius", "radius"), &ZN_SpotNoise::set_spot_radius);
-	ClassDB::bind_method(D_METHOD("get_spot_radius"), &ZN_SpotNoise::get_spot_radius);
+	ClassDB::bind_method(D_METHOD("set_spot_radius", "radius"), &VOXEL_SpotNoise::set_spot_radius);
+	ClassDB::bind_method(D_METHOD("get_spot_radius"), &VOXEL_SpotNoise::get_spot_radius);
 
-	ClassDB::bind_method(D_METHOD("set_jitter", "jitter"), &ZN_SpotNoise::set_jitter);
-	ClassDB::bind_method(D_METHOD("get_jitter"), &ZN_SpotNoise::get_jitter);
+	ClassDB::bind_method(D_METHOD("set_jitter", "jitter"), &VOXEL_SpotNoise::set_jitter);
+	ClassDB::bind_method(D_METHOD("get_jitter"), &VOXEL_SpotNoise::get_jitter);
 
-	ClassDB::bind_method(D_METHOD("get_noise_2d", "x", "y"), &ZN_SpotNoise::get_noise_2d);
-	ClassDB::bind_method(D_METHOD("get_noise_3d", "x", "y", "z"), &ZN_SpotNoise::get_noise_3d);
+	ClassDB::bind_method(D_METHOD("get_noise_2d", "x", "y"), &VOXEL_SpotNoise::get_noise_2d);
+	ClassDB::bind_method(D_METHOD("get_noise_3d", "x", "y", "z"), &VOXEL_SpotNoise::get_noise_3d);
 
-	ClassDB::bind_method(D_METHOD("get_noise_2dv", "pos"), &ZN_SpotNoise::get_noise_2dv);
-	ClassDB::bind_method(D_METHOD("get_noise_3dv", "pos"), &ZN_SpotNoise::get_noise_3dv);
+	ClassDB::bind_method(D_METHOD("get_noise_2dv", "pos"), &VOXEL_SpotNoise::get_noise_2dv);
+	ClassDB::bind_method(D_METHOD("get_noise_3dv", "pos"), &VOXEL_SpotNoise::get_noise_3dv);
 
 	ClassDB::bind_method(
-			D_METHOD("get_spot_positions_in_area_2d", "rect"), &ZN_SpotNoise::get_spot_positions_in_area_2d
+			D_METHOD("get_spot_positions_in_area_2d", "rect"), &VOXEL_SpotNoise::get_spot_positions_in_area_2d
 	);
 	ClassDB::bind_method(
-			D_METHOD("get_spot_positions_in_area_3d", "aabb"), &ZN_SpotNoise::get_spot_positions_in_area_3d
+			D_METHOD("get_spot_positions_in_area_3d", "aabb"), &VOXEL_SpotNoise::get_spot_positions_in_area_3d
 	);
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
@@ -147,4 +147,4 @@ void ZN_SpotNoise::_bind_methods() {
 	);
 }
 
-} // namespace zylann
+} // namespace voxel

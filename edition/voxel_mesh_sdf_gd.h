@@ -11,9 +11,9 @@
 #include "../engine/gpu/compute_shader_resource.h"
 #endif
 
-ZN_GODOT_FORWARD_DECLARE(class SceneTree);
+VOXEL_GODOT_FORWARD_DECLARE(class SceneTree);
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Contains the baked signed distance field of a mesh, which can be used to sculpt terrain.
 class VoxelMeshSDF : public Resource {
@@ -64,7 +64,7 @@ public:
 // TODO A reference to the SceneTree should not be necessary!
 // It is currently needed to ensure `VoxelServerUpdater` gets created so it can tick the task system...
 // TODO GDX: it seems binding a method taking a `SceneTree*` fails to compile. It is supposed to be working.
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 	void bake_async(Object *scene_tree_o);
 #else
 	void bake_async(SceneTree *scene_tree);
@@ -126,8 +126,8 @@ private:
 	Ref<Mesh> _mesh;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelMeshSDF::BakeMode);
+VARIANT_ENUM_CAST(voxel::VoxelMeshSDF::BakeMode);
 
 #endif // VOXEL_MESH_SDF_GD_H

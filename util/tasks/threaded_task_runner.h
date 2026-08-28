@@ -1,5 +1,5 @@
-#ifndef ZYLANN_THREADED_TASK_RUNNER_H
-#define ZYLANN_THREADED_TASK_RUNNER_H
+#ifndef VOXEL_THREADED_TASK_RUNNER_H
+#define VOXEL_THREADED_TASK_RUNNER_H
 
 #include "../containers/container_funcs.h"
 #include "../containers/fixed_array.h"
@@ -14,15 +14,15 @@
 #include "threaded_task.h"
 
 // For debugging
-// #define ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+// #define VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 #include "../containers/std_unordered_map.h"
 #endif
 
 #include <atomic>
 
-namespace zylann {
+namespace voxel {
 
 // Generic thread pool that performs batches of tasks based on dynamic priority
 class ThreadedTaskRunner {
@@ -70,9 +70,9 @@ public:
 
 	template <typename F>
 	void dequeue_completed_tasks(F f) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		StdVector<IThreadedTask *> &temp = get_completed_tasks_temp_tls();
-		ZN_ASSERT(temp.size() == 0);
+		VOXEL_ASSERT(temp.size() == 0);
 		{
 			MutexLock lock(_completed_tasks_mutex);
 			append_array(temp, _completed_tasks);
@@ -81,7 +81,7 @@ public:
 			// temp = std::move(_completed_tasks);
 		}
 		for (IThreadedTask *task : temp) {
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 			debug_remove_owned_task(task);
 #endif
 			f(task);
@@ -133,7 +133,7 @@ private:
 	void create_thread(ThreadData &d, uint32_t i);
 	void destroy_all_threads();
 
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 	void debug_add_owned_task(IThreadedTask *task);
 	void debug_remove_owned_task(IThreadedTask *task);
 #endif
@@ -173,12 +173,12 @@ private:
 	unsigned int _debug_completed_tasks = 0;
 	unsigned int _debug_taken_out_tasks = 0;
 
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 	StdUnorderedMap<IThreadedTask *, StdString> _debug_owned_tasks;
 	Mutex _debug_owned_tasks_mutex;
 #endif
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_THREADED_TASK_RUNNER_H
+#endif // VOXEL_THREADED_TASK_RUNNER_H

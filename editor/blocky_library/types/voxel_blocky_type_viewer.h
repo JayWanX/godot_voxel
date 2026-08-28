@@ -5,15 +5,15 @@
 #include "../../../util/godot/classes/h_box_container.h"
 #include "../model_viewer.h"
 
-ZN_GODOT_FORWARD_DECLARE(class MeshInstance3D);
+VOXEL_GODOT_FORWARD_DECLARE(class MeshInstance3D);
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBlockyTypeAttributeCombinationSelector;
 
 // 3D viewer specialized to inspect blocky types.
-class VoxelBlockyTypeViewer : public ZN_ModelViewer {
-	GDCLASS(VoxelBlockyTypeViewer, ZN_ModelViewer)
+class VoxelBlockyTypeViewer : public VOXEL_ModelViewer {
+	GDCLASS(VoxelBlockyTypeViewer, VOXEL_ModelViewer)
 public:
 	VoxelBlockyTypeViewer();
 
@@ -32,6 +32,6 @@ private:
 	const VoxelBlockyTypeAttributeCombinationSelector *_combination_selector = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TYPE_VIEWER_H

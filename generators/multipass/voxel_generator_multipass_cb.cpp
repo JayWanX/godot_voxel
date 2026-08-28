@@ -11,11 +11,11 @@
 #include "../../util/string/format.h"
 #include "generate_block_multipass_cb_task.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace VoxelGeneratorMultipassCBStructs;
 
@@ -47,14 +47,14 @@ VoxelGenerator::Result VoxelGeneratorMultipassCB::generate_block(VoxelQueryData 
 		// Can't generate column chunks from here for now
 		// TODO Fallback on an expensive single-threaded dependency generation, which we might throw away after?
 		// Or trigger a threaded task and block here until it's done?
-		ZN_PRINT_ERROR("Not implemented");
+		VOXEL_PRINT_ERROR("Not implemented");
 	}
 
 	return { false };
 }
 
 IThreadedTask *VoxelGeneratorMultipassCB::create_block_task(const VoxelGenerator::BlockTaskParams &params) const {
-	return ZN_NEW(GenerateBlockMultipassCBTask(params));
+	return VOXEL_NEW(GenerateBlockMultipassCBTask(params));
 }
 
 void VoxelGeneratorMultipassCB::generate_block_fallback_script(VoxelQueryData &input) {
@@ -71,7 +71,7 @@ void VoxelGeneratorMultipassCB::generate_block_fallback_script(VoxelQueryData &i
 	buffer_wrapper->get_buffer().create(input.voxel_buffer.get_size());
 
 	{
-		ZN_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(buffer_wrapper);
+		VOXEL_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(buffer_wrapper);
 		GDVIRTUAL_CALL(_generate_block_fallback, buffer_wrapper, input.origin_in_voxels);
 	}
 
@@ -96,7 +96,7 @@ void VoxelGeneratorMultipassCB::set_pass_count(int pass_count) {
 		return;
 	}
 
-	ZN_ASSERT_RETURN_MSG(
+	VOXEL_ASSERT_RETURN_MSG(
 			pass_count > 0 && pass_count <= MAX_PASSES, format("Pass count is limited from {} to {}", 1, MAX_PASSES)
 	);
 
@@ -138,19 +138,19 @@ void VoxelGeneratorMultipassCB::set_column_height_blocks(int new_height) {
 
 int VoxelGeneratorMultipassCB::get_pass_extent_blocks(int pass_index) const {
 	std::shared_ptr<Internal> internal = get_internal();
-	ZN_ASSERT_RETURN_V(pass_index >= 0 && pass_index < int(internal->passes.size()), 0);
+	VOXEL_ASSERT_RETURN_V(pass_index >= 0 && pass_index < int(internal->passes.size()), 0);
 	return internal->passes[pass_index].dependency_extents;
 }
 
 void VoxelGeneratorMultipassCB::set_pass_extent_blocks(int pass_index, int new_extent) {
-	ZN_ASSERT_RETURN(pass_index >= 0 && pass_index < int(get_internal()->passes.size()));
+	VOXEL_ASSERT_RETURN(pass_index >= 0 && pass_index < int(get_internal()->passes.size()));
 
 	if (pass_index == 0) {
-		ZN_ASSERT_RETURN_MSG(new_extent == 0, "Non-zero extents is not supported for the first pass.");
+		VOXEL_ASSERT_RETURN_MSG(new_extent == 0, "Non-zero extents is not supported for the first pass.");
 		return;
 
 	} else {
-		ZN_ASSERT_RETURN_MSG(
+		VOXEL_ASSERT_RETURN_MSG(
 				new_extent >= 1 && new_extent <= MAX_PASS_EXTENT,
 				format("Pass extents are limited between {} and {}.", 1, MAX_PASS_EXTENT)
 		);
@@ -166,7 +166,7 @@ void VoxelGeneratorMultipassCB::set_pass_extent_blocks(int pass_index, int new_e
 
 std::shared_ptr<Internal> VoxelGeneratorMultipassCB::get_internal() const {
 	MutexLock mlock(_internal_mutex);
-	ZN_ASSERT(_internal != nullptr);
+	VOXEL_ASSERT(_internal != nullptr);
 	return _internal;
 }
 
@@ -177,7 +177,7 @@ int get_total_dependency_extent(const Internal &generator) {
 	for (unsigned int pass_index = 1; pass_index < generator.passes.size(); ++pass_index) {
 		const Pass &pass = generator.passes[pass_index];
 		if (pass.dependency_extents == 0) {
-			ZN_PRINT_ERROR("Unexpected pass dependency extents");
+			VOXEL_PRINT_ERROR("Unexpected pass dependency extents");
 		}
 		extent += pass.dependency_extents * 2;
 	}
@@ -199,7 +199,7 @@ Box2i to_box2i_in_height_range(Box3i box3, int min_y, int height) {
 } // namespace
 
 void VoxelGeneratorMultipassCB::generate_pass(PassInput input) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Note: must not access _internal from here, only use `input`
 
@@ -210,12 +210,12 @@ void VoxelGeneratorMultipassCB::generate_pass(PassInput input) {
 		vt->set_pass_input(input);
 
 		{
-			ZN_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(vt);
+			VOXEL_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(vt);
 			GDVIRTUAL_CALL(_generate_pass, vt, input.pass_index);
 		}
 
 		{
-			ZN_PROFILE_SCOPE_NAMED("Compress uniform blocks");
+			VOXEL_PROFILE_SCOPE_NAMED("Compress uniform blocks");
 			for (Block *block : input.grid) {
 				if (block != nullptr) {
 					block->voxels.compress_uniform_channels();
@@ -227,7 +227,7 @@ void VoxelGeneratorMultipassCB::generate_pass(PassInput input) {
 
 void VoxelGeneratorMultipassCB::re_initialize_column_refcounts() {
 	// This should only be called following a map reset
-	ZN_ASSERT_RETURN_MSG(get_internal()->map.columns.size() == 0, "Bug!");
+	VOXEL_ASSERT_RETURN_MSG(get_internal()->map.columns.size() == 0, "Bug!");
 
 	for (PairedViewer &pv : _paired_viewers) {
 		process_viewer_diff_internal(pv.request_box, Box3i());
@@ -255,8 +255,8 @@ void VoxelGeneratorMultipassCB::process_viewer_diff(ViewerID id, Box3i p_request
 }
 
 void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_box, Box3i p_prev_requested_box) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 	// TODO Could run as a task similarly to threaded update of VLT
 	// However if we do that we need to make sure block requests dont end up cancelled due to no block being found
 	// to load... the easiest way I can think of, is to just run this in the same thread that triggers the requests,
@@ -293,7 +293,7 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 	const int column_height = internal->column_height_blocks;
 	load_requested_box.difference(prev_load_requested_box, [&map, column_height](Box2i new_box) {
 		{
-			ZN_PROFILE_SCOPE_NAMED("Enter box");
+			VOXEL_PROFILE_SCOPE_NAMED("Enter box");
 
 			SpatialLock2D::Write swlock(map.spatial_lock, new_box);
 			MutexLock mlock(map.mutex);
@@ -316,7 +316,7 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 
 	// Blocks to unview
 	prev_load_requested_box.difference(load_requested_box, [&map, &task_scheduler](Box2i old_box) {
-		ZN_PROFILE_SCOPE_NAMED("Leave box (locking)");
+		VOXEL_PROFILE_SCOPE_NAMED("Leave box (locking)");
 
 		// TODO This can be a bottleneck if the generator is slow and a player teleports far away while columns are
 		// still generating. Could take a second of freezing.
@@ -327,13 +327,13 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 		MutexLock mlock(map.mutex);
 
 		{
-			ZN_PROFILE_SCOPE_NAMED("Leave box");
+			VOXEL_PROFILE_SCOPE_NAMED("Leave box");
 
 			old_box.for_each_cell_yx([&map, &task_scheduler](Vector2i cpos) {
 				auto it = map.columns.find(cpos);
 
 				// The block must be found because last time the block was in the loading area of the viewer.
-				ZN_ASSERT(it != map.columns.end());
+				VOXEL_ASSERT(it != map.columns.end());
 				Column &column = it->second;
 
 				column.viewers.remove();
@@ -403,7 +403,7 @@ bool VoxelGeneratorMultipassCB::is_runnable() const {
 }
 
 bool VoxelGeneratorMultipassCB::debug_try_get_column_states(StdVector<DebugColumnState> &out_states) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	out_states.clear();
 
@@ -479,7 +479,7 @@ TypedArray<godot::VoxelBuffer> VoxelGeneratorMultipassCB::debug_generate_test_co
 	// 		}
 	// 	}
 	// };
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// TODO Allow specifying a target pass? Currently this runs up to the final pass
 
 	std::shared_ptr<Internal> internal = get_internal();
@@ -663,7 +663,7 @@ void VoxelGeneratorMultipassCB::_bind_methods() {
 			&VoxelGeneratorMultipassCB::debug_generate_test_column
 	);
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	// TODO Test if GDVIRTUAL can print errors properly when GDScript fails inside a different thread.
 	GDVIRTUAL_BIND(_generate_pass, "voxel_tool", "pass_index");
 	GDVIRTUAL_BIND(_generate_block_fallback, "out_buffer", "origin_in_voxels");
@@ -690,4 +690,4 @@ void VoxelGeneratorMultipassCB::_bind_methods() {
 	BIND_CONSTANT(MAX_PASS_EXTENT);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

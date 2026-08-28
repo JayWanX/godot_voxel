@@ -10,9 +10,9 @@
 #include "../../util/math/funcs.h"
 #include "axes_3d_control.h"
 
-namespace zylann {
+namespace voxel {
 
-ZN_ModelViewer::ZN_ModelViewer() {
+VOXEL_ModelViewer::VOXEL_ModelViewer() {
 	_pitch = math::deg_to_rad(-28.f);
 	_yaw = math::deg_to_rad(-37.f);
 
@@ -41,7 +41,7 @@ ZN_ModelViewer::ZN_ModelViewer() {
 	viewport_container->set_anchors_and_offsets_preset(Control::PRESET_FULL_RECT);
 	add_child(viewport_container);
 
-	_axes_3d_control = memnew(ZN_Axes3DControl);
+	_axes_3d_control = memnew(VOXEL_Axes3DControl);
 	_axes_3d_control->set_anchors_preset(Control::PRESET_BOTTOM_LEFT);
 	//_axes_3d_control->set_size(editor_scale * Vector2(32, 32));
 	_axes_3d_control->set_offset(SIDE_LEFT, 0);
@@ -54,23 +54,23 @@ ZN_ModelViewer::ZN_ModelViewer() {
 	update_camera();
 }
 
-void ZN_ModelViewer::set_camera_distance(float d) {
+void VOXEL_ModelViewer::set_camera_distance(float d) {
 	_distance = d;
 	update_camera();
 }
 
-Node *ZN_ModelViewer::get_viewer_root_node() const {
+Node *VOXEL_ModelViewer::get_viewer_root_node() const {
 	return _viewport;
 }
 
-#if defined(ZN_GODOT)
-void ZN_ModelViewer::gui_input(const Ref<InputEvent> &p_event) {
-#elif defined(ZN_GODOT_EXTENSION)
-void ZN_ModelViewer::_gui_input(const Ref<InputEvent> &p_event) {
+#if defined(VOXEL_GODOT)
+void VOXEL_ModelViewer::gui_input(const Ref<InputEvent> &p_event) {
+#elif defined(VOXEL_GODOT_EXTENSION)
+void VOXEL_ModelViewer::_gui_input(const Ref<InputEvent> &p_event) {
 #endif
 	Ref<InputEventMouseMotion> mm = p_event;
 	if (mm.is_valid()) {
-		if (mm->get_button_mask().has_flag(ZN_GODOT_MouseButtonMask_MIDDLE)) {
+		if (mm->get_button_mask().has_flag(VOXEL_GODOT_MouseButtonMask_MIDDLE)) {
 			const float sensitivity = 0.01f;
 			const Vector2 delta = mm->get_relative() * sensitivity;
 			_pitch -= delta.y;
@@ -82,7 +82,7 @@ void ZN_ModelViewer::_gui_input(const Ref<InputEvent> &p_event) {
 	}
 }
 
-void ZN_ModelViewer::update_camera() {
+void VOXEL_ModelViewer::update_camera() {
 	Basis basis;
 	basis.set_euler(Vector3(_pitch, _yaw, 0));
 	const Vector3 forward = -basis.get_column(Vector3::AXIS_Z);
@@ -91,4 +91,4 @@ void ZN_ModelViewer::update_camera() {
 	_axes_3d_control->set_basis_3d(basis.inverse());
 }
 
-} // namespace zylann
+} // namespace voxel

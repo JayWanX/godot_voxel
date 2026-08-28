@@ -1,6 +1,6 @@
 #include "../node_type_db.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 void register_input_nodes(Span<NodeType> types) {
 	{
@@ -36,4 +36,4 @@ void register_input_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

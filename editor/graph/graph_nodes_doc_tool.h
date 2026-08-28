@@ -3,10 +3,10 @@
 
 #include "../../util/godot/core/string.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void run_graph_nodes_doc_tool(String src_xml_fpath, String dst_xml_fpath);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_NODES_DOC_TOOL_H

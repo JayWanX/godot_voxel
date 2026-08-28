@@ -1,12 +1,12 @@
-#ifndef ZN_SPOT_NOISE_GD_H
-#define ZN_SPOT_NOISE_GD_H
+#ifndef VOXEL_SPOT_NOISE_GD_H
+#define VOXEL_SPOT_NOISE_GD_H
 
 #include "../godot/classes/resource.h"
 
-namespace zylann {
+namespace voxel {
 
-class ZN_SpotNoise : public Resource {
-	GDCLASS(ZN_SpotNoise, Resource);
+class VOXEL_SpotNoise : public Resource {
+	GDCLASS(VOXEL_SpotNoise, Resource);
 
 public:
 	int get_seed() const;
@@ -39,6 +39,6 @@ private:
 	float _jitter = 0.9f;
 };
 
-}; // namespace zylann
+}; // namespace voxel
 
-#endif // ZN_SPOT_NOISE_GD_H
+#endif // VOXEL_SPOT_NOISE_GD_H

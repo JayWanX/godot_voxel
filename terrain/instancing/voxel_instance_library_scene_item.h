@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/packed_scene.h"
 #include "voxel_instance_library_item.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstanceLibrarySceneItem : public VoxelInstanceLibraryItem {
 	GDCLASS(VoxelInstanceLibrarySceneItem, VoxelInstanceLibraryItem)
@@ -18,6 +18,6 @@ private:
 	Ref<PackedScene> _scene;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_LIBRARY_SCENE_ITEM_H

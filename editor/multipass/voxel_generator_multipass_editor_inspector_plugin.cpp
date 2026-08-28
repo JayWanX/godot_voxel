@@ -2,13 +2,13 @@
 #include "../../generators/multipass/voxel_generator_multipass_cb.h"
 #include "voxel_generator_multipass_cache_viewer.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-bool VoxelGeneratorMultipassEditorInspectorPlugin::_zn_can_handle(const Object *p_object) const {
+bool VoxelGeneratorMultipassEditorInspectorPlugin::_voxel_can_handle(const Object *p_object) const {
 	return Object::cast_to<VoxelGeneratorMultipassCB>(p_object) != nullptr;
 }
 
-void VoxelGeneratorMultipassEditorInspectorPlugin::_zn_parse_begin(Object *p_object) {
+void VoxelGeneratorMultipassEditorInspectorPlugin::_voxel_parse_begin(Object *p_object) {
 	VoxelGeneratorMultipassCacheViewer *viewer = memnew(VoxelGeneratorMultipassCacheViewer);
 	add_custom_control(viewer);
 	VoxelGeneratorMultipassCB *mesh_sdf = Object::cast_to<VoxelGeneratorMultipassCB>(p_object);
@@ -16,4 +16,4 @@ void VoxelGeneratorMultipassEditorInspectorPlugin::_zn_parse_begin(Object *p_obj
 	viewer->set_generator(mesh_sdf);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

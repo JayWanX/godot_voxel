@@ -1,5 +1,5 @@
-#ifndef ZN_VOXEL_RAYCAST_H
-#define ZN_VOXEL_RAYCAST_H
+#ifndef VOXEL_VOXEL_RAYCAST_H
+#define VOXEL_VOXEL_RAYCAST_H
 
 #include "../util/math/vector3i.h"
 // #include "../util/profiling.h"
@@ -7,7 +7,7 @@
 #include "math/conv.h"
 #include "math/vector3.h"
 
-namespace zylann {
+namespace voxel {
 
 // Values known when crossing one cell.
 // View of the cell where the ray goes from A to B:
@@ -43,11 +43,11 @@ bool voxel_raycast(
 		float &out_distance_along_ray,
 		float &out_distance_along_ray_prev
 ) {
-	// ZN_PROFILE_SCOPE();
+	// VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT_RETURN_V(!math::has_nan(ray_origin), false);
-	ZN_ASSERT_RETURN_V(!math::has_nan(ray_direction), false);
-	ZN_ASSERT_RETURN_V(!math::is_nan(max_distance), false);
+	VOXEL_ASSERT_RETURN_V(!math::has_nan(ray_origin), false);
+	VOXEL_ASSERT_RETURN_V(!math::has_nan(ray_direction), false);
+	VOXEL_ASSERT_RETURN_V(!math::is_nan(max_distance), false);
 
 	const float g_infinite = 9999999;
 
@@ -64,7 +64,7 @@ bool voxel_raycast(
 	// Note : the grid is assumed to have 1-unit square cells.
 
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN_V(math::is_normalized(ray_direction), false); // Must be normalized
+	VOXEL_ASSERT_RETURN_V(math::is_normalized(ray_direction), false); // Must be normalized
 #endif
 
 	/* Initialisation */
@@ -207,6 +207,6 @@ bool voxel_raycast(
 	return true;
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_VOXEL_RAYCAST_H
+#endif // VOXEL_VOXEL_RAYCAST_H

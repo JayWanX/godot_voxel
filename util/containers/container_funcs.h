@@ -1,11 +1,11 @@
-#ifndef ZN_CONTAINER_FUNCS_H
-#define ZN_CONTAINER_FUNCS_H
+#ifndef VOXEL_CONTAINER_FUNCS_H
+#define VOXEL_CONTAINER_FUNCS_H
 
 #include "span.h"
 #include "std_vector.h"
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 // Takes elements starting from a given position and moves them at the beginning,
 // then shrink the array to fit them. Other elements are discarded.
@@ -131,7 +131,7 @@ inline bool has_duplicate_f(Span<const T> items, TEqual equal) {
 template <typename Item_T>
 inline bool is_uniform(const Item_T *p_data, const size_t item_count) {
 	// Testing uniformity of an empty buffer has no meaningful answer
-	ZN_ASSERT_RETURN_V(item_count > 0, false);
+	VOXEL_ASSERT_RETURN_V(item_count > 0, false);
 
 	const Item_T v0 = p_data[0];
 
@@ -270,6 +270,6 @@ void fill(std::vector<T, TAllocator> &dst, const T &v) {
 	std::fill(dst.begin(), dst.end(), v);
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_CONTAINER_FUNCS_H
+#endif // VOXEL_CONTAINER_FUNCS_H

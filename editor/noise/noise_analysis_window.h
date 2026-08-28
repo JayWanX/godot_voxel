@@ -7,26 +7,26 @@
 #include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
 #include "noise_adapter.h"
 
-ZN_GODOT_FORWARD_DECLARE(class SpinBox)
-ZN_GODOT_FORWARD_DECLARE(class LineEdit)
-ZN_GODOT_FORWARD_DECLARE(class ProgressBar)
-ZN_GODOT_FORWARD_DECLARE(class OptionButton)
+VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
+VOXEL_GODOT_FORWARD_DECLARE(class LineEdit)
+VOXEL_GODOT_FORWARD_DECLARE(class ProgressBar)
+VOXEL_GODOT_FORWARD_DECLARE(class OptionButton)
 
-namespace zylann {
+namespace voxel {
 
-class ZN_ChartView;
+class VOXEL_ChartView;
 
 // This is an experimental tool to check noise properties empirically,
 // by sampling it a lot of times and seeing what the minimum and maximum values are.
-class ZN_NoiseAnalysisWindow : public AcceptDialog {
-	GDCLASS(ZN_NoiseAnalysisWindow, AcceptDialog)
+class VOXEL_NoiseAnalysisWindow : public AcceptDialog {
+	GDCLASS(VOXEL_NoiseAnalysisWindow, AcceptDialog)
 public:
-	ZN_NoiseAnalysisWindow();
+	VOXEL_NoiseAnalysisWindow();
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 	void set_noise(Ref<FastNoise2> noise);
 #endif
-	void set_noise(Ref<ZN_FastNoiseLite> noise);
+	void set_noise(Ref<VOXEL_FastNoiseLite> noise);
 
 private:
 	enum Dimension { //
@@ -50,7 +50,7 @@ private:
 	SpinBox *_area_size_spinbox = nullptr;
 	SpinBox *_samples_count_spinbox = nullptr;
 
-	ZN_ChartView *_chart_view = nullptr;
+	VOXEL_ChartView *_chart_view = nullptr;
 
 	ProgressBar *_progress_bar = nullptr;
 
@@ -84,6 +84,6 @@ private:
 	RandomPCG _rng;
 };
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // NOISE_ANALYSIS_WINDOW_H

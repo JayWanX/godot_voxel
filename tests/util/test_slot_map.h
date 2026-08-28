@@ -1,10 +1,10 @@
-#ifndef ZN_TEST_SLOT_MAP_H
-#define ZN_TEST_SLOT_MAP_H
+#ifndef VOXEL_TEST_SLOT_MAP_H
+#define VOXEL_TEST_SLOT_MAP_H
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_slot_map();
 
-} // namespace zylann::tests
+} // namespace voxel::tests
 
-#endif // ZN_TEST_SLOT_MAP_H
+#endif // VOXEL_TEST_SLOT_MAP_H

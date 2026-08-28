@@ -7,7 +7,7 @@
 #include "../../util/thread/mutex.h"
 #include <cstdint>
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct InstanceLoadingTaskOutput {
 	Vector3i render_block_position;
@@ -23,6 +23,6 @@ struct InstancerTaskOutputQueue {
 	Mutex mutex;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCER_TASK_OUTPUT_QUEUE_H

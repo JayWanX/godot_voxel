@@ -7,18 +7,18 @@
 #include "voxel_instance_library_editor_plugin.h"
 #include "voxel_instance_library_multimesh_item_editor_plugin.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
-bool VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_zn_can_handle(const Object *p_object) const {
+bool VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_can_handle(const Object *p_object) const {
 	return Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(p_object) != nullptr;
 }
 
-void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_zn_parse_group(Object *p_object, const String &p_group) {
+void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_parse_group(Object *p_object, const String &p_group) {
 	const VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(p_object);
 	ERR_FAIL_COND(item == nullptr);
 
@@ -29,10 +29,10 @@ void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_zn_parse_group(Object *p
 			// This is a legacy workflow, we'll see if it can be removed later.
 			Button *button = memnew(Button);
 			button->set_tooltip_text(
-					ZN_TTR("Set properties based on an existing scene. This might copy mesh and material data if "
+					VOXEL_TTR("Set properties based on an existing scene. This might copy mesh and material data if "
 						   "the scene embeds them. Properties will not update if the scene changes later.")
 			);
-			button->set_text(ZN_TTR("Update from scene..."));
+			button->set_text(VOXEL_TTR("Update from scene..."));
 
 			// Using a bind() instead of relying on "currently edited" item in the editor plugin allows to support
 			// multiple sub-inspectors. Plugins are not instanced per-inspected-object, but custom controls are.
@@ -49,7 +49,7 @@ void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_zn_parse_group(Object *p
 
 		} else {
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Properties are defined by the scene property."));
+			label->set_text(VOXEL_TTR("Properties are defined by the scene property."));
 			add_custom_control(label);
 		}
 	}
@@ -62,7 +62,7 @@ void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_zn_parse_group(Object *p
 	// }
 }
 
-bool VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_zn_parse_property(
+bool VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_parse_property(
 		Object *p_object,
 		const Variant::Type p_type,
 		const String &p_path,
@@ -110,4 +110,4 @@ bool VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_zn_parse_property(
 	return false;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -1,18 +1,18 @@
-#ifndef ZN_GODOT_MULTIMESH_H
-#define ZN_GODOT_MULTIMESH_H
+#ifndef VOXEL_GODOT_MULTIMESH_H
+#define VOXEL_GODOT_MULTIMESH_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/resources/multimesh.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/multi_mesh.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // This API can be confusing so I made a wrapper
 int get_visible_instance_count(const MultiMesh &mm);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_MULTIMESH_H
+#endif // VOXEL_GODOT_MULTIMESH_H

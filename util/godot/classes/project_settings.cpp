@@ -1,6 +1,6 @@
 #include "project_settings.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void add_custom_project_setting(
 		Variant::Type type,
@@ -10,7 +10,7 @@ void add_custom_project_setting(
 		Variant default_value,
 		bool requires_restart
 ) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	if (requires_restart) {
 		GLOBAL_DEF_RST(name, default_value);
 	} else {
@@ -18,7 +18,7 @@ void add_custom_project_setting(
 	}
 	ProjectSettings::get_singleton()->set_custom_property_info(PropertyInfo(type, name, hint, hint_string));
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	ProjectSettings &ps = *ProjectSettings::get_singleton();
 
 	String name_str(name);
@@ -38,4 +38,4 @@ void add_custom_project_setting(
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

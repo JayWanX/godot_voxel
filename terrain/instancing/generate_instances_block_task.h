@@ -1,5 +1,5 @@
-#ifndef ZN_VOXEL_GENERATE_INSTANCES_BLOCK_TASK_H
-#define ZN_VOXEL_GENERATE_INSTANCES_BLOCK_TASK_H
+#ifndef VOXEL_VOXEL_GENERATE_INSTANCES_BLOCK_TASK_H
+#define VOXEL_VOXEL_GENERATE_INSTANCES_BLOCK_TASK_H
 
 #include "../../generators/voxel_generator.h"
 #include "../../util/containers/std_vector.h"
@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <memory>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // TODO Optimize: eventually this should be moved closer to the meshing task, including edited instances
 class GenerateInstancesBlockTask : public IThreadedTask {
@@ -39,6 +39,6 @@ public:
 	void run(ThreadedTaskContext &ctx) override;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-#endif // ZN_VOXEL_GENERATE_INSTANCES_BLOCK_TASK_H
+#endif // VOXEL_VOXEL_GENERATE_INSTANCES_BLOCK_TASK_H

@@ -1,7 +1,7 @@
 #include "box_bounds_3i.h"
 #include "../io/text_writer.h"
 
-namespace zylann {
+namespace voxel {
 
 TextWriter &operator<<(TextWriter &w, const BoxBounds3i &box) {
 	w << "(min:";
@@ -12,4 +12,4 @@ TextWriter &operator<<(TextWriter &w, const BoxBounds3i &box) {
 	return w;
 }
 
-} // namespace zylann
+} // namespace voxel

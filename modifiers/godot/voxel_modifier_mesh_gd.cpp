@@ -7,10 +7,10 @@
 #include "../../util/godot/core/string.h"
 #endif
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
-zylann::voxel::VoxelModifierMesh *get_mesh_modifier(VoxelLodTerrain &volume, uint32_t id) {
-	return get_modifier<zylann::voxel::VoxelModifierMesh>(volume, id, zylann::voxel::VoxelModifier::TYPE_MESH);
+voxel::VoxelModifierMesh *get_mesh_modifier(VoxelLodTerrain &volume, uint32_t id) {
+	return get_modifier<voxel::VoxelModifierMesh>(volume, id, voxel::VoxelModifier::TYPE_MESH);
 }
 
 void VoxelModifierMesh::set_mesh_sdf(Ref<VoxelMeshSDF> mesh_sdf) {
@@ -27,8 +27,8 @@ void VoxelModifierMesh::set_mesh_sdf(Ref<VoxelMeshSDF> mesh_sdf) {
 	if (_volume == nullptr) {
 		return;
 	}
-	zylann::voxel::VoxelModifierMesh *modifier = get_mesh_modifier(*_volume, _modifier_id);
-	ZN_ASSERT_RETURN(modifier != nullptr);
+	voxel::VoxelModifierMesh *modifier = get_mesh_modifier(*_volume, _modifier_id);
+	VOXEL_ASSERT_RETURN(modifier != nullptr);
 	const AABB prev_aabb = modifier->get_aabb();
 	modifier->set_mesh_sdf(_mesh_sdf);
 	const AABB new_aabb = modifier->get_aabb();
@@ -49,8 +49,8 @@ void VoxelModifierMesh::set_isolevel(float isolevel) {
 	if (_volume == nullptr) {
 		return;
 	}
-	zylann::voxel::VoxelModifierMesh *modifier = get_mesh_modifier(*_volume, _modifier_id);
-	ZN_ASSERT_RETURN(modifier != nullptr);
+	voxel::VoxelModifierMesh *modifier = get_mesh_modifier(*_volume, _modifier_id);
+	VOXEL_ASSERT_RETURN(modifier != nullptr);
 	modifier->set_isolevel(_isolevel);
 	post_edit_modifier(*_volume, modifier->get_aabb());
 }
@@ -59,8 +59,8 @@ float VoxelModifierMesh::get_isolevel() const {
 	return _isolevel;
 }
 
-zylann::voxel::VoxelModifier *VoxelModifierMesh::create(zylann::voxel::VoxelModifierStack &modifiers, uint32_t id) {
-	zylann::voxel::VoxelModifierMesh *modifier = modifiers.add_modifier<zylann::voxel::VoxelModifierMesh>(id);
+voxel::VoxelModifier *VoxelModifierMesh::create(voxel::VoxelModifierStack &modifiers, uint32_t id) {
+	voxel::VoxelModifierMesh *modifier = modifiers.add_modifier<voxel::VoxelModifierMesh>(id);
 	modifier->set_mesh_sdf(_mesh_sdf);
 	modifier->set_isolevel(_isolevel);
 	return modifier;
@@ -70,8 +70,8 @@ void VoxelModifierMesh::_on_mesh_sdf_baked() {
 	if (_volume == nullptr) {
 		return;
 	}
-	zylann::voxel::VoxelModifierMesh *modifier = get_mesh_modifier(*_volume, _modifier_id);
-	ZN_ASSERT_RETURN(modifier != nullptr);
+	voxel::VoxelModifierMesh *modifier = get_mesh_modifier(*_volume, _modifier_id);
+	VOXEL_ASSERT_RETURN(modifier != nullptr);
 	const AABB prev_aabb = modifier->get_aabb();
 	modifier->set_mesh_sdf(_mesh_sdf);
 	const AABB new_aabb = modifier->get_aabb();
@@ -87,18 +87,18 @@ void VoxelModifierMesh::get_configuration_warnings(PackedStringArray &warnings) 
 
 	if (_mesh_sdf.is_null()) {
 		warnings.append(
-				ZN_TTR("A {0} resource is required for {1} to function.")
+				VOXEL_TTR("A {0} resource is required for {1} to function.")
 						.format(varray(VoxelMeshSDF::get_class_static(), VoxelModifierMesh::get_class_static()))
 		);
 	} else {
 		if (_mesh_sdf->get_mesh().is_null()) {
 			warnings.append(
-					ZN_TTR("The {0} resource has no mesh assigned.").format(varray(VoxelMeshSDF::get_class_static()))
+					VOXEL_TTR("The {0} resource has no mesh assigned.").format(varray(VoxelMeshSDF::get_class_static()))
 			);
 
 		} else if (!_mesh_sdf->is_baked()) {
 			warnings.append(
-					ZN_TTR("The {0} resource needs to be baked.").format(varray(VoxelMeshSDF::get_class_static()))
+					VOXEL_TTR("The {0} resource needs to be baked.").format(varray(VoxelMeshSDF::get_class_static()))
 			);
 		}
 	}
@@ -125,4 +125,4 @@ void VoxelModifierMesh::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot

@@ -1,11 +1,11 @@
-#ifndef ZYLANN_VECTOR3T_H
-#define ZYLANN_VECTOR3T_H
+#ifndef VOXEL_VECTOR3T_H
+#define VOXEL_VECTOR3T_H
 
 #include "../containers/span.h"
 #include "../errors.h"
 #include "funcs.h"
 
-namespace zylann {
+namespace voxel {
 
 // Template 3-dimensional vector. Only fields and standard operators.
 // Math functions are separate to allow more unified overloading, and similarity with other math libraries such as
@@ -33,14 +33,14 @@ struct Vector3T {
 
 	inline const T &operator[](const unsigned int p_axis) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_axis < AXIS_COUNT);
+		VOXEL_ASSERT(p_axis < AXIS_COUNT);
 #endif
 		return coords[p_axis];
 	}
 
 	inline T &operator[](const unsigned int p_axis) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_axis < AXIS_COUNT);
+		VOXEL_ASSERT(p_axis < AXIS_COUNT);
 #endif
 		return coords[p_axis];
 	}
@@ -297,7 +297,7 @@ void rotate_90(Span<Vector3T<T>> vectors, Axis axis, bool clockwise) {
 			}
 		}
 	} else {
-		ZN_PRINT_ERROR("Invalid axis");
+		VOXEL_PRINT_ERROR("Invalid axis");
 	}
 }
 
@@ -307,6 +307,6 @@ inline bool is_valid_size(const Vector3T<T> &s) {
 }
 
 } // namespace math
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_VECTOR3F_H
+#endif // VOXEL_VECTOR3F_H

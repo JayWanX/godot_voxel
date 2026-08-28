@@ -5,7 +5,7 @@
 #include "../util/profiling.h"
 #include "funcs.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelToolBuffer::VoxelToolBuffer(Ref<godot::VoxelBuffer> vb) {
 	ERR_FAIL_COND(vb.is_null());
@@ -21,7 +21,7 @@ bool VoxelToolBuffer::is_area_editable(const Box3i &box) const {
 
 void VoxelToolBuffer::do_sphere(Vector3 center, float radius) {
 	ERR_FAIL_COND(_buffer.is_null());
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	VoxelBuffer &vb = _buffer->get_buffer();
 
@@ -44,7 +44,7 @@ void VoxelToolBuffer::do_sphere(Vector3 center, float radius) {
 
 void VoxelToolBuffer::do_box(Vector3i begin, Vector3i end) {
 	ERR_FAIL_COND(_buffer.is_null());
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	VoxelBuffer &vb = _buffer->get_buffer();
 
@@ -229,7 +229,7 @@ void VoxelToolBuffer::paste_masked_writable_list(
 
 	} else {
 		DynamicBitset bitarray;
-		ZN_ASSERT_RETURN(indices_to_bitarray_u16(dst_writable_list_s, bitarray));
+		VOXEL_ASSERT_RETURN(indices_to_bitarray_u16(dst_writable_list_s, bitarray));
 		paste_src_masked_dst_writable_bitarray(
 				to_span(channels),
 				src,
@@ -245,9 +245,9 @@ void VoxelToolBuffer::paste_masked_writable_list(
 }
 
 void VoxelToolBuffer::do_path(Span<const Vector3> positions, Span<const float> radii) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(positions.size() >= 2);
-	ZN_ASSERT_RETURN(positions.size() == radii.size());
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(positions.size() >= 2);
+	VOXEL_ASSERT_RETURN(positions.size() == radii.size());
 
 	ERR_FAIL_COND(_buffer.is_null());
 	VoxelBuffer &dst = _buffer->get_buffer();
@@ -332,4 +332,4 @@ void VoxelToolBuffer::do_path(Span<const Vector3> positions, Span<const float> r
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -12,10 +12,10 @@
 #include <memory>
 
 // Can't forward-declare because we use Image::Format
-// ZN_GODOT_FORWARD_DECLARE(class Image)
-ZN_GODOT_FORWARD_DECLARE(class ImageTexture3D)
+// VOXEL_GODOT_FORWARD_DECLARE(class Image)
+VOXEL_GODOT_FORWARD_DECLARE(class ImageTexture3D)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTool;
 
@@ -29,15 +29,15 @@ class VoxelBuffer : public RefCounted {
 
 public:
 	enum ChannelId {
-		CHANNEL_TYPE = zylann::voxel::VoxelBuffer::CHANNEL_TYPE,
-		CHANNEL_SDF = zylann::voxel::VoxelBuffer::CHANNEL_SDF,
-		CHANNEL_COLOR = zylann::voxel::VoxelBuffer::CHANNEL_COLOR,
-		CHANNEL_INDICES = zylann::voxel::VoxelBuffer::CHANNEL_INDICES,
-		CHANNEL_WEIGHTS = zylann::voxel::VoxelBuffer::CHANNEL_WEIGHTS,
-		CHANNEL_DATA5 = zylann::voxel::VoxelBuffer::CHANNEL_DATA5,
-		CHANNEL_DATA6 = zylann::voxel::VoxelBuffer::CHANNEL_DATA6,
-		CHANNEL_DATA7 = zylann::voxel::VoxelBuffer::CHANNEL_DATA7,
-		MAX_CHANNELS = zylann::voxel::VoxelBuffer::MAX_CHANNELS,
+		CHANNEL_TYPE = voxel::VoxelBuffer::CHANNEL_TYPE,
+		CHANNEL_SDF = voxel::VoxelBuffer::CHANNEL_SDF,
+		CHANNEL_COLOR = voxel::VoxelBuffer::CHANNEL_COLOR,
+		CHANNEL_INDICES = voxel::VoxelBuffer::CHANNEL_INDICES,
+		CHANNEL_WEIGHTS = voxel::VoxelBuffer::CHANNEL_WEIGHTS,
+		CHANNEL_DATA5 = voxel::VoxelBuffer::CHANNEL_DATA5,
+		CHANNEL_DATA6 = voxel::VoxelBuffer::CHANNEL_DATA6,
+		CHANNEL_DATA7 = voxel::VoxelBuffer::CHANNEL_DATA7,
+		MAX_CHANNELS = voxel::VoxelBuffer::MAX_CHANNELS,
 	};
 
 	enum ChannelMask {
@@ -56,23 +56,23 @@ public:
 	static const char *CHANNEL_ID_HINT_STRING;
 
 	enum Compression {
-		COMPRESSION_NONE = zylann::voxel::VoxelBuffer::COMPRESSION_NONE,
-		COMPRESSION_UNIFORM = zylann::voxel::VoxelBuffer::COMPRESSION_UNIFORM,
+		COMPRESSION_NONE = voxel::VoxelBuffer::COMPRESSION_NONE,
+		COMPRESSION_UNIFORM = voxel::VoxelBuffer::COMPRESSION_UNIFORM,
 		// COMPRESSION_RLE,
-		COMPRESSION_COUNT = zylann::voxel::VoxelBuffer::COMPRESSION_COUNT
+		COMPRESSION_COUNT = voxel::VoxelBuffer::COMPRESSION_COUNT
 	};
 
 	enum Depth {
-		DEPTH_8_BIT = zylann::voxel::VoxelBuffer::DEPTH_8_BIT,
-		DEPTH_16_BIT = zylann::voxel::VoxelBuffer::DEPTH_16_BIT,
-		DEPTH_32_BIT = zylann::voxel::VoxelBuffer::DEPTH_32_BIT,
-		DEPTH_64_BIT = zylann::voxel::VoxelBuffer::DEPTH_64_BIT,
-		DEPTH_COUNT = zylann::voxel::VoxelBuffer::DEPTH_COUNT
+		DEPTH_8_BIT = voxel::VoxelBuffer::DEPTH_8_BIT,
+		DEPTH_16_BIT = voxel::VoxelBuffer::DEPTH_16_BIT,
+		DEPTH_32_BIT = voxel::VoxelBuffer::DEPTH_32_BIT,
+		DEPTH_64_BIT = voxel::VoxelBuffer::DEPTH_64_BIT,
+		DEPTH_COUNT = voxel::VoxelBuffer::DEPTH_COUNT
 	};
 
 	enum Allocator {
-		ALLOCATOR_DEFAULT = zylann::voxel::VoxelBuffer::ALLOCATOR_DEFAULT,
-		ALLOCATOR_POOL = zylann::voxel::VoxelBuffer::ALLOCATOR_POOL,
+		ALLOCATOR_DEFAULT = voxel::VoxelBuffer::ALLOCATOR_DEFAULT,
+		ALLOCATOR_POOL = voxel::VoxelBuffer::ALLOCATOR_POOL,
 		ALLOCATOR_COUNT
 	};
 
@@ -83,35 +83,35 @@ public:
 	VoxelBuffer();
 	VoxelBuffer(VoxelBuffer::Allocator allocator);
 	// Reference an existing buffer
-	VoxelBuffer(std::shared_ptr<zylann::voxel::VoxelBuffer> &other);
+	VoxelBuffer(std::shared_ptr<voxel::VoxelBuffer> &other);
 
 	~VoxelBuffer();
 
 	// Workaround because the constructor with arguments cannot always be used due to Godot limitations
-	static Ref<VoxelBuffer> create_shared(std::shared_ptr<zylann::voxel::VoxelBuffer> &other);
+	static Ref<VoxelBuffer> create_shared(std::shared_ptr<voxel::VoxelBuffer> &other);
 
-	inline const zylann::voxel::VoxelBuffer &get_buffer() const {
+	inline const voxel::VoxelBuffer &get_buffer() const {
 #ifdef DEBUG_ENABLED
 		CRASH_COND(_buffer == nullptr);
 #endif
 		return *_buffer;
 	}
 
-	inline zylann::voxel::VoxelBuffer &get_buffer() {
+	inline voxel::VoxelBuffer &get_buffer() {
 #ifdef DEBUG_ENABLED
 		CRASH_COND(_buffer == nullptr);
 #endif
 		return *_buffer;
 	}
 
-	inline std::shared_ptr<zylann::voxel::VoxelBuffer> get_buffer_shared() {
+	inline std::shared_ptr<voxel::VoxelBuffer> get_buffer_shared() {
 #ifdef DEBUG_ENABLED
 		CRASH_COND(_buffer == nullptr);
 #endif
 		return _buffer;
 	}
 
-	// inline std::shared_ptr<zylann::voxel::VoxelBuffer> get_buffer_shared() { return _buffer; }
+	// inline std::shared_ptr<voxel::VoxelBuffer> get_buffer_shared() { return _buffer; }
 
 	Vector3i get_size() const {
 		return _buffer->get_size();
@@ -230,11 +230,11 @@ public:
 	// Debugging
 
 	Ref<Image> debug_print_sdf_to_image_top_down();
-	static Ref<Image> debug_print_sdf_to_image_top_down(const zylann::voxel::VoxelBuffer &vb);
+	static Ref<Image> debug_print_sdf_to_image_top_down(const voxel::VoxelBuffer &vb);
 	TypedArray<Image> debug_print_sdf_y_slices(float scale) const;
 	Ref<Image> debug_print_sdf_y_slice(float scale, int y) const;
-	static Ref<Image> debug_print_sdf_y_slice(const zylann::voxel::VoxelBuffer &buffer, float scale, int y);
-	static Ref<Image> debug_print_sdf_z_slice(const zylann::voxel::VoxelBuffer &buffer, float scale, int z);
+	static Ref<Image> debug_print_sdf_y_slice(const voxel::VoxelBuffer &buffer, float scale, int y);
+	static Ref<Image> debug_print_sdf_z_slice(const voxel::VoxelBuffer &buffer, float scale, int z);
 
 private:
 	// In GDExtension, `create` is defined by `GDCLASS`, preventing anyone from binding a `create` function directly
@@ -244,19 +244,19 @@ private:
 
 	static void _bind_methods();
 
-	std::shared_ptr<zylann::voxel::VoxelBuffer> _buffer;
+	std::shared_ptr<voxel::VoxelBuffer> _buffer;
 };
 
-Variant get_voxel_metadata(const zylann::voxel::VoxelBuffer &vb, const Vector3i pos);
-void set_voxel_metadata(zylann::voxel::VoxelBuffer &vb, const Vector3i pos, const Variant &meta);
+Variant get_voxel_metadata(const voxel::VoxelBuffer &vb, const Vector3i pos);
+void set_voxel_metadata(voxel::VoxelBuffer &vb, const Vector3i pos, const Variant &meta);
 
 } // namespace godot
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::godot::VoxelBuffer::ChannelId)
-VARIANT_ENUM_CAST(zylann::voxel::godot::VoxelBuffer::ChannelMask)
-VARIANT_ENUM_CAST(zylann::voxel::godot::VoxelBuffer::Depth)
-VARIANT_ENUM_CAST(zylann::voxel::godot::VoxelBuffer::Compression)
-VARIANT_ENUM_CAST(zylann::voxel::godot::VoxelBuffer::Allocator)
+VARIANT_ENUM_CAST(voxel::godot::VoxelBuffer::ChannelId)
+VARIANT_ENUM_CAST(voxel::godot::VoxelBuffer::ChannelMask)
+VARIANT_ENUM_CAST(voxel::godot::VoxelBuffer::Depth)
+VARIANT_ENUM_CAST(voxel::godot::VoxelBuffer::Compression)
+VARIANT_ENUM_CAST(voxel::godot::VoxelBuffer::Allocator)
 
 #endif // VOXEL_BUFFER_GD_H

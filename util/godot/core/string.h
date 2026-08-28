@@ -1,9 +1,9 @@
-#ifndef ZN_GODOT_STRING_H
-#define ZN_GODOT_STRING_H
+#ifndef VOXEL_GODOT_STRING_H
+#define VOXEL_GODOT_STRING_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/string/ustring.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/global_constants.hpp> // For `Error`
 #include <godot_cpp/variant/string.hpp>
 using namespace godot;
@@ -21,11 +21,11 @@ using namespace godot;
 #include "../core/version.h"
 #include "../macros.h"
 
-namespace zylann {
+namespace voxel {
 class TextWriter;
 }
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 inline String to_godot(const std::string_view sv) {
 	return String::utf8(sv.data(), sv.size());
@@ -64,13 +64,13 @@ inline StdString to_std_string(const String &godot_string) {
 }
 
 inline Error parse_utf8(String &s, Span<const char> utf8) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 5
 	return s.append_utf8(utf8.data(), utf8.size());
 #else
 	return s.parse_utf8(utf8.data(), utf8.size());
 #endif
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	s.parse_utf8(utf8.data(), utf8.size());
 	// The Godot API doesn't return anything, impossible to tell if parsing succeeded.
 	return OK;
@@ -81,21 +81,21 @@ inline String ptr2s(const void *p) {
 	return String::num_uint64((uint64_t)p, 16);
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
 // `TTR` means "tools translate", which is for editor-only localized messages.
 // Godot does not define the TTR macro for translation of messages in release builds. However, there are some non-editor
 // code that can produce errors in this module, and we still want them to compile properly.
 // TODO GDX: `TTR` is missing from `GodotCpp`.
-#if defined(ZN_GODOT) && defined(TOOLS_ENABLED)
-#define ZN_TTR(msg) TTR(msg)
+#if defined(VOXEL_GODOT) && defined(TOOLS_ENABLED)
+#define VOXEL_TTR(msg) TTR(msg)
 #else
-#define ZN_TTR(msg) String(msg)
+#define VOXEL_TTR(msg) String(msg)
 #endif
 
-ZN_GODOT_NAMESPACE_BEGIN
+VOXEL_GODOT_NAMESPACE_BEGIN
 
-// Needed for `zylann::format()`.
+// Needed for `voxel::format()`.
 // I gave up trying to nicely convert Godot's String here... it has non-explicit `const char*` constructor, that makes
 // other overloads ambiguous...
 // StdStringStream &operator<<(StdStringStream &ss, const String &s);
@@ -103,9 +103,9 @@ struct GodotStringWrapper {
 	GodotStringWrapper(const String &p_s) : s(p_s) {}
 	const String &s;
 };
-zylann::TextWriter &operator<<(zylann::TextWriter &ss, GodotStringWrapper s);
+voxel::TextWriter &operator<<(voxel::TextWriter &ss, GodotStringWrapper s);
 
-ZN_GODOT_NAMESPACE_END
+VOXEL_GODOT_NAMESPACE_END
 
 namespace std {
 
@@ -119,4 +119,4 @@ struct hash<String> {
 
 } // namespace std
 
-#endif // ZN_GODOT_STRING_H
+#endif // VOXEL_GODOT_STRING_H

@@ -4,7 +4,7 @@
 #include "../../edition/voxel_mesh_sdf_gd.h"
 #include "voxel_modifier_gd.h"
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 class VoxelModifierMesh : public VoxelModifier {
 	GDCLASS(VoxelModifierMesh, VoxelModifier);
@@ -21,7 +21,7 @@ public:
 #endif
 
 protected:
-	zylann::voxel::VoxelModifier *create(zylann::voxel::VoxelModifierStack &modifiers, uint32_t id) override;
+	voxel::VoxelModifier *create(voxel::VoxelModifierStack &modifiers, uint32_t id) override;
 
 private:
 	void _on_mesh_sdf_baked();
@@ -32,6 +32,6 @@ private:
 	float _isolevel = 0.0f;
 };
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot
 
 #endif // VOXEL_MODIFIER_MESH_GD_H

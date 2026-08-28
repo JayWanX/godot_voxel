@@ -2,23 +2,23 @@
 #include "../util/errors.h"
 #include "../util/memory/memory.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelStringNames *VoxelStringNames::g_singleton;
 
 void VoxelStringNames::create_singleton() {
-	ZN_ASSERT(g_singleton == nullptr);
-	g_singleton = ZN_NEW(VoxelStringNames);
+	VOXEL_ASSERT(g_singleton == nullptr);
+	g_singleton = VOXEL_NEW(VoxelStringNames);
 }
 
 void VoxelStringNames::destroy_singleton() {
-	ZN_ASSERT(g_singleton != nullptr);
-	ZN_DELETE(g_singleton);
+	VOXEL_ASSERT(g_singleton != nullptr);
+	VOXEL_DELETE(g_singleton);
 	g_singleton = nullptr;
 }
 
 const VoxelStringNames &VoxelStringNames::get_singleton() {
-	ZN_ASSERT(g_singleton != nullptr);
+	VOXEL_ASSERT(g_singleton != nullptr);
 	return *g_singleton;
 }
 
@@ -128,4 +128,4 @@ VoxelStringNames::VoxelStringNames() {
 	add_child = StringName("add_child");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

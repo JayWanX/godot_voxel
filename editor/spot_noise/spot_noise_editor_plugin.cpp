@@ -2,16 +2,16 @@
 #include "../../util/noise/spot_noise.h"
 #include "spot_noise_editor_inspector_plugin.h"
 
-namespace zylann {
+namespace voxel {
 
-ZN_SpotNoiseEditorPlugin::ZN_SpotNoiseEditorPlugin() {
-	Ref<ZN_SpotNoiseEditorInspectorPlugin> plugin;
+VOXEL_SpotNoiseEditorPlugin::VOXEL_SpotNoiseEditorPlugin() {
+	Ref<VOXEL_SpotNoiseEditorInspectorPlugin> plugin;
 	plugin.instantiate();
 	add_inspector_plugin(plugin);
 }
 
-String ZN_SpotNoiseEditorPlugin::_zn_get_plugin_name() const {
-	return ZN_SpotNoiseEditorPlugin::get_class_static();
+String VOXEL_SpotNoiseEditorPlugin::_voxel_get_plugin_name() const {
+	return VOXEL_SpotNoiseEditorPlugin::get_class_static();
 }
 
-} // namespace zylann
+} // namespace voxel

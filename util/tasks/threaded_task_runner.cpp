@@ -4,7 +4,7 @@
 #include "../profiling.h"
 #include "../string/format.h"
 
-namespace zylann {
+namespace voxel {
 
 ThreadedTaskRunner::ThreadedTaskRunner() {}
 
@@ -13,16 +13,16 @@ ThreadedTaskRunner::~ThreadedTaskRunner() {
 
 	// We don't have ownership over tasks, so it's an error to destroy the pool without handling them
 	if (_staged_tasks.size() != 0) {
-		ZN_PRINT_ERROR("There are staged tasks remaining!");
+		VOXEL_PRINT_ERROR("There are staged tasks remaining!");
 	}
 	if (_tasks.size() != 0) {
-		ZN_PRINT_ERROR("There are tasks remaining!");
+		VOXEL_PRINT_ERROR("There are tasks remaining!");
 	}
 	if (_spinning_tasks.size() != 0) {
-		ZN_PRINT_ERROR("There are spinning tasks remaining!");
+		VOXEL_PRINT_ERROR("There are spinning tasks remaining!");
 	}
 	if (_completed_tasks.size() != 0) {
-		ZN_PRINT_ERROR("There are completed tasks remaining!");
+		VOXEL_PRINT_ERROR("There are completed tasks remaining!");
 	}
 }
 
@@ -56,7 +56,7 @@ void ThreadedTaskRunner::destroy_all_threads() {
 	}
 }
 
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 
 void ThreadedTaskRunner::debug_add_owned_task(IThreadedTask *task) {
 	StdString s;
@@ -67,19 +67,19 @@ void ThreadedTaskRunner::debug_add_owned_task(IThreadedTask *task) {
 	auto p = _debug_owned_tasks.insert({ task, s });
 	if (p.second == false) {
 		flush_log_file();
-		ZN_CRASH();
+		VOXEL_CRASH();
 	}
 }
 
 void ThreadedTaskRunner::debug_remove_owned_task(IThreadedTask *task) {
 	{
 		MutexLock mlock(_debug_owned_tasks_mutex);
-		ZN_ASSERT(_debug_owned_tasks.erase(task) == 1);
+		VOXEL_ASSERT(_debug_owned_tasks.erase(task) == 1);
 	}
 	println(format("Unowned {}", uint64_t(task)));
 }
 
-#endif // ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#endif // VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 
 void ThreadedTaskRunner::set_name(const char *name) {
 	_name = name;
@@ -102,8 +102,8 @@ void ThreadedTaskRunner::set_priority_update_period(uint32_t milliseconds) {
 }
 
 void ThreadedTaskRunner::enqueue(IThreadedTask *task, bool serial) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT(task != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT(task != nullptr);
 	TaskItem t;
 	t.task = task;
 	t.is_serial = serial;
@@ -112,7 +112,7 @@ void ThreadedTaskRunner::enqueue(IThreadedTask *task, bool serial) {
 		_staged_tasks.push_back(t);
 		++_debug_received_tasks;
 
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 		debug_add_owned_task(task);
 #endif
 	}
@@ -124,7 +124,7 @@ void ThreadedTaskRunner::enqueue(IThreadedTask *task, bool serial) {
 void ThreadedTaskRunner::enqueue(Span<IThreadedTask *> new_tasks, bool serial) {
 #ifdef DEBUG_ENABLED
 	for (size_t i = 0; i < new_tasks.size(); ++i) {
-		ZN_ASSERT(new_tasks[i] != nullptr);
+		VOXEL_ASSERT(new_tasks[i] != nullptr);
 	}
 #endif
 	{
@@ -138,7 +138,7 @@ void ThreadedTaskRunner::enqueue(Span<IThreadedTask *> new_tasks, bool serial) {
 			t.is_serial = serial;
 			_staged_tasks[dst_begin + i] = t;
 
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 			debug_add_owned_task(new_task);
 #endif
 		}
@@ -158,8 +158,8 @@ void ThreadedTaskRunner::thread_func_static(void *p_data) {
 	if (!data.name.empty()) {
 		Thread::set_name(data.name.c_str());
 
-#ifdef ZN_PROFILER_ENABLED
-		ZN_PROFILE_SET_THREAD_NAME(data.name.c_str());
+#ifdef VOXEL_PROFILER_ENABLED
+		VOXEL_PROFILE_SET_THREAD_NAME(data.name.c_str());
 #endif
 	}
 
@@ -177,11 +177,11 @@ void ThreadedTaskRunner::thread_func(ThreadData &data) {
 		bool is_running_serial_task = false;
 		bool task_queue_was_empty = false;
 		{
-			ZN_PROFILE_SCOPE_NAMED("Task pickup");
+			VOXEL_PROFILE_SCOPE_NAMED("Task pickup");
 
 			data.debug_state = STATE_PICKING;
 
-			ZN_ASSERT(tasks.size() == 0);
+			VOXEL_ASSERT(tasks.size() == 0);
 
 			// Pick a postponed task if any.
 			// We will still run a task from the main prioritized queue as well so postponed tasks will not
@@ -219,10 +219,10 @@ void ThreadedTaskRunner::thread_func(ThreadData &data) {
 					// may remove them from the list so they don't slow down the process.
 					const uint64_t now = Time::get_singleton()->get_ticks_msec();
 					if (now - _last_priority_update_time_ms > _priority_update_period_ms) {
-						ZN_PROFILE_SCOPE_NAMED("Sorting");
+						VOXEL_PROFILE_SCOPE_NAMED("Sorting");
 
 						{
-							ZN_PROFILE_SCOPE_NAMED("Update priorities");
+							VOXEL_PROFILE_SCOPE_NAMED("Update priorities");
 							for (unsigned int i = 0; i < _tasks.size();) {
 								TaskItem &item = _tasks[i];
 								item.cached_priority = item.task->get_priority();
@@ -333,7 +333,7 @@ void ThreadedTaskRunner::thread_func(ThreadData &data) {
 					ThreadedTaskContext ctx(data.index, item.cached_priority);
 					data.debug_running_task_name = item.task->get_debug_name();
 					item.task->run(ctx);
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 					if (ctx.status == ThreadedTaskContext::STATUS_TAKEN_OUT) {
 						debug_remove_owned_task(item.task);
 					}
@@ -345,7 +345,7 @@ void ThreadedTaskRunner::thread_func(ThreadData &data) {
 					if (ctx.next_immediate_task != nullptr) {
 						TaskItem next;
 						next.task = ctx.next_immediate_task;
-#ifdef ZN_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
+#ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 						debug_add_owned_task(next.task);
 #endif
 						tasks.push_back(next);
@@ -356,7 +356,7 @@ void ThreadedTaskRunner::thread_func(ThreadData &data) {
 
 			// If the current thread just ran serial tasks
 			if (is_running_serial_task) {
-				ZN_ASSERT(_is_serial_task_running);
+				VOXEL_ASSERT(_is_serial_task_running);
 				// Reset back the boolean so any thread can pick serial tasks now.
 				// This is the only place we set it to `false`, and can only be `true` already when that happens,
 				// so locking the mutex should not be necessary.
@@ -383,7 +383,7 @@ void ThreadedTaskRunner::thread_func(ThreadData &data) {
 							break;
 
 						default:
-							ZN_PRINT_ERROR("Unknown task status");
+							VOXEL_PRINT_ERROR("Unknown task status");
 							break;
 					}
 				}
@@ -433,7 +433,7 @@ void ThreadedTaskRunner::wait_for_all_tasks() {
 		Thread::sleep_usec(2000);
 
 		if (!error1_reported && Time::get_singleton()->get_ticks_msec() - before > suspicious_delay_msec) {
-			ZN_PRINT_WARNING("Waiting for all tasks to be picked is taking a long time");
+			VOXEL_PRINT_WARNING("Waiting for all tasks to be picked is taking a long time");
 			error1_reported = true;
 		}
 	}
@@ -456,7 +456,7 @@ void ThreadedTaskRunner::wait_for_all_tasks() {
 		Thread::sleep_usec(2000);
 
 		if (!error2_reported && Time::get_singleton()->get_ticks_msec() - before > suspicious_delay_msec) {
-			ZN_PRINT_WARNING("Waiting for all tasks to be completed is taking a long time");
+			VOXEL_PRINT_WARNING("Waiting for all tasks to be completed is taking a long time");
 			error2_reported = true;
 		}
 	}
@@ -483,4 +483,4 @@ StdVector<IThreadedTask *> &ThreadedTaskRunner::get_completed_tasks_temp_tls() {
 	return tls_temp;
 }
 
-} // namespace zylann
+} // namespace voxel

@@ -1,11 +1,11 @@
-#ifndef ZN_DYNAMIC_BITSET_H
-#define ZN_DYNAMIC_BITSET_H
+#ifndef VOXEL_DYNAMIC_BITSET_H
+#define VOXEL_DYNAMIC_BITSET_H
 
 #include "../errors.h"
 #include "std_vector.h"
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 // STL's bitset is fixed size, and I don't want to depend on Boost
 class DynamicBitset {
@@ -35,21 +35,21 @@ public:
 
 	inline bool get(uint64_t i) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < _size);
+		VOXEL_ASSERT(i < _size);
 #endif
 		return _bits[i >> 6] & (uint64_t(1) << (i & uint64_t(63)));
 	}
 
 	inline void set(uint64_t i) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < _size);
+		VOXEL_ASSERT(i < _size);
 #endif
 		_bits[i >> 6] |= uint64_t(1) << (i & uint64_t(63));
 	}
 
 	inline void unset(uint64_t i) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < _size);
+		VOXEL_ASSERT(i < _size);
 #endif
 		_bits[i >> 6] &= ~(uint64_t(1) << (i & uint64_t(63)));
 	}
@@ -67,6 +67,6 @@ private:
 	unsigned int _size = 0;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_DYNAMIC_BITSET_H
+#endif // VOXEL_DYNAMIC_BITSET_H

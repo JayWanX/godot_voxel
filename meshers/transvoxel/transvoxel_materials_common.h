@@ -3,7 +3,7 @@
 
 #include "transvoxel.h"
 
-namespace zylann::voxel::transvoxel::materials {
+namespace voxel::transvoxel::materials {
 
 inline uint32_t pack_bytes(const FixedArray<uint8_t, 4> &a) {
 	return (a[0] | (a[1] << 8) | (a[2] << 16) | (a[3] << 24));
@@ -40,6 +40,6 @@ void fill_redundant_transition_cell_values(const TPartialArray9 &src, TFullArray
 	dst[0xC] = src[8];
 }
 
-} // namespace zylann::voxel::transvoxel::materials
+} // namespace voxel::transvoxel::materials
 
 #endif // VOXEL_TRANSVOXEL_MATERIALS_COMMON_H

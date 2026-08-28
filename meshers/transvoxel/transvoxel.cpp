@@ -17,7 +17,7 @@
 
 // #define VOXEL_TRANSVOXEL_REUSE_VERTEX_ON_COINCIDENT_CASES
 
-namespace zylann::voxel::transvoxel {
+namespace voxel::transvoxel {
 
 static const float TRANSITION_CELL_SCALE = 0.25;
 
@@ -193,7 +193,7 @@ void build_regular_mesh(
 		StdVector<CellInfo> *cell_info,
 		const float edge_clamp_margin
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const float edge_clamp_margin_max = 1.f - edge_clamp_margin;
 
@@ -299,7 +299,7 @@ void build_regular_mesh(
 				ReuseCell &current_reuse_cell = cache.get_reuse_cell(pos);
 
 #if DEBUG_ENABLED
-				ZN_ASSERT(case_code <= 255);
+				VOXEL_ASSERT(case_code <= 255);
 #endif
 
 				FixedArray<Vector3i, 8> padded_corner_positions;
@@ -355,7 +355,7 @@ void build_regular_mesh(
 					const uint8_t v1 = edge_code_low & 0xf;
 
 #ifdef DEBUG_ENABLED
-					ZN_ASSERT_RETURN(v1 > v0);
+					VOXEL_ASSERT_RETURN(v1 > v0);
 #endif
 
 					// Get voxel values at the corners
@@ -364,8 +364,8 @@ void build_regular_mesh(
 
 #ifdef DEBUG_ENABLED
 					// TODO Zero-division is not mentionned in the paper?? (never happens tho)
-					ZN_ASSERT_RETURN(sample1 != sample0);
-					ZN_ASSERT_RETURN(sample1 != 0 || sample0 != 0);
+					VOXEL_ASSERT_RETURN(sample1 != sample0);
+					VOXEL_ASSERT_RETURN(sample1 != 0 || sample0 != 0);
 #endif
 
 					// Get interpolation position
@@ -671,7 +671,7 @@ inline void get_face_axes(int &ax, int &ay, int dir) {
 			break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 }
 
@@ -697,7 +697,7 @@ inline uint8_t get_face_index(int cube_dir) {
 			return 5;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 			return 0;
 	}
 }
@@ -722,9 +722,9 @@ void build_transition_mesh(
 			block_size_with_padding - Vector3iUtil::create(MIN_PADDING + MAX_PADDING);
 	const Vector3i block_size_scaled = block_size_without_padding << lod_index;
 
-	ZN_ASSERT_RETURN(block_size_with_padding.x >= 3);
-	ZN_ASSERT_RETURN(block_size_with_padding.y >= 3);
-	ZN_ASSERT_RETURN(block_size_with_padding.z >= 3);
+	VOXEL_ASSERT_RETURN(block_size_with_padding.x >= 3);
+	VOXEL_ASSERT_RETURN(block_size_with_padding.y >= 3);
+	VOXEL_ASSERT_RETURN(block_size_with_padding.z >= 3);
 
 	cache.reset_reuse_cells_2d(block_size_with_padding);
 
@@ -866,7 +866,7 @@ void build_transition_mesh(
 			current_reuse_cell.packed_texture_indices =
 					material_processor.on_transition_cell(cell_data_indices, case_code);
 
-			ZN_ASSERT(case_code <= 511);
+			VOXEL_ASSERT(case_code <= 511);
 
 			// TODO We may not need all of them!
 			FixedArray<Vector3f, 13> cell_gradients;
@@ -928,8 +928,8 @@ void build_transition_mesh(
 				const float sample_a = cell_samples[index_vertex_a]; // d0 and d1 in the paper
 				const float sample_b = cell_samples[index_vertex_b];
 				// TODO Zero-division is not mentionned in the paper??
-				ZN_ASSERT_RETURN(sample_a != sample_b);
-				ZN_ASSERT_RETURN(sample_a != 0 || sample_b != 0);
+				VOXEL_ASSERT_RETURN(sample_a != sample_b);
+				VOXEL_ASSERT_RETURN(sample_a != 0 || sample_b != 0);
 
 				// Get interpolation position
 				// We use an 8-bit fraction, allowing the new vertex to be located at one of 257 possible
@@ -1092,7 +1092,7 @@ void build_transition_mesh(
 template <typename T>
 Span<const T> get_or_decompress_channel(const VoxelBuffer &voxels, StdVector<T> &backing_buffer, unsigned int channel) {
 	//
-	ZN_ASSERT_RETURN_V(
+	VOXEL_ASSERT_RETURN_V(
 			voxels.get_channel_depth(channel) == VoxelBuffer::get_depth_from_size(sizeof(T)), Span<const T>()
 	);
 
@@ -1107,7 +1107,7 @@ Span<const T> get_or_decompress_channel(const VoxelBuffer &voxels, StdVector<T> 
 
 	} else {
 		Span<const uint8_t> data_bytes;
-		ZN_ASSERT(voxels.get_channel_as_bytes_read_only(channel, data_bytes) == true);
+		VOXEL_ASSERT(voxels.get_channel_as_bytes_read_only(channel, data_bytes) == true);
 		return data_bytes.reinterpret_cast_to<const T>();
 	}
 }
@@ -1135,7 +1135,7 @@ Span<const T> get_or_decompress_channel(const VoxelBuffer &voxels, StdVector<T> 
 //
 /*template <typename Sdf_T>
 Span<const Sdf_T> apply_zero_sdf_fix(Span<const Sdf_T> p_sdf_data) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	static thread_local StdVector<Sdf_T> s_sdf_backing_buffer;
 	StdVector<Sdf_T> &sdf_data = s_sdf_backing_buffer;
@@ -1176,7 +1176,7 @@ inline void build_regular_mesh_dispatch_sd(
 		const float edge_clamp_margin
 ) {
 	Span<const uint8_t> sdf_data_raw;
-	ZN_ASSERT(voxels.get_channel_as_bytes_read_only(sdf_channel, sdf_data_raw) == true);
+	VOXEL_ASSERT(voxels.get_channel_as_bytes_read_only(sdf_channel, sdf_data_raw) == true);
 
 	// We settle data types up-front so we can get rid of abstraction layers and conditionals,
 	// which would otherwise harm performance in tight iterations
@@ -1230,13 +1230,13 @@ inline void build_regular_mesh_dispatch_sd(
 			static bool s_once = false;
 			if (s_once == false) {
 				s_once = true;
-				ZN_PRINT_ERROR("Double-precision SDF channel is not supported");
+				VOXEL_PRINT_ERROR("Double-precision SDF channel is not supported");
 				// Not worth growing executable size for relatively pointless double-precision sdf
 			}
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Invalid channel");
+			VOXEL_PRINT_ERROR("Invalid channel");
 			break;
 	}
 }
@@ -1252,7 +1252,7 @@ DefaultTextureIndicesData build_regular_mesh(
 		const float edge_clamp_margin,
 		const bool textures_ignore_air_voxels
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// From this point, we expect the buffer to contain allocated data in the relevant channels.
 
 	const unsigned int voxels_count = Vector3iUtil::get_volume_u64(voxels.get_size());
@@ -1280,7 +1280,7 @@ DefaultTextureIndicesData build_regular_mesh(
 			materials::mixel4::TextureIndicesData voxel_material_indices;
 			materials::mixel4::WeightSamplerPackedU16 voxel_material_weights;
 			{
-				ZN_PROFILE_SCOPE_NAMED("Prepare material info");
+				VOXEL_PROFILE_SCOPE_NAMED("Prepare material info");
 
 				// From this point we know SDF is not uniform so it has an allocated buffer,
 				// but it might have uniform indices or weights so we need to ensure there is a backing buffer.
@@ -1293,7 +1293,7 @@ DefaultTextureIndicesData build_regular_mesh(
 						get_tls_weights_backing_buffer_u16(),
 						VoxelBuffer::CHANNEL_WEIGHTS
 				);
-				ZN_ASSERT_RETURN_V(voxel_material_weights.u16_data.size() == voxels_count, default_texture_indices);
+				VOXEL_ASSERT_RETURN_V(voxel_material_weights.u16_data.size() == voxels_count, default_texture_indices);
 			}
 			build_regular_mesh_dispatch_sd(
 					voxels,
@@ -1357,7 +1357,7 @@ DefaultTextureIndicesData build_regular_mesh(
 #endif
 
 		default:
-			ZN_PRINT_ERROR("Invalid material mode");
+			VOXEL_PRINT_ERROR("Invalid material mode");
 			break;
 	}
 
@@ -1376,7 +1376,7 @@ inline void build_transition_mesh_dispatch_sd(
 		const float edge_clamp_margin
 ) {
 	Span<const uint8_t> sdf_data_raw;
-	ZN_ASSERT(voxels.get_channel_as_bytes_read_only(sdf_channel, sdf_data_raw) == true);
+	VOXEL_ASSERT(voxels.get_channel_as_bytes_read_only(sdf_channel, sdf_data_raw) == true);
 
 	switch (voxels.get_channel_depth(sdf_channel)) {
 		case VoxelBuffer::DEPTH_8_BIT: {
@@ -1422,12 +1422,12 @@ inline void build_transition_mesh_dispatch_sd(
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT:
-			ZN_PRINT_ERROR("Double-precision SDF channel is not supported");
+			VOXEL_PRINT_ERROR("Double-precision SDF channel is not supported");
 			// Not worth growing executable size for relatively pointless double-precision sdf
 			break;
 
 		default:
-			ZN_PRINT_ERROR("Invalid channel");
+			VOXEL_PRINT_ERROR("Invalid channel");
 			break;
 	}
 }
@@ -1444,7 +1444,7 @@ void build_transition_mesh(
 		const float edge_clamp_margin,
 		const bool textures_ignore_air_voxels
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// From this point, we expect the buffer to contain allocated data in the relevant channels.
 
 	const unsigned int voxels_count = Vector3iUtil::get_volume_u64(voxels.get_size());
@@ -1484,7 +1484,7 @@ void build_transition_mesh(
 					get_tls_weights_backing_buffer_u16(),
 					VoxelBuffer::CHANNEL_WEIGHTS
 			);
-			ZN_ASSERT_RETURN(weights_data.u16_data.size() == voxels_count);
+			VOXEL_ASSERT_RETURN(weights_data.u16_data.size() == voxels_count);
 
 			build_transition_mesh_dispatch_sd(
 					voxels,
@@ -1547,9 +1547,9 @@ void build_transition_mesh(
 #endif
 
 		default:
-			ZN_PRINT_ERROR("Invalid material mode");
+			VOXEL_PRINT_ERROR("Invalid material mode");
 			break;
 	}
 }
 
-} // namespace zylann::voxel::transvoxel
+} // namespace voxel::transvoxel

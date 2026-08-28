@@ -9,7 +9,7 @@
 #include "../util/profiling.h"
 #include "funcs.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
@@ -22,7 +22,7 @@
 #include "../util/string/format.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelTool::VoxelTool() {}
 
@@ -127,7 +127,7 @@ float VoxelTool::get_voxel_f_interpolated(const Vector3 pos) const {
 void VoxelTool::set_voxel(Vector3i pos, uint64_t v) {
 	Box3i box(pos, Vector3i(1, 1, 1));
 	if (!is_area_editable(box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 	_set_voxel(pos, v);
@@ -137,7 +137,7 @@ void VoxelTool::set_voxel(Vector3i pos, uint64_t v) {
 void VoxelTool::set_voxel_f(Vector3i pos, float v) {
 	Box3i box(pos, Vector3i(1, 1, 1));
 	if (!is_area_editable(box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 	_set_voxel_f(pos, v);
@@ -181,7 +181,7 @@ void VoxelTool::_set_voxel_f(Vector3i pos, float v) {
 // definition in all specialized classes.
 
 void VoxelTool::do_sphere(Vector3 p_center, float radius) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// Default, suboptimal implementation
 
 	const Box3i box(
@@ -190,14 +190,14 @@ void VoxelTool::do_sphere(Vector3 p_center, float radius) {
 	);
 
 	if (_allow_out_of_bounds == false && !is_area_editable(box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
 	if (_channel == VoxelBuffer::CHANNEL_SDF) {
 		const Vector3f center = to_vec3f(p_center);
 		box.for_each_cell([this, center, radius](Vector3i pos) {
-			float d = _sdf_scale * zylann::math::sdf_sphere(to_vec3f(pos), center, radius);
+			float d = _sdf_scale * voxel::math::sdf_sphere(to_vec3f(pos), center, radius);
 			_set_voxel_f(pos, ops::sdf_blend(d, get_voxel_f(pos), static_cast<ops::Mode>(_mode)));
 		});
 
@@ -217,17 +217,17 @@ void VoxelTool::do_sphere(Vector3 p_center, float radius) {
 
 // Erases matter in every voxel where the provided buffer has matter.
 void VoxelTool::sdf_stamp_erase(Ref<godot::VoxelBuffer> stamp, Vector3i pos) {
-	ZN_ASSERT_RETURN(stamp.is_valid());
+	VOXEL_ASSERT_RETURN(stamp.is_valid());
 	sdf_stamp_erase(stamp->get_buffer(), pos);
 }
 
 void VoxelTool::sdf_stamp_erase(const VoxelBuffer &stamp, Vector3i pos) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_MSG(get_channel() != VoxelBuffer::CHANNEL_SDF, "This function only works when channel is set to SDF");
 
 	const Box3i box(pos, stamp.get_size());
 	if (!is_area_editable(box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -245,14 +245,14 @@ void VoxelTool::sdf_stamp_erase(const VoxelBuffer &stamp, Vector3i pos) {
 }
 
 void VoxelTool::do_box(Vector3i begin, Vector3i end) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// Default, suboptimal implementation
 
 	Vector3iUtil::sort_min_max(begin, end);
 	const Box3i box = Box3i::from_min_max(begin, end + Vector3i(1, 1, 1));
 
 	if (_allow_out_of_bounds == false && !is_area_editable(box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -292,7 +292,7 @@ void VoxelTool::copy(Vector3i pos, Ref<godot::VoxelBuffer> dst, uint8_t channel_
 	ERR_FAIL_COND(dst.is_null());
 #ifdef TOOLS_ENABLED
 	if (Vector3iUtil::is_empty_size(dst->get_size())) {
-		ZN_PRINT_WARNING("The passed buffer has an empty size, nothing will be copied.");
+		VOXEL_PRINT_WARNING("The passed buffer has an empty size, nothing will be copied.");
 	}
 #endif
 	copy(pos, dst->get_buffer(), channel_mask, with_metadata);
@@ -306,7 +306,7 @@ void VoxelTool::paste(Vector3i p_pos, const VoxelBuffer &src, uint8_t channels_m
 void VoxelTool::paste(Vector3i p_pos, Ref<godot::VoxelBuffer> p_voxels, uint8_t channels_mask) {
 	ERR_FAIL_COND(p_voxels.is_null());
 	if (Vector3iUtil::is_empty_size(p_voxels->get_size())) {
-		ZN_PRINT_WARNING("The passed buffer has an empty size, nothing will be pasted.");
+		VOXEL_PRINT_WARNING("The passed buffer has an empty size, nothing will be pasted.");
 	}
 	paste(p_pos, p_voxels->get_buffer(), channels_mask);
 }
@@ -332,14 +332,14 @@ void VoxelTool::paste_masked_writable_list(
 		uint8_t dst_mask_channel,
 		PackedInt32Array dst_writable_list
 ) {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in derived classes
 }
 
 void VoxelTool::smooth_sphere(Vector3 sphere_center, float sphere_radius, int blur_radius) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(blur_radius >= 1 && blur_radius <= 64);
-	ZN_ASSERT_RETURN(sphere_radius >= 0.01f);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(blur_radius >= 1 && blur_radius <= 64);
+	VOXEL_ASSERT_RETURN(sphere_radius >= 0.01f);
 
 	const Box3i voxel_box = Box3i::from_min_max(
 			math::floor_to_int(sphere_center - Vector3(sphere_radius, sphere_radius, sphere_radius)),
@@ -349,7 +349,7 @@ void VoxelTool::smooth_sphere(Vector3 sphere_center, float sphere_radius, int bl
 	const Box3i padded_voxel_box = voxel_box.padded(blur_radius);
 
 	if (_allow_out_of_bounds == false && !is_area_editable(padded_voxel_box)) {
-		ZN_PRINT_VERBOSE("Area not editable");
+		VOXEL_PRINT_VERBOSE("Area not editable");
 		return;
 	}
 
@@ -375,9 +375,9 @@ void VoxelTool::smooth_sphere(Vector3 sphere_center, float sphere_radius, int bl
 
 void VoxelTool::grow_sphere(Vector3 sphere_center, float sphere_radius, float strength) {
 	// TODO: In the future, it may be preferable to use additional "GROW"/"SHRINK" voxel tool modes instead.
-	// see: https://github.com/Zylann/godot_voxel/pull/594
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(sphere_radius >= 0.01f);
+	// see: https://github.com/Voxel/godot_voxel/pull/594
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(sphere_radius >= 0.01f);
 
 	const Box3i voxel_box = Box3i::from_min_max(
 			math::floor_to_int(sphere_center - Vector3(sphere_radius, sphere_radius, sphere_radius)),
@@ -385,7 +385,7 @@ void VoxelTool::grow_sphere(Vector3 sphere_center, float sphere_radius, float st
 	);
 
 	if (_allow_out_of_bounds == false && !is_area_editable(voxel_box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -438,9 +438,9 @@ void VoxelTool::do_path_chunked(
 		Span<const float> radii,
 		const bool with_pre_generate
 ) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(positions.size() >= 2);
-	ZN_ASSERT_RETURN(positions.size() == radii.size());
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(positions.size() >= 2);
+	VOXEL_ASSERT_RETURN(positions.size() == radii.size());
 
 	// TODO Increase margin a bit with smooth voxels?
 	const int margin = 1;
@@ -453,7 +453,7 @@ void VoxelTool::do_path_chunked(
 	);
 
 	if (!is_area_editable(total_voxel_box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -530,15 +530,15 @@ void VoxelTool::do_mesh_chunked(
 		const float isolevel,
 		const bool with_pre_generate
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT_RETURN(mesh_sdf.is_baked());
+	VOXEL_ASSERT_RETURN(mesh_sdf.is_baked());
 	Ref<godot::VoxelBuffer> buffer_ref = mesh_sdf.get_voxel_buffer();
-	ZN_ASSERT_RETURN(buffer_ref.is_valid());
+	VOXEL_ASSERT_RETURN(buffer_ref.is_valid());
 	const VoxelBuffer &buffer = buffer_ref->get_buffer();
 	const VoxelBuffer::ChannelId buffer_channel = VoxelBuffer::CHANNEL_SDF;
-	ZN_ASSERT_RETURN(buffer.get_channel_compression(buffer_channel) != VoxelBuffer::COMPRESSION_UNIFORM);
-	ZN_ASSERT_RETURN(buffer.get_channel_depth(buffer_channel) == VoxelBuffer::DEPTH_32_BIT);
+	VOXEL_ASSERT_RETURN(buffer.get_channel_compression(buffer_channel) != VoxelBuffer::COMPRESSION_UNIFORM);
+	VOXEL_ASSERT_RETURN(buffer.get_channel_depth(buffer_channel) == VoxelBuffer::DEPTH_32_BIT);
 
 	const Transform3D &box_to_world = transform;
 	const AABB local_aabb = mesh_sdf.get_aabb();
@@ -552,7 +552,7 @@ void VoxelTool::do_mesh_chunked(
 	// This could be avoided with a box/transformed-box intersection algorithm. Might investigate if the use case
 	// occurs. It won't happen with full load mode. This also affects other shapes.
 	if (!is_area_editable(voxel_box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -579,7 +579,7 @@ void VoxelTool::do_mesh_chunked(
 	op.shape.sdf_scale = get_sdf_scale() * size_scale;
 	// Note, the passed buffer must not be shared with another thread.
 	// buffer.decompress_channel(channel);
-	ZN_ASSERT_RETURN(buffer.get_channel_data_read_only(buffer_channel, op.shape.buffer));
+	VOXEL_ASSERT_RETURN(buffer.get_channel_data_read_only(buffer_channel, op.shape.buffer));
 	op.mode = static_cast<ops::Mode>(get_mode());
 	op.texture_params = _texture_params;
 	op.blocky_value = _value;
@@ -640,7 +640,7 @@ void VoxelTool::_b_do_path(PackedVector3Array positions, PackedFloat32Array radi
 
 #ifdef VOXEL_ENABLE_MESH_SDF
 void VoxelTool::_b_do_mesh(Ref<VoxelMeshSDF> mesh_sdf, Transform3D transform, float isolevel) {
-	ZN_ASSERT_RETURN(mesh_sdf.is_valid());
+	VOXEL_ASSERT_RETURN(mesh_sdf.is_valid());
 	do_mesh(**mesh_sdf, transform, isolevel);
 }
 #endif
@@ -677,9 +677,9 @@ bool VoxelTool::_b_is_area_editable(AABB box) const {
 	const Box3i ibox = Box3i::from_min_max(minp, maxp);
 #ifdef DEBUG_ENABLED
 	if (Vector3iUtil::is_empty_size(ibox.size)) {
-		ZN_PRINT_WARNING_ONCE(format("Box passed to `is_area_editable` is null-sized: {} => {}", box, ibox));
+		VOXEL_PRINT_WARNING_ONCE(format("Box passed to `is_area_editable` is null-sized: {} => {}", box, ibox));
 	}
-	ZN_ASSERT_RETURN_V(Vector3iUtil::is_valid_size(ibox.size), false);
+	VOXEL_ASSERT_RETURN_V(Vector3iUtil::is_valid_size(ibox.size), false);
 #endif
 	return is_area_editable(ibox);
 }
@@ -856,4 +856,4 @@ void VoxelTool::_bind_methods() {
 	BIND_ENUM_CONSTANT(MODE_TEXTURE_PAINT);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

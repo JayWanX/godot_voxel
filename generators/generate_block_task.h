@@ -11,7 +11,7 @@
 #include "generate_block_gpu_task.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
 class AsyncDependencyTracker;
 
@@ -46,7 +46,7 @@ public:
 
 private:
 #ifdef VOXEL_ENABLE_GPU
-	void run_gpu_task(zylann::ThreadedTaskContext &ctx);
+	void run_gpu_task(voxel::ThreadedTaskContext &ctx);
 	void run_gpu_conversion();
 #endif
 	void run_cpu_generation();
@@ -80,6 +80,6 @@ private:
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // GENERATE_BLOCK_TASK_H

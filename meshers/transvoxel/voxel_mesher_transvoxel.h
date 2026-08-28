@@ -5,10 +5,10 @@
 #include "../voxel_mesher.h"
 #include "transvoxel.h"
 
-ZN_GODOT_FORWARD_DECLARE(class ArrayMesh);
-ZN_GODOT_FORWARD_DECLARE(class ShaderMaterial);
+VOXEL_GODOT_FORWARD_DECLARE(class ArrayMesh);
+VOXEL_GODOT_FORWARD_DECLARE(class ShaderMaterial);
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace godot {
 class VoxelBuffer;
@@ -106,8 +106,8 @@ private:
 	bool _textures_ignore_air_voxels = false;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelMesherTransvoxel::TexturingMode);
+VARIANT_ENUM_CAST(voxel::VoxelMesherTransvoxel::TexturingMode);
 
 #endif // VOXEL_MESHER_TRANSVOXEL_H

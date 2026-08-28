@@ -1,9 +1,9 @@
-#ifndef ZN_GODOT_GRAPH_EDIT_CONNECTION_H
-#define ZN_GODOT_GRAPH_EDIT_CONNECTION_H
+#ifndef VOXEL_GODOT_GRAPH_EDIT_CONNECTION_H
+#define VOXEL_GODOT_GRAPH_EDIT_CONNECTION_H
 
 #include "../core/string_name.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 struct GraphEditConnection {
 	StringName from;
@@ -17,6 +17,6 @@ struct GraphEditConnection {
 	}
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_GRAPH_EDIT_CONNECTION_H
+#endif // VOXEL_GODOT_GRAPH_EDIT_CONNECTION_H

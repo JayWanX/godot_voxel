@@ -2,11 +2,11 @@
 #include "../../util/errors.h"
 #include "custom_voxel_metadata.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelMetadata::clear() {
 	if (_type >= TYPE_CUSTOM_BEGIN) {
-		ZN_DELETE(_data.custom_data);
+		VOXEL_DELETE(_data.custom_data);
 		_data.custom_data = nullptr;
 	}
 	_type = TYPE_EMPTY;
@@ -21,33 +21,33 @@ void VoxelMetadata::set_u64(const uint64_t &v) {
 }
 
 uint64_t VoxelMetadata::get_u64() const {
-	ZN_ASSERT(_type == TYPE_U64);
+	VOXEL_ASSERT(_type == TYPE_U64);
 	return _data.u64_data;
 }
 
 void VoxelMetadata::set_custom(uint8_t type, ICustomVoxelMetadata *custom_data) {
-	ZN_ASSERT(type >= TYPE_CUSTOM_BEGIN);
+	VOXEL_ASSERT(type >= TYPE_CUSTOM_BEGIN);
 	clear();
 	_type = type;
 	_data.custom_data = custom_data;
 }
 
 ICustomVoxelMetadata &VoxelMetadata::get_custom() {
-	ZN_ASSERT(_type >= TYPE_CUSTOM_BEGIN);
-	ZN_ASSERT(_data.custom_data != nullptr);
+	VOXEL_ASSERT(_type >= TYPE_CUSTOM_BEGIN);
+	VOXEL_ASSERT(_data.custom_data != nullptr);
 	return *_data.custom_data;
 }
 
 const ICustomVoxelMetadata &VoxelMetadata::get_custom() const {
-	ZN_ASSERT(_type >= TYPE_CUSTOM_BEGIN);
-	ZN_ASSERT(_data.custom_data != nullptr);
+	VOXEL_ASSERT(_type >= TYPE_CUSTOM_BEGIN);
+	VOXEL_ASSERT(_data.custom_data != nullptr);
 	return *_data.custom_data;
 }
 
 void VoxelMetadata::copy_from(const VoxelMetadata &src) {
 	clear();
 	if (src._type >= TYPE_CUSTOM_BEGIN) {
-		ZN_ASSERT(src._data.custom_data != nullptr);
+		VOXEL_ASSERT(src._data.custom_data != nullptr);
 		_data.custom_data = src._data.custom_data->duplicate();
 	} else {
 		_data = src._data;
@@ -66,14 +66,14 @@ bool VoxelMetadata::equals(const VoxelMetadata &other) const {
 			return _data.u64_data == other._data.u64_data;
 		default:
 			if (_type >= TYPE_CUSTOM_BEGIN) {
-				ZN_ASSERT(_data.custom_data != nullptr);
-				ZN_ASSERT(other._data.custom_data != nullptr);
+				VOXEL_ASSERT(_data.custom_data != nullptr);
+				VOXEL_ASSERT(other._data.custom_data != nullptr);
 				return _data.custom_data->equals(*other._data.custom_data);
 			} else {
-				ZN_PRINT_ERROR("Non-implemented comparison");
+				VOXEL_PRINT_ERROR("Non-implemented comparison");
 				return false;
 			}
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

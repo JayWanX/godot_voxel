@@ -2,9 +2,9 @@
 #include "../godot/classes/os.h"
 #include "../memory/memory.h"
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/os/thread.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include "godot_thread_helper.h"
 #include <godot_cpp/classes/thread.hpp>
 // using namespace godot;
@@ -12,20 +12,20 @@
 
 #include <thread>
 
-namespace zylann {
+namespace voxel {
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 struct ThreadImpl {
 	::Thread thread;
 };
 
 Thread::Thread() {
-	_impl = ZN_NEW(ThreadImpl);
+	_impl = VOXEL_NEW(ThreadImpl);
 }
 
 Thread::~Thread() {
-	ZN_DELETE(_impl);
+	VOXEL_DELETE(_impl);
 }
 
 void Thread::start(Callback p_callback, void *p_userdata, Priority priority) {
@@ -46,15 +46,15 @@ void Thread::set_name(const char *name) {
 	::Thread::set_name(String(name));
 }
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 
 struct ThreadImpl {
 	::godot::Ref<::godot::Thread> thread;
-	ZN_GodotThreadHelper *helper;
+	VOXEL_GodotThreadHelper *helper;
 
 	ThreadImpl() {
 		thread.instantiate();
-		helper = memnew(ZN_GodotThreadHelper);
+		helper = memnew(VOXEL_GodotThreadHelper);
 	}
 
 	~ThreadImpl() {
@@ -63,11 +63,11 @@ struct ThreadImpl {
 };
 
 Thread::Thread() {
-	_impl = ZN_NEW(ThreadImpl);
+	_impl = VOXEL_NEW(ThreadImpl);
 }
 
 Thread::~Thread() {
-	ZN_DELETE(_impl);
+	VOXEL_DELETE(_impl);
 }
 
 void Thread::start(Callback p_callback, void *p_userdata, Priority priority) {
@@ -113,4 +113,4 @@ Thread::ID Thread::get_caller_id() {
 	return caller_id;
 }
 
-} // namespace zylann
+} // namespace voxel

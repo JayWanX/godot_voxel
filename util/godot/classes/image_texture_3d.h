@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_IMAGE_TEXTURE_3D_H
-#define ZN_GODOT_IMAGE_TEXTURE_3D_H
+#ifndef VOXEL_GODOT_IMAGE_TEXTURE_3D_H
+#define VOXEL_GODOT_IMAGE_TEXTURE_3D_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/version.h>
 
 #if VERSION_MAJOR == 4 && VERSION_MINOR <= 1
@@ -10,14 +10,14 @@
 #include <scene/resources/image_texture.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/image_texture3d.hpp>
 using namespace godot;
 #endif
 
 #include "../core/typed_array.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 Ref<ImageTexture3D> create_image_texture_3d(
 		const Image::Format p_format,
@@ -28,6 +28,6 @@ Ref<ImageTexture3D> create_image_texture_3d(
 
 void update_image_texture_3d(ImageTexture3D &p_texture, const TypedArray<Image> p_data);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_IMAGE_TEXTURE_3D_H
+#endif // VOXEL_GODOT_IMAGE_TEXTURE_3D_H

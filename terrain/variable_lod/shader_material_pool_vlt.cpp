@@ -3,11 +3,11 @@
 #include "../../util/godot/classes/texture_2d.h"
 #include "../../util/profiling.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void ShaderMaterialPoolVLT::recycle(Ref<ShaderMaterial> material) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(material.is_valid());
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(material.is_valid());
 
 	const VoxelStringNames &sn = VoxelStringNames::get_singleton();
 
@@ -23,7 +23,7 @@ void ShaderMaterialPoolVLT::recycle(Ref<ShaderMaterial> material) {
 	material->set_shader_parameter(sn.u_transition_mask, 0);
 	material->set_shader_parameter(sn.u_lod_fade, Vector2(0.0, 0.0));
 
-	zylann::godot::ShaderMaterialPool::recycle(material);
+	voxel::godot::ShaderMaterialPool::recycle(material);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

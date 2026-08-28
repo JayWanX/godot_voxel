@@ -33,16 +33,16 @@
 #define MESHOPTIMIZER_EXPERIMENTAL MESHOPTIMIZER_API
 #endif
 
-#ifdef MESHOPTIMIZER_ZYLANN_WRAP_LIBRARY_IN_NAMESPACE
+#ifdef MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE
 
-#define MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN namespace zylannmeshopt {
-#define MESHOPTIMIZER_ZYLANN_NAMESPACE_END }
+#define MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN namespace voxelmeshopt {
+#define MESHOPTIMIZER_VOXEL_NAMESPACE_END }
 // No C interface here, this is exclusively for a C++ source integration
 
 #else
 
-#define MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
-#define MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+#define MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
+#define MESHOPTIMIZER_VOXEL_NAMESPACE_END
 
 /* C interface */
 #ifdef __cplusplus
@@ -52,7 +52,7 @@ extern "C"
 
 #endif // MESHOPTIMIZER_API
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 /**
  * Vertex attribute stream
@@ -839,11 +839,11 @@ MESHOPTIMIZER_API float meshopt_dequantizeHalf(unsigned short h);
  */
 MESHOPTIMIZER_API void meshopt_setAllocator(void* (MESHOPTIMIZER_ALLOC_CALLCONV* allocate)(size_t), void (MESHOPTIMIZER_ALLOC_CALLCONV* deallocate)(void*));
 
-#ifndef MESHOPTIMIZER_ZYLANN_WRAP_LIBRARY_IN_NAMESPACE
+#ifndef MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-#endif // MESHOPTIMIZER_ZYLANN_WRAP_LIBRARY_IN_NAMESPACE
+#endif // MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE
 
 /* Quantization into fixed point normalized formats; these are only available as inline C++ functions */
 #ifdef __cplusplus
@@ -1447,4 +1447,4 @@ inline void meshopt_spatialSortTriangles(T* destination, const T* indices, size_
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

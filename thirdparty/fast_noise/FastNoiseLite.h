@@ -47,13 +47,13 @@
 // VERSION: 1.1.1
 // https://github.com/Auburn/FastNoiseLite
 
-// <Zylann> Prefixed `ZN_` to avoid conflict with Godot's version
-#ifndef ZN_FASTNOISELITE_H
-#define ZN_FASTNOISELITE_H
+// <Voxel> Prefixed `VOXEL_` to avoid conflict with Godot's version
+#ifndef VOXEL_FASTNOISELITE_H
+#define VOXEL_FASTNOISELITE_H
 
 #include <cmath>
 
-// <Zylann> Added namespace to avoid conflict with Godot class
+// <Voxel> Added namespace to avoid conflict with Godot class
 namespace fast_noise_lite {
 
 class FastNoiseLite
@@ -249,7 +249,7 @@ public:
     /// Default: Distance
     /// </remarks>
     void SetCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) { mCellularDistanceFunction = cellularDistanceFunction; }
-    // <Zylann> Added
+    // <Voxel> Added
     CellularDistanceFunction GetCellularDistanceFunction() const { return mCellularDistanceFunction; }
 
     /// <summary>
@@ -259,7 +259,7 @@ public:
     /// Default: EuclideanSq
     /// </remarks>
     void SetCellularReturnType(CellularReturnType cellularReturnType) { mCellularReturnType = cellularReturnType; }
-    // <Zylann> Added
+    // <Voxel> Added
     CellularReturnType GetCellularReturnType() const { return mCellularReturnType; }
 
     /// <summary>
@@ -270,7 +270,7 @@ public:
     /// Note: Setting this higher than 1 will cause artifacts
     /// </remarks> 
     void SetCellularJitter(float cellularJitter) { mCellularJitterModifier = cellularJitter; }
-    // <Zylann> Added
+    // <Voxel> Added
     float GetCellularJitter() const { return mCellularJitterModifier; }
 
     /// <summary>
@@ -402,7 +402,7 @@ public:
         }
     }
 
-// <Zylann> Exposed everything. Need it for extensions without modifying the library too much
+// <Voxel> Exposed everything. Need it for extensions without modifying the library too much
 // private:
     template <typename T>
     struct Arguments_must_be_floating_point_values;
@@ -1487,7 +1487,7 @@ public:
     }
 
 
-// <Zylann> GCC raises warnings when integer overflows occur, which are needed for hashing here.
+// <Voxel> GCC raises warnings when integer overflows occur, which are needed for hashing here.
 // Same fix as in Godot e41e2a110373a251cd0664f077ada6f344e5c8fd
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
@@ -1780,7 +1780,7 @@ public:
         }
     }
 
-// <Zylann>
+// <Voxel>
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif

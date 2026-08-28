@@ -18,7 +18,7 @@
 
 #include <memory>
 
-namespace zylann {
+namespace voxel {
 
 class IThreadedTask;
 class AsyncDependencyTracker;
@@ -213,6 +213,6 @@ protected:
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_H

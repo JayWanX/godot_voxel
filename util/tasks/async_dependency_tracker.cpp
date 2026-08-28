@@ -2,7 +2,7 @@
 #include "../memory/memory.h"
 #include "threaded_task_runner.h"
 
-namespace zylann {
+namespace voxel {
 
 AsyncDependencyTracker::AsyncDependencyTracker() :
 		_count(0), _aborted(false), _tasks_have_started(false), _count_was_set(false) {}
@@ -18,7 +18,7 @@ AsyncDependencyTracker::AsyncDependencyTracker(
 		_count_was_set(true),
 		_next_tasks_schedule_callback(scheduler_cb) {
 	//
-	ZN_ASSERT(scheduler_cb != nullptr);
+	VOXEL_ASSERT(scheduler_cb != nullptr);
 
 	_next_tasks.resize(next_tasks.size());
 
@@ -27,7 +27,7 @@ AsyncDependencyTracker::AsyncDependencyTracker(
 #ifdef DEBUG_ENABLED
 		for (unsigned int j = i + 1; j < next_tasks.size(); ++j) {
 			// Cannot add twice the same task
-			ZN_ASSERT(next_tasks[j] != task);
+			VOXEL_ASSERT(next_tasks[j] != task);
 		}
 #endif
 		_next_tasks[i] = task;
@@ -40,13 +40,13 @@ AsyncDependencyTracker::~AsyncDependencyTracker() {
 	for (auto it = _next_tasks.begin(); it != _next_tasks.end(); ++it) {
 		IThreadedTask *task = *it;
 		// TODO Might want to allow customizing that, maybe calling a `->dispose()` function instead?
-		ZN_DELETE(task);
+		VOXEL_DELETE(task);
 	}
 }
 
 void AsyncDependencyTracker::set_count(int count) {
-	ZN_ASSERT_MSG(_count_was_set == false, "Count must not be set twice");
-	ZN_ASSERT_MSG(_tasks_have_started == false, "Count must not be set after scheduling tasks");
+	VOXEL_ASSERT_MSG(_count_was_set == false, "Count must not be set twice");
+	VOXEL_ASSERT_MSG(_tasks_have_started == false, "Count must not be set after scheduling tasks");
 	_count = count;
 	_count_was_set = true;
 }
@@ -54,11 +54,11 @@ void AsyncDependencyTracker::set_count(int count) {
 void AsyncDependencyTracker::post_complete() {
 	_tasks_have_started = true;
 	// Note, this class only allows decrementing this counter down to zero
-	ZN_ASSERT_RETURN_MSG(_count > 0, "post_complete() called more times than expected");
-	ZN_ASSERT_RETURN_MSG(_aborted == false, "post_complete() called after abortion");
+	VOXEL_ASSERT_RETURN_MSG(_count > 0, "post_complete() called more times than expected");
+	VOXEL_ASSERT_RETURN_MSG(_aborted == false, "post_complete() called after abortion");
 	--_count;
 	if (_count == 0 && _next_tasks.size() > 0) {
-		ZN_ASSERT_RETURN(_next_tasks_schedule_callback != nullptr);
+		VOXEL_ASSERT_RETURN(_next_tasks_schedule_callback != nullptr);
 		_next_tasks_schedule_callback(to_span(_next_tasks));
 		// Clearing tasks because once they are scheduled we no longer have ownership on them.
 		_next_tasks.clear();
@@ -69,4 +69,4 @@ void AsyncDependencyTracker::post_complete() {
 	// Putting next tasks in the tracker instead has a clear unique ownership.
 }
 
-} // namespace zylann
+} // namespace voxel

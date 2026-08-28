@@ -1,10 +1,10 @@
-#ifndef ZN_HASH_FUNCS_H
-#define ZN_HASH_FUNCS_H
+#ifndef VOXEL_HASH_FUNCS_H
+#define VOXEL_HASH_FUNCS_H
 
 #include "math/funcs.h"
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 // Copied from Godot core.
 // TODO GodotCpp now has these functions too, include instead? Or keep using our own custom set?
@@ -43,6 +43,6 @@ inline uint32_t hash_fmix32(uint32_t h) {
 	return h;
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_HASH_FUNCS_H
+#endif // VOXEL_HASH_FUNCS_H

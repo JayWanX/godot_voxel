@@ -1,5 +1,5 @@
-#ifndef ZN_STD_STRING_H
-#define ZN_STD_STRING_H
+#ifndef VOXEL_STD_STRING_H
+#define VOXEL_STD_STRING_H
 
 #include "../memory/std_allocator.h"
 #include <string>
@@ -8,7 +8,7 @@
 #include <string_view>
 #endif
 
-namespace zylann {
+namespace voxel {
 
 using StdString = std::basic_string<char, std::char_traits<char>, StdDefaultAllocator<char>>;
 
@@ -27,7 +27,7 @@ class TextWriter;
 TextWriter &operator<<(TextWriter &w, const StdString &s);
 TextWriter &operator<<(TextWriter &w, const std::string_view s);
 
-} // namespace zylann
+} // namespace voxel
 
 #ifdef __GNUC__
 
@@ -37,8 +37,8 @@ TextWriter &operator<<(TextWriter &w, const std::string_view s);
 // alias seems to workaround it.
 namespace std {
 template <>
-struct hash<zylann::StdString> {
-	size_t operator()(const zylann::StdString &v) const {
+struct hash<voxel::StdString> {
+	size_t operator()(const voxel::StdString &v) const {
 		const std::string_view s(v);
 		std::hash<std::string_view> hasher;
 		return hasher(s);
@@ -48,4 +48,4 @@ struct hash<zylann::StdString> {
 
 #endif
 
-#endif // ZN_STD_STRING_H
+#endif // VOXEL_STD_STRING_H

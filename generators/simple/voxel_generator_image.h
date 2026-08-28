@@ -5,9 +5,9 @@
 #include "../../util/thread/rw_lock.h"
 #include "voxel_generator_heightmap.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Image)
+VOXEL_GODOT_FORWARD_DECLARE(class Image)
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Provides infinite tiling heightmap based on an image
 class VoxelGeneratorImage : public VoxelGeneratorHeightmap {
@@ -45,6 +45,6 @@ private:
 	RWLock _parameters_lock;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // HEADER_VOXEL_GENERATOR_IMAGE

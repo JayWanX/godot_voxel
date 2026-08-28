@@ -7,7 +7,7 @@
 #include "../../util/godot/classes/image.h"
 #include "../../util/godot/classes/image_texture.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGeneratorMultipassCacheViewer : public Control {
 	GDCLASS(VoxelGeneratorMultipassCacheViewer, Control)
@@ -32,6 +32,6 @@ private:
 	uint64_t _next_update_time = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_MULTIPASS_CACHE_VIEWER_H

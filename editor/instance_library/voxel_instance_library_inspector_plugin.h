@@ -4,23 +4,23 @@
 #include "../../util/godot/classes/editor_inspector_plugin.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Control)
+VOXEL_GODOT_FORWARD_DECLARE(class Control)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstanceLibraryEditorPlugin;
 
-class VoxelInstanceLibraryInspectorPlugin : public zylann::godot::ZN_EditorInspectorPlugin {
-	GDCLASS(VoxelInstanceLibraryInspectorPlugin, zylann::godot::ZN_EditorInspectorPlugin)
+class VoxelInstanceLibraryInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
+	GDCLASS(VoxelInstanceLibraryInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
 public:
 	Control *icon_provider = nullptr;
 	VoxelInstanceLibraryEditorPlugin *plugin = nullptr;
 
 protected:
-	bool _zn_can_handle(const Object *p_object) const override;
-	void _zn_parse_begin(Object *p_object) override;
+	bool _voxel_can_handle(const Object *p_object) const override;
+	void _voxel_parse_begin(Object *p_object) override;
 
-	bool _zn_parse_property(
+	bool _voxel_parse_property(
 			Object *p_object,
 			const Variant::Type p_type,
 			const String &p_path,
@@ -35,6 +35,6 @@ private:
 	static void _bind_methods() {}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_LIBRARY_INSPECTOR_PLUGIN_H

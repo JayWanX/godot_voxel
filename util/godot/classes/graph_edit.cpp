@@ -1,9 +1,9 @@
 #include "graph_edit.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void get_graph_edit_connections(const GraphEdit &self, StdVector<GraphEditConnection> &out_connections) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 2
 	List<GraphEdit::Connection> connections_list;
@@ -45,7 +45,7 @@ void get_graph_edit_connections(const GraphEdit &self, StdVector<GraphEditConnec
 	}
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Array list = self.get_connection_list();
 	const int count = list.size();
 
@@ -106,7 +106,7 @@ GraphEditConnection get_graph_edit_closest_connection_at_point(
 
 #else
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	Ref<GraphEdit::Connection> gd_connection = self.get_closest_connection_at_point(point, max_distance);
 	if (gd_connection.is_null()) {
 		return GraphEditConnection();
@@ -118,7 +118,7 @@ GraphEditConnection get_graph_edit_closest_connection_at_point(
 	connection.to_port = gd_connection->to_port;
 	return connection;
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	const Dictionary gd_connection = self.get_closest_connection_at_point(point, max_distance);
 	if (gd_connection.is_empty()) {
 		return GraphEditConnection();
@@ -135,4 +135,4 @@ GraphEditConnection get_graph_edit_closest_connection_at_point(
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

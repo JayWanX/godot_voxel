@@ -1,11 +1,11 @@
-#ifndef ZN_GODOT_DEBUG_RENDERER_H
-#define ZN_GODOT_DEBUG_RENDERER_H
+#ifndef VOXEL_GODOT_DEBUG_RENDERER_H
+#define VOXEL_GODOT_DEBUG_RENDERER_H
 
 #include "../containers/std_vector.h"
 #include "classes/standard_material_3d.h"
 #include "direct_multimesh_instance.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Helper to draw 3D primitives every frame for debugging purposes
 class DebugRenderer {
@@ -44,6 +44,6 @@ private:
 	Ref<StandardMaterial3D> _material;
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_DEBUG_RENDERER_H
+#endif // VOXEL_GODOT_DEBUG_RENDERER_H

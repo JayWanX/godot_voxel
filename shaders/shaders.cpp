@@ -1,6 +1,6 @@
 #include "shaders.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 #include "block_generator_shader_template.h"
 #include "block_modifier_shader_template.h"
@@ -13,4 +13,4 @@ namespace zylann::voxel {
 #include "modifier_mesh_shader_snippet.h"
 #include "modifier_sphere_shader_snippet.h"
 
-} // namespace zylann::voxel
+} // namespace voxel

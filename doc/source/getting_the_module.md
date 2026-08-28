@@ -18,7 +18,7 @@ The following section applies if you use the Module edition of Voxel Tools.
 
 #### Release builds
 
-Builds are provided at [https://github.com/Zylann/godot_voxel/releases](https://github.com/Zylann/godot_voxel/releases).
+Builds are provided at [https://github.com/Voxel/godot_voxel/releases](https://github.com/Voxel/godot_voxel/releases).
 Module builds are usually prefixed as `Godot 4.x.x + Voxel Tools 1.x.x`.
 
 The project follows a continuous development cycle, so "releases" are merely snapshots of development versions. Because Github requires an account to download latest development versions from Github Actions, releases are published for convenience.
@@ -34,9 +34,9 @@ Development builds contain the very latest features and bug fixes (although they
 
 Pick your platform:
 
-- [Windows builds](https://github.com/Zylann/godot_voxel/actions/workflows/windows.yml)
-- [Linux builds](https://github.com/Zylann/godot_voxel/actions/workflows/linux.yml)
-- [MacOS builds](https://github.com/Zylann/godot_voxel/actions/workflows/macos.yml)
+- [Windows builds](https://github.com/Voxel/godot_voxel/actions/workflows/windows.yml)
+- [Linux builds](https://github.com/Voxel/godot_voxel/actions/workflows/linux.yml)
+- [MacOS builds](https://github.com/Voxel/godot_voxel/actions/workflows/macos.yml)
 
 Then click on the latest successful build, with a green checkmark:
 
@@ -48,12 +48,12 @@ Then scroll to the bottom, you should see download links:
 
 In case there are multiple downloadable artifacts, the editor build will be the one with `editor` in the name.
 
-These builds correspond to the `master` version depicted in the [changelog](https://github.com/Zylann/godot_voxel/blob/master/CHANGELOG.md).
+These builds correspond to the `master` version depicted in the [changelog](https://github.com/Voxel/godot_voxel/blob/master/CHANGELOG.md).
 They are built using Godot's latest stable version branch (for example, `4.2` at time of writing), instead of `master`, unless indicated otherwise.
 A new build is made each time commits are pushed to the main branch, but also when other developers make Pull Requests, so careful about which one you pick.
 
 !!! note
-	Mono builds (C# support) [are also done](https://github.com/Zylann/godot_voxel/actions/workflows/mono.yml), however they no longer work out of the box. For more information, see [C# support](#c-suppport).
+	Mono builds (C# support) [are also done](https://github.com/Voxel/godot_voxel/actions/workflows/mono.yml), however they no longer work out of the box. For more information, see [C# support](#c-suppport).
 
 
 ### Building yourself
@@ -105,12 +105,12 @@ Voxel Tools can also compile as a GDExtension, although it is a recent addition,
 Module and GDExtension editions aim to be compatible. However, there are a few important differences (list non exhaustive):
 
 - `FastNoise2` is not included
-- There are some technical drawbacks, some of which [are listed here](https://github.com/Zylann/godot_voxel/issues/442)
+- There are some technical drawbacks, some of which [are listed here](https://github.com/Voxel/godot_voxel/issues/442)
 
 
 ### Release builds
 
-Plugin packages can be found in Releases: [https://github.com/Zylann/godot_voxel/releases](https://github.com/Zylann/godot_voxel/releases).
+Plugin packages can be found in Releases: [https://github.com/Voxel/godot_voxel/releases](https://github.com/Voxel/godot_voxel/releases).
 They usually contain the word `GDExtension` in the title.
 
 The project follows a continuous development cycle, so "releases" are merely snapshots of development versions. Because Github requires an account to download latest development versions from Github Actions, releases are published for convenience.
@@ -118,7 +118,7 @@ The project follows a continuous development cycle, so "releases" are merely sna
 
 ### Development builds
 
-There are development builds of the GDExtension available on [Github Actions](https://github.com/Zylann/godot_voxel/actions/workflows/extension_ci.yml) as we try to keep the module compiling with GodotCpp, however they lack testing and might crash. Use at your own risk.
+There are development builds of the GDExtension available on [Github Actions](https://github.com/Voxel/godot_voxel/actions/workflows/extension_ci.yml) as we try to keep the module compiling with GodotCpp, however they lack testing and might crash. Use at your own risk.
 
 
 ### Building yourself
@@ -131,7 +131,7 @@ See [Development](development.md#gdextension)
 
 Exporting your game with Godot's regular templates should work out of the box.
 
-You can check which platforms are provided by the extension in the config file at `addons/zylann.voxel/voxel.gdextension`:
+You can check which platforms are provided by the extension in the config file at `addons/voxel/voxel.gdextension`:
 
 - Windows x86_64
 - Linux x86_64
@@ -148,7 +148,7 @@ If what you need is not in this list, you may try [Building yourself](developmen
 
 Currently, editor icons have to be registered in the GDExtension config file and cannot be excluded with a `.gdignore` file. That means when you export your game, those icons will be needlessly included in your game.
 
-You can exclude the contents of the `addons/zylann.voxel/editor` folder in your export configurations.
+You can exclude the contents of the `addons/voxel/editor` folder in your export configurations.
 
 
 Switching between Module and GDExtension
@@ -156,7 +156,7 @@ Switching between Module and GDExtension
 
 If you start using GDExtension in a project that was using the Module edition, you should use an official version of Godot Engine, or one that does not include the module, otherwise classes will conflict.
 
-If you want to switch back to using the Module edition, you can remove all files related to GDExtension in `addons/zylann.voxel/` and then start the editor. Alternatively, you can also change the file extension of `addons/zylann.voxel/voxel.gdextension` so that Godot no longer detects it.
+If you want to switch back to using the Module edition, you can remove all files related to GDExtension in `addons/voxel/` and then start the editor. Alternatively, you can also change the file extension of `addons/voxel/voxel.gdextension` so that Godot no longer detects it.
 
 
 C# support

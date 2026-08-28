@@ -4,7 +4,7 @@
 #include "../memory/memory.h"
 #include "../profiling.h"
 
-namespace zylann {
+namespace voxel {
 
 TimeSpreadTaskRunner::~TimeSpreadTaskRunner() {
 	flush();
@@ -25,12 +25,12 @@ void TimeSpreadTaskRunner::push(Span<ITimeSpreadTask *> tasks, Priority priority
 }
 
 void TimeSpreadTaskRunner::process(uint64_t time_budget_usec) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const Time &time = *Time::get_singleton();
 
 	static thread_local FixedArray<StdVector<ITimeSpreadTask *>, PRIORITY_COUNT> tls_postponed_tasks;
 	for (unsigned int i = 0; i < tls_postponed_tasks.size(); ++i) {
-		ZN_ASSERT(tls_postponed_tasks[i].size() == 0);
+		VOXEL_ASSERT(tls_postponed_tasks[i].size() == 0);
 	}
 
 	const uint64_t time_before = time.get_ticks_usec();
@@ -62,7 +62,7 @@ void TimeSpreadTaskRunner::process(uint64_t time_budget_usec) {
 			tls_postponed_tasks[queue_index].push_back(task);
 		} else {
 			// TODO Call recycling function instead?
-			ZN_DELETE(task);
+			VOXEL_DELETE(task);
 		}
 
 	} while (time.get_ticks_usec() - time_before < time_budget_usec);
@@ -96,4 +96,4 @@ unsigned int TimeSpreadTaskRunner::get_pending_count() const {
 	return count;
 }
 
-} // namespace zylann
+} // namespace voxel

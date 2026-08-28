@@ -3,7 +3,7 @@
 #include "../../util/island_finder.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_island_finder() {
 	const char *cdata = "X X X - X "
@@ -39,7 +39,7 @@ void test_island_finder() {
 			;
 
 	const Vector3i grid_size(5, 5, 5);
-	ZN_TEST_ASSERT(Vector3iUtil::get_volume_u64(grid_size) == (strlen(cdata) / 2));
+	VOXEL_TEST_ASSERT(Vector3iUtil::get_volume_u64(grid_size) == (strlen(cdata) / 2));
 
 	StdVector<int> grid;
 	grid.resize(Vector3iUtil::get_volume_u64(grid_size));
@@ -83,7 +83,7 @@ void test_island_finder() {
 	// 	print_line("//");
 	// }
 
-	ZN_TEST_ASSERT(label_count == 3);
+	VOXEL_TEST_ASSERT(label_count == 3);
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

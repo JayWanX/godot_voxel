@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_EDITOR_INSPECTOR_PLUGIN_H
-#define ZN_GODOT_EDITOR_INSPECTOR_PLUGIN_H
+#ifndef VOXEL_GODOT_EDITOR_INSPECTOR_PLUGIN_H
+#define VOXEL_GODOT_EDITOR_INSPECTOR_PLUGIN_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 #include "../core/version.h"
 
@@ -11,17 +11,17 @@
 #include <editor/inspector/editor_inspector.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/editor_inspector_plugin.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
-class ZN_EditorInspectorPlugin : public EditorInspectorPlugin {
-	GDCLASS(ZN_EditorInspectorPlugin, EditorInspectorPlugin)
+class VOXEL_EditorInspectorPlugin : public EditorInspectorPlugin {
+	GDCLASS(VOXEL_EditorInspectorPlugin, EditorInspectorPlugin)
 public:
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	bool can_handle(Object *p_object) override;
 	void parse_begin(Object *p_object) override;
 	void parse_end(Object *p_object) override;
@@ -35,7 +35,7 @@ public:
 			const BitField<PropertyUsageFlags> p_usage,
 			const bool p_wide = false
 	) override;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	bool _can_handle(Object *p_object) const override;
 	void _parse_begin(Object *p_object) override;
 	void _parse_end(Object *p_object) override;
@@ -52,11 +52,11 @@ public:
 #endif
 
 protected:
-	virtual bool _zn_can_handle(const Object *p_object) const;
-	virtual void _zn_parse_begin(Object *p_object);
-	virtual void _zn_parse_end(Object *p_object);
-	virtual void _zn_parse_group(Object *p_object, const String &p_group);
-	virtual bool _zn_parse_property(
+	virtual bool _voxel_can_handle(const Object *p_object) const;
+	virtual void _voxel_parse_begin(Object *p_object);
+	virtual void _voxel_parse_end(Object *p_object);
+	virtual void _voxel_parse_group(Object *p_object, const String &p_group);
+	virtual bool _voxel_parse_property(
 			Object *p_object,
 			const Variant::Type p_type,
 			const String &p_path,
@@ -71,6 +71,6 @@ private:
 	static void _bind_methods() {}
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_EDITOR_INSPECTOR_PLUGIN_H
+#endif // VOXEL_GODOT_EDITOR_INSPECTOR_PLUGIN_H

@@ -7,7 +7,7 @@
 #include "../voxel_blocky_model.h"
 #include "voxel_blocky_attribute.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // High-level representation of a "type" of voxel for use with `VoxelMesherBlocky` and `VoxelBlockyTypeLibrary`.
 // One type can represent multiple possible values in voxel data, corresponding to states of that type (such as
@@ -148,6 +148,6 @@ private:
 
 String to_string(const VoxelBlockyType::VariantKey &key);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TYPE_H

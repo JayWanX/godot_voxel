@@ -6,7 +6,7 @@
 #include "../../util/godot/classes/rendering_device.h"
 #include <array>
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct GPUStorageBuffer {
 	RID rid;
@@ -54,6 +54,6 @@ private:
 	RenderingDevice *_rendering_device = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GPU_STORAGE_BUFFER_H

@@ -1,5 +1,5 @@
-#ifndef ZN_STRING_FORMAT_H
-#define ZN_STRING_FORMAT_H
+#ifndef VOXEL_STRING_FORMAT_H
+#define VOXEL_STRING_FORMAT_H
 
 #ifdef DEV_ENABLED
 #include "../containers/span.h"
@@ -8,7 +8,7 @@
 #include "std_string.h"
 #include <string_view>
 
-namespace zylann {
+namespace voxel {
 namespace strfuncs_detail {
 
 // Not a big implementation, only what I need.
@@ -50,6 +50,6 @@ StdString format(std::string_view fmt, const TN &...an) {
 StdString to_hex_table(Span<const uint8_t> data);
 #endif
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_STRING_FORMAT_H
+#endif // VOXEL_STRING_FORMAT_H

@@ -4,16 +4,16 @@
 #include "voxel_instance_library_item.h"
 #include <algorithm>
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 #include "../../util/godot/core/array.h"
 #include "../../util/string/format.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelInstanceLibrary::~VoxelInstanceLibrary() {
 	for_each_item([this](int id, VoxelInstanceLibraryItem &item) { //
@@ -56,7 +56,7 @@ void VoxelInstanceLibrary::add_item(int p_id, Ref<VoxelInstanceLibraryItem> item
 }
 
 void VoxelInstanceLibrary::remove_item(int p_id) {
-	ZN_ASSERT_RETURN(p_id >= 0 && p_id < MAX_ID);
+	VOXEL_ASSERT_RETURN(p_id >= 0 && p_id < MAX_ID);
 	const unsigned int id = p_id;
 	auto it = _items.find(id);
 	ERR_FAIL_COND_MSG(it == _items.end(), "Cannot remove unregistered item");
@@ -187,7 +187,7 @@ void VoxelInstanceLibrary::get_packed_items_at_lod(StdVector<PackedItem> &out_it
 }
 
 void VoxelInstanceLibrary::update_packed_items() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Yet another candidate for a post-resource-loading callback.
 	// TODO Maybe we could solve this if items were stored in an exposed TypedArray<Item>? We'd do it in the setter?
@@ -222,7 +222,7 @@ void VoxelInstanceLibrary::update_packed_items() {
 void VoxelInstanceLibrary::get_configuration_warnings(PackedStringArray &warnings) const {
 	for (auto it = _items.begin(); it != _items.end(); ++it) {
 		Ref<VoxelInstanceLibraryItem> item = it->second;
-		ZN_ASSERT_CONTINUE(item.is_valid());
+		VOXEL_ASSERT_CONTINUE(item.is_valid());
 		godot::get_resource_configuration_warnings(**item, warnings, [&it]() {
 			return String("Item {0} (\"{1}\"): ").format(varray(it->first, it->second->get_item_name()));
 		});
@@ -255,7 +255,7 @@ Ref<VoxelInstanceLibraryItem> VoxelInstanceLibrary::_b_get_selected_item() const
 #endif
 
 void VoxelInstanceLibrary::set_item(int id, Ref<VoxelInstanceLibraryItem> item) {
-	ZN_ASSERT_RETURN(item.is_valid());
+	VOXEL_ASSERT_RETURN(item.is_valid());
 
 	auto it = _items.find(id);
 
@@ -342,10 +342,10 @@ Array VoxelInstanceLibrary::_b_get_data() const {
 }
 
 void VoxelInstanceLibrary::_b_set_data(Array data) {
-	ZN_ASSERT_RETURN(data.size() >= 1);
+	VOXEL_ASSERT_RETURN(data.size() >= 1);
 	const int src_version = data[0];
-	ZN_ASSERT_RETURN(src_version == 0);
-	ZN_ASSERT_RETURN((data.size() - 1) % 2 == 0);
+	VOXEL_ASSERT_RETURN(src_version == 0);
+	VOXEL_ASSERT_RETURN((data.size() - 1) % 2 == 0);
 	for (int i = 1; i < data.size(); i += 2) {
 		const int item_id = data[i];
 		const Ref<VoxelInstanceLibraryItem> item = data[i + 1];
@@ -392,4 +392,4 @@ void VoxelInstanceLibrary::_bind_methods() {
 	BIND_CONSTANT(MAX_ID);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

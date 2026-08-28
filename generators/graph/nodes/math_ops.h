@@ -2,7 +2,7 @@
 #include "../voxel_graph_runtime.h"
 #include "util.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 // Special case for division because we want to avoid NaNs caused by zeros
 void do_division(Runtime::ProcessBufferContext &ctx) {
@@ -135,4 +135,4 @@ void register_math_ops_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

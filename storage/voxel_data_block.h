@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <memory>
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBuffer;
 
@@ -74,7 +74,7 @@ public:
 	// Get voxels, expecting them to be present
 	VoxelBuffer &get_voxels() {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(_voxels != nullptr);
+		VOXEL_ASSERT(_voxels != nullptr);
 #endif
 		return *_voxels;
 	}
@@ -82,7 +82,7 @@ public:
 	// Get voxels, expecting them to be present
 	const VoxelBuffer &get_voxels_const() const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(_voxels != nullptr);
+		VOXEL_ASSERT(_voxels != nullptr);
 #endif
 		return *_voxels;
 	}
@@ -90,13 +90,13 @@ public:
 	// Get voxels, expecting them to be present
 	std::shared_ptr<VoxelBuffer> get_voxels_shared() const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(_voxels != nullptr);
+		VOXEL_ASSERT(_voxels != nullptr);
 #endif
 		return _voxels;
 	}
 
 	void set_voxels(const std::shared_ptr<VoxelBuffer> &buffer) {
-		ZN_ASSERT_RETURN(buffer != nullptr);
+		VOXEL_ASSERT_RETURN(buffer != nullptr);
 		_voxels = buffer;
 	}
 
@@ -163,6 +163,6 @@ private:
 	// bool _max_lod_hint = false;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_DATA_BLOCK_H

@@ -11,7 +11,7 @@
 #include "../../util/thread/rw_lock.h"
 #include "../voxel_generator.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Common base class for basic heightmap generators
 class VoxelGeneratorHeightmap : public VoxelGenerator {
@@ -179,6 +179,6 @@ private:
 	Parameters _parameters;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_HEIGHTMAP_H

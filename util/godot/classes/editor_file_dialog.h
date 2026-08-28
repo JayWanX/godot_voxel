@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_EDITOR_FILE_DIALOG_H
-#define ZN_GODOT_EDITOR_FILE_DIALOG_H
+#ifndef VOXEL_GODOT_EDITOR_FILE_DIALOG_H
+#define VOXEL_GODOT_EDITOR_FILE_DIALOG_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/version.h>
 
 #if VERSION_MAJOR == 4 && VERSION_MINOR == 0
@@ -10,15 +10,15 @@
 #include <editor/gui/editor_file_dialog.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/editor_file_dialog.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void popup_file_dialog(EditorFileDialog &dialog);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_EDITOR_FILE_DIALOG_H
+#endif // VOXEL_GODOT_EDITOR_FILE_DIALOG_H

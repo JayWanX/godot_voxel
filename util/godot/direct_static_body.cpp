@@ -4,7 +4,7 @@
 #include "classes/physics_server_3d.h"
 #include "classes/world_3d.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 DirectStaticBody::DirectStaticBody() {
 	// Nothing here. It is a thin RID wrapper,
@@ -41,7 +41,7 @@ bool DirectStaticBody::is_valid() const {
 }
 
 void DirectStaticBody::set_transform(Transform3D transform) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(!_body.is_valid());
 	PhysicsServer3D::get_singleton()->body_set_state(_body, PhysicsServer3DEnums::BODY_STATE_TRANSFORM, transform);
 
@@ -51,7 +51,7 @@ void DirectStaticBody::set_transform(Transform3D transform) {
 }
 
 void DirectStaticBody::add_shape(Ref<Shape3D> shape) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(!_body.is_valid());
 	PhysicsServer3D::get_singleton()->body_add_shape(_body, shape->get_rid(), Transform3D(), false);
 	// No use case for multishape yet
@@ -138,4 +138,4 @@ void DirectStaticBody::set_debug(bool enabled, World3D *world) {
 	}
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

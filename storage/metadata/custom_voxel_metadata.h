@@ -3,7 +3,7 @@
 
 #include "../../util/containers/span.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Base interface for custom data types.
 class ICustomVoxelMetadata {
@@ -29,6 +29,6 @@ public:
 	virtual bool equals(const ICustomVoxelMetadata &other) const = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_CUSTOM_METADATA_H

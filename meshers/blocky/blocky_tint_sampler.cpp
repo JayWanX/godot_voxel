@@ -3,7 +3,7 @@
 #include "../../util/errors.h"
 #include "../../util/math/color8.h"
 
-namespace zylann::voxel::blocky {
+namespace voxel::blocky {
 
 TintSampler TintSampler::create(const VoxelBuffer &p_voxels, const Mode mode) {
 	switch (mode) {
@@ -30,17 +30,17 @@ TintSampler TintSampler::create(const VoxelBuffer &p_voxels, const Mode mode) {
 							 p_voxels };
 
 				default:
-					ZN_PRINT_ERROR_ONCE("Color channel depth not supported");
+					VOXEL_PRINT_ERROR_ONCE("Color channel depth not supported");
 					break;
 			}
 		} break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown mode");
 			break;
 	}
 
 	return { nullptr, p_voxels };
 }
 
-} // namespace zylann::voxel::blocky
+} // namespace voxel::blocky

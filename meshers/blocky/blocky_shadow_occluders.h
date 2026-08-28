@@ -7,7 +7,7 @@
 #include "../../util/math/vector3i.h"
 #include "blocky_baked_library.h"
 
-namespace zylann::voxel::blocky {
+namespace voxel::blocky {
 
 struct OccluderArrays {
 	StdVector<Vector3f> vertices;
@@ -23,6 +23,6 @@ void generate_shadow_occluders(
 		const uint8_t enabled_mask
 );
 
-} // namespace zylann::voxel::blocky
+} // namespace voxel::blocky
 
 #endif // VOXEL_BLOCKY_SHADOW_OCCLUDERS_H

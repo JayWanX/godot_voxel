@@ -10,7 +10,7 @@ import common
 import voxel_version
 
 LIB_NAME = "libvoxel"
-BIN_FOLDER = "project/addons/zylann.voxel/bin"
+BIN_FOLDER = "project/addons/voxel/bin"
 
 
 def is_using_clang(env):
@@ -81,7 +81,7 @@ common.register_scons_options(env, True)
 
 env.Append(CPPDEFINES=[
 	# Tell engine-agnostic code we are using Godot Engine as an extension
-	"ZN_GODOT_EXTENSION"
+	"VOXEL_GODOT_EXTENSION"
 ])
 
 # We don't enable warnings on thirdparty libs

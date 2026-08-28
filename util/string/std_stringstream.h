@@ -1,13 +1,13 @@
-#ifndef ZN_STD_STRINGSTREAM_H
-#define ZN_STD_STRINGSTREAM_H
+#ifndef VOXEL_STD_STRINGSTREAM_H
+#define VOXEL_STD_STRINGSTREAM_H
 
 #include "../memory/std_allocator.h"
 #include <iosfwd>
 
-namespace zylann {
+namespace voxel {
 
 using StdStringStream = std::basic_stringstream<char, std::char_traits<char>, StdDefaultAllocator<char>>;
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_STD_STRINGSTREAM_H
+#endif // VOXEL_STD_STRINGSTREAM_H

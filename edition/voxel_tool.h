@@ -11,7 +11,7 @@
 
 // TODO Need to review VoxelTool to account for transformed volumes
 
-namespace zylann::voxel {
+namespace voxel {
 
 #ifdef VOXEL_ENABLE_MESH_SDF
 class VoxelMeshSDF;
@@ -208,8 +208,8 @@ protected:
 	ops::TextureParams _texture_params;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelTool::Mode)
+VARIANT_ENUM_CAST(voxel::VoxelTool::Mode)
 
 #endif // VOXEL_TOOL_H

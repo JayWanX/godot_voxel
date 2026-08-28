@@ -3,7 +3,7 @@
 
 #include "voxel_blocky_model.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // A model with no visuals and no collisions by default.
 class VoxelBlockyModelEmpty : public VoxelBlockyModel {
@@ -20,6 +20,6 @@ private:
 	static void _bind_methods() {}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_EMPTY_H

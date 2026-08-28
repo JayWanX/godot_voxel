@@ -199,7 +199,7 @@ for tree in trees:
     # ...
 ```
 
-This method has been implemented [in this demo](https://github.com/Zylann/voxelgame/blob/2fa552abfdf52c688bbec27edd676018a31373e0/project/blocky_game/generator/generator.gd#L144), although the code is a bit different.
+This method has been implemented [in this demo](https://github.com/Voxel/voxelgame/blob/2fa552abfdf52c688bbec27edd676018a31373e0/project/blocky_game/generator/generator.gd#L144), although the code is a bit different.
 
 This approach is also used in Voronoi noise (also known as cellular noise in FastNoiseLite) to produce seamless cells.
 

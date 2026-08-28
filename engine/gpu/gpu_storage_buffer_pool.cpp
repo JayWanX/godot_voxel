@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <limits>
 
-namespace zylann::voxel {
+namespace voxel {
 
 GPUStorageBufferPool::GPUStorageBufferPool() {
 	uint32_t s = 1;
@@ -25,24 +25,24 @@ GPUStorageBufferPool::~GPUStorageBufferPool() {
 		clear();
 	} else {
 		for (unsigned int i = 0; i < _pool_sizes.size(); ++i) {
-			ZN_ASSERT_CONTINUE_MSG(_pools[i].buffers.size() == 0, "Possibly leaked buffers?");
+			VOXEL_ASSERT_CONTINUE_MSG(_pools[i].buffers.size() == 0, "Possibly leaked buffers?");
 		}
 	}
 }
 
 void GPUStorageBufferPool::clear() {
-	ZN_ASSERT_RETURN(_rendering_device != nullptr);
-	ZN_DSTACK();
+	VOXEL_ASSERT_RETURN(_rendering_device != nullptr);
+	VOXEL_DSTACK();
 	RenderingDevice &rd = *_rendering_device;
 	unsigned int pool_index = 0;
 	for (Pool &pool : _pools) {
 		if (pool.used_buffers > 0) {
-			ZN_PRINT_ERROR(
+			VOXEL_PRINT_ERROR(
 					format("{} storage buffers are still in use when clearing pool {}", pool.used_buffers, pool_index)
 			);
 		}
 		if (pool.buffers.size() > 0) {
-			ZN_PRINT_VERBOSE(
+			VOXEL_PRINT_VERBOSE(
 					format("Freeing {} VoxelRD pooled storage buffers from pool {}", pool.buffers.size(), pool_index)
 			);
 		}
@@ -60,7 +60,7 @@ void GPUStorageBufferPool::set_rendering_device(RenderingDevice *rd) {
 		clear();
 	} else {
 		for (unsigned int i = 0; i < _pool_sizes.size(); ++i) {
-			ZN_ASSERT_CONTINUE_MSG(_pools[i].buffers.size() == 0, "Possibly leaked buffers?");
+			VOXEL_ASSERT_CONTINUE_MSG(_pools[i].buffers.size() == 0, "Possibly leaked buffers?");
 		}
 	}
 	_rendering_device = rd;
@@ -72,7 +72,7 @@ unsigned int GPUStorageBufferPool::get_pool_index_from_size(uint32_t p_size) con
 	auto it = std::lower_bound(_pool_sizes.begin(), _pool_sizes.end(), p_size);
 #ifdef DEBUG_ENABLED
 	if (it != _pool_sizes.end()) {
-		ZN_ASSERT(*it >= p_size);
+		VOXEL_ASSERT(*it >= p_size);
 	}
 #endif
 	return it - _pool_sizes.begin();
@@ -87,21 +87,21 @@ GPUStorageBuffer GPUStorageBufferPool::allocate(uint32_t p_size) {
 }
 
 GPUStorageBuffer GPUStorageBufferPool::allocate(uint32_t p_size, const PackedByteArray *pba) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN_V(p_size > 0, GPUStorageBuffer());
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN_V(p_size > 0, GPUStorageBuffer());
 
-	ZN_ASSERT_RETURN_V(_rendering_device != nullptr, GPUStorageBuffer());
+	VOXEL_ASSERT_RETURN_V(_rendering_device != nullptr, GPUStorageBuffer());
 	RenderingDevice &rd = *_rendering_device;
 
 	const unsigned int pool_index = get_pool_index_from_size(p_size);
-	ZN_ASSERT_RETURN_V(pool_index < _pools.size(), GPUStorageBuffer());
+	VOXEL_ASSERT_RETURN_V(pool_index < _pools.size(), GPUStorageBuffer());
 	Pool &pool = _pools[pool_index];
 
 	GPUStorageBuffer b;
 
 	if (pool.buffers.size() == 0) {
 		const unsigned int capacity = _pool_sizes[pool_index];
-		ZN_PRINT_VERBOSE(format("Creating VoxelRD pooled storage buffer {}b", capacity));
+		VOXEL_PRINT_VERBOSE(format("Creating VoxelRD pooled storage buffer {}b", capacity));
 		// Unfortunately `storage_buffer_create` in the Godot API requires that you provide a PoolByteArray of the exact
 		// same size, when provided. Our pooling strategy means we are often allocating a bit more than initially
 		// requested. The passed data would fit, but Godot doesn't want that... so in order to avoid having to create an
@@ -109,7 +109,7 @@ GPUStorageBuffer GPUStorageBufferPool::allocate(uint32_t p_size, const PackedByt
 		// separate call... I have no idea if that has a particular performance impact, apart from more RID lookups.
 		// b.rid = rd.storage_buffer_create(capacity, pba);
 		b.rid = rd.storage_buffer_create(capacity);
-		ZN_ASSERT_RETURN_V(b.rid.is_valid(), GPUStorageBuffer());
+		VOXEL_ASSERT_RETURN_V(b.rid.is_valid(), GPUStorageBuffer());
 		if (pba != nullptr) {
 			godot::update_storage_buffer(rd, b.rid, 0, pba->size(), *pba);
 		}
@@ -117,7 +117,7 @@ GPUStorageBuffer GPUStorageBufferPool::allocate(uint32_t p_size, const PackedByt
 
 	} else {
 		b = pool.buffers.back();
-		ZN_ASSERT(b.is_valid());
+		VOXEL_ASSERT(b.is_valid());
 		pool.buffers.pop_back();
 		if (pba != nullptr) {
 			godot::update_storage_buffer(rd, b.rid, 0, p_size, *pba);
@@ -130,21 +130,21 @@ GPUStorageBuffer GPUStorageBufferPool::allocate(uint32_t p_size, const PackedByt
 }
 
 void GPUStorageBufferPool::recycle(GPUStorageBuffer b) {
-	ZN_ASSERT_RETURN(b.rid.is_valid());
-	ZN_ASSERT_RETURN(b.size != 0);
+	VOXEL_ASSERT_RETURN(b.rid.is_valid());
+	VOXEL_ASSERT_RETURN(b.size != 0);
 
-	ZN_ASSERT_RETURN(_rendering_device != nullptr);
+	VOXEL_ASSERT_RETURN(_rendering_device != nullptr);
 
 	const unsigned int pool_index = get_pool_index_from_size(b.size);
-	ZN_ASSERT_RETURN(pool_index < _pools.size());
+	VOXEL_ASSERT_RETURN(pool_index < _pools.size());
 	Pool &pool = _pools[pool_index];
 
-	ZN_ASSERT(pool.used_buffers > 0);
+	VOXEL_ASSERT(pool.used_buffers > 0);
 	--pool.used_buffers;
 
 #if DEV_ENABLED
 	for (const GPUStorageBuffer &sb : pool.buffers) {
-		ZN_ASSERT_MSG(sb.rid != b.rid, "Pooling twice the same storage buffer");
+		VOXEL_ASSERT_MSG(sb.rid != b.rid, "Pooling twice the same storage buffer");
 	}
 #endif
 
@@ -167,4 +167,4 @@ void GPUStorageBufferPool::debug_print() const {
 	print_line(ss.get_written());
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

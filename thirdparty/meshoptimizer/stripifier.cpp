@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Francine Evans, Steven Skiena and Amitabh Varshney. Optimizing Triangle Strips for Fast Rendering. 1996
@@ -297,4 +297,4 @@ size_t meshopt_unstripifyBound(size_t index_count)
 	return (index_count == 0) ? 0 : (index_count - 2) * 3;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

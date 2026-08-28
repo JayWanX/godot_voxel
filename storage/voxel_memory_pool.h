@@ -13,7 +13,7 @@
 #include <atomic>
 #include <limits>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Pool based on a scenario where allocated blocks are often the same size.
 // A pool of blocks is assigned for each power of two.
@@ -31,7 +31,7 @@ private:
 			MutexLock lock(mutex);
 			auto it = blocks.find(mem);
 			// Must not add twice
-			ZN_ASSERT(it == blocks.end());
+			VOXEL_ASSERT(it == blocks.end());
 			blocks.insert({ mem, dstack::Info() });
 		}
 
@@ -39,7 +39,7 @@ private:
 			MutexLock lock(mutex);
 			auto it = blocks.find(block);
 			// Must exist
-			ZN_ASSERT(it != blocks.end());
+			VOXEL_ASSERT(it != blocks.end());
 			blocks.erase(it);
 		}
 	};
@@ -82,7 +82,7 @@ private:
 	inline unsigned int get_pool_index_from_size(size_t size) const {
 #ifdef DEBUG_ENABLED
 		// `get_next_power_of_two_32` takes unsigned int
-		ZN_ASSERT(size <= std::numeric_limits<unsigned int>::max());
+		VOXEL_ASSERT(size <= std::numeric_limits<unsigned int>::max());
 #endif
 		return math::get_shift_from_power_of_two_32(math::get_next_power_of_two_32(size));
 	}
@@ -109,6 +109,6 @@ private:
 	std::atomic_uint64_t _total_memory = { 0 };
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MEMORY_POOL_H

@@ -12,14 +12,14 @@
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
 // TODO Binary greedy mesher optimization
 // https://www.youtube.com/watch?v=qnGoGq7DWMc
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 // Table of indices for vertices of cube faces
@@ -422,7 +422,7 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 		Color_F color_func
 ) {
 	//
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(
 			block_size.x < static_cast<int>(2 * VoxelMesherCubes::PADDING) ||
 			block_size.y < static_cast<int>(2 * VoxelMesherCubes::PADDING) ||
@@ -659,20 +659,20 @@ Ref<Image> make_greedy_atlas(
 ) {
 	//
 	ERR_FAIL_COND_V(atlas_data.images.size() == 0, Ref<Image>());
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Pack rectangles
 	StdVector<Vector2i> result_points;
 	Vector2i result_size;
 	{
-		ZN_PROFILE_SCOPE_NAMED("Packing");
+		VOXEL_PROFILE_SCOPE_NAMED("Packing");
 		StdVector<Vector2i> sizes;
 		sizes.resize(atlas_data.images.size());
 		for (unsigned int i = 0; i < atlas_data.images.size(); ++i) {
 			const VoxelMesherCubes::GreedyAtlasData::ImageInfo &im = atlas_data.images[i];
 			sizes[i] = Vector2i(im.size_x, im.size_y);
 		}
-		zylann::godot::geometry_2d_make_atlas(to_span(sizes), result_points, result_size);
+		voxel::godot::geometry_2d_make_atlas(to_span(sizes), result_points, result_size);
 	}
 
 	// DEBUG
@@ -751,7 +751,7 @@ VoxelMesherCubes::Cache &VoxelMesherCubes::get_tls_cache() {
 }
 
 void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Input &input) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const int channel = VoxelBuffer::CHANNEL_COLOR;
 	Cache &cache = get_tls_cache();
 
@@ -1012,7 +1012,7 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 			Array &mesh_arrays = surface.arrays;
 			mesh_arrays.resize(Mesh::ARRAY_MAX);
 
-			using namespace zylann::godot;
+			using namespace voxel::godot;
 
 			{
 				PackedVector3Array positions;
@@ -1127,7 +1127,7 @@ void VoxelMesherCubes::set_material_by_index(Materials id, Ref<Material> materia
 }
 
 Ref<Material> VoxelMesherCubes::get_material_by_index(unsigned int i) const {
-	ZN_ASSERT_RETURN_V(i < _materials.size(), Ref<Material>());
+	VOXEL_ASSERT_RETURN_V(i < _materials.size(), Ref<Material>());
 	return _materials[i];
 }
 
@@ -1152,10 +1152,10 @@ Ref<Material> VoxelMesherCubes::_b_get_transparent_material() const {
 }
 
 Ref<Mesh> VoxelMesherCubes::generate_mesh_from_image(Ref<Image> image, float voxel_size) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN_V(image.is_valid(), Ref<Mesh>());
-	ZN_ASSERT_RETURN_V(voxel_size > 0.001f, Ref<Mesh>());
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN_V(image.is_valid(), Ref<Mesh>());
+	VOXEL_ASSERT_RETURN_V(voxel_size > 0.001f, Ref<Mesh>());
+	VOXEL_ASSERT_RETURN_V_MSG(
 			!image->is_compressed(), Ref<Mesh>(), format("Image format not supported: {}", image->get_format())
 	);
 
@@ -1207,7 +1207,7 @@ Ref<Mesh> VoxelMesherCubes::generate_mesh_from_image(Ref<Image> image, float vox
 	const Vector3 centering_offset = -Vector3(im_size_x, im_size_y, 1) / 2.0;
 
 	for (unsigned int i = 0; i < output.surfaces.size(); ++i) {
-		using namespace zylann::godot;
+		using namespace voxel::godot;
 
 		VoxelMesher::Output::Surface &surface = output.surfaces[i];
 		Array arrays = surface.arrays;
@@ -1282,7 +1282,7 @@ void VoxelMesherCubes::_bind_methods() {
 					Variant::OBJECT,
 					"opaque_material",
 					PROPERTY_HINT_RESOURCE_TYPE,
-					zylann::godot::MATERIAL_3D_PROPERTY_HINT_STRING
+					voxel::godot::MATERIAL_3D_PROPERTY_HINT_STRING
 			),
 			"_set_opaque_material",
 			"_get_opaque_material"
@@ -1292,7 +1292,7 @@ void VoxelMesherCubes::_bind_methods() {
 					Variant::OBJECT,
 					"transparent_material",
 					PROPERTY_HINT_RESOURCE_TYPE,
-					zylann::godot::MATERIAL_3D_PROPERTY_HINT_STRING
+					voxel::godot::MATERIAL_3D_PROPERTY_HINT_STRING
 			),
 			"_set_transparent_material",
 			"_get_transparent_material"
@@ -1307,4 +1307,4 @@ void VoxelMesherCubes::_bind_methods() {
 	BIND_ENUM_CONSTANT(COLOR_SHADER_PALETTE);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

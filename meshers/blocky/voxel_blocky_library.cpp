@@ -1,7 +1,7 @@
 #include "voxel_blocky_library.h"
 #include "../../constants/voxel_string_names.h"
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 // For `MAKE_RESOURCE_TYPE_HINT`
 #include "../../util/godot/classes/object.h"
 #endif
@@ -25,13 +25,13 @@
 #include "../../util/godot/classes/resource.h"
 #endif
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
 #include <bitset>
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyLibrary::VoxelBlockyLibrary() {}
 
@@ -60,7 +60,7 @@ void VoxelBlockyLibrary::load_default() {
 }
 
 void VoxelBlockyLibrary::bake() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	RWLockWrite lock(_baked_data_rw_lock);
 
@@ -100,7 +100,7 @@ void VoxelBlockyLibrary::bake() {
 	generate_side_culling_matrix(_baked_data);
 
 	uint64_t time_spent = Time::get_singleton()->get_ticks_usec() - time_before;
-	ZN_PRINT_VERBOSE(
+	VOXEL_PRINT_VERBOSE(
 			format("Took {} us to bake VoxelLibrary, indexed {} materials", time_spent, _indexed_materials.size())
 	);
 
@@ -118,7 +118,7 @@ int VoxelBlockyLibrary::get_model_index_from_resource_name(String resource_name)
 }
 
 int VoxelBlockyLibrary::add_model(Ref<VoxelBlockyModel> model) {
-	ZN_ASSERT_RETURN_V_MSG(_voxel_models.size() < MAX_MODELS, -1, "Reached maximum supported amount of models");
+	VOXEL_ASSERT_RETURN_V_MSG(_voxel_models.size() < MAX_MODELS, -1, "Reached maximum supported amount of models");
 	const int index = _voxel_models.size();
 	_voxel_models.push_back(model);
 	_needs_baking = true;
@@ -135,7 +135,7 @@ bool VoxelBlockyLibrary::_set(const StringName &p_name, const Variant &p_value) 
 	String property_name(p_name);
 	if (property_name.begins_with("voxels/")) {
 		unsigned int idx = property_name.get_slicec('/', 1).to_int();
-		ZN_ASSERT_RETURN_V(idx < MAX_MODELS, false);
+		VOXEL_ASSERT_RETURN_V(idx < MAX_MODELS, false);
 
 		Ref<VoxelBlockyModel> legacy_model = p_value;
 
@@ -211,7 +211,7 @@ void VoxelBlockyLibrary::get_configuration_warnings(PackedStringArray &out_warni
 	}
 	if (!has_solid_model) {
 		out_warnings.append(
-				String(ZN_TTR("The {0} only has empty {1}s."))
+				String(VOXEL_TTR("The {0} only has empty {1}s."))
 						.format(varray(VoxelBlockyLibrary::get_class_static(), VoxelBlockyModel::get_class_static()))
 		);
 	}
@@ -219,7 +219,7 @@ void VoxelBlockyLibrary::get_configuration_warnings(PackedStringArray &out_warni
 	if (null_indices.size() > 0) {
 		const String indices_str = godot::join_comma_separated<int>(to_span(null_indices));
 		// Should we really consider it a problem?
-		out_warnings.append(String(ZN_TTR("The {0} has null model entries: {1}"))
+		out_warnings.append(String(VOXEL_TTR("The {0} has null model entries: {1}"))
 									.format(varray(VoxelBlockyLibrary::get_class_static(), indices_str)));
 	}
 
@@ -228,7 +228,7 @@ void VoxelBlockyLibrary::get_configuration_warnings(PackedStringArray &out_warni
 		if (model.is_null()) {
 			continue;
 		}
-		zylann::godot::get_resource_configuration_warnings(**model, out_warnings, [i]() {
+		voxel::godot::get_resource_configuration_warnings(**model, out_warnings, [i]() {
 			return String("Model {0}: ").format(varray(i));
 		});
 	}
@@ -253,7 +253,7 @@ TypedArray<VoxelBlockyModel> VoxelBlockyLibrary::_b_get_models() const {
 void VoxelBlockyLibrary::_b_set_models(TypedArray<VoxelBlockyModel> models) {
 	unsigned int count = models.size();
 	if (count > MAX_MODELS) {
-		ZN_PRINT_ERROR(
+		VOXEL_PRINT_ERROR(
 				format("Setting more than {} is not supported (received {}). Extra models will not be added.",
 					   MAX_MODELS,
 					   models.size())
@@ -291,4 +291,4 @@ void VoxelBlockyLibrary::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

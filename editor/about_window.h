@@ -4,10 +4,10 @@
 #include "../util/godot/classes/accept_dialog.h"
 #include "../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class TextureRect);
-ZN_GODOT_FORWARD_DECLARE(class RichTextLabel);
+VOXEL_GODOT_FORWARD_DECLARE(class TextureRect);
+VOXEL_GODOT_FORWARD_DECLARE(class RichTextLabel);
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelAboutWindow : public AcceptDialog {
 	GDCLASS(VoxelAboutWindow, AcceptDialog)
@@ -33,6 +33,6 @@ private:
 	RichTextLabel *_third_party_rich_text_label;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_ABOUT_WINDOW_H

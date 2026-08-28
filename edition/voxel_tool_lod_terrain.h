@@ -5,9 +5,9 @@
 #include "../util/macros.h"
 #include "voxel_tool.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Node);
+VOXEL_GODOT_FORWARD_DECLARE(class Node);
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelLodTerrain;
 class VoxelDataMap;
@@ -47,9 +47,9 @@ public:
 	float get_voxel_f_interpolated(Vector3 position) const override;
 
 	// TODO GDX: it seems binding a method taking a `Node*` fails to compile. It is supposed to be working.
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	Array separate_floating_chunks(AABB world_box, Node *parent_node);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Array separate_floating_chunks(AABB world_box, Object *parent_node_o);
 #endif
 
@@ -84,6 +84,6 @@ private:
 	RandomPCG _random;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_TOOL_LOD_TERRAIN_H

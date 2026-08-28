@@ -2,11 +2,11 @@
 #include "../../util/godot/classes/material.h"
 #include "blocky_material_indexer.h"
 #include "voxel_blocky_model_cube.h"
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyFluid::VoxelBlockyFluid() {}
 
@@ -35,13 +35,13 @@ namespace blocky {
 void bake_fluid(const VoxelBlockyFluid &fluid, BakedFluid &baked_fluid, MaterialIndexer &materials) {
 	// for (const uint16_t model_index : baked_fluid.level_model_indices) {
 	// 	if (model_index == VoxelBlockyModel::AIR_ID) {
-	// 		ZN_PRINT_ERROR("Fluid is missing some levels");
+	// 		VOXEL_PRINT_ERROR("Fluid is missing some levels");
 	// 		break;
 	// 	}
 	// }
 
 	// if (baked_fluid.level_model_indices.size() == 1) {
-	// 	ZN_PRINT_ERROR("Fluid with only one level will not work properly");
+	// 	VOXEL_PRINT_ERROR("Fluid with only one level will not work properly");
 	// }
 
 	Ref<Material> material = fluid.get_material();
@@ -77,7 +77,7 @@ void VoxelBlockyFluid::_bind_methods() {
 					Variant::OBJECT,
 					"material",
 					PROPERTY_HINT_RESOURCE_TYPE,
-					zylann::godot::MATERIAL_3D_PROPERTY_HINT_STRING
+					voxel::godot::MATERIAL_3D_PROPERTY_HINT_STRING
 			),
 			"set_material",
 			"get_material"
@@ -90,4 +90,4 @@ void VoxelBlockyFluid::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

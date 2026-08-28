@@ -3,19 +3,19 @@
 
 #include "../util/containers/slot_map.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 typedef SlotMapKey<uint16_t, uint16_t> VolumeID;
 typedef SlotMapKey<uint16_t, uint16_t> ViewerID;
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-namespace zylann {
+namespace voxel {
 
 class TextWriter;
 
 TextWriter &operator<<(TextWriter &w, const SlotMapKey<uint16_t, uint16_t> &v);
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_VOLUME_ID_H

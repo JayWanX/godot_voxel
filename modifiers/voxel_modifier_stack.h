@@ -7,7 +7,7 @@
 #include "../util/memory/memory.h"
 #include "voxel_modifier.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBuffer;
 
@@ -22,7 +22,7 @@ public:
 
 	template <typename T>
 	T *add_modifier(uint32_t id) {
-		ZN_ASSERT(!has_modifier(id));
+		VOXEL_ASSERT(!has_modifier(id));
 		UniquePtr<VoxelModifier> &uptr = _modifiers[id];
 		uptr = make_unique_instance<T>();
 		VoxelModifier *ptr = uptr.get();
@@ -70,6 +70,6 @@ private:
 	RWLock _stack_lock;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MODIFIER_STACK_H

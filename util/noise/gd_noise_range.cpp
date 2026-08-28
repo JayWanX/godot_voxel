@@ -1,6 +1,6 @@
 #include "gd_noise_range.h"
 
-namespace zylann {
+namespace voxel {
 
 // It is not possible to do the same level of range analysis with Godot's `FastNoiseLite`, because it does not expose
 // the internal instance of FastNoiseLite, and the official library does not expose some internals either.
@@ -16,4 +16,4 @@ math::Interval get_range_3d(const Noise &noise, math::Interval x, math::Interval
 	return { -1.f, 1.f };
 }
 
-} // namespace zylann
+} // namespace voxel

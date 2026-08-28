@@ -1,11 +1,11 @@
-#ifndef ZYLANN_ASYNC_DEPENDENCY_TRACKER_H
-#define ZYLANN_ASYNC_DEPENDENCY_TRACKER_H
+#ifndef VOXEL_ASYNC_DEPENDENCY_TRACKER_H
+#define VOXEL_ASYNC_DEPENDENCY_TRACKER_H
 
 #include "../containers/span.h"
 #include "../containers/std_vector.h"
 #include <atomic>
 
-namespace zylann {
+namespace voxel {
 
 class IThreadedTask;
 
@@ -69,6 +69,6 @@ private:
 	ScheduleNextTasksCallback _next_tasks_schedule_callback = nullptr;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_ASYNC_DEPENDENCY_TRACKER_H
+#endif // VOXEL_ASYNC_DEPENDENCY_TRACKER_H

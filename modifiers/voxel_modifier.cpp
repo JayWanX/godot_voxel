@@ -1,7 +1,7 @@
 #include "voxel_modifier.h"
 #include "../engine/gpu/gpu_task_runner.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelModifier::set_transform(Transform3D t) {
 	RWLockWrite wlock(_rwlock);
@@ -24,7 +24,7 @@ RID VoxelModifier::get_detail_shader(const BaseGPUResources &base_resources, con
 		case TYPE_MESH:
 			return base_resources.detail_modifier_mesh_shader.rid;
 		default:
-			ZN_PRINT_ERROR("Unhandled modifier type");
+			VOXEL_PRINT_ERROR("Unhandled modifier type");
 			return RID();
 	}
 }
@@ -36,11 +36,11 @@ RID VoxelModifier::get_block_shader(const BaseGPUResources &base_resources, cons
 		case TYPE_MESH:
 			return base_resources.block_modifier_mesh_shader.rid;
 		default:
-			ZN_PRINT_ERROR("Unhandled modifier type");
+			VOXEL_PRINT_ERROR("Unhandled modifier type");
 			return RID();
 	}
 }
 
 #endif
 
-} // namespace zylann::voxel
+} // namespace voxel

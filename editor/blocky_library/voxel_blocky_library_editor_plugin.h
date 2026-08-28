@@ -3,7 +3,7 @@
 
 #include "../../util/godot/classes/editor_plugin.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBlockyTypeLibraryIDSDialog;
 
@@ -22,6 +22,6 @@ private:
 	VoxelBlockyTypeLibraryIDSDialog *_type_library_ids_dialog = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_LIBRARY_EDITOR_PLUGIN_H

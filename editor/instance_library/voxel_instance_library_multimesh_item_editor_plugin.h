@@ -5,25 +5,25 @@
 #include "../../util/godot/classes/editor_plugin.h"
 #include "voxel_instance_library_multimesh_item_inspector_plugin.h"
 
-ZN_GODOT_FORWARD_DECLARE(class EditorFileDialog)
+VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
 
-namespace zylann::voxel {
+namespace voxel {
 
-class VoxelInstanceLibraryMultiMeshItemEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(VoxelInstanceLibraryMultiMeshItemEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VoxelInstanceLibraryMultiMeshItemEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VoxelInstanceLibraryMultiMeshItemEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	VoxelInstanceLibraryMultiMeshItemEditorPlugin();
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	void _on_update_from_scene_button_pressed(VoxelInstanceLibraryMultiMeshItem *item);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	void _on_update_from_scene_button_pressed(Object *item_o);
 #endif
 
 protected:
-	bool _zn_handles(const Object *p_object) const override;
-	void _zn_edit(Object *p_object) override;
-	void _zn_make_visible(bool visible) override;
+	bool _voxel_handles(const Object *p_object) const override;
+	void _voxel_edit(Object *p_object) override;
+	void _voxel_make_visible(bool visible) override;
 
 private:
 	void init();
@@ -38,6 +38,6 @@ private:
 	Ref<VoxelInstanceLibraryMultiMeshItemInspectorPlugin> _inspector_plugin;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_LIBRARY_MULTIMESH_ITEM_EDITOR_PLUGIN_H

@@ -4,15 +4,15 @@
 #include "../math/funcs.h"
 #include "../memory/memory.h"
 
-namespace zylann {
+namespace voxel {
 
 ProgressiveTaskRunner::~ProgressiveTaskRunner() {
 	flush();
-	ZN_ASSERT_RETURN_MSG(_tasks.size() == 0, "Tasks got created in destructors?");
+	VOXEL_ASSERT_RETURN_MSG(_tasks.size() == 0, "Tasks got created in destructors?");
 }
 
 void ProgressiveTaskRunner::push(IProgressiveTask *task) {
-	ZN_ASSERT_RETURN(task != nullptr);
+	VOXEL_ASSERT_RETURN(task != nullptr);
 	_tasks.push(task);
 }
 
@@ -20,7 +20,7 @@ void ProgressiveTaskRunner::process() {
 	const int64_t now_msec = Time::get_singleton()->get_ticks_msec();
 	const int64_t delta_msec = now_msec - _last_process_time_msec;
 	_last_process_time_msec = now_msec;
-	ZN_ASSERT_RETURN(delta_msec >= 0);
+	VOXEL_ASSERT_RETURN(delta_msec >= 0);
 
 	// The goal is to dequeue everything in S seconds.
 	// So if we have N tasks and `process` is called F times per second, we must dequeue N / (S * F) tasks.
@@ -38,7 +38,7 @@ void ProgressiveTaskRunner::process() {
 		_tasks.pop();
 		task->run();
 		// TODO Call recycling function instead?
-		ZN_DELETE(task);
+		VOXEL_DELETE(task);
 		--count;
 	}
 }
@@ -48,7 +48,7 @@ void ProgressiveTaskRunner::flush() {
 		IProgressiveTask *task = _tasks.front();
 		_tasks.pop();
 		task->run();
-		ZN_DELETE(task);
+		VOXEL_DELETE(task);
 	}
 }
 
@@ -56,4 +56,4 @@ unsigned int ProgressiveTaskRunner::get_pending_count() const {
 	return _tasks.size();
 }
 
-} // namespace zylann
+} // namespace voxel

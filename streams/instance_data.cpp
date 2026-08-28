@@ -4,7 +4,7 @@
 #include "../util/math/funcs.h"
 #include "../util/string/format.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 const uint32_t TRAILING_MAGIC = 0x900df00d;
@@ -26,7 +26,7 @@ inline uint8_t norm_to_u8(float x) {
 }
 
 inline float u8_to_norm(uint8_t v) {
-	return (static_cast<real_t>(v) - 0x7f) * zylann::voxel::constants::INV_0x7f;
+	return (static_cast<real_t>(v) - 0x7f) * voxel::constants::INV_0x7f;
 }
 
 struct CompressedQuaternion4b {
@@ -60,9 +60,9 @@ bool serialize_instance_block_data(const InstanceBlockData &src, StdVector<uint8
 	// TODO Apparently big-endian is dead
 	// I chose it originally to match "network byte order",
 	// but as I read comments about it there seem to be no reason to continue using it. Needs a version increment.
-	zylann::MemoryWriter w(dst, zylann::ENDIANNESS_LITTLE_ENDIAN);
+	voxel::MemoryWriter w(dst, voxel::ENDIANNESS_LITTLE_ENDIAN);
 
-	ZN_ASSERT_RETURN_V(src.position_range >= 0.f, false);
+	VOXEL_ASSERT_RETURN_V(src.position_range >= 0.f, false);
 	const float position_range = math::max(src.position_range, InstanceBlockData::POSITION_RANGE_MINIMUM);
 
 	w.store_8(INSTANCE_BLOCK_FORMAT_VERSION_1);
@@ -76,7 +76,7 @@ bool serialize_instance_block_data(const InstanceBlockData &src, StdVector<uint8
 	for (size_t i = 0; i < src.layers.size(); ++i) {
 		const InstanceBlockData::LayerData &layer = src.layers[i];
 
-		ZN_ASSERT_RETURN_V(layer.scale_max >= layer.scale_min, false);
+		VOXEL_ASSERT_RETURN_V(layer.scale_max >= layer.scale_min, false);
 
 		float scale_min = layer.scale_min;
 		float scale_max = layer.scale_max;
@@ -121,13 +121,13 @@ bool deserialize_instance_block_data(InstanceBlockData &dst, Span<const uint8_t>
 	const uint8_t expected_version = INSTANCE_BLOCK_FORMAT_VERSION_1;
 	const uint8_t expected_instance_format = InstanceBlockData::FORMAT_SIMPLE_11B_V1;
 
-	zylann::MemoryReader r(src, zylann::ENDIANNESS_LITTLE_ENDIAN);
+	voxel::MemoryReader r(src, voxel::ENDIANNESS_LITTLE_ENDIAN);
 
 	const uint8_t version = r.get_8();
 	if (version == INSTANCE_BLOCK_FORMAT_VERSION_0) {
-		r.endianness = zylann::ENDIANNESS_BIG_ENDIAN;
+		r.endianness = voxel::ENDIANNESS_BIG_ENDIAN;
 	} else {
-		ZN_ASSERT_RETURN_V(version == expected_version, false);
+		VOXEL_ASSERT_RETURN_V(version == expected_version, false);
 	}
 
 	const uint8_t layers_count = r.get_8();
@@ -145,11 +145,11 @@ bool deserialize_instance_block_data(InstanceBlockData &dst, Span<const uint8_t>
 
 		layer.scale_min = r.get_float();
 		layer.scale_max = r.get_float();
-		ZN_ASSERT_RETURN_V(layer.scale_max >= layer.scale_min, false);
+		VOXEL_ASSERT_RETURN_V(layer.scale_max >= layer.scale_min, false);
 		const float scale_range = layer.scale_max - layer.scale_min;
 
 		const uint8_t instance_format = r.get_8();
-		ZN_ASSERT_RETURN_V(instance_format == expected_instance_format, false);
+		VOXEL_ASSERT_RETURN_V(instance_format == expected_instance_format, false);
 
 		for (size_t j = 0; j < layer.instances.size(); ++j) {
 			const float x = (static_cast<float>(r.get_16()) / 0xffff) * dst.position_range;
@@ -171,11 +171,11 @@ bool deserialize_instance_block_data(InstanceBlockData &dst, Span<const uint8_t>
 	}
 
 	const uint32_t control_end = r.get_32();
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			control_end == TRAILING_MAGIC, false, format("Expected {}, found {}", TRAILING_MAGIC, control_end)
 	);
 
 	return true;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

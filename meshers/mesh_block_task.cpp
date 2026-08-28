@@ -19,7 +19,7 @@
 #include "../generators/generate_block_gpu_task.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -47,7 +47,7 @@ CubicAreaInfo get_cubic_area_info_from_size(unsigned int size) {
 			mesh_block_size_factor = 2;
 			break;
 		default:
-			ZN_PRINT_ERROR("Unsupported block count");
+			VOXEL_PRINT_ERROR("Unsupported block count");
 			return CubicAreaInfo{ 0, 0, 0 };
 	}
 
@@ -73,8 +73,8 @@ void copy_block_and_neighbors(
 		StdVector<Box3i> *out_boxes_to_generate,
 		Vector3i *out_origin_in_voxels
 ) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	// Extract wanted channels in a list
 	const SmallVector<uint8_t, VoxelBuffer::MAX_CHANNELS> channels = VoxelBuffer::mask_to_channels_list(channels_mask);
@@ -159,7 +159,7 @@ void copy_block_and_neighbors(
 						// Subtract edited box from the area to generate
 						// TODO This approach allows to batch boxes if necessary,
 						// but is it just better to do it anyways for every clipped box?
-						ZN_PROFILE_SCOPE_NAMED("Box subtract");
+						VOXEL_PROFILE_SCOPE_NAMED("Box subtract");
 						const unsigned int input_count = boxes_to_generate.size();
 						const Box3i block_box =
 								Box3i(offset, Vector3iUtil::create(data_block_size)).clipped(mesh_data_box);
@@ -197,7 +197,7 @@ void copy_block_and_neighbors(
 
 	} else {
 		// Complete data with generated voxels on the CPU
-		ZN_PROFILE_SCOPE_NAMED("Generate");
+		VOXEL_PROFILE_SCOPE_NAMED("Generate");
 		VoxelBuffer generated_voxels(VoxelBuffer::ALLOCATOR_POOL);
 
 #ifdef VOXEL_ENABLE_MODIFIERS
@@ -205,7 +205,7 @@ void copy_block_and_neighbors(
 #endif
 
 		for (const Box3i &box : boxes_to_generate) {
-			ZN_PROFILE_SCOPE_NAMED("Box");
+			VOXEL_PROFILE_SCOPE_NAMED("Box");
 			// print_line(String("size={0}").format(varray(box.size.to_vec3())));
 			generated_voxels.create(box.size, &voxel_format);
 			// generated_voxels.set_voxel_f(2.0f, box.size.x / 2, box.size.y / 2, box.size.z / 2,
@@ -240,8 +240,8 @@ Ref<ArrayMesh> build_mesh(
 		// won't be added to the mesh)
 		StdVector<uint16_t> &mesh_material_indices
 ) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT(mesh_material_indices.size() == 0);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT(mesh_material_indices.size() == 0);
 
 	Ref<ArrayMesh> mesh;
 
@@ -254,7 +254,7 @@ Ref<ArrayMesh> build_mesh(
 		}
 
 		CRASH_COND(arrays.size() != Mesh::ARRAY_MAX);
-		if (!zylann::godot::is_surface_triangulated(arrays)) {
+		if (!voxel::godot::is_surface_triangulated(arrays)) {
 			continue;
 		}
 
@@ -283,7 +283,7 @@ Ref<ArrayMesh> build_mesh(
 		}
 	}*/
 
-	if (mesh.is_valid() && zylann::godot::is_mesh_empty(**mesh)) {
+	if (mesh.is_valid() && voxel::godot::is_mesh_empty(**mesh)) {
 		mesh = Ref<Mesh>();
 	}
 
@@ -318,12 +318,12 @@ int MeshBlockTask::debug_get_running_count() {
 	return g_debug_mesh_tasks_count;
 }
 
-void MeshBlockTask::run(zylann::ThreadedTaskContext &ctx) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT(meshing_dependency != nullptr);
+void MeshBlockTask::run(voxel::ThreadedTaskContext &ctx) {
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT(meshing_dependency != nullptr);
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN_MSG(
+	VOXEL_ASSERT_RETURN_MSG(
 			meshing_dependency->mesher.is_valid(),
 			"Meshing task started without a mesher. Maybe missing on the terrain node?"
 	);
@@ -343,7 +343,7 @@ void MeshBlockTask::run(zylann::ThreadedTaskContext &ctx) {
 	if (_stage == 0)
 #endif
 	{
-		ZN_ASSERT(data != nullptr);
+		VOXEL_ASSERT(data != nullptr);
 		const VoxelFormat format = data->get_format();
 		format.configure_buffer(_voxels);
 	}
@@ -370,9 +370,9 @@ void MeshBlockTask::run(zylann::ThreadedTaskContext &ctx) {
 
 #ifdef VOXEL_ENABLE_GPU
 
-void MeshBlockTask::gather_voxels_gpu(zylann::ThreadedTaskContext &ctx) {
-	ZN_ASSERT(meshing_dependency != nullptr);
-	ZN_ASSERT(data != nullptr);
+void MeshBlockTask::gather_voxels_gpu(voxel::ThreadedTaskContext &ctx) {
+	VOXEL_ASSERT(meshing_dependency != nullptr);
+	VOXEL_ASSERT(data != nullptr);
 
 	Ref<VoxelMesher> mesher = meshing_dependency->mesher;
 	const unsigned int min_padding = mesher->get_minimum_padding();
@@ -412,7 +412,7 @@ void MeshBlockTask::gather_voxels_gpu(zylann::ThreadedTaskContext &ctx) {
 	std::shared_ptr<ComputeShader> generator_shader = generator->get_block_rendering_shader();
 	ERR_FAIL_COND(generator_shader == nullptr);
 
-	GenerateBlockGPUTask *gpu_task = ZN_NEW(GenerateBlockGPUTask);
+	GenerateBlockGPUTask *gpu_task = VOXEL_NEW(GenerateBlockGPUTask);
 	gpu_task->boxes_to_generate = std::move(boxes_to_generate);
 	gpu_task->generator_shader = generator_shader;
 	gpu_task->generator_shader_params = generator->get_block_rendering_shader_parameters();
@@ -443,8 +443,8 @@ void MeshBlockTask::set_gpu_results(StdVector<GenerateBlockGPUTaskResult> &&resu
 #endif
 
 void MeshBlockTask::gather_voxels_cpu() {
-	ZN_ASSERT(meshing_dependency != nullptr);
-	ZN_ASSERT(data != nullptr);
+	VOXEL_ASSERT(meshing_dependency != nullptr);
+	VOXEL_ASSERT(data != nullptr);
 
 	Ref<VoxelMesher> mesher = meshing_dependency->mesher;
 	const unsigned int min_padding = mesher->get_minimum_padding();
@@ -528,17 +528,17 @@ void MeshBlockTask::build_mesh() {
 
 	if (
 			require_visual //
-			&& zylann::godot::try_get_as(mesher, transvoxel_mesher) //
+			&& voxel::godot::try_get_as(mesher, transvoxel_mesher) //
 			&& detail_texture_settings.enabled //
 			&& !mesh_is_empty //
 			&& lod_index >= detail_texture_settings.begin_lod_index //
 			&& require_detail_texture //
 	) {
-		ZN_PROFILE_SCOPE_NAMED("Schedule detail render");
+		VOXEL_PROFILE_SCOPE_NAMED("Schedule detail render");
 
 		const transvoxel::MeshArrays &mesh_arrays = VoxelMesherTransvoxel::get_mesh_cache_from_current_thread();
 		Span<const transvoxel::CellInfo> cell_infos = VoxelMesherTransvoxel::get_cell_info_from_current_thread();
-		ZN_ASSERT(cell_infos.size() > 0 && mesh_arrays.vertices.size() > 0);
+		VOXEL_ASSERT(cell_infos.size() > 0 && mesh_arrays.vertices.size() > 0);
 
 		UniquePtr<TransvoxelCellIterator> cell_iterator = make_unique_instance<TransvoxelCellIterator>(cell_infos);
 
@@ -548,7 +548,7 @@ void MeshBlockTask::build_mesh() {
 		// dequeued in the main thread, since it runs in a separate asynchronous task
 		_detail_textures = detail_textures;
 
-		RenderDetailTextureTask *nm_task = ZN_NEW(RenderDetailTextureTask);
+		RenderDetailTextureTask *nm_task = VOXEL_NEW(RenderDetailTextureTask);
 		nm_task->cell_iterator = std::move(cell_iterator);
 		// Copy mesh data
 		append_array(nm_task->mesh_vertices, mesh_arrays.vertices);
@@ -581,7 +581,7 @@ void MeshBlockTask::build_mesh() {
 	if (require_visual && VoxelEngine::get_singleton().is_threaded_graphics_resource_building_enabled()) {
 		// This can only run if the engine supports building meshes from multiple threads
 
-		_mesh = zylann::voxel::build_mesh(
+		_mesh = voxel::build_mesh(
 				to_span(_surfaces_output.surfaces),
 				_surfaces_output.primitive_type,
 				_surfaces_output.mesh_flags,
@@ -589,7 +589,7 @@ void MeshBlockTask::build_mesh() {
 		);
 
 		if (_surfaces_output.shadow_occluder.size() > 0) {
-			_shadow_occluder_mesh = zylann::voxel::build_mesh(_surfaces_output.shadow_occluder);
+			_shadow_occluder_mesh = voxel::build_mesh(_surfaces_output.shadow_occluder);
 		}
 
 		_has_mesh_resource = true;
@@ -652,8 +652,8 @@ void MeshBlockTask::apply_result() {
 
 	} else {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Mesh request response came back but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Mesh request response came back but volume wasn't found");
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

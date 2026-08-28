@@ -3,7 +3,7 @@
 
 #include "voxel_blocky_model.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Cubic model, with configurable tiles on each side
 // TODO Would it be better to add a new PrimitiveMesh doing this, and use VoxelBlockyMesh?
@@ -53,6 +53,6 @@ void make_cube_side_vertices(StdVector<Vector3f> &positions, const unsigned int 
 void make_cube_side_indices(StdVector<int> &indices, const unsigned int side_index);
 void make_cube_side_tangents(StdVector<float> &tangents, const unsigned int side_index);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_CUBE_H

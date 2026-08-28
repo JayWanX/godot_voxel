@@ -4,10 +4,10 @@
 #include "../../util/godot/classes/editor_plugin.h"
 #include "voxel_generator_multipass_editor_inspector_plugin.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-class VoxelGeneratorMultipassEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(VoxelGeneratorMultipassEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VoxelGeneratorMultipassEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VoxelGeneratorMultipassEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	VoxelGeneratorMultipassEditorPlugin();
 
@@ -20,6 +20,6 @@ private:
 	Ref<VoxelGeneratorMultipassEditorInspectorPlugin> _inspector_plugin;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_MULTIPASS_EDITOR_PLUGIN_H

@@ -10,7 +10,7 @@
 #include "../../util/godot/core/version.h"
 #endif
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 class VoxelModifier : public Node3D {
 	GDCLASS(VoxelModifier, Node3D)
@@ -30,16 +30,16 @@ public:
 	float get_smoothness() const;
 
 #ifdef TOOLS_ENABLED
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	PackedStringArray _get_configuration_warnings() const override;
 #endif
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif
 
 protected:
-	virtual zylann::voxel::VoxelModifier *create(zylann::voxel::VoxelModifierStack &modifiers, uint32_t id);
+	virtual voxel::VoxelModifier *create(voxel::VoxelModifierStack &modifiers, uint32_t id);
 	void _notification(int p_what);
 
 	VoxelLodTerrain *_volume = nullptr;
@@ -57,17 +57,17 @@ private:
 void post_edit_modifier(VoxelLodTerrain &volume, AABB aabb);
 
 template <typename T>
-T *get_modifier(VoxelLodTerrain &volume, uint32_t id, zylann::voxel::VoxelModifier::Type type) {
+T *get_modifier(VoxelLodTerrain &volume, uint32_t id, voxel::VoxelModifier::Type type) {
 	VoxelData &data = volume.get_storage();
 	VoxelModifierStack &modifiers = data.get_modifiers();
-	zylann::voxel::VoxelModifier *modifier = modifiers.get_modifier(id);
-	ZN_ASSERT_RETURN_V(modifier != nullptr, nullptr);
-	ZN_ASSERT_RETURN_V(modifier->get_type() == type, nullptr);
+	voxel::VoxelModifier *modifier = modifiers.get_modifier(id);
+	VOXEL_ASSERT_RETURN_V(modifier != nullptr, nullptr);
+	VOXEL_ASSERT_RETURN_V(modifier->get_type() == type, nullptr);
 	return static_cast<T *>(modifier);
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot
 
-VARIANT_ENUM_CAST(zylann::voxel::godot::VoxelModifier::Operation);
+VARIANT_ENUM_CAST(voxel::godot::VoxelModifier::Operation);
 
 #endif // VOXEL_MODIFIER_GD_H

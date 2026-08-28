@@ -3,7 +3,7 @@
 
 #include "transvoxel.h"
 
-namespace zylann::voxel::transvoxel::materials {
+namespace voxel::transvoxel::materials {
 
 struct NullProcessor {
 	// Called for every 2x2x2 cell containing triangles.
@@ -24,6 +24,6 @@ struct NullProcessor {
 	}
 };
 
-} // namespace zylann::voxel::transvoxel::materials
+} // namespace voxel::transvoxel::materials
 
 #endif // VOXEL_TRANSVOXEL_MATERIALS_NULL_H

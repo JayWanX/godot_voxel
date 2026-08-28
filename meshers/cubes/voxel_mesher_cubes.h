@@ -9,7 +9,7 @@
 
 #include <vector>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // A super simple mesher only producing colored cubes
 class VoxelMesherCubes : public VoxelMesher {
@@ -53,9 +53,9 @@ public:
 
 	// TODO GDX: Resource::duplicate() cannot be overriden (while it can in modules).
 	// This will lead to performance degradation and maybe unexpected behavior
-	// #if defined(ZN_GODOT)
+	// #if defined(VOXEL_GODOT)
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
-	// #elif defined(ZN_GODOT_EXTENSION)
+	// #elif defined(VOXEL_GODOT_EXTENSION)
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const;
 	// #endif
 
@@ -143,9 +143,9 @@ private:
 	static Cache &get_tls_cache();
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelMesherCubes::ColorMode);
-VARIANT_ENUM_CAST(zylann::voxel::VoxelMesherCubes::Materials);
+VARIANT_ENUM_CAST(voxel::VoxelMesherCubes::ColorMode);
+VARIANT_ENUM_CAST(voxel::VoxelMesherCubes::Materials);
 
 #endif // VOXEL_MESHER_CUBES_H

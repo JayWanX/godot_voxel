@@ -1,13 +1,13 @@
-#ifndef ZN_GODOT_NODE_BUCKETS_STRATEGY_H
-#define ZN_GODOT_NODE_BUCKETS_STRATEGY_H
+#ifndef VOXEL_GODOT_NODE_BUCKETS_STRATEGY_H
+#define VOXEL_GODOT_NODE_BUCKETS_STRATEGY_H
 
 #include "../containers/std_vector.h"
 #include "../errors.h"
 #include "macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Node)
+VOXEL_GODOT_FORWARD_DECLARE(class Node)
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // A workaround for the fact Godot is very slow at removing nodes from the scene tree if they have many siblings...
 // See https://github.com/godotengine/godot/issues/61929
@@ -19,7 +19,7 @@ public:
 	NodeBucketsStrategy(Node &parent) : _parent(parent) {}
 
 	void add_child(Node *node) {
-		ZN_ASSERT(node != nullptr);
+		VOXEL_ASSERT(node != nullptr);
 		if (_free_buckets.size() == 0) {
 			TBucket *bucket = memnew(TBucket);
 			_used_buckets.push_back(bucket);
@@ -52,6 +52,6 @@ private:
 	StdVector<TBucket *> _used_buckets;
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_NODE_BUCKETS_STRATEGY_H
+#endif // VOXEL_GODOT_NODE_BUCKETS_STRATEGY_H

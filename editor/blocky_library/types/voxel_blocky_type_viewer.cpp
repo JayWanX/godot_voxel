@@ -6,16 +6,16 @@
 #include "../../../util/godot/editor_scale.h"
 #include "voxel_blocky_type_attribute_combination_selector.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyTypeViewer::VoxelBlockyTypeViewer() {
 	const float editor_scale = EDSCALE;
 
-	ZN_ModelViewer *model_viewer = this;
+	VOXEL_ModelViewer *model_viewer = this;
 	model_viewer->set_h_size_flags(Container::SIZE_EXPAND_FILL);
 	model_viewer->set_v_size_flags(Container::SIZE_EXPAND_FILL);
 	model_viewer->set_custom_minimum_size(Vector2(100, 150 * editor_scale));
@@ -28,7 +28,7 @@ VoxelBlockyTypeViewer::VoxelBlockyTypeViewer() {
 
 void VoxelBlockyTypeViewer::set_combination_selector(VoxelBlockyTypeAttributeCombinationSelector *selector) {
 	// Supposed to be setup only once.
-	ZN_ASSERT_RETURN(_combination_selector == nullptr);
+	VOXEL_ASSERT_RETURN(_combination_selector == nullptr);
 	selector->connect(
 			VoxelBlockyTypeAttributeCombinationSelector::SIGNAL_COMBINATION_CHANGED,
 			callable_mp(this, &VoxelBlockyTypeViewer::_on_combination_changed)
@@ -55,7 +55,7 @@ void VoxelBlockyTypeViewer::set_type(Ref<VoxelBlockyType> type) {
 }
 
 void VoxelBlockyTypeViewer::update_model() {
-	ZN_ASSERT_RETURN(_combination_selector != nullptr);
+	VOXEL_ASSERT_RETURN(_combination_selector != nullptr);
 	const VoxelBlockyType::VariantKey key = _combination_selector->get_variant_key();
 	// The mesh can be null
 	Ref<Mesh> mesh = _type->get_preview_mesh(key);
@@ -72,4 +72,4 @@ void VoxelBlockyTypeViewer::_on_combination_changed() {
 
 void VoxelBlockyTypeViewer::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

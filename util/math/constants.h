@@ -1,7 +1,7 @@
-#ifndef ZN_MATH_CONSTANTS
-#define ZN_MATH_CONSTANTS
+#ifndef VOXEL_MATH_CONSTANTS
+#define VOXEL_MATH_CONSTANTS
 
-namespace zylann::math {
+namespace voxel::math {
 
 // TODO In C++20 we can use <numbers>? (except for TAU unfortunately)
 
@@ -22,6 +22,6 @@ inline constexpr TFloat SQRT3 = 1.7320508075688772935274463415059;
 
 enum Axis { AXIS_X = 0, AXIS_Y = 1, AXIS_Z = 2 };
 
-} // namespace zylann::math
+} // namespace voxel::math
 
-#endif // ZN_MATH_CONSTANTS
+#endif // VOXEL_MATH_CONSTANTS

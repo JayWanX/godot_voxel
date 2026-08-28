@@ -1,10 +1,10 @@
 #include "voxel_generator_flat.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGeneratorFlat::VoxelGeneratorFlat() {}
 
@@ -150,4 +150,4 @@ void VoxelGeneratorFlat::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

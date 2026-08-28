@@ -3,7 +3,7 @@
 #include "../../util/profiling.h"
 #include "voxel_mesher_blocky.h"
 
-namespace zylann::voxel::blocky {
+namespace voxel::blocky {
 
 void generate_occluders_geometry(
 		OccluderArrays &out_arrays,
@@ -335,7 +335,7 @@ void generate_shadow_occluders(
 		const BakedLibrary &baked_data,
 		const uint8_t enabled_mask
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Data must be padded, hence the off-by-one
 	const Vector3i min = Vector3iUtil::create(VoxelMesherBlocky::PADDING);
@@ -403,4 +403,4 @@ void generate_shadow_occluders(
 	);
 }
 
-} // namespace zylann::voxel::blocky
+} // namespace voxel::blocky

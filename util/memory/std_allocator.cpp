@@ -1,6 +1,6 @@
 #include "std_allocator.h"
 
-namespace zylann {
+namespace voxel {
 
 #ifdef DEBUG_ENABLED
 namespace StdDefaultAllocatorCounters {
@@ -9,4 +9,4 @@ std::atomic_uint64_t g_deallocated;
 } // namespace StdDefaultAllocatorCounters
 #endif
 
-} // namespace zylann
+} // namespace voxel

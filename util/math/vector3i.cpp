@@ -1,7 +1,7 @@
 #include "vector3i.h"
 #include "../io/text_writer.h"
 
-namespace zylann {
+namespace voxel {
 
 TextWriter &operator<<(TextWriter &ss, const Vector3i &v) {
 	ss << "(" << v.x << ", " << v.y << ", " << v.z << ")";
@@ -30,7 +30,7 @@ Vector3i rotate_90(Vector3i v, Axis axis, bool clockwise) {
 			return math::rotate_z_90_ccw(v);
 		}
 	} else {
-		ZN_PRINT_ERROR("Invalid axis");
+		VOXEL_PRINT_ERROR("Invalid axis");
 		return v;
 	}
 }
@@ -67,9 +67,9 @@ void rotate_90(Span<Vector3i> vecs, const Axis axis, const bool clockwise) {
 			}
 		}
 	} else {
-		ZN_PRINT_ERROR("Invalid axis");
+		VOXEL_PRINT_ERROR("Invalid axis");
 	}
 }
 
 } // namespace math
-} // namespace zylann
+} // namespace voxel

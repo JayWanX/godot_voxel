@@ -1,7 +1,7 @@
 #include "voxel_blocky_model_empty.h"
 #include "blocky_model_baking_context.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyModelEmpty::VoxelBlockyModelEmpty() {
 	set_collision_aabbs(Span<const AABB>());
@@ -20,4 +20,4 @@ bool VoxelBlockyModelEmpty::is_empty() const {
 	return true;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

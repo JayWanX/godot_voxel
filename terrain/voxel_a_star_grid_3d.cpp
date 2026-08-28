@@ -5,7 +5,7 @@
 #include "../util/math/conv.h"
 #include "../util/string/format.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelAStarGrid3DInternal::VoxelAStarGrid3DInternal() : _voxel_buffer(VoxelBuffer::ALLOCATOR_POOL) {}
 
@@ -46,8 +46,8 @@ bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
 		chunk = _grid_cache[chunk_loc];
 
 	} else {
-		ZN_PROFILE_SCOPE_NAMED("Caching voxels");
-		ZN_ASSERT(data != nullptr);
+		VOXEL_PROFILE_SCOPE_NAMED("Caching voxels");
+		VOXEL_ASSERT(data != nullptr);
 
 		const VoxelBuffer::ChannelId channel_index = VoxelBuffer::CHANNEL_TYPE;
 		const Vector3i copy_origin = (cpos << Chunk::SIZE_PO2) + get_region().position;
@@ -66,7 +66,7 @@ bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
 			switch (_voxel_buffer.get_channel_depth(channel_index)) {
 				case VoxelBuffer::DEPTH_8_BIT: {
 					Span<const uint8_t> values;
-					ZN_ASSERT(_voxel_buffer.get_channel_data(channel_index, values));
+					VOXEL_ASSERT(_voxel_buffer.get_channel_data(channel_index, values));
 					uint64_t i = 0;
 					// Assuming ZXY loop order
 					for (const uint8_t v : values) {
@@ -77,7 +77,7 @@ bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
 
 				case VoxelBuffer::DEPTH_16_BIT: {
 					Span<const uint16_t> values;
-					ZN_ASSERT(_voxel_buffer.get_channel_data(channel_index, values));
+					VOXEL_ASSERT(_voxel_buffer.get_channel_data(channel_index, values));
 					uint64_t i = 0;
 					for (const uint16_t v : values) {
 						chunk.solid_bits |= (v == 0 ? uint64_t(0) : (uint64_t(1) << i));
@@ -86,7 +86,7 @@ bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
 				} break;
 
 				default:
-					ZN_PRINT_ERROR("Unhandled channel depth");
+					VOXEL_PRINT_ERROR("Unhandled channel depth");
 					break;
 			}
 
@@ -102,16 +102,16 @@ bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void VoxelAStarGrid3D::set_terrain(VoxelTerrain *node) {
-	ZN_ASSERT_RETURN(node != nullptr);
+	VOXEL_ASSERT_RETURN(node != nullptr);
 	// Can't modify the pathfinder while it is running in a different thread
-	ZN_ASSERT_RETURN(_is_running_async == false);
+	VOXEL_ASSERT_RETURN(_is_running_async == false);
 	_path_finder.data = node->get_storage_shared();
 }
 
 TypedArray<Vector3i> VoxelAStarGrid3D::find_path(Vector3i from_position, Vector3i to_position) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN_V(_is_running_async == false, TypedArray<Vector3i>());
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN_V(_is_running_async == false, TypedArray<Vector3i>());
+	VOXEL_ASSERT_RETURN_V_MSG(
 			_path_finder.data != nullptr, TypedArray<Vector3i>(), "Terrain to pathfind was not set, use `set_terrain()`"
 	);
 #ifdef DEBUG_ENABLED
@@ -123,17 +123,17 @@ TypedArray<Vector3i> VoxelAStarGrid3D::find_path(Vector3i from_position, Vector3
 #ifdef DEBUG_ENABLED
 void VoxelAStarGrid3D::check_params(Vector3i from_position, Vector3i to_position) {
 	if (get_region().size == Vector3i()) {
-		ZN_PRINT_WARNING("The region is empty or not defined, no path will be found");
+		VOXEL_PRINT_WARNING("The region is empty or not defined, no path will be found");
 	}
 	if (!get_region().contains(from_position)) {
-		ZN_PRINT_WARNING(
+		VOXEL_PRINT_WARNING(
 				format("The current region {} does not contain the source position {}, no path will be found",
 					   get_region(),
 					   from_position)
 		);
 	}
 	if (!get_region().contains(to_position)) {
-		ZN_PRINT_WARNING(
+		VOXEL_PRINT_WARNING(
 				format("The current region {} does not contain the destination {}, no path will be found",
 					   get_region(),
 					   to_position)
@@ -166,8 +166,8 @@ TypedArray<Vector3i> VoxelAStarGrid3D::find_path_internal(Vector3i from_position
 }
 
 void VoxelAStarGrid3D::set_region(Box3i region) {
-	ZN_ASSERT_RETURN(_is_running_async == false);
-	ZN_ASSERT_RETURN_MSG(Vector3iUtil::is_valid_size(region.size), format("Invalid region size: {}", region.size));
+	VOXEL_ASSERT_RETURN(_is_running_async == false);
+	VOXEL_ASSERT_RETURN_MSG(Vector3iUtil::is_valid_size(region.size), format("Invalid region size: {}", region.size));
 	_path_finder.set_region(region);
 }
 
@@ -176,8 +176,8 @@ Box3i VoxelAStarGrid3D::get_region() {
 }
 
 void VoxelAStarGrid3D::find_path_async(Vector3i from_position, Vector3i to_position) {
-	ZN_ASSERT_RETURN(_is_running_async == false);
-	ZN_ASSERT_RETURN_MSG(_path_finder.data != nullptr, "Terrain to pathfind was not set, use `set_terrain()`");
+	VOXEL_ASSERT_RETURN(_is_running_async == false);
+	VOXEL_ASSERT_RETURN_MSG(_path_finder.data != nullptr, "Terrain to pathfind was not set, use `set_terrain()`");
 
 #ifdef DEBUG_ENABLED
 	check_params(from_position, to_position);
@@ -192,7 +192,7 @@ void VoxelAStarGrid3D::find_path_async(Vector3i from_position, Vector3i to_posit
 		Vector3i to_position;
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_ASSERT(astar.is_valid());
+			VOXEL_ASSERT(astar.is_valid());
 			TypedArray<Vector3i> path = astar->find_path_internal(from_position, to_position);
 			astar->call_deferred(VoxelStringNames::get_singleton()._on_async_search_completed, path);
 		}
@@ -202,7 +202,7 @@ void VoxelAStarGrid3D::find_path_async(Vector3i from_position, Vector3i to_posit
 		}
 	};
 
-	Task *task = ZN_NEW(Task);
+	Task *task = VOXEL_NEW(Task);
 	task->astar = Ref<VoxelAStarGrid3D>(this);
 	task->from_position = from_position;
 	task->to_position = to_position;
@@ -215,7 +215,7 @@ bool VoxelAStarGrid3D::is_running_async() const {
 }
 
 TypedArray<Vector3i> VoxelAStarGrid3D::debug_get_visited_positions() const {
-	ZN_ASSERT_RETURN_V(_is_running_async == false, TypedArray<Vector3i>());
+	VOXEL_ASSERT_RETURN_V(_is_running_async == false, TypedArray<Vector3i>());
 	StdVector<Vector3i> positions;
 	_path_finder.debug_get_visited_points(positions);
 	return to_typed_array(to_span(positions));
@@ -260,4 +260,4 @@ void VoxelAStarGrid3D::_bind_methods() {
 	));
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

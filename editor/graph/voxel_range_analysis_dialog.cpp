@@ -7,21 +7,21 @@
 #include "../../util/godot/core/string.h"
 #include "../../util/godot/editor_scale.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelRangeAnalysisDialog::VoxelRangeAnalysisDialog() {
-	set_title(ZN_TTR("Debug Range Analysis"));
+	set_title(VOXEL_TTR("Debug Range Analysis"));
 	set_min_size(EDSCALE * Vector2(300, 280));
 
 	VBoxContainer *vb = memnew(VBoxContainer);
 	// vb->set_anchors_preset(Control::PRESET_TOP_WIDE);
 
 	_enabled_checkbox = memnew(CheckBox);
-	_enabled_checkbox->set_text(ZN_TTR("Enabled"));
+	_enabled_checkbox->set_text(VOXEL_TTR("Enabled"));
 	_enabled_checkbox->connect("toggled", callable_mp(this, &VoxelRangeAnalysisDialog::_on_enabled_checkbox_toggled));
 	vb->add_child(_enabled_checkbox);
 
@@ -29,7 +29,7 @@ VoxelRangeAnalysisDialog::VoxelRangeAnalysisDialog() {
 	// TODO Had to use `\n` and disable autowrap, otherwise the popup height becomes crazy high
 	// See https://github.com/godotengine/godot/issues/47005
 	tip->set_text(
-			ZN_TTR("When enabled, hover node output labels to\ninspect their "
+			VOXEL_TTR("When enabled, hover node output labels to\ninspect their "
 				   "estimated range within the\nconfigured area.\n"
 				   "Nodes that may be optimized out locally will be greyed out.")
 	);
@@ -41,12 +41,12 @@ VoxelRangeAnalysisDialog::VoxelRangeAnalysisDialog() {
 	gc->set_anchors_preset(Control::PRESET_TOP_WIDE);
 	gc->set_columns(2);
 
-	add_row(ZN_TTR("Position X"), _pos_x_spinbox, gc, 0);
-	add_row(ZN_TTR("Position Y"), _pos_y_spinbox, gc, 0);
-	add_row(ZN_TTR("Position Z"), _pos_z_spinbox, gc, 0);
-	add_row(ZN_TTR("Size X"), _size_x_spinbox, gc, 100);
-	add_row(ZN_TTR("Size Y"), _size_y_spinbox, gc, 100);
-	add_row(ZN_TTR("Size Z"), _size_z_spinbox, gc, 100);
+	add_row(VOXEL_TTR("Position X"), _pos_x_spinbox, gc, 0);
+	add_row(VOXEL_TTR("Position Y"), _pos_y_spinbox, gc, 0);
+	add_row(VOXEL_TTR("Position Z"), _pos_z_spinbox, gc, 0);
+	add_row(VOXEL_TTR("Size X"), _size_x_spinbox, gc, 100);
+	add_row(VOXEL_TTR("Size Y"), _size_y_spinbox, gc, 100);
+	add_row(VOXEL_TTR("Size Z"), _size_z_spinbox, gc, 100);
 
 	vb->add_child(gc);
 
@@ -89,4 +89,4 @@ void VoxelRangeAnalysisDialog::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("area_changed"));
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

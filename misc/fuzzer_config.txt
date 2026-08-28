@@ -52,12 +52,12 @@ VoxelToolLodTerrain
 VoxelToolTerrain
 VoxelViewer
 VoxelVoxLoader
-ZN_FastNoiseLite
-ZN_FastNoiseLiteGradient
-ZN_ThreadedTask
+VOXEL_FastNoiseLite
+VOXEL_FastNoiseLiteGradient
+VOXEL_ThreadedTask
 
 function_exceptions_append:
-update_generator # https://github.com/Zylann/godot_voxel/issues/466
-_set_data # https://github.com/Zylann/godot_voxel/issues/463
+update_generator # https://github.com/Voxel/godot_voxel/issues/466
+_set_data # https://github.com/Voxel/godot_voxel/issues/463
 debug_measure_microseconds_per_voxel # Slow function
 debug_print_sdf_top_down # Slow and spams hundreads of things

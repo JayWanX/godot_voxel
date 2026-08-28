@@ -2,12 +2,12 @@
 #include "../string/conv.h"
 #include <cstring>
 
-namespace zylann {
+namespace voxel {
 
 TextWriter::TextWriter(Span<char> buf) : _buffer(buf), _pos(0) {}
 
 void TextWriter::drain(Span<const char> chars) {
-	ZN_PRINT_ERROR("No implemented sink");
+	VOXEL_PRINT_ERROR("No implemented sink");
 }
 
 void TextWriter::flush() {
@@ -129,4 +129,4 @@ TextWriter &operator<<(TextWriter &w, const char *v) {
 	return w;
 }
 
-} // namespace zylann
+} // namespace voxel

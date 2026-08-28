@@ -4,9 +4,9 @@
 #include "../../util/godot/classes/object.h"
 #include "editor_property_aabb_min_max.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-bool VoxelTerrainEditorInspectorPlugin::_zn_can_handle(const Object *p_object) const {
+bool VoxelTerrainEditorInspectorPlugin::_voxel_can_handle(const Object *p_object) const {
 	const VoxelTerrain *vt = Object::cast_to<VoxelTerrain>(p_object);
 	if (vt != nullptr) {
 		return true;
@@ -18,7 +18,7 @@ bool VoxelTerrainEditorInspectorPlugin::_zn_can_handle(const Object *p_object) c
 	return false;
 }
 
-bool VoxelTerrainEditorInspectorPlugin::_zn_parse_property(Object *p_object, const Variant::Type p_type,
+bool VoxelTerrainEditorInspectorPlugin::_voxel_parse_property(Object *p_object, const Variant::Type p_type,
 		const String &p_path, const PropertyHint p_hint, const String &p_hint_text,
 		const BitField<PropertyUsageFlags> p_usage, const bool p_wide) {
 	if (p_type != Variant::AABB) {
@@ -29,10 +29,10 @@ bool VoxelTerrainEditorInspectorPlugin::_zn_parse_property(Object *p_object, con
 		return false;
 	}
 	// Replace default AABB editor with this one
-	ZN_EditorPropertyAABBMinMax *ed = memnew(ZN_EditorPropertyAABBMinMax);
+	VOXEL_EditorPropertyAABBMinMax *ed = memnew(VOXEL_EditorPropertyAABBMinMax);
 	ed->setup(-constants::MAX_VOLUME_EXTENT, constants::MAX_VOLUME_EXTENT, 1, true);
 	add_property_editor(p_path, ed);
 	return true;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

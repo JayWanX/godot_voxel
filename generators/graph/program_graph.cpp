@@ -9,11 +9,11 @@
 #include "../../util/string/format.h"
 #include <fstream>
 
-namespace zylann {
+namespace voxel {
 
 template <typename T>
 inline bool range_contains(const StdVector<T> &vec, const T &v, uint32_t begin, uint32_t end) {
-	ZN_ASSERT(end <= vec.size());
+	VOXEL_ASSERT(end <= vec.size());
 	for (size_t i = begin; i < end; ++i) {
 		if (vec[i] == v) {
 			return true;
@@ -27,7 +27,7 @@ ProgramGraph::~ProgramGraph() {
 }
 
 uint32_t ProgramGraph::Node::find_input_connection(PortLocation src, uint32_t input_port_index) const {
-	ZN_ASSERT(input_port_index < inputs.size());
+	VOXEL_ASSERT(input_port_index < inputs.size());
 	const Port &p = inputs[input_port_index];
 	for (size_t i = 0; i < p.connections.size(); ++i) {
 		if (p.connections[i] == src) {
@@ -38,7 +38,7 @@ uint32_t ProgramGraph::Node::find_input_connection(PortLocation src, uint32_t in
 }
 
 uint32_t ProgramGraph::Node::find_output_connection(uint32_t output_port_index, PortLocation dst) const {
-	ZN_ASSERT(output_port_index < outputs.size());
+	VOXEL_ASSERT(output_port_index < outputs.size());
 	const Port &p = outputs[output_port_index];
 	for (size_t i = 0; i < p.connections.size(); ++i) {
 		if (p.connections[i] == dst) {
@@ -64,12 +64,12 @@ ProgramGraph::Node *ProgramGraph::create_node(uint32_t type_id, uint32_t id) {
 		id = generate_node_id();
 	} else {
 		// ID must not be taken already
-		ZN_ASSERT_RETURN_V(_nodes.find(id) == _nodes.end(), nullptr);
+		VOXEL_ASSERT_RETURN_V(_nodes.find(id) == _nodes.end(), nullptr);
 		if (_next_node_id <= id) {
 			_next_node_id = id + 1;
 		}
 	}
-	Node *node = ZN_NEW(Node);
+	Node *node = VOXEL_NEW(Node);
 	node->id = id;
 	node->type_id = type_id;
 	_nodes[node->id] = node;
@@ -86,7 +86,7 @@ void ProgramGraph::remove_node(uint32_t node_id) {
 			const PortLocation src = *it;
 			Node &src_node = get_node(src.node_id);
 			const uint32_t i = src_node.find_output_connection(src.port_index, PortLocation{ node_id, dst_port_index });
-			ZN_ASSERT(i != NULL_INDEX);
+			VOXEL_ASSERT(i != NULL_INDEX);
 			StdVector<PortLocation> &connections = src_node.outputs[src.port_index].connections;
 			connections.erase(connections.begin() + i);
 		}
@@ -99,21 +99,21 @@ void ProgramGraph::remove_node(uint32_t node_id) {
 			const PortLocation dst = *it;
 			Node &dst_node = get_node(dst.node_id);
 			const uint32_t i = dst_node.find_input_connection(PortLocation{ node_id, src_port_index }, dst.port_index);
-			ZN_ASSERT(i != NULL_INDEX);
+			VOXEL_ASSERT(i != NULL_INDEX);
 			StdVector<PortLocation> &connections = dst_node.inputs[dst.port_index].connections;
 			connections.erase(connections.begin() + i);
 		}
 	}
 
 	_nodes.erase(node_id);
-	ZN_DELETE(&node);
+	VOXEL_DELETE(&node);
 }
 
 void ProgramGraph::clear() {
 	for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
 		Node *node = it->second;
-		ZN_ASSERT(node != nullptr);
-		ZN_DELETE(node);
+		VOXEL_ASSERT(node != nullptr);
+		VOXEL_DELETE(node);
 	}
 	_nodes.clear();
 }
@@ -122,10 +122,10 @@ bool ProgramGraph::is_connected(PortLocation src, PortLocation dst) const {
 	const Node &src_node = get_node(src.node_id);
 	const Node &dst_node = get_node(dst.node_id);
 	if (src_node.find_output_connection(src.port_index, dst) != NULL_INDEX) {
-		ZN_ASSERT(dst_node.find_input_connection(src, dst.port_index) != NULL_INDEX);
+		VOXEL_ASSERT(dst_node.find_input_connection(src, dst.port_index) != NULL_INDEX);
 		return true;
 	} else {
-		ZN_ASSERT(dst_node.find_input_connection(src, dst.port_index) == NULL_INDEX);
+		VOXEL_ASSERT(dst_node.find_input_connection(src, dst.port_index) == NULL_INDEX);
 		return false;
 	}
 }
@@ -156,14 +156,14 @@ bool ProgramGraph::can_connect(PortLocation src, PortLocation dst) const {
 }
 
 void ProgramGraph::connect(PortLocation src, PortLocation dst) {
-	ZN_ASSERT_RETURN_MSG(!is_connected(src, dst), "Cannot create the same connection twice.");
-	ZN_ASSERT_RETURN_MSG(src.node_id != dst.node_id, "Cannot connect a node to itself.");
-	ZN_ASSERT_RETURN_MSG(!has_path(dst.node_id, src.node_id), "Cannot add connection that would create a cycle.");
+	VOXEL_ASSERT_RETURN_MSG(!is_connected(src, dst), "Cannot create the same connection twice.");
+	VOXEL_ASSERT_RETURN_MSG(src.node_id != dst.node_id, "Cannot connect a node to itself.");
+	VOXEL_ASSERT_RETURN_MSG(!has_path(dst.node_id, src.node_id), "Cannot add connection that would create a cycle.");
 	Node &src_node = get_node(src.node_id);
 	Node &dst_node = get_node(dst.node_id);
-	ZN_ASSERT_RETURN_MSG(src.port_index < src_node.outputs.size(), "Source port doesn't exist");
-	ZN_ASSERT_RETURN_MSG(dst.port_index < dst_node.inputs.size(), "Destination port doesn't exist");
-	ZN_ASSERT_RETURN_MSG(
+	VOXEL_ASSERT_RETURN_MSG(src.port_index < src_node.outputs.size(), "Source port doesn't exist");
+	VOXEL_ASSERT_RETURN_MSG(dst.port_index < dst_node.inputs.size(), "Destination port doesn't exist");
+	VOXEL_ASSERT_RETURN_MSG(
 			dst_node.inputs[dst.port_index].connections.size() == 0, "Destination node's port is already connected"
 	);
 	src_node.outputs[src.port_index].connections.push_back(dst);
@@ -178,7 +178,7 @@ bool ProgramGraph::disconnect(PortLocation src, PortLocation dst) {
 		return false;
 	}
 	const uint32_t dst_i = dst_node.find_input_connection(src, dst.port_index);
-	ZN_ASSERT(dst_i != NULL_INDEX);
+	VOXEL_ASSERT(dst_i != NULL_INDEX);
 	StdVector<PortLocation> &src_connections = src_node.outputs[src.port_index].connections;
 	StdVector<PortLocation> &dst_connections = dst_node.inputs[dst.port_index].connections;
 	src_connections.erase(src_connections.begin() + src_i);
@@ -210,9 +210,9 @@ bool ProgramGraph::is_output_port_valid(PortLocation loc) const {
 
 ProgramGraph::Node &ProgramGraph::get_node(uint32_t id) const {
 	auto it = _nodes.find(id);
-	ZN_ASSERT(it != _nodes.end());
+	VOXEL_ASSERT(it != _nodes.end());
 	Node *node = it->second;
-	ZN_ASSERT(node != nullptr);
+	VOXEL_ASSERT(node != nullptr);
 	return *node;
 }
 
@@ -287,7 +287,7 @@ void ProgramGraph::find_dependencies(Span<const uint32_t> p_nodes_to_process, St
 	found:
 		// The loop can come back multiple times to the same node, until all its dependencies have been processed.
 		const Node &node = get_node(nodes_to_process.back());
-		ZN_ASSERT_MSG(nodes_to_process.size() <= get_nodes_count(), "Invalid graph?");
+		VOXEL_ASSERT_MSG(nodes_to_process.size() <= get_nodes_count(), "Invalid graph?");
 
 		// Pick first non-visited dependency
 		for (const Port &port : node.inputs) {
@@ -306,7 +306,7 @@ void ProgramGraph::find_dependencies(Span<const uint32_t> p_nodes_to_process, St
 	}
 
 #if DEBUG_ENABLED
-	ZN_ASSERT(!has_duplicate(to_span_const(out_order)));
+	VOXEL_ASSERT(!has_duplicate(to_span_const(out_order)));
 #endif
 }
 
@@ -333,7 +333,7 @@ void ProgramGraph::debug_print_dot_file(String p_file_path) const {
 	std::ofstream ofs(file_path.c_str(), std::ios::binary | std::ios::trunc | std::ios::out);
 
 	if (!ofs.good()) {
-		ZN_PRINT_VERBOSE(format("Could not write ProgramGraph debug file as {}", file_path));
+		VOXEL_PRINT_VERBOSE(format("Could not write ProgramGraph debug file as {}", file_path));
 		return;
 	}
 
@@ -395,8 +395,8 @@ bool ProgramGraph::branch_equals(
 			if (obj0 == nullptr || obj1 == nullptr) {
 				return false;
 			}
-			const uint64_t h0 = zylann::godot::get_deep_hash(*obj0);
-			const uint64_t h1 = zylann::godot::get_deep_hash(*obj1);
+			const uint64_t h0 = voxel::godot::get_deep_hash(*obj0);
+			const uint64_t h1 = voxel::godot::get_deep_hash(*obj1);
 			if (h0 != h1) {
 				return false;
 			}
@@ -416,8 +416,8 @@ bool ProgramGraph::branch_equals(
 		const Port &src_input = src_node.inputs[input_index];
 		const Port &dst_input = dst_node.inputs[input_index];
 
-		ZN_ASSERT_RETURN_V(src_input.connections.size() <= 1, false);
-		ZN_ASSERT_RETURN_V(dst_input.connections.size() <= 1, false);
+		VOXEL_ASSERT_RETURN_V(src_input.connections.size() <= 1, false);
+		VOXEL_ASSERT_RETURN_V(dst_input.connections.size() <= 1, false);
 
 		if (src_input.connections.size() != dst_input.connections.size()) {
 			return false;
@@ -450,7 +450,7 @@ void ProgramGraph::copy_from(const ProgramGraph &other, bool copy_subresources) 
 	for (auto it = other._nodes.begin(); it != other._nodes.end(); ++it) {
 		const Node *other_node = it->second;
 
-		Node *node = ZN_NEW(Node);
+		Node *node = VOXEL_NEW(Node);
 		*node = *other_node;
 
 		if (copy_subresources) {
@@ -488,7 +488,7 @@ void ProgramGraph::get_connections(StdVector<ProgramGraph::Connection> &connecti
 }
 
 void ProgramGraph::get_node_ids(StdVector<uint32_t> &node_ids) const {
-	ZN_ASSERT(node_ids.size() == 0);
+	VOXEL_ASSERT(node_ids.size() == 0);
 	node_ids.reserve(node_ids.size());
 	for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
 		node_ids.push_back(it->first);
@@ -549,4 +549,4 @@ uint32_t ProgramGraph::generate_node_id() {
 	return _next_node_id++;
 }
 
-} // namespace zylann
+} // namespace voxel

@@ -1,7 +1,7 @@
 #include "test_mesh_sdf.h"
 #include "../../edition/voxel_mesh_sdf_gd.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_voxel_mesh_sdf_issue463() {
 	Ref<VoxelMeshSDF> msdf;
@@ -25,9 +25,9 @@ void test_voxel_mesh_sdf_issue463() {
 	res2.instantiate();
 	d[res1] = res2;
 
-	ZN_ASSERT(msdf->has_method("_set_data"));
+	VOXEL_ASSERT(msdf->has_method("_set_data"));
 	// Setting invalid data should cause an error but not crash or leak
 	msdf->call("_set_data", d);
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

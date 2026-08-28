@@ -4,21 +4,21 @@
 #include "../../../util/godot/classes/editor_inspector_plugin.h"
 #include "../../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class EditorInterface);
-ZN_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorInterface);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
 
-namespace zylann::voxel {
+namespace voxel {
 
-class VoxelBlockyTypeEditorInspectorPlugin : public zylann::godot::ZN_EditorInspectorPlugin {
-	GDCLASS(VoxelBlockyTypeEditorInspectorPlugin, zylann::godot::ZN_EditorInspectorPlugin)
+class VoxelBlockyTypeEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
+	GDCLASS(VoxelBlockyTypeEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
 public:
 	void set_editor_interface(EditorInterface *ed);
 	void set_undo_redo(EditorUndoRedoManager *urm);
 
 protected:
-	bool _zn_can_handle(const Object *p_object) const override;
-	void _zn_parse_begin(Object *p_object) override;
-	bool _zn_parse_property(Object *p_object, const Variant::Type p_type, const String &p_path,
+	bool _voxel_can_handle(const Object *p_object) const override;
+	void _voxel_parse_begin(Object *p_object) override;
+	bool _voxel_parse_property(Object *p_object, const Variant::Type p_type, const String &p_path,
 			const PropertyHint p_hint, const String &p_hint_text, const BitField<PropertyUsageFlags> p_usage,
 			const bool p_wide) override;
 
@@ -30,6 +30,6 @@ private:
 	EditorUndoRedoManager *_undo_redo = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TYPE_EDITOR_INSPECTOR_PLUGIN_H

@@ -7,12 +7,12 @@
 #include "../../../util/godot/core/string.h"
 #include "../../../util/godot/editor_scale.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyTypeLibraryIDSDialog::VoxelBlockyTypeLibraryIDSDialog() {
 	const float editor_scale = EDSCALE;
 
-	set_title(ZN_TTR("VoxelBlockyTypeLibrary model IDs"));
+	set_title(VOXEL_TTR("VoxelBlockyTypeLibrary model IDs"));
 	set_min_size(Vector2(300, 300) * editor_scale);
 
 	VBoxContainer *v_box_container = memnew(VBoxContainer);
@@ -34,7 +34,7 @@ VoxelBlockyTypeLibraryIDSDialog::VoxelBlockyTypeLibraryIDSDialog() {
 }
 
 void VoxelBlockyTypeLibraryIDSDialog::set_library(Ref<VoxelBlockyTypeLibrary> library) {
-	ZN_ASSERT_RETURN(library.is_valid());
+	VOXEL_ASSERT_RETURN(library.is_valid());
 
 	PackedStringArray id_map;
 	StdVector<uint16_t> used_ids;
@@ -64,4 +64,4 @@ void VoxelBlockyTypeLibraryIDSDialog::set_library(Ref<VoxelBlockyTypeLibrary> li
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

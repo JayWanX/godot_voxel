@@ -8,7 +8,7 @@
 #include "../voxel_stream.h"
 #include "region_file.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // TODO Rename VoxelStreamRegionForest
 
@@ -69,8 +69,8 @@ private:
 	EmergeResult _load_block(VoxelBuffer &out_buffer, const Vector3i block_pos, const uint8_t lod);
 	void _save_block(const VoxelBuffer &voxel_buffer, const Vector3i block_pos, const uint8_t lod);
 
-	zylann::godot::FileResult save_meta();
-	zylann::godot::FileResult load_meta();
+	voxel::godot::FileResult save_meta();
+	voxel::godot::FileResult load_meta();
 	Vector3i get_block_position_from_voxels(const Vector3i &origin_in_voxels) const;
 	Vector3i get_region_position_from_blocks(const Vector3i &block_position) const;
 	void close_all_regions();
@@ -138,6 +138,6 @@ private:
 	Mutex _mutex;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_STREAM_REGION_H

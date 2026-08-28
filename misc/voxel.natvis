@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-  <Type Name="zylann::Span&lt;*&gt;">
+  <Type Name="voxel::Span&lt;*&gt;">
     <Expand>
         <Item Name="[size]">_size</Item>
         <ArrayItems>
@@ -11,7 +11,7 @@
     </Expand>
   </Type>
 
-  <Type Name="zylann::SmallVector&lt;*&gt;">
+  <Type Name="voxel::SmallVector&lt;*&gt;">
     <Expand>
         <Item Name="[size]">_size</Item>
         <ArrayItems>

@@ -11,7 +11,7 @@
 #include "voxel_graph_compiler.h"
 #include <sstream>
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 void ShaderGenContext::require_lib_code(const char *lib_name, const char *code) {
 	_code_gen.require_lib_code(lib_name, code);
@@ -40,7 +40,7 @@ CompilationResult generate_shader(
 		StdVector<ShaderOutput> &outputs,
 		Span<const VoxelGraphFunction::NodeTypeID> restricted_outputs
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const NodeTypeDB &type_db = NodeTypeDB::get_singleton();
 
@@ -105,7 +105,7 @@ CompilationResult generate_shader(
 					outputs.push_back(ShaderOutput{ ShaderOutput::TYPE_TYPE });
 					break;
 				default:
-					ZN_PRINT_WARNING(
+					VOXEL_PRINT_WARNING(
 							format("Output type {} is not supported yet in shader generator.", node_type.name)
 					);
 					break;
@@ -131,39 +131,39 @@ CompilationResult generate_shader(
 
 		switch (node.type_id) {
 			case VoxelGraphFunction::NODE_INPUT_X: {
-				ZN_ASSERT(node.outputs.size() == 1);
+				VOXEL_ASSERT(node.outputs.size() == 1);
 				const ProgramGraph::PortLocation output_port{ node_id, 0 };
 				port_to_var.insert({ output_port, "pos.x" });
 				continue;
 			}
 			case VoxelGraphFunction::NODE_INPUT_Y: {
-				ZN_ASSERT(node.outputs.size() == 1);
+				VOXEL_ASSERT(node.outputs.size() == 1);
 				const ProgramGraph::PortLocation output_port{ node_id, 0 };
 				port_to_var.insert({ output_port, "pos.y" });
 				continue;
 			}
 			case VoxelGraphFunction::NODE_INPUT_Z: {
-				ZN_ASSERT(node.outputs.size() == 1);
+				VOXEL_ASSERT(node.outputs.size() == 1);
 				const ProgramGraph::PortLocation output_port{ node_id, 0 };
 				port_to_var.insert({ output_port, "pos.z" });
 				continue;
 			}
 			case VoxelGraphFunction::NODE_CONSTANT: {
-				ZN_ASSERT(node.outputs.size() == 1);
+				VOXEL_ASSERT(node.outputs.size() == 1);
 				const ProgramGraph::PortLocation output_port{ node_id, 0 };
 				const StdString name = codegen.generate_var_name();
 				port_to_var.insert({ output_port, name });
-				ZN_ASSERT(node.params.size() == 1);
+				VOXEL_ASSERT(node.params.size() == 1);
 				codegen.add_format("float {} = {};\n", name, float(node.params[0]));
 				continue;
 			}
 			case VoxelGraphFunction::NODE_OUTPUT_SDF: {
-				ZN_ASSERT(node.outputs.size() == 1);
+				VOXEL_ASSERT(node.outputs.size() == 1);
 				const ProgramGraph::Port &input_port = node.inputs[0];
 				if (input_port.connections.size() > 0) {
-					ZN_ASSERT(input_port.connections.size() == 1);
+					VOXEL_ASSERT(input_port.connections.size() == 1);
 					auto it = port_to_var.find(input_port.connections[0]);
-					ZN_ASSERT(it != port_to_var.end());
+					VOXEL_ASSERT(it != port_to_var.end());
 					codegen.add_format("out_sd = {};\n", it->second);
 				} else {
 					codegen.add_format("out_sd = {};\n", float(node.default_inputs[0]));
@@ -171,12 +171,12 @@ CompilationResult generate_shader(
 				continue;
 			}
 			case VoxelGraphFunction::NODE_OUTPUT_SINGLE_TEXTURE: {
-				ZN_ASSERT(node.outputs.size() == 1);
+				VOXEL_ASSERT(node.outputs.size() == 1);
 				const ProgramGraph::Port &input_port = node.inputs[0];
 				if (input_port.connections.size() > 0) {
-					ZN_ASSERT(input_port.connections.size() == 1);
+					VOXEL_ASSERT(input_port.connections.size() == 1);
 					auto it = port_to_var.find(input_port.connections[0]);
-					ZN_ASSERT(it != port_to_var.end());
+					VOXEL_ASSERT(it != port_to_var.end());
 					codegen.add_format("out_single_texture = {};\n", it->second);
 				} else {
 					codegen.add_format("out_single_texture = {};\n", float(node.default_inputs[0]));
@@ -184,12 +184,12 @@ CompilationResult generate_shader(
 				continue;
 			}
 			case VoxelGraphFunction::NODE_OUTPUT_TYPE: {
-				ZN_ASSERT(node.outputs.size() == 1);
+				VOXEL_ASSERT(node.outputs.size() == 1);
 				const ProgramGraph::Port &input_port = node.inputs[0];
 				if (input_port.connections.size() > 0) {
-					ZN_ASSERT(input_port.connections.size() == 1);
+					VOXEL_ASSERT(input_port.connections.size() == 1);
 					auto it = port_to_var.find(input_port.connections[0]);
-					ZN_ASSERT(it != port_to_var.end());
+					VOXEL_ASSERT(it != port_to_var.end());
 					codegen.add_format("out_type = {};\n", it->second);
 				} else {
 					codegen.add_format("out_type = {};\n", float(node.default_inputs[0]));
@@ -213,9 +213,9 @@ CompilationResult generate_shader(
 		for (unsigned int port_index = 0; port_index < node.inputs.size(); ++port_index) {
 			const ProgramGraph::Port &input_port = node.inputs[port_index];
 			if (input_port.connections.size() > 0) {
-				ZN_ASSERT(input_port.connections.size() == 1);
+				VOXEL_ASSERT(input_port.connections.size() == 1);
 				auto it = port_to_var.find(input_port.connections[0]);
-				ZN_ASSERT(it != port_to_var.end());
+				VOXEL_ASSERT(it != port_to_var.end());
 				input_names[port_index] = it->second.c_str();
 			} else {
 				// No incoming connections to this input. Make up a variable so following code can stay the same.
@@ -230,7 +230,7 @@ CompilationResult generate_shader(
 		for (unsigned int port_index = 0; port_index < node.outputs.size(); ++port_index) {
 			const StdString var_name = codegen.generate_var_name();
 			auto p = port_to_var.insert({ { node_id, port_index }, var_name });
-			ZN_ASSERT(p.second); // Conflict with an existing port?
+			VOXEL_ASSERT(p.second); // Conflict with an existing port?
 			output_names[port_index] = p.first->second.c_str();
 			codegen.add_format("float {};\n", var_name.c_str());
 		}
@@ -269,4 +269,4 @@ CompilationResult generate_shader(
 	return result;
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

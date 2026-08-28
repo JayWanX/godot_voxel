@@ -1,11 +1,11 @@
 #include "noise_adapter.h"
 #include "../../util/errors.h"
 
-namespace zylann {
+namespace voxel {
 
 void NoiseAdapter::get_noise_2d_series(Span<const float> x, Span<const float> y, Span<float> out) const {
 	if (fnl.is_valid()) {
-		ZN_ASSERT_RETURN(x.size() == y.size() && y.size() == out.size());
+		VOXEL_ASSERT_RETURN(x.size() == y.size() && y.size() == out.size());
 		for (unsigned int i = 0; i < x.size(); ++i) {
 			out[i] = fnl->get_noise_2d(x[i], y[i]);
 		}
@@ -25,7 +25,7 @@ void NoiseAdapter::get_noise_3d_series(
 		Span<float> out
 ) const {
 	if (fnl.is_valid()) {
-		ZN_ASSERT_RETURN(x.size() == y.size() && y.size() == z.size() && z.size() == out.size());
+		VOXEL_ASSERT_RETURN(x.size() == y.size() && y.size() == z.size() && z.size() == out.size());
 		for (unsigned int i = 0; i < x.size(); ++i) {
 			out[i] = fnl->get_noise_3d(x[i], y[i], z[i]);
 		}
@@ -38,4 +38,4 @@ void NoiseAdapter::get_noise_3d_series(
 	}
 }
 
-} // namespace zylann
+} // namespace voxel

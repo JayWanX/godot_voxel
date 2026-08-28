@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_EDITOR_INSPECTOR_H
-#define ZN_GODOT_EDITOR_INSPECTOR_H
+#ifndef VOXEL_GODOT_EDITOR_INSPECTOR_H
+#define VOXEL_GODOT_EDITOR_INSPECTOR_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 #include "../core/version.h"
 
@@ -11,9 +11,9 @@
 #include <editor/inspector/editor_inspector.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/editor_inspector.hpp>
 using namespace godot;
 #endif
 
-#endif // ZN_GODOT_EDITOR_INSPECTOR_H
+#endif // VOXEL_GODOT_EDITOR_INSPECTOR_H

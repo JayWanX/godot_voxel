@@ -5,14 +5,14 @@
 #include "collision_shape_3d.h"
 #include "mesh.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 Ref<ConcavePolygonShape3D> create_concave_polygon_shape(const Span<const Array> surfaces) {
 	// Faster version of Mesh::create_trimesh_shape(), because `create_trimesh_shape` creates a Trimesh internally along
 	// the way, which is super slow
-	// See https://github.com/Zylann/godot_voxel/issues/54
+	// See https://github.com/Voxel/godot_voxel/issues/54
 
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	PackedVector3Array face_points;
 	int face_points_size = 0;
@@ -74,7 +74,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(const Span<const Array> 
 
 	Ref<ConcavePolygonShape3D> shape;
 	{
-		ZN_PROFILE_SCOPE_NAMED("Godot shape");
+		VOXEL_PROFILE_SCOPE_NAMED("Godot shape");
 		shape.instantiate();
 		shape->set_faces(face_points);
 	}
@@ -85,7 +85,7 @@ PackedVector3Array deindex_mesh_to_packed_vector3_array(
 		const Span<const Vector3f> positions,
 		const Span<const int> indices
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	PackedVector3Array face_points;
 	face_points.resize(indices.size());
@@ -103,7 +103,7 @@ PackedVector3Array deindex_mesh_to_packed_vector3_array(
 		const Span<const Vector3> vertices,
 		const Span<const int32_t> indices
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	PackedVector3Array face_points;
 	face_points.resize(indices.size());
@@ -123,7 +123,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 		const Span<const Vector3f> positions,
 		const Span<const int> indices
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (indices.size() < 3) {
 		return Ref<ConcavePolygonShape3D>();
@@ -137,7 +137,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 
 	Ref<ConcavePolygonShape3D> shape;
 	{
-		ZN_PROFILE_SCOPE_NAMED("Godot shape");
+		VOXEL_PROFILE_SCOPE_NAMED("Godot shape");
 		shape.instantiate();
 		shape->set_faces(face_points);
 	}
@@ -150,7 +150,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 		const unsigned int vertex_count,
 		const unsigned int index_count
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	Ref<ConcavePolygonShape3D> shape;
 
@@ -158,7 +158,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 		// Empty
 		return shape;
 	}
-	ZN_ASSERT(surface_arrays.size() == Mesh::ARRAY_MAX);
+	VOXEL_ASSERT(surface_arrays.size() == Mesh::ARRAY_MAX);
 
 	const PackedInt32Array indices = surface_arrays[Mesh::ARRAY_INDEX];
 	ERR_FAIL_COND_V(index_count > static_cast<unsigned int>(indices.size()), shape);
@@ -180,11 +180,11 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 	);
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Godot shape");
+		VOXEL_PROFILE_SCOPE_NAMED("Godot shape");
 		shape.instantiate();
 		shape->set_faces(face_points);
 	}
 	return shape;
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

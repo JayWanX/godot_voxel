@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_EDITOR_PLUGIN_H
-#define ZN_GODOT_EDITOR_PLUGIN_H
+#ifndef VOXEL_GODOT_EDITOR_PLUGIN_H
+#define VOXEL_GODOT_EDITOR_PLUGIN_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/version.h>
 
 #if VERSION_MAJOR == 4 && VERSION_MINOR <= 2
@@ -10,7 +10,7 @@
 #include <editor/plugins/editor_plugin.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 // Header includes required due to implementation being required inside the `GDCLASS` macro for virtual methods...
 #include "camera_3d.h"
 #include "input_event.h"
@@ -19,12 +19,12 @@
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
-class ZN_EditorPlugin : public EditorPlugin {
-	GDCLASS(ZN_EditorPlugin, EditorPlugin)
+class VOXEL_EditorPlugin : public EditorPlugin {
+	GDCLASS(VOXEL_EditorPlugin, EditorPlugin)
 public:
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	bool handles(Object *p_object) const override;
 	void edit(Object *p_object) override;
 	void make_visible(bool visible) override;
@@ -37,7 +37,7 @@ public:
 	String get_plugin_name() const override;
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	bool _handles(Object *p_object) const override;
 	void _edit(Object *p_object) override;
 	void _make_visible(bool visible) override;
@@ -47,18 +47,18 @@ public:
 #endif
 
 protected:
-	virtual bool _zn_handles(const Object *p_object) const;
-	virtual void _zn_edit(Object *p_object);
-	virtual void _zn_make_visible(bool visible);
-	virtual EditorPlugin::AfterGUIInput _zn_forward_3d_gui_input(Camera3D *p_camera, const Ref<InputEvent> &p_event);
-	virtual void _zn_save_external_data();
-	virtual String _zn_get_plugin_name() const;
+	virtual bool _voxel_handles(const Object *p_object) const;
+	virtual void _voxel_edit(Object *p_object);
+	virtual void _voxel_make_visible(bool visible);
+	virtual EditorPlugin::AfterGUIInput _voxel_forward_3d_gui_input(Camera3D *p_camera, const Ref<InputEvent> &p_event);
+	virtual void _voxel_save_external_data();
+	virtual String _voxel_get_plugin_name() const;
 
 private:
 	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods() {}
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_EDITOR_PLUGIN_H
+#endif // VOXEL_GODOT_EDITOR_PLUGIN_H

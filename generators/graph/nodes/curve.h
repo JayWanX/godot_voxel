@@ -3,7 +3,7 @@
 #include "../curve_utility.h"
 #include "../node_type_db.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 void register_curve_node(Span<NodeType> types) {
 	using namespace math;
@@ -33,13 +33,13 @@ void register_curve_node(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			Ref<Curve> curve = ctx.get_param(0);
 			if (curve.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Curve::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Curve::get_class_static())));
 				return;
 			}
 			// Make sure it is baked. We don't want multithreading to bail out because of a write operation
 			// happening in `interpolate_baked`...
 			curve->bake();
-			CurveRangeData *curve_range_data = ZN_NEW(CurveRangeData);
+			CurveRangeData *curve_range_data = VOXEL_NEW(CurveRangeData);
 			get_curve_monotonic_sections(**curve, curve_range_data->sections);
 			Params p;
 			p.curve_range_data = curve_range_data;
@@ -48,7 +48,7 @@ void register_curve_node(Span<NodeType> types) {
 			ctx.add_delete_cleanup(curve_range_data);
 		};
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_CURVE");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_CURVE");
 			const Runtime::Buffer &a = ctx.get_input(0);
 			Runtime::Buffer &out = ctx.get_output(0);
 			const Params p = ctx.get_params<Params>();
@@ -71,14 +71,14 @@ void register_curve_node(Span<NodeType> types) {
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
 			Ref<Curve> curve = ctx.get_param(0);
 			if (curve.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Curve::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Curve::get_class_static())));
 				return;
 			}
 			std::shared_ptr<ComputeShaderResource> res = ComputeShaderResourceFactory::create_texture_2d(curve);
 			const StdString uniform_texture = ctx.add_uniform(std::move(res));
 
 			// In Godot 4.4 Curves can be defined beyond 0..1
-			const Interval curve_domain = zylann::godot::get_curve_domain(**curve);
+			const Interval curve_domain = voxel::godot::get_curve_domain(**curve);
 			const float curve_domain_range = curve_domain.length();
 			const float x_remap_a = 1.f / math::max(curve_domain_range, 0.0001f);
 			const float x_remap_b = -curve_domain.min * x_remap_a;
@@ -99,4 +99,4 @@ void register_curve_node(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

@@ -3,7 +3,7 @@
 
 #include "voxel_blocky_attribute.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBlockyAttributeCustom : public VoxelBlockyAttribute {
 	GDCLASS(VoxelBlockyAttributeCustom, VoxelBlockyAttribute)
@@ -34,6 +34,6 @@ private:
 	static void _bind_methods();
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_ATTRIBUTE_CUSTOM_H

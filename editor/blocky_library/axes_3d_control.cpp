@@ -1,22 +1,22 @@
 #include "axes_3d_control.h"
 #include "../../util/math/funcs.h"
 
-namespace zylann {
+namespace voxel {
 
-void ZN_Axes3DControl::set_basis_3d(Basis basis) {
+void VOXEL_Axes3DControl::set_basis_3d(Basis basis) {
 	if (basis != _basis) {
 		_basis = basis;
 		queue_redraw();
 	}
 }
 
-void ZN_Axes3DControl::_notification(int p_what) {
+void VOXEL_Axes3DControl::_notification(int p_what) {
 	if (p_what == NOTIFICATION_DRAW) {
 		draw();
 	}
 }
 
-void ZN_Axes3DControl::draw() {
+void VOXEL_Axes3DControl::draw() {
 	const Vector3 x_axis_3d = _basis.get_column(Vector3::AXIS_X);
 	const Vector3 y_axis_3d = _basis.get_column(Vector3::AXIS_Y);
 	const Vector3 z_axis_3d = _basis.get_column(Vector3::AXIS_Z);
@@ -45,4 +45,4 @@ void ZN_Axes3DControl::draw() {
 	draw_line(center, zp, Color(0, 0, 1), line_width);
 }
 
-} // namespace zylann
+} // namespace voxel

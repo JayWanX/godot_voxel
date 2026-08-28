@@ -15,9 +15,9 @@
 // defined
 #include "../util/godot/classes/scene_tree.h"
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 bool prepare_triangles(
@@ -26,14 +26,14 @@ bool prepare_triangles(
 		Vector3f &out_min_pos,
 		Vector3f &out_max_pos
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V(mesh.get_surface_count() == 0, false);
 	if (mesh.get_surface_count() > 1) {
 		WARN_PRINT("The given mesh has more than one surface. Only the first will be used.");
 	}
 	Array surface;
 	{
-		ZN_PROFILE_SCOPE_NAMED("Get surface from Godot");
+		VOXEL_PROFILE_SCOPE_NAMED("Get surface from Godot");
 		surface = mesh.surface_get_arrays(0);
 	}
 	PackedVector3Array positions = surface[Mesh::ARRAY_VERTEX];
@@ -105,8 +105,8 @@ Ref<Mesh> VoxelMeshSDF::get_mesh() const {
 }
 
 void VoxelMeshSDF::bake() {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	Ref<Mesh> mesh = _mesh;
 	ERR_FAIL_COND(mesh.is_null());
@@ -154,7 +154,7 @@ void VoxelMeshSDF::bake() {
 			);
 		} break;
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 
 	if (_boundary_sign_fix && _bake_mode != BAKE_MODE_APPROX_FLOODFILL) {
@@ -166,16 +166,16 @@ void VoxelMeshSDF::bake() {
 	_max_pos = box_max_pos;
 }
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 void VoxelMeshSDF::bake_async(Object *scene_tree_o) {
 	SceneTree *scene_tree = Object::cast_to<SceneTree>(scene_tree_o);
 #else
 void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 #endif
-	ZN_ASSERT_RETURN(scene_tree != nullptr);
+	VOXEL_ASSERT_RETURN(scene_tree != nullptr);
 	VoxelEngineUpdater::ensure_existence(scene_tree);
 
-	// ZN_ASSERT_RETURN_MSG(!_is_baking, "Already baking");
+	// VOXEL_ASSERT_RETURN_MSG(!_is_baking, "Already baking");
 
 	struct L {
 		static void notify_on_complete(VoxelMeshSDF &obj, mesh_sdf::GenMeshSDFSubBoxTask::SharedData &shared_data) {
@@ -193,7 +193,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 		Ref<VoxelMeshSDF> obj_to_notify;
 
 		void on_complete() override {
-			ZN_ASSERT(obj_to_notify.is_valid());
+			VOXEL_ASSERT(obj_to_notify.is_valid());
 			L::notify_on_complete(**obj_to_notify, *shared_data);
 		}
 	};
@@ -213,9 +213,9 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 		}
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_DSTACK();
-			ZN_PROFILE_SCOPE();
-			ZN_ASSERT(obj_to_notify.is_valid());
+			VOXEL_DSTACK();
+			VOXEL_PROFILE_SCOPE();
+			VOXEL_ASSERT(obj_to_notify.is_valid());
 
 			std::shared_ptr<mesh_sdf::GenMeshSDFSubBoxTask::SharedData> shared_data =
 					make_shared_instance<mesh_sdf::GenMeshSDFSubBoxTask::SharedData>();
@@ -227,7 +227,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 			if (!mesh_sdf::prepare_triangles(
 						to_span(positions), to_span(indices), shared_data->triangles, min_pos, max_pos
 				)) {
-				ZN_PRINT_ERROR("Failed preparing triangles in threaded task");
+				VOXEL_PRINT_ERROR("Failed preparing triangles in threaded task");
 				report_error();
 				return;
 			}
@@ -272,7 +272,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 					shared_data->pending_jobs = res.z;
 
 					for (int z = 0; z < res.z; ++z) {
-						GenMeshSDFSubBoxTaskGD *task = ZN_NEW(GenMeshSDFSubBoxTaskGD);
+						GenMeshSDFSubBoxTaskGD *task = VOXEL_NEW(GenMeshSDFSubBoxTaskGD);
 						task->shared_data = shared_data;
 						task->box = Box3i(Vector3i(0, 0, z), Vector3i(res.x, res.y, 1));
 						task->obj_to_notify = obj_to_notify;
@@ -284,7 +284,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 				case BAKE_MODE_APPROX_INTERP: {
 					VoxelBuffer &buffer = shared_data->buffer;
 					Span<float> sdf_grid;
-					ZN_ASSERT(buffer.get_channel_data(channel, sdf_grid));
+					VOXEL_ASSERT(buffer.get_channel_data(channel, sdf_grid));
 
 					mesh_sdf::generate_mesh_sdf_approx_interp(
 							sdf_grid, res, to_span(shared_data->triangles), box_min_pos, box_max_pos
@@ -300,7 +300,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 				case BAKE_MODE_APPROX_FLOODFILL: {
 					VoxelBuffer &buffer = shared_data->buffer;
 					Span<float> sdf_grid;
-					ZN_ASSERT(buffer.get_channel_data(channel, sdf_grid));
+					VOXEL_ASSERT(buffer.get_channel_data(channel, sdf_grid));
 
 					mesh_sdf::partition_triangles(
 							partition_subdiv,
@@ -326,7 +326,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 				} break;
 
 				default:
-					ZN_PRINT_ERROR(format("Invalid bake mode {}", bake_mode));
+					VOXEL_PRINT_ERROR(format("Invalid bake mode {}", bake_mode));
 					report_error();
 					break;
 			}
@@ -344,13 +344,13 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 	ERR_FAIL_COND(mesh->get_surface_count() == 0);
 	Array surface;
 	{
-		ZN_PROFILE_SCOPE_NAMED("Get surface from Godot");
+		VOXEL_PROFILE_SCOPE_NAMED("Get surface from Godot");
 		surface = mesh->surface_get_arrays(0);
 	}
 
 	_is_baking = true;
 
-	GenMeshSDFFirstPassTask *task = ZN_NEW(GenMeshSDFFirstPassTask);
+	GenMeshSDFFirstPassTask *task = VOXEL_NEW(GenMeshSDFFirstPassTask);
 	task->cell_count = _cell_count;
 	task->margin_ratio = _margin_ratio;
 	task->bake_mode = _bake_mode;
@@ -365,7 +365,7 @@ void VoxelMeshSDF::_on_bake_async_completed(Ref<godot::VoxelBuffer> buffer, Vect
 	_is_baking = false;
 
 	// This can mean an error occurred during one of the tasks
-	ZN_ASSERT_RETURN(buffer.is_valid());
+	VOXEL_ASSERT_RETURN(buffer.is_valid());
 
 	_voxel_buffer = buffer;
 	_min_pos = to_vec3f(min_pos);
@@ -390,7 +390,7 @@ std::shared_ptr<ComputeShaderResource> VoxelMeshSDF::get_gpu_resource() {
 		const VoxelBuffer &buffer = _voxel_buffer->get_buffer();
 
 		Span<const float> sdf_grid;
-		ZN_ASSERT_RETURN_V(buffer.get_channel_data_read_only(VoxelBuffer::CHANNEL_SDF, sdf_grid), _gpu_resource);
+		VOXEL_ASSERT_RETURN_V(buffer.get_channel_data_read_only(VoxelBuffer::CHANNEL_SDF, sdf_grid), _gpu_resource);
 
 		std::shared_ptr<ComputeShaderResource> resource =
 				ComputeShaderResourceFactory::create_texture_3d_zxy(sdf_grid, buffer.get_size());
@@ -405,17 +405,17 @@ std::shared_ptr<ComputeShaderResource> VoxelMeshSDF::get_gpu_resource() {
 Array VoxelMeshSDF::debug_check_sdf(Ref<Mesh> mesh) {
 	Array result;
 
-	ZN_ASSERT_RETURN_V(is_baked(), result);
-	ZN_ASSERT(_voxel_buffer.is_valid());
+	VOXEL_ASSERT_RETURN_V(is_baked(), result);
+	VOXEL_ASSERT(_voxel_buffer.is_valid());
 	const VoxelBuffer &buffer = _voxel_buffer->get_buffer();
 	Span<const float> sdf_grid;
-	ZN_ASSERT_RETURN_V(buffer.get_channel_data_read_only(VoxelBuffer::CHANNEL_SDF, sdf_grid), result);
+	VOXEL_ASSERT_RETURN_V(buffer.get_channel_data_read_only(VoxelBuffer::CHANNEL_SDF, sdf_grid), result);
 
-	ZN_ASSERT_RETURN_V(mesh.is_valid(), result);
+	VOXEL_ASSERT_RETURN_V(mesh.is_valid(), result);
 	StdVector<mesh_sdf::Triangle> triangles;
 	Vector3f min_pos;
 	Vector3f max_pos;
-	ZN_ASSERT_RETURN_V(prepare_triangles(**mesh, triangles, min_pos, max_pos), result);
+	VOXEL_ASSERT_RETURN_V(prepare_triangles(**mesh, triangles, min_pos, max_pos), result);
 
 	const mesh_sdf::CheckResult cr =
 			mesh_sdf::check_sdf(sdf_grid, buffer.get_size(), to_span(triangles), _min_pos, _max_pos);
@@ -464,7 +464,7 @@ Dictionary VoxelMeshSDF::_b_get_data() const {
 }
 
 void VoxelMeshSDF::_b_set_data(Dictionary d) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	if (_is_baking) {
 		WARN_PRINT("Setting data while baking, that data will be overwritten when baking ends.");
 	}
@@ -472,7 +472,7 @@ void VoxelMeshSDF::_b_set_data(Dictionary d) {
 	ERR_FAIL_COND(d.is_empty());
 
 	Vector3i res;
-	ERR_FAIL_COND(!zylann::godot::try_get(d, "res", res));
+	ERR_FAIL_COND(!voxel::godot::try_get(d, "res", res));
 	ERR_FAIL_COND(Vector3iUtil::is_empty_size(res));
 
 	_voxel_buffer.instantiate();
@@ -484,7 +484,7 @@ void VoxelMeshSDF::_b_set_data(Dictionary d) {
 	ERR_FAIL_COND(!vb.get_channel_data(VoxelBuffer::CHANNEL_SDF, channel));
 
 	PackedFloat32Array sdf_f32;
-	ERR_FAIL_COND(!zylann::godot::try_get(d, "sdf_f32", sdf_f32));
+	ERR_FAIL_COND(!voxel::godot::try_get(d, "sdf_f32", sdf_f32));
 	memcpy(channel.data(), sdf_f32.ptr(), channel.size() * sizeof(float));
 
 	_min_pos = to_vec3f(Vector3(d["min_pos"]));
@@ -602,4 +602,4 @@ void VoxelMeshSDF::_bind_methods() {
 	BIND_ENUM_CONSTANT(BAKE_MODE_COUNT);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

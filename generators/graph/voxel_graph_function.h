@@ -10,7 +10,7 @@
 #include "voxel_graph_runtime.h"
 #include <memory>
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 struct ShaderParameter {
 	StdString name;
@@ -417,8 +417,8 @@ inline String get_port_display_name(const VoxelGraphFunction::Port &port) {
 
 #endif
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg
 
-VARIANT_ENUM_CAST(zylann::voxel::pg::VoxelGraphFunction::NodeTypeID)
+VARIANT_ENUM_CAST(voxel::pg::VoxelGraphFunction::NodeTypeID)
 
 #endif // VOXEL_GRAPH_FUNCTION_H

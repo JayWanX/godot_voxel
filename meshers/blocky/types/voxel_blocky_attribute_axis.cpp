@@ -2,11 +2,11 @@
 #include "../../../constants/voxel_string_names.h"
 #include "../../../util/math/ortho_basis.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyAttributeAxis::VoxelBlockyAttributeAxis() {
 	_name = VoxelStringNames::get_singleton().axis;
@@ -73,4 +73,4 @@ void VoxelBlockyAttributeAxis::_bind_methods() {
 	BIND_ENUM_CONSTANT(AXIS_COUNT);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

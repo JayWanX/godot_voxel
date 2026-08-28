@@ -6,7 +6,7 @@
 #include "packed_string_array.h"
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void copy_to(PackedVector3Array &dst, const Span<const Vector3f> src) {
 	dst.resize(src.size());
@@ -51,7 +51,7 @@ template <typename PackedVector_T, typename T>
 inline void copy_to_template(PackedVector_T &dst, Span<const T> src) {
 	dst.resize(src.size());
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(size_t(dst.size()) == src.size());
+	VOXEL_ASSERT(size_t(dst.size()) == src.size());
 #endif
 	T *dst_data = dst.ptrw();
 	// static_assert(sizeof(dst_data) == sizeof(T));
@@ -80,17 +80,17 @@ void copy_to(PackedByteArray &dst, Span<const uint8_t> src) {
 
 void copy_to(Span<uint8_t> dst, const PackedByteArray &src) {
 	const size_t src_size = src.size();
-	ZN_ASSERT(dst.size() == src_size);
+	VOXEL_ASSERT(dst.size() == src_size);
 	const uint8_t *src_data = src.ptr();
-	ZN_ASSERT(src_data != nullptr);
+	VOXEL_ASSERT(src_data != nullptr);
 	memcpy(dst.data(), src_data, src_size);
 }
 
 void copy_to(Span<float> dst, const PackedFloat32Array &src) {
 	const size_t src_size = src.size();
-	ZN_ASSERT(dst.size() == src_size);
+	VOXEL_ASSERT(dst.size() == src_size);
 	const float *src_data = src.ptr();
-	ZN_ASSERT(src_data != nullptr);
+	VOXEL_ASSERT(src_data != nullptr);
 	memcpy(dst.data(), src_data, src_size * sizeof(float));
 }
 
@@ -109,4 +109,4 @@ Array to_array(const PackedStringArray &src) {
 
 #endif
 
-} // namespace zylann::godot
+} // namespace voxel::godot

@@ -1,7 +1,7 @@
 #ifndef VOXEL_UP_MODE_H
 #define VOXEL_UP_MODE_H
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Tells how to interpret where "upwards" is in the current volume
 enum UpMode : uint8_t {
@@ -14,6 +14,6 @@ enum UpMode : uint8_t {
 	UP_MODE_COUNT
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_UP_MODE_H

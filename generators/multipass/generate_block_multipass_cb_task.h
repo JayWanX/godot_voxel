@@ -7,7 +7,7 @@
 #include "../../util/tasks/threaded_task.h"
 #include "../voxel_generator.h"
 
-namespace zylann {
+namespace voxel {
 
 class AsyncDependencyTracker;
 
@@ -53,6 +53,6 @@ private:
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_GENERATE_BLOCK_MULTIPASS_CB_TASK_H

@@ -15,13 +15,13 @@
 #include "../util/testing/test_options.h"
 #endif
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/callable_mp.h"
 #endif
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 VoxelEngine *g_voxel_engine = nullptr;
 
 VoxelEngine *VoxelEngine::get_singleton() {
@@ -41,7 +41,7 @@ void VoxelEngine::destroy_singleton() {
 }
 
 VoxelEngine::Config VoxelEngine::get_config_from_godot() {
-	ZN_ASSERT(ProjectSettings::get_singleton() != nullptr);
+	VOXEL_ASSERT(ProjectSettings::get_singleton() != nullptr);
 	ProjectSettings &ps = *ProjectSettings::get_singleton();
 
 	Config config;
@@ -80,7 +80,7 @@ VoxelEngine::Config VoxelEngine::get_config_from_godot() {
 }
 
 VoxelEngine::VoxelEngine() {
-#ifdef ZN_PROFILER_ENABLED
+#ifdef VOXEL_PROFILER_ENABLED
 	CRASH_COND(RenderingServer::get_singleton() == nullptr);
 	RenderingServer::get_singleton()->connect(
 			VoxelStringNames::get_singleton().frame_post_draw,
@@ -118,7 +118,7 @@ String VoxelEngine::get_version_git_hash() const {
 	return VOXEL_VERSION_GIT_HASH;
 }
 
-Dictionary to_dict(const zylann::voxel::VoxelEngine::Stats::ThreadPoolStats &stats) {
+Dictionary to_dict(const voxel::VoxelEngine::Stats::ThreadPoolStats &stats) {
 	Dictionary d;
 	d["tasks"] = stats.tasks;
 	d["active_threads"] = stats.active_threads;
@@ -141,7 +141,7 @@ Dictionary to_dict(const zylann::voxel::VoxelEngine::Stats::ThreadPoolStats &sta
 	return d;
 }
 
-Dictionary to_dict(const zylann::voxel::VoxelEngine::Stats &stats) {
+Dictionary to_dict(const voxel::VoxelEngine::Stats &stats) {
 	Dictionary pools;
 	pools["general"] = to_dict(stats.general);
 
@@ -156,8 +156,8 @@ Dictionary to_dict(const zylann::voxel::VoxelEngine::Stats &stats) {
 
 	// This part is additional for scripts because VoxelMemoryPool is not exposed
 	Dictionary mem;
-	mem["voxel_total"] = ZN_SIZE_T_TO_VARIANT(VoxelMemoryPool::get_singleton().debug_get_total_memory());
-	mem["voxel_used"] = ZN_SIZE_T_TO_VARIANT(VoxelMemoryPool::get_singleton().debug_get_used_memory());
+	mem["voxel_total"] = VOXEL_SIZE_T_TO_VARIANT(VoxelMemoryPool::get_singleton().debug_get_total_memory());
+	mem["voxel_used"] = VOXEL_SIZE_T_TO_VARIANT(VoxelMemoryPool::get_singleton().debug_get_used_memory());
 	mem["block_count"] = VoxelMemoryPool::get_singleton().debug_get_used_blocks();
 #ifdef DEBUG_ENABLED
 	const uint64_t std_allocated = static_cast<int64_t>(StdDefaultAllocatorCounters::g_allocated);
@@ -179,12 +179,12 @@ Dictionary to_dict(const zylann::voxel::VoxelEngine::Stats &stats) {
 }
 
 Dictionary VoxelEngine::get_stats() const {
-	ZN_PROFILE_SCOPE();
-	return to_dict(zylann::voxel::VoxelEngine::get_singleton().get_stats());
+	VOXEL_PROFILE_SCOPE();
+	return to_dict(voxel::VoxelEngine::get_singleton().get_stats());
 }
 
 int VoxelEngine::get_thread_count() const {
-	return zylann::voxel::VoxelEngine::get_singleton().get_thread_count();
+	return voxel::VoxelEngine::get_singleton().get_thread_count();
 }
 
 void VoxelEngine::set_thread_count(int count) {
@@ -192,18 +192,18 @@ void VoxelEngine::set_thread_count(int count) {
 	ERR_FAIL_COND_MSG(
 			count < 1 || count > MAX_THREADS, vformat("Thread count must be a number from 1 to %d", MAX_THREADS)
 	);
-	zylann::voxel::VoxelEngine::get_singleton().set_thread_count(static_cast<uint32_t>(count));
+	voxel::VoxelEngine::get_singleton().set_thread_count(static_cast<uint32_t>(count));
 }
 
-void VoxelEngine::schedule_task(Ref<ZN_ThreadedTask> task) {
+void VoxelEngine::schedule_task(Ref<VOXEL_ThreadedTask> task) {
 	ERR_FAIL_COND(task.is_null());
 	ERR_FAIL_COND_MSG(task->is_scheduled(), "Cannot schedule again a task that is already scheduled");
-	zylann::voxel::VoxelEngine::get_singleton().push_async_task(task->create_task());
+	voxel::VoxelEngine::get_singleton().push_async_task(task->create_task());
 }
 
 void VoxelEngine::_on_rendering_server_frame_post_draw() {
-#ifdef ZN_PROFILER_ENABLED
-	ZN_PROFILE_MARK_FRAME();
+#ifdef VOXEL_PROFILER_ENABLED
+	VOXEL_PROFILE_MARK_FRAME();
 #endif
 }
 
@@ -227,20 +227,20 @@ Vector3 VoxelEngine::get_editor_camera_direction() const {
 #ifdef VOXEL_TESTS
 
 void VoxelEngine::run_tests(Dictionary options_dict) {
-	zylann::testing::TestOptions options(options_dict);
-	zylann::voxel::tests::run_voxel_tests(options);
+	voxel::testing::TestOptions options(options_dict);
+	voxel::tests::run_voxel_tests(options);
 }
 
 #endif
 
 bool VoxelEngine::_b_get_threaded_graphics_resource_building_enabled() const {
-	const zylann::voxel::VoxelEngine &ve = zylann::voxel::VoxelEngine::get_singleton();
+	const voxel::VoxelEngine &ve = voxel::VoxelEngine::get_singleton();
 	return ve.is_threaded_graphics_resource_building_enabled();
 }
 
 // This is normally automatic. This method is mainly to allow overriding it just in case.
 // void VoxelEngine::_b_set_threaded_graphics_resource_building_enabled(bool enabled) {
-// 	zylann::voxel::VoxelEngine &ve = zylann::voxel::VoxelEngine::get_singleton();
+// 	voxel::VoxelEngine &ve = voxel::VoxelEngine::get_singleton();
 // 	ve.set_threaded_graphics_resource_building_enabled(enabled);
 // }
 
@@ -271,4 +271,4 @@ void VoxelEngine::_bind_methods() {
 	// );
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot

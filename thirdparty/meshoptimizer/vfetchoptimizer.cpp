@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 size_t meshopt_optimizeVertexFetchRemap(unsigned int* destination, const unsigned int* indices, size_t index_count, size_t vertex_count)
 {
@@ -75,4 +75,4 @@ size_t meshopt_optimizeVertexFetch(void* destination, unsigned int* indices, siz
 	return next_vertex;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

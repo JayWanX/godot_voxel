@@ -4,7 +4,7 @@
 #include "../util/containers/std_vector.h"
 #include "../util/thread/thread.h"
 
-namespace zylann {
+namespace voxel {
 
 class IThreadedTask;
 
@@ -48,6 +48,6 @@ private:
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_BUFFERED_TASK_SCHEDULER_H

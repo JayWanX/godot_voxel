@@ -1,11 +1,11 @@
-#ifndef ZN_STD_VECTOR_H
-#define ZN_STD_VECTOR_H
+#ifndef VOXEL_STD_VECTOR_H
+#define VOXEL_STD_VECTOR_H
 
 #include "../memory/std_allocator.h"
 #include "span.h"
 #include <vector>
 
-namespace zylann {
+namespace voxel {
 
 // Convenience alias that uses our own default allocator. When using Godot, it will use Godot's default allocator.
 // (in contrast, direct std::vector always uses the standard library's default allocator)
@@ -24,7 +24,7 @@ Span<const TValue> to_span(const std::vector<TValue, TAllocator> &vec) {
 
 template <typename TValue, typename TAllocator>
 Span<TValue> to_span_from_position_and_size(std::vector<TValue, TAllocator> &vec, unsigned int pos, unsigned int size) {
-	ZN_ASSERT(pos + size <= vec.size());
+	VOXEL_ASSERT(pos + size <= vec.size());
 	return Span<TValue>(vec.data(), pos, pos + size);
 }
 
@@ -34,7 +34,7 @@ Span<const TValue> to_span_from_position_and_size(
 		unsigned int pos,
 		unsigned int size
 ) {
-	ZN_ASSERT(pos + size <= vec.size());
+	VOXEL_ASSERT(pos + size <= vec.size());
 	return Span<const TValue>(vec.data(), pos, pos + size);
 }
 
@@ -44,6 +44,6 @@ Span<const TValue> to_span_const(const std::vector<TValue, TAllocator> &vec) {
 	return Span<const TValue>(vec.data(), 0, vec.size());
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_STD_VECTOR_H
+#endif // VOXEL_STD_VECTOR_H

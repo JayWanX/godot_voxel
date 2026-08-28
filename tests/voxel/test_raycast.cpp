@@ -8,7 +8,7 @@
 #include "../../storage/voxel_data.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_raycast_sdf() {
 	const unsigned int approx_steps = 5;
@@ -45,17 +45,17 @@ void test_raycast_sdf() {
 			// Raycast from integer coordinates
 			const Vector3 ray_origin(5, plane_height + 2, 5);
 			Ref<VoxelRaycastResult> hit = raycast_sdf(data, ray_origin, Vector3i(0, -1, 0), 10.0, approx_steps, true);
-			ZN_TEST_ASSERT(hit.is_valid());
-			ZN_TEST_ASSERT(Math::is_equal_approx(hit->distance_along_ray, 2.f));
-			ZN_TEST_ASSERT(hit->normal.is_equal_approx(Vector3(0, 1, 0)));
+			VOXEL_TEST_ASSERT(hit.is_valid());
+			VOXEL_TEST_ASSERT(Math::is_equal_approx(hit->distance_along_ray, 2.f));
+			VOXEL_TEST_ASSERT(hit->normal.is_equal_approx(Vector3(0, 1, 0)));
 		}
 		{
 			// Raycast from decimal coordinates
 			const Vector3 ray_origin(5.2, plane_height + 2.2, 5.2);
 			Ref<VoxelRaycastResult> hit = raycast_sdf(data, ray_origin, Vector3i(0, -1, 0), 10.0, approx_steps, true);
-			ZN_TEST_ASSERT(hit.is_valid());
-			ZN_TEST_ASSERT(Math::is_equal_approx(hit->distance_along_ray, 2.2f));
-			ZN_TEST_ASSERT(hit->normal.is_equal_approx(Vector3(0, 1, 0)));
+			VOXEL_TEST_ASSERT(hit.is_valid());
+			VOXEL_TEST_ASSERT(Math::is_equal_approx(hit->distance_along_ray, 2.2f));
+			VOXEL_TEST_ASSERT(hit->normal.is_equal_approx(Vector3(0, 1, 0)));
 		}
 	}
 
@@ -92,14 +92,14 @@ void test_raycast_sdf() {
 			const Vector3 ray_origin(sphere_radius, sphere_radius, sphere_radius);
 			const Vector3 ray_dir = Vector3(-1, -1, -1).normalized();
 			Ref<VoxelRaycastResult> hit = raycast_sdf(data, ray_origin, ray_dir, 10.0, approx_steps, true);
-			ZN_TEST_ASSERT(hit.is_valid());
+			VOXEL_TEST_ASSERT(hit.is_valid());
 
 			const float expected_distance = ray_origin.distance_to(Vector3(1, 1, 1).normalized() * sphere_radius);
 			const float found_distance = hit->distance_along_ray;
-			ZN_TEST_ASSERT(math::abs(expected_distance - found_distance) < 0.05f);
+			VOXEL_TEST_ASSERT(math::abs(expected_distance - found_distance) < 0.05f);
 
 			const Vector3 expected_normal = Vector3(1, 1, 1).normalized();
-			ZN_TEST_ASSERT(hit->normal.is_equal_approx(expected_normal));
+			VOXEL_TEST_ASSERT(hit->normal.is_equal_approx(expected_normal));
 		}
 	}
 }
@@ -175,14 +175,14 @@ void test_raycast_blocky() {
 
 		Ref<VoxelRaycastResult> hit = raycast_blocky(data, **mesher, ray_origin, ray_dir, 10, collision_mask);
 
-		ZN_TEST_ASSERT(hit.is_valid());
+		VOXEL_TEST_ASSERT(hit.is_valid());
 
 		const Vector3i expected_hit_position(math::floor(ray_origin.x), floor_height - 1, math::floor(ray_origin.z));
-		ZN_TEST_ASSERT(hit->position == expected_hit_position);
+		VOXEL_TEST_ASSERT(hit->position == expected_hit_position);
 
-		ZN_TEST_ASSERT(hit->previous_position == expected_hit_position + Vector3i(0, 1, 0));
+		VOXEL_TEST_ASSERT(hit->previous_position == expected_hit_position + Vector3i(0, 1, 0));
 
-		ZN_TEST_ASSERT(hit->normal == Vector3i(0, 1, 0));
+		VOXEL_TEST_ASSERT(hit->normal == Vector3i(0, 1, 0));
 	}
 
 	{
@@ -193,16 +193,16 @@ void test_raycast_blocky() {
 
 		Ref<VoxelRaycastResult> hit = raycast_blocky(data, **mesher, ray_origin, ray_dir, 10, collision_mask);
 
-		ZN_TEST_ASSERT(hit.is_valid());
+		VOXEL_TEST_ASSERT(hit.is_valid());
 
-		ZN_TEST_ASSERT(hit->position == slab_position);
+		VOXEL_TEST_ASSERT(hit->position == slab_position);
 
-		ZN_TEST_ASSERT(hit->previous_position == slab_position + Vector3i(0, 1, 0));
+		VOXEL_TEST_ASSERT(hit->previous_position == slab_position + Vector3i(0, 1, 0));
 
-		ZN_TEST_ASSERT(hit->normal == Vector3i(0, 1, 0));
+		VOXEL_TEST_ASSERT(hit->normal == Vector3i(0, 1, 0));
 
 		const float expected_distance = ray_origin.y - (static_cast<float>(slab_position.y) + slab_height);
-		ZN_TEST_ASSERT(Math::is_equal_approx(hit->distance_along_ray, expected_distance));
+		VOXEL_TEST_ASSERT(Math::is_equal_approx(hit->distance_along_ray, expected_distance));
 	}
 }
 
@@ -234,7 +234,7 @@ void test_raycast_blocky_no_cache_graph() {
 		main->add_connection(n_select, 0, n_out_type, 0);
 
 		const CompilationResult result = graph->compile(false);
-		ZN_TEST_ASSERT(result.success);
+		VOXEL_TEST_ASSERT(result.success);
 	}
 
 	VoxelData data;
@@ -273,13 +273,13 @@ void test_raycast_blocky_no_cache_graph() {
 	const int v1 = graph->generate_single(Vector3i(0, floor_height, 0), VoxelBuffer::CHANNEL_TYPE).i;
 	const int v0 = graph->generate_single(Vector3i(0, floor_height - 1, 0), VoxelBuffer::CHANNEL_TYPE).i;
 
-	ZN_TEST_ASSERT(v1 == air_id);
-	ZN_TEST_ASSERT(v0 == cube_id);
+	VOXEL_TEST_ASSERT(v1 == air_id);
+	VOXEL_TEST_ASSERT(v0 == cube_id);
 
 	Ref<VoxelRaycastResult> hit = raycast_blocky(data, **mesher, ray_origin, ray_dir, 20, collision_mask);
 
-	ZN_TEST_ASSERT(hit.is_valid());
-	ZN_TEST_ASSERT(hit->position == Vector3i(10, floor_height - 1, 15));
+	VOXEL_TEST_ASSERT(hit.is_valid());
+	VOXEL_TEST_ASSERT(hit->position == Vector3i(10, floor_height - 1, 15));
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

@@ -4,9 +4,9 @@
 #include "../../generators/graph/voxel_generator_graph.h"
 #include "../../util/godot/classes/ref_counted.h"
 
-ZN_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager)
+VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGraphEditor;
 
@@ -44,6 +44,6 @@ private:
 	VoxelGraphEditor *_graph_editor = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_NODE_INSPECTOR_WRAPPER_H

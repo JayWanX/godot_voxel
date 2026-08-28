@@ -4,7 +4,7 @@
 #include "../../generators/graph/voxel_generator_graph.h"
 #include "../../generators/graph/voxel_graph_function.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // To workaround some legacy differences between graph types, so that the graph editor can offer the same features when
 // editing either. Eventually we should refactor things so these differences go away.
@@ -111,6 +111,6 @@ struct GraphEditorAdapter {
 	}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_ADAPTER_H

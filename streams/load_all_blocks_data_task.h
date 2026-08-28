@@ -6,7 +6,7 @@
 #include "../util/tasks/threaded_task.h"
 #include "voxel_stream.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelData;
 
@@ -29,6 +29,6 @@ private:
 	VoxelStream::FullLoadingResult _result;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // LOAD_ALL_BLOCKS_DATA_TASK_H

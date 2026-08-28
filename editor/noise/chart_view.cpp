@@ -6,9 +6,9 @@
 #include "../../util/godot/string_names.h"
 #include "../../util/math/funcs.h"
 
-namespace zylann {
+namespace voxel {
 
-ZN_ChartView::ZN_ChartView() {
+VOXEL_ChartView::VOXEL_ChartView() {
 	_line_renderer = memnew(Line2D);
 	add_child(_line_renderer);
 
@@ -18,13 +18,13 @@ ZN_ChartView::ZN_ChartView() {
 	_view_max = Vector2(1, 1);
 }
 
-void ZN_ChartView::set_points(Span<const Vector2> points) {
+void VOXEL_ChartView::set_points(Span<const Vector2> points) {
 	_points.resize(points.size());
 	points.copy_to(to_span(_points));
 	queue_redraw();
 }
 
-void ZN_ChartView::auto_fit_view(Vector2 margin_ratios) {
+void VOXEL_ChartView::auto_fit_view(Vector2 margin_ratios) {
 	if (_points.size() > 0) {
 		Vector2 min_point = _points[0];
 		Vector2 max_point = min_point;
@@ -46,7 +46,7 @@ void ZN_ChartView::auto_fit_view(Vector2 margin_ratios) {
 	queue_redraw();
 }
 
-void ZN_ChartView::_notification(int p_what) {
+void VOXEL_ChartView::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_DRAW:
 			on_draw();
@@ -61,7 +61,7 @@ void ZN_ChartView::_notification(int p_what) {
 	}
 }
 
-void ZN_ChartView::on_draw() {
+void VOXEL_ChartView::on_draw() {
 	const Color line_color(Color(0.8, 0.8, 0.8, 1.0));
 	const Color x_axis_color(Color(1.0, 1.0, 1.0, 0.5));
 	const Color y_axis_color(Color(1.0, 1.0, 1.0, 0.5));
@@ -70,7 +70,7 @@ void ZN_ChartView::on_draw() {
 
 	// Background
 
-	const zylann::godot::StringNames &sn = zylann::godot::StringNames::get_singleton();
+	const voxel::godot::StringNames &sn = voxel::godot::StringNames::get_singleton();
 
 	draw_style_box(get_theme_stylebox(sn.bg, sn.Tree), Rect2(Point2(), view_size_pixels));
 
@@ -150,4 +150,4 @@ void ZN_ChartView::on_draw() {
 	// TODO Draw hovered value
 }
 
-} // namespace zylann
+} // namespace voxel

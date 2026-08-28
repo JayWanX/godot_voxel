@@ -9,7 +9,7 @@
 
 #define USE_STD
 
-namespace zylann {
+namespace voxel {
 
 template <typename TFloat>
 unsigned int float_to_string_null_terminated(const TFloat x, Span<char> s, const unsigned int precision) {
@@ -19,13 +19,13 @@ unsigned int float_to_string_null_terminated(const TFloat x, Span<char> s, const
 
 	const int res = snprintf(s.data(), s.size(), "%.*g", precision, x);
 	if (res < 0) {
-		ZN_PRINT_ERROR(format("Failed to convert float to string, snprintf returned {}", res));
+		VOXEL_PRINT_ERROR(format("Failed to convert float to string, snprintf returned {}", res));
 		return 0;
 	}
 	// While `snprintf` writes a null-terminator, it is not included in the returned size.
 	const unsigned int len_with_null_terminator = res + 1;
 	if (len_with_null_terminator > s.size()) {
-		ZN_PRINT_ERROR(
+		VOXEL_PRINT_ERROR(
 				format("Failed to convert float to string, buffer capacity was {} but needed {}",
 					   s.size(),
 					   len_with_null_terminator)
@@ -42,7 +42,7 @@ unsigned int float_to_string(const TFloat x, Span<char> s, const unsigned int pr
 	// char *begin = s.data();
 	// char *end = s.data() + s.size();
 	// const std::to_chars_result res = std::to_chars(begin, end, x, std::chars_format::general);
-	// ZN_ASSERT_MSG(
+	// VOXEL_ASSERT_MSG(
 	// 		res.ec == std::errc(),
 	// 		format("Can't convert float to string, error {}", std::make_error_code(res.ec).message())
 	// );
@@ -59,7 +59,7 @@ unsigned int float_to_string(const TFloat x, Span<char> s, const unsigned int pr
 	}
 	const unsigned int len = len_with_null_terminator - 1;
 	if (len > s.size()) {
-		ZN_PRINT_ERROR(
+		VOXEL_PRINT_ERROR(
 				format("Failed to convert float to string, buffer capacity was {} but needed {}", s.size(), len)
 		);
 	}
@@ -81,7 +81,7 @@ unsigned int int_to_string(const TInt x, Span<char> s, const unsigned int base) 
 	char *begin = s.data();
 	char *end = s.data() + s.size();
 	const std::to_chars_result res = std::to_chars(begin, end, x, 10);
-	ZN_ASSERT_MSG(
+	VOXEL_ASSERT_MSG(
 			res.ec == std::errc(),
 			format("Can't convert int to string, error {}", std::make_error_code(res.ec).message())
 	);
@@ -99,7 +99,7 @@ unsigned int int32_to_string_base10(const int32_t x, Span<uint8_t> s) {
 #else
 	const unsigned int base = 10;
 
-	ZN_ASSERT(s.size() >= 1);
+	VOXEL_ASSERT(s.size() >= 1);
 	unsigned int nchars = 1;
 
 	uint32_t ux;
@@ -116,7 +116,7 @@ unsigned int int32_to_string_base10(const int32_t x, Span<uint8_t> s) {
 		++nchars;
 	}
 
-	ZN_ASSERT(nchars <= s.size());
+	VOXEL_ASSERT(nchars <= s.size());
 
 	unsigned int pos = nchars;
 	while (true) {
@@ -135,7 +135,7 @@ unsigned int int32_to_string_base10(const int32_t x, Span<uint8_t> s) {
 int string_base10_to_int32(std::string_view s, int32_t &out_x) {
 #ifdef USE_STD
 	const std::from_chars_result res = std::from_chars(s.data(), s.data() + s.size(), out_x);
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			res.ec == std::errc(),
 			-1,
 			format("Can't convert string \"{}\" to int32, error {}", s, std::make_error_code(res.ec).message())
@@ -156,7 +156,7 @@ int string_base10_to_int32(std::string_view s, int32_t &out_x) {
 			x = x * base + (c - '0');
 			if ((negative && -x < std::numeric_limits<int32_t>::min()) ||
 				(!negative && x > std::numeric_limits<int32_t>::max())) {
-				ZN_PRINT_ERROR(format("Can't parse \"{}\" to a 32-bit integer", s));
+				VOXEL_PRINT_ERROR(format("Can't parse \"{}\" to a 32-bit integer", s));
 				return -1;
 			}
 			++pos;
@@ -170,4 +170,4 @@ int string_base10_to_int32(std::string_view s, int32_t &out_x) {
 #endif
 }
 
-} // namespace zylann
+} // namespace voxel

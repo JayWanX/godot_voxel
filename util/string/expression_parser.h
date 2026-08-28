@@ -1,5 +1,5 @@
-#ifndef ZYLANN_EXPRESSION_PARSER_H
-#define ZYLANN_EXPRESSION_PARSER_H
+#ifndef VOXEL_EXPRESSION_PARSER_H
+#define VOXEL_EXPRESSION_PARSER_H
 
 #include "../containers/fixed_array.h"
 #include "../containers/span.h"
@@ -8,7 +8,7 @@
 #include "std_string.h"
 #include <string_view>
 
-namespace zylann {
+namespace voxel {
 namespace ExpressionParser {
 
 struct Node {
@@ -126,6 +126,6 @@ inline const Function *find_function_by_id(unsigned int id, Span<const Function>
 }
 
 } // namespace ExpressionParser
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_EXPRESSION_PARSER_H
+#endif // VOXEL_EXPRESSION_PARSER_H

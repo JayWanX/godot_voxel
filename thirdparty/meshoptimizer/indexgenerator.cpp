@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Matthias Teschner, Bruno Heidelberger, Matthias Mueller, Danat Pomeranets, Markus Gross. Optimized Spatial Hashing for Collision Detection of Deformable Objects. 2003
@@ -705,4 +705,4 @@ size_t meshopt_generateProvokingIndexBuffer(unsigned int* destination, unsigned 
 	return reorder_offset;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

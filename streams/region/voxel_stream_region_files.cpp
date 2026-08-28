@@ -13,7 +13,7 @@
 
 #include <algorithm>
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 const uint8_t FORMAT_VERSION = 3;
@@ -72,7 +72,7 @@ void VoxelStreamRegionFiles::save_voxel_block(VoxelStream::VoxelQueryData &query
 }
 
 void VoxelStreamRegionFiles::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// In order to minimize opening/closing files, requests are grouped according to their region.
 
@@ -104,7 +104,7 @@ void VoxelStreamRegionFiles::load_voxel_blocks(Span<VoxelStream::VoxelQueryData>
 }
 
 void VoxelStreamRegionFiles::save_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Had to copy input to sort it, as some areas in the module break if they get responses in different order
 	StdVector<unsigned int> sorted_block_indices;
@@ -129,7 +129,7 @@ VoxelStreamRegionFiles::EmergeResult VoxelStreamRegionFiles::_load_block(
 		const Vector3i block_pos,
 		const uint8_t lod
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	MutexLock lock(_mutex);
 
@@ -141,8 +141,8 @@ VoxelStreamRegionFiles::EmergeResult VoxelStreamRegionFiles::_load_block(
 		// TODO This is sub-optimal when loading a terrain from scratch when there hasn't been anything saved yet.
 		// It pretty much tries to open the file for every chunk, fails and then returns "OK_FALLBACK", but the
 		// repeated IO is wasting time
-		const zylann::godot::FileResult load_res = load_meta();
-		if (load_res != zylann::godot::FILE_OK) {
+		const voxel::godot::FileResult load_res = load_meta();
+		if (load_res != voxel::godot::FILE_OK) {
 			// No block was ever saved
 			return EMERGE_OK_FALLBACK;
 		}
@@ -184,8 +184,8 @@ VoxelStreamRegionFiles::EmergeResult VoxelStreamRegionFiles::_load_block(
 }
 
 void VoxelStreamRegionFiles::_save_block(const VoxelBuffer &voxel_buffer, const Vector3i block_pos, const uint8_t lod) {
-	ZN_PROFILE_SCOPE();
-	using namespace zylann::godot;
+	VOXEL_PROFILE_SCOPE();
+	using namespace voxel::godot;
 
 	MutexLock lock(_mutex);
 
@@ -199,7 +199,7 @@ void VoxelStreamRegionFiles::_save_block(const VoxelBuffer &voxel_buffer, const 
 			// The file is present but there is a problem with it
 			String meta_path = _directory_path.path_join(META_FILE_NAME);
 			ERR_PRINT(String("Could not read {0}: error {1}")
-							  .format(varray(meta_path, zylann::godot::to_string(load_res))));
+							  .format(varray(meta_path, voxel::godot::to_string(load_res))));
 			return;
 		}
 	}
@@ -267,15 +267,15 @@ bool u32_from_json_variant(const Variant &v, uint32_t &i) {
 bool depth_from_json_variant(Variant &v, VoxelBuffer::Depth &d) {
 	uint8_t n;
 	ERR_FAIL_COND_V(!u8_from_json_variant(v, n), false);
-	ZN_ASSERT_RETURN_V(n < VoxelBuffer::DEPTH_COUNT, false);
+	VOXEL_ASSERT_RETURN_V(n < VoxelBuffer::DEPTH_COUNT, false);
 	d = (VoxelBuffer::Depth)n;
 	return true;
 }
 
 } // namespace
 
-zylann::godot::FileResult VoxelStreamRegionFiles::save_meta() {
-	using namespace zylann::godot;
+voxel::godot::FileResult VoxelStreamRegionFiles::save_meta() {
+	using namespace voxel::godot;
 
 	ERR_FAIL_COND_V(_directory_path == "", FILE_CANT_OPEN);
 
@@ -348,8 +348,8 @@ void migrate_region_meta_data(Dictionary &data) {
 
 } // namespace
 
-zylann::godot::FileResult VoxelStreamRegionFiles::load_meta() {
-	using namespace zylann::godot;
+voxel::godot::FileResult VoxelStreamRegionFiles::load_meta() {
+	using namespace voxel::godot;
 
 	ERR_FAIL_COND_V(_directory_path == "", FILE_CANT_OPEN);
 
@@ -380,7 +380,7 @@ zylann::godot::FileResult VoxelStreamRegionFiles::load_meta() {
 	if (json_err != OK) {
 		const String json_err_msg = json->get_error_message();
 		const int json_err_line = json->get_error_line();
-		ZN_PRINT_ERROR(format("Error when parsing {}: line {}: {}", meta_path, json_err_line, json_err_msg));
+		VOXEL_PRINT_ERROR(format("Error when parsing {}: line {}: {}", meta_path, json_err_line, json_err_msg));
 		return FILE_INVALID_DATA;
 	}
 
@@ -430,7 +430,7 @@ void VoxelStreamRegionFiles::close_all_regions() {
 	for (unsigned int i = 0; i < _region_cache.size(); ++i) {
 		CachedRegion *cache = _region_cache[i];
 		close_region(cache);
-		ZN_DELETE(cache);
+		VOXEL_DELETE(cache);
 	}
 	_region_cache.clear();
 }
@@ -463,9 +463,9 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 		unsigned int lod,
 		bool create_if_not_found
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V(!_meta_loaded, nullptr);
-	ZN_ASSERT_RETURN_V(lod < constants::MAX_LOD, nullptr);
+	VOXEL_ASSERT_RETURN_V(lod < constants::MAX_LOD, nullptr);
 
 	CachedRegion *cached_region = get_region_from_cache(region_pos, lod);
 	if (cached_region != nullptr) {
@@ -479,7 +479,7 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 
 	String fpath = get_region_file_path(region_pos, lod);
 
-	cached_region = ZN_NEW(CachedRegion);
+	cached_region = VOXEL_NEW(CachedRegion);
 
 	// Configure format because we might have to create the file, and some old file versions don't embed format
 	{
@@ -504,7 +504,7 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 	//   we assume no other process will modify region files.
 
 	if (err != OK) {
-		ZN_DELETE(cached_region);
+		VOXEL_DELETE(cached_region);
 		if (create_if_not_found) {
 			// Could not create it apparently
 			ERR_PRINT(String("Could not open or create region file {0}, error: {1}").format(varray(fpath, err)));
@@ -523,7 +523,7 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 			|| format.region_size != Vector3iUtil::create(1 << _meta.region_size_po2) //
 			|| format.sector_size != _meta.sector_size) {
 			ERR_PRINT("Region file has unexpected format");
-			ZN_DELETE(cached_region);
+			VOXEL_DELETE(cached_region);
 			return nullptr;
 		}
 	}
@@ -565,7 +565,7 @@ void VoxelStreamRegionFiles::close_oldest_region() {
 	_region_cache.erase(_region_cache.begin() + oldest_index);
 
 	close_region(region);
-	ZN_DELETE(region);
+	VOXEL_DELETE(region);
 }
 
 namespace {
@@ -585,13 +585,13 @@ Vector3i convert_block_coordinates(Vector3i pos, Vector3i old_size, Vector3i new
 } // namespace
 
 void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
-	using namespace zylann::godot;
+	using namespace voxel::godot;
 
 	// TODO Converting across different block sizes is untested.
 	// I wrote it because it would be too bad to loose large voxel worlds because of a setting change, so one day we may
 	// need it
 
-	ZN_PRINT_VERBOSE("Converting region files");
+	VOXEL_PRINT_VERBOSE("Converting region files");
 	// This can be a very long and slow operation. Better run this in a thread.
 
 	ERR_FAIL_COND(!_meta_saved);
@@ -633,7 +633,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 		}
 
 		old_stream->set_directory(old_dir);
-		ZN_PRINT_VERBOSE(format("Data backed up as {}", old_dir));
+		VOXEL_PRINT_VERBOSE(format("Data backed up as {}", old_dir));
 	}
 
 	struct PositionAndLod {
@@ -705,7 +705,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 			continue;
 		}
 
-		ZN_PRINT_VERBOSE(format("Converting region lod{}/{}", region_info.lod_index, region_info.position));
+		VOXEL_PRINT_VERBOSE(format("Converting region lod{}/{}", region_info.lod_index, region_info.position));
 
 		const unsigned int blocks_count = old_region->region.get_header_block_count();
 		for (unsigned int j = 0; j < blocks_count; ++j) {
@@ -798,7 +798,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 
 	close_all_regions();
 
-	ZN_PRINT_VERBOSE("Done converting region files");
+	VOXEL_PRINT_VERBOSE("Done converting region files");
 }
 
 Vector3i VoxelStreamRegionFiles::get_region_size() const {
@@ -896,7 +896,7 @@ void VoxelStreamRegionFiles::convert_files(Dictionary d) {
 		ERR_FAIL_COND_MSG(!check_meta(meta), "Invalid setting");
 
 		if (!_meta_loaded) {
-			if (load_meta() != zylann::godot::FILE_OK) {
+			if (load_meta() != voxel::godot::FILE_OK) {
 				// New stream, nothing to convert
 				_meta = meta;
 
@@ -915,7 +915,7 @@ void VoxelStreamRegionFiles::convert_files(Dictionary d) {
 }
 
 void VoxelStreamRegionFiles::flush() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	MutexLock lock(_mutex);
 	for (CachedRegion *cr : _region_cache) {
 		cr->region.flush();
@@ -945,4 +945,4 @@ void VoxelStreamRegionFiles::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "sector_size"), "set_sector_size", "get_sector_size");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

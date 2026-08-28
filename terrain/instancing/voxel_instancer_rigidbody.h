@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/rigid_body_3d.h"
 #include "voxel_instancer.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Provides collision to VoxelInstancer multimesh instances
 class VoxelInstancerRigidBody : public RigidBody3D {
@@ -55,6 +55,6 @@ private:
 	int _instance_index = -1;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCER_RIGIDBODY_H

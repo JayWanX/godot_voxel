@@ -1,7 +1,7 @@
 #ifndef VOXEL_INSTANCE_LIBRARY_ITEM_LISTENER_H
 #define VOXEL_INSTANCE_LIBRARY_ITEM_LISTENER_H
 
-namespace zylann::voxel {
+namespace voxel {
 
 class IInstanceLibraryItemListener {
 public:
@@ -18,6 +18,6 @@ public:
 	virtual void on_library_item_changed(int id, ChangeType change) = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_LIBRARY_ITEM_LISTENER_H

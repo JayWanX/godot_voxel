@@ -11,9 +11,9 @@
 #include "../util/math/conv.h"
 #include "raycast.h"
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelToolTerrain::VoxelToolTerrain() {
 	_random.randomize();
@@ -114,7 +114,7 @@ void VoxelToolTerrain::paste_masked_writable_list(
 }
 
 void VoxelToolTerrain::do_box(Vector3i begin, Vector3i end) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	if (get_channel() != VoxelBuffer::CHANNEL_SDF) {
@@ -137,7 +137,7 @@ void VoxelToolTerrain::do_box(Vector3i begin, Vector3i end) {
 	op.strength = get_sdf_strength();
 
 	if (!is_area_editable(op.box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -156,7 +156,7 @@ void VoxelToolTerrain::do_box(Vector3i begin, Vector3i end) {
 }
 
 void VoxelToolTerrain::do_sphere(Vector3 center, float radius) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	ops::DoSphere op;
@@ -171,7 +171,7 @@ void VoxelToolTerrain::do_sphere(Vector3 center, float radius) {
 	op.strength = get_sdf_strength();
 
 	if (!is_area_editable(op.box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -184,7 +184,7 @@ void VoxelToolTerrain::do_sphere(Vector3 center, float radius) {
 }
 
 void VoxelToolTerrain::do_hemisphere(Vector3 center, float radius, Vector3 flat_direction, float smoothness) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	ops::DoShapeChunked<ops::SdfHemisphere, ops::VoxelDataGridAccess> op;
@@ -202,7 +202,7 @@ void VoxelToolTerrain::do_hemisphere(Vector3 center, float radius, Vector3 flat_
 	op.strength = get_sdf_strength();
 
 	if (!is_area_editable(op.box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -280,7 +280,7 @@ void VoxelToolTerrain::run_blocky_random_tick(
 		const int batch_count,
 		const uint32_t tags_mask
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	ERR_FAIL_COND(_terrain == nullptr);
 	ERR_FAIL_COND_MSG(
@@ -300,7 +300,7 @@ void VoxelToolTerrain::run_blocky_random_tick(
 	const VoxelBlockyLibraryBase &lib = **get_voxel_library(*_terrain);
 	VoxelData &data = _terrain->get_storage();
 
-	zylann::voxel::run_blocky_random_tick(
+	voxel::run_blocky_random_tick(
 			data, voxel_area, lib, _random, voxel_count, batch_count, tags_mask, callback
 	);
 }
@@ -334,7 +334,7 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 				rel_voxel_box, [&callback, block_origin](Vector3i rel_pos, const VoxelMetadata &meta) {
 					const Variant v = godot::get_as_variant(meta);
 					const Vector3i key = rel_pos + block_origin;
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 					const Variant key_v = key;
 					const Variant *args[2] = { &key_v, &v };
 					Callable::CallError err;
@@ -345,7 +345,7 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 							err.error != Callable::CallError::CALL_OK,
 							String("Callable failed at {0}").format(varray(key))
 					);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 					// TODO GDX: No way to detect or report errors when calling a Callable. Do I need to?
 					callback.call(key, v);
 #endif
@@ -355,19 +355,19 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 }
 
 void VoxelToolTerrain::do_path(Span<const Vector3> positions, Span<const float> radii) {
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 	do_path_chunked(_terrain->get_storage(), positions, radii, false);
 }
 
 #ifdef VOXEL_ENABLE_MESH_SDF
 void VoxelToolTerrain::do_mesh(const VoxelMeshSDF &mesh_sdf, const Transform3D &transform, const float isolevel) {
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 	do_mesh_chunked(mesh_sdf, _terrain->get_storage(), transform, isolevel, false);
 }
 #endif
 
 VoxelFormat VoxelToolTerrain::get_format() const {
-	ZN_ASSERT(_terrain != nullptr);
+	VOXEL_ASSERT(_terrain != nullptr);
 	return _terrain->get_storage().get_format();
 }
 
@@ -389,4 +389,4 @@ void VoxelToolTerrain::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

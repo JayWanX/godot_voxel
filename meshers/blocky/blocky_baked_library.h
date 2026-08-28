@@ -13,7 +13,7 @@
 
 // This is data directly consumed by the blocky mesher.
 
-namespace zylann::voxel::blocky {
+namespace voxel::blocky {
 
 // Limit based on maximum supported by VoxelMesherBlocky.
 // Supporting more requires to double the size of voxels (32-bit), but it's a suspicious situation. Minecraft block
@@ -196,6 +196,6 @@ struct BakedLibrary {
 	}
 };
 
-} // namespace zylann::voxel::blocky
+} // namespace voxel::blocky
 
 #endif // VOXEL_BLOCKY_BAKED_LIBRARY_H

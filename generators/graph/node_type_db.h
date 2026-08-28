@@ -10,7 +10,7 @@
 #include "voxel_graph_function.h"
 #include "voxel_graph_shader_generator.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 enum Category {
 	CATEGORY_INPUT = 0,
@@ -143,6 +143,6 @@ private:
 VoxelGraphFunction::Port make_port_from_io_node(const ProgramGraph::Node &node, const NodeType &type);
 bool is_node_matching_port(const ProgramGraph::Node &node, const VoxelGraphFunction::Port &port);
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg
 
 #endif // VOXEL_GRAPH_NODE_TYPE_DB_H

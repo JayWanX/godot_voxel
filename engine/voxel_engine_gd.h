@@ -3,11 +3,11 @@
 
 #include "voxel_engine.h"
 
-namespace zylann {
-class ZN_ThreadedTask;
-} // namespace zylann
+namespace voxel {
+class VOXEL_ThreadedTask;
+} // namespace voxel
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 // Godot-facing singleton class.
 // the real class is internal and does not need anything from Object.
@@ -19,7 +19,7 @@ public:
 	static void destroy_singleton();
 
 	struct Config {
-		zylann::voxel::VoxelEngine::Config inner;
+		voxel::VoxelEngine::Config inner;
 		bool ownership_checks;
 	};
 
@@ -36,7 +36,7 @@ public:
 	String get_version_git_hash() const;
 
 	Dictionary get_stats() const;
-	void schedule_task(Ref<ZN_ThreadedTask> task);
+	void schedule_task(Ref<VOXEL_ThreadedTask> task);
 
 	int get_thread_count() const;
 	void set_thread_count(int count);
@@ -65,6 +65,6 @@ private:
 #endif
 };
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot
 
 #endif // VOXEL_ENGINE_GD_H

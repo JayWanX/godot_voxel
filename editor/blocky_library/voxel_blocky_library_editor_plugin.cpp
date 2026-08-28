@@ -6,7 +6,7 @@
 #include "types/voxel_blocky_type_library_ids_dialog.h"
 #include "voxel_blocky_model_editor_inspector_plugin.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyLibraryEditorPlugin::VoxelBlockyLibraryEditorPlugin() {}
 
@@ -52,4 +52,4 @@ void VoxelBlockyLibraryEditorPlugin::_notification(int p_what) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

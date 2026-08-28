@@ -1,11 +1,11 @@
-#ifndef ZN_SHADER_MATERIAL_POOL_H
-#define ZN_SHADER_MATERIAL_POOL_H
+#ifndef VOXEL_SHADER_MATERIAL_POOL_H
+#define VOXEL_SHADER_MATERIAL_POOL_H
 
 #include "../containers/span.h"
 #include "../containers/std_vector.h"
 #include "classes/shader_material.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Reasons to pool numerous copies of the same ShaderMaterial:
 // - In the editor, the Shader `changed` signal is connected even if they aren't editable, which makes the shader manage
@@ -34,6 +34,6 @@ private:
 
 void copy_shader_params(const ShaderMaterial &src, ShaderMaterial &dst, Span<const StringName> params);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_SHADER_MATERIAL_POOL_H
+#endif // VOXEL_SHADER_MATERIAL_POOL_H

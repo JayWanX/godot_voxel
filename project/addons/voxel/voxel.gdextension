@@ -5,7 +5,7 @@ compatibility_minimum = "4.4.1"
 
 [libraries]
 
-windows.debug.x86_64 = "res://addons/zylann.voxel/bin/libvoxel.windows.editor.dev.x86_64.dll"
+windows.debug.x86_64 = "res://addons/voxel/bin/libvoxel.windows.editor.dev.x86_64.dll"
 
 [icons]
 
@@ -24,5 +24,5 @@ VoxelNode = "./editor/icons/VoxelNode.svg"
 VoxelTerrain = "./editor/icons/VoxelTerrain.svg"
 VoxelTerrainLarge = "./editor/icons/VoxelTerrainLarge.svg"
 VoxelViewer = "./editor/icons/VoxelViewer.svg"
-ZN_FastNoiseLite = "./editor/icons/ZN_FastNoiseLite.svg"
+VOXEL_FastNoiseLite = "./editor/icons/VOXEL_FastNoiseLite.svg"
 ;</generated-icons>

@@ -2,11 +2,11 @@
 #include "../../../util/math/funcs.h"
 #include "../../../util/math/ortho_basis.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyAttributeCustom::VoxelBlockyAttributeCustom() {
 	// Defaults to a boolean value.
@@ -34,7 +34,7 @@ void VoxelBlockyAttributeCustom::set_value_count(int count) {
 }
 
 void VoxelBlockyAttributeCustom::set_value_name(int index, StringName p_name) {
-	ZN_ASSERT_RETURN(index >= 0 && index < static_cast<int>(_value_names.size()));
+	VOXEL_ASSERT_RETURN(index >= 0 && index < static_cast<int>(_value_names.size()));
 	_value_names[index] = p_name;
 }
 
@@ -56,8 +56,8 @@ void VoxelBlockyAttributeCustom::set_default_value(int v) {
 // }
 
 // void VoxelBlockyAttributeCustom::set_value_ortho_rotation(int index, int ortho_rotation_index) {
-// 	ZN_ASSERT_RETURN(index >= 0 && index < int(get_value_count()));
-// 	ZN_ASSERT_RETURN(ortho_rotation_index >= 0 && ortho_rotation_index < math::ORTHO_ROTATION_COUNT);
+// 	VOXEL_ASSERT_RETURN(index >= 0 && index < int(get_value_count()));
+// 	VOXEL_ASSERT_RETURN(ortho_rotation_index >= 0 && ortho_rotation_index < math::ORTHO_ROTATION_COUNT);
 // 	_ortho_rotations[index] = ortho_rotation_index;
 // 	emit_changed();
 // }
@@ -79,7 +79,7 @@ bool VoxelBlockyAttributeCustom::_set(const StringName &p_name, const Variant &p
 
 		if (what == "name") {
 			// Godot can set properties in any order so we have to be permissive here...
-			ZN_ASSERT_RETURN_V(idx >= 0 && idx < MAX_VALUES, false);
+			VOXEL_ASSERT_RETURN_V(idx >= 0 && idx < MAX_VALUES, false);
 			if (idx >= int(_value_names.size())) {
 				_value_names.resize(idx + 1);
 			}
@@ -87,7 +87,7 @@ bool VoxelBlockyAttributeCustom::_set(const StringName &p_name, const Variant &p
 			return true;
 		}
 		// else if (what == "rotation") {
-		// 	ZN_ASSERT_RETURN_V(idx >= 0 && idx < MAX_VALUES, false);
+		// 	VOXEL_ASSERT_RETURN_V(idx >= 0 && idx < MAX_VALUES, false);
 		// 	if (idx >= int(_ortho_rotations.size())) {
 		// 		_ortho_rotations.resize(idx + 1);
 		// 	}
@@ -153,4 +153,4 @@ void VoxelBlockyAttributeCustom::_bind_methods() {
 	// ADD_PROPERTY(PropertyInfo(Variant::INT, "is_rotation"), "set_is_rotation", "is_rotation");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

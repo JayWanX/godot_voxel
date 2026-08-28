@@ -11,7 +11,7 @@
 #include "../../util/godot/core/version.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTerrain;
 
@@ -27,9 +27,9 @@ public:
 	void send_area(Box3i voxel_box);
 
 #ifdef TOOLS_ENABLED
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	PackedStringArray _get_configuration_warnings() const override;
 #endif
 	void get_configuration_warnings(PackedStringArray &warnings) const;
@@ -55,6 +55,6 @@ private:
 	StdUnorderedMap<int, StdVector<DeferredBlockMessage>> _deferred_block_messages_per_peer;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_NETWORK_TERRAIN_SYNC_H

@@ -1,11 +1,11 @@
-#ifndef ZN_GODOT_FILE_UTILS_H
-#define ZN_GODOT_FILE_UTILS_H
+#ifndef VOXEL_GODOT_FILE_UTILS_H
+#define VOXEL_GODOT_FILE_UTILS_H
 
 #include "../math/vector3i.h"
 #include "classes/file_access.h"
 #include "core/string.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 inline Vector3i get_vec3u8(FileAccess &f) {
 	Vector3i v;
@@ -49,6 +49,6 @@ Error check_directory_created(const String &p_directory_path);
 
 void insert_bytes(FileAccess &f, size_t count, size_t temp_chunk_size = 512);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_FILE_UTILS_H
+#endif // VOXEL_GODOT_FILE_UTILS_H

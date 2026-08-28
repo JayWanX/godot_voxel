@@ -20,7 +20,7 @@
 // required to #include `VoxelToolMultipassGenerator`, which already included the former to access its nested structs,
 // so it could not compile. So I moved the nested structs outside the class.
 
-namespace zylann {
+namespace voxel {
 
 class IThreadedTask;
 
@@ -62,7 +62,7 @@ struct Block {
 	}
 
 	~Block() {
-		ZN_ASSERT_RETURN_MSG(final_pending_task == nullptr, "Unhandled task leaked!");
+		VOXEL_ASSERT_RETURN_MSG(final_pending_task == nullptr, "Unhandled task leaked!");
 	}
 };
 
@@ -169,6 +169,6 @@ struct PassInput {
 
 } // namespace VoxelGeneratorMultipassCBStructs
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_MULTIPASS_CB_STRUCTS_H

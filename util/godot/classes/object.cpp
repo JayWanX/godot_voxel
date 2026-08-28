@@ -1,14 +1,14 @@
 #include "object.h"
 #include "../../hash_funcs.h"
 #include "../../profiling.h"
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 #include "undo_redo.h"
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void get_property_list(const Object &obj, StdVector<PropertyInfoWrapper> &out_properties) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	List<PropertyInfo> properties;
 	obj.get_property_list(&properties, false);
 	// I'd like to use ConstIterator since I only read that list but that isn't possible :shrug:
@@ -20,7 +20,7 @@ void get_property_list(const Object &obj, StdVector<PropertyInfoWrapper> &out_pr
 		pi.usage = property.usage;
 		out_properties.push_back(pi);
 	}
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	const Array properties = obj.get_property_list();
 	const String type_key = "type";
 	const String name_key = "name";
@@ -37,7 +37,7 @@ void get_property_list(const Object &obj, StdVector<PropertyInfoWrapper> &out_pr
 }
 
 uint64_t get_deep_hash(const Object &obj, uint32_t property_usage, uint64_t hash) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	hash = hash_djb2_one_64(obj.get_class().hash(), hash);
 
@@ -70,10 +70,10 @@ uint64_t get_deep_hash(const Object &obj, uint32_t property_usage, uint64_t hash
 #ifdef TOOLS_ENABLED
 
 void set_object_edited(Object &obj) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	obj.set_edited(true);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	// TODO GDX: Object::set_edited is not exposed, and nested resource saving is an unexplained problem
 	// See https://github.com/godotengine/godot-proposals/discussions/7168
 
@@ -98,4 +98,4 @@ void set_object_edited(Object &obj) {
 
 #endif // TOOLS_ENABLED
 
-} // namespace zylann::godot
+} // namespace voxel::godot

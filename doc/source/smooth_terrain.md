@@ -162,7 +162,7 @@ void vertex() {
 }
 ```
 
-Research issue which led to this code: [Issue #2](https://github.com/Zylann/godot_voxel/issues/2)
+Research issue which led to this code: [Issue #2](https://github.com/Voxel/godot_voxel/issues/2)
 
 
 Texturing
@@ -186,7 +186,7 @@ It is also possible to choose a different texture for the 3 axes.
 
 Here's a shader that supports two materials, such as grass on the top and rock on the sides, each with triplanar mapped albedo, normal and AO maps, then blended together based on if their normal faces the upward direction or the sides.
 
-You can find a working example in the [demo](https://github.com/Zylann/voxelgame), or see the [shader](https://github.com/Zylann/voxelgame/blob/godot4/project/smooth_terrain/transvoxel_terrain.gdshader) itself (triplanar functions defined here https://github.com/Zylann/voxelgame/blob/godot4/project/smooth_terrain/shaders/triplanar.gdshaderinc). 
+You can find a working example in the [demo](https://github.com/Voxel/voxelgame), or see the [shader](https://github.com/Voxel/voxelgame/blob/godot4/project/smooth_terrain/transvoxel_terrain.gdshader) itself (triplanar functions defined here https://github.com/Voxel/voxelgame/blob/godot4/project/smooth_terrain/shaders/triplanar.gdshaderinc). 
 
 In the shader parameters, add your two albedo maps, and optionally normal, and AO maps. Then play with the `AB Mix 1` and `AB Mix 2` sliders to adjust how the top and sides blend together. The other settings should be self explanatory. The screenshot below also has a little bit of fog and far DOF added.
 
@@ -270,7 +270,7 @@ You may use `VoxelTool` helper functions to encode/decode these values:
 
 It is also possible to generate this in `VoxelGeneratorGraph` using special outputs, but it still requires a bit of math to produce valid data.
 
-See also this [painting demo](https://github.com/Zylann/voxelgame/tree/master/project/smooth_materials).
+See also this [painting demo](https://github.com/Voxel/voxelgame/tree/master/project/smooth_materials).
 
 
 ### Mesh data

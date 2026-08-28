@@ -8,7 +8,7 @@
 #include "blocky_fluids.h"
 #include "voxel_blocky_fluid.h"
 
-namespace zylann::voxel::blocky {
+namespace voxel::blocky {
 
 void copy(const BakedFluid::Surface &src, Vector2f src_uv, BakedModel::SideSurface &dst) {
 	copy(src.positions, dst.positions);
@@ -404,7 +404,7 @@ void generate_preview_fluid_model(
 		Span<const BakedModel::Surface> &out_model_surfaces,
 		const FixedArray<FixedArray<BakedModel::SideSurface, MAX_SURFACES>, Cube::SIDE_COUNT> *&out_model_sides_surfaces
 ) {
-	ZN_ASSERT(model.fluid_index != NULL_FLUID_INDEX);
+	VOXEL_ASSERT(model.fluid_index != NULL_FLUID_INDEX);
 	FixedArray<uint16_t, 3 * 3 * 3> id_buffer;
 	fill(id_buffer, AIR_ID);
 	const int center_loc = Vector3iUtil::get_zxy_index(Vector3i(1, 1, 1), Vector3i(3, 3, 3));
@@ -423,6 +423,6 @@ void generate_preview_fluid_model(
 	);
 }
 
-} // namespace zylann::voxel::blocky
+} // namespace voxel::blocky
 
 // #endif // VOXEL_BLOCKY_FLUIDS_MESHING_IMPL_H

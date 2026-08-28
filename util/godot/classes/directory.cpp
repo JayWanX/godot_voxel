@@ -1,13 +1,13 @@
 #include "directory.h"
 #include "../../containers/std_vector.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 Error erase_directory_contents_recursive(DirAccess &da) {
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 	return da.erase_contents_recursive();
 
-#elif ZN_GODOT_EXTENSION
+#elif VOXEL_GODOT_EXTENSION
 	// Ported from https://github.com/godotengine/godot/blob/master/core/io/dir_access.cpp#L78
 	// https://github.com/godotengine/godot-proposals/issues/11598
 
@@ -62,4 +62,4 @@ Error erase_directory_contents_recursive(DirAccess &da) {
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

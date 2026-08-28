@@ -1,6 +1,6 @@
 #include "voxel_generator_multipass_editor_plugin.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGeneratorMultipassEditorPlugin::VoxelGeneratorMultipassEditorPlugin() {}
 
@@ -17,4 +17,4 @@ void VoxelGeneratorMultipassEditorPlugin::_notification(int p_what) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

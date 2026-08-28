@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Tom Forsyth. Linear-Speed Vertex Cache Optimisation. 2006
@@ -468,4 +468,4 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 	assert(output_triangle == face_count);
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

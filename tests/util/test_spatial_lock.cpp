@@ -15,7 +15,7 @@
 #include <fstream>
 #endif
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_spatial_lock_misc() {
 	SpatialLock3D spatial_lock;
@@ -38,17 +38,17 @@ void test_spatial_lock_misc() {
 
 				// Try to lock a box overlapping the one locked by the main thread. It's for read too, it should succeed
 				const BoxBounds3i box2 = BoxBounds3i::from_min_max_included(Vector3i(0, 0, 0), Vector3i(3, 4, 5));
-				ZN_TEST_ASSERT(spatial_lock.try_lock_read(box2) == true);
+				VOXEL_TEST_ASSERT(spatial_lock.try_lock_read(box2) == true);
 
 				spatial_lock.unlock_read(box2);
 
 				// Try to lock a box overlapping the one locked by the main thread. It's for write, should not succeed
 				const BoxBounds3i box3 = BoxBounds3i::from_position(Vector3i(0, 0, 0));
-				ZN_TEST_ASSERT(spatial_lock.try_lock_write(box3) == false);
+				VOXEL_TEST_ASSERT(spatial_lock.try_lock_write(box3) == false);
 
 				// Try to lock a box not overlapping the one locked by the main thread. It should succeed.
 				const BoxBounds3i box4 = BoxBounds3i::from_position(Vector3i(5, 0, 0));
-				ZN_TEST_ASSERT(spatial_lock.try_lock_write(box4) == true);
+				VOXEL_TEST_ASSERT(spatial_lock.try_lock_write(box4) == true);
 
 				spatial_lock.unlock_write(box4);
 			},
@@ -62,10 +62,10 @@ void test_spatial_lock_misc() {
 
 	// Lock a box for write
 	const BoxBounds3i box3 = BoxBounds3i::from_position(Vector3i(0, 0, 0));
-	ZN_TEST_ASSERT(spatial_lock.try_lock_write(box3) == true);
+	VOXEL_TEST_ASSERT(spatial_lock.try_lock_write(box3) == true);
 	spatial_lock.unlock_write(box3);
 
-	ZN_TEST_ASSERT(spatial_lock.get_locked_boxes_count() == 0);
+	VOXEL_TEST_ASSERT(spatial_lock.get_locked_boxes_count() == 0);
 }
 
 void test_spatial_lock_spam() {
@@ -95,12 +95,12 @@ void test_spatial_lock_spam() {
 		}
 
 		inline int &at(Vector3i pos) {
-			ZN_ASSERT(is_position_valid(pos));
+			VOXEL_ASSERT(is_position_valid(pos));
 			return _cells[Vector3iUtil::get_zxy_index(pos, Vector3i(AREA_SIZE, AREA_SIZE, AREA_SIZE))];
 		}
 
 		inline int at(Vector3i pos) const {
-			ZN_ASSERT(is_position_valid(pos));
+			VOXEL_ASSERT(is_position_valid(pos));
 			return _cells[Vector3iUtil::get_zxy_index(pos, Vector3i(AREA_SIZE, AREA_SIZE, AREA_SIZE))];
 		}
 
@@ -134,7 +134,7 @@ void test_spatial_lock_spam() {
 				// Increment cells in the box
 				box.for_each_cell([&map](Vector3i pos) { ++map.at(pos); });
 				// Check they have the expected value
-				ZN_TEST_ASSERT(map.cells_in_box_equal(box, base + i));
+				VOXEL_TEST_ASSERT(map.cells_in_box_equal(box, base + i));
 
 				if (Time::get_singleton()->get_ticks_usec() - time_before >= microseconds) {
 					break;
@@ -156,7 +156,7 @@ void test_spatial_lock_spam() {
 				int j = 0;
 				box.for_each_cell([&map, &expected_values, &j](Vector3i pos) {
 					// Cells must not change while we read them.
-					ZN_TEST_ASSERT(expected_values[j] == map.at(pos));
+					VOXEL_TEST_ASSERT(expected_values[j] == map.at(pos));
 					// Note, iteration order is the same as when we cached expected values
 					++j;
 				});
@@ -168,7 +168,7 @@ void test_spatial_lock_spam() {
 		}
 
 		static Box3i make_random_box(const Vector3i area_size, RandomPCG &rng) {
-			ZN_ASSERT(area_size.x > 0 && area_size.y > 0 && area_size.z > 0);
+			VOXEL_ASSERT(area_size.x > 0 && area_size.y > 0 && area_size.z > 0);
 			return Box3i(Vector3i(rng.rand(area_size.x), rng.rand(area_size.y), rng.rand(area_size.z)),
 						 Vector3i(1 + rng.rand(4), 1 + rng.rand(4), 1 + rng.rand(4)))
 					.clipped(Box3i(Vector3i(), area_size));
@@ -193,18 +193,18 @@ void test_spatial_lock_spam() {
 					const bool read = rng.rand(100) < 90;
 
 					if (read) {
-						ZN_PROFILE_SCOPE_NAMED("Read");
+						VOXEL_PROFILE_SCOPE_NAMED("Read");
 						SpatialLock3D::Read srlock(spatial_lock, box);
 						{
-							ZN_PROFILE_SCOPE_NAMED("Work");
+							VOXEL_PROFILE_SCOPE_NAMED("Work");
 							read_cells(map, box, LOCK_DURATION_MICROSECONDS, reusable_vector);
 						}
 
 					} else {
-						ZN_PROFILE_SCOPE_NAMED("Write");
+						VOXEL_PROFILE_SCOPE_NAMED("Write");
 						SpatialLock3D::Write swlock(spatial_lock, box);
 						{
-							ZN_PROFILE_SCOPE_NAMED("Work");
+							VOXEL_PROFILE_SCOPE_NAMED("Work");
 							modify_cells(map, box, rng, LOCK_DURATION_MICROSECONDS);
 						}
 					}
@@ -233,7 +233,7 @@ void test_spatial_lock_spam() {
 		threads[thread_index].wait_to_finish();
 	}
 
-	ZN_TEST_ASSERT(spatial_lock.get_locked_boxes_count() == 0);
+	VOXEL_TEST_ASSERT(spatial_lock.get_locked_boxes_count() == 0);
 }
 
 void test_spatial_lock_dependent_map_chunks() {
@@ -270,11 +270,11 @@ void test_spatial_lock_dependent_map_chunks() {
 	struct L {
 		static void dequeue_tasks(ThreadedTaskRunner &runner, unsigned int &r_in_flight_count) {
 			runner.dequeue_completed_tasks([&r_in_flight_count](IThreadedTask *task) {
-				ZN_ASSERT(task != nullptr);
-				// zylann::println(format("Dequeue {}", task));
+				VOXEL_ASSERT(task != nullptr);
+				// voxel::println(format("Dequeue {}", task));
 				task->apply_result();
-				ZN_DELETE(task);
-				ZN_ASSERT(r_in_flight_count > 0);
+				VOXEL_DELETE(task);
+				VOXEL_ASSERT(r_in_flight_count > 0);
 				--r_in_flight_count;
 			});
 		}
@@ -299,7 +299,7 @@ void test_spatial_lock_dependent_map_chunks() {
 				sleep_amount_usec(p_sleep_amount_usec), column_pos(p_column_pos), map(p_map), events(p_events) {}
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 
 			const BoxBounds3i box(
 					Vector3i(column_pos.x - 1, 0, column_pos.y - 1),
@@ -316,7 +316,7 @@ void test_spatial_lock_dependent_map_chunks() {
 #endif
 
 			{
-				ZN_PROFILE_SCOPE_NAMED("Work");
+				VOXEL_PROFILE_SCOPE_NAMED("Work");
 				Thread::sleep_usec(sleep_amount_usec);
 			}
 
@@ -347,7 +347,7 @@ void test_spatial_lock_dependent_map_chunks() {
 				sleep_amount_usec(p_sleep_amount_usec), bpos0(p_bpos), map(p_map), events(p_events) {}
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 
 			const BoxBounds3i box(bpos0 - Vector3i(1, 1, 1), bpos0 + Vector3i(2, 2, 2));
 
@@ -361,7 +361,7 @@ void test_spatial_lock_dependent_map_chunks() {
 #endif
 
 			{
-				ZN_PROFILE_SCOPE_NAMED("Work");
+				VOXEL_PROFILE_SCOPE_NAMED("Work");
 				Thread::sleep_usec(sleep_amount_usec);
 			}
 
@@ -383,7 +383,7 @@ void test_spatial_lock_dependent_map_chunks() {
 	const unsigned int test_thread_count = 4;
 	const unsigned int hw_concurrency = Thread::get_hardware_concurrency();
 	if (hw_concurrency < test_thread_count) {
-		ZN_PRINT_WARNING(format(
+		VOXEL_PRINT_WARNING(format(
 				"Hardware concurrency is {}, smaller than test requirement {}", test_thread_count, hw_concurrency
 		));
 	}
@@ -404,14 +404,14 @@ void test_spatial_lock_dependent_map_chunks() {
 	for (column_pos.y = 0; column_pos.y < MAP_SIZE; ++column_pos.y) {
 		for (column_pos.x = 0; column_pos.x < MAP_SIZE; ++column_pos.x) {
 			{
-				Task1 *task = ZN_NEW(Task1(1000 + rng.rand(2000), map, column_pos, events));
+				Task1 *task = VOXEL_NEW(Task1(1000 + rng.rand(2000), map, column_pos, events));
 				runner.enqueue(task, false);
 				++in_flight_count;
 			}
 
 			// Add some reading requests
 			for (int i = 0; i < 2; ++i) {
-				Task2 *task = ZN_NEW(
+				Task2 *task = VOXEL_NEW(
 						Task2(1000 + rng.rand(2000),
 							  map,
 							  Vector3i(rng.rand(MAP_SIZE), rng.rand(MAP_SIZE), rng.rand(MAP_SIZE)),
@@ -426,7 +426,7 @@ void test_spatial_lock_dependent_map_chunks() {
 	runner.wait_for_all_tasks();
 	L::dequeue_tasks(runner, in_flight_count);
 
-	ZN_TEST_ASSERT(in_flight_count == 0);
+	VOXEL_TEST_ASSERT(in_flight_count == 0);
 
 #ifdef VOXEL_TEST_TASK_POSTPONING_DUMP_EVENTS
 	// Dump events
@@ -448,4 +448,4 @@ void test_spatial_lock_dependent_map_chunks() {
 #endif
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

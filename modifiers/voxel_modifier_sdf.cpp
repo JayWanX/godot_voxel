@@ -2,7 +2,7 @@
 #include "../util/godot/core/packed_arrays.h"
 #include "../util/memory/memory.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelModifierSdf::set_operation(Operation op) {
 	RWLockWrite wlock(_rwlock);
@@ -54,11 +54,11 @@ void VoxelModifierSdf::update_base_shader_data_no_lock() {
 		_shader_data->params.push_back(ComputeShaderParameter{ 4, res0 });
 
 	} else {
-		ZN_ASSERT(_shader_data->params.size() >= 1);
+		VOXEL_ASSERT(_shader_data->params.size() >= 1);
 		ComputeShaderResource::update_storage_buffer(_shader_data->params[0].resource, pba0);
 	}
 }
 
 #endif
 
-} // namespace zylann::voxel
+} // namespace voxel

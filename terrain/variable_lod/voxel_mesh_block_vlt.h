@@ -6,7 +6,7 @@
 #include "../../util/tasks/time_spread_task_runner.h"
 #include "../voxel_mesh_block.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Stores mesh and collider for one chunk of `VoxelTerrain`.
 // It doesn't store voxel data, because it may be using different block size, or different data structure.
@@ -107,7 +107,7 @@ public:
 		const Transform3D world_transform = local_transform;
 		f(_mesh_instance, world_transform);
 		for (unsigned int i = 0; i < _transition_mesh_instances.size(); ++i) {
-			const zylann::godot::DirectMeshInstance &mi = _transition_mesh_instances[i];
+			const voxel::godot::DirectMeshInstance &mi = _transition_mesh_instances[i];
 			if (mi.is_valid()) {
 				f(mi, world_transform);
 			}
@@ -130,14 +130,14 @@ private:
 
 	Ref<ShaderMaterial> _shader_material;
 
-	FixedArray<zylann::godot::DirectMeshInstance, Cube::SIDE_COUNT> _transition_mesh_instances;
+	FixedArray<voxel::godot::DirectMeshInstance, Cube::SIDE_COUNT> _transition_mesh_instances;
 
 	uint8_t _transition_mask = 0;
 
 	// See VoxelMesherBlocky.
 	// This unfortunately has to be a whole separate mesh instance because Godot doesn't support setting
 	// `cast_shadow` mode per mesh surface. This might have an impact on performance.
-	zylann::godot::DirectMeshInstance _shadow_occluder;
+	voxel::godot::DirectMeshInstance _shadow_occluder;
 
 #ifdef VOXEL_DEBUG_LOD_MATERIALS
 	Ref<Material> _debug_material;
@@ -154,6 +154,6 @@ Ref<ArrayMesh> build_mesh(
 		Ref<Material> material
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESH_BLOCK_VLT_H

@@ -1,17 +1,17 @@
-#ifndef ZN_HEIGHTMAP_UTILITY_H
-#define ZN_HEIGHTMAP_UTILITY_H
+#ifndef VOXEL_HEIGHTMAP_UTILITY_H
+#define VOXEL_HEIGHTMAP_UTILITY_H
 
 #include "../../util/godot/core/rect2i.h"
 #include "../../util/godot/macros.h"
 #include "../../util/math/interval.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Image);
+VOXEL_GODOT_FORWARD_DECLARE(class Image);
 
-namespace zylann {
+namespace voxel {
 
 math::Interval get_heightmap_range(const Image &im);
 math::Interval get_heightmap_range(const Image &im, Rect2i rect);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_HEIGHTMAP_UTILITY_H
+#endif // VOXEL_HEIGHTMAP_UTILITY_H

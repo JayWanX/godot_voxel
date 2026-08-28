@@ -6,7 +6,7 @@
 #include <math.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Graham Wihlidal. Optimizing the Graphics Pipeline with Compute. 2016
@@ -1697,4 +1697,4 @@ void meshopt_optimizeMeshlet(unsigned int* meshlet_vertices, unsigned char* mesh
 	memcpy(vertices, order, vertex_offset * sizeof(unsigned int));
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

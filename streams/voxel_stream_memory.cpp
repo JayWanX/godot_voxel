@@ -4,11 +4,11 @@
 #include "../util/thread/thread.h"
 #include "instance_data.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelStreamMemory::load_voxel_blocks(Span<VoxelQueryData> p_blocks) {
 	for (VoxelQueryData &q : p_blocks) {
@@ -150,7 +150,7 @@ int VoxelStreamMemory::get_lod_count() const {
 }
 
 void VoxelStreamMemory::set_artificial_save_latency_usec(int usec) {
-	ZN_ASSERT_RETURN(usec >= 0);
+	VOXEL_ASSERT_RETURN(usec >= 0);
 	_artificial_save_latency_usec = usec;
 }
 
@@ -173,4 +173,4 @@ void VoxelStreamMemory::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

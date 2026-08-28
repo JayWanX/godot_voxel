@@ -1,7 +1,7 @@
 #include "vox_editor_plugin.h"
 #include "../../util/godot/classes/node.h"
 
-namespace zylann::voxel::magica {
+namespace voxel::magica {
 
 VoxelVoxEditorPlugin::VoxelVoxEditorPlugin() {}
 
@@ -24,4 +24,4 @@ void VoxelVoxEditorPlugin::_notification(int p_what) {
 	}
 }
 
-} // namespace zylann::voxel::magica
+} // namespace voxel::magica

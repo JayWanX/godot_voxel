@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_PHYSICS_SERVER_3D_H
-#define ZN_GODOT_PHYSICS_SERVER_3D_H
+#ifndef VOXEL_GODOT_PHYSICS_SERVER_3D_H
+#define VOXEL_GODOT_PHYSICS_SERVER_3D_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include "../core/version.h"
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
@@ -17,7 +17,7 @@
 using PhysicsServer3DEnums = PhysicsServer3D;
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 
 #include <godot_cpp/classes/physics_server3d.hpp>
 using namespace godot;
@@ -25,21 +25,21 @@ using PhysicsServer3DEnums = godot::PhysicsServer3D;
 
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 inline void free_physics_server_rid(PhysicsServer3D &ps, const RID &rid) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
 	ps.free(rid);
 #else
 	ps.free_rid(rid);
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	ps.free_rid(rid);
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_PHYSICS_SERVER_3D_H
+#endif // VOXEL_GODOT_PHYSICS_SERVER_3D_H

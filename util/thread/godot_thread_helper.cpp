@@ -1,15 +1,15 @@
 #include "godot_thread_helper.h"
 #include <godot_cpp/core/class_db.hpp>
 
-namespace zylann {
+namespace voxel {
 
-void ZN_GodotThreadHelper::run() {
-	ZN_ASSERT_RETURN(_callback != nullptr);
+void VOXEL_GodotThreadHelper::run() {
+	VOXEL_ASSERT_RETURN(_callback != nullptr);
 	_callback(_callback_data);
 }
 
-void ZN_GodotThreadHelper::_bind_methods() {
-	godot::ClassDB::bind_method(godot::D_METHOD("run"), &ZN_GodotThreadHelper::run);
+void VOXEL_GodotThreadHelper::_bind_methods() {
+	godot::ClassDB::bind_method(godot::D_METHOD("run"), &VOXEL_GodotThreadHelper::run);
 }
 
-} // namespace zylann
+} // namespace voxel

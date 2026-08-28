@@ -3,7 +3,7 @@
 #include "voxel_lod_terrain_update_data.h"
 #include "voxel_lod_terrain_update_task.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -14,10 +14,10 @@ void process_unload_data_blocks_sliding_box(
 		StdVector<VoxelData::BlockToSave> *blocks_to_save,
 		const VoxelLodTerrainUpdateData::Settings &settings
 ) {
-	ZN_PROFILE_SCOPE_NAMED("Sliding box data unload");
+	VOXEL_PROFILE_SCOPE_NAMED("Sliding box data unload");
 	// TODO Could it actually be enough to have a rolling update on all blocks?
 
-	ZN_ASSERT_RETURN_MSG(data.is_streaming_enabled(), "This function is not meant to run in full load mode");
+	VOXEL_ASSERT_RETURN_MSG(data.is_streaming_enabled(), "This function is not meant to run in full load mode");
 
 	// This should be the same distance relatively to each LOD
 	const int data_block_size = data.get_block_size();
@@ -36,7 +36,7 @@ void process_unload_data_blocks_sliding_box(
 	//
 	// Iterating from big to small LOD so we can exit earlier if bounds don't intersect.
 	for (int lod_index = lod_count - 2; lod_index >= 0; --lod_index) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
 		// Each LOD keeps a box of loaded blocks, and only some of the blocks will get polygonized.
@@ -64,7 +64,7 @@ void process_unload_data_blocks_sliding_box(
 
 		if (prev_box != new_box) {
 			// Eliminate pending blocks that aren't needed
-			ZN_PROFILE_SCOPE_NAMED("Unload data");
+			VOXEL_PROFILE_SCOPE_NAMED("Unload data");
 
 			// VoxelDataLodMap::Lod &data_lod = data.lods[lod_index];
 			// RWLockWrite wlock(data_lod.map_lock);
@@ -81,7 +81,7 @@ void process_unload_data_blocks_sliding_box(
 		}
 
 		{
-			ZN_PROFILE_SCOPE_NAMED("Cancel updates");
+			VOXEL_PROFILE_SCOPE_NAMED("Cancel updates");
 			// Cancel block updates that are not within the padded region
 			// (since neighbors are always required to remesh)
 
@@ -121,7 +121,7 @@ void process_unload_mesh_blocks_sliding_box(
 		const VoxelLodTerrainUpdateData::Settings &settings,
 		const VoxelData &data
 ) {
-	ZN_PROFILE_SCOPE_NAMED("Sliding box mesh unload");
+	VOXEL_PROFILE_SCOPE_NAMED("Sliding box mesh unload");
 	// TODO Could it actually be enough to have a rolling update on all blocks?
 
 	// This should be the same distance relatively to each LOD
@@ -136,7 +136,7 @@ void process_unload_mesh_blocks_sliding_box(
 	// Instead, those blocks are unloaded by the octree forest management.
 	// Iterating from big to small LOD so we can exit earlier if bounds don't intersect.
 	for (int lod_index = lod_count - 2; lod_index >= 0; --lod_index) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
 		unsigned int block_size_po2 = mesh_block_size_po2 + lod_index;
@@ -160,7 +160,7 @@ void process_unload_mesh_blocks_sliding_box(
 		// Eliminate pending blocks that aren't needed
 
 		if (prev_box != new_box) {
-			ZN_PROFILE_SCOPE_NAMED("Unload meshes");
+			VOXEL_PROFILE_SCOPE_NAMED("Unload meshes");
 			RWLockWrite wlock(lod.mesh_map_state.map_lock);
 			prev_box.difference(new_box, [&lod](Box3i out_of_range_box) {
 				out_of_range_box.for_each_cell([&lod](Vector3i pos) {
@@ -173,7 +173,7 @@ void process_unload_mesh_blocks_sliding_box(
 		}
 
 		{
-			ZN_PROFILE_SCOPE_NAMED("Cancel updates");
+			VOXEL_PROFILE_SCOPE_NAMED("Cancel updates");
 			// Cancel block updates that are not within the new region
 			unordered_remove_if(
 					lod.mesh_blocks_pending_update,
@@ -194,7 +194,7 @@ void process_octrees_sliding_box(
 		const VoxelLodTerrainUpdateData::Settings &settings,
 		const VoxelData &data
 ) {
-	ZN_PROFILE_SCOPE_NAMED("Sliding box octrees");
+	VOXEL_PROFILE_SCOPE_NAMED("Sliding box octrees");
 	// TODO Investigate if multi-octree can produce cracks in the terrain (so far I haven't noticed)
 
 	const unsigned int lod_count = data.get_lod_count();
@@ -286,7 +286,7 @@ void process_octrees_sliding_box(
 		ExitAction exit_action{ state, lod_count };
 		EnterAction enter_action{ state, lod_count };
 		{
-			ZN_PROFILE_SCOPE_NAMED("Unload octrees");
+			VOXEL_PROFILE_SCOPE_NAMED("Unload octrees");
 
 			const unsigned int last_lod_index = lod_count - 1;
 			VoxelLodTerrainUpdateData::Lod &last_lod = state.lods[last_lod_index];
@@ -297,7 +297,7 @@ void process_octrees_sliding_box(
 			});
 		}
 		{
-			ZN_PROFILE_SCOPE_NAMED("Load octrees");
+			VOXEL_PROFILE_SCOPE_NAMED("Load octrees");
 			new_box.difference(prev_box, [enter_action](Box3i box_to_load) { //
 				box_to_load.for_each_cell(enter_action);
 			});
@@ -342,7 +342,7 @@ bool check_block_mesh_updated(
 		StdVector<VoxelLodTerrainUpdateData::BlockToLoad> &blocks_to_load,
 		const VoxelLodTerrainUpdateData::Settings &settings
 ) {
-	// ZN_PROFILE_SCOPE();
+	// VOXEL_PROFILE_SCOPE();
 
 	VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
@@ -526,7 +526,7 @@ void process_octrees_fitting(
 		StdVector<VoxelLodTerrainUpdateData::BlockToLoad> &data_blocks_to_load
 ) {
 	//
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const int mesh_block_size = 1 << settings.mesh_block_size_po2;
 	const int octree_leaf_node_size = mesh_block_size;
@@ -555,7 +555,7 @@ void process_octrees_fitting(
 	for (auto octree_it = state.octree_streaming.lod_octrees.begin();
 		 octree_it != state.octree_streaming.lod_octrees.end();
 		 ++octree_it) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		struct OctreeActions {
 			VoxelLodTerrainUpdateData::State &state;
@@ -635,7 +635,7 @@ void process_octrees_fitting(
 			}
 
 			bool can_split(Vector3i node_pos, int lod_index, LodOctree::NodeData &node_data) {
-				ZN_PROFILE_SCOPE();
+				VOXEL_PROFILE_SCOPE();
 				if (!LodOctree::is_below_split_distance(
 							node_pos, lod_index, viewer_pos_octree_space, lod_distance_octree_space
 					)) {
@@ -673,7 +673,7 @@ void process_octrees_fitting(
 			}
 
 			bool can_join(Vector3i node_pos, int parent_lod_index) {
-				ZN_PROFILE_SCOPE();
+				VOXEL_PROFILE_SCOPE();
 				if (LodOctree::is_below_split_distance(
 							node_pos, parent_lod_index, viewer_pos_octree_space, lod_distance_octree_space
 					)) {
@@ -743,7 +743,7 @@ void process_octree_streaming(
 		const VoxelLodTerrainUpdateData::Settings &settings,
 		bool stream_enabled
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Unload data blocks falling out of block region extent.
 	// We only unload data if data streaming is enabled. Otherwise it's always loaded.
@@ -766,4 +766,4 @@ void process_octree_streaming(
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

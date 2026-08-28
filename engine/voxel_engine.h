@@ -28,12 +28,12 @@
 #include "gpu/gpu_task_runner.h"
 #endif
 
-ZN_GODOT_FORWARD_DECLARE(class RenderingDevice);
-#ifdef ZN_GODOT_EXTENSION
+VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice);
+#ifdef VOXEL_GODOT_EXTENSION
 using namespace godot;
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Singleton for common things, notably the task system and shared viewers list.
 // In Godot terminology this used to be called a "server", but I don't really agree with the term here, and it can be
@@ -115,10 +115,10 @@ public:
 		void *data = nullptr;
 
 		inline bool check_callbacks() const {
-			ZN_ASSERT_RETURN_V(mesh_output_callback != nullptr, false);
-			ZN_ASSERT_RETURN_V(data_output_callback != nullptr, false);
-			// ZN_ASSERT_RETURN_V(normalmap_output_callback != nullptr, false);
-			ZN_ASSERT_RETURN_V(data != nullptr, false);
+			VOXEL_ASSERT_RETURN_V(mesh_output_callback != nullptr, false);
+			VOXEL_ASSERT_RETURN_V(data_output_callback != nullptr, false);
+			// VOXEL_ASSERT_RETURN_V(normalmap_output_callback != nullptr, false);
+			VOXEL_ASSERT_RETURN_V(data != nullptr, false);
 			return true;
 		}
 	};
@@ -234,7 +234,7 @@ public:
 			}
 			void collect(GPUTaskContext &ctx) override {}
 		};
-		push_gpu_task(ZN_NEW(Task(f)));
+		push_gpu_task(VOXEL_NEW(Task(f)));
 	}
 
 	uint32_t get_pending_gpu_tasks_count() const;
@@ -278,7 +278,7 @@ public:
 	void set_thread_count(uint32_t count);
 
 	// RenderingDevice &get_rendering_device() const {
-	// 	ZN_ASSERT(_rendering_device != nullptr);
+	// 	VOXEL_ASSERT(_rendering_device != nullptr);
 	// 	return *_rendering_device;
 	// }
 
@@ -287,22 +287,22 @@ public:
 
 	inline void debug_increment_generate_block_task_counter() {
 		// Need to conditionally do this to avoid "unused variable" warnings in non-profiling builds
-#ifdef ZN_PROFILER_ENABLED
+#ifdef VOXEL_PROFILER_ENABLED
 		int64_t v =
 #endif
 				++_debug_generate_block_task_count;
-#ifdef ZN_PROFILER_ENABLED
-		ZN_PROFILE_PLOT("GenerateBlock* tasks", v);
+#ifdef VOXEL_PROFILER_ENABLED
+		VOXEL_PROFILE_PLOT("GenerateBlock* tasks", v);
 #endif
 	}
 
 	inline void debug_decrement_generate_block_task_counter() {
-#ifdef ZN_PROFILER_ENABLED
+#ifdef VOXEL_PROFILER_ENABLED
 		int64_t v =
 #endif
 				--_debug_generate_block_task_count;
-#ifdef ZN_PROFILER_ENABLED
-		ZN_PROFILE_PLOT("GenerateBlock* tasks", v);
+#ifdef VOXEL_PROFILER_ENABLED
+		VOXEL_PROFILE_PLOT("GenerateBlock* tasks", v);
 #endif
 	}
 
@@ -381,6 +381,6 @@ struct VoxelFileLockerWrite {
 	StdString _path;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_ENGINE_H

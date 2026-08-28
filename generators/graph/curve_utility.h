@@ -1,14 +1,14 @@
-#ifndef ZN_CURVE_UTILITY_H
-#define ZN_CURVE_UTILITY_H
+#ifndef VOXEL_CURVE_UTILITY_H
+#define VOXEL_CURVE_UTILITY_H
 
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/core/rect2i.h"
 #include "../../util/godot/macros.h"
 #include "../../util/math/interval.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Curve)
+VOXEL_GODOT_FORWARD_DECLARE(class Curve)
 
-namespace zylann {
+namespace voxel {
 
 struct CurveMonotonicSection {
 	float x_min;
@@ -38,6 +38,6 @@ math::Interval get_curve_range(Curve &curve, const StdVector<CurveMonotonicSecti
 // Legacy
 math::Interval get_curve_range(Curve &curve, bool &is_monotonic_increasing);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_CURVE_UTILITY_H
+#endif // VOXEL_CURVE_UTILITY_H

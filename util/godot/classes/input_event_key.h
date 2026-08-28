@@ -1,18 +1,18 @@
-#ifndef ZN_GODOT_INPUT_EVENT_KEY_H
-#define ZN_GODOT_INPUT_EVENT_KEY_H
+#ifndef VOXEL_GODOT_INPUT_EVENT_KEY_H
+#define VOXEL_GODOT_INPUT_EVENT_KEY_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/input/input_event.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/input_event_key.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // TODO GDX: InputEventKey::create_reference is not exposed
 Ref<InputEventKey> create_input_event_from_key(Key p_keycode_with_modifier_masks, bool p_physical = false);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_INPUT_EVENT_KEY_H
+#endif // VOXEL_GODOT_INPUT_EVENT_KEY_H

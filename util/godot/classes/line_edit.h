@@ -1,11 +1,11 @@
-#ifndef ZN_GODOT_LINE_EDIT_H
-#define ZN_GODOT_LINE_EDIT_H
+#ifndef VOXEL_GODOT_LINE_EDIT_H
+#define VOXEL_GODOT_LINE_EDIT_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/gui/line_edit.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/line_edit.hpp>
 using namespace godot;
 #endif
 
-#endif // ZN_GODOT_LINE_EDIT_H
+#endif // VOXEL_GODOT_LINE_EDIT_H

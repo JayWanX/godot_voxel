@@ -1,7 +1,7 @@
 #include "box2f.h"
 #include "../io/text_writer.h"
 
-namespace zylann {
+namespace voxel {
 
 TextWriter &operator<<(TextWriter &w, const Box2f &box) {
 	w << "(min:";
@@ -12,4 +12,4 @@ TextWriter &operator<<(TextWriter &w, const Box2f &box) {
 	return w;
 }
 
-} // namespace zylann
+} // namespace voxel

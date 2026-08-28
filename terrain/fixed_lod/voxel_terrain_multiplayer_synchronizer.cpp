@@ -17,7 +17,7 @@
 #include "../../util/godot/core/string.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelTerrainMultiplayerSynchronizer::VoxelTerrainMultiplayerSynchronizer() {
 	Dictionary config;
@@ -34,14 +34,14 @@ VoxelTerrainMultiplayerSynchronizer::VoxelTerrainMultiplayerSynchronizer() {
 
 // Helper function
 bool VoxelTerrainMultiplayerSynchronizer::is_server() const {
-	ZN_ASSERT_RETURN_V(is_inside_tree(), false);
+	VOXEL_ASSERT_RETURN_V(is_inside_tree(), false);
 	// Note, when using multiple Multiplayer branches in the scene tree, `get_multiplayer` can be significantly slower,
 	// because it involves constructing a NodePath and then querying a HashMap<NodePah,V> to check which nodes have
 	// custom multiplayer. In cases Godot thought of, this is not a big issue, but in our case this can have a
 	// noticeable impact because `is_server()` can be called a thousand times in a frame when a viewer joins or
 	// teleports.
 	Ref<MultiplayerAPI> mp = get_multiplayer();
-	ZN_ASSERT_RETURN_V(mp.is_valid(), false);
+	VOXEL_ASSERT_RETURN_V(mp.is_valid(), false);
 	return mp->is_server();
 }
 
@@ -50,11 +50,11 @@ void VoxelTerrainMultiplayerSynchronizer::send_block(
 		const VoxelDataBlock &data_block,
 		Vector3i bpos
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	BlockSerializer::SerializeResult result =
 			BlockSerializer::serialize_and_compress(data_block.get_voxels_const(), CompressedData::COMPRESSION_LZ4);
-	ZN_ASSERT_RETURN(result.success);
+	VOXEL_ASSERT_RETURN(result.success);
 
 	PackedByteArray message_data;
 	message_data.resize(4 * sizeof(int16_t) + result.data.size());
@@ -65,7 +65,7 @@ void VoxelTerrainMultiplayerSynchronizer::send_block(
 	mw.store_16(bpos.x);
 	mw.store_16(bpos.y);
 	mw.store_16(bpos.z);
-	ZN_ASSERT_RETURN(result.data.size() <= 65535);
+	VOXEL_ASSERT_RETURN(result.data.size() <= 65535);
 	mw.store_16(result.data.size());
 	mw.store_buffer(to_span(result.data));
 
@@ -84,8 +84,8 @@ void VoxelTerrainMultiplayerSynchronizer::send_block(
 // isn't acknowledging it for some time.
 
 void VoxelTerrainMultiplayerSynchronizer::send_area(Box3i voxel_box) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 
 	StdVector<ViewerID> viewers;
 	_terrain->get_viewers_in_area(viewers, voxel_box);
@@ -97,7 +97,7 @@ void VoxelTerrainMultiplayerSynchronizer::send_area(Box3i voxel_box) {
 
 	BlockSerializer::SerializeResult result =
 			BlockSerializer::serialize_and_compress(voxels, CompressedData::COMPRESSION_LZ4);
-	ZN_ASSERT_RETURN(result.success);
+	VOXEL_ASSERT_RETURN(result.success);
 
 	PackedByteArray pba;
 	pba.resize(4 * sizeof(int32_t) + result.data.size());
@@ -146,7 +146,7 @@ void VoxelTerrainMultiplayerSynchronizer::_notification(int p_what) {
 // }
 
 void VoxelTerrainMultiplayerSynchronizer::process() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	for (auto it = _deferred_block_messages_per_peer.begin(); it != _deferred_block_messages_per_peer.end(); ++it) {
 		StdVector<DeferredBlockMessage> &messages = it->second;
@@ -174,20 +174,20 @@ void VoxelTerrainMultiplayerSynchronizer::process() {
 		for (const DeferredBlockMessage &message : messages) {
 			mw.store_buffer(Span<const uint8_t>(message.data.ptr(), message.data.size()));
 		}
-		ZN_ASSERT(mw.data.size() == mw.data.pos);
+		VOXEL_ASSERT(mw.data.size() == mw.data.pos);
 
 		messages.clear();
 
 		const int peer_id = it->first;
-		ZN_PRINT_VERBOSE(format("Sending {} bytes of block data to peer {}", pba.size(), peer_id));
+		VOXEL_PRINT_VERBOSE(format("Sending {} bytes of block data to peer {}", pba.size(), peer_id));
 		// print_data_hex(Span<const uint8_t>(pba.ptr(), pba.size()));
 		rpc_id(peer_id, VoxelStringNames::get_singleton()._rpc_receive_blocks, pba);
 	}
 }
 
 void VoxelTerrainMultiplayerSynchronizer::_b_receive_blocks(PackedByteArray message_data) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 
 	// print_line(String("Client: receive blocks data {1}").format(varray(data.size())));
 	//  print_data_hex(Span<const uint8_t>(data.ptr(), data.size()));
@@ -207,21 +207,21 @@ void VoxelTerrainMultiplayerSynchronizer::_b_receive_blocks(PackedByteArray mess
 		// print_line(String("Client: receive block {0} data {1}").format(varray(bpos, voxel_data_size)));
 
 		VoxelBuffer voxels(VoxelBuffer::ALLOCATOR_POOL);
-		ZN_ASSERT_RETURN(BlockSerializer::decompress_and_deserialize(mr.data.sub(mr.pos, voxel_data_size), voxels));
+		VOXEL_ASSERT_RETURN(BlockSerializer::decompress_and_deserialize(mr.data.sub(mr.pos, voxel_data_size), voxels));
 
 		mr.pos += voxel_data_size;
 
 		std::shared_ptr<VoxelBuffer> voxels_p = make_shared_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_POOL);
 		*voxels_p = std::move(voxels);
 
-		ZN_ASSERT_RETURN(_terrain != nullptr);
+		VOXEL_ASSERT_RETURN(_terrain != nullptr);
 		_terrain->try_set_block_data(bpos, voxels_p);
 	}
 }
 
 void VoxelTerrainMultiplayerSynchronizer::_b_receive_area(PackedByteArray message_data) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 
 	MemoryReader mr(Span<const uint8_t>(message_data.ptr(), message_data.size()), ENDIANNESS_LITTLE_ENDIAN);
 
@@ -232,7 +232,7 @@ void VoxelTerrainMultiplayerSynchronizer::_b_receive_area(PackedByteArray messag
 	const int voxel_data_size = mr.get_32();
 
 	VoxelBuffer voxels(VoxelBuffer::ALLOCATOR_POOL);
-	ZN_ASSERT_RETURN(BlockSerializer::decompress_and_deserialize(mr.data.sub(mr.pos, voxel_data_size), voxels));
+	VOXEL_ASSERT_RETURN(BlockSerializer::decompress_and_deserialize(mr.data.sub(mr.pos, voxel_data_size), voxels));
 
 	_terrain->get_storage().paste(pos, voxels, 0xff, false, true);
 	_terrain->post_edit_area(
@@ -245,13 +245,13 @@ void VoxelTerrainMultiplayerSynchronizer::_b_receive_area(PackedByteArray messag
 
 #ifdef TOOLS_ENABLED
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 PackedStringArray VoxelTerrainMultiplayerSynchronizer::get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 PackedStringArray VoxelTerrainMultiplayerSynchronizer::_get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
@@ -262,7 +262,7 @@ PackedStringArray VoxelTerrainMultiplayerSynchronizer::_get_configuration_warnin
 void VoxelTerrainMultiplayerSynchronizer::get_configuration_warnings(PackedStringArray &warnings) const {
 	if (is_inside_tree()) {
 		if (_terrain == nullptr) {
-			warnings.append(ZN_TTR("This node must be child of {0}").format(varray(VoxelTerrain::get_class_static())));
+			warnings.append(VOXEL_TTR("This node must be child of {0}").format(varray(VoxelTerrain::get_class_static())));
 		}
 
 		const Node *parent_node = get_parent();
@@ -270,7 +270,7 @@ void VoxelTerrainMultiplayerSynchronizer::get_configuration_warnings(PackedStrin
 		if (parent_node != nullptr) {
 			const VoxelTerrain *terrain = Object::cast_to<VoxelTerrain>(parent_node);
 			if (terrain != nullptr && terrain->get_multiplayer_synchronizer() != this) {
-				warnings.append(ZN_TTR("Only one instance of {0} should exist under a {1}")
+				warnings.append(VOXEL_TTR("Only one instance of {0} should exist under a {1}")
 										.format(
 												varray(VoxelTerrainMultiplayerSynchronizer::get_class_static(),
 													   VoxelTerrain::get_class_static())
@@ -291,4 +291,4 @@ void VoxelTerrainMultiplayerSynchronizer::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_rpc_receive_area", "data"), &VoxelTerrainMultiplayerSynchronizer::_b_receive_area);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

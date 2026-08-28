@@ -6,7 +6,7 @@
 #include "instance_library_item_listener.h"
 #include "voxel_instance_generator.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstanceLibraryItem : public Resource {
 	GDCLASS(VoxelInstanceLibraryItem, Resource)
@@ -75,6 +75,6 @@ private:
 	float _floating_sdf_offset_along_normal = -0.1f;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_LIBRARY_ITEM_H

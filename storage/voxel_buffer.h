@@ -11,7 +11,7 @@
 
 #include <limits>
 
-namespace zylann {
+namespace voxel {
 
 class DynamicBitset;
 
@@ -78,7 +78,7 @@ public:
 	};
 
 	static inline uint32_t get_depth_byte_count(VoxelBuffer::Depth d) {
-		ZN_ASSERT(d >= 0 && d < VoxelBuffer::DEPTH_COUNT);
+		VOXEL_ASSERT(d >= 0 && d < VoxelBuffer::DEPTH_COUNT);
 		return 1 << d;
 	}
 
@@ -98,7 +98,7 @@ public:
 			case 8:
 				return DEPTH_64_BIT;
 			default:
-				ZN_CRASH();
+				VOXEL_CRASH();
 		}
 		return DEPTH_COUNT;
 	}
@@ -278,12 +278,12 @@ public:
 			Vector3i dst_min,
 			unsigned int channel_index
 	) {
-		ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+		VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 
 		Channel &channel = _channels[channel_index];
 #ifdef DEBUG_ENABLED
 		// Size of source and destination values must match
-		ZN_ASSERT_RETURN(channel.depth == get_depth_from_size(sizeof(T)));
+		VOXEL_ASSERT_RETURN(channel.depth == get_depth_from_size(sizeof(T)));
 #endif
 
 		// This function always decompresses the destination.
@@ -310,12 +310,12 @@ public:
 			Vector3i src_max,
 			unsigned int channel_index
 	) const {
-		ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+		VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 
 		const Channel &channel = _channels[channel_index];
 #ifdef DEBUG_ENABLED
 		// Size of source and destination values must match
-		ZN_ASSERT_RETURN(channel.depth == get_depth_from_size(sizeof(T)));
+		VOXEL_ASSERT_RETURN(channel.depth == get_depth_from_size(sizeof(T)));
 #endif
 
 		if (channel.compression == COMPRESSION_UNIFORM) {
@@ -333,7 +333,7 @@ public:
 	// Can be used to blend voxels together.
 	template <typename F>
 	inline void read_write_action(Box3i box, unsigned int channel_index, F action_func) {
-		ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+		VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 
 		box.clip(Box3i(Vector3i(), _size));
 		const Vector3i min_pos = box.position;
@@ -384,8 +384,8 @@ public:
 		decompress_channel(channel_index);
 		Channel &channel = _channels[channel_index];
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT_RETURN(Box3i(Vector3i(), _size).contains(box));
-		ZN_ASSERT_RETURN(get_depth_byte_count(channel.depth) == sizeof(Data_T));
+		VOXEL_ASSERT_RETURN(Box3i(Vector3i(), _size).contains(box));
+		VOXEL_ASSERT_RETURN(get_depth_byte_count(channel.depth) == sizeof(Data_T));
 #endif
 		Span<Data_T> data = Span<uint8_t>(channel.data, channel.size_in_bytes).reinterpret_cast_to<Data_T>();
 		// `&` is required because lambda captures are `const` by default and `mutable` can be used only from C++23
@@ -410,9 +410,9 @@ public:
 		Channel &channel0 = _channels[channel_index0];
 		Channel &channel1 = _channels[channel_index1];
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT_RETURN(Box3i(Vector3i(), _size).contains(box));
-		ZN_ASSERT_RETURN(get_depth_byte_count(channel0.depth) == sizeof(Data0_T));
-		ZN_ASSERT_RETURN(get_depth_byte_count(channel1.depth) == sizeof(Data1_T));
+		VOXEL_ASSERT_RETURN(Box3i(Vector3i(), _size).contains(box));
+		VOXEL_ASSERT_RETURN(get_depth_byte_count(channel0.depth) == sizeof(Data0_T));
+		VOXEL_ASSERT_RETURN(get_depth_byte_count(channel1.depth) == sizeof(Data1_T));
 #endif
 		Span<Data0_T> data0 = Span<uint8_t>(channel0.data, channel0.size_in_bytes).reinterpret_cast_to<Data0_T>();
 		Span<Data1_T> data1 = Span<uint8_t>(channel1.data, channel1.size_in_bytes).reinterpret_cast_to<Data1_T>();
@@ -427,7 +427,7 @@ public:
 	template <typename F>
 	void write_box(const Box3i &box, unsigned int channel_index, F action_func, Vector3i offset) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+		VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 #endif
 		const Channel &channel = _channels[channel_index];
 		switch (channel.depth) {
@@ -444,7 +444,7 @@ public:
 				write_box_template<F, uint64_t>(box, channel_index, action_func, offset);
 				break;
 			default:
-				ZN_PRINT_ERROR("Unknown channel");
+				VOXEL_PRINT_ERROR("Unknown channel");
 				break;
 		}
 	}
@@ -520,7 +520,7 @@ public:
 	template <typename T>
 	bool get_channel_data(unsigned int channel_index, Span<T> &dst) {
 		Span<uint8_t> dst8;
-		ZN_ASSERT_RETURN_V(get_channel_as_bytes(channel_index, dst8), false);
+		VOXEL_ASSERT_RETURN_V(get_channel_as_bytes(channel_index, dst8), false);
 		dst = dst8.reinterpret_cast_to<T>();
 		return true;
 	}
@@ -529,7 +529,7 @@ public:
 	template <typename T>
 	bool get_channel_data_read_only(unsigned int channel_index, Span<const T> &dst) const {
 		Span<const uint8_t> dst8;
-		ZN_ASSERT_RETURN_V(get_channel_as_bytes_read_only(channel_index, dst8), false);
+		VOXEL_ASSERT_RETURN_V(get_channel_as_bytes_read_only(channel_index, dst8), false);
 		dst = dst8.reinterpret_cast_to<const T>();
 		return true;
 	}
@@ -588,7 +588,7 @@ public:
 		_voxel_metadata.remove_if(predicate);
 	}
 
-	// #ifdef ZN_GODOT
+	// #ifdef VOXEL_GODOT
 	// 	// TODO Move out of here
 	// 	void for_each_voxel_metadata(const Callable &callback) const;
 	// 	void for_each_voxel_metadata_in_area(const Callable &callback, Box3i box) const;
@@ -685,6 +685,6 @@ void paste_src_masked_dst_writable_bitarray(
 );
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_BUFFER_INTERNAL_H

@@ -3,9 +3,9 @@
 
 #include "../errors.h"
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/math/math_funcs.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/core/math.hpp>
 using namespace godot;
 #endif
@@ -14,7 +14,7 @@ using namespace godot;
 #include <cmath>
 #include <type_traits>
 
-namespace zylann::math {
+namespace voxel::math {
 
 // Generic math functions, only using scalar types.
 
@@ -156,7 +156,7 @@ inline double lerp(double a, double b, double t) {
 //    6   | 2   | 2        | 2
 inline int floordiv(int x, int d) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(d > 0);
+	VOXEL_ASSERT(d > 0);
 #endif
 	if (x < 0) {
 		return (x - d + 1) / d;
@@ -172,7 +172,7 @@ inline int floordiv(int x, int d) {
 // ceildiv(11, 10) == 2
 inline int ceildiv(int x, int d) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(d > 0);
+	VOXEL_ASSERT(d > 0);
 #endif
 	if (x > 0) {
 		return (x + d - 1) / d;
@@ -184,7 +184,7 @@ inline int ceildiv(int x, int d) {
 
 inline int ceildiv(unsigned int x, unsigned int d) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(d > 0);
+	VOXEL_ASSERT(d > 0);
 #endif
 	return (x + d - 1) / d;
 }
@@ -193,7 +193,7 @@ inline int ceildiv(unsigned int x, unsigned int d) {
 // `Math::wrapi` with zero min
 inline int wrap(int x, int d) {
 #ifdef DEV_ENABLED
-	ZN_ASSERT(d > 0);
+	VOXEL_ASSERT(d > 0);
 #endif
 	// return x % d; // Positive only
 	return ((x % d) + d) % d;
@@ -265,14 +265,14 @@ inline unsigned int get_previous_power_of_two_32(unsigned int x) {
 // Assuming `pot == (1 << i)`, returns `i`.
 inline unsigned int get_shift_from_power_of_two_32(unsigned int pot) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(is_power_of_two(pot));
+	VOXEL_ASSERT(is_power_of_two(pot));
 #endif
 	for (unsigned int i = 0; i < 32; ++i) {
 		if (pot == (1u << i)) {
 			return i;
 		}
 	}
-	ZN_CRASH_MSG("Input was not a valid power of two");
+	VOXEL_CRASH_MSG("Input was not a valid power of two");
 	return 0;
 }
 
@@ -289,7 +289,7 @@ inline unsigned int get_next_power_of_two_32_shift(unsigned int num) {
 			return i;
 		}
 	}
-	ZN_CRASH_MSG("Number too big");
+	VOXEL_CRASH_MSG("Number too big");
 	return 0;
 }
 
@@ -297,7 +297,7 @@ inline unsigned int get_next_power_of_two_32_shift(unsigned int num) {
 // returns the next aligned address. `align` must be a power of two.
 inline size_t alignup(size_t a, size_t align) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(is_power_of_two(align));
+	VOXEL_ASSERT(is_power_of_two(align));
 #endif
 	return (a + align - 1) & ~(align - 1);
 }
@@ -563,13 +563,13 @@ inline uint64_t multiply_check_overflow_u64(const uint64_t a, const uint64_t b) 
 	const uint64_t r = a * b;
 #ifdef DEV_ENABLED
 	if (a != 0 && r / a != b) {
-		ZN_PRINT_ERROR("Multiplication overflow");
+		VOXEL_PRINT_ERROR("Multiplication overflow");
 		return 0;
 	}
 #endif
 	return r;
 }
 
-} // namespace zylann::math
+} // namespace voxel::math
 
 #endif // VOXEL_MATH_FUNCS_H

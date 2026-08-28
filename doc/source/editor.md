@@ -24,7 +24,7 @@ The whole terrain can be told to re-mesh or re-load by using one of the options 
 If you use a script on either [VoxelGeneratorScript](api/VoxelGeneratorScript.md) or [VoxelStreamScript](api/VoxelStreamScript.md), they will be executed in the editor if they are declared with tool mode (`@tool` in GDScript).
 However, alongside risks of tool mode, there is extra danger: if the script gets modified while it is still being run by a background thread in the editor, unpredictable bugs can happen. You have to make sure the script doesn't change while previewing this way, or that terrain finished loading (can be forced to a degree by closing the scene). Therefore tool mode should only be used temporarily during development.
 You can always test by running your game instead, with or without tool mode.
-This limitation is tracked in [issue177](https://github.com/Zylann/godot_voxel/issues/177).
+This limitation is tracked in [issue177](https://github.com/Voxel/godot_voxel/issues/177).
 
 
 ### Camera options

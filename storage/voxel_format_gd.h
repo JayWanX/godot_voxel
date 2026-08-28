@@ -5,7 +5,7 @@
 #include "voxel_buffer_gd.h"
 #include "voxel_format.h"
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 class VoxelFormat : public Resource {
 	GDCLASS(VoxelFormat, Resource)
@@ -16,7 +16,7 @@ public:
 	void configure_buffer(Ref<VoxelBuffer> buffer) const;
 	Ref<VoxelBuffer> create_buffer(const Vector3i size) const;
 
-	zylann::voxel::VoxelFormat get_internal() const {
+	voxel::VoxelFormat get_internal() const {
 		return _internal;
 	}
 
@@ -26,9 +26,9 @@ private:
 
 	static void _bind_methods();
 
-	zylann::voxel::VoxelFormat _internal;
+	voxel::VoxelFormat _internal;
 };
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot
 
 #endif // VOXEL_FORMAT_GD_H

@@ -4,7 +4,7 @@
 #include "../../util/math/color.h"
 #include "../../util/math/vector3i.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBuffer;
 
@@ -38,6 +38,6 @@ struct TintSampler {
 };
 
 } // namespace blocky
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TINT_SAMPLER_H

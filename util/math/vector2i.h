@@ -1,5 +1,5 @@
-#ifndef ZN_MATH_VECTOR2I_H
-#define ZN_MATH_VECTOR2I_H
+#ifndef VOXEL_MATH_VECTOR2I_H
+#define VOXEL_MATH_VECTOR2I_H
 
 #include "../errors.h"
 #include "../godot/core/vector2i.h"
@@ -9,15 +9,15 @@
 #include "funcs.h"
 #include <functional> // For std::hash
 
-ZN_GODOT_NAMESPACE_BEGIN
+VOXEL_GODOT_NAMESPACE_BEGIN
 
 inline Vector2i operator&(const Vector2i &a, int b) {
 	return Vector2i(a.x & b, a.y & b);
 }
 
-ZN_GODOT_NAMESPACE_END
+VOXEL_GODOT_NAMESPACE_END
 
-namespace zylann {
+namespace voxel {
 
 namespace Vector2iUtil {
 
@@ -27,7 +27,7 @@ inline Vector2i create(int xy) {
 
 inline int64_t get_area(const Vector2i v) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN_V(v.x >= 0 && v.y >= 0, 0);
+	VOXEL_ASSERT_RETURN_V(v.x >= 0 && v.y >= 0, 0);
 #endif
 	return v.x * v.y;
 }
@@ -70,7 +70,7 @@ inline Vector2i min(const Vector2i a, const Vector2i b) {
 class TextWriter;
 TextWriter &operator<<(TextWriter &w, const Vector2i &v);
 
-} // namespace zylann
+} // namespace voxel
 
 // For STL
 namespace std {
@@ -78,11 +78,11 @@ template <>
 struct hash<Vector2i> {
 	size_t operator()(const Vector2i &v) const {
 		// TODO This is 32-bit, would it be better if it was 64?
-		uint32_t h = zylann::hash_murmur3_one_32(v.x);
-		h = zylann::hash_murmur3_one_32(v.y, h);
-		return zylann::hash_fmix32(h);
+		uint32_t h = voxel::hash_murmur3_one_32(v.x);
+		h = voxel::hash_murmur3_one_32(v.y, h);
+		return voxel::hash_fmix32(h);
 	}
 };
 } // namespace std
 
-#endif // ZN_MATH_VECTOR2I_H
+#endif // VOXEL_MATH_VECTOR2I_H

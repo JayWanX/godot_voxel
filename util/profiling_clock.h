@@ -3,7 +3,7 @@
 
 #include "godot/classes/time.h"
 
-namespace zylann {
+namespace voxel {
 
 struct ProfilingClock {
 	uint64_t time_before = 0;
@@ -24,6 +24,6 @@ struct ProfilingClock {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // PROFILING_CLOCK_H

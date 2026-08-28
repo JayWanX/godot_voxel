@@ -5,11 +5,11 @@
 #include "../util/godot/classes/engine.h"
 #include "../util/godot/classes/script.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelStreamScript::load_voxel_block(VoxelStream::VoxelQueryData &query_data) {
 	// Create a temporary wrapper so Godot can pass it to scripts
@@ -21,7 +21,7 @@ void VoxelStreamScript::load_voxel_block(VoxelStream::VoxelQueryData &query_data
 
 	query_data.result = RESULT_ERROR;
 
-	ZN_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(buffer_wrapper);
+	VOXEL_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(buffer_wrapper);
 
 	int res;
 	if (GDVIRTUAL_CALL(_load_voxel_block, buffer_wrapper, query_data.position_in_blocks, query_data.lod_index, res)) {
@@ -75,4 +75,4 @@ void VoxelStreamScript::_bind_methods() {
 	GDVIRTUAL_BIND(_get_used_channels_mask);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

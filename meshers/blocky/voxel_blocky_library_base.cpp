@@ -10,24 +10,24 @@
 #include "voxel_mesher_blocky.h"
 #include <bitset>
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelBlockyLibraryBase::load_default() {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in child classes
 }
 
 void VoxelBlockyLibraryBase::clear() {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in child classes
 }
 
 void VoxelBlockyLibraryBase::bake() {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in child classes
 }
 
@@ -52,7 +52,7 @@ void VoxelBlockyLibraryBase::_b_bake() {
 }
 
 Ref<Material> VoxelBlockyLibraryBase::get_material_by_index(unsigned int index) const {
-	ZN_ASSERT_RETURN_V(index < _indexed_materials.size(), Ref<Material>());
+	VOXEL_ASSERT_RETURN_V(index < _indexed_materials.size(), Ref<Material>());
 	return _indexed_materials[index];
 }
 
@@ -150,14 +150,14 @@ bool detect_single_quad(Span<const Vector2f> vertices, Span<const int32_t> indic
 }
 
 void flip_winding(Span<int32_t> indices) {
-	ZN_ASSERT((indices.size() % 3) == 0);
+	VOXEL_ASSERT((indices.size() % 3) == 0);
 	for (unsigned int i = 0; i < indices.size(); i += 3) {
 		std::swap(indices[i + 1], indices[i + 2]);
 	}
 }
 
 void to_2d(Span<const Vector3f> src, Span<Vector2f> dst, unsigned int src_x_axis, unsigned int src_y_axis) {
-	ZN_ASSERT(src.size() == dst.size());
+	VOXEL_ASSERT(src.size() == dst.size());
 	for (unsigned int i = 0; i < src.size(); ++i) {
 		const Vector3f srcv = src[i];
 		const Vector2f dstv(srcv[src_x_axis], srcv[src_y_axis]);
@@ -197,7 +197,7 @@ void to_3d(
 		unsigned int dst_z_axis,
 		float z
 ) {
-	ZN_ASSERT(src.size() == dst.size());
+	VOXEL_ASSERT(src.size() == dst.size());
 	for (unsigned int i = 0; i < src.size(); ++i) {
 		const Vector2f srcv = src[i];
 		Vector3f dstv;
@@ -334,7 +334,7 @@ void grow_triangle(Vector2f &a, Vector2f &b, Vector2f &c, float by) {
 }
 
 bool find_triangle(Span<const Vector2f> vertices, Span<const int32_t> indices, Vector2f pos, Vector3i &out_indices) {
-	ZN_ASSERT((indices.size() % 3) == 0);
+	VOXEL_ASSERT((indices.size() % 3) == 0);
 
 	for (unsigned int ii = 0; ii < indices.size(); ii += 3) {
 		const int32_t i0 = indices[ii];
@@ -355,7 +355,7 @@ bool find_triangle(Span<const Vector2f> vertices, Span<const int32_t> indices, V
 			return true;
 		}
 		//  else {
-		// 	ZN_PRINT_VERBOSE(format("Not in {}, {}, {}", p0, p1, p2));
+		// 	VOXEL_PRINT_VERBOSE(format("Not in {}, {}, {}", p0, p1, p2));
 		// }
 	}
 
@@ -371,7 +371,7 @@ void interpolate_attributes_assume_no_seams(
 		Span<Vector2f> interp_uvs,
 		Span<float> interp_tangents
 ) {
-	ZN_ASSERT((src_indices.size() % 3) == 0);
+	VOXEL_ASSERT((src_indices.size() % 3) == 0);
 
 	// This method only works if the whole mesh we are interpolating has consistent UVs. The mesh could have seams
 	// with different UVs, and vertices we are interpolating could be located exactly on those seams, leading to
@@ -393,7 +393,7 @@ void interpolate_attributes_assume_no_seams(
 		Vector3i triangle_indices;
 		if (!find_triangle(src_vertices, src_indices, interp_pos, triangle_indices)) {
 			// TODO Might happen on edges due to floats being annoying?
-			ZN_PRINT_ERROR("Triangle not found");
+			VOXEL_PRINT_ERROR("Triangle not found");
 			interp_uvs[i] = Vector2f();
 			continue;
 		}
@@ -562,7 +562,7 @@ void generate_model_cutout_sides(BakedModel &model_data, const uint16_t model_id
 }
 
 void generate_library_cutout_sides(BakedLibrary &lib) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	for (uint16_t model_id = 0; model_id < lib.models.size(); ++model_id) {
 		BakedModel &model_data = lib.models[model_id];
@@ -613,7 +613,7 @@ void rasterize_side(
 		const unsigned int side,
 		std::bitset<RASTER_SIZE * RASTER_SIZE> &bitmap
 ) {
-	ZN_ASSERT_RETURN((indices.size() % 3) == 0);
+	VOXEL_ASSERT_RETURN((indices.size() % 3) == 0);
 
 	// For each triangle
 	for (unsigned int j = 0; j < indices.size(); j += 3) {
@@ -681,7 +681,7 @@ void rasterize_side_all_surfaces(
 }
 
 void generate_side_culling_matrix(BakedLibrary &baked_data) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// When two blocky voxels are next to each other, they share a side.
 	// Geometry of either side can be culled away if covered by the other,
 	// but it's very expensive to do a full polygon check when we build the mesh.
@@ -860,4 +860,4 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 
 } // namespace blocky
 
-} // namespace zylann::voxel
+} // namespace voxel

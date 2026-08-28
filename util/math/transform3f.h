@@ -1,9 +1,9 @@
-#ifndef ZN_TRANSFORM3F_H
-#define ZN_TRANSFORM3F_H
+#ifndef VOXEL_TRANSFORM3F_H
+#define VOXEL_TRANSFORM3F_H
 
 #include "basis3f.h"
 
-namespace zylann {
+namespace voxel {
 
 struct Transform3f {
 	Basis3f basis;
@@ -18,6 +18,6 @@ struct Transform3f {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_TRANSFORM3F_H
+#endif // VOXEL_TRANSFORM3F_H

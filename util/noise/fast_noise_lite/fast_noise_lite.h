@@ -1,9 +1,9 @@
-#ifndef ZYLANN_FAST_NOISE_LITE_H
-#define ZYLANN_FAST_NOISE_LITE_H
+#ifndef VOXEL_FAST_NOISE_LITE_H
+#define VOXEL_FAST_NOISE_LITE_H
 
 #include "fast_noise_lite_gradient.h"
 
-namespace zylann {
+namespace voxel {
 
 // My own implementation of FastNoiseLite for Godot Engine.
 // Godot 4 comes with its own FastNoiseLite, but mine predated it. So it needs to be prefixed to avoid conflict.
@@ -31,8 +31,8 @@ namespace zylann {
 //
 // - Does not use GDVirtual, so it can only be extended by modules, and cannot be extended with GDExtensions
 //
-class ZN_FastNoiseLite : public Resource {
-	GDCLASS(ZN_FastNoiseLite, Resource)
+class VOXEL_FastNoiseLite : public Resource {
+	GDCLASS(VOXEL_FastNoiseLite, Resource)
 
 	typedef ::fast_noise_lite::FastNoiseLite _FastNoise;
 
@@ -78,7 +78,7 @@ public:
 		CELLULAR_RETURN_DISTANCE_2_DIV = _FastNoise::CellularReturnType_Distance2Div
 	};
 
-	ZN_FastNoiseLite();
+	VOXEL_FastNoiseLite();
 
 	// Properties
 
@@ -91,8 +91,8 @@ public:
 	void set_period(float p);
 	float get_period() const;
 
-	void set_warp_noise(Ref<ZN_FastNoiseLiteGradient> warp_noise);
-	Ref<ZN_FastNoiseLiteGradient> get_warp_noise() const;
+	void set_warp_noise(Ref<VOXEL_FastNoiseLiteGradient> warp_noise);
+	Ref<VOXEL_FastNoiseLiteGradient> get_warp_noise() const;
 
 	void set_fractal_type(FractalType type);
 	FractalType get_fractal_type() const;
@@ -197,15 +197,15 @@ private:
 
 	RotationType3D _rotation_type_3d = ROTATION_3D_NONE;
 
-	Ref<ZN_FastNoiseLiteGradient> _warp_noise;
+	Ref<VOXEL_FastNoiseLiteGradient> _warp_noise;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLite::NoiseType);
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLite::FractalType);
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLite::RotationType3D);
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLite::CellularDistanceFunction);
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLite::CellularReturnType);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::NoiseType);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::FractalType);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::RotationType3D);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::CellularDistanceFunction);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLite::CellularReturnType);
 
-#endif // ZYLANN_FAST_NOISE_LITE_H
+#endif // VOXEL_FAST_NOISE_LITE_H

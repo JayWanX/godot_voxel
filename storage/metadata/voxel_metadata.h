@@ -6,7 +6,7 @@
 #include "../../util/containers/span.h"
 #include <cstdint>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Voxel metadata is arbitrary, sparse data that can be attached to particular voxels.
 // It is not intended at being an efficient or fast storage method, but rather a versatile one for special cases.
@@ -80,6 +80,6 @@ private:
 	Data _data;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_METADATA_H

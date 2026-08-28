@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/stream_peer_buffer.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_block_serializer_uncompressed() {
 	// Create an example buffer
@@ -18,18 +18,18 @@ void test_block_serializer_uncompressed() {
 
 	// Serialize without compression wrapper
 	BlockSerializer::SerializeResult result = BlockSerializer::serialize(voxel_buffer);
-	ZN_TEST_ASSERT(result.success);
+	VOXEL_TEST_ASSERT(result.success);
 	StdVector<uint8_t> data = result.data;
 
-	ZN_TEST_ASSERT(data.size() > 0);
-	ZN_TEST_ASSERT(data[0] == BlockSerializer::BLOCK_FORMAT_VERSION);
+	VOXEL_TEST_ASSERT(data.size() > 0);
+	VOXEL_TEST_ASSERT(data[0] == BlockSerializer::BLOCK_FORMAT_VERSION);
 
 	// Deserialize
 	VoxelBuffer deserialized_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
-	ZN_TEST_ASSERT(BlockSerializer::deserialize(to_span_const(data), deserialized_voxel_buffer));
+	VOXEL_TEST_ASSERT(BlockSerializer::deserialize(to_span_const(data), deserialized_voxel_buffer));
 
 	// Must be equal
-	ZN_TEST_ASSERT(voxel_buffer.equals(deserialized_voxel_buffer));
+	VOXEL_TEST_ASSERT(voxel_buffer.equals(deserialized_voxel_buffer));
 }
 
 void test_block_serializer_compressed(const CompressedData::Compression compression_mode) {
@@ -45,17 +45,17 @@ void test_block_serializer_compressed(const CompressedData::Compression compress
 		// Serialize
 		const BlockSerializer::SerializeResult result =
 				BlockSerializer::serialize_and_compress(voxel_buffer, compression_mode);
-		ZN_TEST_ASSERT(result.success);
+		VOXEL_TEST_ASSERT(result.success);
 		StdVector<uint8_t> data = result.data;
 
-		ZN_TEST_ASSERT(data.size() > 0);
+		VOXEL_TEST_ASSERT(data.size() > 0);
 
 		// Deserialize
 		VoxelBuffer deserialized_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
-		ZN_TEST_ASSERT(BlockSerializer::decompress_and_deserialize(to_span_const(data), deserialized_voxel_buffer));
+		VOXEL_TEST_ASSERT(BlockSerializer::decompress_and_deserialize(to_span_const(data), deserialized_voxel_buffer));
 
 		// Must be equal
-		ZN_TEST_ASSERT(voxel_buffer.equals(deserialized_voxel_buffer));
+		VOXEL_TEST_ASSERT(voxel_buffer.equals(deserialized_voxel_buffer));
 	}
 }
 
@@ -97,7 +97,7 @@ void test_block_serializer_stream_peer() {
 
 	godot::VoxelBlockSerializer::deserialize_from_stream_peer(peer2, voxel_buffer2, size, true);
 
-	ZN_TEST_ASSERT(voxel_buffer2->get_buffer().equals(voxel_buffer->get_buffer()));
+	VOXEL_TEST_ASSERT(voxel_buffer2->get_buffer().equals(voxel_buffer->get_buffer()));
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

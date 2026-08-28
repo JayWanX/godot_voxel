@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_EDITOR_RESOURCE_PICKER_H
-#define ZN_GODOT_EDITOR_RESOURCE_PICKER_H
+#ifndef VOXEL_GODOT_EDITOR_RESOURCE_PICKER_H
+#define VOXEL_GODOT_EDITOR_RESOURCE_PICKER_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 #include "../core/version.h"
 
@@ -11,9 +11,9 @@
 #include <editor/inspector/editor_resource_picker.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/editor_resource_picker.hpp>
 using namespace godot;
 #endif
 
-#endif // ZN_GODOT_EDITOR_RESOURCE_PICKER_H
+#endif // VOXEL_GODOT_EDITOR_RESOURCE_PICKER_H

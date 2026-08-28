@@ -3,12 +3,12 @@
 #include "../../util/godot/classes/curve.h"
 #include "../../util/godot/classes/fast_noise_lite.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGeneratorNoise2D::VoxelGeneratorNoise2D() {}
 
@@ -188,4 +188,4 @@ void VoxelGeneratorNoise2D::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

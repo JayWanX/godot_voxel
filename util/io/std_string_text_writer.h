@@ -1,10 +1,10 @@
-#ifndef ZN_STD_STRING_TEXT_WRITER_H
-#define ZN_STD_STRING_TEXT_WRITER_H
+#ifndef VOXEL_STD_STRING_TEXT_WRITER_H
+#define VOXEL_STD_STRING_TEXT_WRITER_H
 
 #include "../string/std_string.h"
 #include "text_writer.h"
 
-namespace zylann {
+namespace voxel {
 
 // TextWriter writing to a string with no staging buffer
 class StdStringTextWriter : public TextWriter {
@@ -23,6 +23,6 @@ protected:
 	StdString _str;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_STD_STRING_TEXT_WRITER_H
+#endif // VOXEL_STD_STRING_TEXT_WRITER_H

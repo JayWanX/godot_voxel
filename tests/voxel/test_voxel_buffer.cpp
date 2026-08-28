@@ -12,7 +12,7 @@
 #include <array>
 #include <sstream>
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_voxel_buffer_create() {
 	// This test was a repro for a memory corruption crash. The point of this test is to check it doesn't crash,
@@ -57,7 +57,7 @@ public:
 	}
 
 	ICustomVoxelMetadata *duplicate() override {
-		CustomMetadataTest *d = ZN_NEW(CustomMetadataTest);
+		CustomMetadataTest *d = VOXEL_NEW(CustomMetadataTest);
 		*d = *this;
 		return d;
 	}
@@ -75,7 +75,7 @@ public:
 			return false;
 		}
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(dynamic_cast<const CustomMetadataTest *>(&other) != nullptr);
+		VOXEL_ASSERT(dynamic_cast<const CustomMetadataTest *>(&other) != nullptr);
 #endif
 		const CustomMetadataTest &other_self = static_cast<const CustomMetadataTest &>(other);
 		return (*this) == other_self;
@@ -89,13 +89,13 @@ void test_voxel_buffer_metadata() {
 		vb.create(10, 10, 10);
 
 		VoxelMetadata *meta = vb.get_or_create_voxel_metadata(Vector3i(1, 2, 3));
-		ZN_TEST_ASSERT(meta != nullptr);
+		VOXEL_TEST_ASSERT(meta != nullptr);
 		meta->set_u64(1234567890);
 
 		const VoxelMetadata *meta2 = vb.get_voxel_metadata(Vector3i(1, 2, 3));
-		ZN_TEST_ASSERT(meta2 != nullptr);
-		ZN_TEST_ASSERT(meta2->get_type() == meta->get_type());
-		ZN_TEST_ASSERT(meta2->get_u64() == meta->get_u64());
+		VOXEL_TEST_ASSERT(meta2 != nullptr);
+		VOXEL_TEST_ASSERT(meta2->get_type() == meta->get_type());
+		VOXEL_TEST_ASSERT(meta2->get_u64() == meta->get_u64());
 	}
 	// Serialization
 	{
@@ -104,13 +104,13 @@ void test_voxel_buffer_metadata() {
 
 		{
 			VoxelMetadata *meta0 = vb.get_or_create_voxel_metadata(Vector3i(1, 2, 3));
-			ZN_TEST_ASSERT(meta0 != nullptr);
+			VOXEL_TEST_ASSERT(meta0 != nullptr);
 			meta0->set_u64(1234567890);
 		}
 
 		{
 			VoxelMetadata *meta1 = vb.get_or_create_voxel_metadata(Vector3i(4, 5, 6));
-			ZN_TEST_ASSERT(meta1 != nullptr);
+			VOXEL_TEST_ASSERT(meta1 != nullptr);
 			meta1->clear();
 		}
 
@@ -123,8 +123,8 @@ void test_voxel_buffer_metadata() {
 		VoxelMetadataFactory::get_singleton().add_constructor_by_type<CustomMetadataTest>(CustomMetadataTest::ID);
 		{
 			VoxelMetadata *meta2 = vb.get_or_create_voxel_metadata(Vector3i(7, 8, 9));
-			ZN_TEST_ASSERT(meta2 != nullptr);
-			CustomMetadataTest *custom = ZN_NEW(CustomMetadataTest);
+			VOXEL_TEST_ASSERT(meta2 != nullptr);
+			CustomMetadataTest *custom = VOXEL_NEW(CustomMetadataTest);
 			custom->a = 10;
 			custom->b = 20;
 			custom->c = 30;
@@ -132,37 +132,37 @@ void test_voxel_buffer_metadata() {
 		}
 
 		BlockSerializer::SerializeResult sresult = BlockSerializer::serialize(vb);
-		ZN_TEST_ASSERT(sresult.success);
+		VOXEL_TEST_ASSERT(sresult.success);
 		StdVector<uint8_t> bytes = sresult.data;
 
 		VoxelBuffer rvb(VoxelBuffer::ALLOCATOR_DEFAULT);
-		ZN_TEST_ASSERT(BlockSerializer::deserialize(to_span(bytes), rvb));
+		VOXEL_TEST_ASSERT(BlockSerializer::deserialize(to_span(bytes), rvb));
 
 		const FlatMapMoveOnly<Vector3i, VoxelMetadata> &vb_meta_map = vb.get_voxel_metadata();
 		const FlatMapMoveOnly<Vector3i, VoxelMetadata> &rvb_meta_map = rvb.get_voxel_metadata();
 
-		ZN_TEST_ASSERT(vb_meta_map.size() == rvb_meta_map.size());
+		VOXEL_TEST_ASSERT(vb_meta_map.size() == rvb_meta_map.size());
 
 		for (auto it = vb_meta_map.begin(); it != vb_meta_map.end(); ++it) {
 			const VoxelMetadata &meta = it->value;
 			const VoxelMetadata *rmeta = rvb_meta_map.find(it->key);
 
-			ZN_TEST_ASSERT(rmeta != nullptr);
-			ZN_TEST_ASSERT(rmeta->get_type() == meta.get_type());
+			VOXEL_TEST_ASSERT(rmeta != nullptr);
+			VOXEL_TEST_ASSERT(rmeta->get_type() == meta.get_type());
 
 			switch (meta.get_type()) {
 				case VoxelMetadata::TYPE_EMPTY:
 					break;
 				case VoxelMetadata::TYPE_U64:
-					ZN_TEST_ASSERT(meta.get_u64() == rmeta->get_u64());
+					VOXEL_TEST_ASSERT(meta.get_u64() == rmeta->get_u64());
 					break;
 				case CustomMetadataTest::ID: {
 					const CustomMetadataTest &custom = static_cast<const CustomMetadataTest &>(meta.get_custom());
 					const CustomMetadataTest &rcustom = static_cast<const CustomMetadataTest &>(rmeta->get_custom());
-					ZN_TEST_ASSERT(custom == rcustom);
+					VOXEL_TEST_ASSERT(custom == rcustom);
 				} break;
 				default:
-					ZN_TEST_ASSERT(false);
+					VOXEL_TEST_ASSERT(false);
 					break;
 			}
 		}
@@ -184,8 +184,8 @@ void test_voxel_buffer_metadata_gd() {
 		vb->set_voxel_metadata(Vector3i(1, 2, 3), meta);
 
 		Array read_meta = vb->get_voxel_metadata(Vector3i(1, 2, 3));
-		ZN_TEST_ASSERT(read_meta.size() == meta.size());
-		ZN_TEST_ASSERT(read_meta == meta);
+		VOXEL_TEST_ASSERT(read_meta.size() == meta.size());
+		VOXEL_TEST_ASSERT(read_meta == meta);
 	}
 	// Comparison 1
 	{
@@ -199,7 +199,7 @@ void test_voxel_buffer_metadata_gd() {
 		vb2->create(10, 10, 10);
 		vb2->set_voxel_metadata(Vector3i(1, 2, 3), 42);
 
-		ZN_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()) == true);
+		VOXEL_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()) == true);
 	}
 	// Comparison 2
 	{
@@ -213,7 +213,7 @@ void test_voxel_buffer_metadata_gd() {
 		vb2->create(10, 10, 10);
 		vb2->set_voxel_metadata(Vector3i(5, 6, 7), 42);
 
-		ZN_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()) == false);
+		VOXEL_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()) == false);
 	}
 	// Duplication
 	{
@@ -224,10 +224,10 @@ void test_voxel_buffer_metadata_gd() {
 
 		Ref<godot::VoxelBuffer> vb2 = vb1->duplicate(true);
 
-		ZN_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()));
+		VOXEL_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()));
 
 		vb2->set_voxel_metadata(Vector3i(1, 2, 3), 43);
-		ZN_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()));
+		VOXEL_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()));
 	}
 	// Serialization (Godot)
 	{
@@ -251,15 +251,15 @@ void test_voxel_buffer_metadata_gd() {
 		}
 
 		BlockSerializer::SerializeResult sresult = BlockSerializer::serialize(vb->get_buffer());
-		ZN_TEST_ASSERT(sresult.success);
+		VOXEL_TEST_ASSERT(sresult.success);
 		StdVector<uint8_t> bytes = sresult.data;
 
 		Ref<godot::VoxelBuffer> vb2;
 		vb2.instantiate();
 
-		ZN_TEST_ASSERT(BlockSerializer::deserialize(to_span(bytes), vb2->get_buffer()));
+		VOXEL_TEST_ASSERT(BlockSerializer::deserialize(to_span(bytes), vb2->get_buffer()));
 
-		ZN_TEST_ASSERT(vb2->get_buffer().equals(vb->get_buffer()));
+		VOXEL_TEST_ASSERT(vb2->get_buffer().equals(vb->get_buffer()));
 
 		// `equals` does not compare metadata at the moment, mainly because it's not trivial and there is no use case
 		// for it apart from this test, so do it manually
@@ -267,21 +267,21 @@ void test_voxel_buffer_metadata_gd() {
 		const FlatMapMoveOnly<Vector3i, VoxelMetadata> &vb_meta_map = vb->get_buffer().get_voxel_metadata();
 		const FlatMapMoveOnly<Vector3i, VoxelMetadata> &vb2_meta_map = vb2->get_buffer().get_voxel_metadata();
 
-		ZN_TEST_ASSERT(vb_meta_map.size() == vb2_meta_map.size());
+		VOXEL_TEST_ASSERT(vb_meta_map.size() == vb2_meta_map.size());
 
 		for (auto it = vb_meta_map.begin(); it != vb_meta_map.end(); ++it) {
 			const VoxelMetadata &meta = it->value;
-			ZN_TEST_ASSERT(meta.get_type() == godot::METADATA_TYPE_VARIANT);
+			VOXEL_TEST_ASSERT(meta.get_type() == godot::METADATA_TYPE_VARIANT);
 
 			const VoxelMetadata *meta2 = vb2_meta_map.find(it->key);
-			ZN_TEST_ASSERT(meta2 != nullptr);
-			ZN_TEST_ASSERT(meta2->get_type() == meta.get_type());
+			VOXEL_TEST_ASSERT(meta2 != nullptr);
+			VOXEL_TEST_ASSERT(meta2->get_type() == meta.get_type());
 
 			const godot::VoxelMetadataVariant &metav =
 					static_cast<const godot::VoxelMetadataVariant &>(meta.get_custom());
 			const godot::VoxelMetadataVariant &meta2v =
 					static_cast<const godot::VoxelMetadataVariant &>(meta2->get_custom());
-			ZN_TEST_ASSERT(metav.data == meta2v.data);
+			VOXEL_TEST_ASSERT(metav.data == meta2v.data);
 		}
 	}
 }
@@ -300,7 +300,7 @@ void load_from_array_litteral_xzy(
 	for (int y = 0; y < size.y; ++y) {
 		for (int z = 0; z < size.z; ++z) {
 			for (int x = 0; x < size.x; ++x) {
-				ZN_ASSERT(i < N);
+				VOXEL_ASSERT(i < N);
 				vb.set_voxel(array[i], Vector3i(x, y, z), channel_index);
 				++i;
 			}
@@ -430,11 +430,11 @@ void test_voxel_buffer_paste_masked() {
 		print_channel_as_ascii(dst, copied_channel_index, 0);
 	}
 
-	ZN_TEST_ASSERT(dst.equals(expected));
+	VOXEL_TEST_ASSERT(dst.equals(expected));
 }
 
 void test_voxel_buffer_paste_masked_metadata() {
-	Ref<zylann::voxel::godot::VoxelBuffer> src_buffer;
+	Ref<voxel::godot::VoxelBuffer> src_buffer;
 	src_buffer.instantiate();
 	src_buffer->create(3, 4, 5);
 
@@ -461,7 +461,7 @@ void test_voxel_buffer_paste_masked_metadata() {
 	src_buffer->set_voxel(1, 1, 2, 2, channel);
 	src_buffer->set_voxel(1, 2, 2, 2, channel);
 
-	Ref<zylann::voxel::godot::VoxelBuffer> dst_buffer;
+	Ref<voxel::godot::VoxelBuffer> dst_buffer;
 	dst_buffer.instantiate();
 	dst_buffer->create(8, 8, 8);
 	const int dst_default_value = 2;
@@ -472,7 +472,7 @@ void test_voxel_buffer_paste_masked_metadata() {
 	const Vector3i preserved_metadata_dst_pos(0, 2, 3);
 	dst_buffer->set_voxel_metadata(preserved_metadata_dst_pos, 301);
 
-	Ref<zylann::voxel::godot::VoxelBuffer> dst_buffer_original = dst_buffer->duplicate(true);
+	Ref<voxel::godot::VoxelBuffer> dst_buffer_original = dst_buffer->duplicate(true);
 
 	Ref<VoxelTool> vt = dst_buffer->get_voxel_tool();
 	const Vector3i dst_paste_origin(1, 2, 3);
@@ -488,13 +488,13 @@ void test_voxel_buffer_paste_masked_metadata() {
 
 				const int dst_v = dst_buffer->get_voxel(x, y, z, channel);
 				// 0 values must not have been copied
-				ZN_TEST_ASSERT(dst_v != 0);
+				VOXEL_TEST_ASSERT(dst_v != 0);
 
 				if (dst_v == dst_default_value) {
 					// All cells not pasted onto must have kept their original metadata
 					const Variant dst_m = dst_buffer->get_voxel_metadata(dst_pos);
 					const Variant dst_m_original = dst_buffer_original->get_voxel_metadata(dst_pos);
-					ZN_TEST_ASSERT(dst_m == dst_m_original);
+					VOXEL_TEST_ASSERT(dst_m == dst_m_original);
 				}
 			}
 		}
@@ -512,9 +512,9 @@ void test_voxel_buffer_paste_masked_metadata() {
 				const int src_v = src_buffer->get_voxel(src_pos.x, src_pos.y, src_pos.z, channel);
 				const int dst_v = dst_buffer->get_voxel(dst_pos.x, dst_pos.y, dst_pos.z, channel);
 				if (src_v == mask_value) {
-					ZN_TEST_ASSERT(dst_v == dst_default_value);
+					VOXEL_TEST_ASSERT(dst_v == dst_default_value);
 				} else {
-					ZN_TEST_ASSERT(dst_v == src_v);
+					VOXEL_TEST_ASSERT(dst_v == src_v);
 				}
 
 				// Metadata in copied area must be equal
@@ -523,10 +523,10 @@ void test_voxel_buffer_paste_masked_metadata() {
 				if (src_v == mask_value) {
 					// Preserved cell
 					const Variant dst_m_original = dst_buffer_original->get_voxel_metadata(dst_pos);
-					ZN_TEST_ASSERT(dst_m == dst_m_original);
+					VOXEL_TEST_ASSERT(dst_m == dst_m_original);
 				} else {
 					// Overwritten
-					ZN_TEST_ASSERT(dst_m == src_m);
+					VOXEL_TEST_ASSERT(dst_m == src_m);
 				}
 			}
 		}
@@ -534,7 +534,7 @@ void test_voxel_buffer_paste_masked_metadata() {
 }
 
 void test_voxel_buffer_paste_masked_metadata_oob() {
-	Ref<zylann::voxel::godot::VoxelBuffer> src_buffer;
+	Ref<voxel::godot::VoxelBuffer> src_buffer;
 	src_buffer.instantiate();
 	src_buffer->create(3, 1, 1);
 
@@ -547,7 +547,7 @@ void test_voxel_buffer_paste_masked_metadata_oob() {
 	src_buffer->set_voxel(1, 1, 0, 0, channel);
 	src_buffer->set_voxel(1, 2, 0, 0, channel);
 
-	Ref<zylann::voxel::godot::VoxelBuffer> dst_buffer;
+	Ref<voxel::godot::VoxelBuffer> dst_buffer;
 	dst_buffer.instantiate();
 	dst_buffer->create(4, 4, 4);
 	dst_buffer->fill(2);
@@ -559,13 +559,13 @@ void test_voxel_buffer_paste_masked_metadata_oob() {
 	dst_buffer->get_buffer().check_voxel_metadata_integrity();
 
 	const FlatMapMoveOnly<Vector3i, VoxelMetadata> &vm = dst_buffer->get_buffer().get_voxel_metadata();
-	ZN_TEST_ASSERT(vm.size() == 1);
+	VOXEL_TEST_ASSERT(vm.size() == 1);
 
 	const Variant dst_m = dst_buffer->get_voxel_metadata(Vector3i(3, 2, 2));
-	ZN_TEST_ASSERT(dst_m == Variant(100));
+	VOXEL_TEST_ASSERT(dst_m == Variant(100));
 
 	// for (FlatMapMoveOnly<Vector3i, VoxelMetadata>::ConstIterator it = vm.begin(); it != vm.end(); ++it) {
-	// 	ZN_PRINT_VERBOSE(format("Metadata found at {}", it->key));
+	// 	VOXEL_PRINT_VERBOSE(format("Metadata found at {}", it->key));
 	// }
 }
 
@@ -597,7 +597,7 @@ void test_voxel_buffer_set_channel_bytes() {
 					for (pos.y = 0; pos.y < vb->get_size().y; ++pos.y) {
 						const int v = vb->get_voxel(pos.x, pos.y, pos.z, channel);
 						const int expected_v = bytes[i];
-						ZN_TEST_ASSERT(v == expected_v);
+						VOXEL_TEST_ASSERT(v == expected_v);
 						++i;
 					}
 				}
@@ -656,12 +656,12 @@ void test_voxel_buffer_issue769() {
 
 	// Check the bitarray
 	for (const uint8_t v : writable_values) {
-		ZN_TEST_ASSERT(v < bitarray.size());
-		ZN_TEST_ASSERT(bitarray.get(v));
+		VOXEL_TEST_ASSERT(v < bitarray.size());
+		VOXEL_TEST_ASSERT(bitarray.get(v));
 	}
 	for (uint8_t v = 0; v < bitarray.size(); ++v) {
 		if (!contains(to_span(writable_values), v)) {
-			ZN_TEST_ASSERT(bitarray.get(v) == false);
+			VOXEL_TEST_ASSERT(bitarray.get(v) == false);
 		}
 	}
 
@@ -685,7 +685,7 @@ void test_voxel_buffer_issue769() {
 		print_channel_as_ascii(expected_buffer, channel_id, 1);
 	}
 #endif
-	ZN_TEST_ASSERT(base_buffer.equals(expected_buffer));
+	VOXEL_TEST_ASSERT(base_buffer.equals(expected_buffer));
 }
 
 void test_voxel_buffer_get_channel_bytes() {
@@ -701,7 +701,7 @@ void test_voxel_buffer_get_channel_bytes() {
 
 		PackedByteArray pba = vb->get_channel_as_byte_array(channel_id);
 		const uint64_t expected_len = Vector3iUtil::get_volume_u64(res) * sizeof(uint16_t);
-		ZN_TEST_ASSERT(static_cast<uint64_t>(pba.size()) == expected_len);
+		VOXEL_TEST_ASSERT(static_cast<uint64_t>(pba.size()) == expected_len);
 	}
 	{
 		// Issue #825
@@ -725,8 +725,8 @@ void test_voxel_buffer_get_channel_bytes() {
 
 		PackedByteArray pba = vb->get_channel_as_byte_array(channel_id);
 		const uint64_t expected_len = Vector3iUtil::get_volume_u64(res) * sizeof(uint16_t);
-		ZN_TEST_ASSERT(static_cast<uint64_t>(pba.size()) == expected_len);
+		VOXEL_TEST_ASSERT(static_cast<uint64_t>(pba.size()) == expected_len);
 	}
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

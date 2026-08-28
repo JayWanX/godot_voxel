@@ -14,7 +14,7 @@
 #include "../util/godot/core/version.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTool;
 class VoxelData;
@@ -64,9 +64,9 @@ public:
 	virtual Node3D *convert_to_nodes(const BitField<NodeConversionFlags> flags) const;
 
 #ifdef TOOLS_ENABLED
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	PackedStringArray _get_configuration_warnings() const override;
 #endif
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
@@ -113,8 +113,8 @@ private:
 	Ref<godot::VoxelFormat> _format;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_BITFIELD_CAST(zylann::voxel::VoxelNode::NodeConversionFlags);
+VARIANT_BITFIELD_CAST(voxel::VoxelNode::NodeConversionFlags);
 
 #endif // VOXEL_NODE_H

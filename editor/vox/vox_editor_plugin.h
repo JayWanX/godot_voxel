@@ -5,7 +5,7 @@
 #include "vox_mesh_importer.h"
 #include "vox_scene_importer.h"
 
-namespace zylann::voxel::magica {
+namespace voxel::magica {
 
 class VoxelVoxEditorPlugin : public EditorPlugin {
 	GDCLASS(VoxelVoxEditorPlugin, EditorPlugin)
@@ -22,6 +22,6 @@ private:
 	Ref<VoxelVoxMeshImporter> _vox_mesh_importer;
 };
 
-} // namespace zylann::voxel::magica
+} // namespace voxel::magica
 
 #endif // VOX_EDITOR_PLUGIN_H

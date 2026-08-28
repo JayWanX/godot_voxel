@@ -5,11 +5,11 @@
 #include "../util/godot/classes/engine.h"
 #include "../util/godot/classes/script.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGeneratorScript::VoxelGeneratorScript() {}
 
@@ -25,7 +25,7 @@ VoxelGenerator::Result VoxelGeneratorScript::generate_block(VoxelGenerator::Voxe
 	buffer_wrapper->get_buffer().create(input.voxel_buffer.get_size());
 
 	{
-		ZN_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(buffer_wrapper);
+		VOXEL_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(buffer_wrapper);
 		if (!GDVIRTUAL_CALL(_generate_block, buffer_wrapper, input.origin_in_voxels, input.lod)) {
 			WARN_PRINT_ONCE("VoxelGeneratorScript::_generate_block is unimplemented!");
 		}
@@ -67,4 +67,4 @@ void VoxelGeneratorScript::_bind_methods() {
 	GDVIRTUAL_BIND(_get_used_channels_mask);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -1,10 +1,10 @@
-#ifndef ZN_STD_UNORDERED_SET_H
-#define ZN_STD_UNORDERED_SET_H
+#ifndef VOXEL_STD_UNORDERED_SET_H
+#define VOXEL_STD_UNORDERED_SET_H
 
 #include "../memory/std_allocator.h"
 #include <unordered_set>
 
-namespace zylann {
+namespace voxel {
 
 // Convenience alias that uses our own default allocator
 template < //
@@ -15,6 +15,6 @@ template < //
 		>
 using StdUnorderedSet = std::unordered_set<TValue, THasher, TEquator, TAllocator>;
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_STD_UNORDERED_SET_H
+#endif // VOXEL_STD_UNORDERED_SET_H

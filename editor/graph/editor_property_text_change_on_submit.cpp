@@ -1,14 +1,14 @@
 #include "editor_property_text_change_on_submit.h"
 #include "../../util/godot/classes/line_edit.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
-ZN_EditorPropertyTextChangeOnSubmit::ZN_EditorPropertyTextChangeOnSubmit() {
-	using Self = ZN_EditorPropertyTextChangeOnSubmit;
+VOXEL_EditorPropertyTextChangeOnSubmit::VOXEL_EditorPropertyTextChangeOnSubmit() {
+	using Self = VOXEL_EditorPropertyTextChangeOnSubmit;
 	_line_edit = memnew(LineEdit);
 	add_child(_line_edit);
 	add_focusable(_line_edit);
@@ -18,7 +18,7 @@ ZN_EditorPropertyTextChangeOnSubmit::ZN_EditorPropertyTextChangeOnSubmit() {
 	_line_edit->connect("focus_entered", callable_mp(this, &Self::_on_line_edit_focus_entered));
 }
 
-void ZN_EditorPropertyTextChangeOnSubmit::_zn_update_property() {
+void VOXEL_EditorPropertyTextChangeOnSubmit::_voxel_update_property() {
 	Object *obj = get_edited_object();
 	ERR_FAIL_COND(obj == nullptr);
 	_ignore_changes = true;
@@ -26,18 +26,18 @@ void ZN_EditorPropertyTextChangeOnSubmit::_zn_update_property() {
 	_ignore_changes = false;
 }
 
-void ZN_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_entered() {
+void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_entered() {
 	_changed = false;
 }
 
-void ZN_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_changed(String new_text) {
+void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_changed(String new_text) {
 	if (_ignore_changes) {
 		return;
 	}
 	_changed = true;
 }
 
-void ZN_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_submitted(String text) {
+void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_submitted(String text) {
 	if (_ignore_changes) {
 		return;
 	}
@@ -47,7 +47,7 @@ void ZN_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_submitted(String te
 	}
 }
 
-void ZN_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_exited() {
+void VOXEL_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_exited() {
 	if (_changed) {
 		_changed = false;
 
@@ -63,6 +63,6 @@ void ZN_EditorPropertyTextChangeOnSubmit::_on_line_edit_focus_exited() {
 	}
 }
 
-void ZN_EditorPropertyTextChangeOnSubmit::_bind_methods() {}
+void VOXEL_EditorPropertyTextChangeOnSubmit::_bind_methods() {}
 
-} // namespace zylann
+} // namespace voxel

@@ -8,7 +8,7 @@
 #include "../../util/thread/rw_lock.h"
 #include "blocky_baked_library.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Base class for libraries that can be used with VoxelMesherBlocky.
 // A library provides a set of pre-processed models that can be efficiently batched into a voxel mesh.
@@ -79,6 +79,6 @@ void generate_side_culling_matrix(blocky::BakedLibrary &baked_data);
 
 } // namespace blocky
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_LIBRARY_BASE_H

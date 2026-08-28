@@ -10,15 +10,15 @@
 #include "../../../util/godot/core/array.h"
 #include "../../../util/godot/core/string.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyTypeVariantListEditor::VoxelBlockyTypeVariantListEditor() {
 	_header_label = memnew(Label);
-	_header_label->set_text(ZN_TTR("Variant models"));
+	_header_label->set_text(VOXEL_TTR("Variant models"));
 	add_child(_header_label);
 
 	_grid_container = memnew(GridContainer);
@@ -62,13 +62,13 @@ void VoxelBlockyTypeVariantListEditor::update_list() {
 
 	_variant_editors.clear();
 
-	ZN_ASSERT_RETURN(_type.is_valid());
+	VOXEL_ASSERT_RETURN(_type.is_valid());
 
 	StdVector<VoxelBlockyType::VariantKey> keys;
 	_type->generate_keys(keys, false);
 
 	const int displayed_count = keys.size() <= 1 ? 0 : keys.size();
-	_header_label->set_text(ZN_TTR("Variant models ({0})").format(varray(displayed_count)));
+	_header_label->set_text(VOXEL_TTR("Variant models ({0})").format(varray(displayed_count)));
 
 	if (keys.size() <= 1) {
 		return;
@@ -118,8 +118,8 @@ void VoxelBlockyTypeVariantListEditor::_on_type_changed() {
 }
 
 void VoxelBlockyTypeVariantListEditor::_on_model_changed(Ref<VoxelBlockyModel> model, int editor_index) {
-	ZN_ASSERT_RETURN(_type.is_valid());
-	ZN_ASSERT_RETURN(_undo_redo != nullptr);
+	VOXEL_ASSERT_RETURN(_type.is_valid());
+	VOXEL_ASSERT_RETURN(_undo_redo != nullptr);
 
 	EditorUndoRedoManager *urm = _undo_redo;
 
@@ -143,7 +143,7 @@ void VoxelBlockyTypeVariantListEditor::_on_model_picker_selected(Ref<VoxelBlocky
 	// TODO Can't unfold as a sub-inspector, Godot does not expose it to extensions and it seems to be a fairly
 	// complicated logic (it's far from just a "create inspector and unfold" inside the selected signal)... This is one
 	// reason why this sole feature would require an entirely separated editor, which is incredibly frustrating
-	ZN_ASSERT_RETURN(_editor_interface != nullptr);
+	VOXEL_ASSERT_RETURN(_editor_interface != nullptr);
 	// Can't call this directly because somehow it crashes Godot later in `_physics_process`???
 	// The current method isn't even in the call stack when this happens... so why would call_deferred even be proven to
 	// fix it? Nevertheless, it seems to workaround it...
@@ -153,4 +153,4 @@ void VoxelBlockyTypeVariantListEditor::_on_model_picker_selected(Ref<VoxelBlocky
 
 void VoxelBlockyTypeVariantListEditor::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

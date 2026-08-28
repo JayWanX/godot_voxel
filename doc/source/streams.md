@@ -48,7 +48,7 @@ func _on_tree_exited():
 
 It can get more complex as development progresses. See following sections for details.
 
-See also this demo game, which includes one save: [https://github.com/Zylann/voxelgame/tree/master/project/blocky_game](https://github.com/Zylann/voxelgame/tree/master/project/blocky_game)
+See also this demo game, which includes one save: [https://github.com/Voxel/voxelgame/tree/master/project/blocky_game](https://github.com/Voxel/voxelgame/tree/master/project/blocky_game)
 
 TODO: Demo handling multiple saves
 
@@ -85,7 +85,7 @@ First, you could wait when saves complete before taking action, or just expect t
 Second, make sure your stream actually closes. Some approaches are:
 
 - 1) Ideally, just let Godot's resource system destroy the stream *once nothing in the game references it*. This is another reason why you should preferably not embed a stream resource in your scenes, because even if there are no instances of that scene in the tree, a variable containing the [PackedScene](https://docs.godotengine.org/en/latest/classes/class_packedscene.html) still references that resource, preventing it from being unloaded. Once all references are gone from your side, the only ones left will be eventual background tasks, that should complete soon after.
-- 2) Manually modify properties of the stream to make it "close". For example, with [VoxelStreamSQLite](api/VoxelStreamSQLite.md), you can set `database_path` to an empty string (`""`), which will force it to close. However, this will cause pending saves and loads to fail, so you should make sure to do that when saving has completed first (TODO: at the moment, [loads will cause errors too](https://github.com/Zylann/godot_voxel/issues/620#issuecomment-2040255061) but there is no way to "wait" for them. This might be addressed in the future if you want to use method 2, but for now try using method 1)
+- 2) Manually modify properties of the stream to make it "close". For example, with [VoxelStreamSQLite](api/VoxelStreamSQLite.md), you can set `database_path` to an empty string (`""`), which will force it to close. However, this will cause pending saves and loads to fail, so you should make sure to do that when saving has completed first (TODO: at the moment, [loads will cause errors too](https://github.com/Voxel/godot_voxel/issues/620#issuecomment-2040255061) but there is no way to "wait" for them. This might be addressed in the future if you want to use method 2, but for now try using method 1)
 
 
 Using streams in the Godot Editor
@@ -95,7 +95,7 @@ Using streams in the Godot Editor
 
 At the moment, streams can run in the editor, but they behave the same as if the game was running. If you modify anything, blocks will eventually get saved under the same conditions as seen earlier. If you want to preserve your game saves, either leave the `stream` property unassigned, or you can assign a "development save" on the stream in the editor. Then, assign a different path from within your game to the real save (using script).
 
-If you use the same save files between game and editor, there is a risk of conflict when you run the game: it will try to open files which are already opened and locked by the editor. To workaround this, either use different files, or close the scene before running the game. See [issue 283](https://github.com/Zylann/godot_voxel/issues/283).
+If you use the same save files between game and editor, there is a risk of conflict when you run the game: it will try to open files which are already opened and locked by the editor. To workaround this, either use different files, or close the scene before running the game. See [issue 283](https://github.com/Voxel/godot_voxel/issues/283).
 
 
 ### Closing the game

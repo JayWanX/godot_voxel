@@ -1,10 +1,10 @@
-#ifndef ZYLANN_VECTOR4T_H
-#define ZYLANN_VECTOR4T_H
+#ifndef VOXEL_VECTOR4T_H
+#define VOXEL_VECTOR4T_H
 
 #include "../errors.h"
 #include "funcs.h"
 
-namespace zylann {
+namespace voxel {
 
 // Template 4-dimensional vector. Only fields and standard operators.
 // Math functions are separate to allow more unified overloading, and similarity with other math libraries such as
@@ -33,14 +33,14 @@ struct Vector4T {
 
 	inline const T &operator[](const unsigned int p_axis) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_axis < AXIS_COUNT);
+		VOXEL_ASSERT(p_axis < AXIS_COUNT);
 #endif
 		return coords[p_axis];
 	}
 
 	inline T &operator[](const unsigned int p_axis) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_axis < AXIS_COUNT);
+		VOXEL_ASSERT(p_axis < AXIS_COUNT);
 #endif
 		return coords[p_axis];
 	}
@@ -73,6 +73,6 @@ struct Vector4T {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_VECTOR4T_H
+#endif // VOXEL_VECTOR4T_H

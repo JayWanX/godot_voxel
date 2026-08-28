@@ -2,12 +2,12 @@
 #include "../godot/classes/directory.h"
 #include "../godot/classes/file_access.h"
 
-namespace zylann::testing {
+namespace voxel::testing {
 
-const char *DEFAULT_TEST_DATA_DIRECTORY = "zylann_testing_dir";
+const char *DEFAULT_TEST_DATA_DIRECTORY = "voxel_testing_dir";
 
 bool create_empty_file(String fpath) {
-	if (!zylann::godot::file_exists(fpath)) {
+	if (!voxel::godot::file_exists(fpath)) {
 		Ref<FileAccess> f = FileAccess::open(fpath, FileAccess::WRITE);
 		if (f.is_valid()) {
 			f->store_line("");
@@ -34,7 +34,7 @@ bool remove_dir_if_exists(const char *p_dirpath) {
 		ERR_FAIL_COND_V(cd_err != OK, false);
 
 		// `remove` fails if the directory is not empty
-		const Error contents_remove_err = zylann::godot::erase_directory_contents_recursive(**da);
+		const Error contents_remove_err = voxel::godot::erase_directory_contents_recursive(**da);
 		ERR_FAIL_COND_V(contents_remove_err != OK, false);
 		// OS::get_singleton()->move_to_trash(dirpath); // ?
 
@@ -77,4 +77,4 @@ String TestDirectory::get_path() const {
 	return DEFAULT_TEST_DATA_DIRECTORY;
 }
 
-} // namespace zylann::testing
+} // namespace voxel::testing

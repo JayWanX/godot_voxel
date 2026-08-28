@@ -1,5 +1,5 @@
-#ifndef ZYLANN_TIME_SPREAD_TASK_RUNNER_H
-#define ZYLANN_TIME_SPREAD_TASK_RUNNER_H
+#ifndef VOXEL_TIME_SPREAD_TASK_RUNNER_H
+#define VOXEL_TIME_SPREAD_TASK_RUNNER_H
 
 #include "../containers/fixed_array.h"
 #include "../containers/span.h"
@@ -7,7 +7,7 @@
 #include "../thread/mutex.h"
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 struct TimeSpreadTaskContext {
 	// If this is set to `true` by a task,
@@ -50,6 +50,6 @@ private:
 	FixedArray<Queue, PRIORITY_COUNT> _queues;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_TIME_SPREAD_TASK_RUNNER_H
+#endif // VOXEL_TIME_SPREAD_TASK_RUNNER_H

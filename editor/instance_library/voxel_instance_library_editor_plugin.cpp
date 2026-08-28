@@ -12,7 +12,7 @@
 #include "../../util/godot/core/array.h"
 #include "../../util/godot/core/string.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelInstanceLibraryEditorPlugin::VoxelInstanceLibraryEditorPlugin() {}
 
@@ -22,16 +22,16 @@ void VoxelInstanceLibraryEditorPlugin::init() {}
 
 EditorUndoRedoManager &VoxelInstanceLibraryEditorPlugin::get_undo_redo2() {
 	EditorUndoRedoManager *ur = get_undo_redo();
-	ZN_ASSERT(ur != nullptr);
+	VOXEL_ASSERT(ur != nullptr);
 	return *ur;
 }
 
-bool VoxelInstanceLibraryEditorPlugin::_zn_handles(const Object *p_object) const {
+bool VoxelInstanceLibraryEditorPlugin::_voxel_handles(const Object *p_object) const {
 	const VoxelInstanceLibrary *lib = Object::cast_to<VoxelInstanceLibrary>(p_object);
 	return lib != nullptr;
 }
 
-void VoxelInstanceLibraryEditorPlugin::_zn_edit(Object *p_object) {
+void VoxelInstanceLibraryEditorPlugin::_voxel_edit(Object *p_object) {
 	// VoxelInstanceLibrary *lib = Object::cast_to<VoxelInstanceLibrary>(p_object);
 	// _library.reference_ptr(lib);
 }
@@ -56,4 +56,4 @@ void VoxelInstanceLibraryEditorPlugin::_notification(int p_what) {
 
 void VoxelInstanceLibraryEditorPlugin::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

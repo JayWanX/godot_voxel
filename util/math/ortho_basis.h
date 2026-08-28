@@ -1,11 +1,11 @@
-#ifndef ZN_ORTHO_BASIS_H
-#define ZN_ORTHO_BASIS_H
+#ifndef VOXEL_ORTHO_BASIS_H
+#define VOXEL_ORTHO_BASIS_H
 
 #include "conv.h"
 #include "vector3i.h"
 #include "vector3t.h"
 
-namespace zylann::math {
+namespace voxel::math {
 
 // Orthogonal bases are useful to define 3D rotations that only use 90-degree steps for angles. Because there is only 24
 // possible cases, they can often be encoded as a single byte. It can be recovered as a regular basis using a lookup
@@ -40,7 +40,7 @@ struct OrthoBasis {
 			case Vector3i::AXIS_Z:
 				return z;
 			default:
-				ZN_CRASH();
+				VOXEL_CRASH();
 		}
 		return Vector3i();
 	}
@@ -116,7 +116,7 @@ struct OrthoBasis {
 	}
 
 	void rotate_90(const Axis axis, const bool clockwise) {
-		zylann::math::rotate_90(Span<Vector3i>(&x, 3), axis, clockwise);
+		voxel::math::rotate_90(Span<Vector3i>(&x, 3), axis, clockwise);
 	}
 };
 
@@ -199,6 +199,6 @@ OrthoBasis get_ortho_basis_from_index(int i);
 int get_index_from_ortho_basis(const OrthoBasis &b);
 const char *ortho_rotation_to_string(int i);
 
-} // namespace zylann::math
+} // namespace voxel::math
 
-#endif // ZN_ORTHO_BASIS_H
+#endif // VOXEL_ORTHO_BASIS_H

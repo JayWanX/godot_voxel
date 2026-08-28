@@ -7,17 +7,17 @@
 #include "../../util/godot/core/version.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Tree);
-ZN_GODOT_FORWARD_DECLARE(class LineEdit);
-ZN_GODOT_FORWARD_DECLARE(class EditorFileDialog)
-ZN_GODOT_FORWARD_DECLARE(class RichTextLabel)
-#ifdef ZN_GODOT
+VOXEL_GODOT_FORWARD_DECLARE(class Tree);
+VOXEL_GODOT_FORWARD_DECLARE(class LineEdit);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
+VOXEL_GODOT_FORWARD_DECLARE(class RichTextLabel)
+#ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-ZN_GODOT_FORWARD_DECLARE(class EditorQuickOpen)
+VOXEL_GODOT_FORWARD_DECLARE(class EditorQuickOpen)
 #endif
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Dialog to pick a graph node type, with categories, search and descriptions
 class VoxelGraphNodeDialog : public ConfirmationDialog {
@@ -70,7 +70,7 @@ private:
 	LineEdit *_filter_line_edit = nullptr;
 	RichTextLabel *_description_label = nullptr;
 	EditorFileDialog *_function_file_dialog = nullptr;
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
 	// TODO GDX: EditorQuickOpen is not exposed!
 	EditorQuickOpen *_function_quick_open_dialog = nullptr;
@@ -78,6 +78,6 @@ private:
 #endif
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_NODE_DIALOG_H

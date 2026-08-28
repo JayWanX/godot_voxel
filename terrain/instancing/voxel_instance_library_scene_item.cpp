@@ -1,10 +1,10 @@
 #include "voxel_instance_library_scene_item.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelInstanceLibrarySceneItem::set_scene(Ref<PackedScene> scene) {
 	if (scene != _scene) {
@@ -28,4 +28,4 @@ void VoxelInstanceLibrarySceneItem::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -5,7 +5,7 @@
 #include "../util/godot/classes/node_3d.h"
 #include "../util/math/vector2f.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Triggers loading of voxel nodes around its position. Voxels will update in priority closer to viewers.
 // Usually added as child of the player's camera.
@@ -64,6 +64,6 @@ private:
 	int _network_peer_id = -1;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_VIEWER_H

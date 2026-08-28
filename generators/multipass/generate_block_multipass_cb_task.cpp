@@ -13,7 +13,7 @@
 #include "../../util/string/format.h"
 #include "../../util/tasks/async_dependency_tracker.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 GenerateBlockMultipassCBTask::GenerateBlockMultipassCBTask(const VoxelGenerator::BlockTaskParams &params) :
 		_block_position(params.block_position),
@@ -35,9 +35,9 @@ GenerateBlockMultipassCBTask::~GenerateBlockMultipassCBTask() {
 	// println(format("H {} {} {} {}", position.x, position.y, position.z, Time::get_singleton()->get_ticks_usec()));
 }
 
-void GenerateBlockMultipassCBTask::run(zylann::ThreadedTaskContext &ctx) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+void GenerateBlockMultipassCBTask::run(voxel::ThreadedTaskContext &ctx) {
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	CRASH_COND(_stream_dependency == nullptr);
 	Ref<VoxelGenerator> generator = _stream_dependency->generator;
@@ -45,9 +45,9 @@ void GenerateBlockMultipassCBTask::run(zylann::ThreadedTaskContext &ctx) {
 
 	// TODO Have a way for generators to provide their own task, instead of shoehorning it here
 	Ref<VoxelGeneratorMultipassCB> multipass_generator = generator;
-	ZN_ASSERT_RETURN(multipass_generator.is_valid());
+	VOXEL_ASSERT_RETURN(multipass_generator.is_valid());
 
-	ZN_ASSERT_RETURN(multipass_generator->get_pass_count() > 0);
+	VOXEL_ASSERT_RETURN(multipass_generator->get_pass_count() > 0);
 	std::shared_ptr<VoxelGeneratorMultipassCBStructs::Internal> multipass_generator_internal =
 			multipass_generator->get_internal();
 	VoxelGeneratorMultipassCBStructs::Map &map = multipass_generator_internal->map;
@@ -102,7 +102,7 @@ void GenerateBlockMultipassCBTask::run(zylann::ThreadedTaskContext &ctx) {
 
 				// It must not be the current task. Only tasks that are not scheduled and not running can be stored
 				// in here. If it is, something went wrong.
-				ZN_ASSERT(block.final_pending_task != this);
+				VOXEL_ASSERT(block.final_pending_task != this);
 
 				// This can happen if you teleport forward, then go back, then forward again.
 				// Because VoxelTerrain forgets about "loading blocks" falling out of its play area, while
@@ -119,7 +119,7 @@ void GenerateBlockMultipassCBTask::run(zylann::ThreadedTaskContext &ctx) {
 			if ((column->pending_subpass_tasks_mask & (1 << final_subpass_index)) == 0) {
 				// No tasks working on it, and we are the first top-level task.
 				// Spawn a subtask to bring this column to final state.
-				GenerateColumnMultipassTask *subtask = ZN_NEW(GenerateColumnMultipassTask(
+				GenerateColumnMultipassTask *subtask = VOXEL_NEW(GenerateColumnMultipassTask(
 						column_position,
 						_format,
 						_block_size,
@@ -195,7 +195,7 @@ void GenerateBlockMultipassCBTask::run_stream_saving_and_finish() {
 		// TODO In some cases we don't want this to run all the time, do we?
 		// Like in full load mode, where non-edited blocks remain generated on the fly...
 		if (stream.is_valid() && stream->get_save_generator_output()) {
-			ZN_PRINT_VERBOSE(
+			VOXEL_PRINT_VERBOSE(
 					format("Requesting save of generator output for block {} lod {}", _block_position, int(_lod_index))
 			);
 
@@ -206,7 +206,7 @@ void GenerateBlockMultipassCBTask::run_stream_saving_and_finish() {
 			// No instances, generators are not designed to produce them at this stage yet.
 			// No priority data, saving doesn't need sorting.
 
-			SaveBlockDataTask *save_task = ZN_NEW(SaveBlockDataTask(
+			SaveBlockDataTask *save_task = VOXEL_NEW(SaveBlockDataTask(
 					_volume_id, _block_position, _lod_index, voxels_copy, _stream_dependency, nullptr, false
 			));
 
@@ -270,7 +270,7 @@ void GenerateBlockMultipassCBTask::apply_result() {
 
 	} else {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Gemerated data request response came back but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Gemerated data request response came back but volume wasn't found");
 	}
 
 	// TODO We could complete earlier inside run() if we had access to the data structure to write the block into.
@@ -285,4 +285,4 @@ void GenerateBlockMultipassCBTask::apply_result() {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -1,7 +1,7 @@
 #ifndef VOXEL_TEST_VOXEL_GRAPH_H
 #define VOXEL_TEST_VOXEL_GRAPH_H
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_voxel_graph_invalid_connection();
 void test_voxel_graph_generator_default_graph_compilation();
@@ -48,6 +48,6 @@ void test_voxel_graph_broad_block();
 void test_voxel_graph_set_default_input_by_name();
 void test_voxel_graph_get_io_indices();
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests
 
 #endif // VOXEL_TEST_VOXEL_GRAPH_H

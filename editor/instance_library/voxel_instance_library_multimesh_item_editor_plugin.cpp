@@ -5,11 +5,11 @@
 #include "../../util/godot/classes/editor_undo_redo_manager.h"
 #include "../../util/godot/classes/resource_loader.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelInstanceLibraryMultiMeshItemEditorPlugin::VoxelInstanceLibraryMultiMeshItemEditorPlugin() {}
 
@@ -31,7 +31,7 @@ void VoxelInstanceLibraryMultiMeshItemEditorPlugin::init() {
 	);
 }
 
-bool VoxelInstanceLibraryMultiMeshItemEditorPlugin::_zn_handles(const Object *p_object) const {
+bool VoxelInstanceLibraryMultiMeshItemEditorPlugin::_voxel_handles(const Object *p_object) const {
 	// TODO Making a plugin handling sub-resources of `VoxelInstanceLibrary` breaks the inspector.
 	// There are also some caveats when using multiple sub-inspectors. To keep supporting multiple sub-inspectors open
 	// inside a library, we cannot rely on `edit` giving us edited resources.
@@ -41,12 +41,12 @@ bool VoxelInstanceLibraryMultiMeshItemEditorPlugin::_zn_handles(const Object *p_
 	// return item != nullptr;
 }
 
-void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_zn_edit(Object *p_object) {
+void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_voxel_edit(Object *p_object) {
 	// VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(p_object);
 	// _item.reference_ptr(item);
 }
 
-void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_zn_make_visible(bool visible) {
+void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_voxel_make_visible(bool visible) {
 	// if (!visible) {
 	// 	_item.unref();
 	// }
@@ -65,17 +65,17 @@ void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_notification(int p_what) {
 	}
 }
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_on_update_from_scene_button_pressed(
 		VoxelInstanceLibraryMultiMeshItem *item
 ) {
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_on_update_from_scene_button_pressed(Object *item_o) {
 	VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(item_o);
 #endif
 	_item.reference_ptr(item);
 	ERR_FAIL_COND(_item.is_null());
-	zylann::godot::popup_file_dialog(*_open_scene_dialog);
+	voxel::godot::popup_file_dialog(*_open_scene_dialog);
 }
 
 namespace {
@@ -118,4 +118,4 @@ void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_on_open_scene_dialog_file_s
 
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

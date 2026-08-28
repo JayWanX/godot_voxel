@@ -1,10 +1,10 @@
-#ifndef ZN_TEST_CONTAINER_FUNCS_H
-#define ZN_TEST_CONTAINER_FUNCS_H
+#ifndef VOXEL_TEST_CONTAINER_FUNCS_H
+#define VOXEL_TEST_CONTAINER_FUNCS_H
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_unordered_remove_if();
 
-} // namespace zylann::tests
+} // namespace voxel::tests
 
-#endif // ZN_TEST_CONTAINER_FUNCS_H
+#endif // VOXEL_TEST_CONTAINER_FUNCS_H

@@ -11,7 +11,7 @@
 #include "../engine/gpu/compute_shader_parameters.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct VoxelModifierContext {
 	Span<float> sdf; // Signed distance values to modify
@@ -68,6 +68,6 @@ private:
 	Transform3D _transform;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MODIFIER_H

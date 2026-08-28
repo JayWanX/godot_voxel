@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGraphEditorNodePreview;
 
@@ -13,6 +13,6 @@ struct VoxelGraphEditorNodePreviewInfo {
 	uint32_t node_id;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif

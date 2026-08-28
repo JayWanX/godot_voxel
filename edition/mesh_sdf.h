@@ -11,7 +11,7 @@
 #include <atomic>
 #include <memory>
 
-namespace zylann::voxel::mesh_sdf {
+namespace voxel::mesh_sdf {
 
 // Utilities to generate a signed distance field from a 3D triangle mesh.
 
@@ -181,6 +181,6 @@ void generate_mesh_sdf_approx_floodfill(
 		bool boundary_sign_fix
 );
 
-} // namespace zylann::voxel::mesh_sdf
+} // namespace voxel::mesh_sdf
 
 #endif // VOXEL_MESH_SDF_H

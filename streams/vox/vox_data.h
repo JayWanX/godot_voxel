@@ -10,11 +10,11 @@
 #include "../../util/math/vector3i.h"
 #include "../../util/memory/memory.h"
 
-#if defined(ZN_GODOT_EXTENSION)
+#if defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/global_constants.hpp> // For `Error`
 #endif
 
-namespace zylann::voxel::magica {
+namespace voxel::magica {
 
 struct Model {
 	Vector3i size;
@@ -131,6 +131,6 @@ private:
 	FixedArray<Color8, 256> _palette;
 };
 
-} // namespace zylann::voxel::magica
+} // namespace voxel::magica
 
 #endif // VOX_DATA_H

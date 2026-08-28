@@ -1,6 +1,6 @@
 #include "../node_type_db.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 void register_output_nodes(Span<NodeType> types) {
 	using namespace math;
@@ -14,7 +14,7 @@ void register_output_nodes(Span<NodeType> types) {
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
 			const Runtime::Buffer &input = ctx.get_input(0);
 			Runtime::Buffer &out = ctx.get_output(0);
-			ZN_ASSERT(out.data != nullptr);
+			VOXEL_ASSERT(out.data != nullptr);
 			memcpy(out.data, input.data, input.size * sizeof(float));
 		};
 		t.range_analysis_func = [](Runtime::RangeAnalysisContext &ctx) {
@@ -96,4 +96,4 @@ void register_output_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

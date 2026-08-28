@@ -3,7 +3,7 @@
 
 #include "../voxel_graph_runtime.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 template <typename F>
 inline void do_monop(pg::Runtime::ProcessBufferContext &ctx, F f) {
@@ -59,6 +59,6 @@ inline void do_binop(pg::Runtime::ProcessBufferContext &ctx, F f) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg
 
 #endif // VOXEL_GRAPH_NODES_UTIL_H

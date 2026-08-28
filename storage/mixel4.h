@@ -7,7 +7,7 @@
 
 // Functions to encode, decode and blend voxel materials using 4 indices and 4 weights.
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBuffer;
 
@@ -62,7 +62,7 @@ inline void debug_check_texture_indices(FixedArray<uint8_t, 4> indices) {
 	fill(checked, false);
 	for (unsigned int i = 0; i < indices.size(); ++i) {
 		unsigned int ti = indices[i];
-		ZN_ASSERT(!checked[ti]);
+		VOXEL_ASSERT(!checked[ti]);
 		checked[ti] = true;
 	}
 }
@@ -126,7 +126,7 @@ inline void blend_texture_packed_u16(
 		uint16_t &encoded_weights
 ) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN(target_weight >= 0.f && target_weight <= 1.f);
+	VOXEL_ASSERT_RETURN(target_weight >= 0.f && target_weight <= 1.f);
 #endif
 
 	FixedArray<uint8_t, 4> indices = decode_indices_from_packed_u16(encoded_indices);
@@ -200,6 +200,6 @@ constexpr inline uint16_t make_encoded_indices_for_single_texture(uint8_t index)
 }
 
 } // namespace mixel4
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MIXEL4_H

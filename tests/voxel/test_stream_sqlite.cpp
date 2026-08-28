@@ -14,7 +14,7 @@
 #include "../../util/testing/test_directory.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 namespace {
 void test_voxel_stream_sqlite_basic(
@@ -23,8 +23,8 @@ void test_voxel_stream_sqlite_basic(
 		const Vector3i block_position,
 		const godot::VoxelBlockSerializer::Compression compression
 ) {
-	zylann::testing::TestDirectory test_dir;
-	ZN_TEST_ASSERT(test_dir.is_valid());
+	voxel::testing::TestDirectory test_dir;
+	VOXEL_TEST_ASSERT(test_dir.is_valid());
 
 	const String database_path = test_dir.get_path().path_join("database.sqlite");
 
@@ -45,15 +45,15 @@ void test_voxel_stream_sqlite_basic(
 			VoxelStreamSQLite::VoxelQueryData q{ vb1, vb1_pos, 0, VoxelStream::RESULT_ERROR };
 			stream->save_voxel_block(q);
 			// Result is not set currently for saves...
-			// ZN_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
+			// VOXEL_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
 		}
 		// Load it back (caching might take effect)
 		{
 			VoxelBuffer loaded_vb1(VoxelBuffer::ALLOCATOR_DEFAULT);
 			VoxelStreamSQLite::VoxelQueryData q{ loaded_vb1, vb1_pos, 0, VoxelStream::RESULT_ERROR };
 			stream->load_voxel_block(q);
-			ZN_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
-			ZN_TEST_ASSERT(loaded_vb1.equals(vb1));
+			VOXEL_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
+			VOXEL_TEST_ASSERT(loaded_vb1.equals(vb1));
 		}
 		// Flush before the stream object is destroyed
 		stream->flush();
@@ -69,8 +69,8 @@ void test_voxel_stream_sqlite_basic(
 			VoxelBuffer loaded_vb1(VoxelBuffer::ALLOCATOR_DEFAULT);
 			VoxelStreamSQLite::VoxelQueryData q{ loaded_vb1, vb1_pos, 0, VoxelStream::RESULT_ERROR };
 			stream->load_voxel_block(q);
-			ZN_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
-			ZN_TEST_ASSERT(loaded_vb1.equals(vb1));
+			VOXEL_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
+			VOXEL_TEST_ASSERT(loaded_vb1.equals(vb1));
 		}
 	}
 }
@@ -160,7 +160,7 @@ void test_voxel_stream_sqlite_basic() {
 }
 
 void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::CoordinateFormat coordinate_format) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	struct BlockInfo {
 		Vector3i position;
@@ -177,8 +177,8 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 		}
 	};
 
-	zylann::testing::TestDirectory test_dir;
-	ZN_TEST_ASSERT(test_dir.is_valid());
+	voxel::testing::TestDirectory test_dir;
+	VOXEL_TEST_ASSERT(test_dir.is_valid());
 
 	const String database_path = test_dir.get_path().path_join("database.sqlite");
 
@@ -239,7 +239,7 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 		stream->flush();
 
 		const uint64_t elapsed_us = pclock.get_elapsed_microseconds();
-		ZN_PRINT_VERBOSE(format("Writes time with coordinate format {}: {} us", coordinate_format, elapsed_us));
+		VOXEL_PRINT_VERBOSE(format("Writes time with coordinate format {}: {} us", coordinate_format, elapsed_us));
 	}
 
 	// Roughly shuffle locations
@@ -259,24 +259,24 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 
 		VoxelBuffer vb(VoxelBuffer::ALLOCATOR_DEFAULT);
 
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		ProfilingClock pclock;
 
 		for (unsigned int i = 0; i < blocks.size(); ++i) {
 			const BlockInfo block = blocks[i];
 			VoxelStreamSQLite::VoxelQueryData q{ vb, block.position, block.lod_index, VoxelStreamSQLite::RESULT_ERROR };
 			{
-				ZN_PROFILE_SCOPE();
+				VOXEL_PROFILE_SCOPE();
 				stream->load_voxel_block(q);
 			}
-			ZN_TEST_ASSERT(q.result == VoxelStreamSQLite::RESULT_BLOCK_FOUND);
+			VOXEL_TEST_ASSERT(q.result == VoxelStreamSQLite::RESULT_BLOCK_FOUND);
 
 			const unsigned int v = vb.get_voxel(Vector3i(vb.get_size().x / 2, 0, vb.get_size().z / 2), 0);
-			ZN_TEST_ASSERT(v == block.id);
+			VOXEL_TEST_ASSERT(v == block.id);
 		}
 
 		const uint64_t elapsed_us = pclock.get_elapsed_microseconds();
-		ZN_PRINT_VERBOSE(format("Reads time with coordinate format {}: {} us", coordinate_format, elapsed_us));
+		VOXEL_PRINT_VERBOSE(format("Reads time with coordinate format {}: {} us", coordinate_format, elapsed_us));
 	}
 }
 
@@ -293,10 +293,10 @@ void test_voxel_stream_sqlite_key_string_csd_encoding(Vector3i pos, uint8_t lod_
 	FixedArray<uint8_t, STRING_LOCATION_MAX_LENGTH> buffer;
 	const BlockLocation loc{ pos, lod_index };
 	std::string_view sv = loc.encode_string_csd(buffer);
-	ZN_ASSERT(sv == expected);
+	VOXEL_ASSERT(sv == expected);
 	BlockLocation loc2;
-	ZN_ASSERT(loc.decode_string_csd(sv, loc2));
-	ZN_ASSERT(loc == loc2);
+	VOXEL_ASSERT(loc.decode_string_csd(sv, loc2));
+	VOXEL_ASSERT(loc == loc2);
 }
 
 void test_voxel_stream_sqlite_key_string_csd_encoding() {
@@ -314,7 +314,7 @@ void test_voxel_stream_sqlite_key_blob80_encoding(Vector3i position, uint8_t lod
 	const BlockLocation loc{ position, lod_index };
 	loc.encode_blob80(to_span(buffer));
 	const BlockLocation loc2 = BlockLocation::decode_blob80(to_span(buffer));
-	ZN_ASSERT(loc == loc2);
+	VOXEL_ASSERT(loc == loc2);
 }
 
 void test_voxel_stream_sqlite_key_blob80_encoding() {
@@ -344,31 +344,31 @@ void test_voxel_stream_sqlite_key_blob80_encoding() {
 void test_voxel_stream_sqlite_transaction_recovery() {
 	using namespace sqlite;
 
-	zylann::testing::TestDirectory test_dir;
-	ZN_TEST_ASSERT(test_dir.is_valid());
+	voxel::testing::TestDirectory test_dir;
+	VOXEL_TEST_ASSERT(test_dir.is_valid());
 
 	const String database_path = test_dir.get_path().path_join("database.sqlite");
-	const StdString database_path_str = zylann::godot::to_std_string(database_path);
+	const StdString database_path_str = voxel::godot::to_std_string(database_path);
 
 	Connection con;
-	ZN_TEST_ASSERT(con.open(database_path_str.c_str(), BlockLocation::FORMAT_STRING_CSD));
+	VOXEL_TEST_ASSERT(con.open(database_path_str.c_str(), BlockLocation::FORMAT_STRING_CSD));
 
 	// Rolling back with no transaction active is a no-op, not an error.
-	ZN_TEST_ASSERT(con.rollback_transaction());
+	VOXEL_TEST_ASSERT(con.rollback_transaction());
 
-	ZN_TEST_ASSERT(con.begin_transaction());
+	VOXEL_TEST_ASSERT(con.begin_transaction());
 
 	// Reproduces the state a failed COMMIT leaves behind: still inside a transaction, so this must fail.
 	// Note this legitimately prints "cannot start a transaction within a transaction" while the test passes;
 	// it is the very error being reproduced here.
-	ZN_TEST_ASSERT(con.begin_transaction() == false);
+	VOXEL_TEST_ASSERT(con.begin_transaction() == false);
 
-	ZN_TEST_ASSERT(con.rollback_transaction());
+	VOXEL_TEST_ASSERT(con.rollback_transaction());
 
 	// The connection has to be usable again. This also covers `sqlite3_reset` returning the error code of the
 	// previous evaluation of a statement, which would otherwise make this first BEGIN fail once more.
-	ZN_TEST_ASSERT(con.begin_transaction());
-	ZN_TEST_ASSERT(con.end_transaction());
+	VOXEL_TEST_ASSERT(con.begin_transaction());
+	VOXEL_TEST_ASSERT(con.end_transaction());
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

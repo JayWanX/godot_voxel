@@ -1,7 +1,7 @@
 #include "../../../util/profiling.h"
 #include "../node_type_db.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 void register_math_vector_nodes(Span<NodeType> types) {
 	using namespace math;
@@ -111,7 +111,7 @@ void register_math_vector_nodes(Span<NodeType> types) {
 		t.outputs.push_back(NodeType::Port("len"));
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_NORMALIZE_3D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_NORMALIZE_3D");
 			const Runtime::Buffer &xb = ctx.get_input(0);
 			const Runtime::Buffer &yb = ctx.get_input(1);
 			const Runtime::Buffer &zb = ctx.get_input(2);
@@ -171,4 +171,4 @@ void register_math_vector_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

@@ -1,10 +1,10 @@
-#ifndef ZYLANN_FAST_NOISE_LITE_GRADIENT_H
-#define ZYLANN_FAST_NOISE_LITE_GRADIENT_H
+#ifndef VOXEL_FAST_NOISE_LITE_GRADIENT_H
+#define VOXEL_FAST_NOISE_LITE_GRADIENT_H
 
 #include "../../../thirdparty/fast_noise/FastNoiseLite.h"
 #include "../../godot/classes/resource.h"
 
-namespace zylann {
+namespace voxel {
 
 // Domain warp is a transformation of coordinates before sampling the actual noise.
 // It can be done with another instance of noise, however it needs a sample for each coordinate,
@@ -14,8 +14,8 @@ namespace zylann {
 // Note: FastNoiseLite provides this with the same class, but then its unclear which applies to what,
 // so I made two classes, each with a specific purpose.
 //
-class ZN_FastNoiseLiteGradient : public Resource {
-	GDCLASS(ZN_FastNoiseLiteGradient, Resource)
+class VOXEL_FastNoiseLiteGradient : public Resource {
+	GDCLASS(VOXEL_FastNoiseLiteGradient, Resource)
 
 	typedef ::fast_noise_lite::FastNoiseLite _FastNoise;
 
@@ -43,7 +43,7 @@ public:
 		ROTATION_3D_IMPROVE_XZ_PLANES = _FastNoise::RotationType3D_ImproveXZPlanes
 	};
 
-	ZN_FastNoiseLiteGradient();
+	VOXEL_FastNoiseLiteGradient();
 
 	void set_noise_type(NoiseType type);
 	NoiseType get_noise_type() const;
@@ -119,10 +119,10 @@ private:
 	RotationType3D _rotation_type_3d = ROTATION_3D_NONE;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLiteGradient::NoiseType);
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLiteGradient::FractalType);
-VARIANT_ENUM_CAST(zylann::ZN_FastNoiseLiteGradient::RotationType3D);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLiteGradient::NoiseType);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLiteGradient::FractalType);
+VARIANT_ENUM_CAST(voxel::VOXEL_FastNoiseLiteGradient::RotationType3D);
 
-#endif // ZYLANN_FAST_NOISE_LITE_GRADIENT_H
+#endif // VOXEL_FAST_NOISE_LITE_GRADIENT_H

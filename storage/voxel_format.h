@@ -4,7 +4,7 @@
 #include "voxel_buffer.h"
 #include <array>
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct VoxelFormat {
 	VoxelFormat();
@@ -34,6 +34,6 @@ struct VoxelFormat {
 	std::array<VoxelBuffer::Depth, VoxelBuffer::MAX_CHANNELS> depths;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_FORMAT_H

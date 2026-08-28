@@ -9,11 +9,11 @@
 #include "../voxel_stream_cache.h"
 #include "block_key_cache.h"
 
-namespace zylann::voxel::sqlite {
+namespace voxel::sqlite {
 class Connection;
 }
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Saves voxel data into a single SQLite database file.
 class VoxelStreamSQLite : public VoxelStream {
@@ -116,8 +116,8 @@ private:
 		ScopeRecycle(VoxelStreamSQLite *p_stream, sqlite::Connection *p_connection) :
 				stream(p_stream), connection(p_connection) {
 #ifdef DEV_ENABLED
-			ZN_ASSERT(stream != nullptr);
-			ZN_ASSERT(connection != nullptr);
+			VOXEL_ASSERT(stream != nullptr);
+			VOXEL_ASSERT(connection != nullptr);
 #endif
 		}
 
@@ -155,8 +155,8 @@ private:
 	CoordinateFormat _preferred_coordinate_format = COORDINATE_FORMAT_STRING_CSD;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelStreamSQLite::CoordinateFormat);
+VARIANT_ENUM_CAST(voxel::VoxelStreamSQLite::CoordinateFormat);
 
 #endif // VOXEL_STREAM_SQLITE_H

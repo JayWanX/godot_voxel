@@ -1,7 +1,7 @@
 // This file is part of meshoptimizer library; see meshoptimizer.h for version/license details
 #include "meshoptimizer.h"
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 #ifdef MESHOPTIMIZER_ALLOC_EXPORT
 meshopt_Allocator::Storage& meshopt_Allocator::storage()
@@ -18,4 +18,4 @@ void meshopt_setAllocator(void* (MESHOPTIMIZER_ALLOC_CALLCONV* allocate)(size_t)
 	s.deallocate = deallocate;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

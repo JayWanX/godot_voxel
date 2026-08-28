@@ -4,7 +4,7 @@
 #include "../util/profiling.h"
 #include <unordered_set>
 
-namespace zylann {
+namespace voxel {
 
 AStarGrid3D::AStarGrid3D() {
 	_open_list.sorter.compare.pool = &_points_pool;
@@ -15,7 +15,7 @@ void AStarGrid3D::set_region(Box3i region) {
 }
 
 void AStarGrid3D::set_agent_size(Vector3f size) {
-	ZN_ASSERT_RETURN(math::is_valid_size(size));
+	VOXEL_ASSERT_RETURN(math::is_valid_size(size));
 	_agent_size = size;
 }
 
@@ -72,7 +72,7 @@ void AStarGrid3D::start(Vector3i from_position, Vector3i target_position) {
 }
 
 void AStarGrid3D::step() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (!_is_running) {
 		return;
@@ -124,7 +124,7 @@ void AStarGrid3D::step() {
 			p.in_open_set = false;
 
 			_points_pool.push_back(p);
-			// ZN_PROFILE_SCOPE_NAMED("Insert to points map");
+			// VOXEL_PROFILE_SCOPE_NAMED("Insert to points map");
 			_points_map.insert({ npos, neighbor_point_index });
 		}
 
@@ -202,7 +202,7 @@ const Vector3i g_directions_2d[8] = {
 void AStarGrid3D::get_neighbor_positions(Vector3i pos, StdVector<Vector3i> &out_positions) {
 	// Implementation specialized for agents walking on top of solid surfaces
 
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const Vector3i pos_below = pos - Vector3i(0, 1, 0);
 	const bool c_below = is_solid(pos_below);
@@ -260,7 +260,7 @@ void AStarGrid3D::get_neighbor_positions(Vector3i pos, StdVector<Vector3i> &out_
 	}
 
 	{
-		// ZN_PROFILE_SCOPE_NAMED("Agent fitting checks");
+		// VOXEL_PROFILE_SCOPE_NAMED("Agent fitting checks");
 		// TODO This takes half of time in profiled results
 
 		unordered_remove_if(out_positions, [this, pos](Vector3i npos) {
@@ -279,7 +279,7 @@ void AStarGrid3D::get_neighbor_positions(Vector3i pos, StdVector<Vector3i> &out_
 }
 
 void AStarGrid3D::reconstruct_path(uint32_t end_point_index) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	_path.clear();
 
@@ -288,12 +288,12 @@ void AStarGrid3D::reconstruct_path(uint32_t end_point_index) {
 
 	while (point_index != _start_point_index) {
 		const uint32_t came_from_index = _points_pool[point_index].came_from_point_index;
-		ZN_ASSERT_RETURN(came_from_index != Point::NO_CAME_FROM);
+		VOXEL_ASSERT_RETURN(came_from_index != Point::NO_CAME_FROM);
 		point_index = came_from_index;
 		const Vector3i pos = _points_pool[point_index].position;
 		_path.push_back(pos);
 		++i;
-		ZN_ASSERT_RETURN_MSG(i < 10000, "Too many iterations");
+		VOXEL_ASSERT_RETURN_MSG(i < 10000, "Too many iterations");
 	}
 
 	std::reverse(_path.begin(), _path.end());
@@ -338,4 +338,4 @@ bool AStarGrid3D::debug_get_next_step_point(Vector3i &out_pos) const {
 	return true;
 }
 
-} // namespace zylann
+} // namespace voxel

@@ -3,7 +3,7 @@
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 
-namespace zylann::voxel::sqlite {
+namespace voxel::sqlite {
 
 namespace {
 
@@ -23,7 +23,7 @@ inline CoordinateColumnType get_coordinate_column_type(BlockLocation::Coordinate
 		case BlockLocation::FORMAT_BLOB80_X25_Y25_Z25_L5:
 			return COORDINATE_COLUMN_BLOB;
 		default:
-			ZN_CRASH_MSG("Invalid coordinate format");
+			VOXEL_CRASH_MSG("Invalid coordinate format");
 			return COORDINATE_COLUMN_U64;
 	}
 }
@@ -76,7 +76,7 @@ struct BindBlockCoordinates {
 			} break;
 
 			default:
-				ZN_CRASH_MSG("Invalid coordinate format");
+				VOXEL_CRASH_MSG("Invalid coordinate format");
 				return false;
 		}
 
@@ -128,7 +128,7 @@ inline bool read_block_location(
 			const unsigned int eloc_len = sqlite3_column_bytes(statement, param_index);
 			// That's ugly...
 			const std::string_view s(reinterpret_cast<const char *>(eloc), eloc_len);
-			ZN_ASSERT_RETURN_V(BlockLocation::decode_string_csd(s, out_location), false);
+			VOXEL_ASSERT_RETURN_V(BlockLocation::decode_string_csd(s, out_location), false);
 		} break;
 
 		case COORDINATE_COLUMN_BLOB: {
@@ -139,7 +139,7 @@ inline bool read_block_location(
 		} break;
 
 		default:
-			ZN_CRASH_MSG("Invalid coordinate column type");
+			VOXEL_CRASH_MSG("Invalid coordinate column type");
 			break;
 	}
 
@@ -178,7 +178,7 @@ const int TRANSACTION_BUSY_TIMEOUT_MS = 1000;
 static bool prepare(sqlite3 *db, sqlite3_stmt **s, const char *sql) {
 	const int rc = sqlite3_prepare_v2(db, sql, -1, s, nullptr);
 	if (rc != SQLITE_OK) {
-		ZN_PRINT_ERROR(format("Preparing statement failed: {}", sqlite3_errmsg(db)));
+		VOXEL_PRINT_ERROR(format("Preparing statement failed: {}", sqlite3_errmsg(db)));
 		return false;
 	}
 	return true;
@@ -200,12 +200,12 @@ Connection::~Connection() {
 }
 
 bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat preferred_coordinate_format) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	close();
 
 	int rc = sqlite3_open_v2(fpath, &_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
 	if (rc != 0) {
-		ZN_PRINT_ERROR(format("Could not open database at path \"{}\": {}", fpath, sqlite3_errmsg(_db)));
+		VOXEL_PRINT_ERROR(format("Could not open database at path \"{}\": {}", fpath, sqlite3_errmsg(_db)));
 		close();
 		return false;
 	}
@@ -239,13 +239,13 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 			tables[1] = "CREATE TABLE IF NOT EXISTS blocks (loc BLOB PRIMARY KEY, vb BLOB, instances BLOB)";
 			break;
 		default:
-			ZN_CRASH_MSG("Invalid column type");
+			VOXEL_CRASH_MSG("Invalid column type");
 			break;
 	}
 	for (size_t i = 0; i < 3; ++i) {
 		rc = sqlite3_exec(db, tables[i], nullptr, nullptr, &error_message);
 		if (rc != SQLITE_OK) {
-			ZN_PRINT_ERROR(format("Failed to create table: {}", error_message));
+			VOXEL_PRINT_ERROR(format("Failed to create table: {}", error_message));
 			sqlite3_free(error_message);
 			close();
 			return false;
@@ -308,7 +308,7 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 			return false;
 		}
 	} else {
-		ZN_PRINT_ERROR(format("Invalid version: {}", version));
+		VOXEL_PRINT_ERROR(format("Invalid version: {}", version));
 		return false;
 	}
 
@@ -346,7 +346,7 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 		save_meta(meta);
 	} else {
 		if (meta.version > VERSION_LATEST) {
-			ZN_PRINT_ERROR(format(
+			VOXEL_PRINT_ERROR(format(
 					"Could not use database at path \"{}\", its version ({}) is higher than the latest supported ({})",
 					fpath,
 					meta.version,
@@ -356,7 +356,7 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 			return false;
 		}
 		if (meta.coordinate_format != preferred_coordinate_format) {
-			ZN_PRINT_VERBOSE(
+			VOXEL_PRINT_VERBOSE(
 					format("Opened database uses version {} (latest is {}) and uses coordinate format {} while the "
 						   "preferred format is {}.",
 						   meta.version,
@@ -462,7 +462,7 @@ bool Connection::rollback_transaction() {
 }
 
 bool Connection::save_block(const BlockLocation loc, const Span<const uint8_t> block_data, const BlockType type) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	sqlite3 *db = _db;
 
@@ -570,7 +570,7 @@ VoxelStream::ResultCode Connection::load_block(
 		break;
 	}
 
-	ZN_ASSERT_RETURN_V(block_coordinates_binding.unbind(db, get_block_statement, 1), VoxelStream::RESULT_ERROR);
+	VOXEL_ASSERT_RETURN_V(block_coordinates_binding.unbind(db, get_block_statement, 1), VoxelStream::RESULT_ERROR);
 
 	return result;
 }
@@ -584,7 +584,7 @@ bool Connection::load_all_blocks(
 				Span<const uint8_t> instances_data
 		)
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	CRASH_COND(process_block_func == nullptr);
 
 	sqlite3 *db = _db;
@@ -604,10 +604,10 @@ bool Connection::load_all_blocks(
 		rc = sqlite3_step(load_all_blocks_statement);
 
 		if (rc == SQLITE_ROW) {
-			ZN_PROFILE_SCOPE_NAMED("Row");
+			VOXEL_PROFILE_SCOPE_NAMED("Row");
 
 			BlockLocation loc;
-			ZN_ASSERT_CONTINUE(
+			VOXEL_ASSERT_CONTINUE(
 					read_block_location(_meta.coordinate_format, key_column_type, load_all_blocks_statement, 0, loc)
 			);
 
@@ -642,8 +642,8 @@ bool Connection::load_all_block_keys(
 		void *callback_data,
 		void (*process_block_func)(void *callback_data, BlockLocation location)
 ) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT(process_block_func != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT(process_block_func != nullptr);
 
 	sqlite3 *db = _db;
 	sqlite3_stmt *load_all_block_keys_statement = _load_all_block_keys_statement;
@@ -662,10 +662,10 @@ bool Connection::load_all_block_keys(
 		rc = sqlite3_step(load_all_block_keys_statement);
 
 		if (rc == SQLITE_ROW) {
-			ZN_PROFILE_SCOPE_NAMED("Row");
+			VOXEL_PROFILE_SCOPE_NAMED("Row");
 
 			BlockLocation loc;
-			ZN_ASSERT_CONTINUE(
+			VOXEL_ASSERT_CONTINUE(
 					read_block_location(_meta.coordinate_format, key_column_type, load_all_block_keys_statement, 0, loc)
 			);
 
@@ -691,7 +691,7 @@ int Connection::load_version() {
 
 	int rc = sqlite3_reset(load_version_statement);
 	if (rc != SQLITE_OK) {
-		ZN_PRINT_ERROR(sqlite3_errmsg(db));
+		VOXEL_PRINT_ERROR(sqlite3_errmsg(db));
 		return -1;
 	}
 
@@ -708,7 +708,7 @@ int Connection::load_version() {
 	}
 
 	if (rc != SQLITE_DONE) {
-		ZN_PRINT_ERROR(sqlite3_errmsg(db));
+		VOXEL_PRINT_ERROR(sqlite3_errmsg(db));
 		return -1;
 	}
 
@@ -757,9 +757,9 @@ Connection::Meta Connection::load_meta() {
 		return Meta();
 	}
 
-	ZN_ASSERT_RETURN_V(!invalid_version, Meta());
+	VOXEL_ASSERT_RETURN_V(!invalid_version, Meta());
 
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			meta.coordinate_format >= 0 && meta.coordinate_format < BlockLocation::FORMAT_COUNT,
 			Meta(),
 			format("Invalid coordinate format: {}", meta.coordinate_format)
@@ -777,11 +777,11 @@ Connection::Meta Connection::load_meta() {
 			const int index = sqlite3_column_int(load_channels_statement, 0);
 			const int depth = sqlite3_column_int(load_channels_statement, 1);
 			if (index < 0 || index >= static_cast<int>(meta.channels.size())) {
-				ZN_PRINT_ERROR(format("Channel index {} is invalid", index));
+				VOXEL_PRINT_ERROR(format("Channel index {} is invalid", index));
 				continue;
 			}
 			if (depth < 0 || depth >= VoxelBuffer::DEPTH_COUNT) {
-				ZN_PRINT_ERROR(format("Depth {} is invalid", depth));
+				VOXEL_PRINT_ERROR(format("Depth {} is invalid", depth));
 				continue;
 			}
 			Meta::Channel &channel = meta.channels[index];
@@ -825,7 +825,7 @@ void Connection::save_meta(Meta meta) {
 	if (meta.version == VERSION_LATEST) {
 		rc = sqlite3_bind_int(save_meta_statement, 3, meta.coordinate_format);
 		if (rc != SQLITE_OK) {
-			ZN_PRINT_ERROR(sqlite3_errmsg(db));
+			VOXEL_PRINT_ERROR(sqlite3_errmsg(db));
 			return;
 		}
 	}
@@ -870,10 +870,10 @@ void Connection::save_meta(Meta meta) {
 
 bool Connection::migrate_from_v0_to_v1() {
 	if (_meta.version == VERSION_V1) {
-		ZN_PRINT_WARNING("Version already matching");
+		VOXEL_PRINT_WARNING("Version already matching");
 		return true;
 	}
-	ZN_ASSERT_RETURN_V(_meta.version == VERSION_V0, false);
+	VOXEL_ASSERT_RETURN_V(_meta.version == VERSION_V0, false);
 
 	// Prepare statements
 	struct Statements {
@@ -891,10 +891,10 @@ bool Connection::migrate_from_v0_to_v1() {
 
 	Statements statements(*this);
 
-	ZN_ASSERT_RETURN_V(
+	VOXEL_ASSERT_RETURN_V(
 			prepare(_db, &statements.alter_table, "ALTER TABLE meta ADD COLUMN coordinate_format INTEGER"), false
 	);
-	ZN_ASSERT_RETURN_V(prepare(_db, &statements.update_table, "UPDATE meta SET version = :version"), false);
+	VOXEL_ASSERT_RETURN_V(prepare(_db, &statements.update_table, "UPDATE meta SET version = :version"), false);
 
 	// Run
 	{
@@ -902,19 +902,19 @@ bool Connection::migrate_from_v0_to_v1() {
 
 		int rc = sqlite3_step(statements.alter_table);
 		if (rc != SQLITE_DONE) {
-			ZN_PRINT_ERROR(sqlite3_errmsg(_db));
+			VOXEL_PRINT_ERROR(sqlite3_errmsg(_db));
 			return false;
 		}
 
 		rc = sqlite3_bind_int(statements.update_table, 1, VERSION_V1);
 		if (rc != SQLITE_OK) {
-			ZN_PRINT_ERROR(sqlite3_errmsg(_db));
+			VOXEL_PRINT_ERROR(sqlite3_errmsg(_db));
 			return false;
 		}
 
 		rc = sqlite3_step(statements.update_table);
 		if (rc != SQLITE_DONE) {
-			ZN_PRINT_ERROR(sqlite3_errmsg(_db));
+			VOXEL_PRINT_ERROR(sqlite3_errmsg(_db));
 			return false;
 		}
 	}
@@ -929,11 +929,11 @@ bool Connection::migrate_to_next_version() {
 			return migrate_from_v0_to_v1();
 
 		case VERSION_LATEST:
-			ZN_PRINT_WARNING("Version is already latest");
+			VOXEL_PRINT_WARNING("Version is already latest");
 			break;
 
 		default:
-			ZN_PRINT_ERROR(format("Unexpected version: {}", _meta.version));
+			VOXEL_PRINT_ERROR(format("Unexpected version: {}", _meta.version));
 			return false;
 	}
 
@@ -941,13 +941,13 @@ bool Connection::migrate_to_next_version() {
 }
 
 void Connection::migrate_to_latest_version() {
-	ZN_ASSERT_RETURN(is_open());
+	VOXEL_ASSERT_RETURN(is_open());
 
 	while (_meta.version != VERSION_LATEST) {
 		const int prev = _meta.version;
-		ZN_ASSERT_RETURN(migrate_to_next_version());
-		ZN_ASSERT_RETURN(prev != _meta.version);
+		VOXEL_ASSERT_RETURN(migrate_to_next_version());
+		VOXEL_ASSERT_RETURN(prev != _meta.version);
 	}
 }
 
-} // namespace zylann::voxel::sqlite
+} // namespace voxel::sqlite

@@ -1,10 +1,10 @@
-#ifndef ZN_SAFE_REF_COUNT_H
-#define ZN_SAFE_REF_COUNT_H
+#ifndef VOXEL_SAFE_REF_COUNT_H
+#define VOXEL_SAFE_REF_COUNT_H
 
 #include "errors.h"
 #include <atomic>
 
-namespace zylann {
+namespace voxel {
 
 // Thread-safe reference counter.
 class SafeRefCount {
@@ -18,7 +18,7 @@ public:
 
 	inline int remove() {
 		const int previous_count = _count.fetch_sub(1, std::memory_order_acq_rel);
-		ZN_ASSERT_RETURN_V_MSG(
+		VOXEL_ASSERT_RETURN_V_MSG(
 				previous_count != 0, previous_count, "Trying to decrease refcount when it's already zero");
 		return previous_count;
 	}
@@ -31,6 +31,6 @@ private:
 	std::atomic_int32_t _count = { 0 };
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SAFE_REF_COUNT_H
+#endif // VOXEL_SAFE_REF_COUNT_H

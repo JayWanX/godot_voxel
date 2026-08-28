@@ -9,7 +9,7 @@
 struct sqlite3;
 struct sqlite3_stmt;
 
-namespace zylann::voxel::sqlite {
+namespace voxel::sqlite {
 
 // One connection to the database, with our prepared statements
 class Connection {
@@ -121,6 +121,6 @@ private:
 	sqlite3_stmt *_load_all_block_keys_statement = nullptr;
 };
 
-} // namespace zylann::voxel::sqlite
+} // namespace voxel::sqlite
 
 #endif // VOXEL_STREAM_SQLITE_CONNECTION_H

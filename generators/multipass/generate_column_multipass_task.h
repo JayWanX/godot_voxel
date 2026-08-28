@@ -4,7 +4,7 @@
 #include "../../util/tasks/threaded_task.h"
 #include "voxel_generator_multipass_cb.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class BufferedTaskScheduler;
 
@@ -77,6 +77,6 @@ private:
 	GenerateColumnMultipassTask *_caller_mp_task = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATE_COLUMN_MULTIPASS_TASK_H

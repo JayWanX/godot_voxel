@@ -6,7 +6,7 @@
 #include "godot/core/sort_array.h"
 #include "math/box3i.h"
 
-namespace zylann {
+namespace voxel {
 
 // Scans a grid of binary values and returns another grid
 // where all contiguous islands are labelled with a unique ID.
@@ -213,6 +213,6 @@ private:
 	FixedArray<uint8_t, MAX_ISLANDS> _equivalences;
 };
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // ISLAND_FINDER_H

@@ -1,10 +1,10 @@
-#ifndef ZN_FIXED_ARRAY_H
-#define ZN_FIXED_ARRAY_H
+#ifndef VOXEL_FIXED_ARRAY_H
+#define VOXEL_FIXED_ARRAY_H
 
 #include "../errors.h"
 #include "span.h"
 
-namespace zylann {
+namespace voxel {
 
 // TODO Could use std::array, but due to how Godot compiles,
 // I couldn't find a way to enable boundary checks without failing to link my module with the rest of Godot...
@@ -16,14 +16,14 @@ public:
 
 	inline T &operator[](unsigned int i) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < N);
+		VOXEL_ASSERT(i < N);
 #endif
 		return _data[i];
 	}
 
 	inline const T &operator[](unsigned int i) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < N);
+		VOXEL_ASSERT(i < N);
 #endif
 		return _data[i];
 	}
@@ -184,14 +184,14 @@ Span<const T> to_span(const FixedArray<T, N> &a) {
 
 template <typename T, unsigned int N>
 Span<T> to_span(FixedArray<T, N> &a, unsigned int count) {
-	ZN_ASSERT(count <= a.size());
+	VOXEL_ASSERT(count <= a.size());
 	return Span<T>(a.data(), count);
 }
 
 // TODO Deprecate, now Span has a conversion constructor that can allow doing that
 template <typename T, unsigned int N>
 Span<const T> to_span_const(const FixedArray<T, N> &a, unsigned int count) {
-	ZN_ASSERT(count <= a.size());
+	VOXEL_ASSERT(count <= a.size());
 	return Span<const T>(a.data(), count);
 }
 
@@ -201,6 +201,6 @@ Span<const T> to_span_const(const FixedArray<T, N> &a) {
 	return Span<const T>(a.data(), 0, a.size());
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_FIXED_ARRAY_H
+#endif // VOXEL_FIXED_ARRAY_H

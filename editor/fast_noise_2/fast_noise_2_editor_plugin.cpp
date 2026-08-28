@@ -10,11 +10,11 @@
 
 #include <core/core_string_names.h>
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
 class FastNoise2Viewer : public Control {
 	GDCLASS(FastNoise2Viewer, Control)
@@ -79,7 +79,7 @@ public:
 		}
 	}
 
-	void set_noise_analysis_window(ZN_NoiseAnalysisWindow *win) {
+	void set_noise_analysis_window(VOXEL_NoiseAnalysisWindow *win) {
 		_noise_analysis_window = win;
 	}
 
@@ -136,7 +136,7 @@ private:
 	float _time_before_update = -1.f;
 	TextureRect *_texture_rect = nullptr;
 	PopupMenu *_context_menu = nullptr;
-	ZN_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
+	VOXEL_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,12 +161,12 @@ public:
 		}
 	}
 
-	void set_noise_analysis_window(ZN_NoiseAnalysisWindow *noise_analysis_window) {
+	void set_noise_analysis_window(VOXEL_NoiseAnalysisWindow *noise_analysis_window) {
 		_noise_analysis_window = noise_analysis_window;
 	}
 
 private:
-	ZN_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
+	VOXEL_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ FastNoise2EditorPlugin::FastNoise2EditorPlugin() {}
 void FastNoise2EditorPlugin::init() {
 	Control *base_control = get_editor_interface()->get_base_control();
 
-	_noise_analysis_window = memnew(ZN_NoiseAnalysisWindow);
+	_noise_analysis_window = memnew(VOXEL_NoiseAnalysisWindow);
 	base_control->add_child(_noise_analysis_window);
 
 	Ref<FastNoise2EditorInspectorPlugin> plugin;
@@ -193,4 +193,4 @@ void FastNoise2EditorPlugin::_notification(int p_what) {
 	}
 }
 
-} // namespace zylann
+} // namespace voxel

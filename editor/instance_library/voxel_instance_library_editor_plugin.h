@@ -5,15 +5,15 @@
 #include "../../util/godot/classes/editor_plugin.h"
 #include "voxel_instance_library_inspector_plugin.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Control)
-ZN_GODOT_FORWARD_DECLARE(class MenuButton)
-ZN_GODOT_FORWARD_DECLARE(class ConfirmationDialog)
-ZN_GODOT_FORWARD_DECLARE(class AcceptDialog)
+VOXEL_GODOT_FORWARD_DECLARE(class Control)
+VOXEL_GODOT_FORWARD_DECLARE(class MenuButton)
+VOXEL_GODOT_FORWARD_DECLARE(class ConfirmationDialog)
+VOXEL_GODOT_FORWARD_DECLARE(class AcceptDialog)
 
-namespace zylann::voxel {
+namespace voxel {
 
-class VoxelInstanceLibraryEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(VoxelInstanceLibraryEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VoxelInstanceLibraryEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VoxelInstanceLibraryEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	VoxelInstanceLibraryEditorPlugin();
 
@@ -21,10 +21,10 @@ public:
 	EditorUndoRedoManager &get_undo_redo2();
 
 protected:
-	bool _zn_handles(const Object *p_object) const override;
-	void _zn_edit(Object *p_object) override;
+	bool _voxel_handles(const Object *p_object) const override;
+	void _voxel_edit(Object *p_object) override;
 
-	String _zn_get_plugin_name() const override {
+	String _voxel_get_plugin_name() const override {
 		return "VoxelInstanceLibrary";
 	}
 
@@ -37,6 +37,6 @@ private:
 	Ref<VoxelInstanceLibraryInspectorPlugin> _inspector_plugin;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_LIBRARY_EDITOR_PLUGIN_H

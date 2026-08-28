@@ -1,4 +1,4 @@
-# ZN_SpotNoise
+# VOXEL_SpotNoise
 
 Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 

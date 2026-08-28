@@ -12,7 +12,7 @@
 #include "graph_preview_mode.h"
 #include "voxel_graph_editor_node_preview_info.h"
 
-ZN_GODOT_NAMESPACE_BEGIN
+VOXEL_GODOT_NAMESPACE_BEGIN
 class GraphEdit;
 class PopupMenu;
 class AcceptDialog;
@@ -22,9 +22,9 @@ class Label;
 class OptionButton;
 class CheckBox;
 class MenuButton;
-ZN_GODOT_NAMESPACE_END
+VOXEL_GODOT_NAMESPACE_END
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelRangeAnalysisDialog;
 class VoxelNode;
@@ -65,7 +65,7 @@ public:
 	bool is_pinned_hint() const;
 	void set_popout_button_enabled(bool enable);
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 	void _process(double delta) override;
 #endif
 
@@ -111,11 +111,11 @@ private:
 	void _on_graph_edit_connection_request(String from_node_name, int from_slot, String to_node_name, int to_slot);
 	void _on_graph_edit_disconnection_request(String from_node_name, int from_slot, String to_node_name, int to_slot);
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	void _on_graph_edit_delete_nodes_request(TypedArray<StringName> node_names);
 	void _on_graph_edit_node_selected(Node *p_node);
 	void _on_graph_edit_node_deselected(Node *p_node);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	// TODO GDX: TypedArray isn't available.
 	void _on_graph_edit_delete_nodes_request(Array node_names);
 	// TODO GDX: Can't bind methods taking a child class of `Object*`
@@ -159,8 +159,8 @@ private:
 	Vector2 _click_position;
 	bool _nothing_selected_check_scheduled = false;
 	float _time_before_preview_update = 0.f;
-	zylann::godot::ObjectWeakRef<VoxelNode> _terrain_node;
-	zylann::godot::DebugRenderer _debug_renderer;
+	voxel::godot::ObjectWeakRef<VoxelNode> _terrain_node;
+	voxel::godot::DebugRenderer _debug_renderer;
 	VoxelGraphEditorShaderDialog *_shader_dialog = nullptr;
 	bool _live_update_enabled = false;
 	uint64_t _last_output_graph_hash = 0;
@@ -171,7 +171,7 @@ private:
 	PopupMenu *_preview_axes_menu = nullptr;
 	VoxelGraphNodeDialog *_node_dialog = nullptr;
 	PopupMenu *_context_menu = nullptr;
-	zylann::godot::GraphEditConnection _context_connection;
+	voxel::godot::GraphEditConnection _context_connection;
 
 	GraphEditorPreview::ViewMode _node_preview_mode = GraphEditorPreview::VIEW_SLICE_XY;
 	Vector2f _preview_offset;
@@ -184,6 +184,6 @@ private:
 	Clipboard _clipboard;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_H

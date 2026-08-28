@@ -1,11 +1,11 @@
-#ifndef ZN_TESTS_NOISE_H
-#define ZN_TESTS_NOISE_H
+#ifndef VOXEL_TESTS_NOISE_H
+#define VOXEL_TESTS_NOISE_H
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_fnl_range();
 void test_spot_noise();
 
-} // namespace zylann::tests
+} // namespace voxel::tests
 
-#endif // ZN_TESTS_NOISE_H
+#endif // VOXEL_TESTS_NOISE_H

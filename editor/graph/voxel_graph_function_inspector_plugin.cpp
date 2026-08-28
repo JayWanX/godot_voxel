@@ -9,15 +9,15 @@
 #include "../../util/godot/core/string.h"
 #include "voxel_graph_editor_plugin.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace pg;
 
-bool VoxelGraphFunctionInspectorPlugin::_zn_can_handle(const Object *obj) const {
+bool VoxelGraphFunctionInspectorPlugin::_voxel_can_handle(const Object *obj) const {
 	return Object::cast_to<VoxelGraphFunction>(obj) != nullptr;
 }
 
@@ -42,7 +42,7 @@ VBoxContainer *create_ports_control(Span<const VoxelGraphFunction::Port> ports, 
 }
 } // namespace
 
-bool VoxelGraphFunctionInspectorPlugin::_zn_parse_property(
+bool VoxelGraphFunctionInspectorPlugin::_voxel_parse_property(
 		Object *p_object,
 		const Variant::Type p_type,
 		const String &p_path,
@@ -58,9 +58,9 @@ bool VoxelGraphFunctionInspectorPlugin::_zn_parse_property(
 		Span<const VoxelGraphFunction::Port> outputs = graph->get_output_definitions();
 
 		HBoxContainer *hb = memnew(HBoxContainer);
-		hb->add_child(create_ports_control(inputs, ZN_TTR("Inputs")));
+		hb->add_child(create_ports_control(inputs, VOXEL_TTR("Inputs")));
 		hb->add_child(memnew(VSeparator));
-		hb->add_child(create_ports_control(outputs, ZN_TTR("Outputs")));
+		hb->add_child(create_ports_control(outputs, VOXEL_TTR("Outputs")));
 
 		add_custom_control(hb);
 
@@ -68,7 +68,7 @@ bool VoxelGraphFunctionInspectorPlugin::_zn_parse_property(
 			Ref<VoxelGraphFunction> graph_ref(graph);
 
 			Button *edit_io_button = memnew(Button);
-			edit_io_button->set_text(ZN_TTR("Edit inputs/outputs..."));
+			edit_io_button->set_text(VOXEL_TTR("Edit inputs/outputs..."));
 
 			edit_io_button->connect(
 					"pressed",
@@ -98,4 +98,4 @@ void VoxelGraphFunctionInspectorPlugin::set_listener(VoxelGraphEditorPlugin *plu
 
 void VoxelGraphFunctionInspectorPlugin::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

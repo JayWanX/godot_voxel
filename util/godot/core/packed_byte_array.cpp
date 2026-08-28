@@ -1,10 +1,10 @@
 #include "packed_byte_array.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 namespace PackedByteArrayUtility {
 
 PackedByteArray compress(const PackedByteArray &self, const FileAccess::CompressionMode p_mode) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	PackedByteArray compressed;
 
 	if (self.size() > 0) {
@@ -18,7 +18,7 @@ PackedByteArray compress(const PackedByteArray &self, const FileAccess::Compress
 
 	return compressed;
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	return self.compress(p_mode);
 #endif
 }
@@ -28,7 +28,7 @@ PackedByteArray decompress(
 		const int64_t buffer_size,
 		const FileAccess::CompressionMode p_mode
 ) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	PackedByteArray decompressed;
 	const Compression::Mode mode = static_cast<Compression::Mode>(p_mode);
 
@@ -47,10 +47,10 @@ PackedByteArray decompress(
 
 	return decompressed;
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	return self.decompress(buffer_size, p_mode);
 #endif
 }
 
 } // namespace PackedByteArrayUtility
-} // namespace zylann::godot
+} // namespace voxel::godot

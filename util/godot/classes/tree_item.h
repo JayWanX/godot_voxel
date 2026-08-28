@@ -1,16 +1,16 @@
-#ifndef ZN_GODOT_TREE_ITEM_H
-#define ZN_GODOT_TREE_ITEM_H
+#ifndef VOXEL_GODOT_TREE_ITEM_H
+#define VOXEL_GODOT_TREE_ITEM_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/gui/tree.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/tree.hpp>
 using namespace godot;
 #endif
 
 #include "node.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 namespace TreeItemUtilities {
 
 inline void set_auto_translate_mode(TreeItem &item, const unsigned int column, const AutoTranslateMode mode) {
@@ -20,6 +20,6 @@ inline void set_auto_translate_mode(TreeItem &item, const unsigned int column, c
 }
 
 } // namespace TreeItemUtilities
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_TREE_ITEM_H
+#endif // VOXEL_GODOT_TREE_ITEM_H

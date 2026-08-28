@@ -5,10 +5,10 @@
 #include "../util/profiling.h"
 #include "../util/string/format.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-void LoadAllBlocksDataTask::run(zylann::ThreadedTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
+void LoadAllBlocksDataTask::run(voxel::ThreadedTaskContext &ctx) {
+	VOXEL_PROFILE_SCOPE();
 
 	CRASH_COND(stream_dependency == nullptr);
 	Ref<VoxelStream> stream = stream_dependency->stream;
@@ -16,7 +16,7 @@ void LoadAllBlocksDataTask::run(zylann::ThreadedTaskContext &ctx) {
 
 	stream->load_all_blocks(_result);
 
-	ZN_PRINT_VERBOSE(format("Loaded {} blocks for volume {}", _result.blocks.size(), volume_id));
+	VOXEL_PRINT_VERBOSE(format("Loaded {} blocks for volume {}", _result.blocks.size(), volume_id));
 }
 
 TaskPriority LoadAllBlocksDataTask::get_priority() {
@@ -58,8 +58,8 @@ void LoadAllBlocksDataTask::apply_result() {
 
 	} else {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Stream data request response came back but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Stream data request response came back but volume wasn't found");
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

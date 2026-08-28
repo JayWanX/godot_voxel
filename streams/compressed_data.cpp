@@ -8,11 +8,11 @@
 
 #include <limits>
 
-namespace zylann::voxel::CompressedData {
+namespace voxel::CompressedData {
 
 bool decompress_lz4(MemoryReader &f, Span<const uint8_t> src, StdVector<uint8_t> &dst) {
 	const int64_t decompressed_size = f.get_32();
-	ZN_ASSERT_RETURN_V(decompressed_size >= 0, false);
+	VOXEL_ASSERT_RETURN_V(decompressed_size >= 0, false);
 
 	const int header_size = sizeof(uint8_t) + sizeof(uint32_t);
 
@@ -22,11 +22,11 @@ bool decompress_lz4(MemoryReader &f, Span<const uint8_t> src, StdVector<uint8_t>
 			(const char *)src.data() + header_size, (char *)dst.data(), src.size() - header_size, dst.size()
 	);
 
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			actually_decompressed_size >= 0, false, format("LZ4 decompression error {}", actually_decompressed_size)
 	);
 
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			actually_decompressed_size == decompressed_size,
 			false,
 			format("Expected {} bytes, obtained {}", decompressed_size, actually_decompressed_size)
@@ -37,35 +37,35 @@ bool decompress_lz4(MemoryReader &f, Span<const uint8_t> src, StdVector<uint8_t>
 
 bool decompress_gd(MemoryReader &f, StdVector<uint8_t> &dst, const FileAccess::CompressionMode mode) {
 	const int64_t decompressed_size = f.get_32();
-	ZN_ASSERT_RETURN_V(decompressed_size >= 0, false);
+	VOXEL_ASSERT_RETURN_V(decompressed_size >= 0, false);
 
 	const Span<const uint8_t> src_comp = f.data.sub(f.pos);
 	PackedByteArray pba_src;
 	pba_src.resize(src_comp.size());
-	zylann::godot::copy_to(pba_src, src_comp);
+	voxel::godot::copy_to(pba_src, src_comp);
 
-	const PackedByteArray pba_dst = zylann::godot::PackedByteArrayUtility::decompress(pba_src, decompressed_size, mode);
+	const PackedByteArray pba_dst = voxel::godot::PackedByteArrayUtility::decompress(pba_src, decompressed_size, mode);
 
 	const int64_t actually_decompressed_size = pba_dst.size();
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			actually_decompressed_size == decompressed_size,
 			false,
 			format("Expected {} bytes, obtained {}", decompressed_size, actually_decompressed_size)
 	);
 
 	dst.resize(decompressed_size);
-	zylann::godot::copy_to(to_span(dst), pba_dst);
+	voxel::godot::copy_to(to_span(dst), pba_dst);
 
 	return true;
 }
 
 bool decompress(Span<const uint8_t> src, StdVector<uint8_t> &dst) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	MemoryReader f(src, ENDIANNESS_LITTLE_ENDIAN);
 
 	const Compression comp = static_cast<Compression>(f.get_8());
-	ZN_ASSERT_RETURN_V(comp >= 0 && comp < COMPRESSION_COUNT, false);
+	VOXEL_ASSERT_RETURN_V(comp >= 0 && comp < COMPRESSION_COUNT, false);
 
 	switch (comp) {
 		case COMPRESSION_NONE: {
@@ -78,19 +78,19 @@ bool decompress(Span<const uint8_t> src, StdVector<uint8_t> &dst) {
 		case COMPRESSION_LZ4_BE:
 			// Legacy format
 			f.endianness = ENDIANNESS_BIG_ENDIAN;
-			ZN_ASSERT_RETURN_V(decompress_lz4(f, src, dst), false);
+			VOXEL_ASSERT_RETURN_V(decompress_lz4(f, src, dst), false);
 			break;
 
 		case COMPRESSION_LZ4:
-			ZN_ASSERT_RETURN_V(decompress_lz4(f, src, dst), false);
+			VOXEL_ASSERT_RETURN_V(decompress_lz4(f, src, dst), false);
 			break;
 
 		case COMPRESSION_ZSTD:
-			ZN_ASSERT_RETURN_V(decompress_gd(f, dst, FileAccess::COMPRESSION_ZSTD), false);
+			VOXEL_ASSERT_RETURN_V(decompress_gd(f, dst, FileAccess::COMPRESSION_ZSTD), false);
 			break;
 
 		default:
-			ZN_PRINT_ERROR("Invalid compression header");
+			VOXEL_PRINT_ERROR("Invalid compression header");
 			return false;
 	}
 
@@ -98,7 +98,7 @@ bool decompress(Span<const uint8_t> src, StdVector<uint8_t> &dst) {
 }
 
 bool compress_lz4(MemoryWriter &f, Span<const uint8_t> src, StdVector<uint8_t> &dst) {
-	ZN_ASSERT_RETURN_V(src.size() <= std::numeric_limits<uint32_t>::max(), false);
+	VOXEL_ASSERT_RETURN_V(src.size() <= std::numeric_limits<uint32_t>::max(), false);
 
 	f.store_32(src.size());
 
@@ -109,8 +109,8 @@ bool compress_lz4(MemoryWriter &f, Span<const uint8_t> src, StdVector<uint8_t> &
 			(const char *)src.data(), (char *)dst.data() + header_size, src.size(), dst.size() - header_size
 	);
 
-	ZN_ASSERT_RETURN_V(int(compressed_size) >= 0, false);
-	ZN_ASSERT_RETURN_V(compressed_size != 0, false);
+	VOXEL_ASSERT_RETURN_V(int(compressed_size) >= 0, false);
+	VOXEL_ASSERT_RETURN_V(compressed_size != 0, false);
 
 	dst.resize(header_size + compressed_size);
 
@@ -124,13 +124,13 @@ bool compress_gd(MemoryWriter &f, Span<const uint8_t> src, const FileAccess::Com
 
 	PackedByteArray pba_src;
 	pba_src.resize(src.size());
-	zylann::godot::copy_to(pba_src, src);
+	voxel::godot::copy_to(pba_src, src);
 
 	const PackedByteArray pba_dst =
-			zylann::godot::PackedByteArrayUtility::compress(pba_src, FileAccess::COMPRESSION_ZSTD);
+			voxel::godot::PackedByteArrayUtility::compress(pba_src, FileAccess::COMPRESSION_ZSTD);
 
 	const int64_t compressed_size = pba_dst.size();
-	ZN_ASSERT_RETURN_V(compressed_size > 0, false);
+	VOXEL_ASSERT_RETURN_V(compressed_size > 0, false);
 
 	f.store_buffer(to_span(pba_dst));
 
@@ -138,7 +138,7 @@ bool compress_gd(MemoryWriter &f, Span<const uint8_t> src, const FileAccess::Com
 }
 
 bool compress(Span<const uint8_t> src, StdVector<uint8_t> &dst, const Compression comp) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	switch (comp) {
 		case COMPRESSION_NONE: {
@@ -148,7 +148,7 @@ bool compress(Span<const uint8_t> src, StdVector<uint8_t> &dst, const Compressio
 		} break;
 
 		case COMPRESSION_LZ4_BE: {
-			ZN_PRINT_ERROR("Using deprecated LZ4_BE compression!");
+			VOXEL_PRINT_ERROR("Using deprecated LZ4_BE compression!");
 			dst.clear();
 			MemoryWriter f(dst, ENDIANNESS_BIG_ENDIAN);
 			f.store_8(comp);
@@ -172,11 +172,11 @@ bool compress(Span<const uint8_t> src, StdVector<uint8_t> &dst, const Compressio
 		} break;
 
 		default:
-			ZN_PRINT_ERROR(format("Invalid compression header {}", comp));
+			VOXEL_PRINT_ERROR(format("Invalid compression header {}", comp));
 			return false;
 	}
 
 	return true;
 }
 
-} // namespace zylann::voxel::CompressedData
+} // namespace voxel::CompressedData

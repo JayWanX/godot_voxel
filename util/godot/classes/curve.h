@@ -1,9 +1,9 @@
-#ifndef ZN_GODOT_CURVE_H
-#define ZN_GODOT_CURVE_H
+#ifndef VOXEL_GODOT_CURVE_H
+#define VOXEL_GODOT_CURVE_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/resources/curve.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/curve.hpp>
 using namespace godot;
 #endif
@@ -11,7 +11,7 @@ using namespace godot;
 #include "../../math/interval.h"
 #include "../core/version.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 inline math::Interval get_curve_domain(const Curve &curve) {
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
@@ -21,6 +21,6 @@ inline math::Interval get_curve_domain(const Curve &curve) {
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_CURVE_H
+#endif // VOXEL_GODOT_CURVE_H

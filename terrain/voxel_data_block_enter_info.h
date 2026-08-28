@@ -4,7 +4,7 @@
 #include "../storage/voxel_data_block.h"
 #include "../util/godot/classes/object.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace godot {
 class VoxelBuffer;
@@ -33,6 +33,6 @@ private:
 	static void _bind_methods();
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_DATA_BLOCK_ENTER_INFO_H

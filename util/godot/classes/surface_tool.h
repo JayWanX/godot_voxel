@@ -1,11 +1,11 @@
-#ifndef ZN_GODOT_SURFACE_TOOL_H
-#define ZN_GODOT_SURFACE_TOOL_H
+#ifndef VOXEL_GODOT_SURFACE_TOOL_H
+#define VOXEL_GODOT_SURFACE_TOOL_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/resources/surface_tool.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/surface_tool.hpp>
 using namespace godot;
 #endif
 
-#endif // ZN_GODOT_SURFACE_TOOL_H
+#endif // VOXEL_GODOT_SURFACE_TOOL_H

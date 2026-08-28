@@ -5,21 +5,21 @@
 #include "../util/string/format.h"
 #include "../util/string/std_string.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 VoxelMemoryPool *g_memory_pool = nullptr;
 } // namespace
 
 void VoxelMemoryPool::create_singleton() {
-	ZN_ASSERT(g_memory_pool == nullptr);
-	g_memory_pool = ZN_NEW(VoxelMemoryPool);
+	VOXEL_ASSERT(g_memory_pool == nullptr);
+	g_memory_pool = VOXEL_NEW(VoxelMemoryPool);
 }
 
 void VoxelMemoryPool::destroy_singleton() {
 	const unsigned int used_blocks = VoxelMemoryPool::get_singleton().debug_get_used_blocks();
 	if (used_blocks > 0) {
-		ZN_PRINT_ERROR(
+		VOXEL_PRINT_ERROR(
 				format("VoxelMemoryPool: "
 					   "{} memory blocks are still used when unregistering the module. Recycling leak?",
 					   used_blocks)
@@ -29,10 +29,10 @@ void VoxelMemoryPool::destroy_singleton() {
 #endif
 	}
 
-	ZN_ASSERT(g_memory_pool != nullptr);
+	VOXEL_ASSERT(g_memory_pool != nullptr);
 	VoxelMemoryPool *pool = g_memory_pool;
 	g_memory_pool = nullptr;
-	ZN_DELETE(pool);
+	VOXEL_DELETE(pool);
 }
 
 #ifdef DEBUG_ENABLED
@@ -81,7 +81,7 @@ void VoxelMemoryPool::debug_print_used_blocks(unsigned int max_count) {
 #endif
 
 VoxelMemoryPool &VoxelMemoryPool::get_singleton() {
-	ZN_ASSERT(g_memory_pool != nullptr);
+	VOXEL_ASSERT(g_memory_pool != nullptr);
 	return *g_memory_pool;
 }
 
@@ -97,20 +97,20 @@ VoxelMemoryPool::~VoxelMemoryPool() {
 }
 
 uint8_t *VoxelMemoryPool::allocate(size_t size) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	// In practice this is not supposed to happen, it might hide a mistake.
 	// We should be able to keep running with this only guarantee: the returned value should be able to be "freed"
 	// using the same pool.
-	ZN_ASSERT_RETURN_V(size != 0, nullptr);
+	VOXEL_ASSERT_RETURN_V(size != 0, nullptr);
 
 	uint8_t *block = nullptr;
 	// Not calculating `pot` immediately because the function we use to calculate it uses 32 bits,
 	// while `size_t` can be larger than that.
 	if (size > get_highest_supported_size()) {
 		// Sorry, memory is not pooled past this size
-		block = (uint8_t *)ZN_ALLOC(size * sizeof(uint8_t));
+		block = (uint8_t *)VOXEL_ALLOC(size * sizeof(uint8_t));
 		_total_memory += size;
 #ifdef DEBUG_ENABLED
 		if (block != nullptr) {
@@ -127,14 +127,14 @@ uint8_t *VoxelMemoryPool::allocate(size_t size) {
 			pool.mutex.unlock();
 		} else {
 			pool.mutex.unlock();
-			ZN_PROFILE_SCOPE_NAMED("new alloc");
+			VOXEL_PROFILE_SCOPE_NAMED("new alloc");
 			// All allocations done in this pool have the same size,
 			// which must be greater or equal to `size`
 			const size_t capacity = get_size_from_pool_index(pot);
 #ifdef DEBUG_ENABLED
-			ZN_ASSERT(capacity >= size);
+			VOXEL_ASSERT(capacity >= size);
 #endif
-			block = (uint8_t *)ZN_ALLOC(capacity * sizeof(uint8_t));
+			block = (uint8_t *)VOXEL_ALLOC(capacity * sizeof(uint8_t));
 			_total_memory += size;
 		}
 #ifdef DEBUG_ENABLED
@@ -144,7 +144,7 @@ uint8_t *VoxelMemoryPool::allocate(size_t size) {
 #endif
 	}
 	if (block == nullptr) {
-		ZN_PRINT_ERROR("Out of memory");
+		VOXEL_PRINT_ERROR("Out of memory");
 	} else {
 		++_used_blocks;
 		_used_memory += size;
@@ -157,8 +157,8 @@ void VoxelMemoryPool::recycle(uint8_t *block, size_t size) {
 	if (block == nullptr && size == 0) {
 		return;
 	}
-	ZN_ASSERT(size != 0);
-	ZN_ASSERT(block != nullptr);
+	VOXEL_ASSERT(size != 0);
+	VOXEL_ASSERT(block != nullptr);
 	// Not calculating `pot` immediately because the function we use to calculate it uses 32 bits,
 	// while `size_t` can be larger than that.
 	if (size > get_highest_supported_size()) {
@@ -166,7 +166,7 @@ void VoxelMemoryPool::recycle(uint8_t *block, size_t size) {
 		// Make sure this allocation was done by this pool in this scenario
 		_debug_nonpooled_used_blocks.remove(block);
 #endif
-		ZN_FREE(block);
+		VOXEL_FREE(block);
 		_total_memory -= size;
 	} else {
 		const unsigned int pot = get_pool_index_from_size(size);
@@ -188,7 +188,7 @@ void VoxelMemoryPool::clear_unused_blocks() {
 		MutexLock lock(pool.mutex);
 		for (unsigned int i = 0; i < pool.blocks.size(); ++i) {
 			void *block = pool.blocks[i];
-			ZN_FREE(block);
+			VOXEL_FREE(block);
 		}
 		_total_memory -= get_size_from_pool_index(pot) * pool.blocks.size();
 		pool.blocks.clear();
@@ -201,7 +201,7 @@ void VoxelMemoryPool::clear() {
 		MutexLock lock(pool.mutex);
 		for (unsigned int i = 0; i < pool.blocks.size(); ++i) {
 			void *block = pool.blocks[i];
-			ZN_FREE(block);
+			VOXEL_FREE(block);
 		}
 		pool.blocks.clear();
 	}
@@ -231,4 +231,4 @@ size_t VoxelMemoryPool::debug_get_total_memory() const {
 	return _total_memory;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

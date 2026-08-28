@@ -1,12 +1,12 @@
-#ifndef ZN_SLOT_MAP_H
-#define ZN_SLOT_MAP_H
+#ifndef VOXEL_SLOT_MAP_H
+#define VOXEL_SLOT_MAP_H
 
 #include "../errors.h"
 #include "std_vector.h"
 #include <cstdint>
 #include <limits>
 
-namespace zylann {
+namespace voxel {
 
 // Version part of a SlotMap key. The last bit is used to represent the version of an unused slot.
 template <typename TVersion>
@@ -38,10 +38,10 @@ struct SlotMapVersion {
 	}
 
 	inline void make_invalid() {
-		ZN_ASSERT(is_valid());
+		VOXEL_ASSERT(is_valid());
 #if DEBUG_ENABLED
 		if (value == MAX_VALUE) {
-			ZN_PRINT_WARNING("SlotMapVersion overflow");
+			VOXEL_PRINT_WARNING("SlotMapVersion overflow");
 		}
 #endif
 		value = (value + 1) | UNUSED_BIT;
@@ -100,7 +100,7 @@ public:
 	}
 
 	T *try_get(Key key) {
-		ZN_ASSERT_RETURN_V(key.version.is_valid(), nullptr);
+		VOXEL_ASSERT_RETURN_V(key.version.is_valid(), nullptr);
 		if (key.index >= _slots.size()) {
 			return nullptr;
 		}
@@ -112,7 +112,7 @@ public:
 	}
 
 	const T *try_get(Key key) const {
-		ZN_ASSERT_RETURN_V(key.version.is_valid(), nullptr);
+		VOXEL_ASSERT_RETURN_V(key.version.is_valid(), nullptr);
 		if (key.index >= _slots.size()) {
 			return nullptr;
 		}
@@ -124,7 +124,7 @@ public:
 	}
 
 	bool exists(Key key) const {
-		ZN_ASSERT_RETURN_V(key.version.is_valid(), false);
+		VOXEL_ASSERT_RETURN_V(key.version.is_valid(), false);
 		if (key.index >= _slots.size()) {
 			return false;
 		}
@@ -136,7 +136,7 @@ public:
 	}
 
 	bool try_remove(Key key) {
-		ZN_ASSERT_RETURN_V(key.version.is_valid(), false);
+		VOXEL_ASSERT_RETURN_V(key.version.is_valid(), false);
 		if (key.index >= _slots.size()) {
 			return false;
 		}
@@ -146,7 +146,7 @@ public:
 		}
 		slot.value = T();
 		slot.version.make_invalid();
-		ZN_ASSERT(_count > 0);
+		VOXEL_ASSERT(_count > 0);
 		--_count;
 		_free_list.push_back(key.index);
 		return true;
@@ -154,18 +154,18 @@ public:
 
 	T &get(Key key) {
 		T *v = try_get(key);
-		ZN_ASSERT(v != nullptr);
+		VOXEL_ASSERT(v != nullptr);
 		return *v;
 	}
 
 	const T &get(Key key) const {
 		const T *v = try_get(key);
-		ZN_ASSERT(v != nullptr);
+		VOXEL_ASSERT(v != nullptr);
 		return *v;
 	}
 
 	void remove(Key key) {
-		ZN_ASSERT(try_remove(key));
+		VOXEL_ASSERT(try_remove(key));
 	}
 
 	void clear() {
@@ -227,6 +227,6 @@ private:
 	uint32_t _count = 0;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SLOT_MAP_H
+#endif // VOXEL_SLOT_MAP_H

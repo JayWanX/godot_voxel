@@ -6,7 +6,7 @@
 #include "../util/godot/core/vector3.h"
 #include "voxel_raycast_result.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelData;
 class VoxelMesherBlocky;
@@ -60,6 +60,6 @@ Ref<VoxelRaycastResult> raycast_generic_world(
 		const bool normal_enabled
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_RAYCAST_FUNCS_H

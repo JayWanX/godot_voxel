@@ -1,10 +1,10 @@
-#ifndef ZN_TEST_EXPRESSION_PARSER_H
-#define ZN_TEST_EXPRESSION_PARSER_H
+#ifndef VOXEL_TEST_EXPRESSION_PARSER_H
+#define VOXEL_TEST_EXPRESSION_PARSER_H
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_expression_parser();
 
-} // namespace zylann::tests
+} // namespace voxel::tests
 
-#endif // ZN_TEST_EXPRESSION_PARSER_H
+#endif // VOXEL_TEST_EXPRESSION_PARSER_H

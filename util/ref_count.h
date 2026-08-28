@@ -1,9 +1,9 @@
-#ifndef ZN_REF_COUNT_H
-#define ZN_REF_COUNT_H
+#ifndef VOXEL_REF_COUNT_H
+#define VOXEL_REF_COUNT_H
 
 #include "errors.h"
 
-namespace zylann {
+namespace voxel {
 
 // Simple reference counter.
 // This one is not thread-safe.
@@ -17,7 +17,7 @@ public:
 	}
 
 	inline void remove() {
-		ZN_ASSERT_RETURN_MSG(_count != 0, "Trying to decrease refcount when it's already zero");
+		VOXEL_ASSERT_RETURN_MSG(_count != 0, "Trying to decrease refcount when it's already zero");
 		--_count;
 	}
 
@@ -29,6 +29,6 @@ private:
 	unsigned int _count = 0;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_REF_COUNT_H
+#endif // VOXEL_REF_COUNT_H

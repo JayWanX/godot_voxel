@@ -10,7 +10,7 @@
 #include "../util/string/format.h"
 #include "../util/tasks/async_dependency_tracker.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 GenerateBlockTask::GenerateBlockTask(const VoxelGenerator::BlockTaskParams &params) :
 		_voxels(params.voxels),
@@ -39,9 +39,9 @@ GenerateBlockTask::~GenerateBlockTask() {
 	// println(format("H {} {} {} {}", position.x, position.y, position.z, Time::get_singleton()->get_ticks_usec()));
 }
 
-void GenerateBlockTask::run(zylann::ThreadedTaskContext &ctx) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+void GenerateBlockTask::run(voxel::ThreadedTaskContext &ctx) {
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	CRASH_COND(_stream_dependency == nullptr);
 	Ref<VoxelGenerator> generator = _stream_dependency->generator;
@@ -76,7 +76,7 @@ void GenerateBlockTask::run(zylann::ThreadedTaskContext &ctx) {
 
 #ifdef VOXEL_ENABLE_GPU
 
-void GenerateBlockTask::run_gpu_task(zylann::ThreadedTaskContext &ctx) {
+void GenerateBlockTask::run_gpu_task(voxel::ThreadedTaskContext &ctx) {
 	Ref<VoxelGenerator> generator = _stream_dependency->generator;
 	ERR_FAIL_COND(generator.is_null());
 
@@ -88,7 +88,7 @@ void GenerateBlockTask::run_gpu_task(zylann::ThreadedTaskContext &ctx) {
 
 	const Vector3i origin_in_voxels = (_position << _lod_index) * _block_size;
 
-	ZN_ASSERT(_voxels != nullptr);
+	VOXEL_ASSERT(_voxels != nullptr);
 	VoxelGenerator::VoxelQueryData generator_query{ *_voxels, origin_in_voxels, _lod_index };
 	if (generator->generate_broad_block(generator_query)) {
 		_stage = 2;
@@ -97,7 +97,7 @@ void GenerateBlockTask::run_gpu_task(zylann::ThreadedTaskContext &ctx) {
 
 	const Vector3i resolution = Vector3iUtil::create(_block_size);
 
-	GenerateBlockGPUTask *gpu_task = ZN_NEW(GenerateBlockGPUTask);
+	GenerateBlockGPUTask *gpu_task = VOXEL_NEW(GenerateBlockGPUTask);
 	gpu_task->boxes_to_generate.push_back(Box3i(Vector3i(), resolution));
 	gpu_task->generator_shader = generator_shader;
 	gpu_task->generator_shader_params = generator->get_block_rendering_shader_parameters();
@@ -160,7 +160,7 @@ void GenerateBlockTask::run_stream_saving_and_finish() {
 		// TODO In some cases we don't want this to run all the time, do we?
 		// Like in full load mode, where non-edited blocks remain generated on the fly...
 		if (stream.is_valid() && stream->get_save_generator_output()) {
-			ZN_PRINT_VERBOSE(
+			VOXEL_PRINT_VERBOSE(
 					format("Requesting save of generator output for block {} lod {}", _position, int(_lod_index))
 			);
 
@@ -171,7 +171,7 @@ void GenerateBlockTask::run_stream_saving_and_finish() {
 			// No instances, generators are not designed to produce them at this stage yet.
 			// No priority data, saving doesn't need sorting.
 
-			SaveBlockDataTask *save_task = ZN_NEW(SaveBlockDataTask(
+			SaveBlockDataTask *save_task = VOXEL_NEW(SaveBlockDataTask(
 					_volume_id, _position, _lod_index, voxels_copy, _stream_dependency, nullptr, false
 			));
 
@@ -235,7 +235,7 @@ void GenerateBlockTask::apply_result() {
 
 	} else {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Gemerated data request response came back but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Gemerated data request response came back but volume wasn't found");
 	}
 
 	// TODO We could complete earlier inside run() if we had access to the data structure to write the block into.
@@ -250,4 +250,4 @@ void GenerateBlockTask::apply_result() {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

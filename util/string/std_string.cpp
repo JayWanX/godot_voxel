@@ -1,7 +1,7 @@
 #include "std_string.h"
 #include "../io/text_writer.h"
 
-namespace zylann {
+namespace voxel {
 
 TextWriter &operator<<(TextWriter &w, const StdString &s) {
 	w.write_chars(Span<const char>(s.data(), s.size()));
@@ -13,4 +13,4 @@ TextWriter &operator<<(TextWriter &w, const std::string_view s) {
 	return w;
 }
 
-} // namespace zylann
+} // namespace voxel

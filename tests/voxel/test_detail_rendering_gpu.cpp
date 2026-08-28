@@ -9,12 +9,12 @@
 #include "../../util/godot/classes/time.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_normalmap_render_gpu() {
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 	// https://github.com/godotengine/godot-cpp/issues/1180
-	ZN_PRINT_ERROR("This test might not work in GDExtension builds at the moment.");
+	VOXEL_PRINT_ERROR("This test might not work in GDExtension builds at the moment.");
 #endif
 	VoxelEngine::get_singleton().try_initialize_gpu_features();
 
@@ -56,7 +56,7 @@ void test_normalmap_render_gpu() {
 		g.add_connection(n_add3, 0, n_out_sd, 0);
 
 		pg::CompilationResult result = generator->compile(false);
-		ZN_TEST_ASSERT(result.success);
+		VOXEL_TEST_ASSERT(result.success);
 	}
 
 	generator->compile_shaders();
@@ -77,11 +77,11 @@ void test_normalmap_render_gpu() {
 	mesher->build(mesher_output, mesher_input);
 
 	const bool mesh_is_empty = VoxelMesher::is_mesh_empty(mesher_output.surfaces);
-	ZN_TEST_ASSERT(!mesh_is_empty);
+	VOXEL_TEST_ASSERT(!mesh_is_empty);
 
 	const transvoxel::MeshArrays &mesh_arrays = VoxelMesherTransvoxel::get_mesh_cache_from_current_thread();
 	Span<const transvoxel::CellInfo> cell_infos = VoxelMesherTransvoxel::get_cell_info_from_current_thread();
-	ZN_ASSERT(cell_infos.size() > 0 && mesh_arrays.vertices.size() > 0);
+	VOXEL_ASSERT(cell_infos.size() > 0 && mesh_arrays.vertices.size() > 0);
 
 	UniquePtr<TransvoxelCellIterator> cell_iterator = make_unique_instance<TransvoxelCellIterator>(cell_infos);
 
@@ -131,15 +131,15 @@ void test_normalmap_render_gpu() {
 			const uint64_t timeout_seconds = 10;
 			const uint64_t now = Time::get_singleton()->get_ticks_usec();
 			const uint64_t time_elapsed_microseconds = now - time_before;
-			ZN_TEST_ASSERT(time_elapsed_microseconds < timeout_seconds * 1'000'000);
+			VOXEL_TEST_ASSERT(time_elapsed_microseconds < timeout_seconds * 1'000'000);
 		}
 	}
 
 	/*
 	RenderingServer *rs = RenderingServer::get_singleton();
-	ZN_ASSERT(rs != nullptr);
+	VOXEL_ASSERT(rs != nullptr);
 	RenderingDevice *rd = rs->create_local_rendering_device();
-	ZN_ASSERT(rd != nullptr);
+	VOXEL_ASSERT(rd != nullptr);
 
 	GPUStorageBufferPool storage_buffer_pool;
 	storage_buffer_pool.set_rendering_device(rd);
@@ -166,7 +166,7 @@ void test_normalmap_render_gpu() {
 	ERR_FAIL_COND(gpu_atlas_image.is_null());
 	// gpu_atlas_image->convert(Image::FORMAT_RGB8);
 
-	// ZN_DELETE(gpu_task);
+	// VOXEL_DELETE(gpu_task);
 
 	// Make a comparison with the CPU version
 
@@ -196,14 +196,14 @@ void test_normalmap_render_gpu() {
 			nm_task.mesh_block_size,
 			detail_texture_settings.octahedral_encoding_enabled
 	);
-	ZN_ASSERT(images.atlas.is_valid());
+	VOXEL_ASSERT(images.atlas.is_valid());
 	Ref<Image> cpu_atlas_image = images.atlas;
 
 	// Analyze
 
 	struct L {
 		static float compare(const Image &im1, const Image &im2) {
-			ZN_ASSERT(im1.get_size() == im2.get_size());
+			VOXEL_ASSERT(im1.get_size() == im2.get_size());
 			const Vector2i size = im1.get_size();
 			float dsum = 0.f;
 			int counted_pixels = 0;
@@ -230,7 +230,7 @@ void test_normalmap_render_gpu() {
 	// Simple compare for now. Ideally we should analyze more things. A challenge is that the two approaches produce
 	// slightly different images, even though they are functionally equivalent.
 	const float diff = L::compare(**cpu_atlas_image, **gpu_atlas_image);
-	ZN_TEST_ASSERT(diff < 0.1);
+	VOXEL_TEST_ASSERT(diff < 0.1);
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

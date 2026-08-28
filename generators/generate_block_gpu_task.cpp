@@ -18,15 +18,15 @@
 #include "generate_block_gpu_task.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 GenerateBlockGPUTask::~GenerateBlockGPUTask() {
 	if (consumer_task != nullptr) {
 		// If we get here, it means the engine got shut down before a mesh task could complete,
 		// so we still have ownership on this task and it should be deleted from here.
-		ZN_PRINT_VERBOSE("Freeing interrupted consumer task");
+		VOXEL_PRINT_VERBOSE("Freeing interrupted consumer task");
 		// TODO We may not assume how this task was allocated
-		ZN_DELETE(consumer_task);
+		VOXEL_DELETE(consumer_task);
 	}
 }
 
@@ -40,17 +40,17 @@ unsigned int GenerateBlockGPUTask::get_required_shared_output_buffer_size() cons
 }
 
 void GenerateBlockGPUTask::prepare(GPUTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
-	ZN_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_DSTACK();
 
-	ZN_ASSERT_RETURN(generator_shader != nullptr);
-	ZN_ASSERT_RETURN(generator_shader->get_rid().is_valid());
+	VOXEL_ASSERT_RETURN(generator_shader != nullptr);
+	VOXEL_ASSERT_RETURN(generator_shader->get_rid().is_valid());
 
-	ZN_ASSERT_RETURN(generator_shader_params != nullptr);
-	ZN_ASSERT_RETURN(generator_shader_outputs != nullptr);
-	ZN_ASSERT_RETURN(generator_shader_outputs->outputs.size() > 0);
+	VOXEL_ASSERT_RETURN(generator_shader_params != nullptr);
+	VOXEL_ASSERT_RETURN(generator_shader_outputs != nullptr);
+	VOXEL_ASSERT_RETURN(generator_shader_outputs->outputs.size() > 0);
 
-	ZN_ASSERT(consumer_task != nullptr);
+	VOXEL_ASSERT(consumer_task != nullptr);
 
 	ERR_FAIL_COND(boxes_to_generate.size() == 0);
 
@@ -98,7 +98,7 @@ void GenerateBlockGPUTask::prepare(GPUTaskContext &ctx) {
 		out_offset_elements += buffer_volume * generator_shader_outputs->outputs.size();
 
 		PackedByteArray params_pba;
-		zylann::godot::copy_bytes_to(params_pba, params);
+		voxel::godot::copy_bytes_to(params_pba, params);
 
 		bd.params_sb = storage_buffer_pool.allocate(params_pba);
 		ERR_FAIL_COND(bd.params_sb.is_null());
@@ -163,15 +163,15 @@ void GenerateBlockGPUTask::prepare(GPUTaskContext &ctx) {
 		// of the compute list (which already locks the class mutex until it ends). Thankfully, it uses a recursive
 		// Mutex (instead of BinaryMutex)
 		const RID generator_uniform_set =
-				zylann::godot::uniform_set_create(rd, generator_uniforms, generator_shader_rid, 0);
+				voxel::godot::uniform_set_create(rd, generator_uniforms, generator_shader_rid, 0);
 		_uniform_sets_to_free.push_back(generator_uniform_set);
 
 		{
-			ZN_PROFILE_SCOPE_NAMED("compute_list_bind_compute_pipeline");
+			VOXEL_PROFILE_SCOPE_NAMED("compute_list_bind_compute_pipeline");
 			rd.compute_list_bind_compute_pipeline(compute_list_id, _generator_pipeline_rid);
 		}
 		{
-			ZN_PROFILE_SCOPE_NAMED("compute_list_bind_uniform_set");
+			VOXEL_PROFILE_SCOPE_NAMED("compute_list_bind_uniform_set");
 			rd.compute_list_bind_uniform_set(compute_list_id, generator_uniform_set, 0);
 		}
 
@@ -181,7 +181,7 @@ void GenerateBlockGPUTask::prepare(GPUTaskContext &ctx) {
 		// bounds in some invocations.
 		const Vector3i groups = math::ceildiv(box.size, Vector3i(4, 4, 4));
 		{
-			ZN_PROFILE_SCOPE_NAMED("compute_list_dispatch");
+			VOXEL_PROFILE_SCOPE_NAMED("compute_list_dispatch");
 			rd.compute_list_dispatch(compute_list_id, groups.x, groups.y, groups.z);
 		}
 	}
@@ -205,7 +205,7 @@ void GenerateBlockGPUTask::prepare(GPUTaskContext &ctx) {
 				const VoxelModifier::ShaderData &modifier_data = modifiers[modifier_index];
 				const RID modifier_shader_rid =
 						VoxelModifier::get_block_shader(ctx.base_resources, modifier_data.modifier_type);
-				ZN_ASSERT_CONTINUE(modifier_shader_rid.is_valid());
+				VOXEL_ASSERT_CONTINUE(modifier_shader_rid.is_valid());
 
 				bd.params_uniform->set_binding(0);
 				sd_buffer0_uniform->set_binding(1);
@@ -223,7 +223,7 @@ void GenerateBlockGPUTask::prepare(GPUTaskContext &ctx) {
 				}
 
 				const RID modifier_uniform_set =
-						zylann::godot::uniform_set_create(rd, modifier_uniforms, modifier_shader_rid, 0);
+						voxel::godot::uniform_set_create(rd, modifier_uniforms, modifier_shader_rid, 0);
 				_uniform_sets_to_free.push_back(modifier_uniform_set);
 
 				const RID pipeline_rid = _modifier_pipelines[modifier_index];
@@ -256,7 +256,7 @@ inline Span<T> get_temporary_conversion_memory_tls(unsigned int count) {
 }
 
 void convert_gpu_output_sdf(VoxelBuffer &dst, Span<const float> src_data_f, const Box3i &box) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const VoxelBuffer::Depth depth = dst.get_channel_depth(VoxelBuffer::CHANNEL_SDF);
 	const float sd_scale = VoxelBuffer::get_sdf_quantization_scale(depth);
@@ -290,17 +290,17 @@ void convert_gpu_output_sdf(VoxelBuffer &dst, Span<const float> src_data_f, cons
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT: {
-			ZN_PRINT_ERROR("64-bit SDF is not supported");
+			VOXEL_PRINT_ERROR("64-bit SDF is not supported");
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Unhandled depth");
+			VOXEL_PRINT_ERROR("Unhandled depth");
 			break;
 	}
 }
 
 void convert_gpu_output_single_texture(VoxelBuffer &dst, Span<const float> src_data_f, const Box3i &box) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const uint16_t encoded_weights = mixel4::make_encoded_weights_for_single_texture();
 	dst.fill_area(encoded_weights, box.position, box.position + box.size, VoxelBuffer::CHANNEL_WEIGHTS);
 
@@ -336,7 +336,7 @@ void convert_gpu_output_uint(
 		const Box3i &box,
 		VoxelBuffer::ChannelId channel_index
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const VoxelBuffer::Depth depth = dst.get_channel_depth(VoxelBuffer::CHANNEL_SDF);
 	StdVector<uint8_t> &tls_temp = get_temporary_conversion_memory_tls();
@@ -387,7 +387,7 @@ void convert_gpu_output_uint(
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Unhandled depth");
+			VOXEL_PRINT_ERROR("Unhandled depth");
 			break;
 	}
 }
@@ -413,7 +413,7 @@ void GenerateBlockGPUTaskResult::convert_to_voxel_buffer(VoxelBuffer &dst) {
 			break;
 
 		default:
-			ZN_PRINT_ERROR("Unhandled output");
+			VOXEL_PRINT_ERROR("Unhandled output");
 			break;
 	}
 }
@@ -422,7 +422,7 @@ void GenerateBlockGPUTaskResult::convert_to_voxel_buffer(
 		Span<GenerateBlockGPUTaskResult> boxes_data,
 		VoxelBuffer &dst
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	for (GenerateBlockGPUTaskResult &box_data : boxes_data) {
 		box_data.convert_to_voxel_buffer(dst);
@@ -432,8 +432,8 @@ void GenerateBlockGPUTaskResult::convert_to_voxel_buffer(
 }
 
 void GenerateBlockGPUTask::collect(GPUTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
-	ZN_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_DSTACK();
 
 	RenderingDevice &rd = ctx.rendering_device;
 	GPUStorageBufferPool &storage_buffer_pool = ctx.storage_buffer_pool;
@@ -474,14 +474,14 @@ void GenerateBlockGPUTask::collect(GPUTaskContext &ctx) {
 		storage_buffer_pool.recycle(bd.params_sb);
 	}
 
-	zylann::godot::free_rendering_device_rid(rd, _generator_pipeline_rid);
+	voxel::godot::free_rendering_device_rid(rd, _generator_pipeline_rid);
 
 	for (const RID &rid : _modifier_pipelines) {
-		zylann::godot::free_rendering_device_rid(rd, rid);
+		voxel::godot::free_rendering_device_rid(rd, rid);
 	}
 
 	for (const RID &rid : _uniform_sets_to_free) {
-		zylann::godot::free_rendering_device_rid(rd, rid);
+		voxel::godot::free_rendering_device_rid(rd, rid);
 	}
 
 	// We leave conversion to the CPU task, because we have only one thread for GPU work and it only exists for waiting
@@ -493,4 +493,4 @@ void GenerateBlockGPUTask::collect(GPUTaskContext &ctx) {
 	consumer_task = nullptr;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -6,7 +6,7 @@
 #include "../util/memory/memory.h"
 #include "../util/profiling.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelModifierSphere::set_radius(float radius) {
 	RWLockWrite wlock(_rwlock);
@@ -31,7 +31,7 @@ void VoxelModifierSphere::update_aabb() {
 }
 
 void VoxelModifierSphere::apply(VoxelModifierContext ctx) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	RWLockRead rlock(_rwlock);
 	const float smoothness = get_smoothness();
 	const Vector3f center = to_vec3f(get_transform().origin);
@@ -55,7 +55,7 @@ void VoxelModifierSphere::apply(VoxelModifierContext ctx) const {
 			break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 }
 
@@ -74,14 +74,14 @@ void VoxelModifierSphere::get_shader_data(ShaderData &out_shader_data) {
 		SphereParams sphere_params;
 		sphere_params.radius = _radius;
 		PackedByteArray pba;
-		zylann::godot::copy_bytes_to(pba, sphere_params);
+		voxel::godot::copy_bytes_to(pba, sphere_params);
 
 		if (_shader_data->params.size() < 2) {
 			std::shared_ptr<ComputeShaderResource> res = ComputeShaderResourceFactory::create_storage_buffer(pba);
 			_shader_data->params.push_back(ComputeShaderParameter{ 5, res });
 
 		} else if (_shader_data_need_update) {
-			ZN_ASSERT(_shader_data->params.size() == 2);
+			VOXEL_ASSERT(_shader_data->params.size() == 2);
 			ComputeShaderResource::update_storage_buffer(_shader_data->params[1].resource, pba);
 		}
 
@@ -94,4 +94,4 @@ void VoxelModifierSphere::get_shader_data(ShaderData &out_shader_data) {
 
 #endif
 
-} // namespace zylann::voxel
+} // namespace voxel

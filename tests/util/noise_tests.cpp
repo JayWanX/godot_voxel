@@ -8,7 +8,7 @@
 #include "../../util/string/format.h"
 #include "../tests.h"
 
-namespace zylann::voxel::noise_tests {
+namespace voxel::noise_tests {
 
 const int ITERATIONS = 1000000;
 const int STEP_RESOLUTION_COUNT = 100;
@@ -329,4 +329,4 @@ void run_noise_tests() {
 	test_noises();
 }
 
-} // namespace zylann::voxel::noise_tests
+} // namespace voxel::noise_tests

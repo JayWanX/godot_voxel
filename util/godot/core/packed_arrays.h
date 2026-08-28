@@ -1,5 +1,5 @@
-#ifndef ZN_GODOT_PACKED_ARRAYS_H
-#define ZN_GODOT_PACKED_ARRAYS_H
+#ifndef VOXEL_GODOT_PACKED_ARRAYS_H
+#define VOXEL_GODOT_PACKED_ARRAYS_H
 
 #include "../../containers/span.h"
 #include "../../math/vector2f.h"
@@ -13,7 +13,7 @@
 #include "packed_string_array_fwd.h"
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Specialized copy functions for vectors because they use `real_t`, which can be either `float` or `double`
 void copy_to(PackedVector3Array &dst, const Span<const Vector3f> src);
@@ -36,7 +36,7 @@ inline void copy_bytes_to(PackedByteArray &dst, Span<const T> src) {
 	const size_t bytes_count = src.size() * sizeof(T);
 	dst.resize(bytes_count);
 	uint8_t *dst_w = dst.ptrw();
-	ZN_ASSERT(dst_w != nullptr);
+	VOXEL_ASSERT(dst_w != nullptr);
 	memcpy(dst_w, src.data(), bytes_count);
 }
 
@@ -44,7 +44,7 @@ template <typename T>
 inline void copy_bytes_to(PackedByteArray &dst, T src) {
 	dst.resize(sizeof(T));
 	uint8_t *dst_w = dst.ptrw();
-	ZN_ASSERT(dst_w != nullptr);
+	VOXEL_ASSERT(dst_w != nullptr);
 	memcpy(dst_w, &src, sizeof(T));
 }
 
@@ -52,9 +52,9 @@ inline void copy_bytes_to(PackedByteArray &dst, T src) {
 Array to_array(const PackedStringArray &src);
 #endif
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-namespace zylann {
+namespace voxel {
 
 // template <typename T>
 // Span<const T> to_span_const(const Vector<T> &a) {
@@ -89,6 +89,6 @@ inline Span<String> to_span(PackedStringArray &a) {
 	return Span<String>(a.ptrw(), a.size());
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_GODOT_PACKED_ARRAYS_H
+#endif // VOXEL_GODOT_PACKED_ARRAYS_H

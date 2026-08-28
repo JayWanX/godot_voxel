@@ -3,11 +3,11 @@
 #include "../util/godot/core/string.h"
 #include "../util/string/format.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelStream::VoxelStream() {}
 
@@ -56,7 +56,7 @@ void VoxelStream::save_instance_blocks(Span<InstancesQueryData> p_blocks) {
 #endif
 
 void VoxelStream::load_all_blocks(FullLoadingResult &result) {
-	ZN_PRINT_ERROR(format("{} does not support `load_all_blocks`", get_class()));
+	VOXEL_PRINT_ERROR(format("{} does not support `load_all_blocks`", get_class()));
 }
 
 int VoxelStream::get_used_channels_mask() const {
@@ -175,4 +175,4 @@ void VoxelStream::_bind_methods() {
 	BIND_ENUM_CONSTANT(RESULT_BLOCK_NOT_FOUND);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

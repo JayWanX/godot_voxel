@@ -1,12 +1,12 @@
-#ifndef ZN_SPAN_H
-#define ZN_SPAN_H
+#ifndef VOXEL_SPAN_H
+#define VOXEL_SPAN_H
 
 #include "../errors.h"
 #include <algorithm>
 #include <array>
 #include <cstddef>
 
-namespace zylann {
+namespace voxel {
 
 // View into an array, referencing a pointer and a size.
 // STL equivalent would be std::span<T> in C++20
@@ -16,7 +16,7 @@ public:
 	inline Span() : _ptr(nullptr), _size(0) {}
 
 	inline Span(T *p_ptr, size_t p_begin, size_t p_end) {
-		ZN_ASSERT(p_end >= p_begin);
+		VOXEL_ASSERT(p_end >= p_begin);
 		_ptr = p_ptr + p_begin;
 		_size = p_end - p_begin;
 	}
@@ -24,9 +24,9 @@ public:
 	inline Span(T *p_ptr, size_t p_size) : _ptr(p_ptr), _size(p_size) {}
 
 	inline Span(Span<T> &p_other, size_t p_begin, size_t p_end) {
-		ZN_ASSERT(p_end >= p_begin);
-		ZN_ASSERT(p_begin < p_other.size());
-		ZN_ASSERT(p_end <= p_other.size()); // `<=` because p_end is typically `p_begin + size`
+		VOXEL_ASSERT(p_end >= p_begin);
+		VOXEL_ASSERT(p_begin < p_other.size());
+		VOXEL_ASSERT(p_end <= p_other.size()); // `<=` because p_end is typically `p_begin + size`
 		_ptr = p_other._ptr + p_begin;
 		_size = p_end - p_begin;
 	}
@@ -45,12 +45,12 @@ public:
 	}
 
 	inline Span<T> sub(size_t from, size_t len) const {
-		ZN_ASSERT(from + len <= _size);
+		VOXEL_ASSERT(from + len <= _size);
 		return Span<T>(_ptr + from, len);
 	}
 
 	inline Span<T> sub(size_t from) const {
-		ZN_ASSERT(from <= _size);
+		VOXEL_ASSERT(from <= _size);
 		return Span<T>(_ptr + from, _size - from);
 	}
 
@@ -60,28 +60,28 @@ public:
 	Span<U> reinterpret_cast_to() const {
 		const size_t size_in_bytes = _size * sizeof(T);
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(size_in_bytes % sizeof(U) == 0);
+		VOXEL_ASSERT(size_in_bytes % sizeof(U) == 0);
 #endif
 		return Span<U>(reinterpret_cast<U *>(_ptr), 0, size_in_bytes / sizeof(U));
 	}
 
 	inline void set(size_t i, T v) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < _size);
+		VOXEL_ASSERT(i < _size);
 #endif
 		_ptr[i] = v;
 	}
 
 	inline T &operator[](size_t i) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < _size);
+		VOXEL_ASSERT(i < _size);
 #endif
 		return _ptr[i];
 	}
 
 	inline const T &operator[](size_t i) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < _size);
+		VOXEL_ASSERT(i < _size);
 #endif
 		return _ptr[i];
 	}
@@ -108,11 +108,11 @@ public:
 	// Template because T could be const and TDst should not be
 	template <typename TDst>
 	inline void copy_to(Span<TDst> other) const {
-		ZN_ASSERT(other.size() == _size);
+		VOXEL_ASSERT(other.size() == _size);
 		if (_size == 0) {
 			return;
 		}
-		ZN_ASSERT(other.data() != nullptr);
+		VOXEL_ASSERT(other.data() != nullptr);
 		// for (size_t i = 0; i < _size; ++i) {
 		// 	other._ptr[i] = _ptr[i];
 		// }
@@ -217,7 +217,7 @@ private:
 
 template <typename T, size_t N>
 Span<T> to_span(std::array<T, N> &a, unsigned int count) {
-	ZN_ASSERT(count <= a.size());
+	VOXEL_ASSERT(count <= a.size());
 	return Span<T>(a.data(), count);
 }
 
@@ -242,6 +242,6 @@ inline Span<T> to_single_element_span(T &a) {
 	return Span<T>(&a, 1);
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SPAN_H
+#endif // VOXEL_SPAN_H

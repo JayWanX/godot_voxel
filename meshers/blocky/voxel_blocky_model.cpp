@@ -12,7 +12,7 @@
 #include "blocky_model_baking_context.h"
 #include "voxel_blocky_library.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
@@ -21,7 +21,7 @@
 
 #include "voxel_blocky_model_cube.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyModel::VoxelBlockyModel() : _color(1.f, 1.f, 1.f) {}
 
@@ -123,7 +123,7 @@ void VoxelBlockyModel::_get_property_list(List<PropertyInfo> *p_list) const {
 					Variant::OBJECT,
 					String("material_override_{0}").format(varray(i)),
 					PROPERTY_HINT_RESOURCE_TYPE,
-					zylann::godot::MATERIAL_3D_PROPERTY_HINT_STRING
+					voxel::godot::MATERIAL_3D_PROPERTY_HINT_STRING
 			));
 		}
 
@@ -246,7 +246,7 @@ void VoxelBlockyModel::bake(blocky::ModelBakingContext &ctx) const {
 	// Set empty sides mask
 	model.empty_sides_mask = 0;
 	for (unsigned int side = 0; side < Cube::SIDE_COUNT; ++side) {
-		if (!zylann::voxel::is_empty(model.sides_surfaces[side])) {
+		if (!voxel::is_empty(model.sides_surfaces[side])) {
 			continue;
 		}
 		model.empty_sides_mask |= (1 << side);
@@ -284,7 +284,7 @@ void VoxelBlockyModel::_b_set_collision_aabbs(TypedArray<AABB> array) {
 		// ERR_FAIL_COND(v.get_type() != Variant::AABB);
 		// TODO "Add Element" in the Godot Array inspector always adds a null element even if the array is typed!
 		if (v.get_type() != Variant::AABB) {
-			ZN_PRINT_WARNING(
+			VOXEL_PRINT_WARNING(
 					format("Item {} of the array is not an AABB (found {}). It will be replaced.",
 						   i,
 						   Variant::get_type_name(v.get_type()))
@@ -305,7 +305,7 @@ unsigned int VoxelBlockyModel::get_collision_aabb_count() const {
 }
 
 void VoxelBlockyModel::set_collision_aabb(unsigned int i, AABB aabb) {
-	ZN_ASSERT_RETURN(i < _collision_aabbs.size());
+	VOXEL_ASSERT_RETURN(i < _collision_aabbs.size());
 	_collision_aabbs[i] = aabb;
 }
 
@@ -341,7 +341,7 @@ void VoxelBlockyModel::get_configuration_warnings(PackedStringArray &out_warning
 #endif
 
 bool VoxelBlockyModel::is_empty() const {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in child classes
 	return true;
 }
@@ -358,7 +358,7 @@ void VoxelBlockyModel::copy_base_properties_from(const VoxelBlockyModel &src) {
 }
 
 Ref<Mesh> VoxelBlockyModel::get_preview_mesh() const {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in child classes
 	return Ref<Mesh>();
 }
@@ -537,7 +537,7 @@ void VoxelBlockyModel::rotate_collision_boxes_ortho(math::OrthoBasis ortho_basis
 }
 
 void VoxelBlockyModel::set_mesh_ortho_rotation_index(int i) {
-	ZN_ASSERT_RETURN(i >= 0 && i < math::ORTHOGONAL_BASIS_COUNT);
+	VOXEL_ASSERT_RETURN(i >= 0 && i < math::ORTHOGONAL_BASIS_COUNT);
 	if (i != int(_mesh_ortho_rotation)) {
 		_mesh_ortho_rotation = i;
 	}
@@ -671,4 +671,4 @@ void VoxelBlockyModel::_bind_methods() {
 	BIND_ENUM_CONSTANT(SIDE_COUNT);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

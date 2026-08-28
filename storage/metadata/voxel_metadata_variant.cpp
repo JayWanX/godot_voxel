@@ -1,24 +1,24 @@
 #include "voxel_metadata_variant.h"
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 size_t VoxelMetadataVariant::get_serialized_size() const {
-	return zylann::godot::get_variant_encoded_size(data);
+	return voxel::godot::get_variant_encoded_size(data);
 }
 
 size_t VoxelMetadataVariant::serialize(Span<uint8_t> dst) const {
-	return zylann::godot::encode_variant(data, dst);
+	return voxel::godot::encode_variant(data, dst);
 }
 
 bool VoxelMetadataVariant::deserialize(Span<const uint8_t> src, uint64_t &out_read_size) {
 	size_t read_size = 0;
-	const bool success = zylann::godot::decode_variant(src, data, read_size);
+	const bool success = voxel::godot::decode_variant(src, data, read_size);
 	out_read_size = read_size;
 	return success;
 }
 
 ICustomVoxelMetadata *VoxelMetadataVariant::duplicate() {
-	VoxelMetadataVariant *d = ZN_NEW(VoxelMetadataVariant);
+	VoxelMetadataVariant *d = VOXEL_NEW(VoxelMetadataVariant);
 	d->data = data.duplicate();
 	return d;
 }
@@ -32,7 +32,7 @@ bool VoxelMetadataVariant::equals(const ICustomVoxelMetadata &other) const {
 		return false;
 	}
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(dynamic_cast<const VoxelMetadataVariant *>(&other) != nullptr);
+	VOXEL_ASSERT(dynamic_cast<const VoxelMetadataVariant *>(&other) != nullptr);
 #endif
 	const VoxelMetadataVariant &other_v = static_cast<const VoxelMetadataVariant &>(other);
 	// TODO Implement deep comparison?
@@ -54,7 +54,7 @@ Variant get_as_variant(const VoxelMetadata &meta) {
 			return Variant(int64_t(meta.get_u64()));
 		}
 		default:
-			ZN_PRINT_ERROR("Unknown VoxelMetadata type");
+			VOXEL_PRINT_ERROR("Unknown VoxelMetadata type");
 			return Variant();
 	}
 }
@@ -68,11 +68,11 @@ void set_as_variant(VoxelMetadata &meta, const Variant &v) {
 			mv.data = v;
 			return;
 		} else {
-			VoxelMetadataVariant *mv = ZN_NEW(VoxelMetadataVariant);
+			VoxelMetadataVariant *mv = VOXEL_NEW(VoxelMetadataVariant);
 			mv->data = v;
 			meta.set_custom(METADATA_TYPE_VARIANT, mv);
 		}
 	}
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot

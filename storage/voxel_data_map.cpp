@@ -10,7 +10,7 @@
 
 #include <limits>
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelDataMap::VoxelDataMap() {
 	// This is not planned to change at runtime at the moment.
@@ -22,7 +22,7 @@ VoxelDataMap::~VoxelDataMap() {
 }
 
 void VoxelDataMap::create(unsigned int lod_index) {
-	ZN_ASSERT(lod_index < constants::MAX_LOD);
+	VOXEL_ASSERT(lod_index < constants::MAX_LOD);
 	clear();
 	// set_block_size_pow2(block_size_po2);
 	set_lod_index(lod_index);
@@ -33,8 +33,8 @@ void VoxelDataMap::set_format(const VoxelFormat format) {
 }
 
 // void VoxelDataMap::set_block_size_pow2(unsigned int p) {
-// 	ZN_ASSERT_RETURN_MSG(p >= 1, "Block size is too small");
-// 	ZN_ASSERT_RETURN_MSG(p <= 8, "Block size is too big");
+// 	VOXEL_ASSERT_RETURN_MSG(p >= 1, "Block size is too small");
+// 	VOXEL_ASSERT_RETURN_MSG(p <= 8, "Block size is too big");
 
 // 	_block_size_pow2 = p;
 // 	_block_size = 1 << _block_size_pow2;
@@ -42,8 +42,8 @@ void VoxelDataMap::set_format(const VoxelFormat format) {
 // }
 
 void VoxelDataMap::set_lod_index(int lod_index) {
-	ZN_ASSERT_RETURN_MSG(lod_index >= 0, "LOD index can't be negative");
-	ZN_ASSERT_RETURN_MSG(lod_index < 32, "LOD index is too big");
+	VOXEL_ASSERT_RETURN_MSG(lod_index >= 0, "LOD index can't be negative");
+	VOXEL_ASSERT_RETURN_MSG(lod_index < 32, "LOD index is too big");
 
 	_lod_index = lod_index;
 }
@@ -65,7 +65,7 @@ VoxelDataBlock *VoxelDataMap::create_default_block(Vector3i bpos) {
 	std::shared_ptr<VoxelBuffer> buffer = make_shared_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_POOL);
 	buffer->create(Vector3iUtil::create(get_block_size()), &_format);
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN_V(!has_block(bpos), nullptr);
+	VOXEL_ASSERT_RETURN_V(!has_block(bpos), nullptr);
 #endif
 	VoxelDataBlock &map_block = _blocks_map[bpos];
 	map_block = VoxelDataBlock(buffer, _lod_index);
@@ -103,7 +103,7 @@ void VoxelDataMap::set_voxel_f(real_t value, Vector3i pos, unsigned int c) {
 	VoxelDataBlock *block = get_or_create_block_at_voxel_pos(pos);
 	Vector3i lpos = to_local(pos);
 	// TODO In this situation, the generator must be invoked to fill the block
-	ZN_ASSERT_RETURN_MSG(block->has_voxels(), "Block not cached");
+	VOXEL_ASSERT_RETURN_MSG(block->has_voxels(), "Block not cached");
 	VoxelBuffer &voxels = block->get_voxels();
 	voxels.set_voxel_f(value, lpos.x, lpos.y, lpos.z, c);
 }
@@ -125,7 +125,7 @@ const VoxelDataBlock *VoxelDataMap::get_block(Vector3i bpos) const {
 }
 
 VoxelDataBlock *VoxelDataMap::set_block_buffer(Vector3i bpos, std::shared_ptr<VoxelBuffer> &buffer, bool overwrite) {
-	ZN_ASSERT_RETURN_V(buffer != nullptr, nullptr);
+	VOXEL_ASSERT_RETURN_V(buffer != nullptr, nullptr);
 
 	VoxelDataBlock *block = get_block(bpos);
 
@@ -138,8 +138,8 @@ VoxelDataBlock *VoxelDataMap::set_block_buffer(Vector3i bpos, std::shared_ptr<Vo
 		block->set_voxels(buffer);
 
 	} else {
-		ZN_PROFILE_MESSAGE("Redundant data block");
-		ZN_PRINT_VERBOSE(format(
+		VOXEL_PROFILE_MESSAGE("Redundant data block");
+		VOXEL_PRINT_VERBOSE(format(
 				"Discarded block {} lod {}, there was already data and overwriting is not enabled", bpos, _lod_index
 		));
 	}
@@ -149,7 +149,7 @@ VoxelDataBlock *VoxelDataMap::set_block_buffer(Vector3i bpos, std::shared_ptr<Vo
 
 void VoxelDataMap::set_block(Vector3i bpos, const VoxelDataBlock &block) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(block.get_lod_index() == _lod_index);
+	VOXEL_ASSERT(block.get_lod_index() == _lod_index);
 #endif
 	_blocks_map[bpos] = block;
 }
@@ -166,8 +166,8 @@ VoxelDataBlock *VoxelDataMap::set_empty_block(Vector3i bpos, bool overwrite) {
 		block->clear_voxels();
 
 	} else {
-		ZN_PROFILE_MESSAGE("Redundant data block");
-		ZN_PRINT_VERBOSE(format(
+		VOXEL_PROFILE_MESSAGE("Redundant data block");
+		VOXEL_PRINT_VERBOSE(format(
 				"Discarded block {} lod {}, there was already data and overwriting is not enabled", bpos, _lod_index
 		));
 	}
@@ -200,7 +200,7 @@ void VoxelDataMap::copy(
 ) const {
 	// TODO Reimplement using `copy_from_chunked_storage`?
 
-	ZN_ASSERT_RETURN_MSG(Vector3iUtil::get_volume_u64(dst_buffer.get_size()) > 0, "The area to copy is empty");
+	VOXEL_ASSERT_RETURN_MSG(Vector3iUtil::get_volume_u64(dst_buffer.get_size()) > 0, "The area to copy is empty");
 	const Vector3i max_pos = min_pos + dst_buffer.get_size();
 
 	const Vector3i min_block_pos = voxel_to_block(min_pos);
@@ -312,7 +312,7 @@ void VoxelDataMap::paste_masked(
 		const bool with_metadata
 ) {
 	if (use_dst_mask && !use_src_mask) {
-		ZN_PRINT_ERROR("Destination mask without source mask is not implemented");
+		VOXEL_PRINT_ERROR("Destination mask without source mask is not implemented");
 		return;
 	}
 
@@ -328,7 +328,7 @@ void VoxelDataMap::paste_masked(
 
 	DynamicBitset bitarray;
 	if (dst_writable_values.size() > 1) {
-		ZN_ASSERT_RETURN(indices_to_bitarray_u16(dst_writable_values, bitarray));
+		VOXEL_ASSERT_RETURN(indices_to_bitarray_u16(dst_writable_values, bitarray));
 	}
 
 	Vector3i bpos;
@@ -346,7 +346,7 @@ void VoxelDataMap::paste_masked(
 				}
 
 				// TODO In this situation, the generator has to be invoked to fill the blanks
-				ZN_ASSERT_CONTINUE_MSG(block->has_voxels(), "Area not cached");
+				VOXEL_ASSERT_CONTINUE_MSG(block->has_voxels(), "Area not cached");
 
 				const Vector3i dst_block_origin = block_to_voxel(bpos);
 
@@ -356,7 +356,7 @@ void VoxelDataMap::paste_masked(
 				if (use_src_mask) {
 					if (use_dst_mask) {
 						if (dst_writable_values.size() == 1) {
-							zylann::voxel::paste_src_masked_dst_writable_value(
+							voxel::paste_src_masked_dst_writable_value(
 									to_span(channel_indices),
 									src_buffer,
 									src_mask_channel,
@@ -369,7 +369,7 @@ void VoxelDataMap::paste_masked(
 							);
 
 						} else {
-							zylann::voxel::paste_src_masked_dst_writable_bitarray(
+							voxel::paste_src_masked_dst_writable_bitarray(
 									to_span(channel_indices),
 									src_buffer,
 									src_mask_channel,
@@ -383,7 +383,7 @@ void VoxelDataMap::paste_masked(
 						}
 
 					} else {
-						zylann::voxel::paste_src_masked(
+						voxel::paste_src_masked(
 								to_span(channel_indices),
 								src_buffer,
 								src_mask_channel,
@@ -395,7 +395,7 @@ void VoxelDataMap::paste_masked(
 					}
 
 				} else {
-					zylann::voxel::paste(to_span(channel_indices), src_buffer, dst_buffer, dst_base_pos, with_metadata);
+					voxel::paste(to_span(channel_indices), src_buffer, dst_buffer, dst_base_pos, with_metadata);
 				}
 			}
 		}
@@ -417,4 +417,4 @@ bool VoxelDataMap::is_area_fully_loaded(const Box3i voxels_box) const {
 	});
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

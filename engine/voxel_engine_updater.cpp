@@ -6,12 +6,12 @@
 #include "../util/godot/classes/scene_tree.h"
 #include "../util/godot/classes/window.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 bool g_updater_created = false;
 
 VoxelEngineUpdater::VoxelEngineUpdater() {
-	ZN_PRINT_VERBOSE("Creating VoxelEngineUpdater");
+	VOXEL_PRINT_VERBOSE("Creating VoxelEngineUpdater");
 	set_process(true);
 	// We don't want it to stop when the scene tree is paused
 	set_process_mode(PROCESS_MODE_ALWAYS);
@@ -49,11 +49,11 @@ void VoxelEngineUpdater::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS:
 			// To workaround the absence of API to have a custom server processing in the main loop
-			zylann::voxel::VoxelEngine::get_singleton().process();
+			voxel::VoxelEngine::get_singleton().process();
 			break;
 
 		case NOTIFICATION_PREDELETE:
-			ZN_PRINT_VERBOSE("Deleting VoxelEngineUpdater");
+			VOXEL_PRINT_VERBOSE("Deleting VoxelEngineUpdater");
 			break;
 
 		default:
@@ -61,4 +61,4 @@ void VoxelEngineUpdater::_notification(int p_what) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

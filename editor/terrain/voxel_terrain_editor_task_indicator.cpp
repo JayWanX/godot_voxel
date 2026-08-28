@@ -11,7 +11,7 @@
 #include "../../util/godot/core/string.h"
 #include "../../util/godot/editor_scale.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelTerrainEditorTaskIndicator::VoxelTerrainEditorTaskIndicator() {
 	// We use a scroll container so it doesn't prevent Godot from shrinking horizontally on small screens
@@ -23,13 +23,13 @@ VoxelTerrainEditorTaskIndicator::VoxelTerrainEditorTaskIndicator() {
 	_box_container = memnew(HBoxContainer);
 	add_child(_box_container);
 
-	create_stat(STAT_STREAM_TASKS, ZN_TTR("I/O"), ZN_TTR("I/O tasks"));
-	create_stat(STAT_GENERATE_TASKS, ZN_TTR("Gen"), ZN_TTR("Generation tasks"));
-	create_stat(STAT_MESH_TASKS, ZN_TTR("Mesh"), ZN_TTR("Meshing tasks"));
-	create_stat(STAT_TOTAL_TASKS, ZN_TTR("Total"), ZN_TTR("Total remaining threaded tasks"));
-	create_stat(STAT_MAIN_THREAD_TASKS, ZN_TTR("Main"), ZN_TTR("Main thread tasks"));
-	create_stat(STAT_VOXEL_MEMORY, ZN_TTR("Voxel memory"), ZN_TTR("Memory for voxels (in use / pooled)"));
-	create_stat(STAT_TOTAL_MEMORY, ZN_TTR("Total"), ZN_TTR("Memory usage (whole editor, not just voxel)"));
+	create_stat(STAT_STREAM_TASKS, VOXEL_TTR("I/O"), VOXEL_TTR("I/O tasks"));
+	create_stat(STAT_GENERATE_TASKS, VOXEL_TTR("Gen"), VOXEL_TTR("Generation tasks"));
+	create_stat(STAT_MESH_TASKS, VOXEL_TTR("Mesh"), VOXEL_TTR("Meshing tasks"));
+	create_stat(STAT_TOTAL_TASKS, VOXEL_TTR("Total"), VOXEL_TTR("Total remaining threaded tasks"));
+	create_stat(STAT_MAIN_THREAD_TASKS, VOXEL_TTR("Main"), VOXEL_TTR("Main thread tasks"));
+	create_stat(STAT_VOXEL_MEMORY, VOXEL_TTR("Voxel memory"), VOXEL_TTR("Memory for voxels (in use / pooled)"));
+	create_stat(STAT_TOTAL_MEMORY, VOXEL_TTR("Total"), VOXEL_TTR("Memory usage (whole editor, not just voxel)"));
 }
 
 void VoxelTerrainEditorTaskIndicator::_notification(int p_what) {
@@ -170,4 +170,4 @@ void VoxelTerrainEditorTaskIndicator::set_stat(StatID id, int64_t value, int64_t
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

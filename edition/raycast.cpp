@@ -10,7 +10,7 @@
 #include "funcs.h"
 #include "voxel_raycast_result.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Binary search can be more accurate than linear regression because the SDF can be inaccurate in the first place.
 // An alternative would be to polygonize a tiny area around the middle-phase hit position.
@@ -79,11 +79,11 @@ inline Vector3f get_raw_sdf_gradient(const Span<const TSd> sd_data, const unsign
 template <typename TSd>
 Vector3f get_interpolated_raw_sdf_gradient_4x4x4_p111_t(const VoxelBuffer &vb, const Vector3f pf) {
 	const Vector3i block_size(4, 4, 4);
-	ZN_ASSERT(vb.get_size() == block_size);
+	VOXEL_ASSERT(vb.get_size() == block_size);
 
 	Span<const TSd> sd_data;
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
-	ZN_ASSERT(vb.get_channel_data_read_only(channel, sd_data));
+	VOXEL_ASSERT(vb.get_channel_data_read_only(channel, sd_data));
 
 	const Vector3i jump(block_size.y, 1, block_size.y * block_size.x);
 	const Vector3i p000(1, 1, 1);
@@ -123,19 +123,19 @@ Vector3f get_interpolated_raw_sdf_gradient_4x4x4_p111(const VoxelBuffer &vb, con
 					return get_interpolated_raw_sdf_gradient_4x4x4_p111_t<float>(vb, pf);
 
 				default:
-					ZN_PRINT_ERROR("Unhandled depth");
+					VOXEL_PRINT_ERROR("Unhandled depth");
 					return Vector3f();
 			}
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Unhandled compression");
+			VOXEL_PRINT_ERROR("Unhandled compression");
 			return Vector3f();
 	}
 }
 
 Vector3f get_interpolated_raw_sdf_gradient(const VoxelData &vd, const Vector3 position) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const Vector3i p00 = to_vec3i(math::floor(position));
 	const Vector3f pf = to_vec3f(position - to_vec3(p00));
@@ -319,7 +319,7 @@ Ref<VoxelRaycastResult> raycast_blocky(
 	Vector3i hit_voxel_pos;
 	Vector3i prev_voxel_pos;
 
-	if (zylann::voxel_raycast(
+	if (voxel_raycast(
 				ray_origin,
 				ray_dir,
 				predicate,
@@ -371,7 +371,7 @@ Ref<VoxelRaycastResult> raycast_nonzero(
 	Vector3i hit_pos;
 	Vector3i prev_pos;
 
-	if (zylann::voxel_raycast(
+	if (voxel_raycast(
 				ray_origin, ray_dir, predicate, max_distance, hit_pos, prev_pos, hit_distance, hit_distance_prev
 		)) {
 		res.instantiate();
@@ -394,7 +394,7 @@ Ref<VoxelRaycastResult> raycast_generic(
 		const uint8_t binary_search_iterations,
 		const bool normal_enabled
 ) {
-	using namespace zylann::godot;
+	using namespace voxel::godot;
 
 	Ref<VoxelRaycastResult> res;
 
@@ -425,7 +425,7 @@ Ref<VoxelRaycastResult> raycast_generic_world(
 		const uint8_t binary_search_iterations,
 		const bool normal_enabled
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// TODO Implement broad-phase on blocks to minimize locking and increase performance
 
@@ -475,4 +475,4 @@ Ref<VoxelRaycastResult> raycast_generic_world(
 	return res;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

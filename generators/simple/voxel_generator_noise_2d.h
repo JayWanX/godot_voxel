@@ -7,10 +7,10 @@
 #include "../../util/thread/rw_lock.h"
 #include "voxel_generator_heightmap.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Curve)
-ZN_GODOT_FORWARD_DECLARE(class Noise)
+VOXEL_GODOT_FORWARD_DECLARE(class Curve)
+VOXEL_GODOT_FORWARD_DECLARE(class Noise)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGeneratorNoise2D : public VoxelGeneratorHeightmap {
 	GDCLASS(VoxelGeneratorNoise2D, VoxelGeneratorHeightmap)
@@ -60,6 +60,6 @@ private:
 	RWLock _parameters_lock;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_NOISE_2D_H

@@ -4,7 +4,7 @@
 #include "../../storage/voxel_buffer_gd.h"
 #include "../../util/godot/classes/ref_counted.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelColorPalette;
 
@@ -27,6 +27,6 @@ private:
 	static void _bind_methods();
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOX_LOADER_H

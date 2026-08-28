@@ -4,7 +4,7 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_encode_weights_packed_u16() {
 	FixedArray<uint8_t, 4> weights;
@@ -18,7 +18,7 @@ void test_encode_weights_packed_u16() {
 	const uint16_t encoded_weights =
 			mixel4::encode_weights_to_packed_u16_lossy(weights[0], weights[1], weights[2], weights[3]);
 	FixedArray<uint8_t, 4> decoded_weights = mixel4::decode_weights_from_packed_u16(encoded_weights);
-	ZN_TEST_ASSERT(weights == decoded_weights);
+	VOXEL_TEST_ASSERT(weights == decoded_weights);
 }
 
 void test_copy_3d_region_zxy() {
@@ -38,7 +38,7 @@ void test_copy_3d_region_zxy() {
 					for (pos.y = src_min.y; pos.y < src_max.y; ++pos.y) {
 						const uint16_t srcv = srcs[Vector3iUtil::get_zxy_index(pos, src_size)];
 						const uint16_t dstv = dsts[Vector3iUtil::get_zxy_index(pos - src_min + dst_min, dst_size)];
-						ZN_TEST_ASSERT(srcv == dstv);
+						VOXEL_TEST_ASSERT(srcv == dstv);
 					}
 				}
 			}
@@ -135,7 +135,7 @@ void test_transform_3d_array_zxy() {
 	const unsigned int volume = Vector3iUtil::get_volume_u64(src_size);
 
 	FixedArray<int, 24> dst_grid;
-	ZN_TEST_ASSERT(dst_grid.size() == volume);
+	VOXEL_TEST_ASSERT(dst_grid.size() == volume);
 
 	{
 		int expected_dst_grid[] = {
@@ -158,10 +158,10 @@ void test_transform_3d_array_zxy() {
 		const Vector3i dst_size =
 				transform_3d_array_zxy(Span<const int>(src_grid, 0, volume), to_span(dst_grid), src_size, basis);
 
-		ZN_TEST_ASSERT(dst_size == expected_dst_size);
+		VOXEL_TEST_ASSERT(dst_size == expected_dst_size);
 
 		for (unsigned int i = 0; i < volume; ++i) {
-			ZN_TEST_ASSERT(dst_grid[i] == expected_dst_grid[i]);
+			VOXEL_TEST_ASSERT(dst_grid[i] == expected_dst_grid[i]);
 		}
 	}
 	{
@@ -183,10 +183,10 @@ void test_transform_3d_array_zxy() {
 		const Vector3i dst_size =
 				transform_3d_array_zxy(Span<const int>(src_grid, 0, volume), to_span(dst_grid), src_size, basis);
 
-		ZN_TEST_ASSERT(dst_size == expected_dst_size);
+		VOXEL_TEST_ASSERT(dst_size == expected_dst_size);
 
 		for (unsigned int i = 0; i < volume; ++i) {
-			ZN_TEST_ASSERT(dst_grid[i] == expected_dst_grid[i]);
+			VOXEL_TEST_ASSERT(dst_grid[i] == expected_dst_grid[i]);
 		}
 	}
 	{
@@ -208,12 +208,12 @@ void test_transform_3d_array_zxy() {
 		const Vector3i dst_size =
 				transform_3d_array_zxy(Span<const int>(src_grid, 0, volume), to_span(dst_grid), src_size, basis);
 
-		ZN_TEST_ASSERT(dst_size == expected_dst_size);
+		VOXEL_TEST_ASSERT(dst_size == expected_dst_size);
 
 		for (unsigned int i = 0; i < volume; ++i) {
-			ZN_TEST_ASSERT(dst_grid[i] == expected_dst_grid[i]);
+			VOXEL_TEST_ASSERT(dst_grid[i] == expected_dst_grid[i]);
 		}
 	}
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

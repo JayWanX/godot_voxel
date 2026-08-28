@@ -1,6 +1,6 @@
 #include "check_ref_ownership.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 namespace {
 bool g_enabled = true;
@@ -23,4 +23,4 @@ void CheckRefCountDoesNotChange::mark_reported() {
 	g_reported = true;
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

@@ -14,10 +14,10 @@
 #include "../../util/godot/editor_scale.h"
 #include "chart_view.h"
 
-namespace zylann {
+namespace voxel {
 
-ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
-	set_title(ZN_TTR("Noise Analysis"));
+VOXEL_NoiseAnalysisWindow::VOXEL_NoiseAnalysisWindow() {
+	set_title(VOXEL_TTR("Noise Analysis"));
 	set_min_size(Vector2(300.f * EDSCALE, 0));
 
 	VBoxContainer *vbox_container = memnew(VBoxContainer);
@@ -28,18 +28,18 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Dimension"));
+			label->set_text(VOXEL_TTR("Dimension"));
 			gc1->add_child(label);
 
 			_dimension_option_button = memnew(OptionButton);
-			_dimension_option_button->get_popup()->add_item(ZN_TTR("2D"), DIMENSION_2D);
-			_dimension_option_button->get_popup()->add_item(ZN_TTR("3D"), DIMENSION_3D);
+			_dimension_option_button->get_popup()->add_item(VOXEL_TTR("2D"), DIMENSION_2D);
+			_dimension_option_button->get_popup()->add_item(VOXEL_TTR("3D"), DIMENSION_3D);
 			_dimension_option_button->select(0);
 			gc1->add_child(_dimension_option_button);
 		}
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Step count"));
+			label->set_text(VOXEL_TTR("Step count"));
 			gc1->add_child(label);
 
 			_step_count_spinbox = memnew(SpinBox);
@@ -52,7 +52,7 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 		}
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Step minimum length"));
+			label->set_text(VOXEL_TTR("Step minimum length"));
 			gc1->add_child(label);
 
 			_step_minimum_length_spinbox = memnew(SpinBox);
@@ -64,7 +64,7 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 		}
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Step maximum length"));
+			label->set_text(VOXEL_TTR("Step maximum length"));
 			gc1->add_child(label);
 
 			_step_maximum_length_spinbox = memnew(SpinBox);
@@ -76,7 +76,7 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 		}
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Area size"));
+			label->set_text(VOXEL_TTR("Area size"));
 			gc1->add_child(label);
 
 			_area_size_spinbox = memnew(SpinBox);
@@ -88,7 +88,7 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 		}
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Samples count"));
+			label->set_text(VOXEL_TTR("Samples count"));
 			gc1->add_child(label);
 
 			_samples_count_spinbox = memnew(SpinBox);
@@ -102,8 +102,8 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 	}
 	{
 		_calculate_button = memnew(Button);
-		_calculate_button->set_text(ZN_TTR("Calculate"));
-		_calculate_button->connect("pressed", callable_mp(this, &ZN_NoiseAnalysisWindow::_on_calculate_button_pressed));
+		_calculate_button->set_text(VOXEL_TTR("Calculate"));
+		_calculate_button->connect("pressed", callable_mp(this, &VOXEL_NoiseAnalysisWindow::_on_calculate_button_pressed));
 		vbox_container->add_child(_calculate_button);
 	}
 
@@ -113,16 +113,16 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 
 	{
 		Label *label = memnew(Label);
-		label->set_text(ZN_TTR("Maximum derivative over step length*:"));
+		label->set_text(VOXEL_TTR("Maximum derivative over step length*:"));
 		label->set_tooltip_text(
-				ZN_TTR("Depending on the noise type, this measure can vary due to very small discontinuities, "
+				VOXEL_TTR("Depending on the noise type, this measure can vary due to very small discontinuities, "
 					   "so it may be interesting to try multiple step lengths, from shortest to longest.")
 		);
 		label->set_mouse_filter(Control::MOUSE_FILTER_STOP);
 		vbox_container->add_child(label);
 	}
 
-	_chart_view = memnew(ZN_ChartView);
+	_chart_view = memnew(VOXEL_ChartView);
 	_chart_view->set_custom_minimum_size(Vector2(0, 150.0 * EDSCALE));
 	_chart_view->set_v_size_flags(Control::SIZE_EXPAND_FILL);
 	vbox_container->add_child(_chart_view);
@@ -133,7 +133,7 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Minimum value"));
+			label->set_text(VOXEL_TTR("Minimum value"));
 			gc2->add_child(label);
 
 			_minimum_value_line_edit = memnew(LineEdit);
@@ -143,7 +143,7 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 		}
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Maximum value"));
+			label->set_text(VOXEL_TTR("Maximum value"));
 			gc2->add_child(label);
 
 			_maximum_value_line_edit = memnew(LineEdit);
@@ -152,7 +152,7 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 		}
 		{
 			Label *label = memnew(Label);
-			label->set_text(ZN_TTR("Maximum derivative"));
+			label->set_text(VOXEL_TTR("Maximum derivative"));
 			gc2->add_child(label);
 
 			_maximum_derivative_line_edit = memnew(LineEdit);
@@ -167,12 +167,12 @@ ZN_NoiseAnalysisWindow::ZN_NoiseAnalysisWindow() {
 }
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
-void ZN_NoiseAnalysisWindow::set_noise(Ref<FastNoise2> noise) {
+void VOXEL_NoiseAnalysisWindow::set_noise(Ref<FastNoise2> noise) {
 	_adapter.set(noise);
 }
 #endif
 
-void ZN_NoiseAnalysisWindow::set_noise(Ref<ZN_FastNoiseLite> noise) {
+void VOXEL_NoiseAnalysisWindow::set_noise(Ref<VOXEL_FastNoiseLite> noise) {
 	_adapter.set(noise);
 }
 
@@ -187,7 +187,7 @@ StdVector<Vector3> &get_tls_precomputed_unit_vectors_3d() {
 }
 } // namespace
 
-void ZN_NoiseAnalysisWindow::_on_calculate_button_pressed() {
+void VOXEL_NoiseAnalysisWindow::_on_calculate_button_pressed() {
 	ERR_FAIL_COND(_adapter.is_null());
 
 	_analysis_params.dimension = Dimension(_dimension_option_button->get_selected_id());
@@ -241,7 +241,7 @@ void ZN_NoiseAnalysisWindow::_on_calculate_button_pressed() {
 	set_process(true);
 }
 
-void ZN_NoiseAnalysisWindow::_notification(int p_what) {
+void VOXEL_NoiseAnalysisWindow::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS:
 			process();
@@ -250,7 +250,7 @@ void ZN_NoiseAnalysisWindow::_notification(int p_what) {
 		case NOTIFICATION_VISIBILITY_CHANGED:
 			if (!is_visible()) {
 				// Release reference when the window is closed
-				set_noise(Ref<ZN_FastNoiseLite>());
+				set_noise(Ref<VOXEL_FastNoiseLite>());
 			}
 			break;
 
@@ -259,7 +259,7 @@ void ZN_NoiseAnalysisWindow::_notification(int p_what) {
 	}
 }
 
-void ZN_NoiseAnalysisWindow::process() {
+void VOXEL_NoiseAnalysisWindow::process() {
 	ERR_FAIL_COND(_adapter.is_null());
 	ERR_FAIL_COND(_analysis_params.step_count <= 0);
 
@@ -370,6 +370,6 @@ void ZN_NoiseAnalysisWindow::process() {
 	}
 }
 
-void ZN_NoiseAnalysisWindow::_bind_methods() {}
+void VOXEL_NoiseAnalysisWindow::_bind_methods() {}
 
-} // namespace zylann
+} // namespace voxel

@@ -10,12 +10,12 @@
 #include "../../util/string/format.h"
 #include "../voxel_engine.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // ComputeShaderResourceInternal::ComputeShaderResourceInternal() {}
 
 // ComputeShaderResourceInternal::~ComputeShaderResourceInternal() {
-// 	ZN_DSTACK();
+// 	VOXEL_DSTACK();
 // 	clear();
 // }
 
@@ -26,10 +26,10 @@ namespace zylann::voxel {
 // }
 
 void ComputeShaderResourceInternal::clear(RenderingDevice &rd) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	if (rid.is_valid()) {
-		ZN_PRINT_VERBOSE(format("Freeing VoxelRD resource type {}", type));
-		zylann::godot::free_rendering_device_rid(rd, rid);
+		VOXEL_PRINT_VERBOSE(format("Freeing VoxelRD resource type {}", type));
+		voxel::godot::free_rendering_device_rid(rd, rid);
 		rid = RID();
 	}
 }
@@ -95,8 +95,8 @@ bool image_to_normalized_rd_format(Image::Format image_format, RenderingDevice::
 }
 
 void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const Image &image) {
-	ZN_PROFILE_SCOPE();
-	ZN_PRINT_VERBOSE(format(
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_PRINT_VERBOSE(format(
 			"Creating VoxelRD texture2d {}x{} format {}", image.get_width(), image.get_height(), image.get_format()
 	));
 	clear(rd);
@@ -125,22 +125,22 @@ void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const
 	TypedArray<PackedByteArray> data_array;
 	data_array.append(image.get_data());
 
-	rid = zylann::godot::texture_create(rd, **texture_format, **texture_view, data_array);
+	rid = voxel::godot::texture_create(rd, **texture_format, **texture_view, data_array);
 	// RID::is_null() is not available in GDExtension
 	ERR_FAIL_COND_MSG(!rid.is_valid(), "Failed to create texture");
 }
 
 void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const Curve &curve) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const Image::Format image_format = Image::FORMAT_RF;
 	const unsigned int width = curve.get_bake_resolution();
 
-	ZN_PRINT_VERBOSE(format("Creating VoxelRD curve texture {}x1 format {}", width, image_format));
+	VOXEL_PRINT_VERBOSE(format("Creating VoxelRD curve texture {}x1 format {}", width, image_format));
 
 	PackedByteArray data;
 	data.resize(width * sizeof(float));
 
-	const math::Interval curve_domain = zylann::godot::get_curve_domain(curve);
+	const math::Interval curve_domain = voxel::godot::get_curve_domain(curve);
 	const float curve_domain_range = curve_domain.length();
 
 	{
@@ -161,10 +161,10 @@ void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const
 
 template <typename T>
 void zxy_grid_to_zyx(Span<const T> src, Span<T> dst, Vector3i size) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT(Vector3iUtil::is_valid_size(size));
-	ZN_ASSERT(Vector3iUtil::get_volume_u64(size) == src.size());
-	ZN_ASSERT(src.size() == dst.size());
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT(Vector3iUtil::is_valid_size(size));
+	VOXEL_ASSERT(Vector3iUtil::get_volume_u64(size) == src.size());
+	VOXEL_ASSERT(src.size() == dst.size());
 	Vector3i pos;
 	for (pos.z = 0; pos.z < size.z; ++pos.z) {
 		for (pos.x = 0; pos.x < size.x; ++pos.x) {
@@ -182,13 +182,13 @@ void ComputeShaderResourceInternal::create_texture_3d_float32(
 		const PackedByteArray &data,
 		const Vector3i size
 ) {
-	ZN_PROFILE_SCOPE();
-	ZN_PRINT_VERBOSE(format("Creating VoxelRD texture3d {}x{}x{} float32", size.x, size.y, size.z));
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_PRINT_VERBOSE(format("Creating VoxelRD texture3d {}x{}x{} float32", size.x, size.y, size.z));
 
-	ZN_ASSERT(Vector3iUtil::is_valid_size(size));
+	VOXEL_ASSERT(Vector3iUtil::is_valid_size(size));
 
 	const size_t expected_size_in_bytes = Vector3iUtil::get_volume_u64(size) * sizeof(float);
-	ZN_ASSERT(expected_size_in_bytes == static_cast<size_t>(data.size()));
+	VOXEL_ASSERT(expected_size_in_bytes == static_cast<size_t>(data.size()));
 
 	clear(rd);
 
@@ -210,7 +210,7 @@ void ComputeShaderResourceInternal::create_texture_3d_float32(
 	TypedArray<PackedByteArray> data_array;
 	data_array.append(data);
 
-	rid = zylann::godot::texture_create(rd, **texture_format, **texture_view, data_array);
+	rid = voxel::godot::texture_create(rd, **texture_format, **texture_view, data_array);
 	ERR_FAIL_COND_MSG(!rid.is_valid(), "Failed to create texture");
 
 	type = TYPE_TEXTURE_3D;
@@ -218,7 +218,7 @@ void ComputeShaderResourceInternal::create_texture_3d_float32(
 
 void ComputeShaderResourceInternal::create_storage_buffer(RenderingDevice &rd, const PackedByteArray &data) {
 	clear(rd);
-	ZN_PRINT_VERBOSE(format("Creating VoxelRD storage buffer {}b", data.size()));
+	VOXEL_PRINT_VERBOSE(format("Creating VoxelRD storage buffer {}b", data.size()));
 	rid = rd.storage_buffer_create(data.size(), data);
 	ERR_FAIL_COND(!rid.is_valid());
 	type = TYPE_STORAGE_BUFFER;
@@ -227,7 +227,7 @@ void ComputeShaderResourceInternal::create_storage_buffer(RenderingDevice &rd, c
 void ComputeShaderResourceInternal::update_storage_buffer(RenderingDevice &rd, const PackedByteArray &data) {
 	ERR_FAIL_COND(!rid.is_valid());
 	ERR_FAIL_COND(type != TYPE_STORAGE_BUFFER);
-	const Error err = zylann::godot::update_storage_buffer(rd, rid, 0, data.size(), data);
+	const Error err = voxel::godot::update_storage_buffer(rd, rid, 0, data.size(), data);
 	ERR_FAIL_COND_MSG(err != OK, String("Failed to update storage buffer (error {0})").format(varray(err)));
 }
 
@@ -288,7 +288,7 @@ void transform3d_to_mat4(const Transform3D &t, Span<float> dst) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::shared_ptr<ComputeShaderResource> ComputeShaderResourceFactory::create_texture_2d(const Ref<Image> &image) {
-	ZN_ASSERT(image.is_valid());
+	VOXEL_ASSERT(image.is_valid());
 
 	std::shared_ptr<ComputeShaderResource> res = make_shared_instance<ComputeShaderResource>();
 	res->_type = ComputeShaderResourceInternal::TYPE_TEXTURE_2D;
@@ -300,7 +300,7 @@ std::shared_ptr<ComputeShaderResource> ComputeShaderResourceFactory::create_text
 }
 
 std::shared_ptr<ComputeShaderResource> ComputeShaderResourceFactory::create_texture_2d(const Ref<Curve> &curve) {
-	ZN_ASSERT(curve.is_valid());
+	VOXEL_ASSERT(curve.is_valid());
 
 	std::shared_ptr<ComputeShaderResource> res = make_shared_instance<ComputeShaderResource>();
 	res->_type = ComputeShaderResourceInternal::TYPE_TEXTURE_2D;
@@ -315,7 +315,7 @@ std::shared_ptr<ComputeShaderResource> ComputeShaderResourceFactory::create_text
 		Span<const float> fdata_zxy,
 		const Vector3i size
 ) {
-	ZN_ASSERT(Vector3iUtil::is_valid_size(size));
+	VOXEL_ASSERT(Vector3iUtil::is_valid_size(size));
 	// Note, this array is refcounted so we can pass it to the async queue. It is also what the RD expects so we
 	// minimize allocations for intermediate objects
 	PackedByteArray pba;
@@ -350,7 +350,7 @@ ComputeShaderResource::~ComputeShaderResource() {
 	// _internal.type = ComputeShaderResourceInternal::TYPE_DEINITIALIZED;
 
 	VoxelEngine::get_singleton().push_gpu_task_f([rid](GPUTaskContext &ctx) {
-		zylann::godot::free_rendering_device_rid(ctx.rendering_device, rid);
+		voxel::godot::free_rendering_device_rid(ctx.rendering_device, rid);
 	});
 }
 
@@ -372,4 +372,4 @@ ComputeShaderResourceInternal::Type ComputeShaderResource::get_type() const {
 	return _type;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

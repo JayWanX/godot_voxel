@@ -8,7 +8,7 @@
 #include "../util/profiling.h"
 #include "transvoxel/transvoxel_cell_iterator.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
@@ -17,16 +17,16 @@
 #include "../meshers/transvoxel/voxel_mesher_transvoxel.h"
 #endif
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel {
+namespace voxel {
 
 Ref<Mesh> VoxelMesher::build_mesh(
 		const VoxelBuffer &voxels,
 		TypedArray<Material> materials,
 		Dictionary additional_data
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	Output output;
 	Input input{ voxels, nullptr, Vector3i(), 0, false, false, false };
@@ -208,4 +208,4 @@ void VoxelMesher::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_maximum_padding"), &VoxelMesher::get_maximum_padding);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

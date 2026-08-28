@@ -6,10 +6,10 @@
 #include "../util/math/vector3.h"
 #include "../util/profiling.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelModifierMesh::set_mesh_sdf(Ref<VoxelMeshSDF> mesh_sdf) {
-	// ZN_ASSERT_RETURN(buffer != nullptr);
+	// VOXEL_ASSERT_RETURN(buffer != nullptr);
 	RWLockWrite wlock(_rwlock);
 	_mesh_sdf = mesh_sdf;
 #ifdef VOXEL_ENABLE_GPU
@@ -27,7 +27,7 @@ void VoxelModifierMesh::set_isolevel(float isolevel) {
 }
 
 void VoxelModifierMesh::apply(VoxelModifierContext ctx) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	RWLockRead rlock(_rwlock);
 	if (_mesh_sdf.is_null()) {
@@ -51,7 +51,7 @@ void VoxelModifierMesh::apply(VoxelModifierContext ctx) const {
 	const Transform3D buffer_to_world = model_to_world * buffer_to_model;
 
 	Span<const float> buffer_sdf;
-	ZN_ASSERT_RETURN(buffer.get_channel_data_read_only(VoxelBuffer::CHANNEL_SDF, buffer_sdf));
+	VOXEL_ASSERT_RETURN(buffer.get_channel_data_read_only(VoxelBuffer::CHANNEL_SDF, buffer_sdf));
 	const float smoothness = get_smoothness();
 
 	ops::SdfBufferShape shape;
@@ -77,12 +77,12 @@ void VoxelModifierMesh::apply(VoxelModifierContext ctx) const {
 			break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 }
 
 void VoxelModifierMesh::update_aabb() {
-	// ZN_ASSERT_RETURN(_mesh_sdf.is_valid());
+	// VOXEL_ASSERT_RETURN(_mesh_sdf.is_valid());
 	if (_mesh_sdf.is_null()) {
 		return;
 	}
@@ -117,7 +117,7 @@ void VoxelModifierMesh::get_shader_data(ShaderData &out_shader_data) {
 		mesh_params.model_to_buffer_translation = min_pos;
 		mesh_params.isolevel = _isolevel;
 		PackedByteArray pba;
-		zylann::godot::copy_bytes_to(pba, mesh_params);
+		voxel::godot::copy_bytes_to(pba, mesh_params);
 
 		if (_shader_data->params.size() < 3) {
 			std::shared_ptr<ComputeShaderResource> params_res =
@@ -145,4 +145,4 @@ void VoxelModifierMesh::request_shader_data_update() {
 
 #endif
 
-} // namespace zylann::voxel
+} // namespace voxel

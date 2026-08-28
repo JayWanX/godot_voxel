@@ -8,7 +8,7 @@
 #include "../util/string/format.h"
 #include "../util/tasks/async_dependency_tracker.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 std::atomic_int g_debug_save_block_tasks_count = { 0 };
@@ -70,19 +70,19 @@ int SaveBlockDataTask::debug_get_running_count() {
 	return g_debug_save_block_tasks_count;
 }
 
-void SaveBlockDataTask::run(zylann::ThreadedTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
+void SaveBlockDataTask::run(voxel::ThreadedTaskContext &ctx) {
+	VOXEL_PROFILE_SCOPE();
 
 	CRASH_COND(_stream_dependency == nullptr);
 	Ref<VoxelStream> stream = _stream_dependency->stream;
-	ZN_ASSERT_RETURN_MSG(stream.is_valid(), "Save task was triggered without a stream, this is a bug");
+	VOXEL_ASSERT_RETURN_MSG(stream.is_valid(), "Save task was triggered without a stream, this is a bug");
 
 	if (_save_voxels) {
 		if (_voxels == nullptr) {
 			if (_tracker != nullptr) {
 				_tracker->abort();
 			}
-			ZN_PRINT_ERROR("Voxels to save shouldn't be null");
+			VOXEL_PRINT_ERROR("Voxels to save shouldn't be null");
 			return;
 		}
 
@@ -105,7 +105,7 @@ void SaveBlockDataTask::run(zylann::ThreadedTaskContext &ctx) {
 			// On the other hand, if we want to represent the fact that "everything was deleted here",
 			// this should not be null.
 
-			ZN_PRINT_VERBOSE(format(
+			VOXEL_PRINT_VERBOSE(format(
 					"Saving instance block {} lod {} with data {}", _position, static_cast<int>(_lod), _instances.get()
 			));
 
@@ -115,7 +115,7 @@ void SaveBlockDataTask::run(zylann::ThreadedTaskContext &ctx) {
 			stream->save_instance_blocks(Span<VoxelStream::InstancesQueryData>(&instances_query, 1));
 
 		} else {
-			ZN_PRINT_WARNING_ONCE(
+			VOXEL_PRINT_WARNING_ONCE(
 					format("Tried to save instance block, but {} does not support them.", String(stream->get_class()))
 			);
 		}
@@ -165,8 +165,8 @@ void SaveBlockDataTask::apply_result() {
 
 	} else {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Stream data request response came back but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Stream data request response came back but volume wasn't found");
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

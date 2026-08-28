@@ -14,10 +14,10 @@
 #include "../util/math/vector3.h"
 #include "../util/profiling.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Callable);
-ZN_GODOT_FORWARD_DECLARE(class RandomPCG);
+VOXEL_GODOT_FORWARD_DECLARE(class Callable);
+VOXEL_GODOT_FORWARD_DECLARE(class RandomPCG);
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Interpolates values from a 3D grid at a given position, using trilinear interpolation.
 // If the position is outside the grid, values are clamped.
@@ -249,13 +249,13 @@ void run_blocky_random_tick(
 		const Callable &callback
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 // Library of templates for executing per-voxel operations.
 // There is a bunch of compile-time abstraction boilerplate, which is to minimize the code to write when adding new
 // operations, and have them work with different chunked containers, different edition modes, different formats... while
 // also trying to avoid runtime per-voxel branching and checks for all these cases.
-namespace zylann::voxel::ops {
+namespace voxel::ops {
 
 // Operations
 
@@ -501,12 +501,12 @@ inline float sdf_blend(float src_value, float dst_value, Mode mode) {
 	float res;
 	switch (mode) {
 		case MODE_ADD:
-			res = zylann::math::sdf_union(src_value, dst_value);
+			res = voxel::math::sdf_union(src_value, dst_value);
 			break;
 
 		case MODE_REMOVE:
 			// Relative complement (or difference)
-			res = zylann::math::sdf_subtract(dst_value, src_value);
+			res = voxel::math::sdf_subtract(dst_value, src_value);
 			break;
 
 		case MODE_SET:
@@ -534,7 +534,7 @@ struct DoSphere {
 	float strength;
 
 	void operator()() {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		if (channel == VoxelBuffer::CHANNEL_SDF) {
 			switch (mode) {
@@ -675,7 +675,7 @@ struct DoShapeChunked {
 	float strength;
 
 	void operator()() {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		if (channel == VoxelBuffer::CHANNEL_SDF) {
 			switch (mode) {
@@ -736,8 +736,8 @@ struct DoShapeSingleBuffer {
 	float strength;
 
 	void operator()() {
-		ZN_PROFILE_SCOPE();
-		ZN_ASSERT(buffer != nullptr);
+		VOXEL_PROFILE_SCOPE();
+		VOXEL_ASSERT(buffer != nullptr);
 
 		// const Box3i clipped_box = box.clip(Box3i(Vector3i(), buffer.get_size()));
 
@@ -796,6 +796,6 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 
 void grow_sphere(VoxelBuffer &src, float strength, Vector3f sphere_pos, float sphere_radius);
 
-} // namespace zylann::voxel::ops
+} // namespace voxel::ops
 
 #endif // VOXEL_EDITION_FUNCS_H

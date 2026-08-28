@@ -2,7 +2,7 @@
 #include "../io/text_writer.h"
 #include "../string/format.h"
 
-namespace zylann {
+namespace voxel {
 
 namespace math {
 namespace interval_impl {
@@ -12,7 +12,7 @@ inline void check_range_once_t(T min, T max) {
 	static bool once = false;
 	if (min > max && once == false) {
 		once = true;
-		ZN_PRINT_ERROR(format("Interval constructed with invalid range: min={}, max={}", min, max));
+		VOXEL_PRINT_ERROR(format("Interval constructed with invalid range: min={}, max={}", min, max));
 	}
 }
 
@@ -32,4 +32,4 @@ TextWriter &operator<<(TextWriter &w, const math::Interval &v) {
 	return w;
 }
 
-} // namespace zylann
+} // namespace voxel

@@ -4,7 +4,7 @@
 #include "../godot/core/variant.h"
 #include "../string/format.h"
 
-namespace zylann::testing {
+namespace voxel::testing {
 
 void parse_string_array(const Dictionary &dict, const char *key, StdVector<StdString> &dst) {
 	const Variant includes_v = dict.get(key, Variant());
@@ -13,7 +13,7 @@ void parse_string_array(const Dictionary &dict, const char *key, StdVector<StdSt
 		for (int i = 0; i < includes_a.size(); ++i) {
 			const Variant include_v = includes_a[i];
 			if (include_v.get_type() == Variant::STRING) {
-				dst.push_back(zylann::godot::to_std_string(String(include_v)));
+				dst.push_back(voxel::godot::to_std_string(String(include_v)));
 			}
 		}
 	}
@@ -28,7 +28,7 @@ bool TestOptions::can_run_print(const char *test_name) const {
 	if (_excludes.size() > 0) {
 		for (const StdString &ex : _excludes) {
 			if (ex == test_name) {
-				ZN_PRINT_VERBOSE(format("Skipping excluded test {}", test_name));
+				VOXEL_PRINT_VERBOSE(format("Skipping excluded test {}", test_name));
 				return false;
 			}
 		}
@@ -43,7 +43,7 @@ bool TestOptions::can_run_print(const char *test_name) const {
 			}
 		}
 		if (!found) {
-			ZN_PRINT_VERBOSE(format("Skipping non-included test {}", test_name));
+			VOXEL_PRINT_VERBOSE(format("Skipping non-included test {}", test_name));
 			return false;
 		}
 	}
@@ -53,4 +53,4 @@ bool TestOptions::can_run_print(const char *test_name) const {
 	return true;
 }
 
-} // namespace zylann::testing
+} // namespace voxel::testing

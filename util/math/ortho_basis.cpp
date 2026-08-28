@@ -1,6 +1,6 @@
 #include "ortho_basis.h"
 
-namespace zylann::math {
+namespace voxel::math {
 
 // We can obtain a list of all the bases by positionning the origin at 8 corners of a cube. In one corner, the basis
 // axes may align with 3 edges of the cube. We can rotate the corresponding edges 3 times per corner (X->Y, Y->Z, Z->X).
@@ -45,7 +45,7 @@ static const OrthoBasis g_ortho_bases[ORTHOGONAL_BASIS_COUNT] = {
 // clang-format on
 
 OrthoBasis get_ortho_basis_from_index(int i) {
-	ZN_ASSERT(i >= 0 && i < ORTHOGONAL_BASIS_COUNT);
+	VOXEL_ASSERT(i >= 0 && i < ORTHOGONAL_BASIS_COUNT);
 	return g_ortho_bases[i];
 }
 
@@ -89,7 +89,7 @@ const char *s_rotation_names[ORTHO_ROTATION_COUNT] = {
 // clang-format on
 
 const char *ortho_rotation_to_string(int i) {
-	ZN_ASSERT_RETURN_V(i >= 0 && i < ORTHO_ROTATION_COUNT, "<error>");
+	VOXEL_ASSERT_RETURN_V(i >= 0 && i < ORTHO_ROTATION_COUNT, "<error>");
 	return s_rotation_names[i];
 }
 
@@ -138,7 +138,7 @@ OrthoBasis OrthoBasis::from_axis_turns(const Vector3i::Axis axis, const int turn
 			}
 			break;
 		default:
-			ZN_PRINT_ERROR("Invalid axis");
+			VOXEL_PRINT_ERROR("Invalid axis");
 	}
 	return OrthoBasis();
 }
@@ -152,4 +152,4 @@ bool OrthoBasis::is_orthonormal() const {
 			math::dot(y, z) == 0;
 }
 
-} // namespace zylann::math
+} // namespace voxel::math

@@ -12,10 +12,10 @@
 
 #include <atomic>
 
-ZN_GODOT_FORWARD_DECLARE(class Node3D);
-ZN_GODOT_FORWARD_DECLARE(class ConcavePolygonShape3D);
+VOXEL_GODOT_FORWARD_DECLARE(class Node3D);
+VOXEL_GODOT_FORWARD_DECLARE(class ConcavePolygonShape3D);
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Stores mesh and collider for one chunk of the rendered volume.
 // It doesn't store voxel data, because it may be using different block size, or different data structure.
@@ -79,7 +79,7 @@ public:
 protected:
 	void _set_visible(bool visible);
 
-	inline void set_mesh_instance_visible(zylann::godot::DirectMeshInstance &mi, bool visible) {
+	inline void set_mesh_instance_visible(voxel::godot::DirectMeshInstance &mi, bool visible) {
 		if (visible) {
 			mi.set_world(*_world);
 		} else {
@@ -89,8 +89,8 @@ protected:
 
 	Vector3i _position_in_voxels;
 
-	zylann::godot::DirectMeshInstance _mesh_instance;
-	zylann::godot::DirectStaticBody _static_body;
+	voxel::godot::DirectMeshInstance _mesh_instance;
+	voxel::godot::DirectStaticBody _static_body;
 	Ref<World3D> _world;
 
 	// Must match default value of `active`
@@ -105,6 +105,6 @@ Ref<ConcavePolygonShape3D> make_collision_shape_from_mesher_output(
 		const VoxelMesher &mesher
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESH_BLOCK_H

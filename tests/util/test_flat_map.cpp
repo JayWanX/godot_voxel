@@ -4,7 +4,7 @@
 #include "../../util/godot/core/random_pcg.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_flat_map() {
 	struct Value {
@@ -24,14 +24,14 @@ void test_flat_map() {
 
 	struct L {
 		static bool validate_map(const FlatMap<int, Value> &map, const StdVector<Pair> &sorted_pairs) {
-			ZN_TEST_ASSERT_V(sorted_pairs.size() == map.size(), false);
+			VOXEL_TEST_ASSERT_V(sorted_pairs.size() == map.size(), false);
 			for (size_t i = 0; i < sorted_pairs.size(); ++i) {
 				const Pair expected_pair = sorted_pairs[i];
-				ZN_TEST_ASSERT_V(map.has(expected_pair.key), false);
-				ZN_TEST_ASSERT_V(map.find(expected_pair.key) != nullptr, false);
+				VOXEL_TEST_ASSERT_V(map.has(expected_pair.key), false);
+				VOXEL_TEST_ASSERT_V(map.find(expected_pair.key) != nullptr, false);
 				const Value *value = map.find(expected_pair.key);
-				ZN_TEST_ASSERT_V(value != nullptr, false);
-				ZN_TEST_ASSERT_V(*value == expected_pair.value, false);
+				VOXEL_TEST_ASSERT_V(value != nullptr, false);
+				VOXEL_TEST_ASSERT_V(*value == expected_pair.value, false);
 			}
 			return true;
 		}
@@ -52,41 +52,41 @@ void test_flat_map() {
 		FlatMap<int, Value> map;
 		for (size_t i = 0; i < sorted_pairs.size(); ++i) {
 			const Pair pair = sorted_pairs[i];
-			ZN_TEST_ASSERT(map.insert(pair.key, pair.value));
+			VOXEL_TEST_ASSERT(map.insert(pair.key, pair.value));
 		}
-		ZN_TEST_ASSERT(L::validate_map(map, sorted_pairs));
+		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
 		// Insert random pairs
 		FlatMap<int, Value> map;
 		for (size_t i = 0; i < shuffled_pairs.size(); ++i) {
 			const Pair pair = shuffled_pairs[i];
-			ZN_TEST_ASSERT(map.insert(pair.key, pair.value));
+			VOXEL_TEST_ASSERT(map.insert(pair.key, pair.value));
 		}
-		ZN_TEST_ASSERT(L::validate_map(map, sorted_pairs));
+		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
 		// Insert random pairs with duplicates
 		FlatMap<int, Value> map;
 		for (size_t i = 0; i < shuffled_pairs.size(); ++i) {
 			const Pair pair = shuffled_pairs[i];
-			ZN_TEST_ASSERT(map.insert(pair.key, pair.value));
-			ZN_TEST_ASSERT_MSG(!map.insert(pair.key, pair.value), "Inserting the key a second time should fail");
+			VOXEL_TEST_ASSERT(map.insert(pair.key, pair.value));
+			VOXEL_TEST_ASSERT_MSG(!map.insert(pair.key, pair.value), "Inserting the key a second time should fail");
 		}
-		ZN_TEST_ASSERT(L::validate_map(map, sorted_pairs));
+		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
 		// Init from collection
 		FlatMap<int, Value> map;
 		map.clear_and_insert(to_span(shuffled_pairs));
-		ZN_TEST_ASSERT(L::validate_map(map, sorted_pairs));
+		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
 		// Inexistent items
 		FlatMap<int, Value> map;
 		map.clear_and_insert(to_span(shuffled_pairs));
-		ZN_TEST_ASSERT(!map.has(inexistent_key1));
-		ZN_TEST_ASSERT(!map.has(inexistent_key2));
+		VOXEL_TEST_ASSERT(!map.has(inexistent_key1));
+		VOXEL_TEST_ASSERT(!map.has(inexistent_key2));
 	}
 	{
 		// Iteration
@@ -94,13 +94,13 @@ void test_flat_map() {
 		map.clear_and_insert(to_span(shuffled_pairs));
 		size_t i = 0;
 		for (FlatMap<int, Value>::ConstIterator it = map.begin(); it != map.end(); ++it) {
-			ZN_TEST_ASSERT(i < sorted_pairs.size());
+			VOXEL_TEST_ASSERT(i < sorted_pairs.size());
 			const Pair expected_pair = sorted_pairs[i];
-			ZN_TEST_ASSERT(expected_pair.key == it->key);
-			ZN_TEST_ASSERT(expected_pair.value == it->value);
+			VOXEL_TEST_ASSERT(expected_pair.key == it->key);
+			VOXEL_TEST_ASSERT(expected_pair.value == it->value);
 			++i;
 		}
 	}
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

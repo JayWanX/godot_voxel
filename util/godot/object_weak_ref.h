@@ -1,9 +1,9 @@
-#ifndef ZN_GODOT_OBJECT_WEAK_REF_H
-#define ZN_GODOT_OBJECT_WEAK_REF_H
+#ifndef VOXEL_GODOT_OBJECT_WEAK_REF_H
+#define VOXEL_GODOT_OBJECT_WEAK_REF_H
 
 #include "classes/object.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Holds a weak reference to a Godot object.
 // Mainly useful to reference scene tree nodes more safely, because their ownership model is harder to handle with
@@ -37,6 +37,6 @@ private:
 	ObjectID _id;
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_OBJECT_WEAK_REF_H
+#endif // VOXEL_GODOT_OBJECT_WEAK_REF_H

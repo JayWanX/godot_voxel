@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace zylann {
+namespace voxel {
 namespace dstack {
 
 struct Stack {
@@ -44,4 +44,4 @@ void Info::to_string(FwdMutableStdString s) const {
 }
 
 } // namespace dstack
-} // namespace zylann
+} // namespace voxel

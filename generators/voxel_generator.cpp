@@ -12,7 +12,7 @@
 #include "../engine/gpu/compute_shader_parameters.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGenerator::VoxelGenerator() {}
 
@@ -22,7 +22,7 @@ VoxelGenerator::Result VoxelGenerator::generate_block(VoxelQueryData input) {
 
 IThreadedTask *VoxelGenerator::create_block_task(const BlockTaskParams &params) const {
 	// Default generic task
-	return ZN_NEW(GenerateBlockTask(params));
+	return VOXEL_NEW(GenerateBlockTask(params));
 }
 
 int VoxelGenerator::get_used_channels_mask() const {
@@ -32,7 +32,7 @@ int VoxelGenerator::get_used_channels_mask() const {
 VoxelSingleValue VoxelGenerator::generate_single(Vector3i pos, unsigned int channel) {
 	VoxelSingleValue v;
 	v.i = 0;
-	ZN_ASSERT_RETURN_V(channel < VoxelBuffer::MAX_CHANNELS, v);
+	VOXEL_ASSERT_RETURN_V(channel < VoxelBuffer::MAX_CHANNELS, v);
 	// Default slow implementation
 	// TODO Optimize: a small part of the slowness is caused by the allocator.
 	// It is not a good use of `VoxelMemoryPool` for such a small size called so often.
@@ -58,7 +58,7 @@ void VoxelGenerator::generate_series(
 		Vector3f min_pos,
 		Vector3f max_pos
 ) {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 }
 
 void VoxelGenerator::_b_generate_block(Ref<godot::VoxelBuffer> out_buffer, Vector3 origin_in_voxels, int lod) {
@@ -72,7 +72,7 @@ void VoxelGenerator::_b_generate_block(Ref<godot::VoxelBuffer> out_buffer, Vecto
 #ifdef VOXEL_ENABLE_GPU
 
 bool VoxelGenerator::get_shader_source(ShaderSourceData &out_params) const {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	return false;
 }
 
@@ -122,7 +122,7 @@ void append_generator_parameter_uniforms(
 	for (unsigned int i = 0; i < shader_data.parameters.size(); ++i) {
 		VoxelGenerator::ShaderParameter &p = shader_data.parameters[i];
 		const unsigned int binding = bindings_start + i;
-		ZN_ASSERT(p.resource->get_type() == ComputeShaderResourceInternal::TYPE_TEXTURE_2D);
+		VOXEL_ASSERT(p.resource->get_type() == ComputeShaderResourceInternal::TYPE_TEXTURE_2D);
 		source_text +=
 				String("layout (set = 0, binding = {0}) uniform sampler2D {1};\n").format(varray(binding, p.name));
 		out_params.params.push_back(ComputeShaderParameter{ binding, p.resource });
@@ -136,7 +136,7 @@ std::shared_ptr<ComputeShader> compile_detail_rendering_compute_shader(
 		VoxelGenerator &generator,
 		ComputeShaderParameters &out_params
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V_MSG(
 			!generator.supports_shaders(),
 			ComputeShaderFactory::create_invalid(),
@@ -195,7 +195,7 @@ std::shared_ptr<ComputeShader> compile_detail_rendering_compute_shader(
 
 	// TODO Pick different name somehow for different generators
 	std::shared_ptr<ComputeShader> shader =
-			ComputeShaderFactory::create_from_glsl(source_text, "zylann.voxel.detail_generator.gen");
+			ComputeShaderFactory::create_from_glsl(source_text, "voxel.detail_generator.gen");
 
 	return shader;
 }
@@ -205,7 +205,7 @@ std::shared_ptr<ComputeShader> compile_block_rendering_compute_shader(
 		ComputeShaderParameters &out_params,
 		VoxelGenerator::ShaderOutputs &outputs
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V_MSG(
 			!generator.supports_shaders(),
 			ComputeShaderFactory::create_invalid(),
@@ -254,15 +254,15 @@ std::shared_ptr<ComputeShader> compile_block_rendering_compute_shader(
 
 	// TODO Pick different name somehow for different generators
 	std::shared_ptr<ComputeShader> shader =
-			ComputeShaderFactory::create_from_glsl(source_text, "zylann.voxel.block_generator.gen");
+			ComputeShaderFactory::create_from_glsl(source_text, "voxel.block_generator.gen");
 
 	return shader;
 }
 
 void VoxelGenerator::compile_shaders() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(!supports_shaders());
-	ZN_PRINT_VERBOSE("Compiling compute shaders for virtual rendering");
+	VOXEL_PRINT_VERBOSE("Compiling compute shaders for virtual rendering");
 
 	std::shared_ptr<ComputeShaderParameters> detail_params = make_shared_instance<ComputeShaderParameters>();
 	std::shared_ptr<ComputeShader> detail_render_shader =
@@ -324,4 +324,4 @@ void VoxelGenerator::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

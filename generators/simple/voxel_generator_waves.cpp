@@ -1,11 +1,11 @@
 #include "voxel_generator_waves.h"
 #include <cmath>
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGeneratorWaves::VoxelGeneratorWaves() {
 	_parameters.pattern_size = Vector2(30, 30);
@@ -70,4 +70,4 @@ void VoxelGeneratorWaves::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "pattern_offset"), "set_pattern_offset", "get_pattern_offset");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

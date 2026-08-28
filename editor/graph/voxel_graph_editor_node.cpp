@@ -13,7 +13,7 @@
 #include "graph_editor_adapter.h"
 #include "voxel_graph_editor_node_preview.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace pg;
 
@@ -28,9 +28,9 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 	{
 		Node *titlebar = node_view->get_titlebar_hbox();
 		if (titlebar != nullptr) {
-			set_node_auto_translate_mode(*titlebar, zylann::godot::AUTO_TRANSLATE_MODE_DISABLED);
+			set_node_auto_translate_mode(*titlebar, voxel::godot::AUTO_TRANSLATE_MODE_DISABLED);
 		} else {
-			ZN_PRINT_ERROR("Title bar is null?");
+			VOXEL_PRINT_ERROR("Title bar is null?");
 		}
 	}
 #endif
@@ -230,13 +230,13 @@ void VoxelGraphEditorNode::update_title(const VoxelGraphFunction &graph, uint32_
 		ERR_FAIL_COND(func.is_null());
 		String fname = func->get_path();
 		fname = fname.get_file();
-		if (zylann::godot::is_empty(node_name)) {
+		if (voxel::godot::is_empty(node_name)) {
 			set_title(fname);
 		} else {
 			set_title(String("{0} ({1})").format(varray(node_name, fname)));
 		}
 
-	} else if (zylann::godot::is_empty(node_name)) {
+	} else if (voxel::godot::is_empty(node_name)) {
 		set_title(type.name);
 
 	} else if (type_id == VoxelGraphFunction::NODE_COMMENT) {
@@ -399,7 +399,7 @@ void VoxelGraphEditorNode::set_profiling_ratio(float ratio) {
 }
 
 void VoxelGraphEditorNode::_notification(int p_what) {
-	using namespace zylann::godot;
+	using namespace voxel::godot;
 
 	if (p_what == NOTIFICATION_DRAW) {
 		if (_is_relay) {
@@ -426,4 +426,4 @@ void VoxelGraphEditorNode::_notification(int p_what) {
 
 void VoxelGraphEditorNode::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

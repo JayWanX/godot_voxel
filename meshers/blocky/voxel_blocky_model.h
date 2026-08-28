@@ -12,7 +12,7 @@
 #include "../../util/math/vector3f.h"
 #include "blocky_baked_library.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace blocky {
 struct ModelBakingContext;
@@ -200,8 +200,8 @@ inline bool is_empty(const FixedArray<blocky::BakedModel::SideSurface, blocky::M
 	return true;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelBlockyModel::Side)
+VARIANT_ENUM_CAST(voxel::VoxelBlockyModel::Side)
 
 #endif // VOXEL_BLOCKY_MODEL_H

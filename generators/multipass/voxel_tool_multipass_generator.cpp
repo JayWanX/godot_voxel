@@ -6,11 +6,11 @@
 #include "../../util/math/vector3.h"
 #include "../../util/string/format.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace VoxelGeneratorMultipassCBStructs;
 
@@ -40,12 +40,12 @@ using namespace VoxelGeneratorMultipassCBStructs;
 // }
 
 void VoxelToolMultipassGenerator::set_pass_input(PassInput &pass_input) {
-	// ZN_ASSERT(!_is_offline);
+	// VOXEL_ASSERT(!_is_offline);
 
 	_pass_input = pass_input;
 
 	// TODO Perhaps we should always pass block size as a power of two index
-	ZN_ASSERT(math::is_power_of_two(pass_input.block_size));
+	VOXEL_ASSERT(math::is_power_of_two(pass_input.block_size));
 	_block_size_po2 = math::get_shift_from_power_of_two_32(pass_input.block_size);
 	_block_size_mask = pass_input.block_size - 1;
 
@@ -116,7 +116,7 @@ void VoxelToolMultipassGenerator::paste_masked(
 		uint8_t mask_channel,
 		uint64_t mask_value
 ) {
-	ZN_ASSERT_RETURN(p_voxels.is_valid());
+	VOXEL_ASSERT_RETURN(p_voxels.is_valid());
 	const VoxelBuffer &src = p_voxels->get_buffer();
 
 	paste_to_chunked_storage_tp(
@@ -138,8 +138,8 @@ void VoxelToolMultipassGenerator::paste_masked_writable_list(
 		uint8_t dst_mask_channel,
 		PackedInt32Array dst_mask_values
 ) {
-	ZN_ASSERT_RETURN(p_voxels.is_valid());
-	ZN_ASSERT_RETURN(dst_mask_values.size() > 0);
+	VOXEL_ASSERT_RETURN(p_voxels.is_valid());
+	VOXEL_ASSERT_RETURN(dst_mask_values.size() > 0);
 
 	const VoxelBuffer &src = p_voxels->get_buffer();
 
@@ -244,9 +244,9 @@ void VoxelToolMultipassGenerator::do_path(Span<const Vector3> positions, Span<co
 		}
 	};
 
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(positions.size() >= 2);
-	ZN_ASSERT_RETURN(positions.size() == radii.size());
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(positions.size() >= 2);
+	VOXEL_ASSERT_RETURN(positions.size() == radii.size());
 
 	// TODO Increase margin a bit with smooth voxels?
 	const int margin = 1;
@@ -324,4 +324,4 @@ void VoxelToolMultipassGenerator::_bind_methods() {
 	// 		&VoxelToolMultipassGenerator::create_offline);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

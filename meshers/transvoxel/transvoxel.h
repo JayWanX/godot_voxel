@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace zylann::voxel::transvoxel {
+namespace voxel::transvoxel {
 
 // How many extra voxels are needed towards the negative axes
 static const int MIN_PADDING = 1;
@@ -139,14 +139,14 @@ public:
 	ReuseCell &get_reuse_cell(Vector3i pos) {
 		unsigned int j = pos.z & 1;
 		unsigned int i = pos.y * _block_size.x + pos.x;
-		ZN_ASSERT(i < _cache[j].size());
+		VOXEL_ASSERT(i < _cache[j].size());
 		return _cache[j][i];
 	}
 
 	ReuseTransitionCell &get_reuse_cell_2d(int x, int y) {
 		unsigned int j = y & 1;
 		unsigned int i = x;
-		ZN_ASSERT(i < _cache_2d[j].size());
+		VOXEL_ASSERT(i < _cache_2d[j].size());
 		return _cache_2d[j][i];
 	}
 
@@ -194,6 +194,6 @@ void build_transition_mesh(
 		const bool textures_ignore_air_voxels
 );
 
-} // namespace zylann::voxel::transvoxel
+} // namespace voxel::transvoxel
 
 #endif // VOXEL_TRANSVOXEL_H

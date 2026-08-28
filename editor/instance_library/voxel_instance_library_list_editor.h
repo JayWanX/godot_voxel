@@ -4,11 +4,11 @@
 #include "../../terrain/instancing/voxel_instance_library.h"
 #include "../../util/godot/classes/h_box_container.h"
 
-ZN_GODOT_FORWARD_DECLARE(class ItemList)
-ZN_GODOT_FORWARD_DECLARE(class ConfirmationDialog)
-ZN_GODOT_FORWARD_DECLARE(class EditorFileDialog)
+VOXEL_GODOT_FORWARD_DECLARE(class ItemList)
+VOXEL_GODOT_FORWARD_DECLARE(class ConfirmationDialog)
+VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstanceLibraryEditorPlugin;
 
@@ -56,6 +56,6 @@ private:
 	VoxelInstanceLibraryEditorPlugin *_plugin = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_LIBRARY_LIST_EDITOR_H

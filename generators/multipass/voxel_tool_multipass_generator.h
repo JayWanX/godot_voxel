@@ -4,7 +4,7 @@
 #include "../../edition/voxel_tool.h"
 #include "voxel_generator_multipass_cb_structs.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Accessor provided to scripts in the context of generating columns of blocks in multipass generators.
 // It is not supposed to be used by more than one thread at a time.
@@ -93,6 +93,6 @@ private:
 	// StdVector<VoxelGeneratorMultipassCBStructs::Block *> _offline_block_pointers;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_TOOL_MULTIPASS_GENERATOR_H

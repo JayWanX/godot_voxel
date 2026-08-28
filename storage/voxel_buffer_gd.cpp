@@ -9,11 +9,11 @@
 #include "../util/string/format.h"
 #include "metadata/voxel_metadata_variant.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 template <typename F>
 void op_buffer_value_f(
@@ -31,7 +31,7 @@ void op_buffer_value_f(
 	switch (dst.get_channel_depth(channel)) {
 		case VoxelBuffer::DEPTH_8_BIT: {
 			Span<int8_t> dst_data;
-			ZN_ASSERT(dst.get_channel_data(channel, dst_data));
+			VOXEL_ASSERT(dst.get_channel_data(channel, dst_data));
 			for (int8_t &d : dst_data) {
 				const float a = s8_to_snorm(d) * constants::QUANTIZED_SDF_8_BITS_SCALE_INV;
 				d = snorm_to_s8(f(a, b) * constants::QUANTIZED_SDF_8_BITS_SCALE);
@@ -40,7 +40,7 @@ void op_buffer_value_f(
 
 		case VoxelBuffer::DEPTH_16_BIT: {
 			Span<int16_t> dst_data;
-			ZN_ASSERT(dst.get_channel_data(channel, dst_data));
+			VOXEL_ASSERT(dst.get_channel_data(channel, dst_data));
 			for (int16_t &d : dst_data) {
 				const float a = s16_to_snorm(d) * constants::QUANTIZED_SDF_16_BITS_SCALE_INV;
 				d = snorm_to_s16(f(a, b) * constants::QUANTIZED_SDF_16_BITS_SCALE);
@@ -49,18 +49,18 @@ void op_buffer_value_f(
 
 		case VoxelBuffer::DEPTH_32_BIT: {
 			Span<float> dst_data;
-			ZN_ASSERT(dst.get_channel_data(channel, dst_data));
+			VOXEL_ASSERT(dst.get_channel_data(channel, dst_data));
 			for (float &d : dst_data) {
 				d = f(d, b);
 			}
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT:
-			ZN_PRINT_ERROR("Unsupported depth for operation");
+			VOXEL_PRINT_ERROR("Unsupported depth for operation");
 			break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 			break;
 	}
 }
@@ -72,13 +72,13 @@ void op_buffer_buffer_f(
 		VoxelBuffer::ChannelId channel,
 		F f // (float a, float b) -> float
 ) {
-	if (src.get_channel_compression(channel) == zylann::voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
+	if (src.get_channel_compression(channel) == voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
 		const float value = src.get_voxel_f(0, 0, 0, channel);
 		op_buffer_value_f(dst, value, channel, f);
 		return;
 	}
 
-	if (dst.get_channel_compression(channel) == zylann::voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
+	if (dst.get_channel_compression(channel) == voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
 		dst.decompress_channel(channel);
 	}
 
@@ -86,8 +86,8 @@ void op_buffer_buffer_f(
 		case VoxelBuffer::DEPTH_8_BIT: {
 			Span<const int8_t> src_data;
 			Span<int8_t> dst_data;
-			ZN_ASSERT(src.get_channel_data_read_only(channel, src_data));
-			ZN_ASSERT(dst.get_channel_data(channel, dst_data));
+			VOXEL_ASSERT(src.get_channel_data_read_only(channel, src_data));
+			VOXEL_ASSERT(dst.get_channel_data(channel, dst_data));
 			for (unsigned int i = 0; i < src_data.size(); ++i) {
 				const float a = s8_to_snorm(dst_data[i]) * constants::QUANTIZED_SDF_8_BITS_SCALE_INV;
 				const float b = s8_to_snorm(src_data[i]) * constants::QUANTIZED_SDF_8_BITS_SCALE_INV;
@@ -98,8 +98,8 @@ void op_buffer_buffer_f(
 		case VoxelBuffer::DEPTH_16_BIT: {
 			Span<const int16_t> src_data;
 			Span<int16_t> dst_data;
-			ZN_ASSERT(src.get_channel_data_read_only(channel, src_data));
-			ZN_ASSERT(dst.get_channel_data(channel, dst_data));
+			VOXEL_ASSERT(src.get_channel_data_read_only(channel, src_data));
+			VOXEL_ASSERT(dst.get_channel_data(channel, dst_data));
 			for (unsigned int i = 0; i < src_data.size(); ++i) {
 				const float a = s16_to_snorm(dst_data[i]) * constants::QUANTIZED_SDF_16_BITS_SCALE_INV;
 				const float b = s16_to_snorm(src_data[i]) * constants::QUANTIZED_SDF_16_BITS_SCALE_INV;
@@ -110,19 +110,19 @@ void op_buffer_buffer_f(
 		case VoxelBuffer::DEPTH_32_BIT: {
 			Span<const float> src_data;
 			Span<float> dst_data;
-			ZN_ASSERT(src.get_channel_data_read_only(channel, src_data));
-			ZN_ASSERT(dst.get_channel_data(channel, dst_data));
+			VOXEL_ASSERT(src.get_channel_data_read_only(channel, src_data));
+			VOXEL_ASSERT(dst.get_channel_data(channel, dst_data));
 			for (unsigned int i = 0; i < src_data.size(); ++i) {
 				dst_data[i] = f(dst_data[i], src_data[i]);
 			}
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT:
-			ZN_PRINT_ERROR("Non-implemented depth for operation");
+			VOXEL_PRINT_ERROR("Non-implemented depth for operation");
 			break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 			break;
 	}
 }
@@ -132,9 +132,9 @@ void op_buffer_buffer_f(
 // shader, you should use the `yxz` swizzle to sample pixels of that texture, because this is how voxels are stored and
 // this function does not convert the coordinate system.
 TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image::Format output_format) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	const VoxelBuffer::ChannelId channel = zylann::voxel::VoxelBuffer::CHANNEL_SDF;
+	const VoxelBuffer::ChannelId channel = voxel::VoxelBuffer::CHANNEL_SDF;
 	const VoxelBuffer::Depth depth = vb.get_channel_depth(channel);
 	const uint64_t xy_area = vb.get_size().x * vb.get_size().y;
 	const VoxelBuffer::Compression channel_compression = vb.get_channel_compression(channel);
@@ -161,7 +161,7 @@ TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image:
 	// Not all combinations are supported. For now we only implement those we need.
 	switch (depth) {
 		case VoxelBuffer::DEPTH_8_BIT:
-			ZN_PRINT_ERROR("Channel depth not supported.");
+			VOXEL_PRINT_ERROR("Channel depth not supported.");
 			return TypedArray<Image>();
 
 		case VoxelBuffer::DEPTH_16_BIT: {
@@ -186,7 +186,7 @@ TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image:
 						}
 					} else {
 						Span<const int16_t> data;
-						ZN_ASSERT_RETURN_V(vb.get_channel_data_read_only(channel, data), TypedArray<Image>());
+						VOXEL_ASSERT_RETURN_V(vb.get_channel_data_read_only(channel, data), TypedArray<Image>());
 
 						for (int z = 0; z < vb.get_size().z; ++z) {
 							PackedByteArray pba;
@@ -208,19 +208,19 @@ TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image:
 				} break;
 
 				default:
-					ZN_PRINT_ERROR("Image format not supported.");
+					VOXEL_PRINT_ERROR("Image format not supported.");
 					return TypedArray<Image>();
 			}
 
 		} break;
 
 		case VoxelBuffer::DEPTH_32_BIT: {
-			ZN_PRINT_ERROR("Channel depth not supported.");
+			VOXEL_PRINT_ERROR("Channel depth not supported.");
 			return TypedArray<Image>();
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Channel depth not supported.");
+			VOXEL_PRINT_ERROR("Channel depth not supported.");
 			return TypedArray<Image>();
 	}
 
@@ -229,18 +229,18 @@ TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image:
 
 Ref<ImageTexture3D> create_3d_texture_from_sdf_zxy(const VoxelBuffer &vb, const Image::Format output_format) {
 	TypedArray<Image> images = sdf_to_3d_texture_data_zxy(vb, output_format);
-	Ref<ImageTexture3D> texture = zylann::godot::create_image_texture_3d(output_format, vb.get_size(), false, images);
+	Ref<ImageTexture3D> texture = voxel::godot::create_image_texture_3d(output_format, vb.get_size(), false, images);
 	return texture;
 }
 
 void update_3d_texture_from_sdf_zxy(const VoxelBuffer &vb, ImageTexture3D &texture) {
 	TypedArray<Image> images = sdf_to_3d_texture_data_zxy(vb, texture.get_format());
 	// Format and size must match
-	zylann::godot::update_image_texture_3d(texture, images);
+	voxel::godot::update_image_texture_3d(texture, images);
 }
 
 PackedByteArray get_channel_as_byte_array(const VoxelBuffer &vb, const VoxelBuffer::ChannelId channel) {
-	ZN_ASSERT_RETURN_V(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS, PackedByteArray());
+	VOXEL_ASSERT_RETURN_V(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS, PackedByteArray());
 
 	const Vector3i res = vb.get_size();
 	const uint64_t volume = Vector3iUtil::get_volume_u64(res);
@@ -276,33 +276,33 @@ PackedByteArray get_channel_as_byte_array(const VoxelBuffer &vb, const VoxelBuff
 				} break;
 
 				default:
-					ZN_PRINT_ERROR("Unhandled channel depth");
+					VOXEL_PRINT_ERROR("Unhandled channel depth");
 					break;
 			}
 		} break;
 
 		case VoxelBuffer::COMPRESSION_NONE: {
 			Span<const uint8_t> src;
-			ZN_ASSERT_RETURN_V(vb.get_channel_as_bytes_read_only(channel, src), pba);
-			zylann::godot::copy_to(pba, src);
+			VOXEL_ASSERT_RETURN_V(vb.get_channel_as_bytes_read_only(channel, src), pba);
+			voxel::godot::copy_to(pba, src);
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Unhandled compression");
+			VOXEL_PRINT_ERROR("Unhandled compression");
 			break;
 	}
 
 	return pba;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 const char *VoxelBuffer::CHANNEL_ID_HINT_STRING = "Type,Sdf,Color,Indices,Weights,Data5,Data6,Data7";
 static thread_local bool s_create_shared = false;
 
-Variant get_voxel_metadata(const zylann::voxel::VoxelBuffer &vb, const Vector3i pos) {
+Variant get_voxel_metadata(const voxel::VoxelBuffer &vb, const Vector3i pos) {
 	const VoxelMetadata *meta = vb.get_voxel_metadata(pos);
 	if (meta == nullptr) {
 		return Variant();
@@ -310,48 +310,48 @@ Variant get_voxel_metadata(const zylann::voxel::VoxelBuffer &vb, const Vector3i 
 	return get_as_variant(*meta);
 }
 
-void set_voxel_metadata(zylann::voxel::VoxelBuffer &vb, const Vector3i pos, const Variant &meta) {
+void set_voxel_metadata(voxel::VoxelBuffer &vb, const Vector3i pos, const Variant &meta) {
 	if (meta.get_type() == Variant::NIL) {
 		vb.erase_voxel_metadata(pos);
 	} else {
 		VoxelMetadata *mv = vb.get_or_create_voxel_metadata(pos);
-		ZN_ASSERT_RETURN(mv != nullptr);
+		VOXEL_ASSERT_RETURN(mv != nullptr);
 		set_as_variant(*mv, meta);
 	}
 }
 
 VoxelBuffer::VoxelBuffer() {
 	if (!s_create_shared) {
-		_buffer = make_shared_instance<zylann::voxel::VoxelBuffer>(zylann::voxel::VoxelBuffer::ALLOCATOR_DEFAULT);
+		_buffer = make_shared_instance<voxel::VoxelBuffer>(voxel::VoxelBuffer::ALLOCATOR_DEFAULT);
 	}
 }
 
 VoxelBuffer::VoxelBuffer(VoxelBuffer::Allocator allocator) {
 	if (allocator < 0 || allocator >= ALLOCATOR_COUNT) {
-		ZN_PRINT_ERROR(format("Out of bounds allocator {}", allocator));
+		VOXEL_PRINT_ERROR(format("Out of bounds allocator {}", allocator));
 		allocator = ALLOCATOR_DEFAULT;
 	}
-	_buffer = make_shared_instance<zylann::voxel::VoxelBuffer>(
-			static_cast<zylann::voxel::VoxelBuffer::Allocator>(allocator)
+	_buffer = make_shared_instance<voxel::VoxelBuffer>(
+			static_cast<voxel::VoxelBuffer::Allocator>(allocator)
 	);
 }
 
-VoxelBuffer::VoxelBuffer(std::shared_ptr<zylann::voxel::VoxelBuffer> &other) {
+VoxelBuffer::VoxelBuffer(std::shared_ptr<voxel::VoxelBuffer> &other) {
 	CRASH_COND(other == nullptr);
 	_buffer = other;
 }
 
 void VoxelBuffer::create(int x, int y, int z) {
-	ZN_ASSERT_RETURN(x >= 0);
-	ZN_ASSERT_RETURN(y >= 0);
-	ZN_ASSERT_RETURN(z >= 0);
+	VOXEL_ASSERT_RETURN(x >= 0);
+	VOXEL_ASSERT_RETURN(y >= 0);
+	VOXEL_ASSERT_RETURN(z >= 0);
 	// Not exposing allocators to scripts for now. Will do if the need comes up.
-	// ZN_ASSERT_RETURN(allocator >= 0 && allocator < ALLOCATOR_COUNT);
-	// _buffer->create(Vector3i(x, y, z), static_cast<zylann::voxel::VoxelBuffer::Allocator>(allocator));
+	// VOXEL_ASSERT_RETURN(allocator >= 0 && allocator < ALLOCATOR_COUNT);
+	// _buffer->create(Vector3i(x, y, z), static_cast<voxel::VoxelBuffer::Allocator>(allocator));
 	_buffer->create(Vector3i(x, y, z));
 }
 
-Ref<VoxelBuffer> VoxelBuffer::create_shared(std::shared_ptr<zylann::voxel::VoxelBuffer> &other) {
+Ref<VoxelBuffer> VoxelBuffer::create_shared(std::shared_ptr<voxel::VoxelBuffer> &other) {
 	Ref<VoxelBuffer> vb;
 	s_create_shared = true;
 	vb.instantiate();
@@ -371,12 +371,12 @@ real_t VoxelBuffer::get_voxel_f(int x, int y, int z, unsigned int channel_index)
 }
 
 void VoxelBuffer::set_voxel_f(real_t value, int x, int y, int z, unsigned int channel_index) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	return _buffer->set_voxel_f(value, x, y, z, channel_index);
 }
 
 void VoxelBuffer::copy_channel_from(Ref<VoxelBuffer> other, unsigned int channel) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	ERR_FAIL_COND(other.is_null());
 	_buffer->copy_channel_from(other->get_buffer(), channel);
 }
@@ -388,19 +388,19 @@ void VoxelBuffer::copy_channel_from_area(
 		Vector3i dst_min,
 		unsigned int channel
 ) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	ERR_FAIL_COND(other.is_null());
 	_buffer->copy_channel_from(other->get_buffer(), src_min, src_max, dst_min, channel);
 }
 
 void VoxelBuffer::fill(uint64_t defval, int channel_index) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	ERR_FAIL_INDEX(channel_index, MAX_CHANNELS);
 	_buffer->fill(defval, channel_index);
 }
 
 void VoxelBuffer::fill_f(real_t value, int channel) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	ERR_FAIL_INDEX(channel, MAX_CHANNELS);
 	_buffer->fill_f(value, channel);
 }
@@ -425,7 +425,7 @@ void VoxelBuffer::decompress_channel(int channel_index) {
 }
 
 void VoxelBuffer::downscale_to(Ref<VoxelBuffer> dst, Vector3i src_min, Vector3i src_max, Vector3i dst_min) const {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	ERR_FAIL_COND(dst.is_null());
 	_buffer->downscale_to(dst->get_buffer(), src_min, src_max, dst_min);
 }
@@ -443,7 +443,7 @@ static math::OrthoBasis mirror_axis_to_basis(const Vector3i::Axis axis) {
 		case Vector3i::AXIS_Z:
 			return math::OrthoBasis(Vector3i(1, 0, 0), Vector3i(0, 1, 0), Vector3i(0, 0, -1));
 		default:
-			ZN_PRINT_ERROR("Invalid axis");
+			VOXEL_PRINT_ERROR("Invalid axis");
 			return math::OrthoBasis();
 	}
 }
@@ -467,7 +467,7 @@ Ref<VoxelTool> VoxelBuffer::get_voxel_tool() {
 }
 
 void VoxelBuffer::set_channel_depth(unsigned int channel_index, Depth new_depth) {
-	_buffer->set_channel_depth(channel_index, zylann::voxel::VoxelBuffer::Depth(new_depth));
+	_buffer->set_channel_depth(channel_index, voxel::VoxelBuffer::Depth(new_depth));
 }
 
 VoxelBuffer::Depth VoxelBuffer::get_channel_depth(unsigned int channel_index) const {
@@ -475,13 +475,13 @@ VoxelBuffer::Depth VoxelBuffer::get_channel_depth(unsigned int channel_index) co
 }
 
 void VoxelBuffer::remap_values(unsigned int channel_index, PackedInt32Array map) {
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 
 	Span<const int> map_r(map.ptr(), map.size());
-	const zylann::voxel::VoxelBuffer::Depth depth = _buffer->get_channel_depth(channel_index);
+	const voxel::VoxelBuffer::Depth depth = _buffer->get_channel_depth(channel_index);
 
 	// TODO If `get_channel_data` could return a span of size 1 for this case, we wouldn't need this code
-	if (_buffer->get_channel_compression(channel_index) == zylann::voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
+	if (_buffer->get_channel_compression(channel_index) == voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
 		uint64_t v = _buffer->get_voxel(Vector3i(), channel_index);
 		if (v < map_r.size()) {
 			v = map_r[v];
@@ -491,9 +491,9 @@ void VoxelBuffer::remap_values(unsigned int channel_index, PackedInt32Array map)
 	}
 
 	switch (depth) {
-		case zylann::voxel::VoxelBuffer::DEPTH_8_BIT: {
+		case voxel::VoxelBuffer::DEPTH_8_BIT: {
 			Span<uint8_t> values;
-			ZN_ASSERT_RETURN(_buffer->get_channel_as_bytes(channel_index, values));
+			VOXEL_ASSERT_RETURN(_buffer->get_channel_as_bytes(channel_index, values));
 			for (uint8_t &v : values) {
 				if (v < map_r.size()) {
 					v = map_r[v];
@@ -501,9 +501,9 @@ void VoxelBuffer::remap_values(unsigned int channel_index, PackedInt32Array map)
 			}
 		} break;
 
-		case zylann::voxel::VoxelBuffer::DEPTH_16_BIT: {
+		case voxel::VoxelBuffer::DEPTH_16_BIT: {
 			Span<uint16_t> values;
-			ZN_ASSERT_RETURN(_buffer->get_channel_data(channel_index, values));
+			VOXEL_ASSERT_RETURN(_buffer->get_channel_data(channel_index, values));
 			for (uint16_t &v : values) {
 				if (v < map_r.size()) {
 					v = map_r[v];
@@ -512,7 +512,7 @@ void VoxelBuffer::remap_values(unsigned int channel_index, PackedInt32Array map)
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Remapping channel values is not implemented for depths greater than 16 bits.");
+			VOXEL_PRINT_ERROR("Remapping channel values is not implemented for depths greater than 16 bits.");
 			break;
 	}
 }
@@ -522,76 +522,76 @@ VoxelBuffer::Allocator VoxelBuffer::get_allocator() const {
 }
 
 void VoxelBuffer::op_add_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel) {
-	ZN_ASSERT_RETURN(other.is_valid());
-	ZN_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
-	ZN_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
-	ZN_ASSERT_RETURN(get_size() == other->get_size());
+	VOXEL_ASSERT_RETURN(other.is_valid());
+	VOXEL_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
+	VOXEL_ASSERT_RETURN(get_size() == other->get_size());
 	op_buffer_buffer_f(
 			*_buffer,
 			other->get_buffer(),
-			static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel),
+			static_cast<voxel::VoxelBuffer::ChannelId>(channel),
 			[](float a, float b) { return a + b; }
 	);
 }
 
 void VoxelBuffer::op_sub_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel) {
-	ZN_ASSERT_RETURN(other.is_valid());
-	ZN_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
-	ZN_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
-	ZN_ASSERT_RETURN(get_size() == other->get_size());
+	VOXEL_ASSERT_RETURN(other.is_valid());
+	VOXEL_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
+	VOXEL_ASSERT_RETURN(get_size() == other->get_size());
 	op_buffer_buffer_f(
 			*_buffer,
 			other->get_buffer(),
-			static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel),
+			static_cast<voxel::VoxelBuffer::ChannelId>(channel),
 			[](float a, float b) { return a - b; }
 	);
 }
 
 void VoxelBuffer::op_mul_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel) {
-	ZN_ASSERT_RETURN(other.is_valid());
-	ZN_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
-	ZN_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
-	ZN_ASSERT_RETURN(get_size() == other->get_size());
+	VOXEL_ASSERT_RETURN(other.is_valid());
+	VOXEL_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
+	VOXEL_ASSERT_RETURN(get_size() == other->get_size());
 	op_buffer_buffer_f(
 			*_buffer,
 			other->get_buffer(),
-			static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel),
+			static_cast<voxel::VoxelBuffer::ChannelId>(channel),
 			[](float a, float b) { return a * b; }
 	);
 }
 
 void VoxelBuffer::op_mul_value_f(float scale, VoxelBuffer::ChannelId channel) {
-	ZN_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
 	op_buffer_value_f(
 			*_buffer,
 			scale,
-			static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel), //
+			static_cast<voxel::VoxelBuffer::ChannelId>(channel), //
 			[](float a, float b) { return a * b; }
 	);
 }
 
 void VoxelBuffer::op_min_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel) {
-	ZN_ASSERT_RETURN(other.is_valid());
-	ZN_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
-	ZN_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
-	ZN_ASSERT_RETURN(get_size() == other->get_size());
+	VOXEL_ASSERT_RETURN(other.is_valid());
+	VOXEL_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
+	VOXEL_ASSERT_RETURN(get_size() == other->get_size());
 	op_buffer_buffer_f(
 			*_buffer,
 			other->get_buffer(),
-			static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel),
+			static_cast<voxel::VoxelBuffer::ChannelId>(channel),
 			[](float a, float b) { return math::min(a, b); }
 	);
 }
 
 void VoxelBuffer::op_max_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel) {
-	ZN_ASSERT_RETURN(other.is_valid());
-	ZN_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
-	ZN_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
-	ZN_ASSERT_RETURN(get_size() == other->get_size());
+	VOXEL_ASSERT_RETURN(other.is_valid());
+	VOXEL_ASSERT_RETURN(channel >= 0 && channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(get_channel_depth(channel) == other->get_channel_depth(channel));
+	VOXEL_ASSERT_RETURN(get_size() == other->get_size());
 	op_buffer_buffer_f(
 			*_buffer,
 			other->get_buffer(),
-			static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel),
+			static_cast<voxel::VoxelBuffer::ChannelId>(channel),
 			[](float a, float b) { return math::max(a, b); }
 	);
 }
@@ -609,24 +609,24 @@ void VoxelBuffer::op_select_less_src_f_dst_i_values(
 		const int value_if_more,
 		const VoxelBuffer::ChannelId dst_channel
 ) {
-	ZN_ASSERT_RETURN(src_ref.is_valid());
-	ZN_ASSERT_RETURN(src_channel >= 0 && src_channel < VoxelBuffer::MAX_CHANNELS);
-	ZN_ASSERT_RETURN(dst_channel >= 0 && dst_channel < VoxelBuffer::MAX_CHANNELS);
-	ZN_ASSERT_RETURN(get_size() == src_ref->get_size());
+	VOXEL_ASSERT_RETURN(src_ref.is_valid());
+	VOXEL_ASSERT_RETURN(src_channel >= 0 && src_channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(dst_channel >= 0 && dst_channel < VoxelBuffer::MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(get_size() == src_ref->get_size());
 
-	const zylann::voxel::VoxelBuffer &src = src_ref->get_buffer();
-	zylann::voxel::VoxelBuffer &dst = *_buffer;
+	const voxel::VoxelBuffer &src = src_ref->get_buffer();
+	voxel::VoxelBuffer &dst = *_buffer;
 
 	// Optimizable, but a bit too many combinations of formats than it's worth.
 	// If necessary, only optimize common formats.
 
-	if (src.get_channel_depth(src_channel) == zylann::voxel::VoxelBuffer::DEPTH_32_BIT &&
-		dst.get_channel_depth(dst_channel) == zylann::voxel::VoxelBuffer::DEPTH_16_BIT) {
+	if (src.get_channel_depth(src_channel) == voxel::VoxelBuffer::DEPTH_32_BIT &&
+		dst.get_channel_depth(dst_channel) == voxel::VoxelBuffer::DEPTH_16_BIT) {
 		//
 		const uint16_t value_if_less_16 = math::clamp(value_if_less, 0, 65535);
 		const uint16_t value_if_more_16 = math::clamp(value_if_more, 0, 65535);
 
-		if (src.get_channel_compression(src_channel) == zylann::voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
+		if (src.get_channel_compression(src_channel) == voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
 			const float src_v = src.get_voxel_f(0, 0, 0, src_channel);
 			const int16_t dst_v = select_less(src_v, threshold, value_if_less, value_if_more);
 			dst.fill(dst_v, dst_channel);
@@ -670,11 +670,11 @@ void VoxelBuffer::set_block_metadata(Variant meta) {
 }
 
 Variant VoxelBuffer::get_voxel_metadata(Vector3i pos) const {
-	return zylann::voxel::godot::get_voxel_metadata(*_buffer, pos);
+	return voxel::godot::get_voxel_metadata(*_buffer, pos);
 }
 
 void VoxelBuffer::set_voxel_metadata(Vector3i pos, Variant meta) {
-	zylann::voxel::godot::set_voxel_metadata(*_buffer, pos, meta);
+	voxel::godot::set_voxel_metadata(*_buffer, pos, meta);
 }
 
 void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
@@ -686,7 +686,7 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 	for (auto it = metadata_map.begin(); it != metadata_map.end(); ++it) {
 		Variant v = get_as_variant(it->value);
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 		// TODO Use template version? Could get closer to GodotCpp
 		const Variant key = it->key;
 		const Variant *args[2] = { &key, &v };
@@ -697,11 +697,11 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))
 		);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 		// TODO Error reporting? GodotCpp doesn't expose anything
 		// callback.call(it->key, v);
 		// TODO GodotCpp is missing the implementation of `Callable::call`.
-		ZN_PRINT_ERROR("Unable to call Callable, go moan at https://github.com/godotengine/godot-cpp/issues/802");
+		VOXEL_PRINT_ERROR("Unable to call Callable, go moan at https://github.com/godotengine/godot-cpp/issues/802");
 #endif
 	}
 }
@@ -714,7 +714,7 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Vect
 	_buffer->for_each_voxel_metadata_in_area(box, [&callback](Vector3i rel_pos, const VoxelMetadata &meta) {
 		Variant v = get_as_variant(meta);
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 		// TODO Use template version? Could get closer to GodotCpp
 		const Variant key = rel_pos;
 		const Variant *args[2] = { &key, &v };
@@ -725,7 +725,7 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Vect
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))
 		);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 		// Can't do error-reporting the same way we do in modules.
 		callback.call(rel_pos, v);
 #endif
@@ -753,22 +753,22 @@ void VoxelBuffer::clear_voxel_metadata() {
 }
 
 Ref<ImageTexture3D> VoxelBuffer::create_3d_texture_from_sdf_zxy(const Image::Format output_format) const {
-	return zylann::voxel::create_3d_texture_from_sdf_zxy(*_buffer, output_format);
+	return voxel::create_3d_texture_from_sdf_zxy(*_buffer, output_format);
 }
 
 void VoxelBuffer::update_3d_texture_from_sdf_zxy(Ref<ImageTexture3D> texture) const {
-	ZN_ASSERT_RETURN(texture.is_valid());
-	return zylann::voxel::update_3d_texture_from_sdf_zxy(*_buffer, **texture);
+	VOXEL_ASSERT_RETURN(texture.is_valid());
+	return voxel::update_3d_texture_from_sdf_zxy(*_buffer, **texture);
 }
 
 PackedByteArray VoxelBuffer::get_channel_as_byte_array(const ChannelId channel) const {
-	return zylann::voxel::get_channel_as_byte_array(
-			*_buffer, static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel)
+	return voxel::get_channel_as_byte_array(
+			*_buffer, static_cast<voxel::VoxelBuffer::ChannelId>(channel)
 	);
 }
 
 void VoxelBuffer::set_channel_from_byte_array(const ChannelId channel, const PackedByteArray &pba) {
-	ZN_ASSERT_RETURN(channel >= 0 && channel < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel >= 0 && channel < MAX_CHANNELS);
 	_buffer->set_channel_from_bytes(channel, to_span(pba));
 }
 
@@ -776,14 +776,14 @@ Ref<Image> VoxelBuffer::debug_print_sdf_to_image_top_down() {
 	return debug_print_sdf_to_image_top_down(*_buffer);
 }
 
-Ref<Image> VoxelBuffer::debug_print_sdf_to_image_top_down(const zylann::voxel::VoxelBuffer &vb) {
+Ref<Image> VoxelBuffer::debug_print_sdf_to_image_top_down(const voxel::VoxelBuffer &vb) {
 	const Vector3i size = vb.get_size();
-	Ref<Image> im = zylann::godot::create_empty_image(size.x, size.z, false, Image::FORMAT_RGB8);
+	Ref<Image> im = voxel::godot::create_empty_image(size.x, size.z, false, Image::FORMAT_RGB8);
 	Vector3i pos;
 	for (pos.z = 0; pos.z < size.z; ++pos.z) {
 		for (pos.x = 0; pos.x < size.x; ++pos.x) {
 			for (pos.y = size.y - 1; pos.y >= 0; --pos.y) {
-				float v = vb.get_voxel_f(pos.x, pos.y, pos.z, zylann::voxel::VoxelBuffer::CHANNEL_SDF);
+				float v = vb.get_voxel_f(pos.x, pos.y, pos.z, voxel::VoxelBuffer::CHANNEL_SDF);
 				if (v < 0.0) {
 					break;
 				}
@@ -796,11 +796,11 @@ Ref<Image> VoxelBuffer::debug_print_sdf_to_image_top_down(const zylann::voxel::V
 	return im;
 }
 
-Ref<Image> VoxelBuffer::debug_print_sdf_y_slice(const zylann::voxel::VoxelBuffer &buffer, float scale, int y) {
+Ref<Image> VoxelBuffer::debug_print_sdf_y_slice(const voxel::VoxelBuffer &buffer, float scale, int y) {
 	const Vector3i res = buffer.get_size();
 	ERR_FAIL_COND_V(y < 0 || y >= res.y, Ref<Image>());
 
-	Ref<Image> im = zylann::godot::create_empty_image(res.x, res.z, false, Image::FORMAT_RGB8);
+	Ref<Image> im = voxel::godot::create_empty_image(res.x, res.z, false, Image::FORMAT_RGB8);
 
 	const Color nega_col(0.5f, 0.5f, 1.0f);
 	const Color posi_col(1.0f, 0.6f, 0.1f);
@@ -808,7 +808,7 @@ Ref<Image> VoxelBuffer::debug_print_sdf_y_slice(const zylann::voxel::VoxelBuffer
 
 	for (int z = 0; z < res.z; ++z) {
 		for (int x = 0; x < res.x; ++x) {
-			const float sd = scale * buffer.get_voxel_f(x, y, z, zylann::voxel::VoxelBuffer::CHANNEL_SDF);
+			const float sd = scale * buffer.get_voxel_f(x, y, z, voxel::VoxelBuffer::CHANNEL_SDF);
 
 			const float nega = math::clamp(-sd, 0.0f, 1.0f);
 			const float posi = math::clamp(sd, 0.0f, 1.0f);
@@ -821,11 +821,11 @@ Ref<Image> VoxelBuffer::debug_print_sdf_y_slice(const zylann::voxel::VoxelBuffer
 	return im;
 }
 
-Ref<Image> VoxelBuffer::debug_print_sdf_z_slice(const zylann::voxel::VoxelBuffer &buffer, float scale, int z) {
+Ref<Image> VoxelBuffer::debug_print_sdf_z_slice(const voxel::VoxelBuffer &buffer, float scale, int z) {
 	const Vector3i res = buffer.get_size();
 	ERR_FAIL_COND_V(z < 0 || z >= res.z, Ref<Image>());
 
-	Ref<Image> im = zylann::godot::create_empty_image(res.x, res.y, false, Image::FORMAT_RGB8);
+	Ref<Image> im = voxel::godot::create_empty_image(res.x, res.y, false, Image::FORMAT_RGB8);
 
 	const Color nega_col(0.5f, 0.5f, 1.0f);
 	const Color posi_col(1.0f, 0.6f, 0.1f);
@@ -833,7 +833,7 @@ Ref<Image> VoxelBuffer::debug_print_sdf_z_slice(const zylann::voxel::VoxelBuffer
 
 	for (int x = 0; x < res.x; ++x) {
 		for (int y = 0; y < res.y; ++y) {
-			const float sd = scale * buffer.get_voxel_f(x, y, z, zylann::voxel::VoxelBuffer::CHANNEL_SDF);
+			const float sd = scale * buffer.get_voxel_f(x, y, z, voxel::VoxelBuffer::CHANNEL_SDF);
 
 			const float nega = math::clamp(-sd, 0.0f, 1.0f);
 			const float posi = math::clamp(sd, 0.0f, 1.0f);
@@ -853,7 +853,7 @@ Ref<Image> VoxelBuffer::debug_print_sdf_y_slice(float scale, int y) const {
 TypedArray<Image> VoxelBuffer::debug_print_sdf_y_slices(float scale) const {
 	TypedArray<Image> images;
 
-	const zylann::voxel::VoxelBuffer &buffer = *_buffer;
+	const voxel::VoxelBuffer &buffer = *_buffer;
 	const Vector3i res = buffer.get_size();
 
 	for (int y = 0; y < res.y; ++y) {
@@ -993,4 +993,4 @@ void VoxelBuffer::_bind_methods() {
 	BIND_CONSTANT(MAX_SIZE);
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot

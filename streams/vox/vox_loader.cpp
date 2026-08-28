@@ -4,11 +4,11 @@
 #include "../../util/dstack.h"
 #include "vox_data.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 int /*Error*/ VoxelVoxLoader::load_from_file(
 		String fpath,
@@ -16,16 +16,16 @@ int /*Error*/ VoxelVoxLoader::load_from_file(
 		Ref<VoxelColorPalette> palette,
 		godot::VoxelBuffer::ChannelId dst_channel
 ) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	ERR_FAIL_INDEX_V(dst_channel, godot::VoxelBuffer::MAX_CHANNELS, ERR_INVALID_PARAMETER);
 	ERR_FAIL_COND_V(p_voxels.is_null(), ERR_INVALID_PARAMETER);
 	VoxelBuffer &voxels = p_voxels->get_buffer();
 
-	zylann::voxel::magica::Data data;
+	voxel::magica::Data data;
 	Error load_err = data.load_from_file(fpath);
 	ERR_FAIL_COND_V(load_err != OK, load_err);
 
-	const zylann::voxel::magica::Model &model = data.get_model(0);
+	const voxel::magica::Model &model = data.get_model(0);
 
 	Span<const Color8> src_palette = to_span_const(data.get_palette());
 	const VoxelBuffer::Depth depth = voxels.get_channel_depth(VoxelBuffer::CHANNEL_COLOR);
@@ -92,4 +92,4 @@ void VoxelVoxLoader::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

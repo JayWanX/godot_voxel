@@ -4,13 +4,13 @@
 #include "../../util/godot/classes/label.h"
 #include "../../util/godot/classes/node.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
-ZN_EditorPropertyAABBMinMax::ZN_EditorPropertyAABBMinMax() {
+VOXEL_EditorPropertyAABBMinMax::VOXEL_EditorPropertyAABBMinMax() {
 	GridContainer *grid = memnew(GridContainer);
 	grid->set_columns(4);
 	add_child(grid);
@@ -30,7 +30,7 @@ ZN_EditorPropertyAABBMinMax::ZN_EditorPropertyAABBMinMax() {
 		EditorSpinSlider *sb = memnew(EditorSpinSlider);
 		sb->set_flat(true);
 		sb->set_h_size_flags(SIZE_EXPAND_FILL);
-		sb->connect("value_changed", callable_mp(this, &ZN_EditorPropertyAABBMinMax::_on_value_changed));
+		sb->connect("value_changed", callable_mp(this, &VOXEL_EditorPropertyAABBMinMax::_on_value_changed));
 		_spinboxes[i] = sb;
 
 		add_focusable(sb);
@@ -48,13 +48,13 @@ ZN_EditorPropertyAABBMinMax::ZN_EditorPropertyAABBMinMax() {
 	set_bottom_editor(grid);
 }
 
-void ZN_EditorPropertyAABBMinMax::_zn_set_read_only(bool p_read_only) {
+void VOXEL_EditorPropertyAABBMinMax::_voxel_set_read_only(bool p_read_only) {
 	for (unsigned int i = 0; i < _spinboxes.size(); i++) {
 		_spinboxes[i]->set_read_only(p_read_only);
 	}
 };
 
-void ZN_EditorPropertyAABBMinMax::_on_value_changed(double val) {
+void VOXEL_EditorPropertyAABBMinMax::_on_value_changed(double val) {
 	if (_ignore_value_change) {
 		return;
 	}
@@ -70,7 +70,7 @@ void ZN_EditorPropertyAABBMinMax::_on_value_changed(double val) {
 	emit_changed(get_edited_property(), p, "");
 }
 
-void ZN_EditorPropertyAABBMinMax::_zn_update_property() {
+void VOXEL_EditorPropertyAABBMinMax::_voxel_update_property() {
 	const AABB val = get_edited_object()->get(get_edited_property());
 
 	_ignore_value_change = true;
@@ -85,7 +85,7 @@ void ZN_EditorPropertyAABBMinMax::_zn_update_property() {
 	_ignore_value_change = false;
 }
 
-void ZN_EditorPropertyAABBMinMax::_notification(int p_what) {
+void VOXEL_EditorPropertyAABBMinMax::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE:
 		case NOTIFICATION_THEME_CHANGED: {
@@ -97,7 +97,7 @@ void ZN_EditorPropertyAABBMinMax::_notification(int p_what) {
 	}
 }
 
-void ZN_EditorPropertyAABBMinMax::setup(
+void VOXEL_EditorPropertyAABBMinMax::setup(
 		double p_min,
 		double p_max,
 		double p_step,
@@ -115,6 +115,6 @@ void ZN_EditorPropertyAABBMinMax::setup(
 	}
 }
 
-void ZN_EditorPropertyAABBMinMax::_bind_methods() {}
+void VOXEL_EditorPropertyAABBMinMax::_bind_methods() {}
 
-} // namespace zylann
+} // namespace voxel

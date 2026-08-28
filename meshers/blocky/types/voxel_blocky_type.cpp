@@ -7,7 +7,7 @@
 #include "../../../util/godot/core/string.h"
 #include "../../../util/godot/core/string_name.h"
 #include "../../../util/godot/core/typed_array.h"
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 // For `MAKE_RESOURCE_TYPE_HINT`
 #include "../../../util/godot/classes/object.h"
 #endif
@@ -19,12 +19,12 @@
 #include "../voxel_blocky_library_base.h"
 #include <array>
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/callable_mp.h"
 #include "../../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Making types can get quite complicated, config files sound like a better solution compared to messing around in the
 // inspector, see how Minecraft defines their models: https://minecraft.wiki/w/Tutorials/Models
@@ -127,13 +127,13 @@ void VoxelBlockyType::get_checked_attributes(StdVector<Ref<VoxelBlockyAttribute>
 			break;
 		}
 	}
-	ZN_ASSERT_RETURN_V(i > 0, false);
+	VOXEL_ASSERT_RETURN_V(i > 0, false);
 
 	VoxelBlockyType::VariantKey key;
 	unsigned int attrib_index = 0;
 
 	while (i < str.size()) {
-		ZN_ASSERT_RETURN_V_MSG(attrib_index < VoxelBlockyType::MAX_ATTRIBUTES, false,
+		VOXEL_ASSERT_RETURN_V_MSG(attrib_index < VoxelBlockyType::MAX_ATTRIBUTES, false,
 				format("When parsing property name '{}'", property_name));
 
 		unsigned int attrib_start = i;
@@ -151,7 +151,7 @@ void VoxelBlockyType::get_checked_attributes(StdVector<Ref<VoxelBlockyAttribute>
 		key.attribute_names[attrib_index] = attrib_name;
 
 		++i;
-		ZN_ASSERT_RETURN_V_MSG(i < str.size(), false, format("When parsing property name '{}'", property_name));
+		VOXEL_ASSERT_RETURN_V_MSG(i < str.size(), false, format("When parsing property name '{}'", property_name));
 
 		unsigned int value = 0;
 		for (; i < str.size(); ++i) {
@@ -169,7 +169,7 @@ void VoxelBlockyType::get_checked_attributes(StdVector<Ref<VoxelBlockyAttribute>
 				// We should make a custom editor for this, but by doing that, we would loose sub-inspectors...
 				// so the only way to keep a good Godot integration is to make an entirely dedicated editor for types,
 				// so THE (glorious singleton) Godot inspector can be visible at the same time to edit sub-resources...
-				ZN_PRINT_ERROR(format(
+				VOXEL_PRINT_ERROR(format(
 						"Unexpected character at position {} when parsing variant property '{}'", i, property_name));
 				return false;
 			}
@@ -225,7 +225,7 @@ Ref<VoxelBlockyModel> VoxelBlockyType::get_variant(const VariantKey &key) const 
 }
 
 /*bool VoxelBlockyType::_set(const StringName &p_name, const Variant &p_value) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	String name_str = p_name;
 
 	if (name_str.begins_with("variants/")) {
@@ -240,7 +240,7 @@ Ref<VoxelBlockyModel> VoxelBlockyType::get_variant(const VariantKey &key) const 
 }*/
 
 /*bool VoxelBlockyType::_get(const StringName &p_name, Variant &r_ret) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	String name_str = p_name;
 
 	if (name_str.begins_with("variants/")) {
@@ -255,7 +255,7 @@ Ref<VoxelBlockyModel> VoxelBlockyType::get_variant(const VariantKey &key) const 
 }*/
 
 /*void VoxelBlockyType::_get_property_list(List<PropertyInfo> *p_list) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	StdVector<Ref<VoxelBlockyAttribute>> attributes;
 	gather_and_sort_attributes(_attributes, attributes);
@@ -332,7 +332,7 @@ void VoxelBlockyType::bake(
 		StdVector<Ref<VoxelBlockyFluid>> &indexed_fluids,
 		StdVector<blocky::BakedFluid> &baked_fluids
 ) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Don't print warnings when used for previewing. It's ok to have momentarily invalid setups when the user is
 	// editing properties.
@@ -384,7 +384,7 @@ void VoxelBlockyType::bake(
 			// Not specified, but the type has a rotation attribute.
 			// Assume rotation. Rotate from default.
 
-			ZN_ASSERT_CONTINUE_MSG(
+			VOXEL_ASSERT_CONTINUE_MSG(
 					key.attribute_names[rotation_attribute_index] == rotation_attribute->get_attribute_name(), "Bug?"
 			);
 
@@ -470,7 +470,7 @@ unsigned int get_non_null_count(const StdVector<Ref<T>> &objects) {
 #ifdef TOOLS_ENABLED
 
 void VoxelBlockyType::get_configuration_warnings(PackedStringArray &out_warnings) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	for (const Ref<VoxelBlockyAttribute> &attrib : _attributes) {
 		if (attrib.is_null()) {
@@ -486,7 +486,7 @@ void VoxelBlockyType::get_configuration_warnings(PackedStringArray &out_warnings
 	gather_and_sort_attributes(_attributes, attributes);
 
 	for (const Ref<VoxelBlockyAttribute> &attrib : attributes) {
-		ZN_ASSERT_RETURN(attrib.is_valid());
+		VOXEL_ASSERT_RETURN(attrib.is_valid());
 		attrib->get_configuration_warnings(out_warnings);
 	}
 
@@ -522,7 +522,7 @@ Ref<Mesh> VoxelBlockyType::get_preview_mesh(const VariantKey &key) const {
 
 	bake(baked_models, keys, material_indexer, &key, require_tangents, indexed_fluids, baked_fluids);
 
-	ZN_ASSERT_RETURN_V(baked_models.size() == 1, Ref<Mesh>());
+	VOXEL_ASSERT_RETURN_V(baked_models.size() == 1, Ref<Mesh>());
 	const blocky::BakedModel &baked_model = baked_models[0];
 	Ref<Mesh> mesh = VoxelBlockyModel::make_mesh_from_baked_data(baked_model, require_tangents);
 
@@ -555,7 +555,7 @@ void VoxelBlockyType::gather_and_sort_attributes(
 		const StdVector<Ref<VoxelBlockyAttribute>> &attributes_with_maybe_nulls,
 		StdVector<Ref<VoxelBlockyAttribute>> &out_attributes
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Gather non-null attributes
 	for (const Ref<VoxelBlockyAttribute> &attrib : attributes_with_maybe_nulls) {
@@ -583,10 +583,10 @@ void VoxelBlockyType::generate_keys(
 		StdVector<VariantKey> &out_keys,
 		bool include_rotations
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	for (unsigned int i = 0; i < attributes.size(); ++i) {
-		ZN_ASSERT_RETURN(attributes[i].is_valid());
+		VOXEL_ASSERT_RETURN(attributes[i].is_valid());
 	}
 
 	// When `include_rotations` is false, rotation attributes may be considered having a single value, their
@@ -611,7 +611,7 @@ void VoxelBlockyType::generate_keys(
 
 	// TODO Return combination count so we can check if it matches returned key count, and we can show feedback in the
 	// inspector using a dummy property as indicator.
-	ZN_ASSERT_RETURN_MSG(variant_count < MAX_EDITING_VARIANTS, "Too many combinations");
+	VOXEL_ASSERT_RETURN_MSG(variant_count < MAX_EDITING_VARIANTS, "Too many combinations");
 
 	StdVector<VariantKey> &keys = out_keys;
 	keys.resize(variant_count);
@@ -735,7 +735,7 @@ void VoxelBlockyType::_b_set_attributes(TypedArray<VoxelBlockyAttribute> attribu
 
 void VoxelBlockyType::_b_set_variant_model(Array p_key, Ref<VoxelBlockyModel> model) {
 	VariantKey key;
-	ZN_ASSERT_RETURN(key.parse_from_array(p_key));
+	VOXEL_ASSERT_RETURN(key.parse_from_array(p_key));
 	key.sort();
 	set_variant(key, model);
 }
@@ -744,14 +744,14 @@ void VoxelBlockyType::_b_set_variant_models_data(Array data) {
 	_variants.clear();
 	for (int i = 0; i < data.size(); ++i) {
 		Variant pair_v = data[i];
-		ZN_ASSERT_CONTINUE(pair_v.get_type() == Variant::ARRAY);
+		VOXEL_ASSERT_CONTINUE(pair_v.get_type() == Variant::ARRAY);
 		Array pair = pair_v;
-		ZN_ASSERT_CONTINUE(pair.size() == 2);
+		VOXEL_ASSERT_CONTINUE(pair.size() == 2);
 		Variant key_v = pair[0];
 		Variant model_v = pair[1];
-		ZN_ASSERT_CONTINUE(key_v.get_type() == Variant::ARRAY);
+		VOXEL_ASSERT_CONTINUE(key_v.get_type() == Variant::ARRAY);
 		VariantKey key;
-		ZN_ASSERT_CONTINUE(key.parse_from_array(key_v));
+		VOXEL_ASSERT_CONTINUE(key.parse_from_array(key_v));
 		Ref<VoxelBlockyModel> model = model_v;
 		if (model.is_null()) {
 			continue;
@@ -764,7 +764,7 @@ void VoxelBlockyType::_b_set_variant_models_data(Array data) {
 }
 
 Array VoxelBlockyType::_b_get_variant_models_data() const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// Instead of just saving the constants of `_variants`, we only gather valid ones, and cleanup the others.
 
 	StdVector<Ref<VoxelBlockyAttribute>> attributes;
@@ -848,7 +848,7 @@ String VoxelBlockyType::VariantKey::to_string() const {
 	String s;
 	for (unsigned int attribute_index = 0; attribute_index < key.attribute_names.size(); ++attribute_index) {
 		const StringName &attrib_name = key.attribute_names[attribute_index];
-		if (zylann::godot::is_empty(attrib_name)) {
+		if (voxel::godot::is_empty(attrib_name)) {
 			break;
 		}
 		if (attribute_index > 0) {
@@ -866,7 +866,7 @@ String VoxelBlockyType::VariantKey::to_string(Span<const Ref<VoxelBlockyAttribut
 	String s;
 	for (unsigned int attribute_index = 0; attribute_index < key.attribute_names.size(); ++attribute_index) {
 		const StringName &attrib_name = key.attribute_names[attribute_index];
-		if (zylann::godot::is_empty(attrib_name)) {
+		if (voxel::godot::is_empty(attrib_name)) {
 			break;
 		}
 		if (attribute_index > 0) {
@@ -877,7 +877,7 @@ String VoxelBlockyType::VariantKey::to_string(Span<const Ref<VoxelBlockyAttribut
 		String value_str;
 		if (attribute_index < context_attributes.size()) {
 			const Ref<VoxelBlockyAttribute> &attrib = context_attributes[attribute_index];
-			ZN_ASSERT_RETURN_V(attrib.is_valid(), "<error>");
+			VOXEL_ASSERT_RETURN_V(attrib.is_valid(), "<error>");
 			if (attrib->get_attribute_name() == attrib_name) {
 				value_str = attrib->get_name_from_value(key.attribute_values[attribute_index]);
 			}
@@ -891,17 +891,17 @@ String VoxelBlockyType::VariantKey::to_string(Span<const Ref<VoxelBlockyAttribut
 }
 
 bool VoxelBlockyType::VariantKey::parse_from_array(const Array &array) {
-	ZN_ASSERT_RETURN_V((array.size() % 2) == 0, false);
+	VOXEL_ASSERT_RETURN_V((array.size() % 2) == 0, false);
 	for (int i = 0; i < array.size(); i += 2) {
 		Variant name_v = array[i];
 		Variant value_v = array[i + 1];
 
-		ZN_ASSERT_RETURN_V(name_v.get_type() == Variant::STRING_NAME, false);
-		ZN_ASSERT_RETURN_V(value_v.get_type() == Variant::INT, false);
+		VOXEL_ASSERT_RETURN_V(name_v.get_type() == Variant::STRING_NAME, false);
+		VOXEL_ASSERT_RETURN_V(value_v.get_type() == Variant::INT, false);
 
 		// TODO GDX: Variant has no operator to convert to 8-bit integers in GodotCpp
 		const int value = value_v;
-		ZN_ASSERT_RETURN_V(value >= 0 && value < VoxelBlockyAttribute::MAX_VALUES, false);
+		VOXEL_ASSERT_RETURN_V(value >= 0 && value < VoxelBlockyAttribute::MAX_VALUES, false);
 
 		const int attrib_index = i / 2;
 		attribute_names[attrib_index] = name_v;
@@ -914,7 +914,7 @@ Array VoxelBlockyType::VariantKey::to_array() const {
 	Array array;
 	for (unsigned int i = 0; i < attribute_names.size(); ++i) {
 		const StringName &attribute_name = attribute_names[i];
-		if (zylann::godot::is_empty(attribute_name)) {
+		if (voxel::godot::is_empty(attribute_name)) {
 			break;
 		}
 		array.append(attribute_name);
@@ -927,7 +927,7 @@ void VoxelBlockyType::VariantKey::sort() {
 	std::array<std::pair<StringName, uint8_t>, MAX_ATTRIBUTES> pairs;
 	unsigned int n = 0;
 	for (unsigned int i = 0; i < attribute_names.size(); ++i) {
-		if (!zylann::godot::is_empty(attribute_names[i])) {
+		if (!voxel::godot::is_empty(attribute_names[i])) {
 			pairs[n] = { attribute_names[i], attribute_values[i] };
 			++n;
 		}
@@ -943,4 +943,4 @@ void VoxelBlockyType::VariantKey::sort() {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

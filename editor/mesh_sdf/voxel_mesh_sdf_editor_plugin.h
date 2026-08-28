@@ -4,28 +4,28 @@
 #include "../../util/godot/classes/editor_inspector_plugin.h"
 #include "../../util/godot/classes/editor_plugin.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-class VoxelMeshSDFInspectorPlugin : public zylann::godot::ZN_EditorInspectorPlugin {
-	GDCLASS(VoxelMeshSDFInspectorPlugin, zylann::godot::ZN_EditorInspectorPlugin)
+class VoxelMeshSDFInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
+	GDCLASS(VoxelMeshSDFInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
 protected:
-	bool _zn_can_handle(const Object *p_object) const override;
-	void _zn_parse_begin(Object *p_object) override;
+	bool _voxel_can_handle(const Object *p_object) const override;
+	void _voxel_parse_begin(Object *p_object) override;
 
 private:
 	// When compiling with GodotCpp, `_bind_methods` is not optional.
 	static void _bind_methods() {}
 };
 
-class VoxelMeshSDFEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(VoxelMeshSDFEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VoxelMeshSDFEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VoxelMeshSDFEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	VoxelMeshSDFEditorPlugin();
 
 protected:
-	bool _zn_handles(const Object *p_object) const override;
-	void _zn_edit(Object *p_object) override;
-	void _zn_make_visible(bool visible) override;
+	bool _voxel_handles(const Object *p_object) const override;
+	void _voxel_edit(Object *p_object) override;
+	void _voxel_make_visible(bool visible) override;
 
 private:
 	void _notification(int p_what);
@@ -36,6 +36,6 @@ private:
 	Ref<VoxelMeshSDFInspectorPlugin> _inspector_plugin;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESH_SDF_EDITOR_PLUGIN_H

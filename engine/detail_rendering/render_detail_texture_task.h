@@ -10,7 +10,7 @@
 #include "../priority_dependency.h"
 #include "detail_rendering.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class RenderDetailTextureGPUTask;
 
@@ -88,6 +88,6 @@ public:
 
 #endif
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_RENDER_DETAIL_TEXTURE_TASK_H

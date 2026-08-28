@@ -1,5 +1,5 @@
-#ifndef ZN_CONV_H
-#define ZN_CONV_H
+#ifndef VOXEL_CONV_H
+#define VOXEL_CONV_H
 
 #include "../godot/core/transform_3d.h"
 #include "../godot/core/vector2.h"
@@ -13,7 +13,7 @@
 #include "vector3i16.h"
 #include <limits>
 
-namespace zylann {
+namespace voxel {
 
 // Explicit conversion methods. Not in respective files because it would cause circular dependencies.
 
@@ -39,7 +39,7 @@ inline Vector3 to_vec3(const Vector3i v) {
 template <typename T>
 inline Vector3 to_vec3(T v) = delete;
 
-// Godot => ZN
+// Godot => VOXEL
 
 inline Vector2f to_vec2f(Vector2 v) {
 	return Vector2f(v.x, v.y);
@@ -73,7 +73,7 @@ inline Transform3f to_transform3f(const Transform3D &t) {
 	return Transform3f(to_basis3f(t.basis), to_vec3f(t.origin));
 }
 
-// ZN => Godot
+// VOXEL => Godot
 
 template <typename T>
 inline Vector2 to_vec2(const Vector2T<T> v) {
@@ -107,7 +107,7 @@ inline Transform3D to_transform3(const Transform3f &t) {
 	return Transform3D(to_basis3(t.basis), to_vec3(t.origin));
 }
 
-// ZN => ZN
+// VOXEL => VOXEL
 
 template <typename T>
 inline Vector3d to_vec3d(const Vector3T<T> v) {
@@ -148,6 +148,6 @@ inline Vector3i ceil_to_int(const Vector3f &f) {
 }
 
 } // namespace math
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_CONV_H
+#endif // VOXEL_CONV_H

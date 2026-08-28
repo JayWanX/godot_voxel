@@ -6,7 +6,7 @@
 #include "transvoxel_materials_single_common.h"
 #include <array>
 
-namespace zylann::voxel::transvoxel::materials::single::s2 {
+namespace voxel::transvoxel::materials::single::s2 {
 
 // One 8-bit material per voxel. Up to 4 blending in shader.
 
@@ -224,6 +224,6 @@ struct Processor {
 	}
 };
 
-} // namespace zylann::voxel::transvoxel::materials::single::s2
+} // namespace voxel::transvoxel::materials::single::s2
 
 #endif // VOXEL_TRANSVOXEL_MATERIALS_SINGLE_S2_H

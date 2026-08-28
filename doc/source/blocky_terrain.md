@@ -35,7 +35,7 @@ With default 16-bit voxel data, you can create up to 65,536 models.
 
 There are several kinds of models. A simple one is `VoxelBlockyModelCube`, which renders a cube with specific textures on its sides.
 
-With `VoxelMesherBlocky`, using texture atlases is recommended to allow re-using materials and reduce the number of draw calls. You can create a texture containing all the tiles your voxels can use. For example, here is one from the [blocky game](https://github.com/Zylann/voxelgame/tree/master/project/blocky_game) demo:
+With `VoxelMesherBlocky`, using texture atlases is recommended to allow re-using materials and reduce the number of draw calls. You can create a texture containing all the tiles your voxels can use. For example, here is one from the [blocky game](https://github.com/Voxel/voxelgame/tree/master/project/blocky_game) demo:
 
 ![Atlas used in the blocky game demo](images/blocky_game_atlas.webp)
 
@@ -146,7 +146,7 @@ TODO Example scene
 - The maximum number of levels is limited (see [VoxelBlockyModelFluid](api/VoxelBlockyModelFluid.md) API)
 - The maximum number of fluids is limited (see [VoxelBlockyLibraryBase](api/VoxelBlockyLibraryBase.md) API)
 - Normals of the top side of fluid voxels remain the same as if it was flat. Only corner positions are displaced. As a result, shading of the top won't change with slope. This is currently not implemented for performance reasons, until a fast method is found (note: Minecraft seems to have done the same choice).
-- Currently no backfaces are generated. In Minecraft, water actually has both backfaces and front faces, which are culled differently in certain edge cases. Currently the engine doesn't differenciate the two. A workaround people often try is to disable backface culling entirely in the water material, but that might lead to other issues. For more details, see [issue 621](https://github.com/Zylann/godot_voxel/issues/621)
+- Currently no backfaces are generated. In Minecraft, water actually has both backfaces and front faces, which are culled differently in certain edge cases. Currently the engine doesn't differenciate the two. A workaround people often try is to disable backface culling entirely in the water material, but that might lead to other issues. For more details, see [issue 621](https://github.com/Voxel/godot_voxel/issues/621)
 
 
 ### Usage of voxel model IDs
@@ -226,7 +226,7 @@ Another more minor detail is how matching faces are detected. During baking of t
 --------------------------------
 
 !!! warning
-	This feature is experimental, may have bugs, missing parts and may change over time. It proposes a way to organize models for a game and automates a few things, but you may still use `VoxelBlockyLibrary` if you want to handle this in your own way. See also the [corresponding issue on Github](https://github.com/Zylann/godot_voxel/issues/506).
+	This feature is experimental, may have bugs, missing parts and may change over time. It proposes a way to organize models for a game and automates a few things, but you may still use `VoxelBlockyLibrary` if you want to handle this in your own way. See also the [corresponding issue on Github](https://github.com/Voxel/godot_voxel/issues/506).
 
 An alternative library type exists, `VoxelBlockyTypeLibrary`. Instead of directly containing a list of models, it contains a list of `VoxelBlockyType`. A type is closer to what you would call a "block type" in a game, and this system was designed to be very similar to how blocks are defined in Minecraft (inspiration from https://docs.minecraftforge.net/en/1.19.2/blocks/states/).
 
@@ -334,13 +334,13 @@ Fast collisions alternative
 
 Mesh-based collisions are quite accurate and feature-rich in Godot, however it has some drawbacks:
 
-- Trimesh collision shapes have to be built each time the terrain is modified, which is [very slow](https://github.com/Zylann/godot_voxel/issues/54).
+- Trimesh collision shapes have to be built each time the terrain is modified, which is [very slow](https://github.com/Voxel/godot_voxel/issues/54).
 - The physics engine has to process arbitrary triangles near the player, which can't take advantage of particular situations, such as everything being cubes
 - Sometimes you may also want a simpler, more game-oriented collision system
 
 The `VoxelBoxMover` class provides a Minecraft-like collision system, which can be used in a similar way to `move_and_slide()`. It is more limited, but is extremely fast and is not affected by tunnelling.
 
-The code below shows how to use it, but see the [blocky demo](https://github.com/Zylann/voxelgame/tree/master/project/blocky_terrain) for the full code.
+The code below shows how to use it, but see the [blocky demo](https://github.com/Voxel/voxelgame/tree/master/project/blocky_terrain) for the full code.
 
 ```gdscript
 var box_mover = VoxelBoxMover.new()
@@ -402,4 +402,4 @@ If you still want to use a custom mesher, the only current ways are:
 - Create your own [C++ module](https://docs.godotengine.org/en/stable/engine_details/architecture/custom_modules_in_cpp.html) to create your own mesher: no need to modify the voxel module, but you will have to compile Godot, inherit the base class `VoxelMesher` and implement its virtual methods (check how the engine's own meshers are implemented for examples).
 - Modify an existing mesher in the module itself, or start from a copy of one.
 
-While in theory we could expose a way for GDScript to inherit `VoxelMesher`, scripts are too slow to take on the task of individually polygonize each voxel, and it's not yet clear what form the API would take. A development branch [mesher_script](https://github.com/Zylann/godot_voxel/tree/mesher_script) attempts to implement that, but isn't ready to use.
+While in theory we could expose a way for GDScript to inherit `VoxelMesher`, scripts are too slow to take on the task of individually polygonize each voxel, and it's not yet clear what form the API would take. A development branch [mesher_script](https://github.com/Voxel/godot_voxel/tree/mesher_script) attempts to implement that, but isn't ready to use.

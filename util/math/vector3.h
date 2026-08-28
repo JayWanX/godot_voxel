@@ -1,5 +1,5 @@
-#ifndef ZN_MATH_VECTOR3_H
-#define ZN_MATH_VECTOR3_H
+#ifndef VOXEL_MATH_VECTOR3_H
+#define VOXEL_MATH_VECTOR3_H
 
 #include "../godot/core/vector3.h"
 #include "funcs.h"
@@ -7,15 +7,15 @@
 // 3-dimensional vector which components are either 32-bit float or 64-bit float depending on how Godot was compiled.
 // This is the type to use for interoperating with Godot.
 
-namespace zylann::godot::Vector3Utility {
+namespace voxel::godot::Vector3Utility {
 
 inline Vector3 splat(const real_t v) {
 	return Vector3(v, v, v);
 }
 
-} // namespace zylann::godot::Vector3Utility
+} // namespace voxel::godot::Vector3Utility
 
-namespace zylann::math {
+namespace voxel::math {
 
 inline Vector3 fract(const Vector3 &p) {
 	return Vector3(fract(p.x), fract(p.y), fract(p.z));
@@ -81,11 +81,11 @@ inline real_t get_largest_coord(Vector3 v) {
 	return math::max(math::max(v.x, v.y), v.z);
 }
 
-} // namespace zylann::math
+} // namespace voxel::math
 
-namespace zylann {
+namespace voxel {
 class TextWriter;
 TextWriter &operator<<(TextWriter &w, const Vector3 &v);
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_MATH_VECTOR3_H
+#endif // VOXEL_MATH_VECTOR3_H

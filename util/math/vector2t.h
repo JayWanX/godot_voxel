@@ -1,9 +1,9 @@
-#ifndef ZN_VECTOR2T_H
-#define ZN_VECTOR2T_H
+#ifndef VOXEL_VECTOR2T_H
+#define VOXEL_VECTOR2T_H
 
 #include "funcs.h"
 
-namespace zylann {
+namespace voxel {
 
 template <typename T>
 struct Vector2T {
@@ -27,14 +27,14 @@ struct Vector2T {
 
 	inline const T &operator[](const unsigned int p_axis) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_axis < AXIS_COUNT);
+		VOXEL_ASSERT(p_axis < AXIS_COUNT);
 #endif
 		return coords[p_axis];
 	}
 
 	inline T &operator[](const unsigned int p_axis) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(p_axis < AXIS_COUNT);
+		VOXEL_ASSERT(p_axis < AXIS_COUNT);
 #endif
 		return coords[p_axis];
 	}
@@ -137,6 +137,6 @@ inline Vector2T<T> max(const Vector2T<T> a, const Vector2T<T> b) {
 }
 
 } // namespace math
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_VECTOR2T_H
+#endif // VOXEL_VECTOR2T_H

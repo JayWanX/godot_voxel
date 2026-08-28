@@ -1,12 +1,12 @@
-#ifndef ZN_TRIANGLE_H
-#define ZN_TRIANGLE_H
+#ifndef VOXEL_TRIANGLE_H
+#define VOXEL_TRIANGLE_H
 
 #include "vector2f.h"
 #include "vector3.h"
 #include "vector3d.h"
 #include "vector3f.h"
 
-namespace zylann::math {
+namespace voxel::math {
 
 // Float version of Geometry::is_point_in_triangle()
 inline bool is_point_in_triangle(const Vector2f &s, const Vector2f &a, const Vector2f &b, const Vector2f &c) {
@@ -242,6 +242,6 @@ struct BakedIntersectionTriangleForFixedDirection {
 	}
 };
 
-} // namespace zylann::math
+} // namespace voxel::math
 
-#endif // ZN_TRIANGLE_H
+#endif // VOXEL_TRIANGLE_H

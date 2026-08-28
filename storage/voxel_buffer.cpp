@@ -11,17 +11,17 @@
 #include "voxel_memory_pool.h"
 #include <cstring>
 
-namespace zylann::voxel {
+namespace voxel {
 
 inline uint8_t *allocate_channel_data(size_t size, VoxelBuffer::Allocator allocator) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	switch (allocator) {
 		case VoxelBuffer::ALLOCATOR_POOL:
 			return VoxelMemoryPool::get_singleton().allocate(size);
 		case VoxelBuffer::ALLOCATOR_DEFAULT:
-			return (uint8_t *)ZN_ALLOC(size * sizeof(uint8_t));
+			return (uint8_t *)VOXEL_ALLOC(size * sizeof(uint8_t));
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 			return nullptr;
 	}
 }
@@ -32,10 +32,10 @@ inline void free_channel_data(uint8_t *data, uint32_t size, VoxelBuffer::Allocat
 			VoxelMemoryPool::get_singleton().recycle(data, size);
 			break;
 		case VoxelBuffer::ALLOCATOR_DEFAULT:
-			ZN_FREE(data);
+			VOXEL_FREE(data);
 			break;
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 }
 
@@ -78,7 +78,7 @@ const char *VoxelBuffer::get_channel_name(const ChannelId id) {
 		case CHANNEL_DATA7:
 			return "data7";
 		default:
-			ZN_PRINT_ERROR("Unknown channel ID");
+			VOXEL_PRINT_ERROR("Unknown channel ID");
 			return "<error>";
 	}
 }
@@ -117,7 +117,7 @@ uint64_t VoxelBuffer::get_default_sdf_raw_value(const Depth depth) {
 		case DEPTH_32_BIT:
 			return constants::SDF_FAR_OUTSIDE;
 		default:
-			ZN_PRINT_ERROR("Unsupported depth");
+			VOXEL_PRINT_ERROR("Unsupported depth");
 			return 0;
 	}
 }
@@ -129,7 +129,7 @@ uint64_t VoxelBuffer::get_default_indices_raw_value(const Depth depth) {
 		case DEPTH_16_BIT:
 			return MIXEL4_DEFAULT_INDICES;
 		default:
-			ZN_PRINT_ERROR("Unsupported depth");
+			VOXEL_PRINT_ERROR("Unsupported depth");
 			return 0;
 	}
 }
@@ -175,8 +175,8 @@ VoxelBuffer &VoxelBuffer::operator=(VoxelBuffer &&src) {
 }
 
 void VoxelBuffer::create(unsigned int sx, unsigned int sy, unsigned int sz, const VoxelFormat *new_format) {
-	ZN_DSTACK();
-	ZN_ASSERT_RETURN(sx <= MAX_SIZE && sy <= MAX_SIZE && sz <= MAX_SIZE);
+	VOXEL_DSTACK();
+	VOXEL_ASSERT_RETURN(sx <= MAX_SIZE && sy <= MAX_SIZE && sz <= MAX_SIZE);
 
 	// Always clear everything even if size doesn't change, because at least we want to start from default.
 	// If one day we really want some hypothetic performance trying to re-use previously allocated data,
@@ -185,7 +185,7 @@ void VoxelBuffer::create(unsigned int sx, unsigned int sy, unsigned int sz, cons
 
 #ifdef TOOLS_ENABLED
 	if (sx == 0 || sy == 0 || sz == 0) {
-		ZN_PRINT_WARNING(format(
+		VOXEL_PRINT_WARNING(format(
 				"VoxelBuffer::create called with empty size ({}, {}, {}). It will be cleared instead.", sx, sy, sz
 		));
 		return;
@@ -196,7 +196,7 @@ void VoxelBuffer::create(unsigned int sx, unsigned int sy, unsigned int sz, cons
 
 #ifdef DEV_ENABLED
 	for (const Channel &channel : _channels) {
-		ZN_ASSERT(channel.compression == COMPRESSION_UNIFORM);
+		VOXEL_ASSERT(channel.compression == COMPRESSION_UNIFORM);
 	}
 #endif
 	// _allocator = allocator;
@@ -213,7 +213,7 @@ void VoxelBuffer::clear(const VoxelFormat *new_format) {
 			delete_channel(channel_index);
 		}
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.compression == COMPRESSION_UNIFORM);
+		VOXEL_ASSERT(channel.compression == COMPRESSION_UNIFORM);
 #endif
 	}
 
@@ -237,7 +237,7 @@ void VoxelBuffer::clear(const VoxelFormat *new_format) {
 }
 
 void VoxelBuffer::clear_channel(unsigned int channel_index, uint64_t clear_value) {
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 	Channel &channel = _channels[channel_index];
 	clear_channel(channel, clear_value, _allocator);
 }
@@ -250,7 +250,7 @@ void VoxelBuffer::clear_channel(Channel &channel, uint64_t clear_value, Allocato
 }
 
 void VoxelBuffer::clear_channel_f(unsigned int channel_index, real_t clear_value) {
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 	const Channel &channel = _channels[channel_index];
 	clear_channel(channel_index, real_to_raw_voxel(clear_value, channel.depth));
 }
@@ -265,8 +265,8 @@ bool VoxelBuffer::has_format(const VoxelFormat &p_format) const {
 }
 
 uint64_t VoxelBuffer::get_voxel(int x, int y, int z, unsigned int channel_index) const {
-	ZN_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, 0);
-	ZN_ASSERT_RETURN_V_MSG(is_position_valid(x, y, z), 0, format("Invalid position ({}, {}, {})", x, y, z));
+	VOXEL_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, 0);
+	VOXEL_ASSERT_RETURN_V_MSG(is_position_valid(x, y, z), 0, format("Invalid position ({}, {}, {})", x, y, z));
 
 	const Channel &channel = _channels[channel_index];
 
@@ -275,7 +275,7 @@ uint64_t VoxelBuffer::get_voxel(int x, int y, int z, unsigned int channel_index)
 
 	} else {
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.data != nullptr);
+		VOXEL_ASSERT(channel.data != nullptr);
 #endif
 		const uint32_t i = get_index(x, y, z);
 
@@ -300,9 +300,9 @@ uint64_t VoxelBuffer::get_voxel(int x, int y, int z, unsigned int channel_index)
 }
 
 void VoxelBuffer::set_voxel(uint64_t value, int x, int y, int z, unsigned int channel_index) {
-	ZN_DSTACK();
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
-	ZN_ASSERT_RETURN_MSG(is_position_valid(x, y, z), format("Invalid position ({}, {}, {})", x, y, z));
+	VOXEL_DSTACK();
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN_MSG(is_position_valid(x, y, z), format("Invalid position ({}, {}, {})", x, y, z));
 
 	Channel &channel = _channels[channel_index];
 
@@ -311,7 +311,7 @@ void VoxelBuffer::set_voxel(uint64_t value, int x, int y, int z, unsigned int ch
 	if (channel.compression == COMPRESSION_UNIFORM) {
 		if (channel.defval != value) {
 			// Allocate channel with same initial values as defval
-			ZN_ASSERT_RETURN(create_channel(channel_index, channel.defval));
+			VOXEL_ASSERT_RETURN(create_channel(channel_index, channel.defval));
 		} else {
 			do_set = false;
 		}
@@ -319,7 +319,7 @@ void VoxelBuffer::set_voxel(uint64_t value, int x, int y, int z, unsigned int ch
 
 	if (do_set) {
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.data != nullptr);
+		VOXEL_ASSERT(channel.data != nullptr);
 #endif
 
 		const uint32_t i = get_index(x, y, z);
@@ -352,17 +352,17 @@ void VoxelBuffer::set_voxel(uint64_t value, int x, int y, int z, unsigned int ch
 }
 
 real_t VoxelBuffer::get_voxel_f(int x, int y, int z, unsigned int channel_index) const {
-	ZN_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, 0);
+	VOXEL_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, 0);
 	return raw_voxel_to_real(get_voxel(x, y, z, channel_index), _channels[channel_index].depth);
 }
 
 void VoxelBuffer::set_voxel_f(real_t value, int x, int y, int z, unsigned int channel_index) {
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 	set_voxel(real_to_raw_voxel(value, _channels[channel_index].depth), x, y, z, channel_index);
 }
 
 void VoxelBuffer::fill(uint64_t defval, unsigned int channel_index) {
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 
 	Channel &channel = _channels[channel_index];
 
@@ -379,10 +379,10 @@ void VoxelBuffer::fill(uint64_t defval, unsigned int channel_index) {
 
 	const size_t volume = get_volume();
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(channel.size_in_bytes == get_size_in_bytes_for_volume(_size, channel.depth));
+	VOXEL_ASSERT(channel.size_in_bytes == get_size_in_bytes_for_volume(_size, channel.depth));
 #endif
 #ifdef DEV_ENABLED
-	ZN_ASSERT(channel.data != nullptr);
+	VOXEL_ASSERT(channel.data != nullptr);
 #endif
 
 	switch (channel.depth) {
@@ -415,8 +415,8 @@ void VoxelBuffer::fill(uint64_t defval, unsigned int channel_index) {
 }
 
 void VoxelBuffer::fill_area(uint64_t defval, Vector3i min, Vector3i max, unsigned int channel_index) {
-	ZN_DSTACK();
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_DSTACK();
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 
 	Vector3iUtil::sort_min_max(min, max);
 	min = min.clamp(Vector3i(0, 0, 0), _size);
@@ -432,12 +432,12 @@ void VoxelBuffer::fill_area(uint64_t defval, Vector3i min, Vector3i max, unsigne
 		if (channel.defval == defval) {
 			return;
 		} else {
-			ZN_ASSERT_RETURN(create_channel(channel_index, channel.defval));
+			VOXEL_ASSERT_RETURN(create_channel(channel_index, channel.defval));
 		}
 	}
 
 #ifdef DEV_ENABLED
-	ZN_ASSERT(channel.data != nullptr);
+	VOXEL_ASSERT(channel.data != nullptr);
 #endif
 
 	Vector3i pos;
@@ -446,7 +446,7 @@ void VoxelBuffer::fill_area(uint64_t defval, Vector3i min, Vector3i max, unsigne
 	for (pos.z = min.z; pos.z < max.z; ++pos.z) {
 		for (pos.x = min.x; pos.x < max.x; ++pos.x) {
 			const size_t dst_ri = get_index(pos.x, pos.y + min.y, pos.z);
-			ZN_ASSERT(dst_ri < volume);
+			VOXEL_ASSERT(dst_ri < volume);
 
 			switch (channel.depth) {
 				case DEPTH_8_BIT:
@@ -481,13 +481,13 @@ void VoxelBuffer::fill_area(uint64_t defval, Vector3i min, Vector3i max, unsigne
 }
 
 void VoxelBuffer::fill_area_f(float fvalue, Vector3i min, Vector3i max, unsigned int channel_index) {
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 	const Channel &channel = _channels[channel_index];
 	fill_area(real_to_raw_voxel(fvalue, channel.depth), min, max, channel_index);
 }
 
 void VoxelBuffer::fill_f(real_t value, unsigned int channel) {
-	ZN_ASSERT_RETURN(channel < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(channel < MAX_CHANNELS);
 	fill(real_to_raw_voxel(value, _channels[channel].depth), channel);
 }
 
@@ -497,7 +497,7 @@ inline bool is_uniform_b(const uint8_t *data, size_t item_count) {
 }
 
 bool VoxelBuffer::is_uniform(unsigned int channel_index) const {
-	ZN_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, true);
+	VOXEL_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, true);
 	const Channel &channel = _channels[channel_index];
 	return is_uniform(channel);
 }
@@ -527,9 +527,9 @@ bool VoxelBuffer::is_uniform(const Channel &channel) {
 }
 
 uint64_t get_first_voxel(const VoxelBuffer::Channel &channel) {
-	ZN_ASSERT(channel.compression != VoxelBuffer::COMPRESSION_UNIFORM);
+	VOXEL_ASSERT(channel.compression != VoxelBuffer::COMPRESSION_UNIFORM);
 #ifdef DEV_ENABLED
-	ZN_ASSERT(channel.data != nullptr);
+	VOXEL_ASSERT(channel.data != nullptr);
 #endif
 
 	switch (channel.depth) {
@@ -546,7 +546,7 @@ uint64_t get_first_voxel(const VoxelBuffer::Channel &channel) {
 			return reinterpret_cast<uint64_t *>(channel.data)[0];
 
 		default:
-			ZN_CRASH_MSG("Unexpected depth");
+			VOXEL_CRASH_MSG("Unexpected depth");
 			return 0;
 	}
 }
@@ -566,17 +566,17 @@ void VoxelBuffer::compress_if_uniform(Channel &channel) {
 }
 
 void VoxelBuffer::decompress_channel(unsigned int channel_index) {
-	ZN_DSTACK();
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
-	ZN_ASSERT_RETURN(!Vector3iUtil::is_empty_size(get_size()));
+	VOXEL_DSTACK();
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(!Vector3iUtil::is_empty_size(get_size()));
 	Channel &channel = _channels[channel_index];
 	if (channel.compression == COMPRESSION_UNIFORM) {
-		ZN_ASSERT_RETURN(create_channel(channel_index, channel.defval));
+		VOXEL_ASSERT_RETURN(create_channel(channel_index, channel.defval));
 	}
 }
 
 VoxelBuffer::Compression VoxelBuffer::get_channel_compression(unsigned int channel_index) const {
-	ZN_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, VoxelBuffer::COMPRESSION_NONE);
+	VOXEL_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, VoxelBuffer::COMPRESSION_NONE);
 	const Channel &channel = _channels[channel_index];
 	return channel.compression;
 }
@@ -595,24 +595,24 @@ void VoxelBuffer::copy_channels_from(const VoxelBuffer &other) {
 }
 
 void VoxelBuffer::copy_channel_from(const VoxelBuffer &other, unsigned int channel_index) {
-	ZN_DSTACK();
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
-	ZN_ASSERT_RETURN(other._size == _size);
+	VOXEL_DSTACK();
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(other._size == _size);
 
 	Channel &channel = _channels[channel_index];
 	const Channel &other_channel = other._channels[channel_index];
 
-	ZN_ASSERT_RETURN(other_channel.depth == channel.depth);
+	VOXEL_ASSERT_RETURN(other_channel.depth == channel.depth);
 
 	if (other_channel.compression != COMPRESSION_UNIFORM) {
 		// Other is not uniform, make sure we allocate our channel
 		if (channel.compression == COMPRESSION_UNIFORM) {
-			ZN_ASSERT_RETURN(create_channel_noinit(channel_index, _size));
+			VOXEL_ASSERT_RETURN(create_channel_noinit(channel_index, _size));
 		}
-		ZN_ASSERT(channel.size_in_bytes == other_channel.size_in_bytes);
+		VOXEL_ASSERT(channel.size_in_bytes == other_channel.size_in_bytes);
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.data != nullptr);
-		ZN_ASSERT(other_channel.data != nullptr);
+		VOXEL_ASSERT(channel.data != nullptr);
+		VOXEL_ASSERT(other_channel.data != nullptr);
 #endif
 		memcpy(channel.data, other_channel.data, channel.size_in_bytes);
 
@@ -628,7 +628,7 @@ void VoxelBuffer::copy_channel_from(const VoxelBuffer &other, unsigned int chann
 	channel.depth = other_channel.depth;
 
 #ifdef DEV_ENABLED
-	ZN_ASSERT(channel.compression == other_channel.compression);
+	VOXEL_ASSERT(channel.compression == other_channel.compression);
 #endif
 }
 
@@ -641,13 +641,13 @@ void VoxelBuffer::copy_channel_from(
 		unsigned int channel_index
 ) {
 	//
-	ZN_DSTACK();
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_DSTACK();
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
 
 	Channel &channel = _channels[channel_index];
 	const Channel &other_channel = other._channels[channel_index];
 
-	ZN_ASSERT_RETURN(other_channel.depth == channel.depth);
+	VOXEL_ASSERT_RETURN(other_channel.depth == channel.depth);
 
 	if (channel.compression == COMPRESSION_UNIFORM && other_channel.compression == COMPRESSION_UNIFORM &&
 		channel.defval == other_channel.defval) {
@@ -659,11 +659,11 @@ void VoxelBuffer::copy_channel_from(
 		if (channel.compression == COMPRESSION_UNIFORM) {
 			// Note, we do this even if the pasted data happens to be all the same value as our current channel.
 			// We assume that this case is not frequent enough to bother, and compression can happen later
-			ZN_ASSERT_RETURN(create_channel(channel_index, channel.defval));
+			VOXEL_ASSERT_RETURN(create_channel(channel_index, channel.defval));
 		}
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.data != nullptr);
-		ZN_ASSERT(other_channel.data != nullptr);
+		VOXEL_ASSERT(channel.data != nullptr);
+		VOXEL_ASSERT(other_channel.data != nullptr);
 #endif
 		const unsigned int item_size = get_depth_byte_count(channel.depth);
 		Span<const uint8_t> src(other_channel.data, other_channel.size_in_bytes);
@@ -687,7 +687,7 @@ void VoxelBuffer::copy_channel_from(
 }
 
 void VoxelBuffer::copy_to(VoxelBuffer &dst, bool include_metadata) const {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	dst.create(_size);
 	for (unsigned int i = 0; i < _channels.size(); ++i) {
 		dst.set_channel_depth(i, _channels[i].depth);
@@ -700,7 +700,7 @@ void VoxelBuffer::copy_to(VoxelBuffer &dst, bool include_metadata) const {
 
 void VoxelBuffer::move_to(VoxelBuffer &dst) {
 	if (this == &dst) {
-		ZN_PRINT_VERBOSE("Moving VoxelBuffer to itself?");
+		VOXEL_PRINT_VERBOSE("Moving VoxelBuffer to itself?");
 		return;
 	}
 
@@ -725,7 +725,7 @@ bool VoxelBuffer::get_channel_as_bytes(unsigned int channel_index, Span<uint8_t>
 	const Channel &channel = _channels[channel_index];
 	if (channel.compression != COMPRESSION_UNIFORM) {
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.data != nullptr);
+		VOXEL_ASSERT(channel.data != nullptr);
 #endif
 		slice = Span<uint8_t>(channel.data, 0, channel.size_in_bytes);
 		return true;
@@ -739,7 +739,7 @@ bool VoxelBuffer::get_channel_as_bytes_read_only(unsigned int channel_index, Spa
 	const Channel &channel = _channels[channel_index];
 	if (channel.compression != COMPRESSION_UNIFORM) {
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.data != nullptr);
+		VOXEL_ASSERT(channel.data != nullptr);
 #endif
 		slice = Span<const uint8_t>(channel.data, 0, channel.size_in_bytes);
 		return true;
@@ -754,18 +754,18 @@ void VoxelBuffer::set_channel_from_bytes(const unsigned int channel_index, Span<
 	if (channel.compression == COMPRESSION_UNIFORM) {
 		// We don't init channel data to nullptr in the constructor so can't do that check
 		// #ifdef DEV_ENABLED
-		// 		ZN_ASSERT(channel.data == nullptr);
+		// 		VOXEL_ASSERT(channel.data == nullptr);
 		// #endif
-		ZN_ASSERT_RETURN(create_channel_noinit(channel_index, _size));
+		VOXEL_ASSERT_RETURN(create_channel_noinit(channel_index, _size));
 	}
-	ZN_ASSERT_RETURN(channel.data != nullptr);
-	ZN_ASSERT_RETURN(src.size() == channel.size_in_bytes);
-	ZN_ASSERT(channel.compression == COMPRESSION_NONE);
+	VOXEL_ASSERT_RETURN(channel.data != nullptr);
+	VOXEL_ASSERT_RETURN(src.size() == channel.size_in_bytes);
+	VOXEL_ASSERT(channel.compression == COMPRESSION_NONE);
 	src.copy_to(Span<uint8_t>(channel.data, channel.size_in_bytes));
 }
 
 bool VoxelBuffer::create_channel(int i, uint64_t defval) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	if (!create_channel_noinit(i, _size)) {
 		return false;
 	}
@@ -782,13 +782,13 @@ size_t VoxelBuffer::get_size_in_bytes_for_volume(Vector3i size, Depth depth) {
 }
 
 bool VoxelBuffer::create_channel_noinit(int i, Vector3i size) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	Channel &channel = _channels[i];
 	const size_t size_in_bytes = get_size_in_bytes_for_volume(size, channel.depth);
-	ZN_ASSERT_RETURN_V_MSG(size_in_bytes <= Channel::MAX_SIZE_IN_BYTES, false, "Buffer is too big");
-	ZN_ASSERT(channel.compression == COMPRESSION_UNIFORM); // The channel must not already be allocated
+	VOXEL_ASSERT_RETURN_V_MSG(size_in_bytes <= Channel::MAX_SIZE_IN_BYTES, false, "Buffer is too big");
+	VOXEL_ASSERT(channel.compression == COMPRESSION_UNIFORM); // The channel must not already be allocated
 	channel.data = allocate_channel_data(size_in_bytes, _allocator);
-	ZN_ASSERT_RETURN_V(channel.data != nullptr, false); // Bad alloc?
+	VOXEL_ASSERT_RETURN_V(channel.data != nullptr, false); // Bad alloc?
 	channel.compression = COMPRESSION_NONE;
 	channel.size_in_bytes = size_in_bytes;
 	return true;
@@ -800,7 +800,7 @@ void VoxelBuffer::delete_channel(int i) {
 }
 
 void VoxelBuffer::delete_channel(Channel &channel, Allocator allocator) {
-	ZN_ASSERT_RETURN(channel.compression != COMPRESSION_UNIFORM);
+	VOXEL_ASSERT_RETURN(channel.compression != COMPRESSION_UNIFORM);
 	// Don't use `_size` to obtain `data` byte count, since we could have changed `_size` up-front during a create().
 	// `size_in_bytes` reflects what is currently allocated inside `data`, regardless of anything else.
 	free_channel_data(channel.data, channel.size_in_bytes, allocator);
@@ -840,7 +840,7 @@ void VoxelBuffer::downscale_to(VoxelBuffer &dst, Vector3i src_min, Vector3i src_
 					const Vector3i src_pos = src_min + ((pos - dst_min) << 1);
 
 					// TODO Remove check once it works
-					ZN_ASSERT(is_position_valid(src_pos.x, src_pos.y, src_pos.z));
+					VOXEL_ASSERT(is_position_valid(src_pos.x, src_pos.y, src_pos.z));
 
 					uint64_t v;
 					if (src_channel.compression != COMPRESSION_UNIFORM) {
@@ -882,10 +882,10 @@ bool VoxelBuffer::equals(const VoxelBuffer &p_other) const {
 			}
 
 		} else {
-			ZN_ASSERT_RETURN_V(channel.size_in_bytes == other_channel.size_in_bytes, false);
+			VOXEL_ASSERT_RETURN_V(channel.size_in_bytes == other_channel.size_in_bytes, false);
 #ifdef DEV_ENABLED
-			ZN_ASSERT(channel.data != nullptr);
-			ZN_ASSERT(other_channel.data != nullptr);
+			VOXEL_ASSERT(channel.data != nullptr);
+			VOXEL_ASSERT(other_channel.data != nullptr);
 #endif
 			for (size_t i = 0; i < channel.size_in_bytes; ++i) {
 				if (channel.data[i] != other_channel.data[i]) {
@@ -919,8 +919,8 @@ bool VoxelBuffer::equals(const VoxelBuffer &p_other) const {
 }
 
 void VoxelBuffer::set_channel_depth(unsigned int channel_index, Depth new_depth) {
-	ZN_ASSERT_RETURN(channel_index < MAX_CHANNELS);
-	ZN_ASSERT_RETURN(new_depth >= 0 && new_depth < DEPTH_COUNT);
+	VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
+	VOXEL_ASSERT_RETURN(new_depth >= 0 && new_depth < DEPTH_COUNT);
 	Channel &channel = _channels[channel_index];
 	if (channel.depth == new_depth) {
 		return;
@@ -934,7 +934,7 @@ void VoxelBuffer::set_channel_depth(unsigned int channel_index, Depth new_depth)
 }
 
 VoxelBuffer::Depth VoxelBuffer::get_channel_depth(unsigned int channel_index) const {
-	ZN_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, DEPTH_8_BIT);
+	VOXEL_ASSERT_RETURN_V(channel_index < MAX_CHANNELS, DEPTH_8_BIT);
 	return _channels[channel_index].depth;
 }
 
@@ -965,7 +965,7 @@ void VoxelBuffer::get_range_f(float &out_min, float &out_max, ChannelId channel_
 	const uint64_t volume = get_volume();
 
 #ifdef DEV_ENABLED
-	ZN_ASSERT(channel.data != nullptr);
+	VOXEL_ASSERT(channel.data != nullptr);
 #endif
 
 	switch (channel.depth) {
@@ -1031,7 +1031,7 @@ Vector3i transform_channel(
 }
 
 void VoxelBuffer::transform(const math::OrthoBasis &basis) {
-	ZN_ASSERT_RETURN(basis.is_orthonormal());
+	VOXEL_ASSERT_RETURN(basis.is_orthonormal());
 
 	if (Vector3iUtil::is_empty_size(_size)) {
 		return;
@@ -1045,7 +1045,7 @@ void VoxelBuffer::transform(const math::OrthoBasis &basis) {
 			continue;
 		}
 #ifdef DEV_ENABLED
-		ZN_ASSERT(channel.data != nullptr);
+		VOXEL_ASSERT(channel.data != nullptr);
 #endif
 		switch (channel.depth) {
 			case VoxelBuffer::DEPTH_8_BIT:
@@ -1067,7 +1067,7 @@ void VoxelBuffer::transform(const math::OrthoBasis &basis) {
 				);
 				break;
 			default:
-				ZN_CRASH();
+				VOXEL_CRASH();
 				break;
 		}
 	}
@@ -1080,17 +1080,17 @@ void VoxelBuffer::transform(const math::OrthoBasis &basis) {
 }
 
 const VoxelMetadata *VoxelBuffer::get_voxel_metadata(Vector3i pos) const {
-	ZN_ASSERT_RETURN_V(is_position_valid(pos), nullptr);
+	VOXEL_ASSERT_RETURN_V(is_position_valid(pos), nullptr);
 	return _voxel_metadata.find(pos);
 }
 
 VoxelMetadata *VoxelBuffer::get_voxel_metadata(Vector3i pos) {
-	ZN_ASSERT_RETURN_V(is_position_valid(pos), nullptr);
+	VOXEL_ASSERT_RETURN_V(is_position_valid(pos), nullptr);
 	return _voxel_metadata.find(pos);
 }
 
 VoxelMetadata *VoxelBuffer::get_or_create_voxel_metadata(Vector3i pos) {
-	ZN_ASSERT_RETURN_V(is_position_valid(pos), nullptr);
+	VOXEL_ASSERT_RETURN_V(is_position_valid(pos), nullptr);
 	VoxelMetadata *d = _voxel_metadata.find(pos);
 	if (d != nullptr) {
 		return d;
@@ -1101,20 +1101,20 @@ VoxelMetadata *VoxelBuffer::get_or_create_voxel_metadata(Vector3i pos) {
 }
 
 void VoxelBuffer::erase_voxel_metadata(Vector3i pos) {
-	ZN_ASSERT_RETURN(is_position_valid(pos));
+	VOXEL_ASSERT_RETURN(is_position_valid(pos));
 	_voxel_metadata.erase(pos);
 }
 
 void VoxelBuffer::clear_and_set_voxel_metadata(Span<FlatMapMoveOnly<Vector3i, VoxelMetadata>::Pair> pairs) {
 #ifdef DEBUG_ENABLED
 	for (size_t i = 0; i < pairs.size(); ++i) {
-		ZN_ASSERT_CONTINUE(is_position_valid(pairs[i].key));
+		VOXEL_ASSERT_CONTINUE(is_position_valid(pairs[i].key));
 	}
 #endif
 	_voxel_metadata.clear_and_insert(pairs);
 }
 
-/*#ifdef ZN_GODOT
+/*#ifdef VOXEL_GODOT
 
 void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 	ERR_FAIL_COND(callback.is_null());
@@ -1183,7 +1183,7 @@ void VoxelBuffer::copy_voxel_metadata_in_area(
 	) {
 		if (clamped_src_box.contains(src_it->key)) {
 			const Vector3i dst_pos = src_it->key + src_to_dst_offset;
-			ZN_ASSERT_CONTINUE(is_position_valid(dst_pos));
+			VOXEL_ASSERT_CONTINUE(is_position_valid(dst_pos));
 
 			VoxelMetadata &meta = _voxel_metadata.insert_or_assign(dst_pos, VoxelMetadata());
 			meta.copy_from(src_it->value);
@@ -1192,7 +1192,7 @@ void VoxelBuffer::copy_voxel_metadata_in_area(
 }
 
 void VoxelBuffer::copy_voxel_metadata(const VoxelBuffer &src_buffer) {
-	ZN_ASSERT_RETURN(src_buffer.get_size() == _size);
+	VOXEL_ASSERT_RETURN(src_buffer.get_size() == _size);
 
 	for (FlatMapMoveOnly<Vector3i, VoxelMetadata>::ConstIterator src_it = src_buffer._voxel_metadata.begin();
 		 src_it != src_buffer._voxel_metadata.end();
@@ -1210,17 +1210,17 @@ void VoxelBuffer::check_voxel_metadata_integrity() const {
 	for (FlatMapMoveOnly<Vector3i, VoxelMetadata>::ConstIterator it = _voxel_metadata.begin();
 		 it != _voxel_metadata.end();
 		 ++it) {
-		ZN_ASSERT(is_position_valid(it->key));
+		VOXEL_ASSERT(is_position_valid(it->key));
 	}
 }
 
 #endif
 
 void get_unscaled_sdf(const VoxelBuffer &voxels, Span<float> sdf) {
-	ZN_PROFILE_SCOPE();
-	ZN_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_DSTACK();
 	const uint64_t volume = Vector3iUtil::get_volume_u64(voxels.get_size());
-	ZN_ASSERT_RETURN(volume == sdf.size());
+	VOXEL_ASSERT_RETURN(volume == sdf.size());
 
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
 	const VoxelBuffer::Depth depth = voxels.get_channel_depth(channel);
@@ -1234,7 +1234,7 @@ void get_unscaled_sdf(const VoxelBuffer &voxels, Span<float> sdf) {
 	switch (depth) {
 		case VoxelBuffer::DEPTH_8_BIT: {
 			Span<const int8_t> raw;
-			ZN_ASSERT(voxels.get_channel_data_read_only(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data_read_only(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				sdf[i] = s8_to_snorm(raw[i]);
 			}
@@ -1242,7 +1242,7 @@ void get_unscaled_sdf(const VoxelBuffer &voxels, Span<float> sdf) {
 
 		case VoxelBuffer::DEPTH_16_BIT: {
 			Span<const int16_t> raw;
-			ZN_ASSERT(voxels.get_channel_data_read_only(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data_read_only(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				sdf[i] = s16_to_snorm(raw[i]);
 			}
@@ -1250,20 +1250,20 @@ void get_unscaled_sdf(const VoxelBuffer &voxels, Span<float> sdf) {
 
 		case VoxelBuffer::DEPTH_32_BIT: {
 			Span<const float> raw;
-			ZN_ASSERT(voxels.get_channel_data_read_only(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data_read_only(channel, raw));
 			memcpy(sdf.data(), raw.data(), sizeof(float) * sdf.size());
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT: {
 			Span<const double> raw;
-			ZN_ASSERT(voxels.get_channel_data_read_only(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data_read_only(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				sdf[i] = raw[i];
 			}
 		} break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 
 	const float inv_scale = 1.f / VoxelBuffer::get_sdf_quantization_scale(depth);
@@ -1274,10 +1274,10 @@ void get_unscaled_sdf(const VoxelBuffer &voxels, Span<float> sdf) {
 }
 
 void scale_and_store_sdf(VoxelBuffer &voxels, Span<float> sdf) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
 	const VoxelBuffer::Depth depth = voxels.get_channel_depth(channel);
-	ZN_ASSERT_RETURN(voxels.get_channel_compression(channel) == VoxelBuffer::COMPRESSION_NONE);
+	VOXEL_ASSERT_RETURN(voxels.get_channel_compression(channel) == VoxelBuffer::COMPRESSION_NONE);
 
 	const float scale = VoxelBuffer::get_sdf_quantization_scale(depth);
 	for (unsigned int i = 0; i < sdf.size(); ++i) {
@@ -1287,7 +1287,7 @@ void scale_and_store_sdf(VoxelBuffer &voxels, Span<float> sdf) {
 	switch (depth) {
 		case VoxelBuffer::DEPTH_8_BIT: {
 			Span<int8_t> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				raw[i] = snorm_to_s8(sdf[i]);
 			}
@@ -1295,7 +1295,7 @@ void scale_and_store_sdf(VoxelBuffer &voxels, Span<float> sdf) {
 
 		case VoxelBuffer::DEPTH_16_BIT: {
 			Span<int16_t> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				raw[i] = snorm_to_s16(sdf[i]);
 			}
@@ -1303,28 +1303,28 @@ void scale_and_store_sdf(VoxelBuffer &voxels, Span<float> sdf) {
 
 		case VoxelBuffer::DEPTH_32_BIT: {
 			Span<float> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			memcpy(raw.data(), sdf.data(), sizeof(float) * sdf.size());
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT: {
 			Span<double> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				raw[i] = sdf[i];
 			}
 		} break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 }
 
 void scale_and_store_sdf_if_modified(VoxelBuffer &voxels, Span<float> sdf, Span<const float> comparand) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
 	const VoxelBuffer::Depth depth = voxels.get_channel_depth(channel);
-	ZN_ASSERT_RETURN(voxels.get_channel_compression(channel) == VoxelBuffer::COMPRESSION_NONE);
+	VOXEL_ASSERT_RETURN(voxels.get_channel_compression(channel) == VoxelBuffer::COMPRESSION_NONE);
 
 	const float scale = VoxelBuffer::get_sdf_quantization_scale(depth);
 	// for (unsigned int i = 0; i < sdf.size(); ++i) {
@@ -1334,7 +1334,7 @@ void scale_and_store_sdf_if_modified(VoxelBuffer &voxels, Span<float> sdf, Span<
 	switch (depth) {
 		case VoxelBuffer::DEPTH_8_BIT: {
 			Span<int8_t> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				if (comparand[i] != sdf[i]) {
 					raw[i] = snorm_to_s8(sdf[i] * scale);
@@ -1344,7 +1344,7 @@ void scale_and_store_sdf_if_modified(VoxelBuffer &voxels, Span<float> sdf, Span<
 
 		case VoxelBuffer::DEPTH_16_BIT: {
 			Span<int16_t> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				if (comparand[i] != sdf[i]) {
 					raw[i] = snorm_to_s16(sdf[i] * scale);
@@ -1356,20 +1356,20 @@ void scale_and_store_sdf_if_modified(VoxelBuffer &voxels, Span<float> sdf, Span<
 
 		case VoxelBuffer::DEPTH_32_BIT: {
 			Span<float> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			memcpy(raw.data(), sdf.data(), sizeof(float) * sdf.size());
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT: {
 			Span<double> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				raw[i] = sdf[i];
 			}
 		} break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 }
 
@@ -1457,7 +1457,7 @@ void paste_src_masked(
 						src_buffer.get_voxel(src_pos, src_mask_channel) != src_mask_value) {
 						VoxelMetadata *dst_meta = dst_buffer.get_or_create_voxel_metadata(dst_pos);
 #ifdef TOOLS_ENABLED
-						ZN_ASSERT_RETURN(dst_meta != nullptr);
+						VOXEL_ASSERT_RETURN(dst_meta != nullptr);
 #endif
 						dst_meta->copy_from(src_meta);
 					}
@@ -1568,7 +1568,7 @@ void paste_src_masked_dst_predicate(
 						&& dst_predicate(dst_buffer.get_voxel(dst_pos, dst_mask_channel))) {
 						VoxelMetadata *dst_meta = dst_buffer.get_or_create_voxel_metadata(dst_pos);
 #ifdef TOOLS_ENABLED
-						ZN_ASSERT_RETURN(dst_meta != nullptr);
+						VOXEL_ASSERT_RETURN(dst_meta != nullptr);
 #endif
 						dst_meta->copy_from(src_meta);
 					}
@@ -1627,4 +1627,4 @@ void paste_src_masked_dst_writable_bitarray(
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

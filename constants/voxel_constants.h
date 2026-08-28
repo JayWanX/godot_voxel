@@ -4,7 +4,7 @@
 #include "../util/math/constants.h"
 #include <cstdint>
 
-namespace zylann::voxel::constants {
+namespace voxel::constants {
 
 // These constants are chosen so you don't accidentally blow up resource usage
 static const float MINIMUM_LOD_DISTANCE = 16.f;
@@ -67,6 +67,6 @@ static const uint8_t TASK_PRIORITY_DETAIL_TEXTURES_BAND2 = 8; // After meshes
 
 static const uint8_t TASK_PRIORITY_BAND3_DEFAULT = 10;
 
-} // namespace zylann::voxel::constants
+} // namespace voxel::constants
 
 #endif // VOXEL_CONSTANTS_H

@@ -2,18 +2,18 @@
 #include "../../util/godot/classes/array_mesh.h"
 #include "../../util/profiling.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void GenerateInstancesBlockTask::run(ThreadedTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(generator.is_valid());
-	ZN_ASSERT(output_queue != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(generator.is_valid());
+	VOXEL_ASSERT(output_queue != nullptr);
 
 	PackedVector3Array vertices = surface_arrays[ArrayMesh::ARRAY_VERTEX];
-	ZN_ASSERT_RETURN(vertices.size() > 0);
+	VOXEL_ASSERT_RETURN(vertices.size() > 0);
 
 	PackedVector3Array normals = surface_arrays[ArrayMesh::ARRAY_NORMAL];
-	ZN_ASSERT_RETURN(normals.size() > 0);
+	VOXEL_ASSERT_RETURN(normals.size() > 0);
 
 	static thread_local StdVector<Transform3f> tls_generated_transforms;
 	tls_generated_transforms.clear();
@@ -49,4 +49,4 @@ void GenerateInstancesBlockTask::run(ThreadedTaskContext &ctx) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

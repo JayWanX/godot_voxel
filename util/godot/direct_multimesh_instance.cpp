@@ -3,7 +3,7 @@
 #include "classes/material.h"
 #include "classes/world_3d.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 DirectMultiMeshInstance::DirectMultiMeshInstance() {}
 
@@ -67,7 +67,7 @@ Ref<MultiMesh> DirectMultiMeshInstance::get_multimesh() const {
 }
 
 void DirectMultiMeshInstance::set_transform(Transform3D world_transform) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(!_multimesh_instance.is_valid());
 	RenderingServer &vs = *RenderingServer::get_singleton();
 	vs.instance_set_transform(_multimesh_instance, world_transform);
@@ -174,7 +174,7 @@ void DirectMultiMeshInstance::make_transform_3d_bulk_array(
 		Span<const Transform3D> transforms,
 		PackedFloat32Array &bulk_array
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const int item_size = 12; // In number of floats
 
@@ -200,7 +200,7 @@ void DirectMultiMeshInstance::make_transform_3d_bulk_array(
 		Span<const Transform3f> transforms,
 		PackedFloat32Array &bulk_array
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const int item_size = 12; // In number of floats
 
@@ -222,7 +222,7 @@ void DirectMultiMeshInstance::make_transform_and_color8_3d_bulk_array(
 		Span<const TransformAndColor8> data,
 		PackedFloat32Array &bulk_array
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const int transform_size = 12; // In number of floats
 	const int item_size = transform_size + sizeof(Color8) / sizeof(float);
@@ -250,7 +250,7 @@ void DirectMultiMeshInstance::make_transform_and_color32_3d_bulk_array(
 		Span<const TransformAndColor32> data,
 		PackedFloat32Array &bulk_array
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const int transform_size = 12; // In number of floats
 	const int item_size = transform_size + sizeof(Color) / sizeof(float);
@@ -278,4 +278,4 @@ void DirectMultiMeshInstance::make_transform_and_color32_3d_bulk_array(
 	}
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

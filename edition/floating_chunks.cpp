@@ -14,21 +14,21 @@
 #include "../util/profiling.h"
 #include "voxel_tool.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 void box_propagate_ccl(Span<uint8_t> cells, const Vector3i size) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Propagate non-zero cells towards zero cells in a 3x3x3 pattern.
 	// Used on a grid produced by Connected-Component-Labelling.
 
 	// Z
 	{
-		ZN_PROFILE_SCOPE_NAMED("Z");
+		VOXEL_PROFILE_SCOPE_NAMED("Z");
 		Vector3i pos;
 		const int dz = size.x * size.y;
 		unsigned int i = 0;
@@ -58,7 +58,7 @@ void box_propagate_ccl(Span<uint8_t> cells, const Vector3i size) {
 
 	// X
 	{
-		ZN_PROFILE_SCOPE_NAMED("X");
+		VOXEL_PROFILE_SCOPE_NAMED("X");
 		Vector3i pos;
 		const int dx = size.y;
 		unsigned int i = 0;
@@ -85,7 +85,7 @@ void box_propagate_ccl(Span<uint8_t> cells, const Vector3i size) {
 
 	// Y
 	{
-		ZN_PROFILE_SCOPE_NAMED("Y");
+		VOXEL_PROFILE_SCOPE_NAMED("Y");
 		Vector3i pos;
 		const int dy = 1;
 		unsigned int i = 0;
@@ -124,7 +124,7 @@ Array separate_floating_chunks(
 		Ref<VoxelMesher> mesher,
 		Array materials
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Checks
 	ERR_FAIL_COND_V(mesher.is_null(), Array());
@@ -138,7 +138,7 @@ Array separate_floating_chunks(
 
 	VoxelBuffer source_copy_buffer(VoxelBuffer::ALLOCATOR_POOL);
 	{
-		ZN_PROFILE_SCOPE_NAMED("Copy");
+		VOXEL_PROFILE_SCOPE_NAMED("Copy");
 		source_copy_buffer.create(world_box.size);
 		voxel_tool.copy(world_box.position, source_copy_buffer, channels_mask, false);
 	}
@@ -153,7 +153,7 @@ Array separate_floating_chunks(
 
 	{
 		// TODO Allow to run the algorithm at a different LOD, to trade precision for speed
-		ZN_PROFILE_SCOPE_NAMED("CCL scan");
+		VOXEL_PROFILE_SCOPE_NAMED("CCL scan");
 		IslandFinder island_finder;
 		island_finder.scan_3d(
 				Box3i(Vector3i(), world_box.size),
@@ -183,7 +183,7 @@ Array separate_floating_chunks(
 
 	StdVector<Bounds> bounds_per_label;
 	{
-		ZN_PROFILE_SCOPE_NAMED("Bounds calculation");
+		VOXEL_PROFILE_SCOPE_NAMED("Bounds calculation");
 
 		// Adding 1 because label 0 is the index for "no label"
 		bounds_per_label.resize(label_count + 1);
@@ -266,7 +266,7 @@ Array separate_floating_chunks(
 	const int max_padding = 2; // mesher->get_maximum_padding();
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Extraction");
+		VOXEL_PROFILE_SCOPE_NAMED("Extraction");
 
 		for (unsigned int label = 1; label < bounds_per_label.size(); ++label) {
 			CRASH_COND(label >= bounds_per_label.size());
@@ -324,7 +324,7 @@ Array separate_floating_chunks(
 	// Must be done after we copied voxels from it.
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Erasing");
+		VOXEL_PROFILE_SCOPE_NAMED("Erasing");
 
 		voxel_tool.set_channel(main_channel);
 
@@ -343,10 +343,10 @@ Array separate_floating_chunks(
 
 	uint32_t materials_to_instance_mask = 0;
 	{
-		StdVector<zylann::godot::ShaderParameterInfo> params;
+		StdVector<voxel::godot::ShaderParameterInfo> params;
 		const String u_block_local_transform = VoxelStringNames::get_singleton().u_block_local_transform;
 
-		ZN_ASSERT_RETURN_V_MSG(
+		VOXEL_ASSERT_RETURN_V_MSG(
 				materials.size() < 32,
 				Array(),
 				"Too many materials. If you need more, make a request or change the code."
@@ -364,9 +364,9 @@ Array separate_floating_chunks(
 			}
 
 			params.clear();
-			zylann::godot::get_shader_parameter_list(shader->get_rid(), params);
+			voxel::godot::get_shader_parameter_list(shader->get_rid(), params);
 
-			for (const zylann::godot::ShaderParameterInfo &param_info : params) {
+			for (const voxel::godot::ShaderParameterInfo &param_info : params) {
 				if (param_info.name == u_block_local_transform) {
 					materials_to_instance_mask |= (1 << material_index);
 					break;
@@ -380,7 +380,7 @@ Array separate_floating_chunks(
 	Array nodes;
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Remeshing and instancing");
+		VOXEL_PROFILE_SCOPE_NAMED("Remeshing and instancing");
 
 		for (unsigned int instance_index = 0; instance_index < instances_info.size(); ++instance_index) {
 			CRASH_COND(instance_index >= instances_info.size());
@@ -420,7 +420,7 @@ Array separate_floating_chunks(
 			for (int i = 0; i < materials.size(); ++i) {
 				if ((materials_to_instance_mask & (1 << i)) != 0) {
 					Ref<ShaderMaterial> sm = materials[i];
-					ZN_ASSERT_CONTINUE(sm.is_valid());
+					VOXEL_ASSERT_CONTINUE(sm.is_valid());
 					sm = sm->duplicate(false);
 					// That parameter should have a valid default value matching the local transform relative to the
 					// volume, which is usually per-instance, but in Godot 3 we have no such feature, so we have to
@@ -440,7 +440,7 @@ Array separate_floating_chunks(
 			// because we build these buffers from connected groups that had negative SDF.
 			ERR_CONTINUE(mesh.is_null());
 
-			if (zylann::godot::is_mesh_empty(**mesh)) {
+			if (voxel::godot::is_mesh_empty(**mesh)) {
 				continue;
 			}
 
@@ -504,4 +504,4 @@ Array separate_floating_chunks(
 	return nodes;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -3,12 +3,12 @@
 #include "../../util/godot/classes/fast_noise_lite.h"
 #include "../../util/math/funcs.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGeneratorNoise::VoxelGeneratorNoise() {}
 
@@ -288,4 +288,4 @@ void VoxelGeneratorNoise::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "height_range"), "set_height_range", "get_height_range");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

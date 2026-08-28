@@ -1,16 +1,16 @@
-#ifndef ZN_GODOT_TYPED_ARRAY_H
-#define ZN_GODOT_TYPED_ARRAY_H
+#ifndef VOXEL_GODOT_TYPED_ARRAY_H
+#define VOXEL_GODOT_TYPED_ARRAY_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/variant/typed_array.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/variant/typed_array.hpp>
 #endif
 
 #include "../../containers/span.h"
 #include <vector>
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 template <typename T>
 inline void copy_to(TypedArray<T> &dst, Span<const T> src) {
@@ -55,8 +55,8 @@ inline void copy_range_to(
 		dst.clear();
 		return;
 	}
-	ZN_ASSERT_RETURN(from >= 0 && from < src.size());
-	ZN_ASSERT_RETURN(count >= 0 && from + count <= src.size());
+	VOXEL_ASSERT_RETURN(from >= 0 && from < src.size());
+	VOXEL_ASSERT_RETURN(count >= 0 && from + count <= src.size());
 	dst.resize(count);
 	const int to = from + count;
 	for (int i = from; i < to; ++i) {
@@ -78,7 +78,7 @@ inline TypedArray<T> to_typed_array(Span<const Ref<T>> src) {
 	return array;
 }
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 template <typename T>
 Vector<Ref<T>> to_ref_vector(const TypedArray<T> &typed_array) {
@@ -92,6 +92,6 @@ Vector<Ref<T>> to_ref_vector(const TypedArray<T> &typed_array) {
 
 #endif
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_TYPED_ARRAY_H
+#endif // VOXEL_GODOT_TYPED_ARRAY_H

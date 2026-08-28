@@ -5,9 +5,9 @@
 #include "../../util/profiling.h"
 #include "../free_mesh_task.h"
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelMeshBlockVLT::VoxelMeshBlockVLT(const Vector3i bpos, unsigned int size, unsigned int p_lod_index) :
 		VoxelMeshBlock(bpos) {
@@ -271,7 +271,7 @@ void VoxelMeshBlockVLT::set_material_override(Ref<Material> material) {
 #ifdef DEBUG_ENABLED
 	Ref<ShaderMaterial> sm = material;
 	if (sm.is_valid()) {
-		ZN_PRINT_ERROR("Internal bug: should use set_shader_material instead of set_material_override");
+		VOXEL_PRINT_ERROR("Internal bug: should use set_shader_material instead of set_material_override");
 	}
 #endif
 	_shader_material = Ref<ShaderMaterial>();
@@ -343,7 +343,7 @@ void VoxelMeshBlockVLT::set_parent_visible(bool parent_visible) {
 }
 
 void VoxelMeshBlockVLT::set_parent_transform(const Transform3D &parent_transform) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (_mesh_instance.is_valid() || _static_body.is_valid()) {
 		// TODO Optimize: could be optimized due to the basis being identity
@@ -458,7 +458,7 @@ Ref<ArrayMesh> build_mesh(
 		int flags,
 		Ref<Material> material
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	Ref<ArrayMesh> mesh;
 
 	unsigned int surface_index = 0;
@@ -501,11 +501,11 @@ Ref<ArrayMesh> build_mesh(
 		}
 	}*/
 
-	if (mesh.is_valid() && zylann::godot::is_mesh_empty(**mesh)) {
+	if (mesh.is_valid() && voxel::godot::is_mesh_empty(**mesh)) {
 		mesh = Ref<Mesh>();
 	}
 
 	return mesh;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

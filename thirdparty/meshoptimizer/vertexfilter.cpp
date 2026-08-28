@@ -70,7 +70,7 @@
 #define __has_builtin(x) 0
 #endif
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 namespace meshopt
 {
@@ -1464,7 +1464,7 @@ void meshopt_encodeFilterColor(void* destination, size_t count, size_t stride, i
 	}
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END
 
 #undef SIMD_SSE
 #undef SIMD_NEON

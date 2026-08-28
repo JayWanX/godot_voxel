@@ -4,7 +4,7 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/math/box3i.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Octree designed to handle level of detail.
 class LodOctree {
@@ -130,7 +130,7 @@ public:
 
 	const Node *get_child(const Node *node, unsigned int i) const {
 		ERR_FAIL_COND_V(node == nullptr, nullptr);
-		ZN_ASSERT_RETURN_V(i < 8, nullptr);
+		VOXEL_ASSERT_RETURN_V(i < 8, nullptr);
 		return get_node(node->first_child + i);
 	}
 
@@ -472,7 +472,7 @@ private:
 	NodePool _pool;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 // Notes:
 // Population of an octree given its depth, thanks to Sage:

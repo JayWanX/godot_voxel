@@ -3,7 +3,7 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_unordered_remove_if() {
 	struct L {
@@ -27,8 +27,8 @@ void test_unordered_remove_if() {
 
 		unordered_remove_if(vec, [](int v) { return v == 0; });
 
-		ZN_TEST_ASSERT(vec.size() == 3);
-		ZN_TEST_ASSERT(
+		VOXEL_TEST_ASSERT(vec.size() == 3);
+		VOXEL_TEST_ASSERT(
 				L::count(vec, 0) == 0 && L::count(vec, 1) == 1 && L::count(vec, 2) == 1 && L::count(vec, 3) == 1
 		);
 	}
@@ -42,8 +42,8 @@ void test_unordered_remove_if() {
 
 		unordered_remove_if(vec, [](int v) { return v == 2; });
 
-		ZN_TEST_ASSERT(vec.size() == 3);
-		ZN_TEST_ASSERT(
+		VOXEL_TEST_ASSERT(vec.size() == 3);
+		VOXEL_TEST_ASSERT(
 				L::count(vec, 0) == 1 && L::count(vec, 1) == 1 && L::count(vec, 2) == 0 && L::count(vec, 3) == 1
 		);
 	}
@@ -57,8 +57,8 @@ void test_unordered_remove_if() {
 
 		unordered_remove_if(vec, [](int v) { return v == 3; });
 
-		ZN_TEST_ASSERT(vec.size() == 3);
-		ZN_TEST_ASSERT(
+		VOXEL_TEST_ASSERT(vec.size() == 3);
+		VOXEL_TEST_ASSERT(
 				L::count(vec, 0) == 1 && L::count(vec, 1) == 1 && L::count(vec, 2) == 1 && L::count(vec, 3) == 0
 		);
 	}
@@ -72,8 +72,8 @@ void test_unordered_remove_if() {
 
 		unordered_remove_if(vec, [](int v) { return v == 1 || v == 2; });
 
-		ZN_TEST_ASSERT(vec.size() == 2);
-		ZN_TEST_ASSERT(
+		VOXEL_TEST_ASSERT(vec.size() == 2);
+		VOXEL_TEST_ASSERT(
 				L::count(vec, 0) == 1 && L::count(vec, 1) == 0 && L::count(vec, 2) == 0 && L::count(vec, 3) == 1
 		);
 	}
@@ -84,8 +84,8 @@ void test_unordered_remove_if() {
 
 		unordered_remove_if(vec, [](int v) { return v == 0; });
 
-		ZN_TEST_ASSERT(vec.size() == 0);
+		VOXEL_TEST_ASSERT(vec.size() == 0);
 	}
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

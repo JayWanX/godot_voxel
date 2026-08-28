@@ -12,7 +12,7 @@
 #include "instance_data.h"
 #include "voxel_stream.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // "fake" stream that just stores copies of the data in memory instead of saving them to the filesystem. May be used for
 // testing.
@@ -58,6 +58,6 @@ private:
 	unsigned int _artificial_save_latency_usec = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_STREAM_MEMORY_H

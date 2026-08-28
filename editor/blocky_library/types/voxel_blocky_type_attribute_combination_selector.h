@@ -5,10 +5,10 @@
 #include "../../../util/containers/std_vector.h"
 #include "../../../util/godot/classes/grid_container.h"
 
-ZN_GODOT_FORWARD_DECLARE(class OptionButton);
-ZN_GODOT_FORWARD_DECLARE(class Label);
+VOXEL_GODOT_FORWARD_DECLARE(class OptionButton);
+VOXEL_GODOT_FORWARD_DECLARE(class Label);
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Editor with the list of attributes from a specific VoxelBlockyType, allowing to choose a combination
 // parametrically.
@@ -47,6 +47,6 @@ private:
 	StdVector<AttributeEditor> _attribute_editors;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TYPE_ATTRIBUTE_COMBINATION_SELECTOR_H

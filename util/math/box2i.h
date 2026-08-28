@@ -1,11 +1,11 @@
-#ifndef ZYLANN_BOX2I_H
-#define ZYLANN_BOX2I_H
+#ifndef VOXEL_BOX2I_H
+#define VOXEL_BOX2I_H
 
 #include "../containers/std_vector.h"
 #include "funcs.h"
 #include "vector2i.h"
 
-namespace zylann {
+namespace voxel {
 
 // Axis-aligned 2D box using integer coordinates
 class Box2i {
@@ -261,6 +261,6 @@ inline bool operator==(const Box2i &a, const Box2i &b) {
 class TextWriter;
 TextWriter &operator<<(TextWriter &w, const Box2i &box);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_Box2i_H
+#endif // VOXEL_Box2i_H

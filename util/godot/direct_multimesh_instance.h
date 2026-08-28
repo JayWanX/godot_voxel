@@ -10,13 +10,13 @@
 #include "classes/rendering_server.h"
 #include "macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class World3D);
-ZN_GODOT_FORWARD_DECLARE(class Material);
+VOXEL_GODOT_FORWARD_DECLARE(class World3D);
+VOXEL_GODOT_FORWARD_DECLARE(class Material);
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Thin wrapper around VisualServer multimesh instance API
-class DirectMultiMeshInstance : public zylann::NonCopyable {
+class DirectMultiMeshInstance : public voxel::NonCopyable {
 public:
 	DirectMultiMeshInstance();
 	DirectMultiMeshInstance(DirectMultiMeshInstance &&src);
@@ -44,7 +44,7 @@ public:
 
 	struct TransformAndColor8 {
 		Transform3D transform;
-		zylann::Color8 color;
+		voxel::Color8 color;
 	};
 
 	static void make_transform_and_color8_3d_bulk_array(
@@ -67,6 +67,6 @@ private:
 	Ref<MultiMesh> _multimesh;
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
 #endif // DIRECT_MULTIMESH_INSTANCE_H

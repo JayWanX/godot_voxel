@@ -22,7 +22,7 @@
 #include "../../util/godot/editor_scale.h"
 #include "graph_nodes_doc_data.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 #include <editor/editor_node.h>
@@ -32,7 +32,7 @@
 
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -61,7 +61,7 @@ void select_up(Tree &tree) {
 	TreeItem *selected_item = tree.get_selected();
 
 	if (selected_item == nullptr) {
-		ZN_PRINT_VERBOSE("No item selected in tree, can't select down");
+		VOXEL_PRINT_VERBOSE("No item selected in tree, can't select down");
 		return;
 	}
 
@@ -86,7 +86,7 @@ void select_down(Tree &tree) {
 	TreeItem *selected_item = tree.get_selected();
 
 	if (selected_item == nullptr) {
-		ZN_PRINT_VERBOSE("No item selected in tree, can't select down");
+		VOXEL_PRINT_VERBOSE("No item selected in tree, can't select down");
 		return;
 	}
 
@@ -113,10 +113,10 @@ const char *VoxelGraphNodeDialog::SIGNAL_NODE_SELECTED = "node_selected";
 const char *VoxelGraphNodeDialog::SIGNAL_FILE_SELECTED = "file_selected";
 
 VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
-	set_title(ZN_TTR("Create Graph Node"));
+	set_title(VOXEL_TTR("Create Graph Node"));
 	set_exclusive(false);
 
-	set_ok_button_text(ZN_TTR("Create"));
+	set_ok_button_text(VOXEL_TTR("Create"));
 	get_ok_button()->connect("pressed", callable_mp(this, &VoxelGraphNodeDialog::on_ok_pressed));
 	get_ok_button()->set_disabled(true);
 	// connect("canceled", callable_mp(this, &VisualShaderEditor::_member_cancel));
@@ -128,7 +128,7 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 	filter_line_edit->connect("text_changed", callable_mp(this, &VoxelGraphNodeDialog::on_filter_text_changed));
 	filter_line_edit->connect("gui_input", callable_mp(this, &VoxelGraphNodeDialog::on_filter_gui_input));
 	filter_line_edit->set_h_size_flags(Control::SIZE_EXPAND_FILL);
-	filter_line_edit->set_placeholder(ZN_TTR("Search"));
+	filter_line_edit->set_placeholder(VOXEL_TTR("Search"));
 	vb_container->add_child(filter_line_edit);
 	_filter_line_edit = filter_line_edit;
 
@@ -168,8 +168,8 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 	_function_file_dialog->set_file_mode(EditorFileDialog::FILE_MODE_OPEN_FILE);
 	// TODO Usability: there is no way to limit a file dialog to a specific TYPE of resource, only file extensions. So
 	// it's not useful because text resources are almost all using `.tres`...
-	_function_file_dialog->add_filter("*.tres", ZN_TTR("Text Resource"));
-	_function_file_dialog->add_filter("*.res", ZN_TTR("Binary Resource"));
+	_function_file_dialog->add_filter("*.tres", VOXEL_TTR("Text Resource"));
+	_function_file_dialog->add_filter("*.res", VOXEL_TTR("Binary Resource"));
 	_function_file_dialog->connect(
 			"file_selected", callable_mp(this, &VoxelGraphNodeDialog::on_function_file_dialog_file_selected)
 	);
@@ -177,7 +177,7 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 
 	// TODO Replace QuickOpen with listing of project functions directly in the dialog
 	// TODO GDX: EditorQuickOpen is not exposed to extensions
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
 	_function_quick_open_dialog = memnew(EditorQuickOpen);
 	_function_quick_open_dialog->connect(
@@ -218,17 +218,17 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 		if (type_index == pg::VoxelGraphFunction::NODE_FUNCTION) {
 			{
 				Item item;
-				item.name = ZN_TTR("Browse Custom Function...");
+				item.name = VOXEL_TTR("Browse Custom Function...");
 				item.description = description;
 				item.category = category_index;
 				item.id = ID_FUNCTION_BROWSE;
 				_items.push_back(item);
 			}
 			// TODO GDX: EditorQuickOpen is not exposed to extensions
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 			{
 				Item item;
-				item.name = ZN_TTR("Quick Open Custom Function...");
+				item.name = VOXEL_TTR("Quick Open Custom Function...");
 				item.description = description;
 				item.category = category_index;
 				item.id = ID_FUNCTION_QUICK_OPEN;
@@ -320,8 +320,8 @@ void VoxelGraphNodeDialog::update_tree(bool autoselect) {
 
 		TreeItem *tree_item = _tree->create_item(parent_tree_item);
 
-		zylann::godot::TreeItemUtilities::set_auto_translate_mode(
-				*tree_item, 0, zylann::godot::AUTO_TRANSLATE_MODE_DISABLED
+		voxel::godot::TreeItemUtilities::set_auto_translate_mode(
+				*tree_item, 0, voxel::godot::AUTO_TRANSLATE_MODE_DISABLED
 		);
 
 		tree_item->set_text(0, item.name);
@@ -379,7 +379,7 @@ void VoxelGraphNodeDialog::on_tree_item_activated() {
 		return;
 	}
 	const int id = item->get_metadata(0);
-	ZN_ASSERT_RETURN(id >= 0);
+	VOXEL_ASSERT_RETURN(id >= 0);
 
 	if (id < pg::VoxelGraphFunction::NODE_TYPE_COUNT) {
 		// Node selected
@@ -388,10 +388,10 @@ void VoxelGraphNodeDialog::on_tree_item_activated() {
 
 	} else if (id == ID_FUNCTION_BROWSE) {
 		// Browse function nodes
-		zylann::godot::popup_file_dialog(*_function_file_dialog);
+		voxel::godot::popup_file_dialog(*_function_file_dialog);
 
 	} else if (id == ID_FUNCTION_QUICK_OPEN) {
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
 		// Quick open function nodes
 		_function_quick_open_dialog->popup_dialog(pg::VoxelGraphFunction::get_class_static());
@@ -417,7 +417,7 @@ void VoxelGraphNodeDialog::on_tree_item_selected() {
 		return;
 	}
 	const int id = tree_item->get_metadata(0);
-	ZN_ASSERT_RETURN(id >= 0);
+	VOXEL_ASSERT_RETURN(id >= 0);
 
 	const Item *item = nullptr;
 	for (const Item &i : _items) {
@@ -426,7 +426,7 @@ void VoxelGraphNodeDialog::on_tree_item_selected() {
 			break;
 		}
 	}
-	ZN_ASSERT_RETURN(item != nullptr);
+	VOXEL_ASSERT_RETURN(item != nullptr);
 
 	_description_label->set_text(item->description);
 
@@ -452,7 +452,7 @@ void VoxelGraphNodeDialog::on_function_file_dialog_file_selected(String fpath) {
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
 void VoxelGraphNodeDialog::on_function_quick_open_dialog_quick_open() {
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 	String fpath = _function_quick_open_dialog->get_selected();
 	on_function_quick_open_dialog_item_selected(fpath);
 #endif
@@ -461,7 +461,7 @@ void VoxelGraphNodeDialog::on_function_quick_open_dialog_quick_open() {
 #endif
 
 void VoxelGraphNodeDialog::on_function_quick_open_dialog_item_selected(String fpath) {
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 	if (fpath.is_empty()) {
 		return;
 	}
@@ -494,4 +494,4 @@ void VoxelGraphNodeDialog::_bind_methods() {
 	ADD_SIGNAL(MethodInfo(SIGNAL_FILE_SELECTED, PropertyInfo(Variant::STRING, "file_path")));
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

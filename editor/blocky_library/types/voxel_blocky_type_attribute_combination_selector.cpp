@@ -4,11 +4,11 @@
 #include "../../../util/godot/classes/option_button.h"
 #include "../../../util/godot/editor_scale.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 const char *VoxelBlockyTypeAttributeCombinationSelector::SIGNAL_COMBINATION_CHANGED = "combination_changed";
 
@@ -37,7 +37,7 @@ void VoxelBlockyTypeAttributeCombinationSelector::set_type(Ref<VoxelBlockyType> 
 }
 
 VoxelBlockyType::VariantKey VoxelBlockyTypeAttributeCombinationSelector::get_variant_key() const {
-	ZN_ASSERT_RETURN_V(_type.is_valid(), VoxelBlockyType::VariantKey());
+	VOXEL_ASSERT_RETURN_V(_type.is_valid(), VoxelBlockyType::VariantKey());
 
 	StdVector<Ref<VoxelBlockyAttribute>> attributes;
 	_type->get_checked_attributes(attributes);
@@ -45,7 +45,7 @@ VoxelBlockyType::VariantKey VoxelBlockyTypeAttributeCombinationSelector::get_var
 	VoxelBlockyType::VariantKey key;
 	for (unsigned int i = 0; i < attributes.size(); ++i) {
 		const Ref<VoxelBlockyAttribute> attrib = attributes[i];
-		ZN_ASSERT_RETURN_V(attrib.is_valid(), VoxelBlockyType::VariantKey());
+		VOXEL_ASSERT_RETURN_V(attrib.is_valid(), VoxelBlockyType::VariantKey());
 		const StringName attrib_name = attrib->get_attribute_name();
 		key.attribute_names[i] = attrib_name;
 		uint8_t value;
@@ -86,13 +86,13 @@ bool VoxelBlockyTypeAttributeCombinationSelector::get_preview_attribute_value(
 }
 
 void VoxelBlockyTypeAttributeCombinationSelector::remove_attribute_editor(unsigned int index) {
-	ZN_ASSERT_RETURN(index < _attribute_editors.size());
+	VOXEL_ASSERT_RETURN(index < _attribute_editors.size());
 	AttributeEditor &ed = _attribute_editors[index];
 
-	ZN_ASSERT_RETURN(ed.label != nullptr);
+	VOXEL_ASSERT_RETURN(ed.label != nullptr);
 	ed.label->queue_free();
 
-	ZN_ASSERT_RETURN(ed.selector != nullptr);
+	VOXEL_ASSERT_RETURN(ed.selector != nullptr);
 	ed.selector->queue_free();
 
 	_attribute_editors.erase(_attribute_editors.begin() + index);
@@ -115,13 +115,13 @@ void VoxelBlockyTypeAttributeCombinationSelector::update_attribute_editors() {
 
 	// Add new attributes
 	for (const Ref<VoxelBlockyAttribute> &attrib : attributes) {
-		ZN_ASSERT_RETURN(attrib.is_valid());
+		VOXEL_ASSERT_RETURN(attrib.is_valid());
 
 		// Check if already present
 		unsigned int editor_index = 0;
 		if (get_attribute_editor_index(attrib->get_attribute_name(), editor_index)) {
 			AttributeEditor &existing_editor = _attribute_editors[editor_index];
-			ZN_ASSERT_RETURN(existing_editor.attribute_copy.is_valid());
+			VOXEL_ASSERT_RETURN(existing_editor.attribute_copy.is_valid());
 			if (existing_editor.attribute_copy->is_equivalent(**attrib)) {
 				// Already present, skip
 				continue;
@@ -208,4 +208,4 @@ void VoxelBlockyTypeAttributeCombinationSelector::_bind_methods() {
 	ADD_SIGNAL(MethodInfo(SIGNAL_COMBINATION_CHANGED));
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

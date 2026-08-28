@@ -10,7 +10,7 @@
 #include "instance_data.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 // In-memory database for voxel streams.
 // It allows to cache blocks so we can save to the filesystem later less frequently, or quickly reload recent blocks.
@@ -75,6 +75,6 @@ private:
 	unsigned int _count = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_STREAM_CACHE_H

@@ -2,7 +2,7 @@
 #include "../core/version.h"
 #include "../editor_scale.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void popup_file_dialog(EditorFileDialog &dialog) {
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
@@ -12,4 +12,4 @@ void popup_file_dialog(EditorFileDialog &dialog) {
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

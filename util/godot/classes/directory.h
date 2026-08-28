@@ -1,14 +1,14 @@
-#ifndef ZN_GODOT_DIRECTORY_H
-#define ZN_GODOT_DIRECTORY_H
+#ifndef VOXEL_GODOT_DIRECTORY_H
+#define VOXEL_GODOT_DIRECTORY_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/io/dir_access.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/dir_access.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 inline Ref<DirAccess> open_directory(const String &directory_path, Error *out_err) {
 	Ref<DirAccess> dir = DirAccess::open(directory_path);
@@ -33,6 +33,6 @@ inline Error rename_directory(const String &from, const String &to) {
 
 Error erase_directory_contents_recursive(DirAccess &da);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_DIRECTORY_H
+#endif // VOXEL_GODOT_DIRECTORY_H

@@ -8,11 +8,11 @@
 #include "../util/profiling.h"
 #include "../util/string/format.h"
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 using namespace godot;
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 void copy_from_chunked_storage(
 		VoxelBuffer &dst_buffer,
@@ -23,8 +23,8 @@ void copy_from_chunked_storage(
 		void *get_block_func_ctx,
 		const bool with_metadata
 ) {
-	ZN_ASSERT_RETURN_MSG(Vector3iUtil::get_volume_u64(dst_buffer.get_size()) > 0, "The area to copy is empty");
-	ZN_ASSERT_RETURN(get_block_func != nullptr);
+	VOXEL_ASSERT_RETURN_MSG(Vector3iUtil::get_volume_u64(dst_buffer.get_size()) > 0, "The area to copy is empty");
+	VOXEL_ASSERT_RETURN(get_block_func != nullptr);
 
 	const Vector3i max_pos = min_pos + dst_buffer.get_size();
 
@@ -90,7 +90,7 @@ void paste_to_chunked_storage(
 		VoxelBuffer *(*get_block_func)(void *, Vector3i),
 		void *get_block_func_ctx
 ) {
-	ZN_ASSERT_RETURN(get_block_func != nullptr);
+	VOXEL_ASSERT_RETURN(get_block_func != nullptr);
 	const Vector3i max_pos = min_pos + src_buffer.get_size();
 
 	const Vector3i min_block_pos = min_pos >> block_size_po2;
@@ -275,7 +275,7 @@ void run_blocky_random_tick(
 
 	const Box3i voxel_box(math::floor_to_int(voxel_box_f.position), math::floor_to_int(voxel_box_f.size));
 
-	zylann::voxel::run_blocky_random_tick(
+	voxel::run_blocky_random_tick(
 			data,
 			voxel_box,
 			lib,
@@ -286,7 +286,7 @@ void run_blocky_random_tick(
 			&cb_self,
 			[](void *self, Vector3i pos, int64_t val) {
 				const CallbackData *cd = reinterpret_cast<const CallbackData *>(self);
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 				const Variant vpos = pos;
 				const Variant vv = val;
 				const Variant *args[2];
@@ -299,7 +299,7 @@ void run_blocky_random_tick(
 				// Examples I found in the engine are inconsistent
 				ERR_FAIL_COND_V(error.error != Callable::CallError::CALL_OK, false);
 		// Return if it fails, we don't want an error spam
-#elif ZN_GODOT_EXTENSION
+#elif VOXEL_GODOT_EXTENSION
 				// TODO GDX: No way to detect or report errors when calling a Callable. Do I need to?
 				cd->callable.call(pos, val);
 #endif
@@ -313,7 +313,7 @@ bool indices_to_bitarray_u16(Span<const int32_t> indices, DynamicBitset &bitarra
 	const int32_t max_supported_value = 65535;
 	// Validate
 	for (const int32_t i : indices) {
-		ZN_ASSERT_RETURN_V_MSG(
+		VOXEL_ASSERT_RETURN_V_MSG(
 				i >= 0 && i <= max_supported_value,
 				false,
 				format("Index {} is out of supported range 0..{}", i, max_supported_value)
@@ -352,9 +352,9 @@ void indices_to_bitarray(Span<const uint8_t> indices, DynamicBitset &bitarray) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-namespace zylann::voxel::ops {
+namespace voxel::ops {
 
 Box3i get_round_cone_int_bounds(Vector3f p0, Vector3f p1, float r0, float r1) {
 	const Vector3f minp(
@@ -376,13 +376,13 @@ Box3i get_round_cone_int_bounds(Vector3f p0, Vector3f p1, float r0, float r1) {
 
 // Reference implementation. Correct but very slow.
 void box_blur_slow_ref(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sphere_pos, float sphere_radius) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const Vector3i dst_size = src.get_size() - Vector3i(radius, radius, radius) * 2;
 
-	ZN_ASSERT_RETURN(dst_size.x >= 0);
-	ZN_ASSERT_RETURN(dst_size.y >= 0);
-	ZN_ASSERT_RETURN(dst_size.z >= 0);
+	VOXEL_ASSERT_RETURN(dst_size.x >= 0);
+	VOXEL_ASSERT_RETURN(dst_size.y >= 0);
+	VOXEL_ASSERT_RETURN(dst_size.z >= 0);
 
 	dst.create(dst_size);
 
@@ -434,14 +434,14 @@ void box_blur_slow_ref(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vec
 #endif
 
 void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sphere_pos, float sphere_radius) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(radius >= 1);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(radius >= 1);
 
 	const Vector3i dst_size = src.get_size() - Vector3i(radius, radius, radius) * 2;
 
-	ZN_ASSERT_RETURN(dst_size.x >= 0);
-	ZN_ASSERT_RETURN(dst_size.y >= 0);
-	ZN_ASSERT_RETURN(dst_size.z >= 0);
+	VOXEL_ASSERT_RETURN(dst_size.x >= 0);
+	VOXEL_ASSERT_RETURN(dst_size.y >= 0);
+	VOXEL_ASSERT_RETURN(dst_size.z >= 0);
 
 	dst.create(dst_size);
 
@@ -462,7 +462,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 	const unsigned int rb_len = 1 << rb_power;
 	ring_buffer.resize(rb_len);
 	const unsigned int rb_mask = rb_len - 1;
-	ZN_ASSERT(static_cast<int>(ring_buffer.size()) >= box_size);
+	VOXEL_ASSERT(static_cast<int>(ring_buffer.size()) >= box_size);
 
 	// Temporary buffer with extra length in two axes
 	StdVector<float> tmp;
@@ -474,7 +474,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 	unsigned int tmp_stride = 1;
 	unsigned int tmp_i = 0;
 	{
-		ZN_PROFILE_SCOPE_NAMED("Y blur");
+		VOXEL_PROFILE_SCOPE_NAMED("Y blur");
 		for (dst_pos.z = 0; dst_pos.z < tmp_size.z; ++dst_pos.z) {
 			for (dst_pos.x = 0; dst_pos.x < tmp_size.x; ++dst_pos.x) {
 				float sd_sum = 0.f;
@@ -519,7 +519,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 
 	// X blur
 	{
-		ZN_PROFILE_SCOPE_NAMED("X blur");
+		VOXEL_PROFILE_SCOPE_NAMED("X blur");
 		tmp_stride = tmp_size.y;
 		for (dst_pos.z = 0; dst_pos.z < tmp_size.z; ++dst_pos.z) {
 			for (dst_pos.y = 0; dst_pos.y < tmp_size.y; ++dst_pos.y) {
@@ -565,7 +565,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 
 	// Z blur
 	{
-		ZN_PROFILE_SCOPE_NAMED("Z blur");
+		VOXEL_PROFILE_SCOPE_NAMED("Z blur");
 		tmp_stride = tmp_size.y * tmp_size.x;
 		for (dst_pos.x = radius; dst_pos.x < tmp_size.x - radius; ++dst_pos.x) {
 			for (dst_pos.y = 0; dst_pos.y < tmp_size.y; ++dst_pos.y) {
@@ -604,7 +604,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 	// Blend using shape
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Blend");
+		VOXEL_PROFILE_SCOPE_NAMED("Blend");
 		for (dst_pos.z = 0; dst_pos.z < dst_size.z; ++dst_pos.z) {
 			for (dst_pos.x = 0; dst_pos.x < dst_size.x; ++dst_pos.x) {
 				for (dst_pos.y = 0; dst_pos.y < dst_size.y; ++dst_pos.y) {
@@ -636,14 +636,14 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 }
 
 void grow_sphere(VoxelBuffer &src, float strength, Vector3f sphere_pos, float sphere_radius) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(sphere_radius > 0.001f);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(sphere_radius > 0.001f);
 
 	const Vector3i src_size = src.get_size();
 
-	ZN_ASSERT_RETURN(src_size.x >= 0);
-	ZN_ASSERT_RETURN(src_size.y >= 0);
-	ZN_ASSERT_RETURN(src_size.z >= 0);
+	VOXEL_ASSERT_RETURN(src_size.x >= 0);
+	VOXEL_ASSERT_RETURN(src_size.y >= 0);
+	VOXEL_ASSERT_RETURN(src_size.z >= 0);
 
 	const float sphere_radius_squared = sphere_radius * sphere_radius;
 	const float inv_sphere_radius = 1.f / sphere_radius;
@@ -671,4 +671,4 @@ void grow_sphere(VoxelBuffer &src, float strength, Vector3f sphere_pos, float sp
 	}
 }
 
-} // namespace zylann::voxel::ops
+} // namespace voxel::ops

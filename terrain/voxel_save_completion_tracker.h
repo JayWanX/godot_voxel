@@ -5,7 +5,7 @@
 #include "../util/tasks/async_dependency_tracker.h"
 #include <memory>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Return value of aynchronous saving functions, allowing to query progress.
 // Wraps a task tracker for Godot script API. Might become generic in the future if needed in other places?
@@ -26,6 +26,6 @@ private:
 	unsigned int _total_tasks = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_SAVE_COMPLETION_TRACKER_H

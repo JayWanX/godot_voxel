@@ -6,11 +6,11 @@
 #include "../../../util/math/funcs.h"
 #include "../../../util/math/ortho_basis.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 StringName VoxelBlockyAttribute::get_attribute_name() const {
 	return _name;
@@ -40,7 +40,7 @@ int VoxelBlockyAttribute::get_value_from_name(StringName p_name) const {
 }
 
 StringName VoxelBlockyAttribute::get_name_from_value(int v) const {
-	ZN_ASSERT_RETURN_V(v >= 0 && v < get_value_count(), StringName());
+	VOXEL_ASSERT_RETURN_V(v >= 0 && v < get_value_count(), StringName());
 	return _value_names[v];
 }
 
@@ -84,12 +84,12 @@ bool VoxelBlockyAttribute::is_equivalent(const VoxelBlockyAttribute &other) cons
 bool find_non_empty_duplicate(const StdVector<StringName> &names) {
 	for (unsigned int i = 0; i < names.size(); ++i) {
 		const StringName &a = names[i];
-		if (zylann::godot::is_empty(a)) {
+		if (voxel::godot::is_empty(a)) {
 			continue;
 		}
 		for (unsigned int j = i + 1; j < names.size(); ++j) {
 			const StringName &b = names[j];
-			if (zylann::godot::is_empty(b)) {
+			if (voxel::godot::is_empty(b)) {
 				continue;
 			}
 			if (a == b) {
@@ -118,13 +118,13 @@ void VoxelBlockyAttribute::get_configuration_warnings(PackedStringArray &out_war
 #endif
 
 // int VoxelBlockyAttribute::get_order() const {
-// 	ZN_PRINT_ERROR("Not implemented");
+// 	VOXEL_PRINT_ERROR("Not implemented");
 // 	// Implemented in child classes
 // 	return 0;
 // }
 
 unsigned int VoxelBlockyAttribute::get_ortho_rotation_index_from_value(int value) const {
-	ZN_ASSERT_RETURN_V(value >= 0 && value < int(_value_names.size()), math::ORTHO_ROTATION_IDENTITY);
+	VOXEL_ASSERT_RETURN_V(value >= 0 && value < int(_value_names.size()), math::ORTHO_ROTATION_IDENTITY);
 	if (value >= int(_ortho_rotations.size())) {
 		return math::ORTHO_ROTATION_IDENTITY;
 	}
@@ -133,7 +133,7 @@ unsigned int VoxelBlockyAttribute::get_ortho_rotation_index_from_value(int value
 
 void VoxelBlockyAttribute::sort_by_name(Span<Ref<VoxelBlockyAttribute>> attributes) {
 	for (const Ref<VoxelBlockyAttribute> &attrib : attributes) {
-		ZN_ASSERT_RETURN(attrib.is_valid());
+		VOXEL_ASSERT_RETURN(attrib.is_valid());
 	}
 	struct AttributeComparator {
 		bool operator()(const Ref<VoxelBlockyAttribute> &a, const Ref<VoxelBlockyAttribute> &b) const {
@@ -146,7 +146,7 @@ void VoxelBlockyAttribute::sort_by_name(Span<Ref<VoxelBlockyAttribute>> attribut
 
 void VoxelBlockyAttribute::sort_by_name(Span<StringName> attributes) {
 	for (const StringName &attrib : attributes) {
-		ZN_ASSERT_RETURN(!zylann::godot::is_empty(attrib));
+		VOXEL_ASSERT_RETURN(!voxel::godot::is_empty(attrib));
 	}
 	struct AttributeComparator {
 		bool operator()(const StringName &a, const StringName &b) const {
@@ -159,7 +159,7 @@ void VoxelBlockyAttribute::sort_by_name(Span<StringName> attributes) {
 
 void VoxelBlockyAttribute::sort_by_name(Span<std::pair<StringName, uint8_t>> attributes) {
 	for (const std::pair<StringName, uint8_t> &attrib : attributes) {
-		ZN_ASSERT_RETURN(!zylann::godot::is_empty(attrib.first));
+		VOXEL_ASSERT_RETURN(!voxel::godot::is_empty(attrib.first));
 	}
 	struct AttributeComparator {
 		bool operator()(const std::pair<StringName, uint8_t> &a, const std::pair<StringName, uint8_t> &b) const {
@@ -179,4 +179,4 @@ void VoxelBlockyAttribute::_bind_methods() {
 	BIND_CONSTANT(MAX_VALUES);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

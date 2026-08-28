@@ -1,18 +1,18 @@
-#ifndef ZN_GODOT_REF_COUNTED_H
-#define ZN_GODOT_REF_COUNTED_H
+#ifndef VOXEL_GODOT_REF_COUNTED_H
+#define VOXEL_GODOT_REF_COUNTED_H
 
 #include <functional>
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/object/ref_counted.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 // Ref<T> is not available if you only include ref_counted.hpp and no derived class.
 // ref.hpp, on the other hand, includes ref_counted.hpp.
 #include <godot_cpp/classes/ref.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // `(ref1 = ref2).is_valid()` does not work because Ref<T> does not implement an `operator=` returning the value.
 // So instead we can write it as `try_get_as(ref2, ref1)`
@@ -30,7 +30,7 @@ struct RefHasher {
 	}
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
 namespace std {
 
@@ -44,4 +44,4 @@ struct hash<Ref<T>> {
 
 } // namespace std
 
-#endif // ZN_GODOT_REF_COUNTED_H
+#endif // VOXEL_GODOT_REF_COUNTED_H

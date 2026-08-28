@@ -1,5 +1,5 @@
-#ifndef ZN_GODOT_STD_ALLOCATOR_H
-#define ZN_GODOT_STD_ALLOCATOR_H
+#ifndef VOXEL_GODOT_STD_ALLOCATOR_H
+#define VOXEL_GODOT_STD_ALLOCATOR_H
 
 #include <limits>
 // #include <new>
@@ -11,7 +11,7 @@
 #include <atomic>
 #endif
 
-namespace zylann {
+namespace voxel {
 
 #ifdef DEBUG_ENABLED
 namespace StdDefaultAllocatorCounters {
@@ -32,12 +32,12 @@ struct StdDefaultAllocator {
 	constexpr StdDefaultAllocator(const StdDefaultAllocator<U> &) noexcept {}
 
 	[[nodiscard]] T *allocate(std::size_t n) {
-		ZN_ASSERT(n <= std::numeric_limits<std::size_t>::max() / sizeof(T));
+		VOXEL_ASSERT(n <= std::numeric_limits<std::size_t>::max() / sizeof(T));
 		// if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
 		// 	throw std::bad_array_new_length();
 		// }
 
-		if (T *p = static_cast<T *>(ZN_ALLOC(n * sizeof(T)))) {
+		if (T *p = static_cast<T *>(VOXEL_ALLOC(n * sizeof(T)))) {
 #ifdef DEBUG_ENABLED
 			StdDefaultAllocatorCounters::g_allocated += n * sizeof(T);
 #endif
@@ -45,7 +45,7 @@ struct StdDefaultAllocator {
 		}
 
 		// throw std::bad_alloc();
-		ZN_CRASH_MSG("Bad alloc");
+		VOXEL_CRASH_MSG("Bad alloc");
 		return nullptr;
 	}
 
@@ -53,7 +53,7 @@ struct StdDefaultAllocator {
 #ifdef DEBUG_ENABLED
 		StdDefaultAllocatorCounters::g_deallocated += n * sizeof(T);
 #endif
-		ZN_FREE(p);
+		VOXEL_FREE(p);
 	}
 
 	// Note: defining a `rebind` struct is optional as long as the allocator is a template class. It is therefore
@@ -71,6 +71,6 @@ bool operator!=(const StdDefaultAllocator<T> &, const StdDefaultAllocator<U> &) 
 	return false;
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_GODOT_STD_ALLOCATOR_H
+#endif // VOXEL_GODOT_STD_ALLOCATOR_H

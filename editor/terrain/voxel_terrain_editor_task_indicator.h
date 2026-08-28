@@ -5,10 +5,10 @@
 #include "../../util/godot/classes/scroll_container.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Label)
-ZN_GODOT_FORWARD_DECLARE(class HBoxContainer)
+VOXEL_GODOT_FORWARD_DECLARE(class Label)
+VOXEL_GODOT_FORWARD_DECLARE(class HBoxContainer)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTerrainEditorTaskIndicator : public ScrollContainer {
 	GDCLASS(VoxelTerrainEditorTaskIndicator, ScrollContainer)
@@ -48,6 +48,6 @@ private:
 	HBoxContainer *_box_container = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_TERRAIN_EDITOR_TASK_INDICATOR_H

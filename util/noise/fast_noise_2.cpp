@@ -5,11 +5,11 @@
 #include "../math/vector3.h"
 #include <core/io/image.h>
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../godot/core/class_db.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
 FastNoise2::FastNoise2() {
 	// Setup default
@@ -841,4 +841,4 @@ void FastNoise2::_bind_methods() {
 	BIND_ENUM_CONSTANT(SIMD_NEON);
 }
 
-} // namespace zylann
+} // namespace voxel

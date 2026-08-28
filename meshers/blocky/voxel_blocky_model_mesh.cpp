@@ -16,13 +16,13 @@
 #include "voxel_blocky_library.h"
 #include "voxel_blocky_model_empty.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelBlockyModelMesh::set_mesh(Ref<Mesh> mesh) {
 	{
 		Ref<PointMesh> point_mesh = mesh;
 		if (point_mesh.is_valid()) {
-			ZN_PRINT_ERROR(format("PointMesh is not supported by {}.", ZN_CLASS_NAME_C(VoxelBlockyModelMesh)));
+			VOXEL_PRINT_ERROR(format("PointMesh is not supported by {}.", VOXEL_CLASS_NAME_C(VoxelBlockyModelMesh)));
 			return;
 		}
 	}
@@ -103,7 +103,7 @@ void rotate_mesh_arrays(Span<Vector3> vertices, Span<Vector3> normals, Span<floa
 
 	} else {
 		const unsigned int tangent_count = tangents.size() / 4;
-		ZN_ASSERT_RETURN(tangent_count == normals.size());
+		VOXEL_ASSERT_RETURN(tangent_count == normals.size());
 
 		for (unsigned int ti = 0; ti < tangent_count; ++ti) {
 			const unsigned int i0 = ti * 4;
@@ -144,7 +144,7 @@ void rotate_mesh_arrays(Span<Vector3f> vertices, Span<Vector3f> normals, Span<fl
 
 	} else {
 		const unsigned int tangent_count = tangents.size() / 4;
-		ZN_ASSERT_RETURN(tangent_count == normals.size());
+		VOXEL_ASSERT_RETURN(tangent_count == normals.size());
 
 		for (unsigned int ti = 0; ti < tangent_count; ++ti) {
 			const unsigned int i0 = ti * 4;
@@ -196,10 +196,10 @@ void rotate_mesh_arrays_ortho(
 }
 
 bool validate_indices(Span<const int> indices, int vertex_count) {
-	ZN_ASSERT_RETURN_V(vertex_count >= 0, false);
+	VOXEL_ASSERT_RETURN_V(vertex_count >= 0, false);
 	for (const int index : indices) {
 		if (index < 0 || index >= vertex_count) {
-			ZN_PRINT_ERROR(
+			VOXEL_PRINT_ERROR(
 					format("Invalid index found in mesh indices. Maximum is {}, found {}", vertex_count - 1, index)
 			);
 			return false;
@@ -232,25 +232,25 @@ void bake_mesh_geometry(
 		PackedVector3Array positions = arrays[Mesh::ARRAY_VERTEX];
 		if (indices.size() == 0) {
 			if (positions.size() == 0) {
-				ZN_PRINT_ERROR(
+				VOXEL_PRINT_ERROR(
 						format("Mesh surface {} is empty (no vertices, no index buffer). If you want an empty "
 							   "model, use {}.",
 							   surface_index,
-							   ZN_CLASS_NAME_C(VoxelBlockyModelEmpty))
+							   VOXEL_CLASS_NAME_C(VoxelBlockyModelEmpty))
 				);
 				continue;
 			} else {
-				ZN_PRINT_ERROR(
+				VOXEL_PRINT_ERROR(
 						format("Mesh surface {} is missing an index buffer. Indexed meshes are expected. If you're "
 							   "generating the mesh with {}, you may use the {}() method.",
 							   surface_index,
-							   ZN_CLASS_NAME_C(SurfaceTool),
-							   ZN_METHOD_NAME_C(SurfaceTool, index))
+							   VOXEL_CLASS_NAME_C(SurfaceTool),
+							   VOXEL_METHOD_NAME_C(SurfaceTool, index))
 				);
 				continue;
 			}
 		}
-		ZN_ASSERT_CONTINUE_MSG(
+		VOXEL_ASSERT_CONTINUE_MSG(
 				(indices.size() % 3) == 0,
 				format("Mesh surface has an invalid number of indices. "
 					   "Expected multiple of 3 (for triangles), found {}",
@@ -269,11 +269,11 @@ void bake_mesh_geometry(
 
 		baked_data.empty = positions.size() == 0;
 
-		ZN_ASSERT_CONTINUE_MSG(normals.size() != 0, "The mesh is missing normals, this is not supported.");
+		VOXEL_ASSERT_CONTINUE_MSG(normals.size() != 0, "The mesh is missing normals, this is not supported.");
 
-		ZN_ASSERT_CONTINUE(positions.size() == normals.size());
-		// ZN_ASSERT_CONTINUE(positions.size() == uvs.size());
-		// ZN_ASSERT_CONTINUE(positions.size() == tangents.size() * 4);
+		VOXEL_ASSERT_CONTINUE(positions.size() == normals.size());
+		// VOXEL_ASSERT_CONTINUE(positions.size() == uvs.size());
+		// VOXEL_ASSERT_CONTINUE(positions.size() == tangents.size() * 4);
 
 		if (ortho_rotation != math::ORTHOGONAL_BASIS_IDENTITY_INDEX) {
 			// Move mesh to origin for easier rotation, since the baked mesh spans 0..1 instead of -0.5..0.5
@@ -324,19 +324,19 @@ void bake_mesh_geometry(
 		if (tangents_empty && bake_tangents) {
 			if (uvs.size() == 0) {
 				// TODO Provide context where the model is used, they can't always be named
-				ZN_PRINT_ERROR(
+				VOXEL_PRINT_ERROR(
 						format("Voxel model is missing tangents and UVs. The model won't be "
 							   "baked. You should consider providing a mesh with tangents, or at least UVs and "
 							   "normals, or turn off tangents baking in {}.",
-							   ZN_CLASS_NAME_C(VoxelBlockyLibrary))
+							   VOXEL_CLASS_NAME_C(VoxelBlockyLibrary))
 				);
 				continue;
 			}
-			ZN_PRINT_WARNING(
+			VOXEL_PRINT_WARNING(
 					format("Voxel model does not have tangents. They will be generated."
 						   "You should consider providing a mesh with tangents, or at least UVs and normals, "
 						   "or turn off tangents baking in {}.",
-						   ZN_CLASS_NAME_C(VoxelBlockyLibrary))
+						   VOXEL_CLASS_NAME_C(VoxelBlockyLibrary))
 			);
 
 			tangents = generate_tangents_from_uvs(positions, normals, uvs, indices);
@@ -466,7 +466,7 @@ void bake_mesh_geometry(
 	// different or is null)
 	const uint32_t src_surface_count = mesh->get_surface_count();
 	if (mesh->get_surface_count() > int(blocky::MAX_SURFACES)) {
-		ZN_PRINT_WARNING(
+		VOXEL_PRINT_WARNING(
 				format("Mesh has more than {} surfaces, extra surfaces will not be baked.", blocky::MAX_SURFACES)
 		);
 	}
@@ -592,4 +592,4 @@ void VoxelBlockyModelMesh::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

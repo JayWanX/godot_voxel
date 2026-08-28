@@ -1,7 +1,7 @@
 #include "camera_cache.h"
 #include "../util/errors.h"
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 namespace {
 ObjectID g_camera_id;
@@ -27,9 +27,9 @@ Vector3 get_3d_editor_camera_position() {
 }
 
 void set_3d_editor_camera_cache(Camera3D *camera) {
-	ZN_ASSERT_RETURN(camera != nullptr);
+	VOXEL_ASSERT_RETURN(camera != nullptr);
 	g_camera_id = camera->get_instance_id();
 	g_position = camera->get_position();
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot

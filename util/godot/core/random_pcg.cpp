@@ -27,7 +27,7 @@
 /* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
-// Zylann: added the `godot` namespace, adapted so it can compile with GodotCpp
+// Voxel: added the `godot` namespace, adapted so it can compile with GodotCpp
 
 #include "random_pcg.h"
 
@@ -58,7 +58,7 @@ int RandomPCG::random(int p_from, int p_to) {
 	if (p_from == p_to) {
 		return p_from;
 	}
-	return rand(abs(p_from - p_to) + 1) + zylann::math::min(p_from, p_to);
+	return rand(abs(p_from - p_to) + 1) + voxel::math::min(p_from, p_to);
 }
 
 } // namespace godot

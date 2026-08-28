@@ -2,7 +2,7 @@
 #include "../containers/std_vector.h"
 #include "classes/directory.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 const char *to_string(FileResult res) {
 	switch (res) {
@@ -75,4 +75,4 @@ void insert_bytes(FileAccess &f, size_t count, size_t temp_chunk_size) {
 	}
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

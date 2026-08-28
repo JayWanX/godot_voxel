@@ -4,12 +4,12 @@
 #include "../../edition/voxel_mesh_sdf_gd.h"
 #include "../../util/godot/classes/v_box_container.h"
 
-ZN_GODOT_FORWARD_DECLARE(class TextureRect)
-ZN_GODOT_FORWARD_DECLARE(class Button)
-ZN_GODOT_FORWARD_DECLARE(class SpinBox)
-ZN_GODOT_FORWARD_DECLARE(class Label)
+VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
+VOXEL_GODOT_FORWARD_DECLARE(class Button)
+VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
+VOXEL_GODOT_FORWARD_DECLARE(class Label)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelMeshSDFViewer : public VBoxContainer {
 	GDCLASS(VoxelMeshSDFViewer, VBoxContainer)
@@ -43,6 +43,6 @@ private:
 	Vector3i _size_before_baking;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESH_SDF_VIEWER_H

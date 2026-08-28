@@ -9,11 +9,11 @@
 #include "../about_window.h"
 #include "voxel_instancer_stat_view.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 enum MenuItemID { //
@@ -32,14 +32,14 @@ void VoxelInstancerEditorPlugin::init() {
 	{
 		PopupMenu *popup = menu_button->get_popup();
 		{
-			popup->add_item(ZN_TTR("Show statistics"), MENU_SHOW_STATS);
+			popup->add_item(VOXEL_TTR("Show statistics"), MENU_SHOW_STATS);
 			const int i = menu_button->get_popup()->get_item_index(MENU_SHOW_STATS);
 			popup->set_item_as_checkable(i, true);
 			popup->set_item_checked(i, false);
 		}
 		{
 			popup->add_separator();
-			popup->add_item(ZN_TTR("About Voxel Tools..."), MENU_ABOUT);
+			popup->add_item(VOXEL_TTR("About Voxel Tools..."), MENU_ABOUT);
 		}
 	}
 	menu_button->get_popup()->connect(
@@ -56,12 +56,12 @@ void VoxelInstancerEditorPlugin::_notification(int p_what) {
 	}
 }
 
-bool VoxelInstancerEditorPlugin::_zn_handles(const Object *p_object) const {
+bool VoxelInstancerEditorPlugin::_voxel_handles(const Object *p_object) const {
 	ERR_FAIL_COND_V(p_object == nullptr, false);
 	return Object::cast_to<VoxelInstancer>(p_object) != nullptr;
 }
 
-void VoxelInstancerEditorPlugin::_zn_edit(Object *p_object) {
+void VoxelInstancerEditorPlugin::_voxel_edit(Object *p_object) {
 	// Godot will call `edit(null)` when selecting another node
 	if (p_object == nullptr) {
 		VoxelInstancer *instancer = get_instancer();
@@ -84,7 +84,7 @@ void VoxelInstancerEditorPlugin::_zn_edit(Object *p_object) {
 	}
 }
 
-void VoxelInstancerEditorPlugin::_zn_make_visible(bool visible) {
+void VoxelInstancerEditorPlugin::_voxel_make_visible(bool visible) {
 	_menu_button->set_visible(visible);
 
 	VoxelInstancer *instancer = get_instancer();
@@ -159,4 +159,4 @@ VoxelInstancer *VoxelInstancerEditorPlugin::get_instancer() {
 
 void VoxelInstancerEditorPlugin::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

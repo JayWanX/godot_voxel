@@ -7,7 +7,7 @@
 #include "../../util/math/vector3i.h"
 #include "../../util/thread/rw_lock.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct BlockKeysCache {
 	FixedArray<StdUnorderedSet<Vector3i>, constants::MAX_LOD> lods;
@@ -45,6 +45,6 @@ struct BlockKeysCache {
 	// }
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCK_KEY_CACHE_H

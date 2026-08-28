@@ -8,7 +8,7 @@
 #include "file_utils.h"
 #include <algorithm>
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 const uint8_t FORMAT_VERSION = 3;
@@ -73,7 +73,7 @@ bool save_header(
 	// `f` could be anywhere in the file, we seek to ensure we start at the beginning
 	f.seek(0);
 
-	zylann::godot::store_buffer(f, Span<const uint8_t>(reinterpret_cast<const uint8_t *>(FORMAT_REGION_MAGIC), 4));
+	voxel::godot::store_buffer(f, Span<const uint8_t>(reinterpret_cast<const uint8_t *>(FORMAT_REGION_MAGIC), 4));
 	f.store_8(version);
 
 	f.store_8(format.block_size_po2);
@@ -102,7 +102,7 @@ bool save_header(
 	}
 
 	// TODO Deal with endianness, this should be little-endian
-	zylann::godot::store_buffer(
+	voxel::godot::store_buffer(
 			f,
 			Span<const uint8_t>(
 					reinterpret_cast<const uint8_t *>(block_infos.data()), block_infos.size() * sizeof(RegionBlockInfo)
@@ -129,7 +129,7 @@ bool load_header(
 	FixedArray<char, 5> magic;
 	fill(magic, '\0');
 	ERR_FAIL_COND_V(
-			zylann::godot::get_buffer(f, Span<uint8_t>(reinterpret_cast<uint8_t *>(magic.data()), 4)) != 4, false
+			voxel::godot::get_buffer(f, Span<uint8_t>(reinterpret_cast<uint8_t *>(magic.data()), 4)) != 4, false
 	);
 	ERR_FAIL_COND_V(strcmp(magic.data(), FORMAT_REGION_MAGIC) != 0, false);
 
@@ -166,7 +166,7 @@ bool load_header(
 			out_format.has_palette = false;
 
 		} else {
-			ZN_PRINT_ERROR(format("Unexpected palette value: {}", int(palette_size)));
+			VOXEL_PRINT_ERROR(format("Unexpected palette value: {}", int(palette_size)));
 			return false;
 		}
 	}
@@ -176,7 +176,7 @@ bool load_header(
 
 	// TODO Deal with endianness
 	const size_t blocks_len = out_block_infos.size() * sizeof(RegionBlockInfo);
-	const size_t read_size = zylann::godot::get_buffer(f, Span<uint8_t>((uint8_t *)out_block_infos.data(), blocks_len));
+	const size_t read_size = voxel::godot::get_buffer(f, Span<uint8_t>((uint8_t *)out_block_infos.data(), blocks_len));
 	ERR_FAIL_COND_V(read_size != blocks_len, false);
 
 	return true;
@@ -206,7 +206,7 @@ Error RegionFile::open(const String &fpath, bool create_if_not_found) {
 	Error file_error;
 	// Open existing file for read and write permissions. This should not create the file if it doesn't exist.
 	// Note, there is no read-only mode supported, because there was no need for it yet.
-	Ref<FileAccess> f = zylann::godot::open_file(fpath, FileAccess::READ_WRITE, file_error);
+	Ref<FileAccess> f = voxel::godot::open_file(fpath, FileAccess::READ_WRITE, file_error);
 	if (file_error != OK) {
 		if (create_if_not_found) {
 			CRASH_COND(f.is_valid());
@@ -220,7 +220,7 @@ Error RegionFile::open(const String &fpath, bool create_if_not_found) {
 			}
 
 			// This time, we attempt to create the file
-			f = zylann::godot::open_file(fpath, FileAccess::WRITE_READ, file_error);
+			f = voxel::godot::open_file(fpath, FileAccess::WRITE_READ, file_error);
 			if (file_error != OK) {
 				ERR_PRINT(String("Failed to create file {0}").format(varray(fpath)));
 				return file_error;
@@ -287,7 +287,7 @@ Error RegionFile::open(const String &fpath, bool create_if_not_found) {
 }
 
 Error RegionFile::close() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	Error err = OK;
 	if (_file_access.is_valid()) {
 		if (_header_modified) {
@@ -312,7 +312,7 @@ void RegionFile::flush() {
 		return;
 	}
 	if (_header_modified) {
-		ZN_ASSERT_RETURN(save_header(**_file_access));
+		VOXEL_ASSERT_RETURN(save_header(**_file_access));
 	}
 	_file_access->flush();
 }
@@ -410,7 +410,7 @@ Error RegionFile::save_block(
 		ERR_FAIL_COND_V(!res.success, ERR_INVALID_PARAMETER);
 		f.store_32(res.data.size());
 		const unsigned int written_size = sizeof(uint32_t) + res.data.size();
-		zylann::godot::store_buffer(f, to_span(res.data));
+		voxel::godot::store_buffer(f, to_span(res.data));
 
 		const unsigned int end_pos = f.get_position();
 		CRASH_COND_MSG(
@@ -459,7 +459,7 @@ Error RegionFile::save_block(
 			f.seek(block_offset);
 
 			f.store_32(data.size());
-			zylann::godot::store_buffer(f, to_span(data));
+			voxel::godot::store_buffer(f, to_span(data));
 
 			const size_t end_pos = f.get_position();
 			CRASH_COND(written_size != (end_pos - block_offset));
@@ -477,7 +477,7 @@ Error RegionFile::save_block(
 			f.seek(block_offset);
 
 			f.store_32(data.size());
-			zylann::godot::store_buffer(f, to_span(data));
+			voxel::godot::store_buffer(f, to_span(data));
 
 			const size_t end_pos = f.get_position();
 			CRASH_COND(written_size != (end_pos - block_offset));
@@ -513,7 +513,7 @@ void RegionFile::pad_to_sector_size(FileAccess &f) {
 }
 
 void RegionFile::remove_sectors_from_block(Vector3i block_pos, unsigned int p_sector_count) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Removes sectors from a block, starting from the last ones.
 	// So if a block has 5 sectors and we remove 2, the first 3 will be preserved.
@@ -548,11 +548,11 @@ void RegionFile::remove_sectors_from_block(Vector3i block_pos, unsigned int p_se
 	// Erase sectors from file
 	while (src_offset < old_end_offset) {
 		f.seek(src_offset);
-		const size_t read_bytes = zylann::godot::get_buffer(f, to_span(temp));
+		const size_t read_bytes = voxel::godot::get_buffer(f, to_span(temp));
 		CRASH_COND(read_bytes != sector_size); // Corrupted file
 
 		f.seek(dst_offset);
-		zylann::godot::store_buffer(f, to_span(temp));
+		voxel::godot::store_buffer(f, to_span(temp));
 
 		src_offset += sector_size;
 		dst_offset += sector_size;
@@ -593,14 +593,14 @@ bool RegionFile::save_header(FileAccess &f) {
 	if (_header.version != FORMAT_VERSION) {
 		ERR_FAIL_COND_V(migrate_to_latest(f) == false, false);
 	}
-	ERR_FAIL_COND_V(!zylann::voxel::save_header(f, _header.version, _header.format, _header.blocks), false);
+	ERR_FAIL_COND_V(!voxel::save_header(f, _header.version, _header.format, _header.blocks), false);
 	_blocks_begin_offset = f.get_position();
 	_header_modified = false;
 	return true;
 }
 
 bool RegionFile::migrate_from_v2_to_v3(FileAccess &f, RegionFormat &format) {
-	ZN_PRINT_VERBOSE(zylann::format("Migrating region file {} from v2 to v3", _file_path));
+	VOXEL_PRINT_VERBOSE(voxel::format("Migrating region file {} from v2 to v3", _file_path));
 
 	// We can migrate if we know in advance what format the file should contain.
 	ERR_FAIL_COND_V_MSG(format.block_size_po2 == 0, false, "Cannot migrate without knowing the correct format");
@@ -615,7 +615,7 @@ bool RegionFile::migrate_from_v2_to_v3(FileAccess &f, RegionFormat &format) {
 	const unsigned int extra_bytes_needed = new_header_size - old_header_size;
 
 	f.seek(MAGIC_AND_VERSION_SIZE);
-	zylann::godot::insert_bytes(f, extra_bytes_needed);
+	voxel::godot::insert_bytes(f, extra_bytes_needed);
 
 	// Set version because otherwise `save_header` will attempt to migrate again causing stack-overflow
 	_header.version = FORMAT_VERSION;
@@ -650,7 +650,7 @@ bool RegionFile::migrate_to_latest(FileAccess &f) {
 }
 
 Error RegionFile::load_header(FileAccess &f) {
-	ERR_FAIL_COND_V(!zylann::voxel::load_header(f, _header.version, _header.format, _header.blocks), ERR_PARSE_ERROR);
+	ERR_FAIL_COND_V(!voxel::load_header(f, _header.version, _header.format, _header.blocks), ERR_PARSE_ERROR);
 	_blocks_begin_offset = f.get_position();
 	return OK;
 }
@@ -701,7 +701,7 @@ void RegionFile::debug_check() {
 		const unsigned int sector_index = block_info.get_sector_index();
 		const unsigned int block_begin = _blocks_begin_offset + sector_index * _header.format.sector_size;
 		if (block_begin >= file_len) {
-			ZN_PRINT_ERROR(format(
+			VOXEL_PRINT_ERROR(format(
 					"LUT {} {}: offset {} is larger than file size {}", lut_index, position, block_begin, file_len
 			));
 			continue;
@@ -711,7 +711,7 @@ void RegionFile::debug_check() {
 		const size_t pos = f.get_position();
 		const size_t remaining_size = file_len - pos;
 		if (block_data_size > remaining_size) {
-			ZN_PRINT_ERROR(
+			VOXEL_PRINT_ERROR(
 					format("LUT {} {}: block size {} at offset {} is larger than remaining size {}",
 						   lut_index,
 						   position,
@@ -723,4 +723,4 @@ void RegionFile::debug_check() {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

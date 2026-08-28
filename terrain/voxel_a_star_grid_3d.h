@@ -8,7 +8,7 @@
 #include "../util/containers/std_vector.h"
 #include <atomic>
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTerrain;
 
@@ -91,6 +91,6 @@ private:
 	std::atomic_bool _is_running_async = { false };
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_A_STAR_GRID_3D_H

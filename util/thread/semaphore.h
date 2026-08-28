@@ -1,10 +1,10 @@
-#ifndef ZN_SEMAPHORE_H
-#define ZN_SEMAPHORE_H
+#ifndef VOXEL_SEMAPHORE_H
+#define VOXEL_SEMAPHORE_H
 
 #include <condition_variable>
 #include <mutex>
 
-namespace zylann {
+namespace voxel {
 
 class Semaphore {
 public:
@@ -37,6 +37,6 @@ private:
 	mutable unsigned long _count = 0; // Initialized as locked.
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SEMAPHORE_H
+#endif // VOXEL_SEMAPHORE_H

@@ -4,7 +4,7 @@
 #include "task_priority.h"
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 struct ThreadedTaskContext {
 	enum Status : uint8_t {
@@ -74,6 +74,6 @@ public:
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // THREADED_TASK_H

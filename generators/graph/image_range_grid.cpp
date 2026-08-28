@@ -3,7 +3,7 @@
 #include "../../util/string/format.h"
 #include "image_utility.h"
 
-namespace zylann {
+namespace voxel {
 
 using namespace math;
 
@@ -19,7 +19,7 @@ void ImageRangeGrid::clear() {
 }
 
 void ImageRangeGrid::generate(const Image &im) {
-	ZN_ASSERT_RETURN_MSG(!im.is_compressed(), format("Image format not supported: {}", im.get_format()));
+	VOXEL_ASSERT_RETURN_MSG(!im.is_compressed(), format("Image format not supported: {}", im.get_format()));
 
 	clear();
 
@@ -46,7 +46,7 @@ void ImageRangeGrid::generate(const Image &im) {
 				const int max_x = min(min_x + chunk_size, im.get_width());
 				const int max_y = min(min_y + chunk_size, im.get_height());
 
-				const Interval r = zylann::get_heightmap_range(im, Rect2i(min_x, min_y, max_x - min_x, max_y - min_y));
+				const Interval r = voxel::get_heightmap_range(im, Rect2i(min_x, min_y, max_x - min_x, max_y - min_y));
 
 				lod.data[cx + cy * lod.size_x] = r;
 			}
@@ -106,7 +106,7 @@ void ImageRangeGrid::generate(const Image &im) {
 	}
 
 	{
-		ZN_ASSERT(lod_count > 0);
+		VOXEL_ASSERT(lod_count > 0);
 		const int last_lod_index = lod_count - 1;
 		const Lod &lod = _lods[last_lod_index];
 		Interval r = lod.data[0];
@@ -165,7 +165,7 @@ void interval_to_pixels_repeat(Interval i, int &out_min, int &out_max, int image
 } // namespace
 
 Interval ImageRangeGrid::get_range_repeat(Interval xr, Interval yr) const {
-	ZN_ASSERT(_lod_count > 0);
+	VOXEL_ASSERT(_lod_count > 0);
 
 	int pixel_min_x, pixel_max_x, pixel_min_y, pixel_max_y;
 	interval_to_pixels_repeat(xr, pixel_min_x, pixel_max_x, _pixels_x);
@@ -184,7 +184,7 @@ Interval ImageRangeGrid::get_range_repeat(Interval xr, Interval yr) const {
 		}
 	}
 
-	ZN_ASSERT(lod_index < _lod_count);
+	VOXEL_ASSERT(lod_index < _lod_count);
 
 	// Calculate the area in chunks
 	const int absolute_lod = _lod_base + lod_index;
@@ -223,4 +223,4 @@ Interval ImageRangeGrid::get_range_repeat(Interval xr, Interval yr) const {
 	return r;
 }
 
-} // namespace zylann
+} // namespace voxel

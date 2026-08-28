@@ -17,7 +17,7 @@
 #include "../../util/godot/classes/image.h"
 #include "../../util/godot/classes/texture_2d.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGenerator;
 class VoxelData;
@@ -172,6 +172,6 @@ void copy_2d_region_from_packed_to_atlased(
 		const unsigned int item_size_in_bytes
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_DETAIL_RENDERING_H

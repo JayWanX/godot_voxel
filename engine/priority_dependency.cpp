@@ -2,11 +2,11 @@
 #include "../constants/voxel_constants.h"
 #include "../util/math/funcs.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 TaskPriority PriorityDependency::evaluate(uint8_t lod_index, uint8_t band2_priority, float *out_closest_distance_sq) {
 	TaskPriority priority;
-	ZN_ASSERT_RETURN_V(shared != nullptr, priority);
+	VOXEL_ASSERT_RETURN_V(shared != nullptr, priority);
 
 	const StdVector<Vector3f> &viewer_positions = shared->viewers;
 	const unsigned int viewer_count = shared->viewers_count;
@@ -55,4 +55,4 @@ TaskPriority PriorityDependency::evaluate(uint8_t lod_index, uint8_t band2_prior
 	return priority;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

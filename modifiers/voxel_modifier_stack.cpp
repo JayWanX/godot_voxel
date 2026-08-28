@@ -4,7 +4,7 @@
 #include "../util/math/vector3.h"
 #include "../util/profiling.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -49,7 +49,7 @@ Span<const Vector3f> get_positions_temporary(
 		Span<const float> y_buffer,
 		Span<const float> z_buffer
 ) {
-	ZN_ASSERT(x_buffer.size() == z_buffer.size() && y_buffer.size() == z_buffer.size());
+	VOXEL_ASSERT(x_buffer.size() == z_buffer.size() && y_buffer.size() == z_buffer.size());
 
 	get_tls_positions().resize(x_buffer.size());
 	Span<Vector3f> positions = to_span(get_tls_positions());
@@ -63,7 +63,7 @@ Span<const Vector3f> get_positions_temporary(
 
 // TODO Use VoxelBuffer helper function
 void decompress_sdf_to_buffer(VoxelBuffer &voxels, StdVector<float> &sdf) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 
 	sdf.resize(Vector3iUtil::get_volume_u64(voxels.get_size()));
 
@@ -75,7 +75,7 @@ void decompress_sdf_to_buffer(VoxelBuffer &voxels, StdVector<float> &sdf) {
 	switch (depth) {
 		case VoxelBuffer::DEPTH_8_BIT: {
 			Span<int8_t> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				sdf[i] = s8_to_snorm(raw[i]);
 			}
@@ -83,7 +83,7 @@ void decompress_sdf_to_buffer(VoxelBuffer &voxels, StdVector<float> &sdf) {
 
 		case VoxelBuffer::DEPTH_16_BIT: {
 			Span<int16_t> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				sdf[i] = s16_to_snorm(raw[i]);
 			}
@@ -91,20 +91,20 @@ void decompress_sdf_to_buffer(VoxelBuffer &voxels, StdVector<float> &sdf) {
 
 		case VoxelBuffer::DEPTH_32_BIT: {
 			Span<float> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			memcpy(sdf.data(), raw.data(), sizeof(float) * sdf.size());
 		} break;
 
 		case VoxelBuffer::DEPTH_64_BIT: {
 			Span<double> raw;
-			ZN_ASSERT(voxels.get_channel_data(channel, raw));
+			VOXEL_ASSERT(voxels.get_channel_data(channel, raw));
 			for (unsigned int i = 0; i < sdf.size(); ++i) {
 				sdf[i] = raw[i];
 			}
 		} break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 
 	const float inv_scale = 1.0f / VoxelBuffer::get_sdf_quantization_scale(depth);
@@ -145,7 +145,7 @@ void VoxelModifierStack::remove_modifier(uint32_t id) {
 	RWLockWrite lock(_stack_lock);
 
 	auto map_it = _modifiers.find(id);
-	ZN_ASSERT_RETURN(map_it != _modifiers.end());
+	VOXEL_ASSERT_RETURN(map_it != _modifiers.end());
 
 	const VoxelModifier *ptr = map_it->second.get();
 	for (auto stack_it = _stack.begin(); stack_it != _stack.end(); ++stack_it) {
@@ -171,7 +171,7 @@ VoxelModifier *VoxelModifierStack::get_modifier(uint32_t id) const {
 }
 
 void VoxelModifierStack::apply(VoxelBuffer &voxels, AABB aabb) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	RWLockRead lock(_stack_lock);
 
 	if (_stack.size() == 0) {
@@ -201,14 +201,14 @@ void VoxelModifierStack::apply(VoxelBuffer &voxels, AABB aabb) const {
 
 	for (unsigned int i = 0; i < _stack.size(); ++i) {
 		const VoxelModifier *modifier = _stack[i];
-		ZN_ASSERT(modifier != nullptr);
+		VOXEL_ASSERT(modifier != nullptr);
 
 		const AABB modifier_aabb = modifier->get_aabb();
 		if (modifier_aabb.intersects(aabb)) {
-			ZN_PROFILE_SCOPE_NAMED("Intersecting modifier");
+			VOXEL_PROFILE_SCOPE_NAMED("Intersecting modifier");
 
 			if (any_intersection == false) {
-				ZN_PROFILE_SCOPE_NAMED("Read block");
+				VOXEL_PROFILE_SCOPE_NAMED("Read block");
 				any_intersection = true;
 
 				decompress_sdf_to_buffer(voxels, tls_block_sdf_initial);
@@ -267,7 +267,7 @@ void VoxelModifierStack::apply(VoxelBuffer &voxels, AABB aabb) const {
 }
 
 void VoxelModifierStack::apply(float &sdf, Vector3f position) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	RWLockRead lock(_stack_lock);
 
 	if (_stack.size() == 0) {
@@ -282,7 +282,7 @@ void VoxelModifierStack::apply(float &sdf, Vector3f position) const {
 
 	for (unsigned int i = 0; i < _stack.size(); ++i) {
 		const VoxelModifier *modifier = _stack[i];
-		ZN_ASSERT(modifier != nullptr);
+		VOXEL_ASSERT(modifier != nullptr);
 
 		if (modifier->get_aabb().intersects(aabb)) {
 			modifier->apply(ctx);
@@ -298,7 +298,7 @@ void VoxelModifierStack::apply(
 		Vector3f min_pos,
 		Vector3f max_pos
 ) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	RWLockRead lock(_stack_lock);
 
 	if (_stack.size() == 0) {
@@ -313,7 +313,7 @@ void VoxelModifierStack::apply(
 
 	for (unsigned int i = 0; i < _stack.size(); ++i) {
 		const VoxelModifier *modifier = _stack[i];
-		ZN_ASSERT(modifier != nullptr);
+		VOXEL_ASSERT(modifier != nullptr);
 
 		if (modifier->get_aabb().intersects(aabb)) {
 			modifier->apply(ctx);
@@ -327,7 +327,7 @@ void VoxelModifierStack::apply_for_gpu_rendering(
 		StdVector<VoxelModifier::ShaderData> &out_data,
 		const AABB aabb
 ) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	RWLockRead lock(_stack_lock);
 
 	if (_stack.size() == 0) {
@@ -336,7 +336,7 @@ void VoxelModifierStack::apply_for_gpu_rendering(
 
 	for (unsigned int i = 0; i < _stack.size(); ++i) {
 		VoxelModifier *modifier = _stack[i];
-		ZN_ASSERT(modifier != nullptr);
+		VOXEL_ASSERT(modifier != nullptr);
 
 		if (modifier->get_aabb().intersects(aabb)) {
 			VoxelModifier::ShaderData sd;
@@ -354,4 +354,4 @@ void VoxelModifierStack::clear() {
 	_modifiers.clear();
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

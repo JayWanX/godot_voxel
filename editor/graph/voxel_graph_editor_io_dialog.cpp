@@ -14,24 +14,24 @@
 #include "../../util/godot/core/array.h"
 #include "../../util/godot/editor_scale.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace pg;
 
 VoxelGraphEditorIODialog::VoxelGraphEditorIODialog() {
-	set_title(ZN_TTR("{0} inputs / outputs").format(varray(VoxelGraphFunction::get_class_static())));
+	set_title(VOXEL_TTR("{0} inputs / outputs").format(varray(VoxelGraphFunction::get_class_static())));
 	set_min_size(EDSCALE * Vector2i(600, 230));
 
 	VBoxContainer *vb = memnew(VBoxContainer);
 	vb->set_anchors_and_offsets_preset(Control::PRESET_FULL_RECT, Control::PRESET_MODE_MINSIZE, 4);
 
 	_auto_generate_button = memnew(Button);
-	_auto_generate_button->set_text(ZN_TTR("Auto-generate"));
+	_auto_generate_button->set_text(VOXEL_TTR("Auto-generate"));
 	_auto_generate_button->connect(
 			"pressed", callable_mp(this, &VoxelGraphEditorIODialog::_on_auto_generate_button_pressed)
 	);
@@ -39,9 +39,9 @@ VoxelGraphEditorIODialog::VoxelGraphEditorIODialog() {
 
 	HBoxContainer *hb = memnew(HBoxContainer);
 	hb->set_v_size_flags(Control::SIZE_EXPAND_FILL);
-	hb->add_child(create_ui(_inputs_ui, ZN_TTR("Inputs"), true));
+	hb->add_child(create_ui(_inputs_ui, VOXEL_TTR("Inputs"), true));
 	hb->add_child(memnew(VSeparator));
-	hb->add_child(create_ui(_outputs_ui, ZN_TTR("Outputs"), false));
+	hb->add_child(create_ui(_outputs_ui, VOXEL_TTR("Outputs"), false));
 	vb->add_child(hb);
 
 	vb->add_child(memnew(HSeparator));
@@ -79,7 +79,7 @@ Control *VoxelGraphEditorIODialog::create_ui(PortsUI &ui, String title, bool is_
 	gc_settings->set_columns(2);
 	{
 		Label *label = memnew(Label);
-		label->set_text(ZN_TTR("Name: "));
+		label->set_text(VOXEL_TTR("Name: "));
 		gc_settings->add_child(label);
 
 		ui.name = memnew(LineEdit);
@@ -88,7 +88,7 @@ Control *VoxelGraphEditorIODialog::create_ui(PortsUI &ui, String title, bool is_
 	}
 	{
 		Label *label = memnew(Label);
-		label->set_text(ZN_TTR("Usage: "));
+		label->set_text(VOXEL_TTR("Usage: "));
 		gc_settings->add_child(label);
 
 		// TODO Don't allow choosing a non-custom input twice
@@ -105,7 +105,7 @@ Control *VoxelGraphEditorIODialog::create_ui(PortsUI &ui, String title, bool is_
 	}
 	if (is_input) {
 		Label *label = memnew(Label);
-		label->set_text(ZN_TTR("Default: "));
+		label->set_text(VOXEL_TTR("Default: "));
 		gc_settings->add_child(label);
 
 		ui.default_value = memnew(SpinBox);
@@ -179,7 +179,7 @@ void VoxelGraphEditorIODialog::set_enabled(PortsUI &ui, bool enabled) {
 		ui.default_value->set_editable(false);
 	}
 
-	ZN_ASSERT(ui.name != nullptr);
+	VOXEL_ASSERT(ui.name != nullptr);
 	ui.name->set_editable(enabled);
 	ui.usage->set_disabled(!enabled);
 	ui.add->set_disabled(!enabled);
@@ -229,7 +229,7 @@ void VoxelGraphEditorIODialog::copy_ui_to_data(const PortsUI &ui, StdVector<Voxe
 		ui.item_list->set_item_text(port_index, get_port_display_name(port));
 
 		const int usage_id = ui.usage->get_selected_id();
-		ZN_ASSERT(usage_id != -1);
+		VOXEL_ASSERT(usage_id != -1);
 		port.type = VoxelGraphFunction::NodeTypeID(usage_id);
 	}
 }
@@ -262,7 +262,7 @@ void VoxelGraphEditorIODialog::copy_data_to_ui(PortsUI &ui, const StdVector<Voxe
 
 		if (ui.usage->get_selected_id() != port.type) {
 			const int usage_index = ui.usage->get_item_index(port.type);
-			ZN_ASSERT(usage_index != -1);
+			VOXEL_ASSERT(usage_index != -1);
 			ui.usage->select(usage_index);
 		}
 	}
@@ -334,4 +334,4 @@ void VoxelGraphEditorIODialog::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("reshow"), &VoxelGraphEditorIODialog::reshow);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -5,7 +5,7 @@
 #include "../util/containers/std_vector.h"
 #include "../util/math/transform3f.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Stores data to pass around until it either gets saved or turned into actual instances
 struct InstanceBlockData {
@@ -59,6 +59,6 @@ struct InstanceBlockData {
 bool serialize_instance_block_data(const InstanceBlockData &src, StdVector<uint8_t> &dst);
 bool deserialize_instance_block_data(InstanceBlockData &dst, Span<const uint8_t> src);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_DATA_H

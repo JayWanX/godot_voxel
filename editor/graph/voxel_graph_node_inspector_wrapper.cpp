@@ -9,17 +9,17 @@
 
 #include <algorithm>
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace pg;
-using namespace zylann::godot;
+using namespace voxel::godot;
 
 namespace {
 const char *AUTOCONNECT_PROPERTY_NAME = "autoconnect_default_inputs";
 }
 
 void VoxelGraphNodeInspectorWrapper::setup(uint32_t p_node_id, VoxelGraphEditor *ed) {
-	ZN_ASSERT(ed != nullptr);
+	VOXEL_ASSERT(ed != nullptr);
 	_graph = ed->get_graph();
 	_generator = ed->get_generator();
 	_node_id = p_node_id;
@@ -39,7 +39,7 @@ void VoxelGraphNodeInspectorWrapper::_get_property_list(List<PropertyInfo> *p_li
 	if (!graph->has_node(_node_id)) {
 		// Maybe got erased by the user?
 #ifdef DEBUG_ENABLED
-		ZN_PRINT_VERBOSE("VoxelGeneratorGraph node was not found, from the graph inspector");
+		VOXEL_PRINT_VERBOSE("VoxelGeneratorGraph node was not found, from the graph inspector");
 #endif
 		return;
 	}
@@ -336,4 +336,4 @@ void VoxelGraphNodeInspectorWrapper::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_dont_undo_redo"), &VoxelGraphNodeInspectorWrapper::_dont_undo_redo);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

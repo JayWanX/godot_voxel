@@ -1,10 +1,10 @@
-#ifndef ZN_TESTS_FLAT_MAP_H
-#define ZN_TESTS_FLAT_MAP_H
+#ifndef VOXEL_TESTS_FLAT_MAP_H
+#define VOXEL_TESTS_FLAT_MAP_H
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_flat_map();
 
-} // namespace zylann::tests
+} // namespace voxel::tests
 
-#endif // ZN_TESTS_FLAT_MAP_H
+#endif // VOXEL_TESTS_FLAT_MAP_H

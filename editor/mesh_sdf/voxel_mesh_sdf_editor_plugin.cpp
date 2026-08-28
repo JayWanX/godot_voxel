@@ -2,13 +2,13 @@
 #include "../../edition/voxel_mesh_sdf_gd.h"
 #include "voxel_mesh_sdf_viewer.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-bool VoxelMeshSDFInspectorPlugin::_zn_can_handle(const Object *p_object) const {
+bool VoxelMeshSDFInspectorPlugin::_voxel_can_handle(const Object *p_object) const {
 	return Object::cast_to<VoxelMeshSDF>(p_object) != nullptr;
 }
 
-void VoxelMeshSDFInspectorPlugin::_zn_parse_begin(Object *p_object) {
+void VoxelMeshSDFInspectorPlugin::_voxel_parse_begin(Object *p_object) {
 	VoxelMeshSDFViewer *viewer = memnew(VoxelMeshSDFViewer);
 	add_custom_control(viewer);
 	VoxelMeshSDF *mesh_sdf = Object::cast_to<VoxelMeshSDF>(p_object);
@@ -20,16 +20,16 @@ void VoxelMeshSDFInspectorPlugin::_zn_parse_begin(Object *p_object) {
 
 VoxelMeshSDFEditorPlugin::VoxelMeshSDFEditorPlugin() {}
 
-bool VoxelMeshSDFEditorPlugin::_zn_handles(const Object *p_object) const {
+bool VoxelMeshSDFEditorPlugin::_voxel_handles(const Object *p_object) const {
 	ERR_FAIL_COND_V(p_object == nullptr, false);
 	return Object::cast_to<VoxelMeshSDF>(p_object) != nullptr;
 }
 
-void VoxelMeshSDFEditorPlugin::_zn_edit(Object *p_object) {
+void VoxelMeshSDFEditorPlugin::_voxel_edit(Object *p_object) {
 	//_mesh_sdf = p_object;
 }
 
-void VoxelMeshSDFEditorPlugin::_zn_make_visible(bool visible) {
+void VoxelMeshSDFEditorPlugin::_voxel_make_visible(bool visible) {
 	//_mesh_sdf.unref();
 }
 
@@ -46,4 +46,4 @@ void VoxelMeshSDFEditorPlugin::_notification(int p_what) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

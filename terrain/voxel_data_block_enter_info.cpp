@@ -1,7 +1,7 @@
 #include "voxel_data_block_enter_info.h"
 #include "../storage/voxel_buffer_gd.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 int VoxelDataBlockEnterInfo::_b_get_network_peer_id() const {
 	return network_peer_id;
@@ -34,4 +34,4 @@ void VoxelDataBlockEnterInfo::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("are_voxels_edited"), &VoxelDataBlockEnterInfo::_b_are_voxels_edited);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

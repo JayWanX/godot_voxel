@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/texture_rect.h"
 #include "graph_editor_adapter.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -62,7 +62,7 @@ void VoxelGraphEditorNodePreview::unload_resources() {
 }
 
 VoxelGraphEditorNodePreview::VoxelGraphEditorNodePreview() {
-	_image = zylann::godot::create_empty_image(RESOLUTION, RESOLUTION, false, Image::FORMAT_RF);
+	_image = voxel::godot::create_empty_image(RESOLUTION, RESOLUTION, false, Image::FORMAT_RF);
 	_image->fill(Color(0.5, 0.5, 0.5));
 	_texture = ImageTexture::create_from_image(_image);
 	_texture->update(_image);
@@ -129,7 +129,7 @@ void VoxelGraphEditorNodePreview::update_previews(
 		const Vector2f transform_offset
 ) {
 	// TODO Use a thread?
-	ZN_PRINT_VERBOSE("Updating slice previews");
+	VOXEL_PRINT_VERBOSE("Updating slice previews");
 
 	if (previews.size() == 0) {
 		return;
@@ -190,4 +190,4 @@ void VoxelGraphEditorNodePreview::update_previews(
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -2,7 +2,7 @@
 #include "../../containers/std_vector.h"
 #include "rendering_server.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 #ifdef TOOLS_ENABLED
 
@@ -33,7 +33,7 @@ String get_missing_uniform_names(Span<const StringName> expected_uniforms, const
 	// See https://github.com/godotengine/godot/issues/64467
 	// for (unsigned int i = 0; i < expected_uniforms.size(); ++i) {
 	// 	StringName uniform_name = expected_uniforms[i];
-	// 	ZN_ASSERT_CONTINUE(uniform_name != StringName());
+	// 	VOXEL_ASSERT_CONTINUE(uniform_name != StringName());
 	// 	if (!shader.has_uniform(uniform_name)) {
 	// 		if (missing_uniforms.size() > 0) {
 	// 			missing_uniforms += ", ";
@@ -67,4 +67,4 @@ String get_missing_uniform_names(Span<const StringName> expected_uniforms, const
 
 #endif
 
-} // namespace zylann::godot
+} // namespace voxel::godot

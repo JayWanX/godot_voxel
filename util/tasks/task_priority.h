@@ -1,9 +1,9 @@
-#ifndef ZN_TASK_PRIORITY_H
-#define ZN_TASK_PRIORITY_H
+#ifndef VOXEL_TASK_PRIORITY_H
+#define VOXEL_TASK_PRIORITY_H
 
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 // Represents the priorirty of a task, which can be compared quickly to another.
 struct TaskPriority {
@@ -53,6 +53,6 @@ struct TaskPriority {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_TASK_PRIORITY_H
+#endif // VOXEL_TASK_PRIORITY_H

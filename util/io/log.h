@@ -1,19 +1,19 @@
-#ifndef ZYLANN_LOG_H
-#define ZYLANN_LOG_H
+#ifndef VOXEL_LOG_H
+#define VOXEL_LOG_H
 
 #include "../string/fwd_std_string.h"
 
 // print_verbose() is used everywhere in Godot, but its drawback is that even if you turn it off, strings
 // you print are still allocated and formatted, to not be used. This macro avoids the string.
-#define ZN_PRINT_VERBOSE(msg)                                                                                          \
-	if (zylann::is_verbose_output_enabled()) {                                                                         \
-		zylann::print_line(msg);                                                                                       \
+#define VOXEL_PRINT_VERBOSE(msg)                                                                                          \
+	if (voxel::is_verbose_output_enabled()) {                                                                         \
+		voxel::print_line(msg);                                                                                       \
 	}
 
-#define ZN_PRINT_WARNING(msg) zylann::print_warning(msg, __FUNCTION__, __FILE__, __LINE__)
-#define ZN_PRINT_ERROR(msg) zylann::print_error(msg, __FUNCTION__, __FILE__, __LINE__)
+#define VOXEL_PRINT_WARNING(msg) voxel::print_warning(msg, __FUNCTION__, __FILE__, __LINE__)
+#define VOXEL_PRINT_ERROR(msg) voxel::print_error(msg, __FUNCTION__, __FILE__, __LINE__)
 
-#define ZN_DO_ONCE(stuff)                                                                                              \
+#define VOXEL_DO_ONCE(stuff)                                                                                              \
 	{                                                                                                                  \
 		static bool s_first = true;                                                                                    \
 		if (s_first) {                                                                                                 \
@@ -22,10 +22,10 @@
 		}                                                                                                              \
 	}
 
-#define ZN_PRINT_WARNING_ONCE(msg) ZN_DO_ONCE(ZN_PRINT_WARNING(msg));
-#define ZN_PRINT_ERROR_ONCE(msg) ZN_DO_ONCE(ZN_PRINT_ERROR(msg));
+#define VOXEL_PRINT_WARNING_ONCE(msg) VOXEL_DO_ONCE(VOXEL_PRINT_WARNING(msg));
+#define VOXEL_PRINT_ERROR_ONCE(msg) VOXEL_DO_ONCE(VOXEL_PRINT_ERROR(msg));
 
-namespace zylann {
+namespace voxel {
 
 bool is_verbose_output_enabled();
 
@@ -43,9 +43,9 @@ void print_error(const char *error, const FwdConstStdString &msg, const char *fu
 void flush_stdout();
 
 // When defined, redirects `println` to a file instead of standard output.
-// #define ZN_DEBUG_LOG_FILE_ENABLED
+// #define VOXEL_DEBUG_LOG_FILE_ENABLED
 
-#ifdef ZN_DEBUG_LOG_FILE_ENABLED
+#ifdef VOXEL_DEBUG_LOG_FILE_ENABLED
 
 void open_log_file();
 void close_log_file();
@@ -53,6 +53,6 @@ void flush_log_file();
 
 #endif
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_LOG_H
+#endif // VOXEL_LOG_H

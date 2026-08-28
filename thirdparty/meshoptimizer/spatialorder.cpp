@@ -5,7 +5,7 @@
 #include <float.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Fabian Giesen. Decoding Morton codes. 2009
@@ -341,4 +341,4 @@ void meshopt_spatialClusterPoints(unsigned int* destination, const float* vertex
 	splitPoints(destination, order, order + vertex_count, order + 2 * vertex_count, keys, vertex_count, scratch, cluster_size);
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

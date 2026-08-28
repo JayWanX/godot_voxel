@@ -1,5 +1,5 @@
-#ifndef ZN_GODOT_CHECK_REF_OWNERSHIP_H
-#define ZN_GODOT_CHECK_REF_OWNERSHIP_H
+#ifndef VOXEL_GODOT_CHECK_REF_OWNERSHIP_H
+#define VOXEL_GODOT_CHECK_REF_OWNERSHIP_H
 
 #ifdef TOOLS_ENABLED
 #include "../errors.h"
@@ -8,7 +8,7 @@
 #include "classes/ref_counted.h"
 #include "core/string.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Checks that nothing takes extra ownership of a RefCounted object between the beginning and the end of a scope.
 // This can be used when calling GDVIRTUAL methods that are passed an object that must not be held by the callee after
@@ -33,7 +33,7 @@ public:
 		const int after_count = _rc->get_reference_count();
 		if (after_count != _initial_count && !was_reported()) {
 			mark_reported();
-			ZN_PRINT_ERROR(
+			VOXEL_PRINT_ERROR(
 					format("Holding a reference to the passed {} outside {} is not allowed (count before: {}, "
 						   "count after: {}). If you are using a garbage-collected language (like C#), "
 						   "you may want to turn off this check in ProjectSettings.",
@@ -54,16 +54,16 @@ private:
 	const int _initial_count;
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#define ZN_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(m_ref)                                                                \
-	ZN_ASSERT(m_ref.is_valid());                                                                                       \
-	zylann::godot::CheckRefCountDoesNotChange ZN_CONCAT(ref_count_checker_, __LINE__)(__FUNCTION__, m_ref.ptr())
+#define VOXEL_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(m_ref)                                                                \
+	VOXEL_ASSERT(m_ref.is_valid());                                                                                       \
+	voxel::godot::CheckRefCountDoesNotChange VOXEL_CONCAT(ref_count_checker_, __LINE__)(__FUNCTION__, m_ref.ptr())
 
 #else // TOOLS_ENABLED
 
-#define ZN_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(m_ref)
+#define VOXEL_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(m_ref)
 
 #endif // TOOLS_ENABLED
 
-#endif // ZN_GODOT_CHECK_REF_OWNERSHIP_H
+#endif // VOXEL_GODOT_CHECK_REF_OWNERSHIP_H

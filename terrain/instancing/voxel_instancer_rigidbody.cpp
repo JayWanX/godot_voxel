@@ -1,10 +1,10 @@
 #include "voxel_instancer_rigidbody.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelInstancerRigidBody::VoxelInstancerRigidBody() {
 	set_freeze_mode(RigidBody3D::FREEZE_MODE_STATIC);
@@ -49,4 +49,4 @@ void VoxelInstancerRigidBody::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

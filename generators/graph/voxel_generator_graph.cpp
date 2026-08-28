@@ -20,11 +20,11 @@
 #include "node_type_db.h"
 #include "voxel_graph_function.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 const char *VoxelGeneratorGraph::SIGNAL_NODE_NAME_CHANGED = "node_name_changed";
 
@@ -103,7 +103,7 @@ int VoxelGeneratorGraph::get_used_channels_mask() const {
 				break;
 
 			default:
-				ZN_PRINT_ERROR_ONCE("Unknown texture mode");
+				VOXEL_PRINT_ERROR_ONCE("Unknown texture mode");
 				break;
 		}
 	}
@@ -143,7 +143,7 @@ bool VoxelGeneratorGraph::is_using_xz_caching() const {
 }
 
 void VoxelGeneratorGraph::set_texture_mode(const TextureMode mode) {
-	ZN_ASSERT_RETURN(mode >= 0 && mode < TEXTURE_MODE_COUNT);
+	VOXEL_ASSERT_RETURN(mode >= 0 && mode < TEXTURE_MODE_COUNT);
 	_texture_mode = mode;
 }
 
@@ -164,7 +164,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 		const FixedArray<uint8_t, 4> spare_indices,
 		const VoxelGeneratorGraph::TextureMode mode
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// TODO Optimization: exclude up-front outputs that are known to be zero?
 	// So we choose the cases below based on non-zero outputs instead of total output count
@@ -180,7 +180,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 			// That span can either have size 1 (means all values would be the same) or have regular buffer
 			// size. We use min() to quickly access that without branching, but that could hide actual OOB bugs, so
 			// make sure they are detected
-			ZN_ASSERT(s.size() > 0 && (value_index < s.size() || s.size() == 1));
+			VOXEL_ASSERT(s.size() > 0 && (value_index < s.size() || s.size() == 1));
 #endif
 			const float weight = s[math::min(value_index, s.size() - 1)];
 			return weight;
@@ -336,7 +336,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 		} break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown texture mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown texture mode");
 			break;
 	}
 }
@@ -367,7 +367,7 @@ void fill_texturing_data_from_single_texture_index(
 		} break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown texture mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown texture mode");
 			break;
 	}
 }
@@ -394,7 +394,7 @@ void fill_texturing_data_from_single_texture_index(
 		} break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown texture mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown texture mode");
 			break;
 	}
 }
@@ -408,7 +408,7 @@ void gather_texturing_data_from_single_texture_output(
 		VoxelBuffer &out_voxel_buffer,
 		const VoxelGeneratorGraph::TextureMode mode
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const pg::Runtime::Buffer &buffer = state.get_buffer(output_buffer_index);
 	Span<const float> buffer_data = Span<const float>(buffer.data, buffer.size);
@@ -442,7 +442,7 @@ void gather_texturing_data_from_single_texture_output(
 		} break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown texture mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown texture mode");
 			break;
 	}
 }
@@ -480,7 +480,7 @@ void fill_zx_sdf_slice(
 		Vector3i rmax,
 		int ry
 ) {
-	ZN_PROFILE_SCOPE_NAMED("Copy SDF to block");
+	VOXEL_PROFILE_SCOPE_NAMED("Copy SDF to block");
 
 	if (out_buffer.get_channel_compression(channel) != VoxelBuffer::COMPRESSION_NONE) {
 		out_buffer.decompress_channel(channel);
@@ -541,7 +541,7 @@ void fill_zx_sdf_slice(
 			break;
 
 		default:
-			ZN_PRINT_ERROR(format("Unknown depth {}", channel_depth));
+			VOXEL_PRINT_ERROR(format("Unknown depth {}", channel_depth));
 			break;
 	}
 }
@@ -576,7 +576,7 @@ void fill_zx_integer_slice(
 		Vector3i rmax,
 		int ry
 ) {
-	ZN_PROFILE_SCOPE_NAMED("Copy integer data to block");
+	VOXEL_PROFILE_SCOPE_NAMED("Copy integer data to block");
 
 	if (out_buffer.get_channel_compression(channel) != VoxelBuffer::COMPRESSION_NONE) {
 		out_buffer.decompress_channel(channel);
@@ -629,7 +629,7 @@ void fill_zx_integer_slice(
 			break;
 
 		default:
-			ZN_PRINT_ERROR(format("Unknown depth {}", channel_depth));
+			VOXEL_PRINT_ERROR(format("Unknown depth {}", channel_depth));
 			break;
 	}
 }
@@ -656,7 +656,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 		case TEXTURE_MODE_MIXEL4: {
 			const VoxelBuffer::Depth indices_depth = out_buffer.get_channel_depth(VoxelBuffer::CHANNEL_INDICES);
 			if (indices_depth != VoxelBuffer::DEPTH_16_BIT) {
-				ZN_PRINT_ERROR_ONCE(format(
+				VOXEL_PRINT_ERROR_ONCE(format(
 						"The Indices channel is set to {} bits, but 16 bits are necessary to use the Mixel4 texturing "
 						"mode.",
 						VoxelBuffer::get_depth_byte_count(indices_depth)
@@ -664,7 +664,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 			}
 			const VoxelBuffer::Depth weights_depth = out_buffer.get_channel_depth(VoxelBuffer::CHANNEL_WEIGHTS);
 			if (weights_depth != VoxelBuffer::DEPTH_16_BIT) {
-				ZN_PRINT_ERROR_ONCE(format(
+				VOXEL_PRINT_ERROR_ONCE(format(
 						"The Weights channel is set to {} bits, but 16 bits are necessary to use the Mixel4 texturing "
 						"mode.",
 						VoxelBuffer::get_depth_byte_count(weights_depth)
@@ -675,7 +675,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 		case TEXTURE_MODE_SINGLE: {
 			const VoxelBuffer::Depth indices_depth = out_buffer.get_channel_depth(VoxelBuffer::CHANNEL_INDICES);
 			if (indices_depth != VoxelBuffer::DEPTH_8_BIT) {
-				ZN_PRINT_WARNING_ONCE(
+				VOXEL_PRINT_WARNING_ONCE(
 						format("The Indices channel is set to {} bits, but only 8 bits are required to use the Single "
 							   "texturing mode.",
 							   VoxelBuffer::get_depth_byte_count(indices_depth))
@@ -684,7 +684,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 		} break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown texture mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown texture mode");
 			break;
 	}
 #endif
@@ -746,7 +746,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 	Span<float> input_sdf_full_cache;
 	Span<float> input_sdf_slice_cache;
 	if (runtime_ptr->sdf_input_index != -1) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		cache.input_sdf_slice_cache.resize(slice_buffer_size);
 		input_sdf_slice_cache = to_span(cache.input_sdf_slice_cache);
 
@@ -767,7 +767,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 	for (int sz = 0; sz < bs.z; sz += section_size.z) {
 		for (int sy = 0; sy < bs.y; sy += section_size.y) {
 			for (int sx = 0; sx < bs.x; sx += section_size.x) {
-				ZN_PROFILE_SCOPE_NAMED("Section");
+				VOXEL_PROFILE_SCOPE_NAMED("Section");
 
 				const Vector3i rmin(sx, sy, sz);
 				const Vector3i rmax = rmin + Vector3i(section_size);
@@ -885,7 +885,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 				}
 
 				for (int ry = rmin.y, gy = gmin.y; ry < rmax.y; ++ry, gy += stride) {
-					ZN_PROFILE_SCOPE_NAMED("Full slice");
+					VOXEL_PROFILE_SCOPE_NAMED("Full slice");
 
 					y_cache.fill(gy);
 
@@ -1172,7 +1172,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 				if (r->sdf_output_buffer_index != -1) {
 					pg::CompilationResult error;
 					error.success = false;
-					error.message = ZN_TTR("Multiple SDF outputs are not supported");
+					error.message = VOXEL_TTR("Multiple SDF outputs are not supported");
 					error.node_id = output.node_id;
 					return error;
 				} else {
@@ -1185,7 +1185,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 				if (r->weight_outputs_count >= r->weight_outputs.size()) {
 					pg::CompilationResult error;
 					error.success = false;
-					error.message = String(ZN_TTR("Cannot use more than {0} weight outputs"))
+					error.message = String(VOXEL_TTR("Cannot use more than {0} weight outputs"))
 											.format(varray(r->weight_outputs.size()));
 					error.node_id = output.node_id;
 					return error;
@@ -1196,7 +1196,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 					// Should not be allowed by the UI, but who knows
 					pg::CompilationResult error;
 					error.success = false;
-					error.message = String(ZN_TTR("Cannot use negative layer index in weight output"));
+					error.message = String(VOXEL_TTR("Cannot use negative layer index in weight output"));
 					error.node_id = output.node_id;
 					return error;
 				}
@@ -1204,7 +1204,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 					pg::CompilationResult error;
 					error.success = false;
 					error.message =
-							String(ZN_TTR("Weight layers cannot exceed {0}")).format(varray(r->weight_outputs.size()));
+							String(VOXEL_TTR("Weight layers cannot exceed {0}")).format(varray(r->weight_outputs.size()));
 					error.node_id = output.node_id;
 					return error;
 				}
@@ -1214,7 +1214,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 						pg::CompilationResult error;
 						error.success = false;
 						error.message =
-								String(ZN_TTR("Only one weight output node can use layer index {0}, found duplicate"))
+								String(VOXEL_TTR("Only one weight output node can use layer index {0}, found duplicate"))
 										.format(varray(layer_index));
 						error.node_id = output.node_id;
 						return error;
@@ -1231,7 +1231,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 				if (r->type_output_buffer_index != -1) {
 					pg::CompilationResult error;
 					error.success = false;
-					error.message = ZN_TTR("Multiple TYPE outputs are not supported");
+					error.message = VOXEL_TTR("Multiple TYPE outputs are not supported");
 					error.node_id = output.node_id;
 					return error;
 				} else {
@@ -1244,7 +1244,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 				if (r->single_texture_output_buffer_index != -1) {
 					pg::CompilationResult error;
 					error.success = false;
-					error.message = ZN_TTR("Multiple TYPE outputs are not supported");
+					error.message = VOXEL_TTR("Multiple TYPE outputs are not supported");
 					error.node_id = output.node_id;
 					return error;
 				}
@@ -1252,7 +1252,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 					pg::CompilationResult error;
 					error.success = false;
 					error.message =
-							ZN_TTR("Using both OutputWeight nodes and an OutputSingleTexture node is not allowed");
+							VOXEL_TTR("Using both OutputWeight nodes and an OutputSingleTexture node is not allowed");
 					error.node_id = output.node_id;
 					return error;
 				}
@@ -1268,7 +1268,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 	if (r->sdf_output_buffer_index == -1 && r->type_output_buffer_index == -1) {
 		pg::CompilationResult error;
 		error.success = false;
-		error.message = String(ZN_TTR("An SDF or TYPE output is required for the graph to be valid."));
+		error.message = String(VOXEL_TTR("An SDF or TYPE output is required for the graph to be valid."));
 		return error;
 	}
 
@@ -1280,7 +1280,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 			}
 		};
 		SortArray<WeightOutput, WeightOutputComparer> sorter;
-		ZN_ASSERT(r->weight_outputs_count <= r->weight_outputs.size());
+		VOXEL_ASSERT(r->weight_outputs_count <= r->weight_outputs.size());
 		sorter.sort(r->weight_outputs.data(), r->weight_outputs_count);
 	}
 
@@ -1305,7 +1305,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 		// debug_check_texture_indices(spare_indices);
 		const unsigned int expected_spare_indices_count =
 				math::min(spare_indices.size(), used_indices_map.size() - used_indices_count);
-		ZN_ASSERT_RETURN_V(spare_indices_count == expected_spare_indices_count, pg::CompilationResult());
+		VOXEL_ASSERT_RETURN_V(spare_indices_count == expected_spare_indices_count, pg::CompilationResult());
 		r->spare_texture_indices = spare_indices;
 	}
 
@@ -1314,7 +1314,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 	_runtime = r;
 
 	const int64_t time_spent = Time::get_singleton()->get_ticks_usec() - time_before;
-	ZN_PRINT_VERBOSE(format("Voxel graph compiled in {} us", time_spent));
+	VOXEL_PRINT_VERBOSE(format("Voxel graph compiled in {} us", time_spent));
 
 #ifdef VOXEL_ENABLE_GPU
 	if (result.success) {
@@ -1402,7 +1402,7 @@ void VoxelGeneratorGraph::generate_series(
 			buffer_index = runtime_ptr->type_output_buffer_index;
 			break;
 		default:
-			ZN_PRINT_ERROR("Unexpected channel");
+			VOXEL_PRINT_ERROR("Unexpected channel");
 			return;
 	}
 
@@ -1534,7 +1534,7 @@ void VoxelGeneratorGraph::bake_sphere_bumpmap(Ref<Image> im, float ref_radius, f
 				sdf_max(p_sdf_max) {}
 
 		void operator()(int x0, int y0, int width, int height) {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 
 			const unsigned int area = width * height;
 			x_coords.resize(area);
@@ -1601,7 +1601,7 @@ void VoxelGeneratorGraph::bake_sphere_bumpmap(Ref<Image> im, float ref_radius, f
 // then this function can be used to bake a map of the surface.
 // Such maps can be used by shaders to sharpen the details of the planet when seen from far away.
 void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius, float strength) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(im.is_null());
 
 	std::shared_ptr<const Runtime> runtime_ptr;
@@ -1643,7 +1643,7 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 				ref_radius(p_ref_radius) {}
 
 		void operator()(int x0, int y0, int width, int height) {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 
 			const unsigned int area = width * height;
 			x_coords.resize(area);
@@ -1803,7 +1803,7 @@ MaybeRayHit raycast_sdf_approx_batch(
 	// Generate a group of values
 	runtime.generate_set(state, inputs_spans, false, nullptr);
 	const pg::Runtime::Buffer &sd_output_buffer = state.get_buffer(sdf_output_buffer_index);
-	ZN_ASSERT(x_array.size() == sd_output_buffer.size);
+	VOXEL_ASSERT(x_array.size() == sd_output_buffer.size);
 	Span<const float> out_sd_values(sd_output_buffer.data, sd_output_buffer.size);
 
 	// Analyse values
@@ -1843,10 +1843,10 @@ float VoxelGeneratorGraph::raycast_sdf_approx(
 	// TODO Use range analysis? Could be effective on such a restricted XZ range
 	// TODO Allow rational stride, for LOD use cases?
 
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT_RETURN_V_MSG(stride >= 0.001f, -1.f, "Stride is too low");
-	ZN_ASSERT_RETURN_V_MSG(Math::is_finite(stride), -1.f, "Stride is invalid");
+	VOXEL_ASSERT_RETURN_V_MSG(stride >= 0.001f, -1.f, "Stride is too low");
+	VOXEL_ASSERT_RETURN_V_MSG(Math::is_finite(stride), -1.f, "Stride is invalid");
 
 	std::shared_ptr<const Runtime> runtime_ptr;
 	{
@@ -1854,11 +1854,11 @@ float VoxelGeneratorGraph::raycast_sdf_approx(
 		runtime_ptr = _runtime;
 	}
 
-	ZN_ASSERT_RETURN_V(runtime_ptr != nullptr, -1.f);
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V(runtime_ptr != nullptr, -1.f);
+	VOXEL_ASSERT_RETURN_V_MSG(
 			runtime_ptr->sdf_output_buffer_index != -1, -1.f, "This function only works with an SDF output."
 	);
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			runtime_ptr->sdf_input_index == -1, -1.f, "This function doesn't support graphs that have an SDF input."
 	);
 
@@ -1922,20 +1922,20 @@ float VoxelGeneratorGraph::raycast_sdf_approx(
 }
 
 void VoxelGeneratorGraph::generate_image_from_sdf(Ref<Image> image, const Transform3D transform, const Vector2 size) {
-	ZN_ASSERT_RETURN(image.is_valid());
-	ZN_ASSERT_RETURN(!image->is_compressed());
+	VOXEL_ASSERT_RETURN(image.is_valid());
+	VOXEL_ASSERT_RETURN(!image->is_compressed());
 
 	const Vector2i resolution = image->get_size();
-	ZN_ASSERT_RETURN(resolution.x > 0 && resolution.y > 0);
+	VOXEL_ASSERT_RETURN(resolution.x > 0 && resolution.y > 0);
 
 	std::shared_ptr<const Runtime> runtime_ptr;
 	{
 		RWLockRead rlock(_runtime_lock);
 		runtime_ptr = _runtime;
 	}
-	ZN_ASSERT_RETURN(runtime_ptr != nullptr);
-	ZN_ASSERT_RETURN_MSG(runtime_ptr->sdf_output_buffer_index != -1, "This function only works with an SDF output.");
-	ZN_ASSERT_RETURN_MSG(
+	VOXEL_ASSERT_RETURN(runtime_ptr != nullptr);
+	VOXEL_ASSERT_RETURN_MSG(runtime_ptr->sdf_output_buffer_index != -1, "This function only works with an SDF output.");
+	VOXEL_ASSERT_RETURN_MSG(
 			runtime_ptr->sdf_input_index == -1, "This function doesn't support graphs that have an SDF input."
 	);
 
@@ -1981,7 +1981,7 @@ void VoxelGeneratorGraph::generate_image_from_sdf(Ref<Image> image, const Transf
 
 		runtime.generate_set(cache.state, inputs_spans, false, nullptr);
 		const pg::Runtime::Buffer &sd_output_buffer = cache.state.get_buffer(runtime_ptr->sdf_output_buffer_index);
-		ZN_ASSERT_RETURN(x_buffer.size() == sd_output_buffer.size);
+		VOXEL_ASSERT_RETURN(x_buffer.size() == sd_output_buffer.size);
 		Span<const float> out_sd_values(sd_output_buffer.data, sd_output_buffer.size);
 
 		for (int xi = 0; xi < resolution.x; ++xi) {
@@ -1995,7 +1995,7 @@ void VoxelGeneratorGraph::generate_image_from_sdf(Ref<Image> image, const Transf
 #ifdef VOXEL_ENABLE_GPU
 
 bool VoxelGeneratorGraph::get_shader_source(ShaderSourceData &out_data) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V(_main_function.is_null(), false);
 	pg::VoxelGraphFunction::ShaderResult shader_res = _main_function->get_shader_source();
 
@@ -2023,7 +2023,7 @@ bool VoxelGeneratorGraph::get_shader_source(ShaderSourceData &out_data) const {
 				out.type = ShaderOutput::TYPE_TYPE;
 				break;
 			default:
-				ZN_PRINT_ERROR(format("Unsupported output for voxel generator shader generation ({})", output.type));
+				VOXEL_PRINT_ERROR(format("Unsupported output for voxel generator shader generation ({})", output.type));
 				return false;
 		}
 		out_data.outputs.push_back(out);
@@ -2065,7 +2065,7 @@ VoxelSingleValue VoxelGeneratorGraph::generate_single(Vector3i position, unsigne
 		runtime_ptr = _runtime;
 	}
 	if (runtime_ptr == nullptr) {
-		ZN_PRINT_ERROR_ONCE("No compiled graph available");
+		VOXEL_PRINT_ERROR_ONCE("No compiled graph available");
 		return v;
 	}
 
@@ -2088,7 +2088,7 @@ VoxelSingleValue VoxelGeneratorGraph::generate_single(Vector3i position, unsigne
 					v.i = math::clamp(int(tex_index), 0, 255);
 					break;
 				default:
-					ZN_PRINT_ERROR("Unknown texture mode");
+					VOXEL_PRINT_ERROR("Unknown texture mode");
 					break;
 			}
 		} break;
@@ -2123,9 +2123,9 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 		Vector3i max_pos,
 		bool optimize_execution_map
 ) const {
-	ZN_ASSERT_RETURN_V(max_pos.x >= min_pos.x, math::Interval());
-	ZN_ASSERT_RETURN_V(max_pos.y >= min_pos.y, math::Interval());
-	ZN_ASSERT_RETURN_V(max_pos.z >= min_pos.z, math::Interval());
+	VOXEL_ASSERT_RETURN_V(max_pos.x >= min_pos.x, math::Interval());
+	VOXEL_ASSERT_RETURN_V(max_pos.y >= min_pos.y, math::Interval());
+	VOXEL_ASSERT_RETURN_V(max_pos.z >= min_pos.z, math::Interval());
 
 	std::shared_ptr<const Runtime> runtime_ptr;
 	{
@@ -2164,10 +2164,10 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 
 		const Vector3i cube_size = max_pos - min_pos;
 		if (cube_size.x > 64 || cube_size.y > 64 || cube_size.z > 64) {
-			ZN_PRINT_ERROR("Area too big for range validation");
+			VOXEL_PRINT_ERROR("Area too big for range validation");
 		} else {
 			const int64_t cube_volume = Vector3iUtil::get_volume(cube_size);
-			ZN_ASSERT_RETURN_V(cube_volume >= 0, math::Interval());
+			VOXEL_ASSERT_RETURN_V(cube_volume >= 0, math::Interval());
 
 			StdVector<float> src_x;
 			StdVector<float> src_y;
@@ -2222,7 +2222,7 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 							// Not supported
 							continue;
 						}
-						ZN_PRINT_ERROR("Didn't expect nullptr in buffer data");
+						VOXEL_PRINT_ERROR("Didn't expect nullptr in buffer data");
 						continue;
 					}
 
@@ -2232,7 +2232,7 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 					if (!analytic_range.contains(empiric_range)) {
 						const String node_name = node.name;
 						const pg::NodeType &node_type = pg::NodeTypeDB::get_singleton().get_type(node.type_id);
-						ZN_PRINT_WARNING(
+						VOXEL_PRINT_WARNING(
 								format("Empiric range not included in analytic range. A: {}, E: {}; {} "
 									   "output {} instance {} \"{}\"",
 									   analytic_range,
@@ -2597,4 +2597,4 @@ void VoxelGeneratorGraph::_bind_methods() {
 	BIND_ENUM_CONSTANT(TEXTURE_MODE_SINGLE);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

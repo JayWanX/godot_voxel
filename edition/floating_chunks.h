@@ -6,9 +6,9 @@
 #include "../util/godot/core/transform_3d.h"
 #include "../util/math/box3i.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Node);
+VOXEL_GODOT_FORWARD_DECLARE(class Node);
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTool;
 
@@ -21,6 +21,6 @@ Array separate_floating_chunks(
 		Array materials
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_FLOATING_CHUNKS_H

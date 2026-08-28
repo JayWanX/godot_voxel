@@ -1,10 +1,10 @@
-#ifndef ZYLANN_VECTOR2F_H
-#define ZYLANN_VECTOR2F_H
+#ifndef VOXEL_VECTOR2F_H
+#define VOXEL_VECTOR2F_H
 
 #include "../errors.h"
 #include "vector2t.h"
 
-namespace zylann {
+namespace voxel {
 
 // 32-bit float precision 2D vector.
 // Because Godot's `Vector2` uses `real_t`, so when `real_t` is `double` it forces some things to use double-precision
@@ -30,6 +30,6 @@ inline bool is_equal_approx(const Vector2f a, const Vector2f b) {
 class TextWriter;
 TextWriter &operator<<(TextWriter &w, const Vector2f &v);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_VECTOR2F_H
+#endif // VOXEL_VECTOR2F_H

@@ -13,12 +13,12 @@
 #include "../../util/godot/editor_scale.h"
 #include "model_viewer.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -176,7 +176,7 @@ VoxelBlockyModelViewer::VoxelBlockyModelViewer() {
 
 	const float editor_scale = EDSCALE;
 
-	ZN_ModelViewer *viewer = memnew(ZN_ModelViewer);
+	VOXEL_ModelViewer *viewer = memnew(VOXEL_ModelViewer);
 	viewer->set_h_size_flags(Container::SIZE_EXPAND_FILL);
 	viewer->set_v_size_flags(Container::SIZE_EXPAND_FILL);
 	viewer->set_custom_minimum_size(Vector2(100, 150 * editor_scale));
@@ -202,12 +202,12 @@ VoxelBlockyModelViewer::VoxelBlockyModelViewer() {
 	Button *rotate_x_button = memnew(Button);
 	Button *rotate_y_button = memnew(Button);
 	Button *rotate_z_button = memnew(Button);
-	rotate_x_button->set_text(ZN_TTR("Rotate X"));
-	rotate_y_button->set_text(ZN_TTR("Rotate Y"));
-	rotate_z_button->set_text(ZN_TTR("Rotate Z"));
-	rotate_x_button->set_tooltip_text(ZN_TTR("Rotate 90 degrees around X (clockwise)"));
-	rotate_y_button->set_tooltip_text(ZN_TTR("Rotate 90 degrees around Y (clockwise)"));
-	rotate_z_button->set_tooltip_text(ZN_TTR("Rotate 90 degrees around Z (clockwise)"));
+	rotate_x_button->set_text(VOXEL_TTR("Rotate X"));
+	rotate_y_button->set_text(VOXEL_TTR("Rotate Y"));
+	rotate_z_button->set_text(VOXEL_TTR("Rotate Z"));
+	rotate_x_button->set_tooltip_text(VOXEL_TTR("Rotate 90 degrees around X (clockwise)"));
+	rotate_y_button->set_tooltip_text(VOXEL_TTR("Rotate 90 degrees around Y (clockwise)"));
+	rotate_z_button->set_tooltip_text(VOXEL_TTR("Rotate 90 degrees around Z (clockwise)"));
 	rotate_x_button->connect("pressed", callable_mp(this, &VoxelBlockyModelViewer::_on_rotate_x_button_pressed));
 	rotate_y_button->connect("pressed", callable_mp(this, &VoxelBlockyModelViewer::_on_rotate_y_button_pressed));
 	rotate_z_button->connect("pressed", callable_mp(this, &VoxelBlockyModelViewer::_on_rotate_z_button_pressed));
@@ -242,7 +242,7 @@ void VoxelBlockyModelViewer::set_undo_redo(EditorUndoRedoManager *urm) {
 }
 
 void VoxelBlockyModelViewer::update_model() {
-	ZN_ASSERT_RETURN(_model.is_valid());
+	VOXEL_ASSERT_RETURN(_model.is_valid());
 	// Can be null
 	Ref<Mesh> mesh = _model->get_preview_mesh();
 	_mesh_instance->set_mesh(mesh);
@@ -252,8 +252,8 @@ void VoxelBlockyModelViewer::update_model() {
 }
 
 void VoxelBlockyModelViewer::rotate_model_90(Vector3i::Axis axis) {
-	ZN_ASSERT_RETURN(_model.is_valid());
-	ZN_ASSERT_RETURN(_undo_redo != nullptr);
+	VOXEL_ASSERT_RETURN(_model.is_valid());
+	VOXEL_ASSERT_RETURN(_undo_redo != nullptr);
 
 	EditorUndoRedoManager &urm = *_undo_redo;
 
@@ -274,7 +274,7 @@ void VoxelBlockyModelViewer::add_rotation_anim(Basis basis) {
 	_rotation_anim_basis = basis * _rotation_anim_basis;
 }
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 void VoxelBlockyModelViewer::_notification(int p_what) {
 	if (p_what == NOTIFICATION_PROCESS) {
 		process(get_tree()->get_process_time());
@@ -282,7 +282,7 @@ void VoxelBlockyModelViewer::_notification(int p_what) {
 }
 #endif
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 void VoxelBlockyModelViewer::_process(double delta) {
 	process(delta);
 }
@@ -326,4 +326,4 @@ void VoxelBlockyModelViewer::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("add_rotation_anim"), &VoxelBlockyModelViewer::add_rotation_anim);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

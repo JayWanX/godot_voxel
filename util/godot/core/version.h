@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_VERSION_H
-#define ZN_GODOT_VERSION_H
+#ifndef VOXEL_GODOT_VERSION_H
+#define VOXEL_GODOT_VERSION_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 #include <core/version.h>
 
@@ -17,7 +17,7 @@
 #define GODOT_VERSION_MINOR VERSION_MINOR
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 
 // Note, in early versions of GodotCpp, this header might not exist
 #include <godot_cpp/core/version.hpp>
@@ -31,6 +31,6 @@
 
 #endif
 
-#endif // ZN_GODOT_EXTENSION
+#endif // VOXEL_GODOT_EXTENSION
 
-#endif // ZN_GODOT_VERSION_H
+#endif // VOXEL_GODOT_VERSION_H

@@ -5,7 +5,7 @@
 #include "../../../util/containers/std_vector.h"
 #include "../../../util/godot/classes/resource.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Attribute that can be attached to a VoxelBlockyType.
 // It has a unique name and can take two or more positive values. Values can be named.
@@ -62,6 +62,6 @@ protected:
 	StdVector<uint8_t> _used_values;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_ATTRIBUTE_H

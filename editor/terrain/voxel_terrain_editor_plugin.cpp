@@ -18,11 +18,11 @@
 #include "../graph/voxel_graph_node_inspector_wrapper.h"
 #include "voxel_terrain_editor_task_indicator.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelTerrainEditorPlugin::VoxelTerrainEditorPlugin() {}
 
@@ -30,7 +30,7 @@ VoxelTerrainEditorPlugin::VoxelTerrainEditorPlugin() {}
 // See https://github.com/godotengine/godot-cpp/issues/1179
 void VoxelTerrainEditorPlugin::init() {
 	MenuButton *menu_button = memnew(MenuButton);
-	menu_button->set_text(ZN_TTR("Terrain"));
+	menu_button->set_text(VOXEL_TTR("Terrain"));
 	menu_button->get_popup()->connect(
 			"id_pressed", callable_mp(this, &VoxelTerrainEditorPlugin::_on_menu_item_selected)
 	);
@@ -48,7 +48,7 @@ void VoxelTerrainEditorPlugin::init() {
 	VoxelAboutWindow::create_singleton(*base_control);
 
 	_save_file_dialog = memnew(EditorFileDialog);
-	_save_file_dialog->set_title(ZN_TTR("Save Debug Terrain Dump As Scene"));
+	_save_file_dialog->set_title(VOXEL_TTR("Save Debug Terrain Dump As Scene"));
 	_save_file_dialog->add_filter("*.scn", "Godot Scene File");
 	_save_file_dialog->set_access(EditorFileDialog::ACCESS_RESOURCES);
 	_save_file_dialog->connect(
@@ -73,26 +73,26 @@ void VoxelTerrainEditorPlugin::generate_menu_items(MenuButton *menu_button, bool
 	popup->clear();
 
 	popup->add_shortcut(
-			zylann::godot::get_or_create_editor_shortcut(
-					"voxel/regenerate_terrain", ZN_TTR("Re-generate"), ::godot::KEY_MASK_CMD_OR_CTRL | ::godot::KEY_R
+			voxel::godot::get_or_create_editor_shortcut(
+					"voxel/regenerate_terrain", VOXEL_TTR("Re-generate"), ::godot::KEY_MASK_CMD_OR_CTRL | ::godot::KEY_R
 			),
 			MENU_RESTART_STREAM
 	);
 
-	popup->add_item(ZN_TTR("Re-mesh"), MENU_REMESH);
+	popup->add_item(VOXEL_TTR("Re-mesh"), MENU_REMESH);
 	popup->add_separator();
 
 	add_checkable_item(
-			popup, ZN_TTR("Editor Viewer Follow Camera"), MENU_STREAM_FOLLOW_CAMERA, _editor_viewer_follows_camera
+			popup, VOXEL_TTR("Editor Viewer Follow Camera"), MENU_STREAM_FOLLOW_CAMERA, _editor_viewer_follows_camera
 	);
-	add_checkable_item(popup, ZN_TTR("Enable Editor Viewer"), MENU_ENABLE_EDITOR_VIEWER, _editor_viewer_enabled);
+	add_checkable_item(popup, VOXEL_TTR("Enable Editor Viewer"), MENU_ENABLE_EDITOR_VIEWER, _editor_viewer_enabled);
 
 	if (is_lod_terrain) {
 		popup->add_separator();
-		popup->add_item(ZN_TTR("Dump as scene... (Debug)"), MENU_DUMP_AS_SCENE);
+		popup->add_item(VOXEL_TTR("Dump as scene... (Debug)"), MENU_DUMP_AS_SCENE);
 	}
 	popup->add_separator();
-	popup->add_item(ZN_TTR("About Voxel Tools..."), MENU_ABOUT);
+	popup->add_item(VOXEL_TTR("About Voxel Tools..."), MENU_ABOUT);
 }
 
 namespace {
@@ -135,11 +135,11 @@ void VoxelTerrainEditorPlugin::_notification(int p_what) {
 	}
 }
 
-bool VoxelTerrainEditorPlugin::_zn_handles(const Object *p_object) const {
+bool VoxelTerrainEditorPlugin::_voxel_handles(const Object *p_object) const {
 	return Object::cast_to<VoxelNode>(p_object) != nullptr;
 }
 
-void VoxelTerrainEditorPlugin::_zn_edit(Object *p_object) {
+void VoxelTerrainEditorPlugin::_voxel_edit(Object *p_object) {
 	VoxelNode *node = Object::cast_to<VoxelNode>(p_object);
 	set_voxel_node(node);
 }
@@ -153,7 +153,7 @@ void VoxelTerrainEditorPlugin::set_voxel_node(VoxelNode *node) {
 	}
 }
 
-void VoxelTerrainEditorPlugin::_zn_make_visible(bool visible) {
+void VoxelTerrainEditorPlugin::_voxel_make_visible(bool visible) {
 	_menu_button->set_visible(visible);
 	_task_indicator->set_visible(visible);
 	set_process(visible);
@@ -165,7 +165,7 @@ void VoxelTerrainEditorPlugin::_zn_make_visible(bool visible) {
 	// So we'll need to check if _node is null all over the place
 }
 
-EditorPlugin::AfterGUIInput VoxelTerrainEditorPlugin::_zn_forward_3d_gui_input(
+EditorPlugin::AfterGUIInput VoxelTerrainEditorPlugin::_voxel_forward_3d_gui_input(
 		Camera3D *p_camera,
 		const Ref<InputEvent> &p_event
 ) {
@@ -234,7 +234,7 @@ void VoxelTerrainEditorPlugin::_on_menu_item_selected(int id) {
 		} break;
 
 		case MENU_DUMP_AS_SCENE:
-			zylann::godot::popup_file_dialog(*_save_file_dialog);
+			voxel::godot::popup_file_dialog(*_save_file_dialog);
 			break;
 
 		case MENU_ABOUT:
@@ -242,7 +242,7 @@ void VoxelTerrainEditorPlugin::_on_menu_item_selected(int id) {
 			break;
 
 		default: {
-			ZN_ASSERT_RETURN(id >= 0 && id < MENU_COUNT);
+			VOXEL_ASSERT_RETURN(id >= 0 && id < MENU_COUNT);
 		}
 	}
 }
@@ -256,4 +256,4 @@ void VoxelTerrainEditorPlugin::_on_save_file_dialog_file_selected(String fpath) 
 
 void VoxelTerrainEditorPlugin::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

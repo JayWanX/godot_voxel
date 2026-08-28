@@ -14,11 +14,11 @@
 #include "../util/godot/core/string.h"
 #include "../util/godot/editor_scale.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 struct ThirdParty {
@@ -170,26 +170,26 @@ VoxelAboutWindow *g_window_singleton = nullptr;
 } // namespace
 
 void VoxelAboutWindow::create_singleton(Node &base_control) {
-	ZN_ASSERT_RETURN(g_window_singleton == nullptr);
+	VOXEL_ASSERT_RETURN(g_window_singleton == nullptr);
 	g_window_singleton = memnew(VoxelAboutWindow);
 	base_control.add_child(g_window_singleton);
 }
 
 void VoxelAboutWindow::destroy_singleton() {
-	ZN_ASSERT_RETURN(g_window_singleton != nullptr);
+	VOXEL_ASSERT_RETURN(g_window_singleton != nullptr);
 	memdelete(g_window_singleton);
 	g_window_singleton = nullptr;
 }
 
 void VoxelAboutWindow::popup_singleton() {
-	ZN_ASSERT_RETURN(g_window_singleton != nullptr);
+	VOXEL_ASSERT_RETURN(g_window_singleton != nullptr);
 	g_window_singleton->popup_centered_ratio(0.6);
 }
 
 VoxelAboutWindow::VoxelAboutWindow() {
-	// Generated with the help of https://github.com/Zylann/godot_scene_code_converter
+	// Generated with the help of https://github.com/Voxel/godot_scene_code_converter
 
-	set_title(ZN_TTR("About Voxel Tools"));
+	set_title(VOXEL_TTR("About Voxel Tools"));
 	// set_resizable(true); // TODO How to set if a Window is resizable or not?
 	set_min_size(Vector2(600, 300) * EDSCALE);
 
@@ -218,8 +218,8 @@ VoxelAboutWindow::VoxelAboutWindow() {
 	// About
 	String about_text = L"[b]Version:[/b] {version}\n"
 						"[b]Author:[/b] Marc Gilleron\n"
-						"[b]Repository:[/b] [url]https://github.com/Zylann/godot_voxel[/url]\n"
-						"[b]Issue tracker:[/b] [url]https://github.com/Zylann/godot_voxel/issues[/url]\n"
+						"[b]Repository:[/b] [url]https://github.com/Voxel/godot_voxel[/url]\n"
+						"[b]Issue tracker:[/b] [url]https://github.com/Voxel/godot_voxel/issues[/url]\n"
 						"[b]Git hash:[/b] {git_hash}\n"
 						"\n"
 						"[b]Gold supporters:[/b]\n"
@@ -321,8 +321,8 @@ VoxelAboutWindow::VoxelAboutWindow() {
 	rich_text_label2->set_selection_enabled(true);
 
 	tab_container->add_child(rich_text_label2);
-	tab_container->set_tab_title(0, ZN_TTR("About"));
-	tab_container->set_tab_title(1, ZN_TTR("License"));
+	tab_container->set_tab_title(0, VOXEL_TTR("About"));
+	tab_container->set_tab_title(1, VOXEL_TTR("License"));
 
 	// Third-party licenses
 	if (VOXEL_THIRD_PARTY_COUNT > 0) {
@@ -346,7 +346,7 @@ VoxelAboutWindow::VoxelAboutWindow() {
 		third_party_container->add_child(_third_party_rich_text_label);
 
 		tab_container->add_child(third_party_container);
-		tab_container->set_tab_title(2, ZN_TTR("Third party licenses"));
+		tab_container->set_tab_title(2, VOXEL_TTR("Third party licenses"));
 
 		third_party_list->select(0);
 		_on_third_party_list_item_selected(0);
@@ -383,4 +383,4 @@ void VoxelAboutWindow::_on_third_party_list_item_selected(int index) {
 
 void VoxelAboutWindow::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -1,11 +1,11 @@
 #include "voxel_blocky_attribute_direction.h"
 #include "../../../constants/voxel_string_names.h"
 #include "../../../util/math/ortho_basis.h"
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyAttributeDirection::VoxelBlockyAttributeDirection() {
 	_name = VoxelStringNames::get_singleton().direction;
@@ -77,7 +77,7 @@ int VoxelBlockyAttributeDirection::from_vec3(Vector3 v) const {
 		case Vector3::AXIS_Z:
 			return v.z < 0 ? DIR_NEGATIVE_Z : DIR_POSITIVE_Z;
 		default:
-			ZN_PRINT_ERROR("Unexpected axis");
+			VOXEL_PRINT_ERROR("Unexpected axis");
 			return -1;
 	}
 }
@@ -104,4 +104,4 @@ void VoxelBlockyAttributeDirection::_bind_methods() {
 	BIND_ENUM_CONSTANT(DIR_COUNT);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -7,7 +7,7 @@
 #include "voxel_blocky_model.h"
 #include "voxel_mesher_blocky.h"
 
-namespace zylann::voxel::blocky {
+namespace voxel::blocky {
 
 Vector3f side_to_block_coordinates(const Vector3f v, const VoxelBlockyModel::Side side) {
 	switch (side) {
@@ -22,7 +22,7 @@ Vector3f side_to_block_coordinates(const Vector3f v, const VoxelBlockyModel::Sid
 		case VoxelBlockyModel::SIDE_POSITIVE_Z:
 			return v;
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 			return v;
 	}
 }
@@ -38,7 +38,7 @@ int get_side_sign(const VoxelBlockyModel::Side side) {
 		case VoxelBlockyModel::SIDE_POSITIVE_Z:
 			return 1;
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 			return 1;
 	}
 }
@@ -206,7 +206,7 @@ void append_skirts(
 		const BakedLibrary &library,
 		const TintSampler tint_sampler
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const Vector3T<int> jump(size.y, 1, size.x * size.y);
 
@@ -227,4 +227,4 @@ void append_skirts(
 	append_side_skirts(buffer, tint_sampler, jump.zxy(), (size.y - 1), size.z, size.x, POSITIVE_Y, library, out);
 }
 
-} // namespace zylann::voxel::blocky
+} // namespace voxel::blocky

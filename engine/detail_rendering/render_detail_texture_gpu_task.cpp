@@ -21,13 +21,13 @@
 // #include "../../util/string/format.h"
 // #endif
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel {
+namespace voxel {
 
 void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
-	ZN_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_DSTACK();
 
 	ERR_FAIL_COND(mesh_vertices.size() == 0);
 	ERR_FAIL_COND(mesh_indices.size() == 0);
@@ -393,7 +393,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 		const VoxelModifier::ShaderData &modifier_data = modifiers[modifier_index];
 		const RID modifier_shader_rid =
 				VoxelModifier::get_detail_shader(ctx.base_resources, modifier_data.modifier_type);
-		ZN_ASSERT_CONTINUE(modifier_shader_rid.is_valid());
+		VOXEL_ASSERT_CONTINUE(modifier_shader_rid.is_valid());
 
 		hit_positions_uniform->set_binding(0);
 		generator_params_uniform->set_binding(1);
@@ -563,7 +563,7 @@ PackedByteArray RenderDetailTextureGPUTask::collect_texture_and_cleanup(
 		RenderingDevice &rd,
 		GPUStorageBufferPool &storage_buffer_pool
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// TODO This is incredibly slow and should not happen in the first place.
 	// But due to how Godot is designed right now, it is not possible to create a texture from the output of a compute
@@ -571,7 +571,7 @@ PackedByteArray RenderDetailTextureGPUTask::collect_texture_and_cleanup(
 	PackedByteArray texture_data = rd.texture_get_data(_normalmap_texture0_rid, 0);
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Cleanup");
+		VOXEL_PROFILE_SCOPE_NAMED("Cleanup");
 
 		// Godot "auto-frees" uniform sets when their dependencies get freed.
 		// But sometimes it doesn't, and can't guess that it should (like when re-using resources).
@@ -598,7 +598,7 @@ PackedByteArray RenderDetailTextureGPUTask::collect_texture_and_cleanup(
 		// 		for (unsigned int i = 0; i < _uniform_sets_expected_to_be_freed.size(); ++i) {
 		// 			const RID rid = _uniform_sets_expected_to_be_freed[i];
 		// 			if(rd.uniform_set_is_valid(rid)) {
-		// 				ZN_PRINT_ERROR(format("Uniform Set #{} wasn't freed by Godot", i));
+		// 				VOXEL_PRINT_ERROR(format("Uniform Set #{} wasn't freed by Godot", i));
 		// 			}
 		// 		}
 		// #endif
@@ -628,8 +628,8 @@ PackedByteArray RenderDetailTextureGPUTask::collect_texture_and_cleanup(
 }
 
 void RenderDetailTextureGPUTask::collect(GPUTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
-	ZN_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_DSTACK();
 
 	PackedByteArray texture_data = collect_texture_and_cleanup(ctx.rendering_device, ctx.storage_buffer_pool);
 
@@ -647,7 +647,7 @@ void RenderDetailTextureGPUTask::collect(GPUTaskContext &ctx) {
 			tile_data2.push_back(DetailTextureData::Tile{ td.cell_x, td.cell_y, td.cell_z, uint8_t(td.data & 0x3) });
 		}
 
-		RenderDetailTexturePass2Task *task = ZN_NEW(RenderDetailTexturePass2Task);
+		RenderDetailTexturePass2Task *task = VOXEL_NEW(RenderDetailTexturePass2Task);
 		task->atlas_data = texture_data;
 		task->tile_data = std::move(tile_data2);
 		task->edited_tiles_texture_data = std::move(edited_tiles_texture_data);
@@ -664,4 +664,4 @@ void RenderDetailTextureGPUTask::collect(GPUTaskContext &ctx) {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

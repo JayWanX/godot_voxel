@@ -1,5 +1,5 @@
-#ifndef ZN_MATH_VECTOR3I_H
-#define ZN_MATH_VECTOR3I_H
+#ifndef VOXEL_MATH_VECTOR3I_H
+#define VOXEL_MATH_VECTOR3I_H
 
 #include "../containers/span.h"
 #include "../godot/core/vector3.h"
@@ -10,7 +10,7 @@
 #include "funcs.h"
 #include <functional> // For std::hash
 
-namespace zylann {
+namespace voxel {
 namespace Vector3iUtil {
 
 constexpr int AXIS_COUNT = 3;
@@ -29,7 +29,7 @@ inline void sort_min_max(Vector3i &a, Vector3i &b) {
 // even though dense volumes of that size will rarely be encountered in this module.
 inline uint64_t get_volume_u64(const Vector3i &v) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN_V(v.x >= 0 && v.y >= 0 && v.z >= 0, 0);
+	VOXEL_ASSERT_RETURN_V(v.x >= 0 && v.y >= 0 && v.z >= 0, 0);
 #endif
 	return math::multiply_check_overflow_u64(
 			static_cast<uint64_t>(v.x),
@@ -163,9 +163,9 @@ inline int dot(const Vector3i &a, const Vector3i &b) {
 class TextWriter;
 TextWriter &operator<<(TextWriter &w, const Vector3i &v);
 
-} // namespace zylann
+} // namespace voxel
 
-ZN_GODOT_NAMESPACE_BEGIN
+VOXEL_GODOT_NAMESPACE_BEGIN
 // To prevent unintuitive overload-resolution compiler errors, operators overloads should be
 // defined in the same namespace as the type they are dealing with... in which case, Godot's namespace.
 // The compiler only looks for overrides in the namespace of the arguments (Koenig lookup, is it?).
@@ -173,16 +173,16 @@ ZN_GODOT_NAMESPACE_BEGIN
 
 inline Vector3i operator<<(const Vector3i &a, int b) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(b >= 0);
+	VOXEL_ASSERT(b >= 0);
 #endif
 	return Vector3i(a.x << b, a.y << b, a.z << b);
 }
 
 inline Vector3i operator>>(const Vector3i &a, int b) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(b >= 0);
+	VOXEL_ASSERT(b >= 0);
 #endif
-	using namespace zylann::math;
+	using namespace voxel::math;
 	return Vector3i(arithmetic_rshift(a.x, b), arithmetic_rshift(a.y, b), arithmetic_rshift(a.z, b));
 }
 
@@ -194,20 +194,20 @@ inline Vector3i operator%(const Vector3i &a, int b) {
 	return Vector3i(a.x % b, a.y % b, a.z % b);
 }
 
-ZN_GODOT_NAMESPACE_END
+VOXEL_GODOT_NAMESPACE_END
 
 // For Godot
 struct Vector3iHasher {
 	static inline uint32_t hash(const Vector3i &v) {
-		uint32_t hash = zylann::hash_djb2_one_32(v.x);
-		hash = zylann::hash_djb2_one_32(v.y, hash);
-		return zylann::hash_djb2_one_32(v.z, hash);
+		uint32_t hash = voxel::hash_djb2_one_32(v.x);
+		hash = voxel::hash_djb2_one_32(v.y, hash);
+		return voxel::hash_djb2_one_32(v.z, hash);
 
 		// What Godot uses. Turns out to be slower?
-		// uint32_t h = zylann::hash_murmur3_one_32(v.x);
-		// h = zylann::hash_murmur3_one_32(v.y, h);
-		// h = zylann::hash_murmur3_one_32(v.z, h);
-		// return zylann::hash_fmix32(h);
+		// uint32_t h = voxel::hash_murmur3_one_32(v.x);
+		// h = voxel::hash_murmur3_one_32(v.y, h);
+		// h = voxel::hash_murmur3_one_32(v.z, h);
+		// return voxel::hash_fmix32(h);
 	}
 };
 
@@ -221,4 +221,4 @@ struct hash<Vector3i> {
 };
 } // namespace std
 
-#endif // ZN_MATH_VECTOR3I_H
+#endif // VOXEL_MATH_VECTOR3I_H

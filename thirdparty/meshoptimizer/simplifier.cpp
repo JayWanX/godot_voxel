@@ -20,7 +20,7 @@
 #define TRACESTATS(i) (void)0
 #endif
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Michael Garland and Paul S. Heckbert. Surface simplification using quadric error metrics. 1997
@@ -2881,4 +2881,4 @@ float meshopt_simplifyScale(const float* vertex_positions, size_t vertex_count, 
 	return extent;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

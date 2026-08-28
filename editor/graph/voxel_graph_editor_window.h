@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/button.h"
 #include "../../util/godot/editor_scale.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // TODO It would be really nice if we were not forced to use an AcceptDialog for making a window.
 // AcceptDialog adds stuff I don't need, but Window is too low level.
@@ -36,6 +36,6 @@ public:
 	static void _bind_methods() {}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_WINDOW_H

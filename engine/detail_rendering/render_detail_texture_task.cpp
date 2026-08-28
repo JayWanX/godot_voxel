@@ -11,7 +11,7 @@
 #include "render_detail_texture_gpu_task.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 DetailTextureData &get_tls_normalmap_data() {
@@ -46,15 +46,15 @@ DetailTextureData &get_tls_normalmap_data() {
 }*/
 
 void RenderDetailTextureTask::run(ThreadedTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(generator.is_valid());
-	ZN_ASSERT_RETURN(output_textures != nullptr);
-	ZN_ASSERT_RETURN(output_textures->valid == false);
-	ZN_ASSERT_RETURN(cell_iterator != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(generator.is_valid());
+	VOXEL_ASSERT_RETURN(output_textures != nullptr);
+	VOXEL_ASSERT_RETURN(output_textures->valid == false);
+	VOXEL_ASSERT_RETURN(cell_iterator != nullptr);
 
 #ifdef VOXEL_ENABLE_GPU
 	if (use_gpu) {
-		ZN_ASSERT_RETURN(generator->supports_shaders());
+		VOXEL_ASSERT_RETURN(generator->supports_shaders());
 		run_on_gpu();
 	} else
 #endif
@@ -127,7 +127,7 @@ void RenderDetailTextureTask::apply_result() {
 
 	if (!VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Normalmap task completed but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Normalmap task completed but volume wasn't found");
 		return;
 	}
 
@@ -139,8 +139,8 @@ void RenderDetailTextureTask::apply_result() {
 	o.detail_textures = output_textures;
 
 	VoxelEngine::VolumeCallbacks callbacks = VoxelEngine::get_singleton().get_volume_callbacks(volume_id);
-	ZN_ASSERT_RETURN(callbacks.mesh_output_callback != nullptr);
-	ZN_ASSERT_RETURN(callbacks.data != nullptr);
+	VOXEL_ASSERT_RETURN(callbacks.mesh_output_callback != nullptr);
+	VOXEL_ASSERT_RETURN(callbacks.data != nullptr);
 	callbacks.detail_texture_output_callback(callbacks.data, o);
 }
 
@@ -196,9 +196,9 @@ static void build_gpu_tiles_data(
 		td.cell_y = cell_info.position.y;
 		td.cell_z = cell_info.position.z;
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(chunk_index < ((1 << 24) - 1));
-		ZN_ASSERT(cell_info.triangle_count <= 5);
-		ZN_ASSERT(projection <= 2);
+		VOXEL_ASSERT(chunk_index < ((1 << 24) - 1));
+		VOXEL_ASSERT(cell_info.triangle_count <= 5);
+		VOXEL_ASSERT(projection <= 2);
 #endif
 		td.data = (chunk_index << 8) | (cell_info.triangle_count << 4) | projection;
 
@@ -207,9 +207,9 @@ static void build_gpu_tiles_data(
 }
 
 void RenderDetailTextureTask::run_on_gpu() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	RenderDetailTextureGPUTask *gpu_task = make_gpu_task();
-	ZN_ASSERT_RETURN(gpu_task != nullptr);
+	VOXEL_ASSERT_RETURN(gpu_task != nullptr);
 	VoxelEngine::get_singleton().push_gpu_task(gpu_task);
 }
 
@@ -217,7 +217,7 @@ RenderDetailTextureGPUTask *RenderDetailTextureTask::make_gpu_task() {
 	const unsigned int tile_resolution = get_detail_texture_tile_resolution_for_lod(detail_texture_settings, lod_index);
 
 	std::shared_ptr<ComputeShader> shader = generator->get_detail_rendering_shader();
-	ZN_ASSERT_RETURN_V(shader != nullptr, nullptr);
+	VOXEL_ASSERT_RETURN_V(shader != nullptr, nullptr);
 
 	// Fallback on CPU for tiles containing edited voxels.
 	// TODO Figure out an efficient way to have sparse voxel data available on the GPU
@@ -249,7 +249,7 @@ RenderDetailTextureGPUTask *RenderDetailTextureTask::make_gpu_task() {
 	StdVector<int32_t> cell_triangles;
 	cell_iterator->rewind();
 	build_gpu_tiles_data(*cell_iterator, tile_count, cell_triangles, tile_data, mesh_indices, mesh_normals);
-	ZN_ASSERT(cell_triangles.size() > 0);
+	VOXEL_ASSERT(cell_triangles.size() > 0);
 
 	RenderDetailTextureGPUTask::Params params;
 	params.block_origin_world = to_vec3f(origin_in_voxels);
@@ -262,7 +262,7 @@ RenderDetailTextureGPUTask *RenderDetailTextureTask::make_gpu_task() {
 
 	// Create GPU task
 
-	RenderDetailTextureGPUTask *gpu_task = ZN_NEW(RenderDetailTextureGPUTask);
+	RenderDetailTextureGPUTask *gpu_task = VOXEL_NEW(RenderDetailTextureGPUTask);
 	gpu_task->texture_width = pixels_across;
 	gpu_task->texture_height = pixels_across;
 	// TODO Mesh data need std::move or std::shared_ptr, we only read it
@@ -304,7 +304,7 @@ RenderDetailTextureGPUTask *RenderDetailTextureTask::make_gpu_task() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // PackedByteArray convert_pixels_from_rgba8_to_rgb8(const PackedByteArray &src) {
-// 	ZN_ASSERT((src.size() % 4) == 0);
+// 	VOXEL_ASSERT((src.size() % 4) == 0);
 // 	const unsigned int pixel_count = src.size() / 4;
 // 	PackedByteArray dst;
 // 	uint8_t *dst_w = dst.ptrw();
@@ -320,7 +320,7 @@ RenderDetailTextureGPUTask *RenderDetailTextureTask::make_gpu_task() {
 // }
 
 // static void convert_pixels_from_rgba8_to_rgb8_in_place(PackedByteArray &pba) {
-// 	ZN_ASSERT((pba.size() % 4) == 0);
+// 	VOXEL_ASSERT((pba.size() % 4) == 0);
 // 	const unsigned int pixel_count = pba.size() / 4;
 // 	uint8_t *pba_w = pba.ptrw();
 // 	for (unsigned int pi = 0; pi < pixel_count; ++pi) {
@@ -340,7 +340,7 @@ static void combine_edited_tiles(
 		const DetailTextureData &edited_tiles_normalmap_data,
 		const unsigned int pixel_size
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	uint8_t *dst_w = atlas_data.ptrw();
 	Span<uint8_t> dst(dst_w, atlas_data.size());
@@ -371,7 +371,7 @@ static void combine_edited_tiles(
 #ifdef VOXEL_ENABLE_GPU
 
 void RenderDetailTexturePass2Task::run(ThreadedTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// TODO Suggestion: given how fast GPU normalmaps are computed, maybe we could output them first,
 	// and get the edits later, even if that means computing tiles redundantly, because at least we get a
@@ -414,7 +414,7 @@ void RenderDetailTexturePass2Task::run(ThreadedTaskContext &ctx) {
 void RenderDetailTexturePass2Task::apply_result() {
 	if (!VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Normalmap task completed but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Normalmap task completed but volume wasn't found");
 		return;
 	}
 
@@ -426,11 +426,11 @@ void RenderDetailTexturePass2Task::apply_result() {
 	o.detail_textures = output_textures;
 
 	VoxelEngine::VolumeCallbacks callbacks = VoxelEngine::get_singleton().get_volume_callbacks(volume_id);
-	ZN_ASSERT_RETURN(callbacks.mesh_output_callback != nullptr);
-	ZN_ASSERT_RETURN(callbacks.data != nullptr);
+	VOXEL_ASSERT_RETURN(callbacks.mesh_output_callback != nullptr);
+	VOXEL_ASSERT_RETURN(callbacks.data != nullptr);
 	callbacks.detail_texture_output_callback(callbacks.data, o);
 }
 
 #endif
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -4,19 +4,19 @@
 #include "../../util/godot/classes/editor_inspector_plugin.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
 
-namespace zylann::voxel {
+namespace voxel {
 
-class VoxelBlockyModelEditorInspectorPlugin : public zylann::godot::ZN_EditorInspectorPlugin {
-	GDCLASS(VoxelBlockyModelEditorInspectorPlugin, zylann::godot::ZN_EditorInspectorPlugin)
+class VoxelBlockyModelEditorInspectorPlugin : public voxel::godot::VOXEL_EditorInspectorPlugin {
+	GDCLASS(VoxelBlockyModelEditorInspectorPlugin, voxel::godot::VOXEL_EditorInspectorPlugin)
 public:
 	// TODO GDX: `EditorUndoRedoManager` isn't a singleton yet in GDExtension, so it has to be injected
 	void set_undo_redo(EditorUndoRedoManager *urm);
 
 protected:
-	bool _zn_can_handle(const Object *p_object) const override;
-	void _zn_parse_begin(Object *p_object) override;
+	bool _voxel_can_handle(const Object *p_object) const override;
+	void _voxel_parse_begin(Object *p_object) override;
 
 private:
 	// When compiling with GodotCpp, `_bind_methods` isn't optional.
@@ -25,6 +25,6 @@ private:
 	EditorUndoRedoManager *_undo_redo = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_EDITOR_INSPECTOR_PLUGIN_H

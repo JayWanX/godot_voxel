@@ -6,7 +6,7 @@
 #include "voxel_graph_runtime.h"
 #include <type_traits>
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 struct PortRemap {
 	ProgramGraph::PortLocation original;
@@ -49,7 +49,7 @@ public:
 			/*_node(node),*/ _program(program), _heap_resources(heap_resources), _params(params) {}
 
 	const Variant &get_param(size_t i) const {
-		ZN_ASSERT(i < _params.size());
+		VOXEL_ASSERT(i < _params.size());
 		return _params[i];
 	}
 
@@ -97,7 +97,7 @@ public:
 		hr.ptr = ptr;
 		hr.deleter = [](void *p) {
 			T *tp = reinterpret_cast<T *>(p);
-			ZN_DELETE(tp);
+			VOXEL_DELETE(tp);
 		};
 		_heap_resources.push_back(hr);
 	}
@@ -132,6 +132,6 @@ private:
 
 typedef void (*CompileFunc)(CompileContext &);
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg
 
 #endif // VOXEL_GRAPH_COMPILER_H

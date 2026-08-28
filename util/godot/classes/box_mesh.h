@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_BOX_MESH_H
-#define ZN_GODOT_BOX_MESH_H
+#ifndef VOXEL_GODOT_BOX_MESH_H
+#define VOXEL_GODOT_BOX_MESH_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/version.h>
 
 #if VERSION_MAJOR == 4 && VERSION_MINOR <= 2
@@ -10,9 +10,9 @@
 #include <scene/resources/3d/primitive_meshes.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/box_mesh.hpp>
 using namespace godot;
 #endif
 
-#endif // ZN_GODOT_BOX_MESH_H
+#endif // VOXEL_GODOT_BOX_MESH_H

@@ -10,7 +10,7 @@
 #include "voxel_graph_function.h"
 #include "voxel_graph_runtime.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 // Generates GLSL code from the given graph.
 CompilationResult generate_shader(
@@ -39,7 +39,7 @@ public:
 			_uniforms(uniforms) {}
 
 	Variant get_param(size_t i) const {
-		ZN_ASSERT(i < _params.size());
+		VOXEL_ASSERT(i < _params.size());
 		return _params[i];
 	}
 
@@ -87,6 +87,6 @@ private:
 
 typedef void (*ShaderGenFunc)(ShaderGenContext &);
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg
 
 #endif // VOXEL_GRAPH_SHADER_GENERATOR_H

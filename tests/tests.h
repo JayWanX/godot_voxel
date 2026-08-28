@@ -3,7 +3,7 @@
 
 #include "../util/godot/macros.h"
 
-namespace zylann {
+namespace voxel {
 
 namespace testing {
 class TestOptions;
@@ -20,6 +20,6 @@ void run_noise_tests();
 }
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_TESTS_H

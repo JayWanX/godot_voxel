@@ -18,9 +18,9 @@
 
 #include <memory>
 
-ZN_GODOT_FORWARD_DECLARE(class Image)
+VOXEL_GODOT_FORWARD_DECLARE(class Image)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBuffer;
 
@@ -95,7 +95,7 @@ public:
 			Vector3f max_pos
 	) override;
 
-	// Ref<Resource> duplicate(bool p_subresources) const ZN_OVERRIDE_UNLESS_GODOT_EXTENSION;
+	// Ref<Resource> duplicate(bool p_subresources) const VOXEL_OVERRIDE_UNLESS_GODOT_EXTENSION;
 
 	// Utility
 
@@ -291,8 +291,8 @@ private:
 	static Cache &get_tls_cache();
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelGeneratorGraph::TextureMode)
+VARIANT_ENUM_CAST(voxel::VoxelGeneratorGraph::TextureMode)
 
 #endif // VOXEL_GENERATOR_GRAPH_H

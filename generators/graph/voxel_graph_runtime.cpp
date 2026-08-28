@@ -18,7 +18,7 @@
 // #define VOXEL_DEBUG_GRAPH_PROG_SENTINEL uint16_t(12345) // 48, 57 (base 10)
 // #endif
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 Runtime::Runtime() {
 	clear();
@@ -87,10 +87,10 @@ void Runtime::generate_optimized_execution_map(
 		Span<const unsigned int> required_outputs,
 		bool debug
 ) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Range analysis results must have been computed
-	ZN_ASSERT_RETURN(state.ranges.size() != 0);
+	VOXEL_ASSERT_RETURN(state.ranges.size() != 0);
 
 	const Program &program = _program;
 	const DependencyGraph &graph = program.dependency_graph;
@@ -124,7 +124,7 @@ void Runtime::generate_optimized_execution_map(
 
 		// Check needed because Godot never compiles with `_DEBUG`...
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(node_index < graph.nodes.size());
+		VOXEL_ASSERT(node_index < graph.nodes.size());
 #endif
 		const DependencyGraph::Node &node = graph.nodes[node_index];
 
@@ -154,7 +154,7 @@ void Runtime::generate_optimized_execution_map(
 
 	if (debug) {
 		StdVector<uint32_t> &debug_nodes = execution_map.debug_nodes;
-		ZN_ASSERT(debug_nodes.size() == 0);
+		VOXEL_ASSERT(debug_nodes.size() == 0);
 
 		for (unsigned int node_index = 0; node_index < graph.nodes.size(); ++node_index) {
 			const ProcessResult res = results[node_index];
@@ -209,14 +209,14 @@ void Runtime::generate_optimized_execution_map(
 						continue;
 					}
 
-					ZN_ASSERT(!buffer.is_binding);
+					VOXEL_ASSERT(!buffer.is_binding);
 
 					// The node is considered skippable, which means its outputs are either locally constant or unused.
 					// Unused buffers can be left as-is, but local constants must be filled in.
 					if (buffer.local_users_count > 0) {
 						const math::Interval range = state.ranges[output_address];
 						// If this interval is not a single value then the node should not have been skippable
-						ZN_ASSERT(range.is_single_value());
+						VOXEL_ASSERT(range.is_single_value());
 						const float v = range.min;
 						// When we re-use buffer data in multiple nodes, this optimization cannot work reliably
 						// if we were to fill constant data here. It is possible that the data pointer
@@ -225,7 +225,7 @@ void Runtime::generate_optimized_execution_map(
 						// To avoid this problem defer the filling to run just before the first node reading the buffer.
 						// The reason we do it is to avoid having to rewrite operations for every
 						// combination of constant arguments vs buffers.
-						ZN_ASSERT(buffer.data != nullptr);
+						VOXEL_ASSERT(buffer.data != nullptr);
 						tls_constant_fills.push_back(ExecutionMap::ConstantFill{ buffer.data, v });
 					}
 				}
@@ -266,7 +266,7 @@ void Runtime::generate_optimized_execution_map(
 
 void Runtime::generate_single(State &state, Span<const float> inputs, const ExecutionMap *execution_map) const {
 	FixedArray<Span<const float>, MAX_INPUTS> input_bindings;
-	ZN_ASSERT_RETURN_MSG(inputs.size() < input_bindings.size(), "Too many inputs, not supported");
+	VOXEL_ASSERT_RETURN_MSG(inputs.size() < input_bindings.size(), "Too many inputs, not supported");
 	for (unsigned int i = 0; i < inputs.size(); ++i) {
 		input_bindings[i] = Span<const float>(&inputs[i], 1);
 	}
@@ -282,9 +282,9 @@ void Runtime::prepare_state(State &state, unsigned int buffer_size, bool with_pr
 		state.buffer_datas.resize(_program.buffer_data_count);
 		for (unsigned int i = old_buffer_data_count; i < state.buffer_datas.size(); ++i) {
 			BufferData &bd = state.buffer_datas[i];
-			ZN_ASSERT(bd.data == nullptr);
+			VOXEL_ASSERT(bd.data == nullptr);
 			// These are new items, we always allocate.
-			bd.data = reinterpret_cast<float *>(ZN_ALLOC(buffer_size * sizeof(float)));
+			bd.data = reinterpret_cast<float *>(VOXEL_ALLOC(buffer_size * sizeof(float)));
 			bd.capacity = buffer_size;
 		}
 	}
@@ -293,10 +293,10 @@ void Runtime::prepare_state(State &state, unsigned int buffer_size, bool with_pr
 		// Make existing buffer datas larger.
 		for (unsigned int i = 0; i < old_buffer_data_count; ++i) {
 			BufferData &bd = state.buffer_datas[i];
-			ZN_ASSERT(bd.data != nullptr);
+			VOXEL_ASSERT(bd.data != nullptr);
 			if (bd.capacity < buffer_size) {
 				// These are existing items, we always realloc.
-				bd.data = reinterpret_cast<float *>(ZN_REALLOC(bd.data, buffer_size * sizeof(float)));
+				bd.data = reinterpret_cast<float *>(VOXEL_REALLOC(bd.data, buffer_size * sizeof(float)));
 				bd.capacity = buffer_size;
 			}
 		}
@@ -311,7 +311,7 @@ void Runtime::prepare_state(State &state, unsigned int buffer_size, bool with_pr
 	for (const Buffer &buffer : state.buffers) {
 		if (buffer.is_binding) {
 			// Forgot to unbind?
-			ZN_ASSERT(buffer.data == nullptr);
+			VOXEL_ASSERT(buffer.data == nullptr);
 		}
 	}
 #endif
@@ -330,12 +330,12 @@ void Runtime::prepare_state(State &state, unsigned int buffer_size, bool with_pr
 		Buffer &buffer = buffers[buffer_spec.address];
 
 		if (buffer_spec.has_data) {
-			ZN_ASSERT(!buffer_spec.is_binding);
+			VOXEL_ASSERT(!buffer_spec.is_binding);
 			BufferData &bd = buffer_datas[buffer_spec.data_index];
-			ZN_ASSERT(bd.capacity >= buffer_size);
+			VOXEL_ASSERT(bd.capacity >= buffer_size);
 			buffer.data = bd.data;
 		} else {
-			ZN_ASSERT(buffer_spec.is_binding || buffer_spec.is_constant);
+			VOXEL_ASSERT(buffer_spec.is_binding || buffer_spec.is_constant);
 			buffer.data = nullptr;
 		}
 
@@ -362,7 +362,7 @@ void Runtime::prepare_state(State &state, unsigned int buffer_size, bool with_pr
 	// 	for (unsigned int i = 0; i < state.buffers.size(); ++i) {
 	// 		Buffer &buffer = state.buffers[i];
 	// 		if (!buffer.is_constant && !buffer.is_binding) {
-	// 			ZN_ASSERT(buffer.data != nullptr);
+	// 			VOXEL_ASSERT(buffer.data != nullptr);
 	// 			for (unsigned int j = 0; j < buffer.size; ++j) {
 	// 				buffer.data[j] = -969696.f;
 	// 			}
@@ -400,7 +400,7 @@ void Runtime::generate_set(
 	struct L {
 		static inline void bind_input_buffer(Span<Buffer> buffers, int a, Span<const float> d) {
 			Buffer &buffer = buffers[a];
-			ZN_ASSERT(buffer.is_binding);
+			VOXEL_ASSERT(buffer.is_binding);
 			// TODO This is unfortunate but with the current design we can't guarantee constness at compile time.
 			// Inputs should never be written to.
 			buffer.data = const_cast<float *>(d.data());
@@ -409,38 +409,38 @@ void Runtime::generate_set(
 
 		static inline void unbind_buffer(Span<Buffer> buffers, int a) {
 			Buffer &buffer = buffers[a];
-			ZN_ASSERT(buffer.is_binding);
+			VOXEL_ASSERT(buffer.is_binding);
 			buffer.data = nullptr;
 		}
 	};
 
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT_RETURN(p_inputs.size() == _program.inputs.size());
+	VOXEL_ASSERT_RETURN(p_inputs.size() == _program.inputs.size());
 
 #ifdef DEBUG_ENABLED
 	// Each array must have the same size
 	for (unsigned int i = 1; i < p_inputs.size(); ++i) {
-		ZN_ASSERT(p_inputs[0].size() == p_inputs[i].size());
+		VOXEL_ASSERT(p_inputs[0].size() == p_inputs[i].size());
 	}
 #endif
 
 #ifdef TOOLS_ENABLED
-	ZN_ASSERT_RETURN(state.buffers.size() >= _program.buffer_count);
-	ZN_ASSERT_RETURN(state.buffers.size() != 0);
+	VOXEL_ASSERT_RETURN(state.buffers.size() >= _program.buffer_count);
+	VOXEL_ASSERT_RETURN(state.buffers.size() != 0);
 	const unsigned int buffer_size = p_inputs.size() > 0 ? p_inputs[0].size() : state.buffer_size;
-	ZN_ASSERT_RETURN(state.buffer_size >= buffer_size);
-	ZN_ASSERT_RETURN(state.buffers[0].size >= buffer_size);
+	VOXEL_ASSERT_RETURN(state.buffer_size >= buffer_size);
+	VOXEL_ASSERT_RETURN(state.buffers[0].size >= buffer_size);
 #ifdef DEBUG_ENABLED
 	for (size_t i = 0; i < state.buffers.size(); ++i) {
 		const Buffer &b = state.buffers[i];
-		ZN_ASSERT(b.size >= buffer_size);
-		ZN_ASSERT(b.size <= state.buffer_capacity);
-		ZN_ASSERT(b.size == state.buffer_size);
+		VOXEL_ASSERT(b.size >= buffer_size);
+		VOXEL_ASSERT(b.size <= state.buffer_capacity);
+		VOXEL_ASSERT(b.size == state.buffer_size);
 		if (b.data != nullptr && !b.is_binding) {
-			ZN_ASSERT(b.buffer_data_index < state.buffer_datas.size());
+			VOXEL_ASSERT(b.buffer_data_index < state.buffer_datas.size());
 			const BufferData &bd = state.buffer_datas[b.buffer_data_index];
-			ZN_ASSERT(b.size <= bd.capacity);
+			VOXEL_ASSERT(b.size <= bd.capacity);
 		}
 	}
 #endif
@@ -476,7 +476,7 @@ void Runtime::generate_set(
 
 		for (unsigned int i = 0; i < op_info.constant_fill_count; ++i) {
 			const ExecutionMap::ConstantFill &cf = constant_fills[constant_fill_index];
-			ZN_ASSERT(cf.data != nullptr);
+			VOXEL_ASSERT(cf.data != nullptr);
 			for (unsigned int j = 0; j < state.buffer_size; ++j) {
 				cf.data[j] = cf.value;
 			}
@@ -499,7 +499,7 @@ void Runtime::generate_set(
 		Span<const uint8_t> op_params = read_params(operations, pc);
 
 		// TODO Buffers will stay bound if this error occurs!
-		ZN_ASSERT_RETURN(node_type.process_buffer_func != nullptr);
+		VOXEL_ASSERT_RETURN(node_type.process_buffer_func != nullptr);
 		ProcessBufferContext ctx(op_inputs, op_outputs, op_params, buffers, p_execution_map != nullptr);
 		node_type.process_buffer_func(ctx);
 
@@ -519,13 +519,13 @@ void Runtime::generate_set(
 }
 
 void Runtime::analyze_range(State &state, Span<const math::Interval> p_inputs) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 #ifdef TOOLS_ENABLED
 	ERR_FAIL_COND(state.ranges.size() != _program.buffer_count);
 #endif
 
-	ZN_ASSERT_RETURN(p_inputs.size() == _program.inputs.size());
+	VOXEL_ASSERT_RETURN(p_inputs.size() == _program.inputs.size());
 
 	Span<math::Interval> ranges = to_span(state.ranges);
 	Span<Buffer> buffers = to_span(state.buffers);
@@ -561,13 +561,13 @@ void Runtime::analyze_range(State &state, Span<const math::Interval> p_inputs) c
 
 		Span<const uint8_t> op_params = read_params(operations, pc);
 
-		ZN_ASSERT_RETURN(node_type.range_analysis_func != nullptr);
+		VOXEL_ASSERT_RETURN(node_type.range_analysis_func != nullptr);
 		RangeAnalysisContext ctx(op_inputs, op_outputs, op_params, ranges, buffers);
 		node_type.range_analysis_func(ctx);
 
 #ifdef VOXEL_DEBUG_GRAPH_PROG_SENTINEL
 		// If this fails, the program is ill-formed
-		ZN_ASSERT(read<uint16_t>(_program, pc) == VOXEL_DEBUG_GRAPH_PROG_SENTINEL);
+		VOXEL_ASSERT(read<uint16_t>(_program, pc) == VOXEL_DEBUG_GRAPH_PROG_SENTINEL);
 #endif
 	}
 }
@@ -639,4 +639,4 @@ bool Runtime::try_get_output_port_address(ProgramGraph::PortLocation port, uint1
 	return true;
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

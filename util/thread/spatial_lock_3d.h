@@ -1,5 +1,5 @@
-#ifndef ZN_SPATIAL_LOCK_3D_H
-#define ZN_SPATIAL_LOCK_3D_H
+#ifndef VOXEL_SPATIAL_LOCK_3D_H
+#define VOXEL_SPATIAL_LOCK_3D_H
 
 #include "../containers/std_vector.h"
 #include "../math/box_bounds_3i.h"
@@ -9,10 +9,10 @@
 #include "thread.h"
 
 #ifdef TOOLS_ENABLED
-#define ZN_SPATIAL_LOCK_3D_CHECKS
+#define VOXEL_SPATIAL_LOCK_3D_CHECKS
 #endif
 
-namespace zylann {
+namespace voxel {
 
 // Locking on a large voxel data structure can be done with this, instead of putting RWLocks on every chunk or
 // every octree node. This also reduces the amount of required mutexes considerably (that matters on some platforms with
@@ -34,7 +34,7 @@ public:
 	struct Box {
 		BoxBounds3i bounds;
 		Mode mode;
-#ifdef ZN_SPATIAL_LOCK_3D_CHECKS
+#ifdef VOXEL_SPATIAL_LOCK_3D_CHECKS
 		Thread::ID thread_id;
 #endif
 	};
@@ -42,7 +42,7 @@ public:
 	SpatialLock3D();
 
 	~SpatialLock3D() {
-		ZN_ASSERT_RETURN(_boxes.size() == 0);
+		VOXEL_ASSERT_RETURN(_boxes.size() == 0);
 	}
 
 	bool try_lock_read(const BoxBounds3i &box) {
@@ -51,7 +51,7 @@ public:
 			_boxes.push_back(
 					Box{ box,
 						 MODE_READ,
-#ifdef ZN_SPATIAL_LOCK_3D_CHECKS
+#ifdef VOXEL_SPATIAL_LOCK_3D_CHECKS
 						 Thread::get_caller_id()
 #endif
 					}
@@ -80,7 +80,7 @@ public:
 			_boxes.push_back(
 					Box{ box,
 						 MODE_WRITE,
-#ifdef ZN_SPATIAL_LOCK_3D_CHECKS
+#ifdef VOXEL_SPATIAL_LOCK_3D_CHECKS
 						 Thread::get_caller_id()
 #endif
 					}
@@ -134,13 +134,13 @@ public:
 
 private:
 	bool can_lock_for_read(const BoxBounds3i &box) {
-#ifdef ZN_SPATIAL_LOCK_3D_CHECKS
+#ifdef VOXEL_SPATIAL_LOCK_3D_CHECKS
 		const Thread::ID thread_id = Thread::get_caller_id();
 #endif
 
 		for (unsigned int i = 0; i < _boxes.size(); ++i) {
 			const Box &existing_box = _boxes[i];
-#ifdef ZN_SPATIAL_LOCK_3D_CHECKS
+#ifdef VOXEL_SPATIAL_LOCK_3D_CHECKS
 			// Each thread can lock only one box at a time, otherwise there can be deadlocks depending on the order of
 			// locks. For example:
 			// - Thread 1 locks A
@@ -150,7 +150,7 @@ private:
 			//   This is a deadlock.
 			// Note: this is not true if threads only lock for reading, but if we didn't ever write we'd not use locks.
 			// Note: this is also not true if threads use `try_lock` instead!
-			ZN_ASSERT_RETURN_V_MSG(
+			VOXEL_ASSERT_RETURN_V_MSG(
 					existing_box.thread_id != thread_id, false, "Locking two areas from the same threads is not allowed"
 			);
 #endif
@@ -163,15 +163,15 @@ private:
 	}
 
 	bool can_lock_for_write(const BoxBounds3i &box) {
-#ifdef ZN_SPATIAL_LOCK_3D_CHECKS
+#ifdef VOXEL_SPATIAL_LOCK_3D_CHECKS
 		const Thread::ID thread_id = Thread::get_caller_id();
 #endif
 
 		for (unsigned int i = 0; i < _boxes.size(); ++i) {
 			const Box &existing_box = _boxes[i];
 
-#ifdef ZN_SPATIAL_LOCK_3D_CHECKS
-			ZN_ASSERT_RETURN_V_MSG(
+#ifdef VOXEL_SPATIAL_LOCK_3D_CHECKS
+			VOXEL_ASSERT_RETURN_V_MSG(
 					existing_box.thread_id != thread_id, false, "Locking two areas from the same threads is not allowed"
 			);
 #endif
@@ -206,6 +206,6 @@ private:
 	Semaphore _semaphore;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SPATIAL_LOCK_3D_H
+#endif // VOXEL_SPATIAL_LOCK_3D_H

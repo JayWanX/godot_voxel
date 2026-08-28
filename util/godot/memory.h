@@ -1,15 +1,15 @@
-#ifndef ZN_GODOT_MEMORY_H
-#define ZN_GODOT_MEMORY_H
+#ifndef VOXEL_GODOT_MEMORY_H
+#define VOXEL_GODOT_MEMORY_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/os/memory.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/core/memory.hpp>
 #endif
 
 #include <memory>
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 /*// Creates a shared_ptr which will always use Godot's allocation functions
 template <typename T>
@@ -36,6 +36,6 @@ ObjectUniquePtr<T> make_unique() {
 	return ObjectUniquePtr<T>(memnew(T));
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_MEMORY_H
+#endif // VOXEL_GODOT_MEMORY_H

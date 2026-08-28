@@ -1,7 +1,7 @@
 #include "format.h"
 #include "../io/std_string_text_writer.h"
 
-namespace zylann {
+namespace voxel {
 
 #ifdef DEV_ENABLED
 
@@ -48,4 +48,4 @@ StdString to_hex_table(Span<const uint8_t> data) {
 
 #endif
 
-} // namespace zylann
+} // namespace voxel

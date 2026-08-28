@@ -6,7 +6,7 @@
 #include "../util/thread/spatial_lock_3d.h"
 #include "voxel_data_map.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Stores blocks of voxel data in a finite grid.
 // This is used as temporary storage for some operations, to avoid holding exclusive locks on maps for too long.
@@ -29,7 +29,7 @@ public:
 			// Will be referenced for operations, assuming its lifetime is equal or greater than the grid
 			SpatialLock3D &spatial_lock
 	) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		create(blocks_box.size, map.get_block_size());
 
 		_offset_in_blocks = blocks_box.position;
@@ -89,36 +89,36 @@ public:
 	};
 
 	inline void lock_read() const {
-		ZN_ASSERT(_spatial_lock != nullptr);
-		ZN_ASSERT(!_locked);
+		VOXEL_ASSERT(_spatial_lock != nullptr);
+		VOXEL_ASSERT(!_locked);
 		_spatial_lock->lock_read(BoxBounds3i::from_position_size(_offset_in_blocks, _size_in_blocks));
 		_locked = true;
 	}
 
 	inline void unlock_read() const {
-		ZN_ASSERT(_spatial_lock != nullptr);
-		ZN_ASSERT(_locked);
+		VOXEL_ASSERT(_spatial_lock != nullptr);
+		VOXEL_ASSERT(_locked);
 		_spatial_lock->unlock_read(BoxBounds3i::from_position_size(_offset_in_blocks, _size_in_blocks));
 		_locked = false;
 	}
 
 	inline void lock_write() {
-		ZN_ASSERT(_spatial_lock != nullptr);
-		ZN_ASSERT(!_locked);
+		VOXEL_ASSERT(_spatial_lock != nullptr);
+		VOXEL_ASSERT(!_locked);
 		_spatial_lock->lock_write(BoxBounds3i::from_position_size(_offset_in_blocks, _size_in_blocks));
 		_locked = true;
 	}
 
 	inline void unlock_write() {
-		ZN_ASSERT(_spatial_lock != nullptr);
-		ZN_ASSERT(_locked);
+		VOXEL_ASSERT(_spatial_lock != nullptr);
+		VOXEL_ASSERT(_locked);
 		_spatial_lock->unlock_write(BoxBounds3i::from_position_size(_offset_in_blocks, _size_in_blocks));
 		_locked = false;
 	}
 
 	inline bool try_get_voxel_f(Vector3i pos, float &out_value, VoxelBuffer::ChannelId channel) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(_locked);
+		VOXEL_ASSERT(_locked);
 #endif
 		const Vector3i bpos = (pos >> _block_size_po2) - _logical_offset_in_blocks;
 		if (!is_valid_relative_block_position(bpos)) {
@@ -188,7 +188,7 @@ public:
 	// }
 
 	inline void clear() {
-		ZN_ASSERT(!_locked);
+		VOXEL_ASSERT(!_locked);
 		_blocks.clear();
 		_size_in_blocks = Vector3i();
 		_spatial_lock = nullptr;
@@ -248,7 +248,7 @@ private:
 	}
 
 	inline void create(Vector3i size, unsigned int block_size) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		_blocks.clear();
 		_blocks.resize(Vector3iUtil::get_volume_u64(size));
 		_size_in_blocks = size;
@@ -269,18 +269,18 @@ private:
 	}
 
 	inline void set_block(Vector3i position, std::shared_ptr<VoxelBuffer> block) {
-		ZN_ASSERT_RETURN(is_valid_block_position(position));
+		VOXEL_ASSERT_RETURN(is_valid_block_position(position));
 		position -= _offset_in_blocks;
 		const unsigned int index = Vector3iUtil::get_zxy_index(position, _size_in_blocks);
-		ZN_ASSERT(index < _blocks.size());
+		VOXEL_ASSERT(index < _blocks.size());
 		_blocks[index] = block;
 	}
 
 	inline VoxelBuffer *get_block(Vector3i position) {
-		ZN_ASSERT_RETURN_V(is_valid_block_position(position), nullptr);
+		VOXEL_ASSERT_RETURN_V(is_valid_block_position(position), nullptr);
 		position -= _offset_in_blocks;
 		const unsigned int index = Vector3iUtil::get_zxy_index(position, _size_in_blocks);
-		ZN_ASSERT(index < _blocks.size());
+		VOXEL_ASSERT(index < _blocks.size());
 		return _blocks[index].get();
 	}
 
@@ -302,6 +302,6 @@ private:
 	mutable bool _locked = false;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_DATA_GRID_H

@@ -5,9 +5,9 @@
 #include "../../util/godot/core/string.h"
 #include "../../util/memory/memory.h"
 
-ZN_GODOT_FORWARD_DECLARE(class RenderingDevice)
+VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice)
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct ComputeShaderInternal {
 	RID rid;
@@ -54,6 +54,6 @@ private:
 	ComputeShaderInternal _internal;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_COMPUTE_SHADER_H

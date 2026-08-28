@@ -5,7 +5,7 @@
 #include "../meshers/voxel_mesher.h"
 #include "../util/memory/memory.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Shared dependency needed by some asynchronous tasks.
 // It may be passed with a shared_ptr.
@@ -27,6 +27,6 @@ struct MeshingDependency {
 	}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESHING_DEPENDENCY_H

@@ -7,10 +7,10 @@
 #include "../../util/godot/classes/time.h"
 #include "../../util/string/format.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
-#ifdef ZN_PROFILER_ENABLED
+#ifdef VOXEL_PROFILER_ENABLED
 std::atomic_int g_task_count[VoxelGeneratorMultipassCB::MAX_SUBPASSES] = { 0 };
 const char *g_profiling_task_names[VoxelGeneratorMultipassCB::MAX_SUBPASSES] = {
 	"GenerateColumnMultipassTasks_subpass0", //
@@ -44,19 +44,19 @@ GenerateColumnMultipassTask::GenerateColumnMultipassTask(
 	_block_size = p_block_size;
 	_subpass_index = p_subpass_index;
 
-	ZN_ASSERT(p_generator.is_valid());
+	VOXEL_ASSERT(p_generator.is_valid());
 	_generator = p_generator;
 
-	ZN_ASSERT(p_generator_internal != nullptr);
+	VOXEL_ASSERT(p_generator_internal != nullptr);
 	_generator_internal = p_generator_internal;
 
-	ZN_ASSERT(p_caller != nullptr);
+	VOXEL_ASSERT(p_caller != nullptr);
 	_caller_task = p_caller;
 	_caller_task_dependency_counter = p_caller_dependency_count;
 
-#ifdef ZN_PROFILER_ENABLED
+#ifdef VOXEL_PROFILER_ENABLED
 	int64_t v = ++g_task_count[_subpass_index];
-	ZN_PROFILE_PLOT(g_profiling_task_names[_subpass_index], v);
+	VOXEL_PROFILE_PLOT(g_profiling_task_names[_subpass_index], v);
 #endif
 
 	// println(format("K {} {} {} {} {}", int(_subpass_index), _column_position.x, 0, _column_position.y,
@@ -64,11 +64,11 @@ GenerateColumnMultipassTask::GenerateColumnMultipassTask(
 }
 
 GenerateColumnMultipassTask::~GenerateColumnMultipassTask() {
-	ZN_ASSERT(_caller_task == nullptr);
+	VOXEL_ASSERT(_caller_task == nullptr);
 
-#ifdef ZN_PROFILER_ENABLED
+#ifdef VOXEL_PROFILER_ENABLED
 	int64_t v = --g_task_count[_subpass_index];
-	ZN_PROFILE_PLOT(g_profiling_task_names[_subpass_index], v);
+	VOXEL_PROFILE_PLOT(g_profiling_task_names[_subpass_index], v);
 #endif
 
 	// println(format("J {} {} {} {} {}", int(_subpass_index), _column_position.x, 0, _column_position.y,
@@ -76,9 +76,9 @@ GenerateColumnMultipassTask::~GenerateColumnMultipassTask() {
 }
 
 void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT(_generator.is_valid());
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT(_generator.is_valid());
 
 	Map &map = _generator_internal->map;
 	BufferedTaskScheduler &task_scheduler = BufferedTaskScheduler::get_for_current_thread();
@@ -124,9 +124,9 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 	if (_subpass_index == 0) {
 		// The first subpass can't depend on another subpass
-		ZN_ASSERT(pass.dependency_extents == 0);
+		VOXEL_ASSERT(pass.dependency_extents == 0);
 	} else {
-		ZN_ASSERT(pass.dependency_extents > 0);
+		VOXEL_ASSERT(pass.dependency_extents > 0);
 	}
 
 	const Box2i neighbors_box = Box2i::from_min_max(
@@ -143,7 +143,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 	// Lock region we are going to process
 	{
-		ZN_PROFILE_SCOPE_NAMED("Region");
+		VOXEL_PROFILE_SCOPE_NAMED("Region");
 
 		// Blocking until available causes bottlenecks. Not always big ones, but enough to be very noticeable in the
 		// profiler.
@@ -158,7 +158,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 		// Fetch columns from map
 		{
-			ZN_PROFILE_SCOPE_NAMED("Fetch columns");
+			VOXEL_PROFILE_SCOPE_NAMED("Fetch columns");
 
 			// TODO We don't create new columns from here, could use a shared lock?
 			MutexLock mlock(map.mutex);
@@ -184,7 +184,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 		// Check loading levels
 		{
-			ZN_PROFILE_SCOPE_NAMED("Check levels");
+			VOXEL_PROFILE_SCOPE_NAMED("Check levels");
 
 			Vector2i cpos;
 
@@ -212,13 +212,13 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 				}
 			}
 
-			// ZN_ASSERT(!has_duplicate(to_span_const(columns)));
+			// VOXEL_ASSERT(!has_duplicate(to_span_const(columns)));
 
 			unsigned int i = 0;
 			for (cpos.y = cpos_min.y; cpos.y < cpos_max.y; ++cpos.y) {
 				for (cpos.x = cpos_min.x; cpos.x < cpos_max.x; ++cpos.x) {
 					Column *column = columns[i];
-					ZN_ASSERT(column != nullptr);
+					VOXEL_ASSERT(column != nullptr);
 
 					// We want all blocks in the neighborhood to be at least at the previous subpass before we can
 					// run the current subpass
@@ -248,7 +248,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 							}
 							++(*dependency_counter);
 
-							GenerateColumnMultipassTask *subtask = ZN_NEW(GenerateColumnMultipassTask(
+							GenerateColumnMultipassTask *subtask = VOXEL_NEW(GenerateColumnMultipassTask(
 									cpos,
 									_format,
 									_block_size,
@@ -288,10 +288,10 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 			return;
 
 		} else {
-			ZN_PROFILE_SCOPE_NAMED("Run pass");
+			VOXEL_PROFILE_SCOPE_NAMED("Run pass");
 			// We can run the pass
 
-			ZN_ASSERT(main_column != nullptr);
+			VOXEL_ASSERT(main_column != nullptr);
 
 			if (main_column->subpass_index == prev_subpass_index) {
 				const int column_height_blocks = _generator_internal->column_height_blocks;
@@ -306,7 +306,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 				// Debug check
 				// const int subpass_completion_iterations = math::cubed(pass.dependency_extents * 2 + 1);
-				// ZN_ASSERT(main_block->subpass_iterations[_subpass_index] < subpass_completion_iterations);
+				// VOXEL_ASSERT(main_block->subpass_iterations[_subpass_index] < subpass_completion_iterations);
 
 				// The fact we split passes in two doesn't mean we should run the generator again each time. Instead, we
 				// may run the generator only on the first subpass referring to a given pass.
@@ -374,7 +374,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 void GenerateColumnMultipassTask::schedule_final_block_tasks(Column &column, BufferedTaskScheduler &task_scheduler) {
 	for (Block &block : column.blocks) {
 		if (block.final_pending_task != nullptr) {
-			ZN_ASSERT(block.final_pending_task != _caller_task);
+			VOXEL_ASSERT(block.final_pending_task != _caller_task);
 			task_scheduler.push_main_task(block.final_pending_task);
 			block.final_pending_task = nullptr;
 		}
@@ -382,10 +382,10 @@ void GenerateColumnMultipassTask::schedule_final_block_tasks(Column &column, Buf
 }
 
 void GenerateColumnMultipassTask::return_to_caller(bool success) {
-	ZN_ASSERT(_caller_task != nullptr);
-	ZN_ASSERT(_caller_task_dependency_counter != nullptr);
+	VOXEL_ASSERT(_caller_task != nullptr);
+	VOXEL_ASSERT(_caller_task_dependency_counter != nullptr);
 	const int counter = --(*_caller_task_dependency_counter);
-	ZN_ASSERT(counter >= 0);
+	VOXEL_ASSERT(counter >= 0);
 	if (!success) {
 		if (_caller_mp_task != nullptr) {
 			_caller_mp_task->_cancelled = true;
@@ -399,4 +399,4 @@ void GenerateColumnMultipassTask::return_to_caller(bool success) {
 	_caller_task = nullptr;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

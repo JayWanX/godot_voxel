@@ -1,7 +1,7 @@
-#ifndef ZN_PROFILING_H
-#define ZN_PROFILING_H
+#ifndef VOXEL_PROFILING_H
+#define VOXEL_PROFILING_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include "godot/core/version.h"
 
 #if GODOT_VERSION_MAJOR >= 4 && GODOT_VERSION_MINOR >= 6
@@ -17,36 +17,36 @@
 
 #include <tracy/Tracy.hpp>
 
-#define ZN_PROFILER_ENABLED
+#define VOXEL_PROFILER_ENABLED
 
-#define ZN_PROFILE_SCOPE() ZoneScoped
-#define ZN_PROFILE_SCOPE_NAMED(name) ZoneScopedN(name)
+#define VOXEL_PROFILE_SCOPE() ZoneScoped
+#define VOXEL_PROFILE_SCOPE_NAMED(name) ZoneScopedN(name)
 
 #ifdef GODOT_USE_TRACY
-#define ZN_PROFILE_MARK_FRAME()
+#define VOXEL_PROFILE_MARK_FRAME()
 #else
 // Only define our own frame tracking when Tracy is enabled from our own integration instead of Godot's.
-#define ZN_PROFILE_MARK_FRAME() FrameMark
+#define VOXEL_PROFILE_MARK_FRAME() FrameMark
 #endif
 
-#define ZN_PROFILE_SET_THREAD_NAME(name) tracy::SetThreadName(name)
-#define ZN_PROFILE_PLOT(name, number) TracyPlot(name, number)
-#define ZN_PROFILE_MESSAGE(message) TracyMessageL(message)
-#define ZN_PROFILE_MESSAGE_DYN(message, size) TracyMessage(message, size)
+#define VOXEL_PROFILE_SET_THREAD_NAME(name) tracy::SetThreadName(name)
+#define VOXEL_PROFILE_PLOT(name, number) TracyPlot(name, number)
+#define VOXEL_PROFILE_MESSAGE(message) TracyMessageL(message)
+#define VOXEL_PROFILE_MESSAGE_DYN(message, size) TracyMessage(message, size)
 
 #else
 
-#define ZN_PROFILE_SCOPE()
+#define VOXEL_PROFILE_SCOPE()
 // Name must be static const char* (usually string litteral)
-#define ZN_PROFILE_SCOPE_NAMED(name)
-#define ZN_PROFILE_MARK_FRAME()
-#define ZN_PROFILE_PLOT(name, number)
-#define ZN_PROFILE_MESSAGE(message)
+#define VOXEL_PROFILE_SCOPE_NAMED(name)
+#define VOXEL_PROFILE_MARK_FRAME()
+#define VOXEL_PROFILE_PLOT(name, number)
+#define VOXEL_PROFILE_MESSAGE(message)
 // Name must be const char*. An internal copy will be made so it can be temporary.
 // Size does not include the terminating character.
-#define ZN_PROFILE_MESSAGE_DYN(message, size)
+#define VOXEL_PROFILE_MESSAGE_DYN(message, size)
 // Name must be const char*. An internal copy will be made so it can be temporary.
-#define ZN_PROFILE_SET_THREAD_NAME(name)
+#define VOXEL_PROFILE_SET_THREAD_NAME(name)
 
 #endif
 
@@ -61,4 +61,4 @@ env_thirdparty.add_source_files(env.core_sources, ["#thirdparty/tracy/TracyClien
 ```
 */
 
-#endif // ZN_PROFILING_H
+#endif // VOXEL_PROFILING_H

@@ -6,7 +6,7 @@
 
 // Some common functions to vox importers
 
-namespace zylann::voxel::magica {
+namespace voxel::magica {
 
 Ref<Mesh> build_mesh(
 		const VoxelBuffer &voxels,
@@ -17,6 +17,6 @@ Ref<Mesh> build_mesh(
 		Vector3 p_offset
 );
 
-} // namespace zylann::voxel::magica
+} // namespace voxel::magica
 
 #endif // VOX_IMPORT_FUNCS_H

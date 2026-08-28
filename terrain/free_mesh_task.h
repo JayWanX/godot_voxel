@@ -6,7 +6,7 @@
 #include "../util/profiling.h"
 #include "../util/tasks/progressive_task_runner.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Had to resort to this in Godot4 because deleting meshes is particularly expensive,
 // because of the Vulkan allocator used by the renderer.
@@ -15,7 +15,7 @@ namespace zylann::voxel {
 // bit longer, assuming that mesh is no longer used. Then the execution of the task releases that reference.
 class FreeMeshTask : public IProgressiveTask {
 public:
-	static inline void try_add_and_destroy(zylann::godot::DirectMeshInstance &mi) {
+	static inline void try_add_and_destroy(voxel::godot::DirectMeshInstance &mi) {
 		const Mesh *mesh = mi.get_mesh_ptr();
 		if (mesh != nullptr && mesh->get_reference_count() == 1) {
 			// That instances holds the last reference to this mesh
@@ -25,9 +25,9 @@ public:
 	}
 
 	void run() override {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		if (_mesh->get_reference_count() > 1) {
-			ZN_PRINT_WARNING("Mesh has more than one ref left, task spreading will not be effective at smoothing "
+			VOXEL_PRINT_WARNING("Mesh has more than one ref left, task spreading will not be effective at smoothing "
 							 "destruction cost");
 		}
 		_mesh.unref();
@@ -35,8 +35,8 @@ public:
 
 private:
 	static void add(Ref<Mesh> mesh) {
-		ZN_ASSERT(mesh.is_valid());
-		FreeMeshTask *task = ZN_NEW(FreeMeshTask(mesh));
+		VOXEL_ASSERT(mesh.is_valid());
+		FreeMeshTask *task = VOXEL_NEW(FreeMeshTask(mesh));
 		VoxelEngine::get_singleton().push_main_thread_progressive_task(task);
 	}
 
@@ -45,6 +45,6 @@ private:
 	Ref<Mesh> _mesh;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_FREE_MESH_TASK_H

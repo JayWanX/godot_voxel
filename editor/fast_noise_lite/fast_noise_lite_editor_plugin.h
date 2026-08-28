@@ -1,19 +1,19 @@
-#ifndef ZN_FAST_NOISE_LITE_EDITOR_PLUGIN_H
-#define ZN_FAST_NOISE_LITE_EDITOR_PLUGIN_H
+#ifndef VOXEL_FAST_NOISE_LITE_EDITOR_PLUGIN_H
+#define VOXEL_FAST_NOISE_LITE_EDITOR_PLUGIN_H
 
 #include "../../util/godot/classes/editor_plugin.h"
 
-namespace zylann {
+namespace voxel {
 
-class ZN_NoiseAnalysisWindow;
+class VOXEL_NoiseAnalysisWindow;
 
-class ZN_FastNoiseLiteEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(ZN_FastNoiseLiteEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VOXEL_FastNoiseLiteEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VOXEL_FastNoiseLiteEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
-	ZN_FastNoiseLiteEditorPlugin();
+	VOXEL_FastNoiseLiteEditorPlugin();
 
 protected:
-	String _zn_get_plugin_name() const override;
+	String _voxel_get_plugin_name() const override;
 
 private:
 	void _notification(int p_what);
@@ -21,9 +21,9 @@ private:
 	// When compiling with GodotCpp, `_bind_methods` is not optional
 	static void _bind_methods() {}
 
-	ZN_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
+	VOXEL_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_FAST_NOISE_LITE_EDITOR_PLUGIN_H
+#endif // VOXEL_FAST_NOISE_LITE_EDITOR_PLUGIN_H

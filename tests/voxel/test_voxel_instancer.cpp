@@ -7,7 +7,7 @@
 #include "../../util/math/conv.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_instance_data_serialization() {
 	struct L {
@@ -58,15 +58,15 @@ void test_instance_data_serialization() {
 
 	StdVector<uint8_t> serialized_data;
 
-	ZN_TEST_ASSERT(serialize_instance_block_data(src_data, serialized_data));
+	VOXEL_TEST_ASSERT(serialize_instance_block_data(src_data, serialized_data));
 
 	InstanceBlockData dst_data;
-	ZN_TEST_ASSERT(deserialize_instance_block_data(dst_data, to_span_const(serialized_data)));
+	VOXEL_TEST_ASSERT(deserialize_instance_block_data(dst_data, to_span_const(serialized_data)));
 
 	// Compare blocks
-	ZN_TEST_ASSERT(src_data.layers.size() == dst_data.layers.size());
-	ZN_TEST_ASSERT(dst_data.position_range >= 0.f);
-	ZN_TEST_ASSERT(dst_data.position_range == src_data.position_range);
+	VOXEL_TEST_ASSERT(src_data.layers.size() == dst_data.layers.size());
+	VOXEL_TEST_ASSERT(dst_data.position_range >= 0.f);
+	VOXEL_TEST_ASSERT(dst_data.position_range == src_data.position_range);
 
 	const float distance_error = math::max(src_data.position_range, InstanceBlockData::POSITION_RANGE_MINIMUM) /
 			float(InstanceBlockData::POSITION_RESOLUTION);
@@ -76,14 +76,14 @@ void test_instance_data_serialization() {
 		const InstanceBlockData::LayerData &src_layer = src_data.layers[layer_index];
 		const InstanceBlockData::LayerData &dst_layer = dst_data.layers[layer_index];
 
-		ZN_TEST_ASSERT(src_layer.id == dst_layer.id);
+		VOXEL_TEST_ASSERT(src_layer.id == dst_layer.id);
 		if (src_layer.scale_max - src_layer.scale_min < InstanceBlockData::SIMPLE_11B_V1_SCALE_RANGE_MINIMUM) {
-			ZN_TEST_ASSERT(src_layer.scale_min == dst_layer.scale_min);
+			VOXEL_TEST_ASSERT(src_layer.scale_min == dst_layer.scale_min);
 		} else {
-			ZN_TEST_ASSERT(src_layer.scale_min == dst_layer.scale_min);
-			ZN_TEST_ASSERT(src_layer.scale_max == dst_layer.scale_max);
+			VOXEL_TEST_ASSERT(src_layer.scale_min == dst_layer.scale_min);
+			VOXEL_TEST_ASSERT(src_layer.scale_max == dst_layer.scale_max);
 		}
-		ZN_TEST_ASSERT(src_layer.instances.size() == dst_layer.instances.size());
+		VOXEL_TEST_ASSERT(src_layer.instances.size() == dst_layer.instances.size());
 
 		const float scale_error =
 				math::max(
@@ -98,7 +98,7 @@ void test_instance_data_serialization() {
 			const InstanceBlockData::InstanceData &src_instance = src_layer.instances[instance_index];
 			const InstanceBlockData::InstanceData &dst_instance = dst_layer.instances[instance_index];
 
-			ZN_TEST_ASSERT(
+			VOXEL_TEST_ASSERT(
 					math::distance(src_instance.transform.origin, dst_instance.transform.origin) <= distance_error
 			);
 
@@ -107,7 +107,7 @@ void test_instance_data_serialization() {
 
 			const Vector3 src_scale = src_basis.get_scale();
 			const Vector3 dst_scale = src_basis.get_scale();
-			ZN_TEST_ASSERT(src_scale.distance_to(dst_scale) <= scale_error);
+			VOXEL_TEST_ASSERT(src_scale.distance_to(dst_scale) <= scale_error);
 
 			// Had to normalize here because Godot doesn't want to give you a Quat if the basis is scaled (even
 			// uniformly)
@@ -117,10 +117,10 @@ void test_instance_data_serialization() {
 			const float rot_dy = Math::abs(src_rot.y - dst_rot.y);
 			const float rot_dz = Math::abs(src_rot.z - dst_rot.z);
 			const float rot_dw = Math::abs(src_rot.w - dst_rot.w);
-			ZN_TEST_ASSERT(rot_dx <= rotation_error);
-			ZN_TEST_ASSERT(rot_dy <= rotation_error);
-			ZN_TEST_ASSERT(rot_dz <= rotation_error);
-			ZN_TEST_ASSERT(rot_dw <= rotation_error);
+			VOXEL_TEST_ASSERT(rot_dx <= rotation_error);
+			VOXEL_TEST_ASSERT(rot_dy <= rotation_error);
+			VOXEL_TEST_ASSERT(rot_dz <= rotation_error);
+			VOXEL_TEST_ASSERT(rot_dw <= rotation_error);
 		}
 	}
 }
@@ -184,7 +184,7 @@ void test_instance_generator_material_filter_issue774() {
 		PackedFloat32Array custom1;
 		custom1.resize(2 * attribs.size());
 		Span<const float> attribs_f = to_span(attribs).reinterpret_cast_to<const float>();
-		zylann::godot::copy_to(custom1, attribs_f);
+		voxel::godot::copy_to(custom1, attribs_f);
 
 		mesh_arrays.resize(ArrayMesh::ARRAY_MAX);
 		mesh_arrays[ArrayMesh::ARRAY_VERTEX] = vertices;
@@ -216,7 +216,7 @@ void test_instance_generator_material_filter_issue774() {
 			Ref<VoxelGenerator>()
 	);
 
-	ZN_TEST_ASSERT(transforms.size() > 0);
+	VOXEL_TEST_ASSERT(transforms.size() > 0);
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

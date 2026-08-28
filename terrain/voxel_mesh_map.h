@@ -6,7 +6,7 @@
 #include "../util/containers/std_vector.h"
 #include "../util/macros.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Stores meshes and colliders in an infinite sparse grid of chunks (aka blocks).
 template <typename MeshBlock_T>
@@ -105,7 +105,7 @@ public:
 			if (block == nullptr) {
 				ERR_PRINT("Unexpected nullptr in VoxelMap::clear()");
 			} else {
-				ZN_DELETE(block);
+				VOXEL_DELETE(block);
 			}
 		}
 		_blocks.clear();
@@ -173,14 +173,14 @@ private:
 	static void queue_free_mesh_block(MeshBlock_T *block) {
 		// We spread this out because of physics
 		// TODO Could it be enough to do both render and physic deallocation with the task in ~MeshBlock_T()?
-		struct FreeMeshBlockTask : public zylann::ITimeSpreadTask {
+		struct FreeMeshBlockTask : public voxel::ITimeSpreadTask {
 			void run(TimeSpreadTaskContext &ctx) override {
-				ZN_DELETE(block);
+				VOXEL_DELETE(block);
 			}
 			MeshBlock_T *block = nullptr;
 		};
 		ERR_FAIL_COND(block == nullptr);
-		FreeMeshBlockTask *task = ZN_NEW(FreeMeshBlockTask);
+		FreeMeshBlockTask *task = VOXEL_NEW(FreeMeshBlockTask);
 		task->block = block;
 		VoxelEngine::get_singleton().push_main_thread_time_spread_task(task);
 	}
@@ -197,6 +197,6 @@ private:
 	mutable MeshBlock_T *_last_accessed_block;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESH_BLOCK_MAP_H

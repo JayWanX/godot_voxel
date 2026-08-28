@@ -7,14 +7,14 @@
 #include "../compressed_data.h"
 #include "connection.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
 #include <string_view>
 #include <unordered_set>
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace sqlite;
 
@@ -41,20 +41,20 @@ VoxelStreamSQLite::CoordinateFormat to_exposed_coordinate_format(BlockLocation::
 // later `begin_transaction` on that connection would fail with "cannot start a transaction within a transaction".
 bool recover_after_failed_transaction(sqlite::Connection &con) {
 	if (con.rollback_transaction()) {
-		ZN_PRINT_VERBOSE("VoxelStreamSQLite: recovered connection after a failed transaction");
+		VOXEL_PRINT_VERBOSE("VoxelStreamSQLite: recovered connection after a failed transaction");
 		return true;
 	}
-	ZN_PRINT_ERROR("VoxelStreamSQLite: could not recover connection after a failed transaction, dropping it");
+	VOXEL_PRINT_ERROR("VoxelStreamSQLite: could not recover connection after a failed transaction, dropping it");
 	return false;
 }
 
 bool validate_range(Vector3i pos, unsigned int lod_index, const Box3i coordinate_range, unsigned int lod_count) {
 	if (!coordinate_range.contains(pos)) {
-		ZN_PRINT_ERROR(format("Block position {} is outside of supported range {}", pos, coordinate_range));
+		VOXEL_PRINT_ERROR(format("Block position {} is outside of supported range {}", pos, coordinate_range));
 		return false;
 	}
 	if (lod_index >= lod_count) {
-		ZN_PRINT_ERROR(format("Block LOD {} is outside of supported range [0..{})", lod_index, lod_count));
+		VOXEL_PRINT_ERROR(format("Block LOD {} is outside of supported range [0..{})", lod_index, lod_count));
 		return false;
 	}
 	return true;
@@ -65,20 +65,20 @@ bool validate_range(Vector3i pos, unsigned int lod_index, const Box3i coordinate
 VoxelStreamSQLite::VoxelStreamSQLite() {}
 
 VoxelStreamSQLite::~VoxelStreamSQLite() {
-	ZN_PRINT_VERBOSE("~VoxelStreamSQLite");
+	VOXEL_PRINT_VERBOSE("~VoxelStreamSQLite");
 	if (!_globalized_connection_path.empty() && _cache.get_indicative_block_count() > 0) {
-		ZN_PRINT_VERBOSE("~VoxelStreamSQLite flushy flushy");
+		VOXEL_PRINT_VERBOSE("~VoxelStreamSQLite flushy flushy");
 		if (!flush_cache()) {
 			// Last chance to save that data: past this point it is lost.
-			ZN_PRINT_ERROR("VoxelStreamSQLite: final flush failed in destructor, unsaved cached data was lost");
+			VOXEL_PRINT_ERROR("VoxelStreamSQLite: final flush failed in destructor, unsaved cached data was lost");
 		}
-		ZN_PRINT_VERBOSE("~VoxelStreamSQLite flushy done");
+		VOXEL_PRINT_VERBOSE("~VoxelStreamSQLite flushy done");
 	}
 	for (auto it = _connection_pool.begin(); it != _connection_pool.end(); ++it) {
 		delete *it;
 	}
 	_connection_pool.clear();
-	ZN_PRINT_VERBOSE("~VoxelStreamSQLite done");
+	VOXEL_PRINT_VERBOSE("~VoxelStreamSQLite done");
 }
 
 void VoxelStreamSQLite::set_database_path(String path) {
@@ -97,7 +97,7 @@ void VoxelStreamSQLite::set_database_path(String path) {
 			if (!flush_cache_to_connection(&con)) {
 				// The connection is local and destroyed right after, so there is nothing to recover, but the
 				// data could not be saved to the previous database before switching away from it.
-				ZN_PRINT_ERROR(
+				VOXEL_PRINT_ERROR(
 						"VoxelStreamSQLite: failed to save cached data to the previous database before "
 						"changing the path"
 				);
@@ -112,7 +112,7 @@ void VoxelStreamSQLite::set_database_path(String path) {
 
 	_user_specified_connection_path = path;
 	// To support Godot shortcuts like `user://` and `res://` (though the latter won't work on exported builds)
-	_globalized_connection_path = zylann::godot::to_std_string(ProjectSettings::get_singleton()->globalize_path(path));
+	_globalized_connection_path = voxel::godot::to_std_string(ProjectSettings::get_singleton()->globalize_path(path));
 
 	// Don't actually open anything here. We'll do it only when necessary
 }
@@ -157,7 +157,7 @@ static void set_result_codes(
 }
 
 void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Getting connection first to allow the key cache to load if enabled.
 	// This should be quick after the first call because the connection is cached.
@@ -203,7 +203,7 @@ void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 	}
 
 	if (con->begin_transaction() == false) {
-		ZN_PRINT_ERROR("VoxelStreamSQLite: failed to begin transaction, blocks were not loaded");
+		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to begin transaction, blocks were not loaded");
 		set_result_codes(p_blocks, blocks_to_load, RESULT_ERROR);
 		con_scope.broken = !recover_after_failed_transaction(*con);
 		return;
@@ -232,7 +232,7 @@ void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 	if (con->end_transaction() == false) {
 		// The transaction only read data, and results were already copied out above, so they remain valid.
 		// Only the connection needs attention.
-		ZN_PRINT_ERROR("VoxelStreamSQLite: failed to end read transaction, recovering the connection");
+		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to end read transaction, recovering the connection");
 		con_scope.broken = !recover_after_failed_transaction(*con);
 	}
 }
@@ -276,7 +276,7 @@ void VoxelStreamSQLite::save_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 		if (!flush_cache()) {
 			// Recoverable: blocks stay cached (unless the commit itself failed, which reported above), and the
 			// next save that grows the cache past the threshold will retry.
-			ZN_PRINT_WARNING("VoxelStreamSQLite: automatic cache flush did not complete, will retry later");
+			VOXEL_PRINT_WARNING("VoxelStreamSQLite: automatic cache flush did not complete, will retry later");
 		}
 	}
 }
@@ -288,7 +288,7 @@ bool VoxelStreamSQLite::supports_instance_blocks() const {
 }
 
 void VoxelStreamSQLite::load_instance_blocks(Span<VoxelStream::InstancesQueryData> out_blocks) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// TODO Get block size from database
 	// const int bs_po2 = constants::DEFAULT_BLOCK_SIZE_PO2;
@@ -327,7 +327,7 @@ void VoxelStreamSQLite::load_instance_blocks(Span<VoxelStream::InstancesQueryDat
 	ScopeRecycle con_scope(this, con);
 
 	if (con->begin_transaction() == false) {
-		ZN_PRINT_ERROR("VoxelStreamSQLite: failed to begin transaction, instance blocks were not loaded");
+		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to begin transaction, instance blocks were not loaded");
 		set_result_codes(out_blocks, blocks_to_load, RESULT_ERROR);
 		con_scope.broken = !recover_after_failed_transaction(*con);
 		return;
@@ -367,7 +367,7 @@ void VoxelStreamSQLite::load_instance_blocks(Span<VoxelStream::InstancesQueryDat
 	if (con->end_transaction() == false) {
 		// The transaction only read data, and results were already copied out above, so they remain valid.
 		// Only the connection needs attention.
-		ZN_PRINT_ERROR("VoxelStreamSQLite: failed to end read transaction, recovering the connection");
+		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to end read transaction, recovering the connection");
 		con_scope.broken = !recover_after_failed_transaction(*con);
 	}
 }
@@ -409,7 +409,7 @@ void VoxelStreamSQLite::save_instance_blocks(Span<VoxelStream::InstancesQueryDat
 		if (!flush_cache()) {
 			// Recoverable: blocks stay cached (unless the commit itself failed, which reported above), and the
 			// next save that grows the cache past the threshold will retry.
-			ZN_PRINT_WARNING("VoxelStreamSQLite: automatic cache flush did not complete, will retry later");
+			VOXEL_PRINT_WARNING("VoxelStreamSQLite: automatic cache flush did not complete, will retry later");
 		}
 	}
 }
@@ -417,7 +417,7 @@ void VoxelStreamSQLite::save_instance_blocks(Span<VoxelStream::InstancesQueryDat
 #endif
 
 void VoxelStreamSQLite::load_all_blocks(FullLoadingResult &result) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const ConnectionResult con_res = get_connection();
 
@@ -451,7 +451,7 @@ void VoxelStreamSQLite::load_all_blocks(FullLoadingResult &result) {
 			Context *ctx = reinterpret_cast<Context *>(callback_data);
 
 			if (voxel_data.size() == 0 && instances_data.size() == 0) {
-				ZN_PRINT_VERBOSE(format(
+				VOXEL_PRINT_VERBOSE(format(
 						"Unexpected empty voxel data and instances data at {} lod {}", location.position, location.lod
 				));
 				return;
@@ -520,7 +520,7 @@ bool VoxelStreamSQLite::flush_cache() {
 
 void VoxelStreamSQLite::flush() {
 	if (!flush_cache()) {
-		ZN_PRINT_ERROR("VoxelStreamSQLite: flush did not complete");
+		VOXEL_PRINT_ERROR("VoxelStreamSQLite: flush did not complete");
 	}
 }
 
@@ -528,14 +528,14 @@ void VoxelStreamSQLite::flush() {
 // Returns false if the transaction failed, in which case the connection may need to be recovered before reuse (see
 // `recover_after_failed_transaction`).
 bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connection) {
-	ZN_PROFILE_SCOPE();
-	ZN_PRINT_VERBOSE(format("VoxelStreamSQLite: Flushing cache ({} elements)", _cache.get_indicative_block_count()));
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_PRINT_VERBOSE(format("VoxelStreamSQLite: Flushing cache ({} elements)", _cache.get_indicative_block_count()));
 
 	ERR_FAIL_COND_V(p_connection == nullptr, false);
 	if (p_connection->begin_transaction() == false) {
 		// Nothing was written or dropped at this point: cached blocks are retained, so a later flush will retry
 		// them. Detailed reporting is left to callers, which know their context.
-		ZN_PRINT_VERBOSE("VoxelStreamSQLite: could not begin flush transaction, keeping cached blocks");
+		VOXEL_PRINT_VERBOSE("VoxelStreamSQLite: could not begin flush transaction, keeping cached blocks");
 		return false;
 	}
 
@@ -559,7 +559,7 @@ bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connecti
 				  coordinate_range,
 				  compression_mode,
 				  lod_count](VoxelStreamCache::Block &block) {
-		ZN_ASSERT_RETURN(validate_range(block.position, block.lod, coordinate_range, lod_count));
+		VOXEL_ASSERT_RETURN(validate_range(block.position, block.lod, coordinate_range, lod_count));
 
 		BlockLocation loc;
 		loc.position = block.position;
@@ -598,7 +598,7 @@ bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connecti
 	if (p_connection->end_transaction() == false) {
 		// The cache was already drained into this transaction, so these blocks are dropped without being saved.
 		// This is the lossy case, unlike a failed begin above.
-		ZN_PRINT_ERROR("VoxelStreamSQLite: failed to commit flush transaction, unsaved cached blocks were dropped");
+		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to commit flush transaction, unsaved cached blocks were dropped");
 		return false;
 	}
 
@@ -612,7 +612,7 @@ VoxelStreamSQLite::ConnectionResult VoxelStreamSQLite::get_connection() {
 		MutexLock mlock(_connection_mutex);
 
 		if (_globalized_connection_path.empty()) {
-			ZN_PRINT_WARNING_ONCE("The database path hasn't been set.")
+			VOXEL_PRINT_WARNING_ONCE("The database path hasn't been set.")
 			return { nullptr, ConnectionResult::NOT_CONFIGURED };
 		}
 		if (_connection_pool.size() != 0) {
@@ -626,7 +626,7 @@ VoxelStreamSQLite::ConnectionResult VoxelStreamSQLite::get_connection() {
 	}
 
 	if (fpath.empty()) {
-		ZN_PRINT_WARNING_ONCE("The database path hasn't been set.")
+		VOXEL_PRINT_WARNING_ONCE("The database path hasn't been set.")
 		return { nullptr, ConnectionResult::NOT_CONFIGURED };
 	}
 	sqlite::Connection *con = new sqlite::Connection();
@@ -688,7 +688,7 @@ int VoxelStreamSQLite::get_lod_count() const {
 }
 
 void VoxelStreamSQLite::set_preferred_coordinate_format(CoordinateFormat format) {
-	ZN_ASSERT_RETURN(format >= 0 && format < COORDINATE_FORMAT_COUNT);
+	VOXEL_ASSERT_RETURN(format >= 0 && format < COORDINATE_FORMAT_COUNT);
 	_preferred_coordinate_format = format;
 }
 
@@ -711,19 +711,19 @@ bool VoxelStreamSQLite::copy_blocks_to_other_sqlite_stream(Ref<VoxelStreamSQLite
 	// needs to change. If it's just a version change, it might be possible to do it in-place, however changes like
 	// coordinate format affect primary keys, so not doing it in-place is easier.
 
-	ZN_ASSERT_RETURN_V(dst_stream.is_valid(), false);
-	ZN_ASSERT_RETURN_V(dst_stream.ptr() != this, false);
+	VOXEL_ASSERT_RETURN_V(dst_stream.is_valid(), false);
+	VOXEL_ASSERT_RETURN_V(dst_stream.ptr() != this, false);
 
-	ZN_ASSERT_RETURN_V(dst_stream->get_database_path() != get_database_path(), false);
+	VOXEL_ASSERT_RETURN_V(dst_stream->get_database_path() != get_database_path(), false);
 
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			dst_stream->get_block_size_po2() != get_block_size_po2(),
 			false,
 			"Copying between streams of different block sizes is not supported"
 	);
 
 	sqlite::Connection *src_con = get_connection().connection;
-	ZN_ASSERT_RETURN_V(src_con != nullptr, false);
+	VOXEL_ASSERT_RETURN_V(src_con != nullptr, false);
 	const ScopeRecycle src_con_scope(this, src_con);
 
 	// We can skip deserialization and copy data blocks directly.
@@ -746,7 +746,7 @@ bool VoxelStreamSQLite::copy_blocks_to_other_sqlite_stream(Ref<VoxelStreamSQLite
 
 	Context context;
 	context.dst_con = dst_stream->get_connection().connection;
-	ZN_ASSERT_RETURN_V(context.dst_con != nullptr, false);
+	VOXEL_ASSERT_RETURN_V(context.dst_con != nullptr, false);
 	const ScopeRecycle dst_con_scope(dst_stream.ptr(), context.dst_con);
 
 	const bool success = src_con->load_all_blocks(&context, Context::save);
@@ -790,4 +790,4 @@ void VoxelStreamSQLite::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

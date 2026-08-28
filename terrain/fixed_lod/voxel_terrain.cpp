@@ -42,7 +42,7 @@
 #include "../instancing/voxel_instancer.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelTerrain::VoxelTerrain() {
 	// Note: don't do anything heavy in the constructor.
@@ -64,7 +64,7 @@ VoxelTerrain::VoxelTerrain() {
 		void run(TimeSpreadTaskContext &ctx) override {
 			if (!VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
 				// The node can have been destroyed while this task was still pending
-				ZN_PRINT_VERBOSE("Cancelling ApplyMeshUpdateTask, volume_id is invalid");
+				VOXEL_PRINT_VERBOSE("Cancelling ApplyMeshUpdateTask, volume_id is invalid");
 				return;
 			}
 			self->apply_mesh_update(data);
@@ -81,7 +81,7 @@ VoxelTerrain::VoxelTerrain() {
 	callbacks.data = this;
 	callbacks.mesh_output_callback = [](void *cb_data, VoxelEngine::BlockMeshOutput &ob) {
 		VoxelTerrain *self = reinterpret_cast<VoxelTerrain *>(cb_data);
-		ApplyMeshUpdateTask *task = ZN_NEW(ApplyMeshUpdateTask);
+		ApplyMeshUpdateTask *task = VOXEL_NEW(ApplyMeshUpdateTask);
 		task->volume_id = self->_volume_id;
 		task->self = self;
 		task->data = std::move(ob);
@@ -102,7 +102,7 @@ VoxelTerrain::VoxelTerrain() {
 }
 
 VoxelTerrain::~VoxelTerrain() {
-	ZN_PRINT_VERBOSE("Destroying VoxelTerrain");
+	VOXEL_PRINT_VERBOSE("Destroying VoxelTerrain");
 	_streaming_dependency->valid = false;
 	_meshing_dependency->valid = false;
 	VoxelEngine::get_singleton().remove_volume(_volume_id);
@@ -133,7 +133,7 @@ bool VoxelTerrain::get_generator_use_gpu() const {
 #endif
 
 VoxelData &VoxelTerrain::get_storage() const {
-	ZN_ASSERT(_data != nullptr);
+	VOXEL_ASSERT(_data != nullptr);
 	return *_data;
 }
 
@@ -405,7 +405,7 @@ bool VoxelTerrain::is_automatic_loading_enabled() const {
 }
 
 void VoxelTerrain::try_schedule_mesh_update(VoxelMeshBlockVT &mesh_block) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	if (mesh_block.is_in_update_list) {
 		// Already in the list
 		return;
@@ -421,7 +421,7 @@ void VoxelTerrain::try_schedule_mesh_update(VoxelMeshBlockVT &mesh_block) {
 			Box3i(mesh_block.position * render_to_data_factor, Vector3iUtil::create(render_to_data_factor)).padded(1);
 
 	// If we get an empty box at this point, something is wrong with the caller
-	ZN_ASSERT_RETURN(!data_box.is_empty());
+	VOXEL_ASSERT_RETURN(!data_box.is_empty());
 
 	const bool data_available = _data->has_all_blocks_in_area(data_box, 0);
 
@@ -443,7 +443,7 @@ void VoxelTerrain::view_mesh_block(Vector3i bpos, bool mesh_flag, bool collision
 
 	if (block == nullptr) {
 		// Create if not found
-		block = ZN_NEW(VoxelMeshBlockVT(bpos, get_mesh_block_size()));
+		block = VOXEL_NEW(VoxelMeshBlockVT(bpos, get_mesh_block_size()));
 		block->set_world(get_world_3d());
 		_mesh_map.set_block(bpos, block);
 	}
@@ -523,7 +523,7 @@ void VoxelTerrain::unload_mesh_block(Vector3i bpos) {
 }
 
 void VoxelTerrain::save_all_modified_blocks(bool with_copy, std::shared_ptr<AsyncDependencyTracker> tracker) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	Ref<VoxelStream> stream = get_stream();
 	ERR_FAIL_COND_MSG(stream.is_null(), "Attempting to save modified blocks, but there is no stream to save them to.");
 
@@ -647,7 +647,7 @@ void VoxelTerrain::get_meshed_block_positions(StdVector<Vector3i> &out_positions
 // It will be slower than using the instancing generation events,
 // because it has to query VisualServer, which then allocates and decodes vertex buffers (assuming they are cached).
 Array VoxelTerrain::get_mesh_block_surface(Vector3i block_pos) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	Ref<Mesh> mesh;
 	{
@@ -821,7 +821,7 @@ void VoxelTerrain::post_edit_voxel(Vector3i pos) {
 }
 
 void VoxelTerrain::try_schedule_mesh_update_from_data(const Box3i &box_in_voxels) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	if (_mesher.is_null()) {
 		// No mesher, can't do updates
 		return;
@@ -997,7 +997,7 @@ void request_block_load(
 		bool use_gpu,
 		const std::shared_ptr<VoxelData> &voxel_data
 ) {
-	ZN_ASSERT(stream_dependency != nullptr);
+	VOXEL_ASSERT(stream_dependency != nullptr);
 
 #ifdef VOXEL_ENABLE_GPU
 	if (use_gpu && (stream_dependency->generator.is_null() || !stream_dependency->generator->supports_shaders())) {
@@ -1014,7 +1014,7 @@ void request_block_load(
 		);
 
 		const bool request_instances = false;
-		LoadBlockDataTask *task = ZN_NEW(LoadBlockDataTask(
+		LoadBlockDataTask *task = VOXEL_NEW(LoadBlockDataTask(
 				volume_id,
 				block_pos,
 				0,
@@ -1058,7 +1058,7 @@ void request_block_load(
 } // namespace
 
 void VoxelTerrain::send_data_load_requests() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (_blocks_pending_load.size() > 0) {
 		std::shared_ptr<PriorityDependency::ViewersData> shared_viewers_data =
@@ -1076,7 +1076,7 @@ void VoxelTerrain::send_data_load_requests() {
 			const bool quick_reloading = saving_block_it != _unloaded_saving_blocks.end();
 
 			if (quick_reloading) {
-				ZN_PROFILE_SCOPE_NAMED("Quick reloading");
+				VOXEL_PROFILE_SCOPE_NAMED("Quick reloading");
 				// The block is unloaded and currently waiting to be saved but we already want it back. This simulates a
 				// request and will complete on the next process.
 				// Ideally this shouldn't happen often. This is a corner case that occurs if the player moves fast
@@ -1122,14 +1122,14 @@ void VoxelTerrain::consume_block_data_save_requests(
 		std::shared_ptr<AsyncDependencyTracker> saving_tracker,
 		bool with_flush
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Blocks to save
 	if (get_stream().is_valid()) {
 		for (const VoxelData::BlockToSave &b : _blocks_to_save) {
-			ZN_PRINT_VERBOSE(format("Requesting save of block {}", b.position));
+			VOXEL_PRINT_VERBOSE(format("Requesting save of block {}", b.position));
 
-			SaveBlockDataTask *task = ZN_NEW(SaveBlockDataTask(
+			SaveBlockDataTask *task = VOXEL_NEW(SaveBlockDataTask(
 					_volume_id, b.position, 0, b.voxels, _streaming_dependency, saving_tracker, with_flush
 			));
 
@@ -1138,7 +1138,7 @@ void VoxelTerrain::consume_block_data_save_requests(
 		}
 	} else {
 		if (_blocks_to_save.size() > 0) {
-			ZN_PRINT_VERBOSE(format("Not saving {} blocks because no stream is assigned", _blocks_to_save.size()));
+			VOXEL_PRINT_VERBOSE(format("Not saving {} blocks because no stream is assigned", _blocks_to_save.size()));
 		}
 	}
 
@@ -1199,7 +1199,7 @@ void VoxelTerrain::notify_data_block_enter(const VoxelDataBlock &block, Vector3i
 		return;
 	}
 	if (_data_block_enter_info_obj == nullptr) {
-		_data_block_enter_info_obj = zylann::godot::make_unique<VoxelDataBlockEnterInfo>();
+		_data_block_enter_info_obj = voxel::godot::make_unique<VoxelDataBlockEnterInfo>();
 	}
 	const int network_peer_id = VoxelEngine::get_singleton().get_viewer_network_peer_id(viewer_id);
 	_data_block_enter_info_obj->network_peer_id = network_peer_id;
@@ -1218,7 +1218,7 @@ void VoxelTerrain::notify_data_block_enter(const VoxelDataBlock &block, Vector3i
 }
 
 void VoxelTerrain::process() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 #ifdef VOXEL_ENABLE_GPU
 	if (get_generator_use_gpu()) {
@@ -1285,7 +1285,7 @@ void VoxelTerrain::process_viewers() {
 		for (size_t i = 0; i < _paired_viewers.size(); ++i) {
 			PairedViewer &p = _paired_viewers[i];
 			if (!VoxelEngine::get_singleton().viewer_exists(p.id)) {
-				ZN_PRINT_VERBOSE(format("Detected destroyed viewer {} in VoxelTerrain", p.id));
+				VOXEL_PRINT_VERBOSE(format("Detected destroyed viewer {} in VoxelTerrain", p.id));
 				// Interpret removal as nullified view distance so the same code handling loading of blocks
 				// will be used to unload those viewed by this viewer.
 				// We'll actually remove unpaired viewers in a second pass.
@@ -1328,7 +1328,7 @@ void VoxelTerrain::process_viewers() {
 					p.id = viewer_id;
 					paired_viewer_index = self._paired_viewers.size();
 					self._paired_viewers.push_back(p);
-					ZN_PRINT_VERBOSE(format("Pairing viewer {} to VoxelTerrain", viewer_id));
+					VOXEL_PRINT_VERBOSE(format("Pairing viewer {} to VoxelTerrain", viewer_id));
 				}
 
 				PairedViewer &paired_viewer = self._paired_viewers[paired_viewer_index];
@@ -1421,7 +1421,7 @@ void VoxelTerrain::process_viewers() {
 
 	// Find out which blocks need to appear and which need to be unloaded
 	{
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		for (size_t i = 0; i < _paired_viewers.size(); ++i) {
 			const PairedViewer &viewer = _paired_viewers[i];
@@ -1440,7 +1440,7 @@ void VoxelTerrain::process_viewers() {
 				const Box3i &prev_mesh_box = viewer.prev_state.mesh_box;
 
 				if (prev_mesh_box != new_mesh_box) {
-					ZN_PROFILE_SCOPE();
+					VOXEL_PROFILE_SCOPE();
 
 					// TODO Any reason to unview old blocks before viewing new blocks?
 					// Because if a viewer is removed and another is added, it will reload the whole area even if their
@@ -1505,7 +1505,7 @@ void VoxelTerrain::process_viewers() {
 		// Iterating backward so indexes of paired viewers that need removal will not change because of the removal
 		// itself
 		const size_t vi = unpaired_viewer_indexes[unpaired_viewer_indexes.size() - i - 1];
-		ZN_PRINT_VERBOSE(format("Unpairing viewer {} from VoxelTerrain", _paired_viewers[vi].id));
+		VOXEL_PRINT_VERBOSE(format("Unpairing viewer {} from VoxelTerrain", _paired_viewers[vi].id));
 		_paired_viewers[vi] = _paired_viewers.back();
 		_paired_viewers.pop_back();
 	}
@@ -1527,8 +1527,8 @@ void VoxelTerrain::process_viewer_data_box_change(
 		const Box3i new_data_box,
 		const bool can_load_blocks
 ) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(prev_data_box != new_data_box);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(prev_data_box != new_data_box);
 
 	static thread_local StdVector<Vector3i> tls_missing_blocks;
 	static thread_local StdVector<Vector3i> tls_found_blocks_positions;
@@ -1552,7 +1552,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 
 		// Decrement refcounts from loaded blocks, and unload them
 		prev_data_box.difference(new_data_box, [this, may_save](Box3i out_of_range_box) {
-			// ZN_PRINT_VERBOSE(format("Unview data box {}", out_of_range_box));
+			// VOXEL_PRINT_VERBOSE(format("Unview data box {}", out_of_range_box));
 			_data->unview_area(
 					out_of_range_box,
 					0,
@@ -1569,7 +1569,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 		}
 
 		{
-			ZN_PROFILE_SCOPE_NAMED("Unload signals");
+			VOXEL_PROFILE_SCOPE_NAMED("Unload signals");
 			// Remove loading blocks (those were loaded and had their refcount reach zero)
 			for (const Vector3i bpos : tls_found_blocks_positions) {
 				emit_data_block_unloaded(bpos);
@@ -1581,11 +1581,11 @@ void VoxelTerrain::process_viewer_data_box_change(
 
 		// Remove refcount from loading blocks, and cancel loading if it reaches zero
 		{
-			ZN_PROFILE_SCOPE_NAMED("Cancel missing blocks");
+			VOXEL_PROFILE_SCOPE_NAMED("Cancel missing blocks");
 			for (const Vector3i bpos : tls_missing_blocks) {
 				auto loading_block_it = _loading_blocks.find(bpos);
 				if (loading_block_it == _loading_blocks.end()) {
-					ZN_PRINT_VERBOSE("Request to unview a loading block that was never requested");
+					VOXEL_PRINT_VERBOSE("Request to unview a loading block that was never requested");
 					// Not expected, but fine I guess
 					return;
 				}
@@ -1625,13 +1625,13 @@ void VoxelTerrain::process_viewer_data_box_change(
 		tls_found_blocks_positions.clear();
 
 		new_data_box.difference(prev_data_box, [this](Box3i box_to_load) {
-			// ZN_PRINT_VERBOSE(format("View data box {}", box_to_load));
+			// VOXEL_PRINT_VERBOSE(format("View data box {}", box_to_load));
 			_data->view_area(box_to_load, 0, &tls_missing_blocks, &tls_found_blocks_positions, &tls_found_blocks);
 		});
 
 		// Schedule loading of missing blocks
 		{
-			ZN_PROFILE_SCOPE_NAMED("Gather missing blocks");
+			VOXEL_PROFILE_SCOPE_NAMED("Gather missing blocks");
 			for (const Vector3i missing_bpos : tls_missing_blocks) {
 				auto loading_block_it = _loading_blocks.find(missing_bpos);
 
@@ -1660,7 +1660,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 		}
 
 		if (require_notifications) {
-			ZN_PROFILE_SCOPE_NAMED("Enter notifications");
+			VOXEL_PROFILE_SCOPE_NAMED("Enter notifications");
 			// Notifications for blocks that were already loaded
 			for (unsigned int i = 0; i < tls_found_blocks.size(); ++i) {
 				const Vector3i bpos = tls_found_blocks_positions[i];
@@ -1679,7 +1679,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 }
 
 void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// print_line(String("Receiving {0} blocks").format(varray(output.emerged_blocks.size())));
 
@@ -1717,7 +1717,7 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 		}
 		// That block was cancelled, but we are still expecting it.
 		// We'll have to request it again.
-		ZN_PRINT_VERBOSE(
+		VOXEL_PRINT_VERBOSE(
 				format("Received a block loading drop while we were still expecting it: "
 					   "lod{} ({}, {}, {}), re-requesting it",
 					   int(ob.lod_index),
@@ -1749,7 +1749,7 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 		_loading_blocks.erase(loading_block_it);
 	}
 
-	ZN_ASSERT_RETURN(ob.voxels != nullptr);
+	VOXEL_ASSERT_RETURN(ob.voxels != nullptr);
 
 	VoxelDataBlock block(ob.voxels, ob.lod_index);
 	block.set_edited(ob.type == VoxelEngine::BlockDataOutput::TYPE_LOADED);
@@ -1758,7 +1758,7 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 
 	if (block.has_voxels() && block.get_voxels_const().get_size() != Vector3iUtil::create(_data->get_block_size())) {
 		// Voxel block size is incorrect, drop it
-		ZN_PRINT_ERROR(
+		VOXEL_PRINT_ERROR(
 				format("Block is different from expected size. Expected {}, got {}",
 					   Vector3iUtil::create(_data->get_block_size()),
 					   block.get_voxels_const().get_size())
@@ -1776,7 +1776,7 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 #endif
 	](VoxelDataBlock &existing_block, const VoxelDataBlock &incoming_block) {
 #ifdef DEBUG_ENABLED
-				ZN_PRINT_VERBOSE(format("Replacing existing data block {}", block_pos));
+				VOXEL_PRINT_VERBOSE(format("Replacing existing data block {}", block_pos));
 #endif
 				existing_block.set_voxels(incoming_block.get_voxels_shared());
 				existing_block.set_edited(incoming_block.is_edited());
@@ -1811,7 +1811,7 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 // If the given block coordinates are not inside any viewer's area, this function won't do anything and return
 // false. If a block is already loading or generating at this position, it will be cancelled.
 bool VoxelTerrain::try_set_block_data(Vector3i position, std::shared_ptr<VoxelBuffer> &voxel_data) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V(voxel_data == nullptr, false);
 
 	const Vector3i expected_block_size = Vector3iUtil::create(_data->get_block_size());
@@ -1836,7 +1836,7 @@ bool VoxelTerrain::try_set_block_data(Vector3i position, std::shared_ptr<VoxelBu
 		// Actually, this block is not even in range. So we may ignore it.
 		// If we don't want this behavior, we could introduce a fake viewer that adds a reference to all blocks in
 		// this volume as long as it is enabled?
-		ZN_PRINT_VERBOSE("Trying to set a data block outside of any viewer range");
+		VOXEL_PRINT_VERBOSE("Trying to set a data block outside of any viewer range");
 		return false;
 	}
 
@@ -1867,7 +1867,7 @@ bool VoxelTerrain::has_data_block(Vector3i position) const {
 }
 
 void VoxelTerrain::process_meshing() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ProfilingClock profiling_clock;
 
 	_stats.dropped_block_meshs = 0;
@@ -1884,14 +1884,14 @@ void VoxelTerrain::process_meshing() {
 	BufferedTaskScheduler &scheduler = BufferedTaskScheduler::get_for_current_thread();
 
 	for (size_t bi = 0; bi < _blocks_pending_update.size(); ++bi) {
-		ZN_PROFILE_SCOPE_NAMED("Block");
+		VOXEL_PROFILE_SCOPE_NAMED("Block");
 		const Vector3i mesh_block_pos = _blocks_pending_update[bi];
 
 		VoxelMeshBlockVT *mesh_block = _mesh_map.get_block(mesh_block_pos);
 
 		// If we got here, it must have been because of scheduling an update
-		ZN_ASSERT_CONTINUE(mesh_block != nullptr);
-		ZN_ASSERT_CONTINUE(mesh_block->is_in_update_list);
+		VOXEL_ASSERT_CONTINUE(mesh_block != nullptr);
+		VOXEL_ASSERT_CONTINUE(mesh_block->is_in_update_list);
 
 		// Pad by 1 because meshing requires neighbors
 		const Box3i data_box =
@@ -1901,13 +1901,13 @@ void VoxelTerrain::process_meshing() {
 		// We must have picked up a valid data block
 		{
 			const Vector3i anchor_pos = data_box.position + Vector3i(1, 1, 1);
-			ZN_ASSERT_CONTINUE(_data->has_block(anchor_pos, 0));
+			VOXEL_ASSERT_CONTINUE(_data->has_block(anchor_pos, 0));
 		}
 #endif
 
 		// print_line(String("DDD request {0}").format(varray(mesh_request.render_block_position.to_vec3())));
 		// We'll allocate this quite often. If it becomes a problem, it should be easy to pool.
-		MeshBlockTask *task = ZN_NEW(MeshBlockTask);
+		MeshBlockTask *task = VOXEL_NEW(MeshBlockTask);
 		task->volume_id = _volume_id;
 		task->mesh_block_position = mesh_block_pos;
 		task->lod_index = 0;
@@ -1930,8 +1930,8 @@ void VoxelTerrain::process_meshing() {
 			}
 			// Blocks that were in the list must have been scheduled because we have data for them!
 			if (count == 0) {
-				ZN_PRINT_ERROR("Unexpected empty block list in meshing block task");
-				ZN_DELETE(task);
+				VOXEL_PRINT_ERROR("Unexpected empty block list in meshing block task");
+				VOXEL_DELETE(task);
 				continue;
 			}
 		}
@@ -1961,7 +1961,7 @@ void VoxelTerrain::process_meshing() {
 }
 
 void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// print_line(String("DDD receive {0}").format(varray(ob.position.to_vec3())));
 
 	VoxelMeshBlockVT *block = _mesh_map.get_block(ob.position);
@@ -1975,7 +1975,7 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 	if (ob.type == VoxelEngine::BlockMeshOutput::TYPE_DROPPED) {
 		// That block is loaded, but its meshing request was dropped.
 		// TODO Not sure what to do in this case, the code sending update queries has to be tweaked
-		ZN_PRINT_VERBOSE("Received a block mesh drop while we were still expecting it");
+		VOXEL_PRINT_VERBOSE("Received a block mesh drop while we were still expecting it");
 		++_stats.dropped_block_meshs;
 		return;
 	}
@@ -2073,8 +2073,8 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 			const SceneTree *scene_tree = get_tree();
 #if DEBUG_ENABLED
 			if (collision_shape.is_valid()) {
-				const Color debug_color = zylann::godot::get_shape_3d_default_color(*scene_tree);
-				zylann::godot::set_shape_3d_debug_color(**collision_shape, debug_color);
+				const Color debug_color = voxel::godot::get_shape_3d_default_color(*scene_tree);
+				voxel::godot::set_shape_3d_debug_color(**collision_shape, debug_color);
 			}
 #endif
 			debug_collisions = scene_tree->is_debugging_collisions_hint();
@@ -2259,9 +2259,9 @@ bool VoxelTerrain::debug_get_draw_shadow_occluders() const {
 #ifdef TOOLS_ENABLED
 
 void VoxelTerrain::process_debug_draw() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	zylann::godot::DebugRenderer &dr = _debug_renderer;
+	voxel::godot::DebugRenderer &dr = _debug_renderer;
 	dr.begin();
 
 	const Transform3D parent_transform = get_global_transform();
@@ -2344,7 +2344,7 @@ Vector3i VoxelTerrain::_b_data_block_to_voxel(Vector3i pos) const {
 Ref<VoxelSaveCompletionTracker> VoxelTerrain::_b_save_modified_blocks() {
 	std::shared_ptr<AsyncDependencyTracker> tracker = make_shared_instance<AsyncDependencyTracker>();
 	save_all_modified_blocks(true, tracker);
-	ZN_ASSERT_RETURN_V(tracker != nullptr, Ref<VoxelSaveCompletionTracker>());
+	VOXEL_ASSERT_RETURN_V(tracker != nullptr, Ref<VoxelSaveCompletionTracker>());
 	return VoxelSaveCompletionTracker::create(tracker);
 }
 
@@ -2400,7 +2400,7 @@ PackedInt32Array VoxelTerrain::_b_get_viewer_network_peer_ids_in_area(Vector3i a
 	// Using direct access because when compiling with GodotCpp the array access syntax is different, also it is a bit
 	// faster
 	int32_t *peer_ids_data = peer_ids.ptrw();
-	ZN_ASSERT_RETURN_V(peer_ids_data != nullptr, peer_ids);
+	VOXEL_ASSERT_RETURN_V(peer_ids_data != nullptr, peer_ids);
 	for (size_t i = 0; i < viewer_ids.size(); ++i) {
 		const int peer_id = VoxelEngine::get_singleton().get_viewer_network_peer_id(viewer_ids[i]);
 		peer_ids_data[i] = peer_id;
@@ -2489,7 +2489,7 @@ void VoxelTerrain::_bind_methods() {
 	);
 	ClassDB::bind_method(D_METHOD("debug_get_draw_shadow_occluders"), &Self::debug_get_draw_shadow_occluders);
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 	GDVIRTUAL_BIND(_on_data_block_entered, "info");
 	GDVIRTUAL_BIND(_on_area_edited, "area_origin", "area_size");
 #endif
@@ -2523,7 +2523,7 @@ void VoxelTerrain::_bind_methods() {
 					Variant::OBJECT,
 					"material_override",
 					PROPERTY_HINT_RESOURCE_TYPE,
-					zylann::godot::MATERIAL_3D_PROPERTY_HINT_STRING
+					voxel::godot::MATERIAL_3D_PROPERTY_HINT_STRING
 			),
 			"set_material_override",
 			"get_material_override"
@@ -2598,4 +2598,4 @@ void VoxelTerrain::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("mesh_block_exited", PropertyInfo(Variant::VECTOR3I, "position")));
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

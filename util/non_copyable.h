@@ -1,7 +1,7 @@
-#ifndef ZYLANN_NON_COPYABLE_H
-#define ZYLANN_NON_COPYABLE_H
+#ifndef VOXEL_NON_COPYABLE_H
+#define VOXEL_NON_COPYABLE_H
 
-namespace zylann {
+namespace voxel {
 
 class NonCopyable {
 protected:
@@ -12,6 +12,6 @@ protected:
 	void operator=(NonCopyable const &x) = delete;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_NON_COPYABLE_H
+#endif // VOXEL_NON_COPYABLE_H

@@ -4,7 +4,7 @@
 #include "../util/godot/classes/ref_counted.h"
 #include "../util/math/vector3i.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // This class exists only to make the script API nicer.
 class VoxelRaycastResult : public RefCounted {
@@ -24,6 +24,6 @@ private:
 	static void _bind_methods();
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_RAYCAST_RESULT_H

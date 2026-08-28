@@ -19,14 +19,14 @@
 #include "voxel_graph_editor_window.h"
 #include "voxel_graph_function_inspector_plugin.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 using namespace pg;
-using namespace zylann::godot;
+using namespace voxel::godot;
 
 VoxelGraphEditorPlugin::VoxelGraphEditorPlugin() {}
 
@@ -56,7 +56,7 @@ void VoxelGraphEditorPlugin::init() {
 			VoxelGraphEditor::SIGNAL_POPOUT_REQUESTED,
 			callable_mp(this, &VoxelGraphEditorPlugin::_on_graph_editor_popout_requested)
 	);
-	_bottom_panel_button = add_control_to_bottom_panel(_graph_editor, ZN_TTR("Voxel Graph"));
+	_bottom_panel_button = add_control_to_bottom_panel(_graph_editor, VOXEL_TTR("Voxel Graph"));
 	_bottom_panel_button->hide();
 
 	// TODO Move this to `_enter_tree` and remove it on `_exit_tree`?
@@ -70,7 +70,7 @@ void VoxelGraphEditorPlugin::init() {
 	add_inspector_plugin(vgf_inspector_plugin);
 }
 
-bool VoxelGraphEditorPlugin::_zn_handles(const Object *p_object) const {
+bool VoxelGraphEditorPlugin::_voxel_handles(const Object *p_object) const {
 	if (p_object == nullptr) {
 		return false;
 	}
@@ -91,10 +91,10 @@ bool VoxelGraphEditorPlugin::_zn_handles(const Object *p_object) const {
 	return false;
 }
 
-void VoxelGraphEditorPlugin::_zn_edit(Object *p_object) {
+void VoxelGraphEditorPlugin::_voxel_edit(Object *p_object) {
 	// Workaround for when we inspect nodes of the graph...
 	if (p_object == nullptr && _ignore_edit_null) {
-		ZN_PRINT_VERBOSE(format("{}: ignored edit(null)", ZN_CLASS_NAME_C(VoxelGraphEditorPlugin)));
+		VOXEL_PRINT_VERBOSE(format("{}: ignored edit(null)", VOXEL_CLASS_NAME_C(VoxelGraphEditorPlugin)));
 		return;
 	}
 
@@ -168,10 +168,10 @@ void VoxelGraphEditorPlugin::_zn_edit(Object *p_object) {
 	}
 }
 
-void VoxelGraphEditorPlugin::_zn_make_visible(bool visible) {
+void VoxelGraphEditorPlugin::_voxel_make_visible(bool visible) {
 	// Workaround for when we inspect nodes of the graph...
 	if (_ignore_make_visible) {
-		ZN_PRINT_VERBOSE(format("{}: ignored make_visible({})", ZN_CLASS_NAME_C(VoxelGraphEditorPlugin), visible));
+		VOXEL_PRINT_VERBOSE(format("{}: ignored make_visible({})", VOXEL_CLASS_NAME_C(VoxelGraphEditorPlugin), visible));
 		return;
 	}
 
@@ -208,7 +208,7 @@ void VoxelGraphEditorPlugin::_hide_deferred() {
 	}
 	// The point is when the plugin's UI closed (for real, not closed and re-opened simultaneously!),
 	// it should cleanup its UI to not waste RAM (as it references stuff).
-	_zn_edit(nullptr);
+	_voxel_edit(nullptr);
 
 	if (_graph_editor->is_visible_in_tree()) {
 		hide_bottom_panel();
@@ -352,7 +352,7 @@ void VoxelGraphEditorPlugin::_notification(int p_what) {
 
 void VoxelGraphEditorPlugin::undock_graph_editor() {
 	ERR_FAIL_COND(_graph_editor_window != nullptr);
-	ZN_PRINT_VERBOSE("Undock voxel graph editor");
+	VOXEL_PRINT_VERBOSE("Undock voxel graph editor");
 
 	remove_control_from_bottom_panel(_graph_editor);
 	_bottom_panel_button = nullptr;
@@ -377,7 +377,7 @@ void VoxelGraphEditorPlugin::undock_graph_editor() {
 
 void VoxelGraphEditorPlugin::dock_graph_editor() {
 	ERR_FAIL_COND(_graph_editor_window == nullptr);
-	ZN_PRINT_VERBOSE("Dock voxel graph editor");
+	VOXEL_PRINT_VERBOSE("Dock voxel graph editor");
 
 	_graph_editor->get_parent()->remove_child(_graph_editor);
 	_graph_editor_window->queue_free();
@@ -385,7 +385,7 @@ void VoxelGraphEditorPlugin::dock_graph_editor() {
 
 	_graph_editor->set_popout_button_enabled(true);
 
-	_bottom_panel_button = add_control_to_bottom_panel(_graph_editor, ZN_TTR("Voxel Graph"));
+	_bottom_panel_button = add_control_to_bottom_panel(_graph_editor, VOXEL_TTR("Voxel Graph"));
 
 	_bottom_panel_button->show();
 	make_bottom_panel_item_visible(_graph_editor);
@@ -434,4 +434,4 @@ void VoxelGraphEditorPlugin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_hide_deferred"), &VoxelGraphEditorPlugin::_hide_deferred);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

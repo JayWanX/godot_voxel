@@ -2,7 +2,7 @@
 #include "../voxel_graph_runtime.h"
 #include "util.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 void register_math_func_nodes(Span<NodeType> types) {
 	typedef Runtime::ProcessBufferContext ProcessBufferContext;
@@ -500,7 +500,7 @@ void register_math_func_nodes(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			const int power = ctx.get_param(0).operator int();
 			if (power < 0) {
-				ctx.make_error(ZN_TTR("Power cannot be negative"));
+				ctx.make_error(VOXEL_TTR("Power cannot be negative"));
 			} else {
 				Params p;
 				p.power = power;
@@ -544,7 +544,7 @@ void register_math_func_nodes(Span<NodeType> types) {
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
 			const int power = ctx.get_param(0).operator int();
 			if (power < 0) {
-				ctx.make_error(ZN_TTR("Power cannot be negative"));
+				ctx.make_error(VOXEL_TTR("Power cannot be negative"));
 			}
 			ctx.add_format("{} = 1.0;\n", ctx.get_output_name(0));
 			for (int i = 0; i < power; ++i) {
@@ -581,4 +581,4 @@ void register_math_func_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

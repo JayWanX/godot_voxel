@@ -3,7 +3,7 @@
 
 #include "../util/godot/classes/node.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // TODO Hack to make VoxelEngine update... need ways to integrate callbacks from main loop!
 class VoxelEngineUpdater : public Node {
@@ -22,6 +22,6 @@ private:
 	static void _bind_methods() {}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_SERVER_UPDATER_H

@@ -7,7 +7,7 @@
 #include "../../util/godot/editor_scale.h"
 #include "../../util/profiling.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 const uint64_t UPDATE_INTERVAL_MS = 200;
@@ -81,7 +81,7 @@ void VoxelGeneratorMultipassCacheViewer::update_image() {
 	if (_image.is_null() || //
 		_image->get_width() != view_rect_tiles.size.x || //
 		_image->get_height() != view_rect_tiles.size.y) {
-		_image = zylann::godot::create_empty_image(
+		_image = voxel::godot::create_empty_image(
 				view_rect_tiles.size.x,
 				view_rect_tiles.size.y,
 				false,
@@ -134,7 +134,7 @@ void VoxelGeneratorMultipassCacheViewer::update_image() {
 		}
 	}
 
-	ZN_ASSERT_RETURN(_image.is_valid());
+	VOXEL_ASSERT_RETURN(_image.is_valid());
 	if (_texture.is_null() || Vector2i(_texture->get_size()) != _image->get_size()) {
 		_texture = ImageTexture::create_from_image(_image);
 	} else {
@@ -143,7 +143,7 @@ void VoxelGeneratorMultipassCacheViewer::update_image() {
 }
 
 void VoxelGeneratorMultipassCacheViewer::draw() {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (_texture.is_valid()) {
 		draw_texture_rect(_texture, Rect2(Vector2(), _texture->get_size() * TILE_SIZE), false);
@@ -218,4 +218,4 @@ void VoxelGeneratorMultipassCacheViewer::draw() {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

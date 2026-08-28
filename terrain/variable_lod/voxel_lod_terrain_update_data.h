@@ -17,7 +17,7 @@
 #include "../../engine/detail_rendering/detail_rendering.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
 class AsyncDependencyTracker;
 
@@ -361,6 +361,6 @@ struct VoxelLodTerrainUpdateData {
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_LOD_TERRAIN_UPDATE_DATA_H

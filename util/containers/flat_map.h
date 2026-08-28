@@ -1,12 +1,12 @@
-#ifndef ZN_FLAT_MAP_H
-#define ZN_FLAT_MAP_H
+#ifndef VOXEL_FLAT_MAP_H
+#define VOXEL_FLAT_MAP_H
 
 #include "container_funcs.h"
 #include "span.h"
 #include "std_vector.h"
 #include <algorithm>
 
-namespace zylann {
+namespace voxel {
 
 template <typename T>
 struct FlatMapDefaultComparator {
@@ -158,14 +158,14 @@ public:
 
 		inline const Pair &operator*() {
 #ifdef DEBUG_ENABLED
-			ZN_ASSERT(_current != nullptr);
+			VOXEL_ASSERT(_current != nullptr);
 #endif
 			return *_current;
 		}
 
 		inline const Pair *operator->() {
 #ifdef DEBUG_ENABLED
-			ZN_ASSERT(_current != nullptr);
+			VOXEL_ASSERT(_current != nullptr);
 #endif
 			return _current;
 		}
@@ -204,7 +204,7 @@ private:
 
 // template <typename T>
 // void insert_default(StdVector<T> &vec, size_t pi) {
-// 	ZN_ASSERT(pi <= vec.size());
+// 	VOXEL_ASSERT(pi <= vec.size());
 // 	const size_t prev_size = vec.size();
 // 	vec.resize(vec.size() + 1);
 // 	for (size_t i = pi; i < prev_size; ++i) {
@@ -350,7 +350,7 @@ public:
 			p.key = modifier(p.key);
 		}
 #ifdef DEV_ENABLED
-		ZN_ASSERT(!has_duplicate_f(to_span_const(_items), [](const Pair &a, const Pair &b) { return a.key == b.key; }));
+		VOXEL_ASSERT(!has_duplicate_f(to_span_const(_items), [](const Pair &a, const Pair &b) { return a.key == b.key; }));
 #endif
 		std::sort(_items.begin(), _items.end());
 	}
@@ -369,14 +369,14 @@ public:
 
 		inline const Pair &operator*() {
 #ifdef DEBUG_ENABLED
-			ZN_ASSERT(_current != nullptr);
+			VOXEL_ASSERT(_current != nullptr);
 #endif
 			return *_current;
 		}
 
 		inline const Pair *operator->() {
 #ifdef DEBUG_ENABLED
-			ZN_ASSERT(_current != nullptr);
+			VOXEL_ASSERT(_current != nullptr);
 #endif
 			return _current;
 		}
@@ -411,6 +411,6 @@ private:
 	StdVector<Pair> _items;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_FLAT_MAP_H
+#endif // VOXEL_FLAT_MAP_H

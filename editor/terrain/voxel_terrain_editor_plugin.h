@@ -12,25 +12,25 @@
 #include "../../util/godot/classes/camera_3d.h"
 #include "../../util/godot/classes/input_event.h"
 
-ZN_GODOT_FORWARD_DECLARE(class MenuButton)
-ZN_GODOT_FORWARD_DECLARE(class EditorFileDialog)
+VOXEL_GODOT_FORWARD_DECLARE(class MenuButton)
+VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelAboutWindow;
 class VoxelNode;
 class VoxelTerrainEditorTaskIndicator;
 
-class VoxelTerrainEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(VoxelTerrainEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VoxelTerrainEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VoxelTerrainEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	VoxelTerrainEditorPlugin();
 
 protected:
-	bool _zn_handles(const Object *p_object) const override;
-	void _zn_edit(Object *p_object) override;
-	void _zn_make_visible(bool visible) override;
-	EditorPlugin::AfterGUIInput _zn_forward_3d_gui_input(Camera3D *p_camera, const Ref<InputEvent> &p_event) override;
+	bool _voxel_handles(const Object *p_object) const override;
+	void _voxel_edit(Object *p_object) override;
+	void _voxel_make_visible(bool visible) override;
+	EditorPlugin::AfterGUIInput _voxel_forward_3d_gui_input(Camera3D *p_camera, const Ref<InputEvent> &p_event) override;
 
 	void _notification(int p_what);
 
@@ -57,7 +57,7 @@ private:
 		MENU_COUNT
 	};
 
-	zylann::godot::ObjectWeakRef<VoxelNode> _terrain_node;
+	voxel::godot::ObjectWeakRef<VoxelNode> _terrain_node;
 
 	ViewerID _editor_viewer_id;
 	bool _editor_viewer_enabled = true;
@@ -71,6 +71,6 @@ private:
 	EditorFileDialog *_save_file_dialog = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_TERRAIN_EDITOR_PLUGIN_H

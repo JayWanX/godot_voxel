@@ -4,7 +4,7 @@
 #include "../../containers/std_vector.h"
 #include "../core/packed_arrays.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 #ifdef TOOLS_ENABLED
 
@@ -109,4 +109,4 @@ Array generate_debug_seams_wireframe_surface(const ArrayMesh &src_mesh, int surf
 
 #endif // TOOLS_ENABLED
 
-} // namespace zylann::godot
+} // namespace voxel::godot

@@ -7,11 +7,11 @@
 #include "../../util/godot/core/packed_arrays.h"
 #include "voxel_instancer.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 const char *VoxelInstanceLibraryMultiMeshItem::MANUAL_SETTINGS_GROUP_NAME = "Manual settings";
 const char *VoxelInstanceLibraryMultiMeshItem::SCENE_SETTINGS_GROUP_NAME = "Scene properties";
@@ -62,7 +62,7 @@ void deserialize_group_names(const Array &src, StdVector<StringName> &dst) {
 	dst.reserve(src.size());
 	for (int i = 0; i < src.size(); ++i) {
 		StringName name = src[i];
-		ERR_CONTINUE(zylann::godot::is_empty(name));
+		ERR_CONTINUE(voxel::godot::is_empty(name));
 		dst.push_back(name);
 	}
 }
@@ -469,13 +469,13 @@ bool setup_from_template(Node *root, VoxelInstanceLibraryMultiMeshItem::Settings
 
 } // namespace
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 void VoxelInstanceLibraryMultiMeshItem::setup_from_template(Node *root) {
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 void VoxelInstanceLibraryMultiMeshItem::setup_from_template(Object *root_o) {
 	Node *root = Object::cast_to<Node>(root_o);
 #endif
-	ERR_FAIL_COND(!zylann::voxel::setup_from_template(root, _manual_settings));
+	ERR_FAIL_COND(!voxel::setup_from_template(root, _manual_settings));
 	notify_listeners(IInstanceLibraryItemListener::CHANGE_VISUAL);
 }
 
@@ -487,7 +487,7 @@ void VoxelInstanceLibraryMultiMeshItem::set_scene(Ref<PackedScene> scene) {
 	if (_scene.is_valid()) {
 		Node *root = _scene->instantiate();
 		ERR_FAIL_COND(root == nullptr);
-		ERR_FAIL_COND(!zylann::voxel::setup_from_template(root, _scene_settings));
+		ERR_FAIL_COND(!voxel::setup_from_template(root, _scene_settings));
 		memdelete(root);
 	}
 	notify_listeners(IInstanceLibraryItemListener::CHANGE_VISUAL);
@@ -606,7 +606,7 @@ void VoxelInstanceLibraryMultiMeshItem::get_configuration_warnings(PackedStringA
 			break;
 
 		default:
-			ZN_PRINT_ERROR("Unknown removal behavior");
+			VOXEL_PRINT_ERROR("Unknown removal behavior");
 			break;
 	}
 }
@@ -631,10 +631,10 @@ PackedFloat32Array VoxelInstanceLibraryMultiMeshItem::_b_get_mesh_lod_distance_r
 
 // This version is called when loading the resource
 void VoxelInstanceLibraryMultiMeshItem::_b_set_mesh_lod_distance_ratios(PackedFloat32Array ratios) {
-	ZN_ASSERT_RETURN(ratios.size() == static_cast<int>(_mesh_lod_max_distance_ratios.size()));
-	ZN_ASSERT_RETURN(is_ascending(to_span(ratios)));
+	VOXEL_ASSERT_RETURN(ratios.size() == static_cast<int>(_mesh_lod_max_distance_ratios.size()));
+	VOXEL_ASSERT_RETURN(is_ascending(to_span(ratios)));
 	if (!is_in_range(to_span(ratios), MIN_DISTANCE_RATIO, MAX_DISTANCE_RATIO)) {
-		ZN_PRINT_ERROR("LOD distance ratios are not in usual range");
+		VOXEL_PRINT_ERROR("LOD distance ratios are not in usual range");
 	}
 	godot::copy_to(to_span(_mesh_lod_max_distance_ratios), ratios);
 }
@@ -856,4 +856,4 @@ void VoxelInstanceLibraryMultiMeshItem::_bind_methods() {
 	GDVIRTUAL_BIND(_on_instance_removed, "instancer", "transform");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -9,7 +9,7 @@
 #include "../../util/math/vector3i.h"
 #include "../compressed_data.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct RegionFormat {
 	static const char *FILE_EXTENSION;
@@ -144,6 +144,6 @@ private:
 	String _file_path;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // REGION_FILE_H

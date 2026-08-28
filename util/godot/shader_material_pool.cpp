@@ -3,7 +3,7 @@
 #include "../profiling.h"
 #include "classes/rendering_server.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void ShaderMaterialPool::set_template(Ref<ShaderMaterial> tpl) {
 	_template_material = tpl;
@@ -37,7 +37,7 @@ Ref<ShaderMaterial> ShaderMaterialPool::allocate() {
 		_materials.pop_back();
 		return material;
 	}
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	Ref<ShaderMaterial> material;
 	material.instantiate();
 	material->set_shader(_template_material->get_shader());
@@ -50,9 +50,9 @@ Ref<ShaderMaterial> ShaderMaterialPool::allocate() {
 }
 
 void ShaderMaterialPool::recycle(Ref<ShaderMaterial> material) {
-	ZN_ASSERT_RETURN(material.is_valid());
-	ZN_ASSERT_RETURN(_template_material.is_valid());
-	ZN_ASSERT_RETURN(material->get_shader() == _template_material->get_shader());
+	VOXEL_ASSERT_RETURN(material.is_valid());
+	VOXEL_ASSERT_RETURN(_template_material.is_valid());
+	VOXEL_ASSERT_RETURN(material->get_shader() == _template_material->get_shader());
 	_materials.push_back(material);
 }
 
@@ -62,7 +62,7 @@ Span<const StringName> ShaderMaterialPool::get_cached_shader_uniforms() const {
 
 void copy_shader_params(const ShaderMaterial &src, ShaderMaterial &dst, Span<const StringName> params) {
 	// Ref<Shader> shader = src.get_shader();
-	// ZN_ASSERT_RETURN(shader.is_valid());
+	// VOXEL_ASSERT_RETURN(shader.is_valid());
 	// Not using `Shader::get_param_list()` because it is not exposed to the script/extension API, and it prepends
 	// `shader_params/` to every parameter name, which is slow and not usable for our case.
 	// TBH List is slow too, I don't know why Godot uses that for lists of shader params.
@@ -77,4 +77,4 @@ void copy_shader_params(const ShaderMaterial &src, ShaderMaterial &dst, Span<con
 	}
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

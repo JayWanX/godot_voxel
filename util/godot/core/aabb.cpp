@@ -2,7 +2,7 @@
 #include "../../io/text_writer.h"
 #include "../../math/vector3.h"
 
-namespace zylann {
+namespace voxel {
 
 TextWriter &operator<<(TextWriter &w, const AABB &v) {
 	w << "(o:";
@@ -13,4 +13,4 @@ TextWriter &operator<<(TextWriter &w, const AABB &v) {
 	return w;
 }
 
-} // namespace zylann
+} // namespace voxel

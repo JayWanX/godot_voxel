@@ -3,7 +3,7 @@
 #include "../../storage/voxel_data_map.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_voxel_data_map_paste_fill() {
 	static const int voxel_value = 1;
@@ -26,7 +26,7 @@ void test_voxel_data_map_paste_fill() {
 		return map.get_voxel(pos, channel) == voxel_value;
 	});
 
-	ZN_TEST_ASSERT(is_match);
+	VOXEL_TEST_ASSERT(is_match);
 
 	// Check neighbor voxels to make sure they were not changed
 	const Box3i padded_box = box.padded(1);
@@ -37,7 +37,7 @@ void test_voxel_data_map_paste_fill() {
 		}
 	});
 
-	ZN_TEST_ASSERT(outside_is_ok);
+	VOXEL_TEST_ASSERT(outside_is_ok);
 }
 
 void test_voxel_data_map_paste_mask() {
@@ -106,7 +106,7 @@ void test_voxel_data_map_paste_mask() {
 		print_line(line);
 	}*/
 
-	ZN_TEST_ASSERT(is_match);
+	VOXEL_TEST_ASSERT(is_match);
 
 	// Now check the outline voxels, they should be the same as before
 	bool outside_is_ok = true;
@@ -116,7 +116,7 @@ void test_voxel_data_map_paste_mask() {
 		}
 	});
 
-	ZN_TEST_ASSERT(outside_is_ok);
+	VOXEL_TEST_ASSERT(outside_is_ok);
 }
 
 void test_voxel_data_map_paste_dst_mask() {
@@ -146,7 +146,7 @@ void test_voxel_data_map_paste_dst_mask() {
 		const int vbv = vb.get_voxel(rpos, channel);
 		const int expected_v = writable ? vbv : original_v;
 		const int found_v = map.get_voxel(pos, channel);
-		ZN_TEST_ASSERT(found_v == expected_v);
+		VOXEL_TEST_ASSERT(found_v == expected_v);
 	});
 }
 
@@ -206,7 +206,7 @@ void test_voxel_data_map_copy() {
 	// 	print_line(line);
 	// }
 
-	ZN_TEST_ASSERT(buffer.equals(buffer2));
+	VOXEL_TEST_ASSERT(buffer.equals(buffer2));
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

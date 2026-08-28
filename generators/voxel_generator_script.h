@@ -4,12 +4,12 @@
 #include "../util/godot/core/gdvirtual.h"
 #include "voxel_generator.h"
 
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 // GodotCpp wants the full definition of the class in GDVIRTUAL
 #include "../storage/voxel_buffer_gd.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Generator based on a script, like GDScript, C# or NativeScript.
 // The script is expected to properly handle multithreading.
@@ -31,6 +31,6 @@ private:
 	static void _bind_methods();
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_SCRIPT_H

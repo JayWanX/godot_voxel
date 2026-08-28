@@ -7,7 +7,7 @@
 #include "transvoxel.h"
 #include "transvoxel_materials_common.h"
 
-namespace zylann::voxel::transvoxel::materials::mixel4 {
+namespace voxel::transvoxel::materials::mixel4 {
 
 // How many textures can be referred to in total
 static const unsigned int MAX_TEXTURES = 16;
@@ -44,7 +44,7 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 		indexed_weight_sums[i] = IndexAndWeight{ i, 0 };
 	}
 	for (unsigned int ci = 0; ci < voxel_indices.size(); ++ci) {
-		// ZN_PROFILE_SCOPE();
+		// VOXEL_PROFILE_SCOPE();
 
 		FixedArray<uint8_t, MAX_TEXTURES> &weights_temp = cell_texture_weights_temp[ci];
 		fill(weights_temp, uint8_t(0));
@@ -57,7 +57,7 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 		const unsigned int data_index = voxel_indices[ci];
 
 		const FixedArray<uint8_t, 4> indices =
-				zylann::voxel::mixel4::decode_indices_from_packed_u16(indices_data[data_index]);
+				voxel::mixel4::decode_indices_from_packed_u16(indices_data[data_index]);
 		const FixedArray<uint8_t, 4> weights = weights_sampler.get_weights(data_index);
 
 		for (unsigned int j = 0; j < indices.size(); ++j) {
@@ -90,7 +90,7 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 
 	// Remap weights to follow the indices we selected
 	for (unsigned int ci = 0; ci < cell_texture_weights_temp.size(); ++ci) {
-		// ZN_PROFILE_SCOPE();
+		// VOXEL_PROFILE_SCOPE();
 
 		FixedArray<uint8_t, 4> &dst_weights = cell_textures.weights[ci];
 
@@ -155,7 +155,7 @@ inline void get_cell_texture_data(
 struct WeightSamplerPackedU16 {
 	Span<const uint16_t> u16_data;
 	inline FixedArray<uint8_t, 4> get_weights(unsigned int i) const {
-		return zylann::voxel::mixel4::decode_weights_from_packed_u16(u16_data[i]);
+		return voxel::mixel4::decode_weights_from_packed_u16(u16_data[i]);
 	}
 };
 
@@ -258,13 +258,13 @@ TextureIndicesData get_texture_indices_data(
 		const unsigned int indices_channel,
 		DefaultTextureIndicesData &out_default_texture_indices_data
 ) {
-	ZN_ASSERT_RETURN_V(voxels.get_channel_depth(indices_channel) == VoxelBuffer::DEPTH_16_BIT, TextureIndicesData());
+	VOXEL_ASSERT_RETURN_V(voxels.get_channel_depth(indices_channel) == VoxelBuffer::DEPTH_16_BIT, TextureIndicesData());
 
 	TextureIndicesData data;
 
 	if (voxels.is_uniform(indices_channel)) {
 		const uint16_t encoded_indices = voxels.get_voxel(Vector3i(), indices_channel);
-		data.default_indices = zylann::voxel::mixel4::decode_indices_from_packed_u16(encoded_indices);
+		data.default_indices = voxel::mixel4::decode_indices_from_packed_u16(encoded_indices);
 		data.packed_default_indices = pack_bytes(data.default_indices);
 
 		out_default_texture_indices_data.indices = data.default_indices;
@@ -273,7 +273,7 @@ TextureIndicesData get_texture_indices_data(
 
 	} else {
 		Span<const uint8_t> data_bytes;
-		ZN_ASSERT(voxels.get_channel_as_bytes_read_only(indices_channel, data_bytes) == true);
+		VOXEL_ASSERT(voxels.get_channel_as_bytes_read_only(indices_channel, data_bytes) == true);
 		data.buffer = data_bytes.reinterpret_cast_to<const uint16_t>();
 
 		out_default_texture_indices_data.use = false;
@@ -282,6 +282,6 @@ TextureIndicesData get_texture_indices_data(
 	return data;
 }
 
-} // namespace zylann::voxel::transvoxel::materials::mixel4
+} // namespace voxel::transvoxel::materials::mixel4
 
 #endif // VOXEL_TRANSVOXEL_MATERIALS_MIXEL4_H

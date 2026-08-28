@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/node.h"
 #include "voxel_instancer.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Used as child of scene items instanced with VoxelInstancer.
 //
@@ -111,6 +111,6 @@ private:
 	int _instance_index = -1;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCE_COMPONENT_H

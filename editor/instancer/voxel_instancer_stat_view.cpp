@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/node.h"
 #include "../../util/godot/classes/tree.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelInstancerStatView::VoxelInstancerStatView() {
 	_tree = memnew(Tree);
@@ -62,4 +62,4 @@ void VoxelInstancerStatView::process() {
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

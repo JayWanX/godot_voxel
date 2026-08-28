@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/material.h"
 #include "../voxel_mesh_block.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Stores mesh and collider for one chunk of `VoxelLodTerrain`.
 // It doesn't store voxel data, because it may be using different block size, or different data structure.
@@ -17,7 +17,7 @@ public:
 	// See VoxelMesherBlocky.
 	// This unfortunately has to be a whole separate mesh instance because Godot doesn't support setting
 	// `cast_shadow` mode per mesh surface. This might have an impact on performance.
-	zylann::godot::DirectMeshInstance shadow_occluder;
+	voxel::godot::DirectMeshInstance shadow_occluder;
 
 	RefCount mesh_viewers;
 	RefCount collision_viewers;
@@ -121,7 +121,7 @@ public:
 	}
 
 	void set_parent_transform(const Transform3D &parent_transform) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		if (shadow_occluder.is_valid()) {
 			const Transform3D local_transform(Basis(), _position_in_voxels);
@@ -144,6 +144,6 @@ protected:
 	}
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESH_BLOCK_VT_H

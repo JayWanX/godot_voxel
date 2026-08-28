@@ -18,21 +18,21 @@
 #include "../../util/profiling.h"
 #include "voxel_instance_library_editor_plugin.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelInstanceLibraryListEditor::VoxelInstanceLibraryListEditor() {}
 
 void VoxelInstanceLibraryListEditor::setup(const Control *icon_provider, VoxelInstanceLibraryEditorPlugin *plugin) {
 	using Self = VoxelInstanceLibraryListEditor;
 
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(_item_list == nullptr);
-	ZN_ASSERT_RETURN(icon_provider != nullptr);
-	ZN_ASSERT_RETURN(plugin != nullptr);
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(_item_list == nullptr);
+	VOXEL_ASSERT_RETURN(icon_provider != nullptr);
+	VOXEL_ASSERT_RETURN(plugin != nullptr);
 
 	const VoxelStringNames &sn = VoxelStringNames::get_singleton();
 	const float editor_scale = EDSCALE;
@@ -68,7 +68,7 @@ void VoxelInstanceLibraryListEditor::setup(const Control *icon_provider, VoxelIn
 	// TODO Could need optimization.
 	// In the editor, dialogs are full-blown windows, and here they get re-created every time a library is inspected.
 	{
-		ZN_PROFILE_SCOPE_NAMED("Dialogs");
+		VOXEL_PROFILE_SCOPE_NAMED("Dialogs");
 
 		Control *base_control = plugin->get_editor_interface()->get_base_control();
 
@@ -136,7 +136,7 @@ void VoxelInstanceLibraryListEditor::_notification(int p_what) {
 				if (item_list_count != lib_item_count) {
 					update_list_from_library();
 				} else {
-					ZN_ASSERT_RETURN(static_cast<int>(_name_cache.size()) == item_list_count);
+					VOXEL_ASSERT_RETURN(static_cast<int>(_name_cache.size()) == item_list_count);
 					for (int i = 0; i < item_list_count; ++i) {
 						const int id = _item_list->get_item_metadata(i);
 						Ref<VoxelInstanceLibraryItem> item = _library->get_item(id);
@@ -161,7 +161,7 @@ void VoxelInstanceLibraryListEditor::_notification(int p_what) {
 }
 
 void VoxelInstanceLibraryListEditor::on_list_item_selected(int index) {
-	ZN_ASSERT_RETURN(_library.is_valid());
+	VOXEL_ASSERT_RETURN(_library.is_valid());
 	const int item_id = _item_list->get_item_metadata(index);
 	_library->set_selected_item_id(item_id);
 }
@@ -175,7 +175,7 @@ void VoxelInstanceLibraryListEditor::on_button_pressed(int button_id) {
 			break;
 
 		case BUTTON_ADD_SCENE_ITEM:
-			zylann::godot::popup_file_dialog(*_open_scene_dialog);
+			voxel::godot::popup_file_dialog(*_open_scene_dialog);
 			break;
 
 		case BUTTON_REMOVE_ITEM: {
@@ -185,7 +185,7 @@ void VoxelInstanceLibraryListEditor::on_button_pressed(int button_id) {
 				const int ui_index = selected_items[0];
 				const int item_id = _item_list->get_item_metadata(ui_index);
 				_item_id_to_remove = item_id;
-				_confirmation_dialog->set_text(ZN_TTR("Remove item {0}?").format(varray(_item_id_to_remove)));
+				_confirmation_dialog->set_text(VOXEL_TTR("Remove item {0}?").format(varray(_item_id_to_remove)));
 				_confirmation_dialog->popup_centered();
 			}
 		} break;
@@ -240,7 +240,7 @@ void VoxelInstanceLibraryListEditor::on_remove_item_confirmed() {
 // 		case IInstanceLibraryItemListener::CHANGE_SCENE:
 // 			break;
 // 		default:
-// 			ZN_PRINT_ERROR("Unhandled change type");
+// 			VOXEL_PRINT_ERROR("Unhandled change type");
 // 			break;
 // 	}
 // }
@@ -327,4 +327,4 @@ void VoxelInstanceLibraryListEditor::_bind_methods() {
 	// );
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

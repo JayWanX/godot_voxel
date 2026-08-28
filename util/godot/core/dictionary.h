@@ -1,19 +1,19 @@
-#ifndef ZN_GODOT_DICTIONARY_H
-#define ZN_GODOT_DICTIONARY_H
+#ifndef VOXEL_GODOT_DICTIONARY_H
+#define VOXEL_GODOT_DICTIONARY_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/variant/dictionary.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/variant/variant.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 template <typename T>
 inline bool try_get(const Dictionary &d, const Variant &key, T &out_value) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	const Variant *v = d.getptr(key);
 	if (v == nullptr) {
 		return false;
@@ -23,7 +23,7 @@ inline bool try_get(const Dictionary &d, const Variant &key, T &out_value) {
 	// between them.
 	out_value = *v;
 	return true;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Variant v = d.get(key, Variant());
 	// TODO GDX: there is no way, in a single lookup, to differenciate an inexistent key and an existing key with the
 	// value `null`. So we have to do a second lookup to check what NIL meant.
@@ -36,6 +36,6 @@ inline bool try_get(const Dictionary &d, const Variant &key, T &out_value) {
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_DICTIONARY_H
+#endif // VOXEL_GODOT_DICTIONARY_H

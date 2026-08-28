@@ -3,12 +3,12 @@
 #include "../../util/math/vector2i.h"
 #include "../../util/string/format.h"
 
-namespace zylann {
+namespace voxel {
 
 using namespace math;
 
 void get_curve_monotonic_sections(Curve &curve, StdVector<CurveMonotonicSection> &sections) {
-	const Interval curve_domain = zylann::godot::get_curve_domain(curve);
+	const Interval curve_domain = voxel::godot::get_curve_domain(curve);
 	const float curve_domain_range = curve_domain.length();
 
 	const int res = curve.get_bake_resolution();
@@ -109,7 +109,7 @@ Interval get_curve_range(Curve &curve, bool &is_monotonic_increasing) {
 	// TODO Would be nice to have the cache directly
 	const int res = curve.get_bake_resolution();
 	Interval range;
-	const Interval curve_domain = zylann::godot::get_curve_domain(curve);
+	const Interval curve_domain = voxel::godot::get_curve_domain(curve);
 	const float curve_domain_range = curve_domain.length();
 	float prev_v = curve.sample_baked(curve_domain.min);
 	if (curve.sample_baked(curve_domain.max) > prev_v) {
@@ -127,4 +127,4 @@ Interval get_curve_range(Curve &curve, bool &is_monotonic_increasing) {
 	return range;
 }
 
-} // namespace zylann
+} // namespace voxel

@@ -7,13 +7,13 @@
 #include "../../util/godot/classes/editor_undo_redo_manager.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class ItemList)
-ZN_GODOT_FORWARD_DECLARE(class LineEdit)
-ZN_GODOT_FORWARD_DECLARE(class OptionButton)
-ZN_GODOT_FORWARD_DECLARE(class SpinBox)
-ZN_GODOT_FORWARD_DECLARE(class Button)
+VOXEL_GODOT_FORWARD_DECLARE(class ItemList)
+VOXEL_GODOT_FORWARD_DECLARE(class LineEdit)
+VOXEL_GODOT_FORWARD_DECLARE(class OptionButton)
+VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
+VOXEL_GODOT_FORWARD_DECLARE(class Button)
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Dialog to edit exposed inputs and outputs of a `VoxelGraphFunction`
 class VoxelGraphEditorIODialog : public ConfirmationDialog {
@@ -68,6 +68,6 @@ private:
 	bool _reshow_on_undo_redo = true;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_IO_DIALOG_H

@@ -2,7 +2,7 @@
 #include "../../meshers/transvoxel/voxel_mesher_transvoxel.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_transvoxel_issue772() {
 	// There was a wrong assertion check on the values of component indices when texturing mode is SINGLE_S4
@@ -37,7 +37,7 @@ void test_transvoxel_issue772() {
 	// Used to crash
 	mesher->build(output, VoxelMesher::Input{ voxels, nullptr, Vector3i(), 0, false, false, false });
 
-	ZN_TEST_ASSERT(!VoxelMesher::is_mesh_empty(output.surfaces));
+	VOXEL_TEST_ASSERT(!VoxelMesher::is_mesh_empty(output.surfaces));
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

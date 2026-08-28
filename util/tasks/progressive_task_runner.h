@@ -1,10 +1,10 @@
-#ifndef ZYLANN_PROGRESSIVE_TASK_RUNNER_H
-#define ZYLANN_PROGRESSIVE_TASK_RUNNER_H
+#ifndef VOXEL_PROGRESSIVE_TASK_RUNNER_H
+#define VOXEL_PROGRESSIVE_TASK_RUNNER_H
 
 #include "../containers/std_queue.h"
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 // TODO It would be really nice if Godot4 Vulkan buffer deallocation was better optimized.
 // This is originally to workaround the terribly slow Vulkan buffer deallocation in Godot4.
@@ -44,6 +44,6 @@ private:
 	int64_t _last_process_time_msec = 0;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_PROGRESSIVE_TASK_RUNNER_H
+#endif // VOXEL_PROGRESSIVE_TASK_RUNNER_H

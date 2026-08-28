@@ -4,7 +4,7 @@
 #include "../../storage/voxel_data.h"
 #include "voxel_lod_terrain_update_data.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void process_clipbox_streaming(
 		VoxelLodTerrainUpdateData::State &state,
@@ -18,6 +18,6 @@ void process_clipbox_streaming(
 		bool can_mesh
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_LOD_TERRAIN_UPDATE_CLIPBOX_STREAMING_H

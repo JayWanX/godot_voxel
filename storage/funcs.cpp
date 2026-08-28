@@ -2,7 +2,7 @@
 #include "../util/math/box3i.h"
 #include <cstring>
 
-namespace zylann::voxel {
+namespace voxel {
 
 void copy_3d_region_zxy(
 		Span<uint8_t> dst,
@@ -24,21 +24,21 @@ void copy_3d_region_zxy(
 
 #ifdef DEBUG_ENABLED
 	if (src.data() == dst.data()) {
-		ZN_ASSERT_RETURN_MSG(
+		VOXEL_ASSERT_RETURN_MSG(
 				!Box3i::from_min_max(src_min, src_max).intersects(Box3i::from_min_max(dst_min, dst_min + area_size)),
 				"Copy across the same buffer to an overlapping area is not supported"
 		);
 	} else if (src.overlaps(dst)) {
-		ZN_PRINT_ERROR("Different overlapping spans are not allowed");
+		VOXEL_PRINT_ERROR("Different overlapping spans are not allowed");
 		return;
 	}
-	ZN_ASSERT_RETURN(Vector3iUtil::get_volume_u64(area_size) * item_size <= dst.size());
-	ZN_ASSERT_RETURN(Vector3iUtil::get_volume_u64(area_size) * item_size <= src.size());
+	VOXEL_ASSERT_RETURN(Vector3iUtil::get_volume_u64(area_size) * item_size <= dst.size());
+	VOXEL_ASSERT_RETURN(Vector3iUtil::get_volume_u64(area_size) * item_size <= src.size());
 #endif
 
 	if (area_size == src_size && area_size == dst_size) {
 		// Copy everything
-		ZN_ASSERT_RETURN(dst.size() == src.size());
+		VOXEL_ASSERT_RETURN(dst.size() == src.size());
 		memcpy(dst.data(), src.data(), dst.size());
 
 	} else {
@@ -54,9 +54,9 @@ void copy_3d_region_zxy(
 			unsigned int dst_ri = Vector3iUtil::get_zxy_index(Vector3i(dst_min + pos), dst_size) * item_size;
 			for (; pos.x < area_size.x; ++pos.x) {
 #ifdef DEBUG_ENABLED
-				ZN_ASSERT_RETURN(dst_ri < dst.size());
-				ZN_ASSERT_RETURN(dst.size() - dst_ri >= area_size.y * item_size);
-				ZN_ASSERT_RETURN(src.size() - src_ri >= area_size.y * item_size);
+				VOXEL_ASSERT_RETURN(dst_ri < dst.size());
+				VOXEL_ASSERT_RETURN(dst.size() - dst_ri >= area_size.y * item_size);
+				VOXEL_ASSERT_RETURN(src.size() - src_ri >= area_size.y * item_size);
 #endif
 				// TODO Cast src and dst to `restrict` so the optimizer can assume addresses don't overlap,
 				//      which might allow to write as a for loop (which may compile as a `memcpy`)?
@@ -90,4 +90,4 @@ Vector3i get_3d_array_transform_origin(const math::OrthoBasis &basis, const Vect
 	return Vector3i(ox, oy, oz);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

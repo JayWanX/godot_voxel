@@ -12,51 +12,51 @@
 #include "../../util/profiling.h"
 #include "vox_import_funcs.h"
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel::magica {
+namespace voxel::magica {
 
-String VoxelVoxSceneImporter::_zn_get_importer_name() const {
+String VoxelVoxSceneImporter::_voxel_get_importer_name() const {
 	return "VoxelVoxSceneImporter";
 }
 
-String VoxelVoxSceneImporter::_zn_get_visible_name() const {
+String VoxelVoxSceneImporter::_voxel_get_visible_name() const {
 	return "VoxelVoxSceneImporter";
 }
 
-PackedStringArray VoxelVoxSceneImporter::_zn_get_recognized_extensions() const {
+PackedStringArray VoxelVoxSceneImporter::_voxel_get_recognized_extensions() const {
 	PackedStringArray extensions;
 	extensions.append("vox");
 	return extensions;
 }
 
-String VoxelVoxSceneImporter::_zn_get_preset_name(int p_idx) const {
+String VoxelVoxSceneImporter::_voxel_get_preset_name(int p_idx) const {
 	return "Default";
 }
 
-int VoxelVoxSceneImporter::_zn_get_preset_count() const {
+int VoxelVoxSceneImporter::_voxel_get_preset_count() const {
 	return 1;
 }
 
-String VoxelVoxSceneImporter::_zn_get_save_extension() const {
+String VoxelVoxSceneImporter::_voxel_get_save_extension() const {
 	return "tscn";
 }
 
-String VoxelVoxSceneImporter::_zn_get_resource_type() const {
+String VoxelVoxSceneImporter::_voxel_get_resource_type() const {
 	return "PackedScene";
 }
 
-float VoxelVoxSceneImporter::_zn_get_priority() const {
+float VoxelVoxSceneImporter::_voxel_get_priority() const {
 	// Higher import priority means the importer is preferred over another.
 	// By default, use this importer (the other Vox importer has lower priority).
 	return 1.0;
 }
 
-int VoxelVoxSceneImporter::_zn_get_import_order() const {
+int VoxelVoxSceneImporter::_voxel_get_import_order() const {
 	return IMPORT_ORDER_SCENE;
 }
 
-void VoxelVoxSceneImporter::_zn_get_import_options(
+void VoxelVoxSceneImporter::_voxel_get_import_options(
 		StdVector<ImportOptionWrapper> &p_out_options,
 		const String &p_path,
 		int p_preset_index
@@ -66,7 +66,7 @@ void VoxelVoxSceneImporter::_zn_get_import_options(
 	p_out_options.push_back(ImportOptionWrapper(PropertyInfo(Variant::BOOL, "enable_baked_lighting"), true));
 }
 
-bool VoxelVoxSceneImporter::_zn_get_option_visibility(
+bool VoxelVoxSceneImporter::_voxel_get_option_visibility(
 		const String &p_path,
 		const StringName &p_option_name,
 		const KeyValueWrapper p_options
@@ -273,14 +273,14 @@ Error process_scene_node_recursively(
 
 } // namespace
 
-Error VoxelVoxSceneImporter::_zn_import(
+Error VoxelVoxSceneImporter::_voxel_import(
 		const String &p_source_file,
 		const String &p_save_path,
 		const KeyValueWrapper p_options,
 		StringListWrapper p_out_platform_variants,
 		StringListWrapper p_out_gen_files
 ) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const bool p_store_colors_in_textures = p_options.get("store_colors_in_texture");
 	const float p_scale = p_options.get("scale");
@@ -417,7 +417,7 @@ Error VoxelVoxSceneImporter::_zn_import(
 
 	// Save meshes
 	for (unsigned int model_index = 0; model_index < meshes.size(); ++model_index) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		Ref<Mesh> mesh = meshes[model_index].mesh;
 		// Some models might be empty, as seen earlier
 		if (mesh.is_null()) {
@@ -436,7 +436,7 @@ Error VoxelVoxSceneImporter::_zn_import(
 
 	// Save scene
 	{
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		Ref<PackedScene> scene;
 		scene.instantiate();
 		scene->pack(root_node);
@@ -449,7 +449,7 @@ Error VoxelVoxSceneImporter::_zn_import(
 	return OK;
 }
 
-bool VoxelVoxSceneImporter::_zn_can_import_threaded() const {
+bool VoxelVoxSceneImporter::_voxel_can_import_threaded() const {
 	// By default it is `true`, but `ResourceSaver::save` ended up deadlocking the editor when saving meshes.
 	// I don't know if this is a known issue or something importers should do when saving meshes.
 
@@ -459,4 +459,4 @@ bool VoxelVoxSceneImporter::_zn_can_import_threaded() const {
 	return false;
 }
 
-} // namespace zylann::voxel::magica
+} // namespace voxel::magica

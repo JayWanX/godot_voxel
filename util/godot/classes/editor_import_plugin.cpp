@@ -1,73 +1,73 @@
 #include "editor_import_plugin.h"
 #include "../../errors.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
-String ZN_EditorImportPlugin::get_importer_name() const {
-	return _zn_get_importer_name();
+String VOXEL_EditorImportPlugin::get_importer_name() const {
+	return _voxel_get_importer_name();
 }
 
-String ZN_EditorImportPlugin::get_visible_name() const {
-	return _zn_get_visible_name();
+String VOXEL_EditorImportPlugin::get_visible_name() const {
+	return _voxel_get_visible_name();
 }
 
-void ZN_EditorImportPlugin::get_recognized_extensions(List<String> *p_extensions) const {
-	ZN_ASSERT_RETURN(p_extensions != nullptr);
-	const PackedStringArray extensions = _zn_get_recognized_extensions();
+void VOXEL_EditorImportPlugin::get_recognized_extensions(List<String> *p_extensions) const {
+	VOXEL_ASSERT_RETURN(p_extensions != nullptr);
+	const PackedStringArray extensions = _voxel_get_recognized_extensions();
 	for (const String &extension : extensions) {
 		p_extensions->push_back(extension);
 	}
 }
 
-String ZN_EditorImportPlugin::get_preset_name(int p_idx) const {
-	return _zn_get_preset_name(p_idx);
+String VOXEL_EditorImportPlugin::get_preset_name(int p_idx) const {
+	return _voxel_get_preset_name(p_idx);
 }
 
-int ZN_EditorImportPlugin::get_preset_count() const {
-	return _zn_get_preset_count();
+int VOXEL_EditorImportPlugin::get_preset_count() const {
+	return _voxel_get_preset_count();
 }
 
-String ZN_EditorImportPlugin::get_save_extension() const {
-	return _zn_get_save_extension();
+String VOXEL_EditorImportPlugin::get_save_extension() const {
+	return _voxel_get_save_extension();
 }
 
-String ZN_EditorImportPlugin::get_resource_type() const {
-	return _zn_get_resource_type();
+String VOXEL_EditorImportPlugin::get_resource_type() const {
+	return _voxel_get_resource_type();
 }
 
-float ZN_EditorImportPlugin::get_priority() const {
-	return _zn_get_priority();
+float VOXEL_EditorImportPlugin::get_priority() const {
+	return _voxel_get_priority();
 }
 
-int ZN_EditorImportPlugin::get_import_order() const {
-	return _zn_get_import_order();
+int VOXEL_EditorImportPlugin::get_import_order() const {
+	return _voxel_get_import_order();
 }
 
-void ZN_EditorImportPlugin::get_import_options(
+void VOXEL_EditorImportPlugin::get_import_options(
 		const String &p_path,
 		List<ImportOption> *r_options,
 		int p_preset
 ) const {
-	ZN_ASSERT_RETURN(r_options != nullptr);
+	VOXEL_ASSERT_RETURN(r_options != nullptr);
 	StdVector<ImportOptionWrapper> options;
-	_zn_get_import_options(options, p_path, p_preset);
+	_voxel_get_import_options(options, p_path, p_preset);
 	for (const ImportOptionWrapper &option : options) {
 		ImportOption opt(option.option, option.default_value);
 		r_options->push_back(opt);
 	}
 }
 
-bool ZN_EditorImportPlugin::get_option_visibility(
+bool VOXEL_EditorImportPlugin::get_option_visibility(
 		const String &p_path,
 		const String &p_option,
 		const HashMap<StringName, Variant> &p_options
 ) const {
-	return _zn_get_option_visibility(p_path, p_option, KeyValueWrapper{ p_options });
+	return _voxel_get_option_visibility(p_path, p_option, KeyValueWrapper{ p_options });
 }
 
-Error ZN_EditorImportPlugin::import(
+Error VOXEL_EditorImportPlugin::import(
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 		ResourceUID::ID p_source_id,
 #endif
@@ -78,9 +78,9 @@ Error ZN_EditorImportPlugin::import(
 		List<String> *r_gen_files,
 		Variant *r_metadata
 ) {
-	ZN_ASSERT_RETURN_V(r_platform_variants != nullptr, ERR_BUG);
-	ZN_ASSERT_RETURN_V(r_gen_files != nullptr, ERR_BUG);
-	return _zn_import(
+	VOXEL_ASSERT_RETURN_V(r_platform_variants != nullptr, ERR_BUG);
+	VOXEL_ASSERT_RETURN_V(r_gen_files != nullptr, ERR_BUG);
+	return _voxel_import(
 			p_source_file,
 			p_save_path,
 			KeyValueWrapper{ p_options },
@@ -90,52 +90,52 @@ Error ZN_EditorImportPlugin::import(
 }
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
-bool ZN_EditorImportPlugin::can_import_threaded() const {
-	return _zn_can_import_threaded();
+bool VOXEL_EditorImportPlugin::can_import_threaded() const {
+	return _voxel_can_import_threaded();
 }
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 
-String ZN_EditorImportPlugin::_get_importer_name() const {
-	return _zn_get_importer_name();
+String VOXEL_EditorImportPlugin::_get_importer_name() const {
+	return _voxel_get_importer_name();
 }
 
-String ZN_EditorImportPlugin::_get_visible_name() const {
-	return _zn_get_visible_name();
+String VOXEL_EditorImportPlugin::_get_visible_name() const {
+	return _voxel_get_visible_name();
 }
 
-PackedStringArray ZN_EditorImportPlugin::_get_recognized_extensions() const {
-	return _zn_get_recognized_extensions();
+PackedStringArray VOXEL_EditorImportPlugin::_get_recognized_extensions() const {
+	return _voxel_get_recognized_extensions();
 }
 
-String ZN_EditorImportPlugin::_get_preset_name(int32_t p_idx) const {
-	return _zn_get_preset_name(p_idx);
+String VOXEL_EditorImportPlugin::_get_preset_name(int32_t p_idx) const {
+	return _voxel_get_preset_name(p_idx);
 }
 
-int32_t ZN_EditorImportPlugin::_get_preset_count() const {
-	return _zn_get_preset_count();
+int32_t VOXEL_EditorImportPlugin::_get_preset_count() const {
+	return _voxel_get_preset_count();
 }
 
-String ZN_EditorImportPlugin::_get_save_extension() const {
-	return _zn_get_save_extension();
+String VOXEL_EditorImportPlugin::_get_save_extension() const {
+	return _voxel_get_save_extension();
 }
 
-String ZN_EditorImportPlugin::_get_resource_type() const {
-	return _zn_get_resource_type();
+String VOXEL_EditorImportPlugin::_get_resource_type() const {
+	return _voxel_get_resource_type();
 }
 
-float ZN_EditorImportPlugin::_get_priority() const {
-	return _zn_get_priority();
+float VOXEL_EditorImportPlugin::_get_priority() const {
+	return _voxel_get_priority();
 }
 
-int32_t ZN_EditorImportPlugin::_get_import_order() const {
-	return _zn_get_import_order();
+int32_t VOXEL_EditorImportPlugin::_get_import_order() const {
+	return _voxel_get_import_order();
 }
 
-TypedArray<Dictionary> ZN_EditorImportPlugin::_get_import_options(const String &path, int32_t preset_index) const {
+TypedArray<Dictionary> VOXEL_EditorImportPlugin::_get_import_options(const String &path, int32_t preset_index) const {
 	StdVector<ImportOptionWrapper> options;
-	_zn_get_import_options(options, path, preset_index);
+	_voxel_get_import_options(options, path, preset_index);
 
 	TypedArray<Dictionary> output;
 
@@ -158,15 +158,15 @@ TypedArray<Dictionary> ZN_EditorImportPlugin::_get_import_options(const String &
 	return output;
 }
 
-bool ZN_EditorImportPlugin::_get_option_visibility(
+bool VOXEL_EditorImportPlugin::_get_option_visibility(
 		const String &path,
 		const StringName &option_name,
 		const Dictionary &options
 ) const {
-	return _zn_get_option_visibility(path, option_name, KeyValueWrapper{ options });
+	return _voxel_get_option_visibility(path, option_name, KeyValueWrapper{ options });
 }
 
-Error ZN_EditorImportPlugin::_import(
+Error VOXEL_EditorImportPlugin::_import(
 		const String &source_file,
 		const String &save_path,
 		const Dictionary &options,
@@ -176,7 +176,7 @@ Error ZN_EditorImportPlugin::_import(
 	// TODO GDX: `EditorImportPlugin::_import` is passing constant arrays for parameters that should be writable
 	TypedArray<String> &platform_variants_writable = const_cast<TypedArray<String> &>(platform_variants);
 	TypedArray<String> &gen_files_writable = const_cast<TypedArray<String> &>(gen_files);
-	return _zn_import(
+	return _voxel_import(
 			source_file,
 			save_path,
 			KeyValueWrapper{ options },
@@ -186,87 +186,87 @@ Error ZN_EditorImportPlugin::_import(
 }
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
-bool ZN_EditorImportPlugin::_can_import_threaded() const {
-	return _zn_can_import_threaded();
+bool VOXEL_EditorImportPlugin::_can_import_threaded() const {
+	return _voxel_can_import_threaded();
 }
 #endif
 
 #endif
 
-String ZN_EditorImportPlugin::_zn_get_importer_name() const {
-	ZN_PRINT_ERROR("Method is not implemented");
+String VOXEL_EditorImportPlugin::_voxel_get_importer_name() const {
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "<unnamed>";
 }
 
-String ZN_EditorImportPlugin::_zn_get_visible_name() const {
-	ZN_PRINT_ERROR("Method is not implemented");
+String VOXEL_EditorImportPlugin::_voxel_get_visible_name() const {
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "<unnamed>";
 }
-PackedStringArray ZN_EditorImportPlugin::_zn_get_recognized_extensions() const {
-	ZN_PRINT_ERROR("Method is not implemented");
+PackedStringArray VOXEL_EditorImportPlugin::_voxel_get_recognized_extensions() const {
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return PackedStringArray();
 }
 
-String ZN_EditorImportPlugin::_zn_get_preset_name(int p_idx) const {
-	ZN_PRINT_ERROR("Method is not implemented");
+String VOXEL_EditorImportPlugin::_voxel_get_preset_name(int p_idx) const {
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "<unnamed>";
 }
 
-int ZN_EditorImportPlugin::_zn_get_preset_count() const {
-	ZN_PRINT_ERROR("Method is not implemented");
+int VOXEL_EditorImportPlugin::_voxel_get_preset_count() const {
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return 0;
 }
 
-String ZN_EditorImportPlugin::_zn_get_save_extension() const {
-	ZN_PRINT_ERROR("Method is not implemented");
+String VOXEL_EditorImportPlugin::_voxel_get_save_extension() const {
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "";
 }
 
-String ZN_EditorImportPlugin::_zn_get_resource_type() const {
-	ZN_PRINT_ERROR("Method is not implemented");
+String VOXEL_EditorImportPlugin::_voxel_get_resource_type() const {
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return "";
 }
 
-float ZN_EditorImportPlugin::_zn_get_priority() const {
+float VOXEL_EditorImportPlugin::_voxel_get_priority() const {
 	return 1.0;
 }
 
-int ZN_EditorImportPlugin::_zn_get_import_order() const {
+int VOXEL_EditorImportPlugin::_voxel_get_import_order() const {
 	return IMPORT_ORDER_DEFAULT;
 }
 
-void ZN_EditorImportPlugin::_zn_get_import_options(
+void VOXEL_EditorImportPlugin::_voxel_get_import_options(
 		StdVector<ImportOptionWrapper> &p_out_options,
 		const String &p_path,
 		int p_preset_index
 ) const {
-	ZN_PRINT_ERROR("Method is not implemented");
+	VOXEL_PRINT_ERROR("Method is not implemented");
 }
 
-bool ZN_EditorImportPlugin::_zn_get_option_visibility(
+bool VOXEL_EditorImportPlugin::_voxel_get_option_visibility(
 		const String &p_path,
 		const StringName &p_option_name,
 		const KeyValueWrapper p_options
 ) const {
-	ZN_PRINT_ERROR("Method is not implemented");
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return false;
 }
 
-Error ZN_EditorImportPlugin::_zn_import(
+Error VOXEL_EditorImportPlugin::_voxel_import(
 		const String &p_source_file,
 		const String &p_save_path,
 		const KeyValueWrapper p_options,
 		StringListWrapper p_out_platform_variants,
 		StringListWrapper p_out_gen_files
 ) const {
-	ZN_PRINT_ERROR("Method is not implemented");
+	VOXEL_PRINT_ERROR("Method is not implemented");
 	return ERR_METHOD_NOT_FOUND;
 }
 
-bool ZN_EditorImportPlugin::_zn_can_import_threaded() const {
+bool VOXEL_EditorImportPlugin::_voxel_can_import_threaded() const {
 	// According to docs
 	// https://docs.godotengine.org/en/stable/classes/class_editorimportplugin.html#class-editorimportplugin-private-method-can-import-threaded
 	return true;
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

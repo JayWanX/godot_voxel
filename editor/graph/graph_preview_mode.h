@@ -1,7 +1,7 @@
 #ifndef VOXEL_GRAPH_EDITOR_PREVIEW_MODE_H
 #define VOXEL_GRAPH_EDITOR_PREVIEW_MODE_H
 
-namespace zylann::voxel {
+namespace voxel {
 namespace GraphEditorPreview {
 
 enum ViewMode { //
@@ -11,6 +11,6 @@ enum ViewMode { //
 };
 
 } // namespace GraphEditorPreview
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_PREVIEW_MODE_H

@@ -15,46 +15,46 @@
 #include "../../util/profiling.h"
 #include "vox_import_funcs.h"
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel::magica {
+namespace voxel::magica {
 
-String VoxelVoxMeshImporter::_zn_get_importer_name() const {
+String VoxelVoxMeshImporter::_voxel_get_importer_name() const {
 	return "VoxelVoxMeshImporter";
 }
 
-String VoxelVoxMeshImporter::_zn_get_visible_name() const {
+String VoxelVoxMeshImporter::_voxel_get_visible_name() const {
 	return "VoxelVoxMeshImporter";
 }
 
-PackedStringArray VoxelVoxMeshImporter::_zn_get_recognized_extensions() const {
+PackedStringArray VoxelVoxMeshImporter::_voxel_get_recognized_extensions() const {
 	PackedStringArray extensions;
 	extensions.append("vox");
 	return extensions;
 }
 
-String VoxelVoxMeshImporter::_zn_get_preset_name(int p_idx) const {
+String VoxelVoxMeshImporter::_voxel_get_preset_name(int p_idx) const {
 	return "Default";
 }
 
-int VoxelVoxMeshImporter::_zn_get_preset_count() const {
+int VoxelVoxMeshImporter::_voxel_get_preset_count() const {
 	return 1;
 }
 
-String VoxelVoxMeshImporter::_zn_get_save_extension() const {
+String VoxelVoxMeshImporter::_voxel_get_save_extension() const {
 	return "mesh";
 }
 
-String VoxelVoxMeshImporter::_zn_get_resource_type() const {
+String VoxelVoxMeshImporter::_voxel_get_resource_type() const {
 	return "ArrayMesh";
 }
 
-float VoxelVoxMeshImporter::_zn_get_priority() const {
+float VoxelVoxMeshImporter::_voxel_get_priority() const {
 	// Higher import priority means the importer is preferred over another.
 	return 0.0;
 }
 
-void VoxelVoxMeshImporter::_zn_get_import_options(
+void VoxelVoxMeshImporter::_voxel_get_import_options(
 		StdVector<ImportOptionWrapper> &out_options,
 		const String &path,
 		int preset_index
@@ -67,7 +67,7 @@ void VoxelVoxMeshImporter::_zn_get_import_options(
 	));
 }
 
-bool VoxelVoxMeshImporter::_zn_get_option_visibility(
+bool VoxelVoxMeshImporter::_voxel_get_option_visibility(
 		const String &path,
 		const StringName &option_name,
 		const KeyValueWrapper options
@@ -151,7 +151,7 @@ struct ModelInstance {
 };
 
 void extract_model_instances(const Data &vox_data, StdVector<ModelInstance> &out_instances) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 	// Gather all models and bake their rotations
 	for_each_model_instance(vox_data, [&out_instances](ForEachModelInstanceArgs args) {
 		ERR_FAIL_COND(args.model == nullptr);
@@ -214,7 +214,7 @@ bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_o
 			volume > limit,
 			false,
 			String("Vox data is too big to be meshed as a single mesh ({0}: {0} bytes)")
-					.format(varray(bounding_box.size, ZN_SIZE_T_TO_VARIANT(volume)))
+					.format(varray(bounding_box.size, VOXEL_SIZE_T_TO_VARIANT(volume)))
 	);
 
 	out_voxels.create(bounding_box.size + Vector3iUtil::create(VoxelMesherCubes::PADDING * 2));
@@ -237,7 +237,7 @@ bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_o
 	return true;
 }
 
-Error VoxelVoxMeshImporter::_zn_import(
+Error VoxelVoxMeshImporter::_voxel_import(
 		const String &p_source_file,
 		const String &p_save_path,
 		const KeyValueWrapper p_options,
@@ -379,7 +379,7 @@ Error VoxelVoxMeshImporter::_zn_import(
 
 	// Save mesh
 	{
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		String mesh_save_path = String("{0}.mesh").format(varray(p_save_path));
 		const Error mesh_save_err = save_resource(mesh, mesh_save_path, ResourceSaver::FLAG_NONE);
 		ERR_FAIL_COND_V_MSG(
@@ -390,4 +390,4 @@ Error VoxelVoxMeshImporter::_zn_import(
 	return OK;
 }
 
-} // namespace zylann::voxel::magica
+} // namespace voxel::magica

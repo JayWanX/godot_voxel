@@ -1,10 +1,10 @@
 #include "voxel_raycast_result.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 Vector3i VoxelRaycastResult::_b_get_position() const {
 	return position;
@@ -34,4 +34,4 @@ void VoxelRaycastResult::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "normal"), "", "get_normal");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

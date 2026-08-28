@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 union FloatBits
 {
@@ -77,4 +77,4 @@ float meshopt_dequantizeHalf(unsigned short h)
 	return u.f;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

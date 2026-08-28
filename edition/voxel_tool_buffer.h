@@ -3,7 +3,7 @@
 
 #include "voxel_tool.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelToolBuffer : public VoxelTool {
 	GDCLASS(VoxelToolBuffer, VoxelTool)
@@ -52,6 +52,6 @@ private:
 	Ref<godot::VoxelBuffer> _buffer;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_TOOL_BUFFER_H

@@ -1,11 +1,11 @@
-#ifndef ZN_GODOT_STRING_NAMES_H
-#define ZN_GODOT_STRING_NAMES_H
+#ifndef VOXEL_GODOT_STRING_NAMES_H
+#define VOXEL_GODOT_STRING_NAMES_H
 
 #include "core/string_name.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
-// StringNames used by ZN_* classes
+// StringNames used by VOXEL_* classes
 class StringNames {
 private:
 	static StringNames *g_singleton;
@@ -28,6 +28,6 @@ public:
 #endif
 };
 
-}; // namespace zylann::godot
+}; // namespace voxel::godot
 
 #endif

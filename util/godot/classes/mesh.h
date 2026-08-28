@@ -1,16 +1,16 @@
-#ifndef ZN_GODOT_MESH_H
-#define ZN_GODOT_MESH_H
+#ifndef VOXEL_GODOT_MESH_H
+#define VOXEL_GODOT_MESH_H
 
 #include "../../containers/span.h"
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/resources/mesh.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/mesh.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Mesh utilities
 
@@ -22,6 +22,6 @@ void offset_vec3_array(PackedVector3Array &array, Vector3 offset);
 void scale_surface(Array &surface, float scale);
 void offset_surface(Array &surface, Vector3 offset);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_MESH_H
+#endif // VOXEL_GODOT_MESH_H

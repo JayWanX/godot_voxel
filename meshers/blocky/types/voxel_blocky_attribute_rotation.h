@@ -3,7 +3,7 @@
 
 #include "voxel_blocky_attribute.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // `rotation`
 class VoxelBlockyAttributeRotation : public VoxelBlockyAttribute {
@@ -22,6 +22,6 @@ private:
 	bool _horizontal_roll_enabled = false;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_ATTRIBUTE_ROTATION_H

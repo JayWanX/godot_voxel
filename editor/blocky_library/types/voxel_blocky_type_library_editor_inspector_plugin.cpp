@@ -3,24 +3,24 @@
 #include "../../../util/godot/core/string.h"
 #include "voxel_blocky_type_library_ids_dialog.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../../util/godot/core/callable_mp.h"
 #include "../../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
-bool VoxelBlockyTypeLibraryEditorInspectorPlugin::_zn_can_handle(const Object *p_object) const {
+bool VoxelBlockyTypeLibraryEditorInspectorPlugin::_voxel_can_handle(const Object *p_object) const {
 	return Object::cast_to<VoxelBlockyTypeLibrary>(p_object) != nullptr;
 }
 
-void VoxelBlockyTypeLibraryEditorInspectorPlugin::_zn_parse_end(Object *p_object) {
+void VoxelBlockyTypeLibraryEditorInspectorPlugin::_voxel_parse_end(Object *p_object) {
 	const VoxelBlockyTypeLibrary *library_ptr = Object::cast_to<VoxelBlockyTypeLibrary>(p_object);
-	ZN_ASSERT_RETURN(library_ptr != nullptr);
+	VOXEL_ASSERT_RETURN(library_ptr != nullptr);
 	Ref<VoxelBlockyTypeLibrary> library(library_ptr);
 
 	Button *button = memnew(Button);
-	button->set_text(ZN_TTR("Inspect IDs..."));
+	button->set_text(VOXEL_TTR("Inspect IDs..."));
 
 	button->connect(
 			"pressed",
@@ -38,11 +38,11 @@ void VoxelBlockyTypeLibraryEditorInspectorPlugin::set_ids_dialog(VoxelBlockyType
 }
 
 void VoxelBlockyTypeLibraryEditorInspectorPlugin::_on_inspect_ids_button_pressed(Ref<VoxelBlockyTypeLibrary> library) {
-	ZN_ASSERT_RETURN(_ids_dialog != nullptr);
+	VOXEL_ASSERT_RETURN(_ids_dialog != nullptr);
 	_ids_dialog->set_library(library);
 	_ids_dialog->popup_centered();
 }
 
 void VoxelBlockyTypeLibraryEditorInspectorPlugin::_bind_methods() {}
 
-} // namespace zylann::voxel
+} // namespace voxel

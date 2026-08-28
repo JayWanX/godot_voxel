@@ -1,11 +1,11 @@
-#ifndef ZYLANN_BOX2F_H
-#define ZYLANN_BOX2F_H
+#ifndef VOXEL_BOX2F_H
+#define VOXEL_BOX2F_H
 
 #include "../containers/small_vector.h"
 #include "funcs.h"
 #include "vector2f.h"
 
-namespace zylann {
+namespace voxel {
 
 // Axis-aligned 2D box using float coordinates
 class Box2f {
@@ -92,6 +92,6 @@ public:
 class TextWriter;
 TextWriter &operator<<(TextWriter &ss, const Box2f &box);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_Box2i_H
+#endif // VOXEL_Box2i_H

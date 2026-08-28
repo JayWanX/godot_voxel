@@ -1,24 +1,24 @@
-#ifndef ZYLANN_EDITOR_PROPERTY_TEXT_CHANGE_ON_SUBMIT_H
-#define ZYLANN_EDITOR_PROPERTY_TEXT_CHANGE_ON_SUBMIT_H
+#ifndef VOXEL_EDITOR_PROPERTY_TEXT_CHANGE_ON_SUBMIT_H
+#define VOXEL_EDITOR_PROPERTY_TEXT_CHANGE_ON_SUBMIT_H
 
 #include "../../util/godot/classes/editor_property.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class LineEdit)
+VOXEL_GODOT_FORWARD_DECLARE(class LineEdit)
 
-namespace zylann {
+namespace voxel {
 
 // The default string editor of the inspector calls the setter of the edited object on every character typed.
 // This is not always desired. Instead, this editor should emit a change only when enter is pressed, or when the
 // editor looses focus.
 // Note: Godot's default string editor for LineEdit is `EditorPropertyText`
-class ZN_EditorPropertyTextChangeOnSubmit : public zylann::godot::ZN_EditorProperty {
-	GDCLASS(ZN_EditorPropertyTextChangeOnSubmit, zylann::godot::ZN_EditorProperty)
+class VOXEL_EditorPropertyTextChangeOnSubmit : public voxel::godot::VOXEL_EditorProperty {
+	GDCLASS(VOXEL_EditorPropertyTextChangeOnSubmit, voxel::godot::VOXEL_EditorProperty)
 public:
-	ZN_EditorPropertyTextChangeOnSubmit();
+	VOXEL_EditorPropertyTextChangeOnSubmit();
 
 protected:
-	void _zn_update_property() override;
+	void _voxel_update_property() override;
 
 private:
 	void _on_line_edit_focus_entered();
@@ -33,6 +33,6 @@ private:
 	bool _changed = false;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZYLANN_EDITOR_PROPERTY_TEXT_CHANGE_ON_SUBMIT_H
+#endif // VOXEL_EDITOR_PROPERTY_TEXT_CHANGE_ON_SUBMIT_H

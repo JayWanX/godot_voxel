@@ -1,14 +1,14 @@
-#ifndef ZN_GODOT_PROJECT_SETTINGS_H
-#define ZN_GODOT_PROJECT_SETTINGS_H
+#ifndef VOXEL_GODOT_PROJECT_SETTINGS_H
+#define VOXEL_GODOT_PROJECT_SETTINGS_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/config/project_settings.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/project_settings.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void add_custom_project_setting(
 		Variant::Type type,
@@ -19,6 +19,6 @@ void add_custom_project_setting(
 		bool requires_restart
 );
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_PROJECT_SETTINGS_H
+#endif // VOXEL_GODOT_PROJECT_SETTINGS_H

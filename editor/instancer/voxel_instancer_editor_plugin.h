@@ -4,22 +4,22 @@
 #include "../../util/godot/classes/editor_plugin.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class MenuButton)
+VOXEL_GODOT_FORWARD_DECLARE(class MenuButton)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstancer;
 class VoxelInstancerStatView;
 
-class VoxelInstancerEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(VoxelInstancerEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VoxelInstancerEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VoxelInstancerEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	VoxelInstancerEditorPlugin();
 
 protected:
-	bool _zn_handles(const Object *p_object) const override;
-	void _zn_edit(Object *p_object) override;
-	void _zn_make_visible(bool visible) override;
+	bool _voxel_handles(const Object *p_object) const override;
+	void _voxel_edit(Object *p_object) override;
+	void _voxel_make_visible(bool visible) override;
 
 private:
 	void init();
@@ -40,6 +40,6 @@ private:
 	VoxelInstancerStatView *_stat_view = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCER_EDITOR_PLUGIN_H

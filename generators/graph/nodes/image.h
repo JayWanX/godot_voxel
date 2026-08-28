@@ -4,7 +4,7 @@
 #include "../image_range_grid.h"
 #include "../node_type_db.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 inline float get_pixel_repeat(const Image &im, int x, int y, int w, int h) {
 	return im.get_pixel(math::wrap(x, w), math::wrap(y, h)).r;
@@ -62,7 +62,7 @@ inline float sdf_sphere_heightmap(
 	const float nz = z / d;
 	// TODO Could use fast atan2, it doesn't have to be precise
 	// https://github.com/ducha-aiki/fast_atan2/blob/master/fast_atan.cpp
-	const float uvx = -Math::atan2(nz, nx) * zylann::math::INV_TAU<float> + 0.5f;
+	const float uvx = -Math::atan2(nz, nx) * voxel::math::INV_TAU<float> + 0.5f;
 	// This is an approximation of asin(ny)/(PI/2)
 	// TODO It may be desirable to use the real function though,
 	// in cases where we want to combine the same map in shaders
@@ -103,11 +103,11 @@ inline math::Interval sdf_sphere_heightmap(
 
 	Interval h;
 	{
-		const Interval uvx = -atan_r0 * zylann::math::INV_TAU<float> + 0.5f;
+		const Interval uvx = -atan_r0 * voxel::math::INV_TAU<float> + 0.5f;
 		h = im_range->get_range_repeat(uvx * norm_x, uvy * norm_y);
 	}
 	if (atan_r1.valid) {
-		const Interval uvx = -atan_r1.value * zylann::math::INV_TAU<float> + 0.5f;
+		const Interval uvx = -atan_r1.value * voxel::math::INV_TAU<float> + 0.5f;
 		h.add_interval(im_range->get_range_repeat(uvx * norm_x, uvy * norm_y));
 	}
 
@@ -140,19 +140,19 @@ void register_image_nodes(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			Ref<Image> image = ctx.get_param(0);
 			if (image.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Image::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Image::get_class_static())));
 				return;
 			}
 			if (image->is_compressed()) {
-				ctx.make_error(String(ZN_TTR("{0} has a compressed format, this is not supported"))
+				ctx.make_error(String(VOXEL_TTR("{0} has a compressed format, this is not supported"))
 									   .format(varray(Image::get_class_static())));
 				return;
 			}
 			if (image->is_empty()) {
-				ctx.make_error(String(ZN_TTR("{0} is empty").format(varray(Image::get_class_static()))));
+				ctx.make_error(String(VOXEL_TTR("{0} is empty").format(varray(Image::get_class_static()))));
 				return;
 			}
-			ImageRangeGrid *im_range = ZN_NEW(ImageRangeGrid);
+			ImageRangeGrid *im_range = VOXEL_NEW(ImageRangeGrid);
 			im_range->generate(**image);
 			Params p;
 			p.image = *image;
@@ -162,7 +162,7 @@ void register_image_nodes(Span<NodeType> types) {
 			ctx.add_delete_cleanup(im_range);
 		};
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_IMAGE_2D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_IMAGE_2D");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			Runtime::Buffer &out = ctx.get_output(0);
@@ -173,7 +173,7 @@ void register_image_nodes(Span<NodeType> types) {
 			const int h = im.get_height();
 #ifdef DEBUG_ENABLED
 			if (w == 0 || h == 0) {
-				ZN_PRINT_ERROR_ONCE("Image is empty");
+				VOXEL_PRINT_ERROR_ONCE("Image is empty");
 				return;
 			}
 #endif
@@ -225,15 +225,15 @@ void register_image_nodes(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			Ref<Image> image = ctx.get_param(0);
 			if (image.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Image::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Image::get_class_static())));
 				return;
 			}
 			if (image->is_compressed()) {
-				ctx.make_error(String(ZN_TTR("{0} has a compressed format, this is not supported"))
+				ctx.make_error(String(VOXEL_TTR("{0} has a compressed format, this is not supported"))
 									   .format(varray(Image::get_class_static())));
 				return;
 			}
-			ImageRangeGrid *im_range = ZN_NEW(ImageRangeGrid);
+			ImageRangeGrid *im_range = VOXEL_NEW(ImageRangeGrid);
 			im_range->generate(**image);
 			const float factor = ctx.get_param(2);
 			const Interval range = im_range->get_range() * factor;
@@ -251,7 +251,7 @@ void register_image_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_SDF_SPHERE_HEIGHTMAP");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_SDF_SPHERE_HEIGHTMAP");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			const Runtime::Buffer &z = ctx.get_input(2);
@@ -287,4 +287,4 @@ void register_image_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

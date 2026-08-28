@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/curve.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_get_curve_monotonic_sections() {
 	// This one is a bit annoying to test because Curve has float precision issues stemming from the bake() function
@@ -21,27 +21,27 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 1));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 1);
-		ZN_TEST_ASSERT(sections[0].x_min == 0.f);
-		ZN_TEST_ASSERT(sections[0].x_max == 1.f);
-		ZN_TEST_ASSERT(sections[0].y_min == 0.f);
-		ZN_TEST_ASSERT(sections[0].y_max == 1.f);
+		VOXEL_TEST_ASSERT(sections.size() == 1);
+		VOXEL_TEST_ASSERT(sections[0].x_min == 0.f);
+		VOXEL_TEST_ASSERT(sections[0].x_max == 1.f);
+		VOXEL_TEST_ASSERT(sections[0].y_min == 0.f);
+		VOXEL_TEST_ASSERT(sections[0].y_max == 1.f);
 		{
 			math::Interval yi = get_curve_range(**curve, sections, math::Interval(0.f, 1.f));
-			ZN_TEST_ASSERT(L::is_equal_approx(yi.min, 0.f));
-			ZN_TEST_ASSERT(L::is_equal_approx(yi.max, 1.f));
+			VOXEL_TEST_ASSERT(L::is_equal_approx(yi.min, 0.f));
+			VOXEL_TEST_ASSERT(L::is_equal_approx(yi.max, 1.f));
 		}
 		{
 			math::Interval yi = get_curve_range(**curve, sections, math::Interval(-2.f, 2.f));
-			ZN_TEST_ASSERT(L::is_equal_approx(yi.min, 0.f));
-			ZN_TEST_ASSERT(L::is_equal_approx(yi.max, 1.f));
+			VOXEL_TEST_ASSERT(L::is_equal_approx(yi.min, 0.f));
+			VOXEL_TEST_ASSERT(L::is_equal_approx(yi.max, 1.f));
 		}
 		{
 			math::Interval xi(0.2f, 0.8f);
 			math::Interval yi = get_curve_range(**curve, sections, xi);
 			math::Interval yi_expected(curve->sample_baked(xi.min), curve->sample_baked(xi.max));
-			ZN_TEST_ASSERT(L::is_equal_approx(yi.min, yi_expected.min));
-			ZN_TEST_ASSERT(L::is_equal_approx(yi.max, yi_expected.max));
+			VOXEL_TEST_ASSERT(L::is_equal_approx(yi.min, yi_expected.min));
+			VOXEL_TEST_ASSERT(L::is_equal_approx(yi.max, yi_expected.max));
 		}
 	}
 	{
@@ -52,11 +52,11 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 0));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 1);
-		ZN_TEST_ASSERT(sections[0].x_min == 0.f);
-		ZN_TEST_ASSERT(sections[0].x_max == 1.f);
-		ZN_TEST_ASSERT(sections[0].y_min == 0.f);
-		ZN_TEST_ASSERT(sections[0].y_max == 0.f);
+		VOXEL_TEST_ASSERT(sections.size() == 1);
+		VOXEL_TEST_ASSERT(sections[0].x_min == 0.f);
+		VOXEL_TEST_ASSERT(sections[0].x_max == 1.f);
+		VOXEL_TEST_ASSERT(sections[0].y_min == 0.f);
+		VOXEL_TEST_ASSERT(sections[0].y_max == 0.f);
 	}
 	{
 		// Two segments: going up, then flat
@@ -67,7 +67,7 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 1));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 1);
+		VOXEL_TEST_ASSERT(sections.size() == 1);
 	}
 	{
 		// Two segments: flat, then up
@@ -78,7 +78,7 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 1));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 1);
+		VOXEL_TEST_ASSERT(sections.size() == 1);
 	}
 	{
 		// Three segments: flat, then up, then flat
@@ -90,7 +90,7 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 1));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 1);
+		VOXEL_TEST_ASSERT(sections.size() == 1);
 	}
 	{
 		// Three segments: up, down, up
@@ -102,9 +102,9 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 1));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 3);
-		ZN_TEST_ASSERT(sections[0].x_min == 0.f);
-		ZN_TEST_ASSERT(sections[2].x_max == 1.f);
+		VOXEL_TEST_ASSERT(sections.size() == 3);
+		VOXEL_TEST_ASSERT(sections[0].x_min == 0.f);
+		VOXEL_TEST_ASSERT(sections[2].x_max == 1.f);
 	}
 	{
 		// Two segments: going up, then down
@@ -115,7 +115,7 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 0));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 2);
+		VOXEL_TEST_ASSERT(sections.size() == 2);
 	}
 	{
 		// One segment, curved as a parabola going up then down
@@ -125,11 +125,11 @@ void test_get_curve_monotonic_sections() {
 		curve->add_point(Vector2(1, 0));
 		StdVector<CurveMonotonicSection> sections;
 		get_curve_monotonic_sections(**curve, sections);
-		ZN_TEST_ASSERT(sections.size() == 2);
-		ZN_TEST_ASSERT(sections[0].x_min == 0.f);
-		ZN_TEST_ASSERT(sections[0].y_max >= 0.1f);
-		ZN_TEST_ASSERT(sections[1].x_max == 1.f);
+		VOXEL_TEST_ASSERT(sections.size() == 2);
+		VOXEL_TEST_ASSERT(sections[0].x_min == 0.f);
+		VOXEL_TEST_ASSERT(sections[0].y_max >= 0.1f);
+		VOXEL_TEST_ASSERT(sections[1].x_max == 1.f);
 	}
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

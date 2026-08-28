@@ -2,7 +2,7 @@
 // #include <sstream>
 #include "../../io/text_writer.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 #ifdef TOOLS_ENABLED
 
@@ -26,15 +26,15 @@ PackedStringArray to_godot(const StdVector<StdString> &sv) {
 
 #endif
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-ZN_GODOT_NAMESPACE_BEGIN
+VOXEL_GODOT_NAMESPACE_BEGIN
 
-zylann::TextWriter &operator<<(zylann::TextWriter &w, GodotStringWrapper s) {
+voxel::TextWriter &operator<<(voxel::TextWriter &w, GodotStringWrapper s) {
 	const CharString cs = s.s.utf8();
 	// String has non-explicit constructors from various types making this ambiguous
-	w.write_chars(zylann::Span<const char>(cs.get_data(), cs.length()));
+	w.write_chars(voxel::Span<const char>(cs.get_data(), cs.length()));
 	return w;
 }
 
-ZN_GODOT_NAMESPACE_END
+VOXEL_GODOT_NAMESPACE_END

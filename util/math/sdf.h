@@ -1,11 +1,11 @@
-#ifndef ZN_MATH_SDF_H
-#define ZN_MATH_SDF_H
+#ifndef VOXEL_MATH_SDF_H
+#define VOXEL_MATH_SDF_H
 
 #include "interval.h"
 #include "vector2t.h"
 #include "vector3t.h"
 
-namespace zylann::math {
+namespace voxel::math {
 
 // Signed-distance-field functions.
 // For more, see https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
@@ -163,7 +163,7 @@ IntervalT<T> sdf_smooth_union(const IntervalT<T> p_b, const IntervalT<T> p_a, co
 	// TODO Not tested
 	// Had to use a lambda because otherwise it's ambiguous
 	return sdf_smooth_op(p_b, p_a, p_s, [](const T b, const T a, const T s) { //
-		return zylann::math::sdf_smooth_union(b, a, s);
+		return voxel::math::sdf_smooth_union(b, a, s);
 	});
 }
 
@@ -171,7 +171,7 @@ IntervalT<T> sdf_smooth_union(const IntervalT<T> p_b, const IntervalT<T> p_a, co
 template <typename T>
 IntervalT<T> sdf_smooth_subtract(const IntervalT<T> p_b, const IntervalT<T> p_a, const T p_s) {
 	return sdf_smooth_op(p_b, p_a, p_s, [](const T b, const T a, const T s) { //
-		return zylann::math::sdf_smooth_subtract(b, a, s);
+		return voxel::math::sdf_smooth_subtract(b, a, s);
 	});
 }
 
@@ -306,6 +306,6 @@ struct SdfRoundConePrecalc {
 	}
 };
 
-} // namespace zylann::math
+} // namespace voxel::math
 
-#endif // ZN_MATH_SDF_H
+#endif // VOXEL_MATH_SDF_H

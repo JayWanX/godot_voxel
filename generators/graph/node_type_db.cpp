@@ -14,7 +14,7 @@
 #include "nodes/outputs.h"
 #include "nodes/sdf.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 namespace {
 NodeTypeDB *g_node_type_db = nullptr;
@@ -27,12 +27,12 @@ const NodeTypeDB &NodeTypeDB::get_singleton() {
 
 void NodeTypeDB::create_singleton() {
 	CRASH_COND(g_node_type_db != nullptr);
-	g_node_type_db = ZN_NEW(NodeTypeDB());
+	g_node_type_db = VOXEL_NEW(NodeTypeDB());
 }
 
 void NodeTypeDB::destroy_singleton() {
 	CRASH_COND(g_node_type_db == nullptr);
-	ZN_DELETE(g_node_type_db);
+	VOXEL_DELETE(g_node_type_db);
 	g_node_type_db = nullptr;
 }
 
@@ -87,7 +87,7 @@ NodeTypeDB::NodeTypeDB() {
 
 	for (unsigned int i = 0; i < _types.size(); ++i) {
 		NodeType &t = _types[i];
-		ZN_ASSERT(!t.name.is_empty());
+		VOXEL_ASSERT(!t.name.is_empty());
 
 		_type_name_to_id.insert({ t.name, (VoxelGraphFunction::NodeTypeID)i });
 
@@ -189,7 +189,7 @@ bool NodeTypeDB::try_get_type_id_from_name(const String &name, VoxelGraphFunctio
 }
 
 bool NodeTypeDB::try_get_param_index_from_name(uint32_t type_id, const String &name, uint32_t &out_param_index) const {
-	ZN_ASSERT_RETURN_V(type_id < _types.size(), false);
+	VOXEL_ASSERT_RETURN_V(type_id < _types.size(), false);
 	const NodeType &t = _types[type_id];
 	auto it = t.param_name_to_index.find(name);
 	if (it == t.param_name_to_index.end()) {
@@ -200,7 +200,7 @@ bool NodeTypeDB::try_get_param_index_from_name(uint32_t type_id, const String &n
 }
 
 bool NodeTypeDB::try_get_input_index_from_name(uint32_t type_id, const String &name, uint32_t &out_input_index) const {
-	ZN_ASSERT_RETURN_V(type_id < _types.size(), false);
+	VOXEL_ASSERT_RETURN_V(type_id < _types.size(), false);
 	const NodeType &t = _types[type_id];
 	auto it = t.input_name_to_index.find(name);
 	if (it == t.input_name_to_index.end()) {
@@ -215,7 +215,7 @@ bool NodeTypeDB::try_get_output_index_from_name(
 		const String &name,
 		uint32_t &out_output_index
 ) const {
-	ZN_ASSERT_RETURN_V(type_id < _types.size(), false);
+	VOXEL_ASSERT_RETURN_V(type_id < _types.size(), false);
 	const NodeType &t = _types[type_id];
 
 	for (uint32_t i = 0; i < t.outputs.size(); ++i) {
@@ -230,7 +230,7 @@ bool NodeTypeDB::try_get_output_index_from_name(
 }
 
 VoxelGraphFunction::Port make_port_from_io_node(const ProgramGraph::Node &node, const NodeType &type) {
-	ZN_ASSERT(type.category == CATEGORY_INPUT || type.category == CATEGORY_OUTPUT);
+	VOXEL_ASSERT(type.category == CATEGORY_INPUT || type.category == CATEGORY_OUTPUT);
 
 	VoxelGraphFunction::Port port;
 	port.type = VoxelGraphFunction::NodeTypeID(node.type_id);
@@ -242,18 +242,18 @@ VoxelGraphFunction::Port make_port_from_io_node(const ProgramGraph::Node &node, 
 			break;
 
 		case VoxelGraphFunction::NODE_OUTPUT_WEIGHT:
-			ZN_ASSERT(node.params.size() >= 1);
+			VOXEL_ASSERT(node.params.size() >= 1);
 			port.sub_index = node.params[0];
-			ZN_ASSERT(type.outputs.size() == 1);
+			VOXEL_ASSERT(type.outputs.size() == 1);
 			port.name = type.outputs[0].name + String("_") + String::num_int64(port.sub_index);
 			break;
 
 		default:
 			if (type.category == CATEGORY_INPUT) {
-				ZN_ASSERT(type.outputs.size() == 1);
+				VOXEL_ASSERT(type.outputs.size() == 1);
 				port.name = type.outputs[0].name;
 			} else {
-				ZN_ASSERT(type.inputs.size() == 1);
+				VOXEL_ASSERT(type.inputs.size() == 1);
 				port.name = type.inputs[0].name;
 			}
 			break;
@@ -272,7 +272,7 @@ bool is_node_matching_port(const ProgramGraph::Node &node, const VoxelGraphFunct
 	}
 
 	if (node.type_id == VoxelGraphFunction::NODE_OUTPUT_WEIGHT) {
-		ZN_ASSERT(node.params.size() >= 1);
+		VOXEL_ASSERT(node.params.size() >= 1);
 		const unsigned int sub_index = node.params[0];
 		if (sub_index != port.sub_index) {
 			return false;
@@ -282,4 +282,4 @@ bool is_node_matching_port(const ProgramGraph::Node &node, const VoxelGraphFunct
 	return true;
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

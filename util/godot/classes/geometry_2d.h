@@ -1,9 +1,9 @@
-#ifndef ZN_GODOT_GEOMETRY_2D_H
-#define ZN_GODOT_GEOMETRY_2D_H
+#ifndef VOXEL_GODOT_GEOMETRY_2D_H
+#define VOXEL_GODOT_GEOMETRY_2D_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/math/geometry_2d.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/geometry2d.hpp>
 using namespace godot;
 #endif
@@ -13,7 +13,7 @@ using namespace godot;
 #include "../../math/vector2i.h"
 #include "../core/packed_vector2_array.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r_result, Vector2i &r_size);
 
@@ -23,6 +23,6 @@ void geometry_2d_clip_polygons( //
 		StdVector<PackedVector2Array> &output //
 );
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_GEOMETRY_2D_H
+#endif // VOXEL_GODOT_GEOMETRY_2D_H

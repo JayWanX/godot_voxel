@@ -3,13 +3,13 @@
 
 #include "../../util/godot/shader_material_pool.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-class ShaderMaterialPoolVLT : public zylann::godot::ShaderMaterialPool {
+class ShaderMaterialPoolVLT : public voxel::godot::ShaderMaterialPool {
 public:
 	void recycle(Ref<ShaderMaterial> material);
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_SHADER_MATERIAL_POOL_VLT_H

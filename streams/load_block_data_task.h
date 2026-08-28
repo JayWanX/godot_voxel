@@ -7,7 +7,7 @@
 #include "../util/memory/memory.h"
 #include "../util/tasks/threaded_task.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelData;
 
@@ -67,6 +67,6 @@ private:
 	TaskCancellationToken _cancellation_token;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // LOAD_BLOCK_DATA_TASK_H

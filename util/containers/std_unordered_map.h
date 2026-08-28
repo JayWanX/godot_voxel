@@ -1,10 +1,10 @@
-#ifndef ZN_STD_UNORDERED_MAP_H
-#define ZN_STD_UNORDERED_MAP_H
+#ifndef VOXEL_STD_UNORDERED_MAP_H
+#define VOXEL_STD_UNORDERED_MAP_H
 
 #include "../memory/std_allocator.h"
 #include <unordered_map>
 
-namespace zylann {
+namespace voxel {
 
 // Convenience alias that uses our own default allocator
 template < //
@@ -16,6 +16,6 @@ template < //
 		>
 using StdUnorderedMap = std::unordered_map<TKey, TValue, THasher, TEquator, TAllocator>;
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_STD_UNORDERED_MAP_H
+#endif // VOXEL_STD_UNORDERED_MAP_H

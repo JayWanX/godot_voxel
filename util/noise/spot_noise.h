@@ -1,12 +1,12 @@
-#ifndef ZN_SPOT_NOISE_H
-#define ZN_SPOT_NOISE_H
+#ifndef VOXEL_SPOT_NOISE_H
+#define VOXEL_SPOT_NOISE_H
 
 #include "../math/conv.h"
 #include "../math/interval.h"
 #include "../math/vector2i.h"
 #include "../math/vector3i.h"
 
-namespace zylann::SpotNoise {
+namespace voxel::SpotNoise {
 
 // Very specialized kind of cellular noise for generating "spots" in a grid. Typical use case is ores in terrain.
 // There are limitations, but they should not be noticeable for this use case.
@@ -236,6 +236,6 @@ inline math::Interval spot_noise_3d_range(
 	return math::Interval::from_single_value(0);
 }
 
-} // namespace zylann::SpotNoise
+} // namespace voxel::SpotNoise
 
-#endif // ZN_SPOT_NOISE_H
+#endif // VOXEL_SPOT_NOISE_H

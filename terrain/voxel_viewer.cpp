@@ -5,11 +5,11 @@
 #include "../util/math/conv.h"
 #include "../util/string/format.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelViewer::VoxelViewer() {
 	set_notify_transform(!Engine::get_singleton()->is_editor_hint());
@@ -142,7 +142,7 @@ void VoxelViewer::_notification(int p_what) {
 				if (!_pending_deferred_unregistration) {
 					_viewer_id = VoxelEngine::get_singleton().add_viewer();
 				} else {
-					ZN_ASSERT_RETURN(VoxelEngine::get_singleton().viewer_exists(_viewer_id));
+					VOXEL_ASSERT_RETURN(VoxelEngine::get_singleton().viewer_exists(_viewer_id));
 				}
 				sync_all_parameters();
 				// VoxelEngine::get_singleton().sync_viewers_task_priority_data();
@@ -199,7 +199,7 @@ void VoxelViewer::unregister_deferred_callback(const int64_t viewer_node_id, con
 	ViewerID viewer_id;
 	viewer_id.index = encoded_viewer_id.x;
 	viewer_id.version.value = encoded_viewer_id.y;
-	ZN_ASSERT_RETURN(VoxelEngine::get_singleton().viewer_exists(viewer_id));
+	VOXEL_ASSERT_RETURN(VoxelEngine::get_singleton().viewer_exists(viewer_id));
 	VoxelEngine::get_singleton().remove_viewer(viewer_id);
 }
 
@@ -254,4 +254,4 @@ void VoxelViewer::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enabled_in_editor"), "set_enabled_in_editor", "is_enabled_in_editor");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -1,9 +1,9 @@
-#ifndef ZN_MATH_QUATERNION_F_H
-#define ZN_MATH_QUATERNION_F_H
+#ifndef VOXEL_MATH_QUATERNION_F_H
+#define VOXEL_MATH_QUATERNION_F_H
 
 #include "funcs.h"
 
-namespace zylann {
+namespace voxel {
 
 // 32-bit float Quaternion.
 struct Quaternionf {
@@ -45,6 +45,6 @@ inline Quaternionf normalized(const Quaternionf &q) {
 }
 
 } // namespace math
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_MATH_QUATERNION_F_H
+#endif // VOXEL_MATH_QUATERNION_F_H

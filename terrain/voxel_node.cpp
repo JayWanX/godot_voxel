@@ -10,7 +10,7 @@
 #include "../util/godot/classes/script.h"
 #include "../util/godot/core/string.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/callable_mp.h"
 #include "../util/godot/core/class_db.h"
 #endif
@@ -23,7 +23,7 @@
 #include "../util/godot/core/packed_arrays.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 void VoxelNode::set_mesher(Ref<VoxelMesher> mesher) {
 	// Implemented in subclasses
@@ -54,7 +54,7 @@ Ref<VoxelGenerator> VoxelNode::get_generator() const {
 
 VoxelData &VoxelNode::get_storage() const {
 	// Have to implement for the class to be bindable to Godot, but shouldnt be called
-	ZN_CRASH_MSG("Not available");
+	VOXEL_CRASH_MSG("Not available");
 	static VoxelData s_dummy;
 	return s_dummy;
 }
@@ -101,38 +101,38 @@ void VoxelNode::remesh_all_blocks() {
 }
 
 VolumeID VoxelNode::get_volume_id() const {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in subclasses
 	return VolumeID();
 }
 
 std::shared_ptr<StreamingDependency> VoxelNode::get_streaming_dependency() const {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in subclasses
 	return nullptr;
 }
 
 Ref<VoxelTool> VoxelNode::get_voxel_tool() {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in subclasses
 	return Ref<VoxelTool>();
 }
 
 Node3D *VoxelNode::convert_to_nodes(const BitField<NodeConversionFlags> flags) const {
-	ZN_PRINT_ERROR("Not implemented");
+	VOXEL_PRINT_ERROR("Not implemented");
 	// Implemented in subclasses
 	return nullptr;
 }
 
 #ifdef TOOLS_ENABLED
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 PackedStringArray VoxelNode::get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 PackedStringArray VoxelNode::_get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
@@ -163,7 +163,7 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 
 	if (mesher.is_null()) {
 		warnings.append(
-				ZN_TTR("This node has no mesher assigned, it won't produce any mesh visuals. "
+				VOXEL_TTR("This node has no mesher assigned, it won't produce any mesh visuals. "
 					   "You can assign one on the `mesher` property.")
 		);
 	}
@@ -176,12 +176,12 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 				// TODO This is very annoying. Probably needs an issue or proposal in Godot so we can handle this
 				// properly?
 				warnings.append(
-						ZN_TTR("Careful, don't edit your custom stream while it's running, "
+						VOXEL_TTR("Careful, don't edit your custom stream while it's running, "
 							   "it can cause crashes. To prevent it from running in the editor, remove tool mode from "
 							   "your script.")
 				);
 			} else {
-				warnings.append(ZN_TTR("The custom stream is not tool, the editor won't be able to use it."));
+				warnings.append(VOXEL_TTR("The custom stream is not tool, the editor won't be able to use it."));
 			}
 		}
 
@@ -190,7 +190,7 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 			const int mesher_channels = mesher->get_used_channels_mask();
 
 			if ((stream_channels & mesher_channels) == 0) {
-				warnings.append(ZN_TTR("The current stream is providing voxel data on channels {0}, but the current "
+				warnings.append(VOXEL_TTR("The current stream is providing voxel data on channels {0}, but the current "
 									   "mesher uses {1}. This might result in nothing being visible.")
 										.format(
 												varray(channel_mask_to_string(stream_channels),
@@ -209,13 +209,13 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 				// TODO This is very annoying. Probably needs an issue or proposal in Godot so we can handle this
 				// properly?
 				warnings.append(
-						ZN_TTR("Careful, don't edit your custom generator while it's running, "
+						VOXEL_TTR("Careful, don't edit your custom generator while it's running, "
 							   "it can cause crashes. To prevent it from running in the editor, remove tool mode from "
 							   "your script.")
 				);
 			} else {
 				can_check_generator_channels = false;
-				// return ZN_TTR("The custom generator is not tool, the editor won't be able to use it.");
+				// return VOXEL_TTR("The custom generator is not tool, the editor won't be able to use it.");
 			}
 		}
 
@@ -229,7 +229,7 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 					gen_name += String(" with script ") + generator_script->get_path();
 				}
 
-				warnings.append(ZN_TTR("The current generator ({0}) is providing voxel data on channels {1}, but the "
+				warnings.append(VOXEL_TTR("The current generator ({0}) is providing voxel data on channels {1}, but the "
 									   "current mesher ({2}) uses {3}. This might result in nothing being visible.")
 										.format(
 												varray(gen_name,
@@ -248,7 +248,7 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 		if (blocky_mesher.is_valid()) {
 			if (blocky_mesher->get_shadow_occluder_mask() > 0 &&
 				get_shadow_casting() == GeometryInstance3D::SHADOW_CASTING_SETTING_OFF) {
-				warnings.append(ZN_TTR(
+				warnings.append(VOXEL_TTR(
 						"Shadow casting is turned off on the terrain, but the mesher generates shadow occluders. You "
 						"may want to turn that off too."
 				));
@@ -269,7 +269,7 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 					switch (mesher_tex_mode) {
 						case VoxelMesherTransvoxel::TEXTURES_NONE:
 							if (graph_generator->has_texture_output()) {
-								warnings.append(ZN_TTR(
+								warnings.append(VOXEL_TTR(
 										"The generator's graph has a texture output, but the mesher's texture mode is "
 										"set to None."
 								));
@@ -279,7 +279,7 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 						case VoxelMesherTransvoxel::TEXTURES_MIXEL4_S4:
 							if (generator_tex_mode != VoxelGeneratorGraph::TEXTURE_MODE_MIXEL4) {
 								warnings.append(
-										ZN_TTR("The mesher's texture mode does not match the generator's texture mode")
+										VOXEL_TTR("The mesher's texture mode does not match the generator's texture mode")
 								);
 							}
 							break;
@@ -287,7 +287,7 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 						case VoxelMesherTransvoxel::TEXTURES_SINGLE_S4:
 							if (generator_tex_mode != VoxelGeneratorGraph::TEXTURE_MODE_SINGLE) {
 								warnings.append(
-										ZN_TTR("The mesher's texture mode does not match the generator's texture mode")
+										VOXEL_TTR("The mesher's texture mode does not match the generator's texture mode")
 								);
 							}
 							break;
@@ -321,7 +321,7 @@ int VoxelNode::get_used_channels_mask() const {
 }
 
 void VoxelNode::set_gi_mode(GeometryInstance3D::GIMode mode) {
-	ERR_FAIL_INDEX(mode, zylann::godot::GI_MODE_COUNT);
+	ERR_FAIL_INDEX(mode, voxel::godot::GI_MODE_COUNT);
 	if (mode != _gi_mode) {
 		_gi_mode = mode;
 		_on_gi_mode_changed();
@@ -404,18 +404,18 @@ void VoxelNode::_bind_methods() {
 					Variant::OBJECT,
 					"format",
 					PROPERTY_HINT_RESOURCE_TYPE,
-					zylann::voxel::godot::VoxelFormat::get_class_static()
+					voxel::godot::VoxelFormat::get_class_static()
 			),
 			"set_format",
 			"get_format"
 	);
 	ADD_PROPERTY(
-			PropertyInfo(Variant::INT, "gi_mode", PROPERTY_HINT_ENUM, zylann::godot::GI_MODE_ENUM_HINT_STRING),
+			PropertyInfo(Variant::INT, "gi_mode", PROPERTY_HINT_ENUM, voxel::godot::GI_MODE_ENUM_HINT_STRING),
 			"set_gi_mode",
 			"get_gi_mode"
 	);
 	ADD_PROPERTY(
-			PropertyInfo(Variant::INT, "cast_shadow", PROPERTY_HINT_ENUM, zylann::godot::CAST_SHADOW_ENUM_HINT_STRING),
+			PropertyInfo(Variant::INT, "cast_shadow", PROPERTY_HINT_ENUM, voxel::godot::CAST_SHADOW_ENUM_HINT_STRING),
 			"set_shadow_casting",
 			"get_shadow_casting"
 	);
@@ -430,4 +430,4 @@ void VoxelNode::_bind_methods() {
 	BIND_BITFIELD_FLAG(NODE_CONVERSION_INCLUDE_MATERIAL_OVERRIDES);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

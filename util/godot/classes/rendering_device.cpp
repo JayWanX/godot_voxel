@@ -8,25 +8,25 @@
 #include "rd_texture_view.h"
 #include "rd_uniform.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void free_rendering_device_rid(RenderingDevice &rd, RID rid) {
-	ZN_DSTACK();
+	VOXEL_DSTACK();
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
 	rd.free(rid);
 #else
 	rd.free_rid(rid);
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	rd.free_rid(rid);
 #endif
 }
 
 Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShaderSource &p_source, bool p_allow_cache) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	// This is a copy of `RenderingDevice::_shader_compile_spirv_from_source` because it's private
 
 	Ref<RDShaderSPIRV> bytecode;
@@ -46,14 +46,14 @@ Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShade
 	}
 	return bytecode;
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Ref<RDShaderSource> source_ref(&p_source);
 	return rd.shader_compile_spirv_from_source(source_ref, p_allow_cache);
 #endif
 }
 
 PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSPIRV &p_spirv, String name) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	// This is a copy of `RenderingDevice::_shader_compile_binary_from_spirv` because it's private.
 
 	Vector<RenderingDevice::ShaderStageSPIRVData> stage_data;
@@ -84,7 +84,7 @@ PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSP
 
 	return rd.shader_compile_binary_from_spirv(stage_data, name);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Ref<RDShaderSPIRV> spirv_data_ref(&p_spirv);
 	return rd.shader_compile_binary_from_spirv(spirv_data_ref, name);
 #endif
@@ -96,7 +96,7 @@ RID texture_create(
 		RDTextureView &p_view,
 		const TypedArray<PackedByteArray> &p_data
 ) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	// This is a partial re-implementation of `RenderingDevice::_texture_create` because it's private
 
 	Vector<Vector<uint8_t>> data;
@@ -128,7 +128,7 @@ RID texture_create(
 
 	return rd.texture_create(tf, tv, data);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Ref<RDTextureFormat> format_ref(&p_format);
 	Ref<RDTextureView> view_ref(&p_view);
 	return rd.texture_create(format_ref, view_ref, p_data);
@@ -136,18 +136,18 @@ RID texture_create(
 }
 
 RID uniform_set_create(RenderingDevice &rd, Array uniforms, RID shader, int shader_set) {
-	ZN_PROFILE_SCOPE();
-#if defined(ZN_GODOT)
+	VOXEL_PROFILE_SCOPE();
+#if defined(VOXEL_GODOT)
 	// Can't access the version of that method taking an `Array` because it is private...
 	return rd.call(SNAME("uniform_set_create"), uniforms, shader, shader_set);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	return rd.uniform_set_create(uniforms, shader, shader_set);
 #endif
 }
 
 RID sampler_create(RenderingDevice &rd, const RDSamplerState &sampler_state) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	// Can't access the version of that method taking an `RDSamplerState` object because it is private...
 
 	// return rd.call(SNAME("sampler_create"), sampler_state_ref);
@@ -171,7 +171,7 @@ RID sampler_create(RenderingDevice &rd, const RDSamplerState &sampler_state) {
 
 	return rd.sampler_create(ss);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Ref<RDSamplerState> sampler_state_ref(&sampler_state);
 	return rd.sampler_create(sampler_state_ref);
 #endif
@@ -190,21 +190,21 @@ Error update_storage_buffer(
 	// At some point in development of 4.3, a render graph was added, which removed the need for this parameter.
 	// https://github.com/godotengine/godot/pull/84976
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return rd.buffer_update(rid, offset, size, pba.ptr(), RenderingDevice::BARRIER_MASK_ALL_BARRIERS);
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	return rd.buffer_update(rid, offset, size, pba, RenderingDevice::BARRIER_MASK_ALL_BARRIERS);
 #endif
 
 #else // Godot 4.3 and later
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return rd.buffer_update(rid, offset, size, pba.ptr());
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	return rd.buffer_update(rid, offset, size, pba);
 #endif
 
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

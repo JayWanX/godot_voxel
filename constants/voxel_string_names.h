@@ -5,7 +5,7 @@
 #include "../util/godot/core/string_name.h"
 #include "../util/math/ortho_basis.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelStringNames {
 private:
@@ -116,6 +116,6 @@ public:
 	StringName add_child;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_STRING_NAMES_H

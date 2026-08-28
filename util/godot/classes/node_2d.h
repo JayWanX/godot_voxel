@@ -1,11 +1,11 @@
-#ifndef ZN_GODOT_NODE_2D_H
-#define ZN_GODOT_NODE_2D_H
+#ifndef VOXEL_GODOT_NODE_2D_H
+#define VOXEL_GODOT_NODE_2D_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <scene/2d/node_2d.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/node2d.hpp>
 using namespace godot;
 #endif
 
-#endif // ZN_GODOT_NODE_2D_H
+#endif // VOXEL_GODOT_NODE_2D_H

@@ -4,7 +4,7 @@
 #include "../../storage/voxel_data.h"
 #include "voxel_lod_terrain_update_data.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Limitations:
 // - Supports only one viewer
@@ -21,6 +21,6 @@ void process_octree_streaming(
 		bool stream_enabled
 );
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_LOD_TERRAIN_UPDATE_OCTREE_STREAMING_H

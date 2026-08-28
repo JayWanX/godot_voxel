@@ -92,7 +92,7 @@ jobs:
 
       # Setup custom buildroot so we may use an old but compatible GLIBC version, while keeping recent toolchain.
       # This allows to make production builds that are compatible with older Linux distros.
-      # See the kind of nasty things we try to avoid: https://github.com/Zylann/godot_voxel/issues/842
+      # See the kind of nasty things we try to avoid: https://github.com/Voxel/godot_voxel/issues/842
       # This step is after checkout because the checkout step changes the working directory for all following steps.
       # Also adds system directory in a way that persists between steps.
       # TODO Enhancement: cache buildroot so future runs can use it? Would save 15s
@@ -152,12 +152,12 @@ jobs:
         if: ${{ matrix.target.platform == 'windows' }}
         shell: pwsh
         run: |
-          Remove-Item project/addons/zylann.voxel/bin/* -Include *.exp,*.lib,*.pdb -Force
+          Remove-Item project/addons/voxel/bin/* -Include *.exp,*.lib,*.pdb -Force
 
       - name: Print
         shell: bash
         run: |
-          cd project/addons/zylann.voxel/bin
+          cd project/addons/voxel/bin
           ls -l
 
       # Upload the build
@@ -166,7 +166,7 @@ jobs:
         with:
           name: ${{env.LIB_NAME}}-${{ matrix.target.platform }}-${{ matrix.target.arch }}-${{ matrix.float-precision }}-${{ matrix.target-type }}
           path: |
-            ${{ github.workspace }}/project/addons/zylann.voxel/bin/**
+            ${{ github.workspace }}/project/addons/voxel/bin/**
 
   # Merges all the build artifacts together into a single godot-cpp-template artifact.
   # If you comment out this step, all the builds will be uploaded individually.

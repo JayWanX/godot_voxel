@@ -1,5 +1,5 @@
-#ifndef ZN_NOISE_ADAPTER_H
-#define ZN_NOISE_ADAPTER_H
+#ifndef VOXEL_NOISE_ADAPTER_H
+#define VOXEL_NOISE_ADAPTER_H
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 #include "../../util/noise/fast_noise_2.h"
@@ -7,7 +7,7 @@
 #include "../../util/containers/span.h"
 #include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
 
-namespace zylann {
+namespace voxel {
 
 // Godot still doesn't allow to inherit from `Noise` (and yet even wouldn't have methods we need) so we have to do this
 // nonsense
@@ -16,7 +16,7 @@ struct NoiseAdapter {
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 	Ref<FastNoise2> fn2;
 #endif
-	Ref<ZN_FastNoiseLite> fnl;
+	Ref<VOXEL_FastNoiseLite> fnl;
 
 	void unset() {
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
@@ -40,7 +40,7 @@ struct NoiseAdapter {
 	}
 #endif
 
-	void set(Ref<ZN_FastNoiseLite> noise) {
+	void set(Ref<VOXEL_FastNoiseLite> noise) {
 		unset();
 		fnl = noise;
 	}
@@ -71,6 +71,6 @@ struct NoiseAdapter {
 	void get_noise_3d_series(Span<const float> x, Span<const float> y, Span<const float> z, Span<float> out) const;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_NOISE_ADAPTER_H
+#endif // VOXEL_NOISE_ADAPTER_H

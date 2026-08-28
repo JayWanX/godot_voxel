@@ -1,6 +1,6 @@
 #include "multimesh.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 int get_visible_instance_count(const MultiMesh &mm) {
 	int visible_count = mm.get_visible_instance_count();
@@ -10,4 +10,4 @@ int get_visible_instance_count(const MultiMesh &mm) {
 	return visible_count;
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

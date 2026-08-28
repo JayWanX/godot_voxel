@@ -11,7 +11,7 @@
 #include "../../util/math/vector3i.h"
 #include "program_graph.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 class VoxelGraphFunction;
 class NodeTypeDB;
@@ -138,7 +138,7 @@ public:
 
 		inline const math::Interval &get_range_const_ref(uint16_t address) const {
 			// TODO Just for convenience because STL bound checks aren't working in Godot 3
-			ZN_ASSERT(address < buffers.size());
+			VOXEL_ASSERT(address < buffers.size());
 			return ranges[address];
 		}
 
@@ -150,7 +150,7 @@ public:
 			buffer_size = 0;
 			// buffer_capacity = 0;
 			for (BufferData &bd : buffer_datas) {
-				ZN_ASSERT(bd.data != nullptr);
+				VOXEL_ASSERT(bd.data != nullptr);
 				memfree(bd.data);
 			}
 			buffer_datas.clear();
@@ -285,8 +285,8 @@ public:
 		void (*deleter)(void *p);
 
 		void free() {
-			ZN_ASSERT(deleter != nullptr);
-			ZN_ASSERT(ptr != nullptr);
+			VOXEL_ASSERT(deleter != nullptr);
+			VOXEL_ASSERT(ptr != nullptr);
 			deleter(ptr);
 			ptr = nullptr;
 		}
@@ -562,6 +562,6 @@ private:
 	Program _program;
 };
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg
 
 #endif // VOXEL_GRAPH_RUNTIME_H

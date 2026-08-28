@@ -1,7 +1,7 @@
 #include "voxel_format.h"
 #include "mixel4.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelFormat::VoxelFormat() {
 	depths[VoxelBuffer::CHANNEL_TYPE] = VoxelBuffer::DEFAULT_TYPE_CHANNEL_DEPTH;
@@ -40,9 +40,9 @@ VoxelFormat::DepthRange VoxelFormat::get_supported_depths(const VoxelBuffer::Cha
 		case VoxelBuffer::CHANNEL_DATA7:
 			return { 1, 4 };
 		default:
-			ZN_PRINT_ERROR("Unknown channel");
+			VOXEL_PRINT_ERROR("Unknown channel");
 			return { 1, 1 };
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

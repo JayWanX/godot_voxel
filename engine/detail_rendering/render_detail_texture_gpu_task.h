@@ -13,7 +13,7 @@
 #include "../../modifiers/voxel_modifier.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class ComputeShader;
 struct ComputeShaderParameters;
@@ -105,6 +105,6 @@ private:
 	GPUStorageBuffer _normalmap_params_sb;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_RENDER_DETAIL_TEXTURE_GPU_TASK_H

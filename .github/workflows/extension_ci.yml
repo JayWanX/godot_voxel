@@ -7,7 +7,7 @@ on:
 
 jobs:
   build_binaries:
-    uses: Zylann/godot_voxel/.github/workflows/extension_builds.yml@master
+    uses: Voxel/godot_voxel/.github/workflows/extension_builds.yml@master
     with:
       # TODO Using slightly older commit because it fails to compile cast_to<const T*>
       # https://github.com/godotengine/godot-cpp/pull/1974#issuecomment-4434507799

@@ -4,11 +4,11 @@
 #include "../../meshers/blocky/voxel_blocky_model.h"
 #include "../../util/godot/classes/h_box_container.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Camera3D);
-ZN_GODOT_FORWARD_DECLARE(class MeshInstance3D);
-ZN_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
+VOXEL_GODOT_FORWARD_DECLARE(class Camera3D);
+VOXEL_GODOT_FORWARD_DECLARE(class MeshInstance3D);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
 
-namespace zylann {
+namespace voxel {
 
 namespace voxel {
 
@@ -23,7 +23,7 @@ public:
 	void set_undo_redo(EditorUndoRedoManager *urm);
 
 	// TODO GDX: `SceneTree::get_process_time` is not exposed, can't get delta time from `_notification`
-#ifdef ZN_GODOT_EXTENSION
+#ifdef VOXEL_GODOT_EXTENSION
 	void _process(double delta) override;
 #endif
 
@@ -32,7 +32,7 @@ private:
 	void rotate_model_90(Vector3i::Axis axis);
 	void add_rotation_anim(Basis basis);
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 	void _notification(int p_what);
 #endif
 	void process(float delta);
@@ -56,6 +56,6 @@ private:
 };
 
 } // namespace voxel
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_VIEWER_H

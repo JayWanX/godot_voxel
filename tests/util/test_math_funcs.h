@@ -1,10 +1,10 @@
-#ifndef ZN_TESTS_MATH_FUNCS_H
-#define ZN_TESTS_MATH_FUNCS_H
+#ifndef VOXEL_TESTS_MATH_FUNCS_H
+#define VOXEL_TESTS_MATH_FUNCS_H
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_wrap();
 
-} // namespace zylann::tests
+} // namespace voxel::tests
 
-#endif // ZN_TESTS_MATH_FUNCS_H
+#endif // VOXEL_TESTS_MATH_FUNCS_H

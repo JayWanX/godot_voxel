@@ -12,7 +12,7 @@
 
 #include <limits>
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 namespace {
 
@@ -54,7 +54,7 @@ void add_remap(
 		Span<const uint32_t> new_node_ids,
 		Span<const ProgramGraph::PortLocation> output_locations
 ) {
-	ZN_ASSERT(old_node_id != ProgramGraph::NULL_ID);
+	VOXEL_ASSERT(old_node_id != ProgramGraph::NULL_ID);
 	// Add remap for the output ports
 	{
 		bool found = false;
@@ -136,7 +136,7 @@ bool expand_input(
 	switch (arg.type) {
 		case ExpressionParser::Node::NUMBER: {
 			const ExpressionParser::NumberNode &arg_nn = reinterpret_cast<const ExpressionParser::NumberNode &>(arg);
-			ZN_ASSERT(pg_node_input_index < pg_node.default_inputs.size());
+			VOXEL_ASSERT(pg_node_input_index < pg_node.default_inputs.size());
 			pg_node.default_inputs[pg_node_input_index] = arg_nn.value;
 		} break;
 
@@ -150,7 +150,7 @@ bool expand_input(
 		case ExpressionParser::Node::FUNCTION: {
 			const uint32_t dependency_pg_node_id =
 					expand_node(graph, arg, db, to_connect, expanded_node_ids, functions);
-			ZN_ASSERT_RETURN_V(dependency_pg_node_id != ProgramGraph::NULL_ID, false);
+			VOXEL_ASSERT_RETURN_V(dependency_pg_node_id != ProgramGraph::NULL_ID, false);
 			graph.connect({ dependency_pg_node_id, 0 }, { pg_node.id, pg_node_input_index });
 		} break;
 
@@ -167,7 +167,7 @@ ProgramGraph::Node &create_node(
 ) {
 	// Not creating default sub-resources here, there are no use cases where we use such nodes.
 	ProgramGraph::Node *node = create_node_internal(graph, node_type_id, Vector2(), ProgramGraph::NULL_ID, false);
-	ZN_ASSERT(node != nullptr);
+	VOXEL_ASSERT(node != nullptr);
 	return *node;
 }
 
@@ -185,7 +185,7 @@ uint32_t expand_node(
 			// Constant node inputs don't create a constant node, they just set the default value of the input.
 			ProgramGraph::Node &pg_node = create_node(graph, db, VoxelGraphFunction::NODE_CONSTANT);
 			const ExpressionParser::NumberNode &nn = reinterpret_cast<const ExpressionParser::NumberNode &>(ep_node);
-			ZN_ASSERT(pg_node.params.size() == 1);
+			VOXEL_ASSERT(pg_node.params.size() == 1);
 			pg_node.params[0] = nn.value;
 			expanded_node_ids.push_back(pg_node.id);
 			return pg_node.id;
@@ -199,7 +199,7 @@ uint32_t expand_node(
 			const ExpressionParser::VariableNode &vn =
 					reinterpret_cast<const ExpressionParser::VariableNode &>(ep_node);
 			to_connect.push_back({ vn.name, { pg_node.id, 0 } });
-			ZN_ASSERT(pg_node.default_inputs.size() == 2);
+			VOXEL_ASSERT(pg_node.default_inputs.size() == 2);
 			pg_node.default_inputs[1] = 0;
 			expanded_node_ids.push_back(pg_node.id);
 			return pg_node.id;
@@ -209,8 +209,8 @@ uint32_t expand_node(
 			const ExpressionParser::OperatorNode &on =
 					reinterpret_cast<const ExpressionParser::OperatorNode &>(ep_node);
 
-			ZN_ASSERT(on.n0 != nullptr);
-			ZN_ASSERT(on.n1 != nullptr);
+			VOXEL_ASSERT(on.n0 != nullptr);
+			VOXEL_ASSERT(on.n1 != nullptr);
 
 			VoxelGraphFunction::NodeTypeID node_type_id;
 			switch (on.op) {
@@ -238,10 +238,10 @@ uint32_t expand_node(
 							ProgramGraph::Node &pg_node = create_node(graph, db, VoxelGraphFunction::NODE_POWI);
 							expanded_node_ids.push_back(pg_node.id);
 
-							ZN_ASSERT(pg_node.params.size() == 1);
+							VOXEL_ASSERT(pg_node.params.size() == 1);
 							pg_node.params[0] = pi;
 
-							ZN_ASSERT_RETURN_V(
+							VOXEL_ASSERT_RETURN_V(
 									expand_input(
 											graph, *on.n0, pg_node, 0, db, to_connect, expanded_node_ids, functions
 									),
@@ -258,19 +258,19 @@ uint32_t expand_node(
 					// Fix uninitialized variable warning on Clang, even though it is not supposed to carry on after the
 					// switch
 					node_type_id = VoxelGraphFunction::NODE_CONSTANT;
-					ZN_CRASH();
+					VOXEL_CRASH();
 					break;
 			}
 
 			ProgramGraph::Node &pg_node = create_node(graph, db, node_type_id);
 			expanded_node_ids.push_back(pg_node.id);
 
-			ZN_ASSERT_RETURN_V(
+			VOXEL_ASSERT_RETURN_V(
 					expand_input(graph, *on.n0, pg_node, 0, db, to_connect, expanded_node_ids, functions),
 					ProgramGraph::NULL_ID
 			);
 
-			ZN_ASSERT_RETURN_V(
+			VOXEL_ASSERT_RETURN_V(
 					expand_input(graph, *on.n1, pg_node, 1, db, to_connect, expanded_node_ids, functions),
 					ProgramGraph::NULL_ID
 			);
@@ -282,7 +282,7 @@ uint32_t expand_node(
 			const ExpressionParser::FunctionNode &fn =
 					reinterpret_cast<const ExpressionParser::FunctionNode &>(ep_node);
 			const ExpressionParser::Function *f = ExpressionParser::find_function_by_id(fn.function_id, functions);
-			ZN_ASSERT(f != nullptr);
+			VOXEL_ASSERT(f != nullptr);
 			const unsigned int arg_count = f->argument_count;
 
 			ProgramGraph::Node &pg_node = create_node(graph, db, VoxelGraphFunction::NodeTypeID(fn.function_id));
@@ -290,8 +290,8 @@ uint32_t expand_node(
 
 			for (unsigned int arg_index = 0; arg_index < arg_count; ++arg_index) {
 				const ExpressionParser::Node *arg = fn.args[arg_index].get();
-				ZN_ASSERT(arg != nullptr);
-				ZN_ASSERT_RETURN_V(
+				VOXEL_ASSERT(arg != nullptr);
+				VOXEL_ASSERT_RETURN_V(
 						expand_input(graph, *arg, pg_node, arg_index, db, to_connect, expanded_node_ids, functions),
 						ProgramGraph::NULL_ID
 				);
@@ -312,9 +312,9 @@ CompilationResult expand_expression_node(
 		StdVector<uint32_t> &expanded_nodes,
 		const NodeTypeDB &type_db
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const ProgramGraph::Node &original_node = graph.get_node(original_node_id);
-	ZN_ASSERT(original_node.params.size() != 0);
+	VOXEL_ASSERT(original_node.params.size() != 0);
 	const String code = original_node.params[0];
 	const CharString code_utf8 = code.utf8();
 
@@ -368,7 +368,7 @@ CompilationResult expand_expression_node(
 			result.message = "Could not resolve expression variable from input ports";
 			return result;
 		}
-		ZN_ASSERT(original_port_index < original_node.inputs.size());
+		VOXEL_ASSERT(original_port_index < original_node.inputs.size());
 		const ProgramGraph::Port &original_port = original_node.inputs[original_port_index];
 		for (const ProgramGraph::PortLocation src : original_port.connections) {
 			graph.connect(src, tc.dst);
@@ -376,7 +376,7 @@ CompilationResult expand_expression_node(
 	}
 
 	// Copy first because we'll remove the original node
-	ZN_ASSERT(original_node.outputs.size() != 0);
+	VOXEL_ASSERT(original_node.outputs.size() != 0);
 	const ProgramGraph::Port original_output_port_copy = original_node.outputs[0];
 
 	// Remove the original expression node
@@ -398,7 +398,7 @@ CompilationResult expand_expression_nodes(
 		const NodeTypeDB &type_db,
 		GraphRemappingInfo *remap_info
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const unsigned int initial_node_count = graph.get_nodes_count();
 
 	// Gather expression node IDs first, as expansion could invalidate the iterator
@@ -425,7 +425,7 @@ CompilationResult expand_expression_nodes(
 	}
 
 	// Expanding expression nodes may produce more nodes, not remove any
-	ZN_ASSERT_RETURN_V(graph.get_nodes_count() >= initial_node_count, CompilationResult::make_error("Internal error"));
+	VOXEL_ASSERT_RETURN_V(graph.get_nodes_count() >= initial_node_count, CompilationResult::make_error("Internal error"));
 
 	CompilationResult result;
 	result.success = true;
@@ -476,7 +476,7 @@ bool is_node_equivalent(
 		// Different input count
 		return false;
 	}
-	ZN_ASSERT_RETURN_V(node1.params.size() == node2.params.size(), false);
+	VOXEL_ASSERT_RETURN_V(node1.params.size() == node2.params.size(), false);
 	for (unsigned int param_index = 0; param_index < node1.params.size(); ++param_index) {
 		const Variant v1 = node1.params[param_index];
 		const Variant v2 = node2.params[param_index];
@@ -492,15 +492,15 @@ bool is_node_equivalent(
 		if (node1_input.connections.size() != node2_input.connections.size()) {
 			return false;
 		}
-		ZN_ASSERT_RETURN_V_MSG(
+		VOXEL_ASSERT_RETURN_V_MSG(
 				node1_input.connections.size() <= 1, false, "Multiple input connections isn't supported"
 		);
 		// TODO Some nodes like `*` and `+` have unordered inputs, we need to handle that
 		if (node1_input.connections.size() == 0) {
 			// Continuing the paranoia here, but that's because Godot doesn't define `_DEBUG` (and I can't define it in
 			// my module without failing to link), so standard library bound checks are in the toilet
-			ZN_ASSERT(node1.default_inputs.size() == node1.inputs.size());
-			ZN_ASSERT(node2.default_inputs.size() == node2.inputs.size());
+			VOXEL_ASSERT(node1.default_inputs.size() == node1.inputs.size());
+			VOXEL_ASSERT(node2.default_inputs.size() == node2.inputs.size());
 			// No ancestor, check default inputs (autoconnect is ignored, it must have been applied earlier)
 			const Variant v1 = node1.default_inputs[input_index];
 			const Variant v2 = node2.default_inputs[input_index];
@@ -528,7 +528,7 @@ bool is_node_equivalent(
 #ifdef DEBUG_ENABLED
 	for (const NodePair &p : equivalences) {
 		// We already check for this, if we still get duplicates here something is wrong
-		ZN_ASSERT_RETURN_V(p != equivalence, true);
+		VOXEL_ASSERT_RETURN_V(p != equivalence, true);
 	}
 #endif
 	equivalences.push_back(equivalence);
@@ -539,8 +539,8 @@ bool is_node_equivalent(
 void merge_node(ProgramGraph &graph, uint32_t node1_id, uint32_t node2_id, GraphRemappingInfo *remap_info) {
 	const ProgramGraph::Node &node1 = graph.get_node(node1_id);
 	const ProgramGraph::Node &node2 = graph.get_node(node2_id);
-	ZN_ASSERT_RETURN(node1.type_id == node2.type_id);
-	ZN_ASSERT_RETURN(node1.outputs.size() == node2.outputs.size());
+	VOXEL_ASSERT_RETURN(node1.type_id == node2.type_id);
+	VOXEL_ASSERT_RETURN(node1.outputs.size() == node2.outputs.size());
 	// Remove 2, keep 1
 	for (unsigned int output_index = 0; output_index < node2.outputs.size(); ++output_index) {
 		// Remove output connections, re-create them on the equivalent node.
@@ -564,7 +564,7 @@ void merge_node(ProgramGraph &graph, uint32_t node1_id, uint32_t node2_id, Graph
 // so we should share that operation, but it's harder to do so with self-contained branches. So it's easier if that
 // can be delegated to an automated process.
 void merge_equivalences(ProgramGraph &graph, GraphRemappingInfo *remap_info) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	StdVector<uint32_t> node_ids;
 	graph.get_node_ids(node_ids);
 
@@ -630,7 +630,7 @@ void apply_auto_connects(
 			}
 
 			// const NodeType &type = type_db.get_type(node.type_id);
-			// ZN_ASSERT(node.inputs.size() == type.inputs.size());
+			// VOXEL_ASSERT(node.inputs.size() == type.inputs.size());
 			// const VoxelGraphFunction::AutoConnect auto_connect = type.inputs[input_index].auto_connect;
 			const VoxelGraphFunction::AutoConnect auto_connect =
 					VoxelGraphFunction::AutoConnect(input_port.autoconnect_hint);
@@ -649,7 +649,7 @@ void apply_auto_connects(
 			}
 			if (!found_in_input_defs) {
 				// Not a declared input
-				ZN_PRINT_VERBOSE(
+				VOXEL_PRINT_VERBOSE(
 						"Not applying auto-connect because the corresponding node type isn't present in input "
 						"definitions of the function."
 				);
@@ -662,7 +662,7 @@ void apply_auto_connects(
 				// Not found, create it then
 				const ProgramGraph::Node *src_node =
 						create_node_internal(graph, src_type, Vector2(), graph.generate_node_id(), false);
-				ZN_ASSERT_CONTINUE(src_node != nullptr);
+				VOXEL_ASSERT_CONTINUE(src_node != nullptr);
 				src_node_id = src_node->id;
 			}
 			graph.connect(
@@ -678,7 +678,7 @@ void try_simplify_clamp_node(
 		const NodeTypeDB &type_db,
 		GraphRemappingInfo *remap_info
 ) {
-	ZN_ASSERT(node.inputs.size() == 3);
+	VOXEL_ASSERT(node.inputs.size() == 3);
 
 	const uint32_t clamp_x_input_id = 0;
 	const uint32_t clamp_output_id = 0;
@@ -694,7 +694,7 @@ void try_simplify_clamp_node(
 		node.inputs[clamp_max_input_id].connections.size() == 0) {
 		// Can be replaced with a clamp version with constant bounds
 
-		ZN_ASSERT(node.default_inputs.size() == node.inputs.size());
+		VOXEL_ASSERT(node.default_inputs.size() == node.inputs.size());
 
 		const float minv = node.default_inputs[clamp_min_input_id];
 		const float maxv = node.default_inputs[clamp_max_input_id];
@@ -755,7 +755,7 @@ bool try_add_io_node(
 		const ProgramGraph::Node &node,
 		Span<StdVector<uint32_t>> node_ids_per_port
 ) {
-	ZN_ASSERT(ports.size() == node_ids_per_port.size());
+	VOXEL_ASSERT(ports.size() == node_ids_per_port.size());
 
 	for (unsigned int port_index = 0; port_index < ports.size(); ++port_index) {
 		const VoxelGraphFunction::Port &port = ports[port_index];
@@ -817,10 +817,10 @@ CompilationResult expand_function(
 		const NodeTypeDB &type_db,
 		GraphRemappingInfo *remap_info
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const ProgramGraph::Node &fnode = graph.get_node(node_id);
-	ZN_ASSERT(fnode.type_id == VoxelGraphFunction::NODE_FUNCTION);
-	ZN_ASSERT(fnode.params.size() >= 1);
+	VOXEL_ASSERT(fnode.type_id == VoxelGraphFunction::NODE_FUNCTION);
+	VOXEL_ASSERT(fnode.params.size() >= 1);
 	Ref<VoxelGraphFunction> function = fnode.params[0];
 
 	if (function.is_null()) {
@@ -923,14 +923,14 @@ CompilationResult expand_function(
 	for (unsigned int input_index = 0; input_index < fnode.inputs.size(); ++input_index) {
 		StdVector<ProgramGraph::PortLocation> &in_destinations = inputs_to_destinations[input_index];
 
-		ZN_ASSERT(input_index < inputs_node_ids.size());
+		VOXEL_ASSERT(input_index < inputs_node_ids.size());
 		const StdVector<uint32_t> &inner_input_node_ids = inputs_node_ids[input_index];
 
 		// For each inner node corresponding to this input
 		for (const uint32_t inner_input_node_id : inner_input_node_ids) {
 			auto it = fn_to_expanded_node_ids.find(inner_input_node_id);
 			// We create a node for every node present in the function, so there must be a match
-			ZN_ASSERT(it != fn_to_expanded_node_ids.end());
+			VOXEL_ASSERT(it != fn_to_expanded_node_ids.end());
 			in_destinations.push_back(ProgramGraph::PortLocation{ it->second, 0 });
 		}
 	}
@@ -942,17 +942,17 @@ CompilationResult expand_function(
 		if (port.connections.size() == 0) {
 			// Assign default input values
 			if (port.autoconnect_hint == VoxelGraphFunction::AUTO_CONNECT_NONE || !fnode.autoconnect_default_inputs) {
-				ZN_ASSERT(input_index < fnode.default_inputs.size());
+				VOXEL_ASSERT(input_index < fnode.default_inputs.size());
 				const float defval = fnode.default_inputs[input_index];
 				for (const ProgramGraph::PortLocation &dst : destinations) {
 					ProgramGraph::Node &dst_node = graph.get_node(dst.node_id);
-					ZN_ASSERT(dst.port_index < dst_node.default_inputs.size());
+					VOXEL_ASSERT(dst.port_index < dst_node.default_inputs.size());
 					dst_node.default_inputs[dst.port_index] = defval;
 				}
 			}
 		} else {
 			// Create connections
-			ZN_ASSERT_MSG(port.connections.size() == 1, "Input nodes are expected to have only 1 input");
+			VOXEL_ASSERT_MSG(port.connections.size() == 1, "Input nodes are expected to have only 1 input");
 			const ProgramGraph::PortLocation src = port.connections[0];
 			for (const ProgramGraph::PortLocation &dst : destinations) {
 				graph.connect(src, dst);
@@ -967,17 +967,17 @@ CompilationResult expand_function(
 			// That output isn't connected outside the function
 			continue;
 		}
-		ZN_ASSERT(output_index < outputs_node_ids.size());
+		VOXEL_ASSERT(output_index < outputs_node_ids.size());
 		const StdVector<uint32_t> &output_node_ids = outputs_node_ids[output_index];
 		if (output_node_ids.size() == 0) {
 			// This output isn't actually bound to any node.
-			ZN_PRINT_VERBOSE("Function output isn't bound to an output node");
+			VOXEL_PRINT_VERBOSE("Function output isn't bound to an output node");
 			continue;
 		}
 		// An output node can only appear once
-		ZN_ASSERT(output_node_ids.size() == 1);
+		VOXEL_ASSERT(output_node_ids.size() == 1);
 		const ProgramGraph::Node &inner_fnode = fgraph.get_node(output_node_ids[0]);
-		ZN_ASSERT(inner_fnode.inputs.size() == 1);
+		VOXEL_ASSERT(inner_fnode.inputs.size() == 1);
 		const ProgramGraph::Port &foi = inner_fnode.inputs[0];
 
 		if (foi.connections.size() == 0) {
@@ -994,17 +994,17 @@ CompilationResult expand_function(
 
 		} else {
 			// That output is connected inside the function
-			ZN_ASSERT(foi.connections.size() == 1);
+			VOXEL_ASSERT(foi.connections.size() == 1);
 			const ProgramGraph::PortLocation fsrc = foi.connections[0];
 			auto it = fn_to_expanded_node_ids.find(fsrc.node_id);
 			// We create a node for every node present in the function, so there must be a match
-			ZN_ASSERT(it != fn_to_expanded_node_ids.end());
+			VOXEL_ASSERT(it != fn_to_expanded_node_ids.end());
 			for (const ProgramGraph::PortLocation dst : port.connections) {
 				graph.connect(ProgramGraph::PortLocation{ it->second, fsrc.port_index }, dst);
 			}
 
 			if (remap_info != nullptr) {
-				ZN_ASSERT(output_index < output_locations.size());
+				VOXEL_ASSERT(output_index < output_locations.size());
 				output_locations[output_index] = ProgramGraph::PortLocation{ it->second, fsrc.port_index };
 			}
 		}
@@ -1071,15 +1071,15 @@ CompilationResult expand_functions(ProgramGraph &graph, const NodeTypeDB &type_d
 
 void remove_relay(ProgramGraph &graph, const uint32_t node_id, GraphRemappingInfo *remap_info) {
 	const ProgramGraph::Node &node = graph.get_node(node_id);
-	ZN_ASSERT(node.inputs.size() == 1);
-	ZN_ASSERT(node.outputs.size() == 1);
+	VOXEL_ASSERT(node.inputs.size() == 1);
+	VOXEL_ASSERT(node.outputs.size() == 1);
 
 	const ProgramGraph::Port &node_input = node.inputs[0];
 	if (node_input.connections.size() == 0) {
 		// Just remove the node,
 		// But first we need to propagate default inputs. This is used by function expansion.
 		if (node.autoconnect_default_inputs == false) {
-			ZN_ASSERT(node.default_inputs.size() > 0);
+			VOXEL_ASSERT(node.default_inputs.size() > 0);
 			const float defval = node.default_inputs[0];
 			for (const ProgramGraph::Port &out : node.outputs) {
 				for (const ProgramGraph::PortLocation dst : out.connections) {
@@ -1092,7 +1092,7 @@ void remove_relay(ProgramGraph &graph, const uint32_t node_id, GraphRemappingInf
 		return;
 	}
 
-	ZN_ASSERT(node_input.connections.size() == 1);
+	VOXEL_ASSERT(node_input.connections.size() == 1);
 	const ProgramGraph::PortLocation src = node_input.connections[0];
 
 	const StdVector<ProgramGraph::Port> node_outputs = node.outputs;
@@ -1145,8 +1145,8 @@ void combine_inputs(
 		GraphRemappingInfo *remap_info
 ) {
 	const ProgramGraph::Node &node = graph.get_node(node_id_to_combine);
-	ZN_ASSERT(node.inputs.size() == 0);
-	ZN_ASSERT(node.outputs.size() == 1);
+	VOXEL_ASSERT(node.inputs.size() == 0);
+	VOXEL_ASSERT(node.outputs.size() == 1);
 	merge_node(graph, node_id, node_id_to_combine, remap_info);
 }
 
@@ -1184,7 +1184,7 @@ CompilationResult combine_inputs(
 		out_input_node_ids->resize(input_defs.size());
 		for (unsigned int input_index = 0; input_index < input_defs.size(); ++input_index) {
 			const StdVector<uint32_t> &node_ids = node_ids_per_port[input_index];
-			ZN_ASSERT(node_ids.size() > 0);
+			VOXEL_ASSERT(node_ids.size() > 0);
 			(*out_input_node_ids)[input_index] = node_ids[0];
 		}
 	}
@@ -1216,8 +1216,8 @@ CompilationResult compile_params(
 		}
 
 		const size_t params_size = ctx.get_params_size_in_words();
-		ZN_ASSERT(params_size <= std::numeric_limits<uint16_t>::max());
-		ZN_ASSERT(params_size_index < program.size());
+		VOXEL_ASSERT(params_size <= std::numeric_limits<uint16_t>::max());
+		VOXEL_ASSERT(params_size_index < program.size());
 		program[params_size_index] = params_size;
 	}
 
@@ -1232,12 +1232,12 @@ CompilationResult evaluate_single_node(
 	output_values.clear();
 
 	if (node.type_id == VoxelGraphFunction::NODE_CONSTANT) {
-		ZN_ASSERT(node.params.size() >= 1);
+		VOXEL_ASSERT(node.params.size() >= 1);
 		output_values.push_back(node.params[0]);
 		return CompilationResult::make_success();
 	}
 
-	ZN_ASSERT_RETURN_V(
+	VOXEL_ASSERT_RETURN_V(
 			node_type.process_buffer_func != nullptr,
 			CompilationResult::make_error("Graph node has no buffer processing function. Bug?", node.id)
 	);
@@ -1355,7 +1355,7 @@ CompilationResult reduce_constants(ProgramGraph &graph, const NodeTypeDB &type_d
 				return eval_result;
 			}
 
-			ZN_ASSERT_CONTINUE(output_values.size() == node.outputs.size());
+			VOXEL_ASSERT_CONTINUE(output_values.size() == node.outputs.size());
 
 			for (unsigned int output_index = 0; output_index < output_values.size(); ++output_index) {
 				const ProgramGraph::Port &output = node.outputs[output_index];
@@ -1387,7 +1387,7 @@ CompilationResult expand_graph(
 		GraphRemappingInfo *remap_info,
 		const bool enable_constant_reduction
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// First make a copy of the graph which we'll modify
 	expanded_graph.copy_from(graph, false);
 
@@ -1424,7 +1424,7 @@ CompilationResult expand_graph(
 }
 
 CompilationResult Runtime::compile(const VoxelGraphFunction &function, bool debug) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const NodeTypeDB &type_db = NodeTypeDB::get_singleton();
 
@@ -1476,7 +1476,7 @@ namespace {
 // Moves them all at the beginning.
 // `order` is a previously computed order of execution of each node.
 uint32_t move_outer_group_operations_up(StdVector<uint32_t> &order, const ProgramGraph &graph) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	StdVector<uint32_t> immediate_deps;
 	StdUnorderedSet<uint32_t> outer_group_node_ids;
 	StdVector<uint32_t> order_outer_group;
@@ -1520,7 +1520,7 @@ uint32_t move_outer_group_operations_up(StdVector<uint32_t> &order, const Progra
 	for (const uint32_t node_id : order_inner_group) {
 		order[i++] = node_id;
 	}
-	ZN_ASSERT(i == order.size());
+	VOXEL_ASSERT(i == order.size());
 
 	return inner_group_start_index;
 }
@@ -1563,7 +1563,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		const bool debug,
 		const NodeTypeDB &type_db
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	program.clear();
 
 	program.inputs.resize(input_count);
@@ -1632,8 +1632,8 @@ CompilationResult Runtime::compile_preprocessed_graph(
 
 #ifdef DEBUG_ENABLED
 		const ProgramGraph::Node &node = graph.get_node(node_id);
-		ZN_ASSERT(node.inputs.size() == 0);
-		ZN_ASSERT(node.outputs.size() == 1);
+		VOXEL_ASSERT(node.inputs.size() == 0);
+		VOXEL_ASSERT(node.outputs.size() == 1);
 #endif
 
 		InputInfo &input = program.inputs[input_index];
@@ -1657,8 +1657,8 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		const ProgramGraph::Node &node = graph.get_node(node_id);
 		const NodeType &type = type_db.get_type(node.type_id);
 
-		ZN_ASSERT(node.inputs.size() == type.inputs.size());
-		ZN_ASSERT(node.outputs.size() == type.outputs.size());
+		VOXEL_ASSERT(node.inputs.size() == type.inputs.size());
+		VOXEL_ASSERT(node.outputs.size() == type.outputs.size());
 
 		if (order_index == inner_group_start_index) {
 			program.inner_group_start_op_index = operations.size();
@@ -1678,8 +1678,8 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		switch (node.type_id) {
 			// TODO Get rid of constant nodes, replace them with default inputs wherever they are used?
 			case VoxelGraphFunction::NODE_CONSTANT: {
-				ZN_ASSERT(type.outputs.size() == 1);
-				ZN_ASSERT(type.params.size() == 1);
+				VOXEL_ASSERT(type.outputs.size() == 1);
+				VOXEL_ASSERT(type.params.size() == 1);
 				const uint16_t a = mem.add_constant(node.params[0].operator float(), true);
 				program.output_port_addresses[ProgramGraph::PortLocation{ node_id, 0 }] = a;
 				// Technically not an input or an output, but is a dependency regardless so treat it like an input
@@ -1696,7 +1696,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					CompilationResult result;
 					result.success = false;
 					result.message =
-							ZN_TTR("Used input node isn't registered. Remove it, or add it to function inputs.");
+							VOXEL_TTR("Used input node isn't registered. Remove it, or add it to function inputs.");
 					result.node_id = node_id;
 					return result;
 				}
@@ -1706,7 +1706,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 
 			case VoxelGraphFunction::NODE_SDF_PREVIEW: {
 				if (!debug) {
-					ZN_PRINT_WARNING(
+					VOXEL_PRINT_WARNING(
 							"Found preview node when compiling graph in non-debug mode. That node should not "
 							"have been present. Bug?"
 					);
@@ -1714,7 +1714,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				auto it = program.output_port_addresses.find(ProgramGraph::PortLocation{ node_id, 0 });
 				if (it != program.output_port_addresses.end()) {
 					const uint16_t a = it->second;
-					ZN_ASSERT(a < program.buffer_specs.size());
+					VOXEL_ASSERT(a < program.buffer_specs.size());
 					BufferSpec &src_buffer_spec = program.buffer_specs[a];
 					// Add a fake user, we want to see their result.
 					// Pinning would work too, but it allocates more buffers.
@@ -1727,7 +1727,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 
 		// Add actual operation
 
-		ZN_ASSERT(node.type_id <= std::numeric_limits<uint16_t>::max());
+		VOXEL_ASSERT(node.type_id <= std::numeric_limits<uint16_t>::max());
 
 		if (order_index == inner_group_start_index) {
 			program.default_execution_map.inner_group_start_index = program.default_execution_map.operations.size();
@@ -1752,7 +1752,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 
 			if (node.inputs[j].connections.size() == 0) {
 				// No input, default it
-				ZN_ASSERT(j < node.default_inputs.size());
+				VOXEL_ASSERT(j < node.default_inputs.size());
 				float defval = node.default_inputs[j];
 				a = mem.add_constant(defval, port.require_input_buffer_when_constant);
 
@@ -1760,20 +1760,20 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				const ProgramGraph::PortLocation src_port = node.inputs[j].connections[0];
 				auto address_it = program.output_port_addresses.find(src_port);
 				// Previous node ports must have been registered
-				ZN_ASSERT(address_it != program.output_port_addresses.end());
+				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				a = address_it->second;
 
 				// Register dependency
 				auto it = node_id_to_dependency_graph.find(src_port.node_id);
-				ZN_ASSERT(it != node_id_to_dependency_graph.end());
-				ZN_ASSERT(it->second < program.dependency_graph.nodes.size());
+				VOXEL_ASSERT(it != node_id_to_dependency_graph.end());
+				VOXEL_ASSERT(it->second < program.dependency_graph.nodes.size());
 				program.dependency_graph.dependencies.push_back(it->second);
 				++dg_node.end_dependency;
 			}
 
 			operations.push_back(a);
 
-			ZN_ASSERT(a < program.buffer_specs.size());
+			VOXEL_ASSERT(a < program.buffer_specs.size());
 			BufferSpec &bs = program.buffer_specs[a];
 			++bs.users_count;
 
@@ -1809,7 +1809,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					// so we have to limit to this instead of Reference or Object
 					CompilationResult result;
 					result.success = false;
-					result.message = ZN_TTR("A parameter is an object but does not inherit Resource");
+					result.message = VOXEL_TTR("A parameter is an object but does not inherit Resource");
 					result.node_id = node_id;
 					return result;
 				}
@@ -1832,13 +1832,13 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		}
 
 		if (type.category == pg::CATEGORY_OUTPUT) {
-			ZN_ASSERT(node.outputs.size() == 1);
-			ZN_ASSERT(node.outputs[0].connections.size() == 0);
+			VOXEL_ASSERT(node.outputs.size() == 1);
+			VOXEL_ASSERT(node.outputs[0].connections.size() == 0);
 
 			if (program.outputs_count == program.outputs.size()) {
 				CompilationResult result;
 				result.success = false;
-				result.message = ZN_TTR("Maximum number of outputs has been reached");
+				result.message = VOXEL_TTR("Maximum number of outputs has been reached");
 				result.node_id = node_id;
 				return result;
 			}
@@ -1846,7 +1846,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 			{
 				auto address_it = program.output_port_addresses.find(ProgramGraph::PortLocation{ node_id, 0 });
 				// Previous node ports must have been registered
-				ZN_ASSERT(address_it != program.output_port_addresses.end());
+				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				OutputInfo &output_info = program.outputs[program.outputs_count];
 				output_info.buffer_address = address_it->second;
 				output_info.dependency_graph_node_index = dg_node_index;
@@ -1858,10 +1858,10 @@ CompilationResult Runtime::compile_preprocessed_graph(
 			for (unsigned int j = 0; j < type.outputs.size(); ++j) {
 				const ProgramGraph::PortLocation loc{ node_id, j };
 				auto address_it = program.output_port_addresses.find(loc);
-				ZN_ASSERT(address_it != program.output_port_addresses.end());
+				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				BufferSpec &bs = program.buffer_specs[address_it->second];
 				// Not expecting existing users on that port
-				ZN_ASSERT_RETURN_V(bs.users_count == 0, CompilationResult());
+				VOXEL_ASSERT_RETURN_V(bs.users_count == 0, CompilationResult());
 				++bs.users_count;
 			}
 		}
@@ -1906,7 +1906,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 
 				auto address_it = program.output_port_addresses.find(src_port);
 				// Previous node ports must have been registered
-				ZN_ASSERT(address_it != program.output_port_addresses.end());
+				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				BufferSpec &src_buffer_spec = buffer_specs[address_it->second];
 				src_buffer_spec.is_pinned = true;
 			}
@@ -1924,7 +1924,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 			StdVector<Data> datas;
 
 			uint16_t allocate(uint16_t users, bool pinned) {
-				ZN_ASSERT(users > 0);
+				VOXEL_ASSERT(users > 0);
 				// Note, pinned buffers must have unique data, so we may not re-use a previous buffer for them
 				if (free_indices.size() == 0 || pinned) {
 					const uint16_t i = datas.size();
@@ -1933,20 +1933,20 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				} else {
 					const uint16_t i = free_indices[free_indices.size() - 1];
 					free_indices.pop_back();
-					ZN_ASSERT(i < datas.size());
+					VOXEL_ASSERT(i < datas.size());
 					Data &d = datas[i];
 					// Must not re-use a pinned buffer
-					ZN_ASSERT(!d.pinned);
+					VOXEL_ASSERT(!d.pinned);
 					d.usages = users;
 					return i;
 				}
 			}
 
 			void unref(uint16_t i) {
-				ZN_ASSERT(i < datas.size());
+				VOXEL_ASSERT(i < datas.size());
 				Data &d = datas[i];
-				ZN_ASSERT(!d.pinned);
-				ZN_ASSERT(d.usages > 0);
+				VOXEL_ASSERT(!d.pinned);
+				VOXEL_ASSERT(d.usages > 0);
 				--d.usages;
 				if (d.usages == 0) {
 					free_indices.push_back(i);
@@ -1994,7 +1994,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				for (unsigned int output_index = 0; output_index < type.outputs.size(); ++output_index) {
 					const ProgramGraph::PortLocation dst_port{ node_id, output_index };
 					auto address_it = program.output_port_addresses.find(dst_port);
-					ZN_ASSERT(address_it != program.output_port_addresses.end());
+					VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 					BufferSpec &buffer_spec = buffer_specs[address_it->second];
 
 					if (buffer_spec.is_binding || buffer_spec.is_pinned) {
@@ -2027,7 +2027,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					}
 					const ProgramGraph::PortLocation src_port = input.connections[0];
 					auto address_it = program.output_port_addresses.find(src_port);
-					ZN_ASSERT(address_it != program.output_port_addresses.end());
+					VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 					const BufferSpec &buffer_spec = buffer_specs[address_it->second];
 
 					// Bindings are user-provided.
@@ -2044,7 +2044,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		program.buffer_data_count = data_helper.datas.size();
 	}
 
-	ZN_PRINT_VERBOSE(
+	VOXEL_PRINT_VERBOSE(
 			format("Compiled voxel graph. Program size: {}b, ports: {}, buffers: {}",
 				   program.operations.size() * sizeof(uint16_t),
 				   program.buffer_count,
@@ -2056,4 +2056,4 @@ CompilationResult Runtime::compile_preprocessed_graph(
 	return result;
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

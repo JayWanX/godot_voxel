@@ -4,13 +4,13 @@
 #include "voxel_instance_library_editor_plugin.h"
 #include "voxel_instance_library_list_editor.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
-bool VoxelInstanceLibraryInspectorPlugin::_zn_can_handle(const Object *p_object) const {
+bool VoxelInstanceLibraryInspectorPlugin::_voxel_can_handle(const Object *p_object) const {
 	return Object::cast_to<VoxelInstanceLibrary>(p_object) != nullptr;
 }
 
-void VoxelInstanceLibraryInspectorPlugin::_zn_parse_begin(Object *p_object) {
+void VoxelInstanceLibraryInspectorPlugin::_voxel_parse_begin(Object *p_object) {
 	// TODO How can I make sure the buttons will be at the beginning of the "VoxelInstanceLibrary" category?
 	// This is a better place than the Spatial editor toolbar (which would get hidden if you are not in the 3D tab
 	// of the editor), but it will appear at the very top of the inspector, even above the "VoxelInstanceLibrary"
@@ -20,7 +20,7 @@ void VoxelInstanceLibraryInspectorPlugin::_zn_parse_begin(Object *p_object) {
 	// the class returns no properties AND no category.
 }
 
-bool VoxelInstanceLibraryInspectorPlugin::_zn_parse_property(
+bool VoxelInstanceLibraryInspectorPlugin::_voxel_parse_property(
 		Object *p_object,
 		const Variant::Type p_type,
 		const String &p_path,
@@ -38,11 +38,11 @@ bool VoxelInstanceLibraryInspectorPlugin::_zn_parse_property(
 		list_editor->set_library(library);
 		add_custom_control(list_editor);
 
-		ZN_ControlSizer *sizer = memnew(ZN_ControlSizer);
+		VOXEL_ControlSizer *sizer = memnew(VOXEL_ControlSizer);
 		sizer->set_target_control(list_editor);
 		add_custom_control(sizer);
 	}
 	return false;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

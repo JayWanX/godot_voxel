@@ -1,20 +1,20 @@
-#ifndef ZN_SHORT_LOCK
-#define ZN_SHORT_LOCK
+#ifndef VOXEL_SHORT_LOCK
+#define VOXEL_SHORT_LOCK
 
-// #define ZN_SHORT_LOCK_IS_MUTEX
+// #define VOXEL_SHORT_LOCK_IS_MUTEX
 
-#ifdef ZN_SHORT_LOCK_IS_MUTEX
+#ifdef VOXEL_SHORT_LOCK_IS_MUTEX
 #include "mutex.h"
 #else
 #include "spin_lock.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
 // A mutex-like primitive that is expected to be locked for short periods of time.
 // It can be implemented either with a SpinLock or a Mutex, depending on test results.
 
-#ifdef ZN_SHORT_LOCK_IS_MUTEX
+#ifdef VOXEL_SHORT_LOCK_IS_MUTEX
 typedef BinaryMutex ShortLock;
 #else
 typedef SpinLock ShortLock;
@@ -30,6 +30,6 @@ struct ShortLockScope {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SHORT_LOCK
+#endif // VOXEL_SHORT_LOCK

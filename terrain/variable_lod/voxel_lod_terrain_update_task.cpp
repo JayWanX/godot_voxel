@@ -21,7 +21,7 @@
 #include "../../meshers/transvoxel/voxel_mesher_transvoxel.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -121,8 +121,8 @@ void request_block_load(
 		const TaskCancellationToken cancellation_token,
 		VoxelLodTerrainUpdateData::State &state
 ) {
-	ZN_ASSERT(data_block_size < 256);
-	ZN_ASSERT(stream_dependency != nullptr);
+	VOXEL_ASSERT(data_block_size < 256);
+	VOXEL_ASSERT(stream_dependency != nullptr);
 
 	VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 	{
@@ -153,7 +153,7 @@ void request_block_load(
 		);
 
 		const bool request_instances = false;
-		LoadBlockDataTask *task = ZN_NEW(LoadBlockDataTask(
+		LoadBlockDataTask *task = VOXEL_NEW(LoadBlockDataTask(
 				volume_id,
 				block_pos,
 				lod_index,
@@ -188,7 +188,7 @@ void request_block_load(
 		);
 
 	} else {
-		ZN_PRINT_WARNING("Requesting a block load when it should not have been necessary");
+		VOXEL_PRINT_WARNING("Requesting a block load when it should not have been necessary");
 	}
 }
 
@@ -232,8 +232,8 @@ void apply_block_data_requests_as_empty(
 		VoxelLodTerrainUpdateData::State &state,
 		const VoxelLodTerrainUpdateData::Settings &settings
 ) {
-	ZN_PROFILE_SCOPE();
-	ZN_ASSERT_RETURN(data.is_streaming_enabled());
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_ASSERT_RETURN(data.is_streaming_enabled());
 
 	for (const VoxelLodTerrainUpdateData::BlockToLoad &btl : blocks_to_load) {
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[btl.loc.lod];
@@ -245,7 +245,7 @@ void apply_block_data_requests_as_empty(
 				viewers = it->second.viewers;
 				lod.loading_blocks.erase(it);
 			} else {
-				ZN_PRINT_ERROR("Loading block wasn't found when consuming data requests as empty");
+				VOXEL_PRINT_ERROR("Loading block wasn't found when consuming data requests as empty");
 			}
 		}
 		{
@@ -282,7 +282,7 @@ void request_voxel_block_save(
 	ERR_FAIL_COND(stream_dependency->stream.is_null());
 
 	SaveBlockDataTask *task =
-			ZN_NEW(SaveBlockDataTask(volume_id, block_pos, lod_index, voxels, stream_dependency, tracker, with_flush));
+			VOXEL_NEW(SaveBlockDataTask(volume_id, block_pos, lod_index, voxels, stream_dependency, tracker, with_flush));
 
 	// No priority data, saving doesn't need sorting.
 
@@ -299,9 +299,9 @@ void send_mesh_requests(
 		const Transform3D &volume_transform,
 		BufferedTaskScheduler &task_scheduler
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT(data_ptr != nullptr);
+	VOXEL_ASSERT(data_ptr != nullptr);
 	const VoxelData &data = *data_ptr;
 
 	const int data_block_size = data.get_block_size();
@@ -310,19 +310,19 @@ void send_mesh_requests(
 	const unsigned int lod_count = data.get_lod_count();
 
 	for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
 		for (unsigned int bi = 0; bi < lod.mesh_blocks_pending_update.size(); ++bi) {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 			const VoxelLodTerrainUpdateData::MeshToUpdate &mesh_to_update = lod.mesh_blocks_pending_update[bi];
 
 			auto mesh_block_it = lod.mesh_map_state.map.find(mesh_to_update.position);
 			// A block must have been allocated before we ask for a mesh update
-			ZN_ASSERT_CONTINUE(mesh_block_it != lod.mesh_map_state.map.end());
+			VOXEL_ASSERT_CONTINUE(mesh_block_it != lod.mesh_map_state.map.end());
 			VoxelLodTerrainUpdateData::MeshBlockState &mesh_block = mesh_block_it->second;
 			// All blocks we get here must be in the scheduled state
-			ZN_ASSERT_CONTINUE(mesh_block.state == VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT);
+			VOXEL_ASSERT_CONTINUE(mesh_block.state == VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT);
 
 			// Get block and its neighbors
 			// VoxelEngine::BlockMeshInput mesh_request;
@@ -330,7 +330,7 @@ void send_mesh_requests(
 			// mesh_request.lod = lod_index;
 
 			// We'll allocate this quite often. If it becomes a problem, it should be easy to pool.
-			MeshBlockTask *task = ZN_NEW(MeshBlockTask);
+			MeshBlockTask *task = VOXEL_NEW(MeshBlockTask);
 			task->volume_id = volume_id;
 			task->mesh_block_position = mesh_to_update.position;
 			task->lod_index = lod_index;
@@ -408,12 +408,12 @@ std::shared_ptr<AsyncDependencyTracker> preload_boxes_async(
 		const Transform3D &volume_transform,
 		BufferedTaskScheduler &task_scheduler
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT(data_ptr != nullptr);
+	VOXEL_ASSERT(data_ptr != nullptr);
 	VoxelData &data = *data_ptr;
 
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(
 			data.is_streaming_enabled() == false, nullptr, "This function can only be used in full load mode"
 	);
 
@@ -429,13 +429,13 @@ std::shared_ptr<AsyncDependencyTracker> preload_boxes_async(
 
 	for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 		for (unsigned int box_index = 0; box_index < voxel_boxes.size(); ++box_index) {
-			ZN_PROFILE_SCOPE_NAMED("Box");
+			VOXEL_PROFILE_SCOPE_NAMED("Box");
 
 			VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 			const Box3i voxel_box = voxel_boxes[box_index];
 			const Box3i block_box = voxel_box.downscaled(data_block_size << lod_index);
 
-			// ZN_PRINT_VERBOSE(String("Preloading box {0} at lod {1}")
+			// VOXEL_PRINT_VERBOSE(String("Preloading box {0} at lod {1}")
 			// 						.format(varray(block_box.to_string(), lod_index)));
 
 			static thread_local StdVector<Vector3i> tls_missing;
@@ -455,14 +455,14 @@ std::shared_ptr<AsyncDependencyTracker> preload_boxes_async(
 		}
 	}
 
-	ZN_PRINT_VERBOSE(format("Preloading boxes with {} tasks", todo.size()));
+	VOXEL_PRINT_VERBOSE(format("Preloading boxes with {} tasks", todo.size()));
 
 	std::shared_ptr<AsyncDependencyTracker> tracker = nullptr;
 
 	// TODO `next_tasks` is executed in parallel. But since they can be edits, may we do them in sequence?
 
 	if (todo.size() > 0) {
-		ZN_PROFILE_SCOPE_NAMED("Posting requests");
+		VOXEL_PROFILE_SCOPE_NAMED("Posting requests");
 
 		// Only create the tracker if we actually are creating tasks. If we still create it,
 		// no task will take ownership of it, so if it is not stored after this function returns,
@@ -514,7 +514,7 @@ void process_async_edits(
 		const Transform3D &volume_transform,
 		BufferedTaskScheduler &task_scheduler
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (state.running_async_edits.size() == 0) {
 		// Schedule all next edits when the previous ones are done
@@ -529,8 +529,8 @@ void process_async_edits(
 
 			// Not sure if worth doing, I don't think tasks can be aborted before even being scheduled.
 			if (edit.task_tracker->is_aborted()) {
-				ZN_PRINT_VERBOSE("Aborted async edit");
-				ZN_DELETE(edit.task);
+				VOXEL_PRINT_VERBOSE("Aborted async edit");
+				VOXEL_DELETE(edit.task);
 				continue;
 			}
 
@@ -613,7 +613,7 @@ void VoxelLodTerrainUpdateTask::send_block_save_requests(
 ) {
 	for (unsigned int i = 0; i < blocks_to_save.size(); ++i) {
 		const VoxelData::BlockToSave &b = blocks_to_save[i];
-		ZN_PRINT_VERBOSE(format("Requesting save of block {} lod {}", b.position, b.lod_index));
+		VOXEL_PRINT_VERBOSE(format("Requesting save of block {} lod {}", b.position, b.lod_index));
 		request_voxel_block_save(
 				volume_id, b.voxels, b.position, b.lod_index, stream_dependency, task_scheduler, tracker, with_flush
 		);
@@ -625,8 +625,8 @@ void VoxelLodTerrainUpdateTask::flush_pending_lod_edits(
 		VoxelData &data,
 		const int mesh_block_size
 ) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	static thread_local StdVector<Vector3i> tls_modified_lod0_blocks;
 	static thread_local StdVector<Box3i> tls_modified_voxel_areas_lod0;
@@ -806,7 +806,7 @@ void update_transition_masks(
 	// It is unclear yet why the old approach didn't work, maybe because it didn't properly made N-1 and N+1 update.
 	// If you find a better approach, it has to comply with the validation check below.
 	if (lods_to_update_transitions != 0) {
-		ZN_PROFILE_SCOPE_NAMED("Transition masks");
+		VOXEL_PROFILE_SCOPE_NAMED("Transition masks");
 		// We pass a mask that gets populated with (0b111 << index), because we want to add lod+1, lod+0 and lod-1. But
 		// because the case of -1 would require more code, we instead offset the mask by 1. Then at the end, we
 		// only need to undo that offset once here.
@@ -843,7 +843,7 @@ void update_transition_masks(
 #if 0
 	// DEBUG: Validation check for transition mask updates.
 	{
-		ZN_PROFILE_SCOPE_NAMED("Transition checks");
+		VOXEL_PROFILE_SCOPE_NAMED("Transition checks");
 		for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 			const VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 			RWLockRead rlock(lod.mesh_map_state.map_lock);
@@ -863,7 +863,7 @@ void add_unloaded_saving_blocks(VoxelLodTerrainUpdateData::Lod &lod, Span<const 
 	if (src.size() == 0) {
 		return;
 	}
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	MutexLock mlock(lod.unloaded_saving_blocks_mutex);
 	for (const VoxelData::BlockToSave &bts : src) {
 		lod.unloaded_saving_blocks[bts.position] = bts.voxels;
@@ -873,7 +873,7 @@ void add_unloaded_saving_blocks(VoxelLodTerrainUpdateData::Lod &lod, Span<const 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void VoxelLodTerrainUpdateTask::run(ThreadedTaskContext &ctx) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	struct SetCompleteOnScopeExit {
 		std::atomic_bool &_complete;
@@ -976,7 +976,7 @@ void VoxelLodTerrainUpdateTask::run(ThreadedTaskContext &ctx) {
 
 	profiling_clock.restart();
 	{
-		ZN_PROFILE_SCOPE_NAMED("IO requests");
+		VOXEL_PROFILE_SCOPE_NAMED("IO requests");
 		// It's possible the user didn't set a stream yet, or it is turned off
 		if (stream_enabled) {
 			const unsigned int data_block_size = data.get_block_size();
@@ -1041,4 +1041,4 @@ void VoxelLodTerrainUpdateTask::run(ThreadedTaskContext &ctx) {
 	state.stats.time_total = profiling_clock.restart();
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

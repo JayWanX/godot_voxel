@@ -4,7 +4,7 @@
 #include "../../util/noise/fast_noise_2.h"
 #include "../../util/string/format.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_fast_noise_2_basic() {
 	// Very basic test. The point is to make sure it doesn't crash, so there is no special condition to check.
@@ -15,7 +15,7 @@ void test_fast_noise_2_basic() {
 	print_line(format("Noise: {}", nv));
 	Ref<Image> im = godot::create_empty_image(256, 256, false, Image::FORMAT_RGB8);
 	noise->generate_image(im, false);
-	// im->save_png("zylann_test_fastnoise2.png");
+	// im->save_png("voxel_test_fastnoise2.png");
 }
 
 void test_fast_noise_2_empty_encoded_node_tree() {
@@ -26,4 +26,4 @@ void test_fast_noise_2_empty_encoded_node_tree() {
 	noise->update_generator();
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

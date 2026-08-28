@@ -1,18 +1,18 @@
-#ifndef ZN_GODOT_RESOURCE_LOADER_H
-#define ZN_GODOT_RESOURCE_LOADER_H
+#ifndef VOXEL_GODOT_RESOURCE_LOADER_H
+#define VOXEL_GODOT_RESOURCE_LOADER_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/io/resource_loader.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/resource_loader.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 PackedStringArray get_recognized_extensions_for_type(const String &type_name);
 Ref<Resource> load_resource(const String &path);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_RESOURCE_LOADER_H
+#endif // VOXEL_GODOT_RESOURCE_LOADER_H

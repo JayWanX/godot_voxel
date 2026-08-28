@@ -1,5 +1,5 @@
-#ifndef ZN_SMALL_VECTOR_H
-#define ZN_SMALL_VECTOR_H
+#ifndef VOXEL_SMALL_VECTOR_H
+#define VOXEL_SMALL_VECTOR_H
 
 #include "../errors.h"
 #include "span.h"
@@ -8,7 +8,7 @@
 #include <new>
 #include <type_traits>
 
-namespace zylann {
+namespace voxel {
 
 // Dynamic sequence of elements using fixed capacity.
 // Meant for small amount of elements, where their maximum count is also known and small.
@@ -39,7 +39,7 @@ public:
 	}
 
 	inline void push_back(const T &v) {
-		ZN_ASSERT(_size < capacity());
+		VOXEL_ASSERT(_size < capacity());
 		::new (&_items[_size]) T(v);
 		++_size;
 	}
@@ -57,7 +57,7 @@ public:
 			return;
 		}
 
-		ZN_ASSERT(new_size <= capacity());
+		VOXEL_ASSERT(new_size <= capacity());
 
 		// Default-construct new elements
 		for (; _size < new_size; ++_size) {
@@ -75,7 +75,7 @@ public:
 			return;
 		}
 
-		ZN_ASSERT(new_size <= capacity());
+		VOXEL_ASSERT(new_size <= capacity());
 
 		// Copy-construct new elements
 		for (; _size < new_size; ++_size) {
@@ -102,14 +102,14 @@ public:
 
 	inline T &operator[](unsigned int i) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < N);
+		VOXEL_ASSERT(i < N);
 #endif
 		return *std::launder(reinterpret_cast<T *>(&_items[i]));
 	}
 
 	inline const T &operator[](unsigned int i) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(i < N);
+		VOXEL_ASSERT(i < N);
 #endif
 		return *std::launder(reinterpret_cast<const T *>(&_items[i]));
 	}
@@ -225,6 +225,6 @@ Span<const T> to_span(const SmallVector<T, N> &v) {
 	return Span<const T>(v.data(), v.size());
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SMALL_VECTOR_H
+#endif // VOXEL_SMALL_VECTOR_H

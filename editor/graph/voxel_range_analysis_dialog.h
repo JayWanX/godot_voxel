@@ -4,11 +4,11 @@
 #include "../../util/godot/classes/accept_dialog.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class CheckBox)
-ZN_GODOT_FORWARD_DECLARE(class SpinBox)
-ZN_GODOT_FORWARD_DECLARE(class GridContainer)
+VOXEL_GODOT_FORWARD_DECLARE(class CheckBox)
+VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
+VOXEL_GODOT_FORWARD_DECLARE(class GridContainer)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelRangeAnalysisDialog : public AcceptDialog {
 	GDCLASS(VoxelRangeAnalysisDialog, AcceptDialog)
@@ -35,6 +35,6 @@ private:
 	SpinBox *_size_z_spinbox;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_RANGE_ANALYSIS_DIALOG_H

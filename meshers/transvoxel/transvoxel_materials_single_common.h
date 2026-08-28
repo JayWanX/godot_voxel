@@ -3,7 +3,7 @@
 
 #include "transvoxel_materials_common.h"
 
-namespace zylann::voxel::transvoxel::materials::single {
+namespace voxel::transvoxel::materials::single {
 
 struct WeightedIndex {
 	uint8_t index;
@@ -46,7 +46,7 @@ VoxelMaterialIndices get_material_indices_from_vb(
 		const unsigned int channel,
 		StdVector<uint8_t> &conversion_buffer
 ) {
-	ZN_ASSERT_RETURN_V(voxels.get_channel_depth(channel) == VoxelBuffer::DEPTH_8_BIT, VoxelMaterialIndices());
+	VOXEL_ASSERT_RETURN_V(voxels.get_channel_depth(channel) == VoxelBuffer::DEPTH_8_BIT, VoxelMaterialIndices());
 
 	VoxelMaterialIndices data;
 
@@ -61,7 +61,7 @@ VoxelMaterialIndices get_material_indices_from_vb(
 	switch (voxels.get_channel_depth(channel)) {
 		case VoxelBuffer::DEPTH_8_BIT: {
 			Span<const uint8_t> data_bytes;
-			ZN_ASSERT(voxels.get_channel_as_bytes_read_only(channel, data_bytes) == true);
+			VOXEL_ASSERT(voxels.get_channel_as_bytes_read_only(channel, data_bytes) == true);
 			data.indices = data_bytes;
 		} break;
 
@@ -69,14 +69,14 @@ VoxelMaterialIndices get_material_indices_from_vb(
 			static bool s_once = false;
 			if (!s_once) {
 				s_once = true;
-				ZN_PRINT_WARNING(
+				VOXEL_PRINT_WARNING(
 						"Transvoxel: the Single texturing mode expects 8-bit indices in voxel data, but "
 						"it was passed 16-bit. Data will be converted on the fly, with a performance cost."
 				);
 			}
 
 			Span<const uint16_t> data_u16;
-			ZN_ASSERT(voxels.get_channel_data_read_only(channel, data_u16) == true);
+			VOXEL_ASSERT(voxels.get_channel_data_read_only(channel, data_u16) == true);
 
 			conversion_buffer.resize(data_u16.size());
 			for (unsigned int i = 0; i < data_u16.size(); ++i) {
@@ -90,7 +90,7 @@ VoxelMaterialIndices get_material_indices_from_vb(
 			static bool s_once = false;
 			if (!s_once) {
 				s_once = true;
-				ZN_PRINT_WARNING(
+				VOXEL_PRINT_WARNING(
 						"Transvoxel: the Single texturing mode expects 8-bit indices in voxel data, but "
 						"it was passed 32-bit. This is not supported."
 				);
@@ -103,7 +103,7 @@ VoxelMaterialIndices get_material_indices_from_vb(
 			static bool s_once = false;
 			if (!s_once) {
 				s_once = true;
-				ZN_PRINT_WARNING(
+				VOXEL_PRINT_WARNING(
 						"Transvoxel: the Single texturing mode expects 8-bit indices in voxel data, but "
 						"it was passed 64-bit. This is not supported."
 				);
@@ -113,7 +113,7 @@ VoxelMaterialIndices get_material_indices_from_vb(
 		} break;
 
 		default:
-			ZN_PRINT_ERROR("Unhandled depth");
+			VOXEL_PRINT_ERROR("Unhandled depth");
 			data.is_uniform = true;
 			data.uniform_value = 0;
 			break;
@@ -122,6 +122,6 @@ VoxelMaterialIndices get_material_indices_from_vb(
 	return data;
 }
 
-} // namespace zylann::voxel::transvoxel::materials::single
+} // namespace voxel::transvoxel::materials::single
 
 #endif // VOXEL_TRANSVOXEL_MATERIALS_SINGLE_COMMON_H

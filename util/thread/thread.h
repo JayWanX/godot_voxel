@@ -1,9 +1,9 @@
-#ifndef ZN_THREAD_H
-#define ZN_THREAD_H
+#ifndef VOXEL_THREAD_H
+#define VOXEL_THREAD_H
 
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 struct ThreadImpl;
 
@@ -40,6 +40,6 @@ private:
 	ThreadImpl *_impl = nullptr;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_THREAD_H
+#endif // VOXEL_THREAD_H

@@ -3,7 +3,7 @@
 #include "../../storage/voxel_buffer.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_voxel_mesher_cubes() {
 	VoxelBuffer vb(VoxelBuffer::ALLOCATOR_DEFAULT);
@@ -24,9 +24,9 @@ void test_voxel_mesher_cubes() {
 	const unsigned int opaque_surface_index = VoxelMesherCubes::MATERIAL_OPAQUE;
 	const unsigned int transparent_surface_index = VoxelMesherCubes::MATERIAL_TRANSPARENT;
 
-	ZN_TEST_ASSERT(output.surfaces.size() == 2);
-	ZN_TEST_ASSERT(output.surfaces[0].arrays.size() > 0);
-	ZN_TEST_ASSERT(output.surfaces[1].arrays.size() > 0);
+	VOXEL_TEST_ASSERT(output.surfaces.size() == 2);
+	VOXEL_TEST_ASSERT(output.surfaces[0].arrays.size() > 0);
+	VOXEL_TEST_ASSERT(output.surfaces[1].arrays.size() > 0);
 
 	const PackedVector3Array surface0_vertices = output.surfaces[opaque_surface_index].arrays[Mesh::ARRAY_VERTEX];
 	const unsigned int surface0_vertices_count = surface0_vertices.size();
@@ -45,10 +45,10 @@ void test_voxel_mesher_cubes() {
 
 	// Greedy meshing with two cubes of the same color next to each other means it will be a single box.
 	// Each side has different normals, so vertices have to be repeated. 6 sides * 4 vertices = 24.
-	ZN_TEST_ASSERT(surface0_vertices_count == 24);
+	VOXEL_TEST_ASSERT(surface0_vertices_count == 24);
 	// The transparent cube has less vertices because one of its faces overlaps with a neighbor solid face,
 	// so it is culled
-	ZN_TEST_ASSERT(surface1_vertices_count == 20);
+	VOXEL_TEST_ASSERT(surface1_vertices_count == 20);
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

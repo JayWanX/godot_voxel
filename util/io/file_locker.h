@@ -1,5 +1,5 @@
-#ifndef ZN_FILE_LOCKER_H
-#define ZN_FILE_LOCKER_H
+#ifndef VOXEL_FILE_LOCKER_H
+#define VOXEL_FILE_LOCKER_H
 
 #include "../containers/std_unordered_map.h"
 #include "../errors.h"
@@ -7,7 +7,7 @@
 #include "../thread/mutex.h"
 #include "../thread/rw_lock.h"
 
-namespace zylann {
+namespace voxel {
 
 // Performs software locking on paths,
 // so that multiple threads (controlled by this module) wanting to access the same file will lock a shared mutex.
@@ -61,7 +61,7 @@ private:
 				fp = &it->second;
 			}
 		}
-		ZN_ASSERT_RETURN(fp != nullptr);
+		VOXEL_ASSERT_RETURN(fp != nullptr);
 		// TODO FileAccess::reopen can have been called, nullifying my efforts to enforce thread sync :|
 		// So for now please don't do that
 
@@ -77,6 +77,6 @@ private:
 	StdUnorderedMap<StdString, File> _files;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_FILE_LOCKER_H
+#endif // VOXEL_FILE_LOCKER_H

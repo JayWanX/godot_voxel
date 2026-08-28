@@ -3,7 +3,7 @@
 
 #include "voxel_blocky_attribute.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // `axis`
 class VoxelBlockyAttributeAxis : public VoxelBlockyAttribute {
@@ -27,8 +27,8 @@ private:
 	// TODO Corresponding ortho rotations
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelBlockyAttributeAxis::Axis);
+VARIANT_ENUM_CAST(voxel::VoxelBlockyAttributeAxis::Axis);
 
 #endif // VOXEL_BLOCKY_ATTRIBUTE_AXIS_H

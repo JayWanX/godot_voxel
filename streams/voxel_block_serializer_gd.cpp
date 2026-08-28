@@ -3,13 +3,13 @@
 #include "../util/godot/core/packed_arrays.h"
 #include "voxel_block_serializer.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 const char *VoxelBlockSerializer::COMPRESSION_MODE_HINT_STRING = "None,LZ4,ZSTD";
 
@@ -22,7 +22,7 @@ VoxelBlockSerializer::Compression VoxelBlockSerializer::compression_to_gd(const 
 		case CompressedData::COMPRESSION_ZSTD:
 			return COMPRESSION_ZSTD;
 		default:
-			ZN_PRINT_ERROR("Unknown compression mode");
+			VOXEL_PRINT_ERROR("Unknown compression mode");
 			return COMPRESSION_NONE;
 	}
 }
@@ -36,7 +36,7 @@ CompressedData::Compression VoxelBlockSerializer::compression_from_gd(const Comp
 		case COMPRESSION_ZSTD:
 			return CompressedData::COMPRESSION_ZSTD;
 		default:
-			ZN_PRINT_ERROR("Unknown compression mode");
+			VOXEL_PRINT_ERROR("Unknown compression mode");
 			return CompressedData::COMPRESSION_NONE;
 	}
 }
@@ -166,4 +166,4 @@ void VoxelBlockSerializer::_bind_methods() {
 	BIND_ENUM_CONSTANT(COMPRESSION_ZSTD);
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot

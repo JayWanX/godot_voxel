@@ -4,9 +4,9 @@
 #include "../../util/godot/classes/accept_dialog.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class CodeEdit)
+VOXEL_GODOT_FORWARD_DECLARE(class CodeEdit)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGraphEditorShaderDialog : public AcceptDialog {
 	GDCLASS(VoxelGraphEditorShaderDialog, AcceptDialog)
@@ -23,6 +23,6 @@ private:
 	CodeEdit *_text_edit = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_SHADER_DIALOG_H

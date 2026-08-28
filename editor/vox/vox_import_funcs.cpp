@@ -1,7 +1,7 @@
 #include "vox_import_funcs.h"
 #include "../../util/godot/classes/array_mesh.h"
 
-namespace zylann {
+namespace voxel {
 
 namespace voxel::magica {
 
@@ -33,16 +33,16 @@ Ref<Mesh> build_mesh(
 		}
 
 		CRASH_COND(arrays.size() != Mesh::ARRAY_MAX);
-		if (!zylann::godot::is_surface_triangulated(arrays)) {
+		if (!voxel::godot::is_surface_triangulated(arrays)) {
 			continue;
 		}
 
 		if (p_scale != 1.f) {
-			zylann::godot::scale_surface(arrays, p_scale);
+			voxel::godot::scale_surface(arrays, p_scale);
 		}
 
 		if (p_offset != Vector3()) {
-			zylann::godot::offset_surface(arrays, p_offset);
+			voxel::godot::offset_surface(arrays, p_offset);
 		}
 
 		mesh->add_surface_from_arrays(output.primitive_type, arrays, Array(), Dictionary(), output.mesh_flags);
@@ -57,4 +57,4 @@ Ref<Mesh> build_mesh(
 }
 
 } // namespace voxel::magica
-} // namespace zylann
+} // namespace voxel

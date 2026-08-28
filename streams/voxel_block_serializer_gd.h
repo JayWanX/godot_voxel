@@ -4,9 +4,9 @@
 #include "../storage/voxel_buffer_gd.h"
 #include "compressed_data.h"
 
-ZN_GODOT_FORWARD_DECLARE(class StreamPeer);
+VOXEL_GODOT_FORWARD_DECLARE(class StreamPeer);
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 class VoxelBuffer;
 
@@ -52,8 +52,8 @@ public:
 	static void _bind_methods();
 };
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot
 
-VARIANT_ENUM_CAST(zylann::voxel::godot::VoxelBlockSerializer::Compression);
+VARIANT_ENUM_CAST(voxel::godot::VoxelBlockSerializer::Compression);
 
 #endif // VOXEL_BLOCK_SERIALIZER_GD_H

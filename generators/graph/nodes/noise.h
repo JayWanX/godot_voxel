@@ -14,7 +14,7 @@
 #include "../../../shaders/fast_noise_lite_shader.h"
 #endif
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 template <typename T>
 Variant create_resource_to_variant() {
@@ -84,7 +84,7 @@ void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const FastNoiseLite
 	}
 }
 
-void add_fast_noise_lite_gradient_state_config(ShaderGenContext &ctx, const ZN_FastNoiseLiteGradient &fnl) {
+void add_fast_noise_lite_gradient_state_config(ShaderGenContext &ctx, const VOXEL_FastNoiseLiteGradient &fnl) {
 	ctx.add_format(
 			"fnl_state warp_state = fnlCreateState({});\n"
 			"warp_state.domain_warp_type = {};\n"
@@ -105,7 +105,7 @@ void add_fast_noise_lite_gradient_state_config(ShaderGenContext &ctx, const ZN_F
 	);
 }
 
-void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const ZN_FastNoiseLite &fnl) {
+void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const VOXEL_FastNoiseLite &fnl) {
 	// TODO Add missing options
 	ctx.add_format(
 			"fnl_state state = fnlCreateState({});\n"
@@ -129,7 +129,7 @@ void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const ZN_FastNoiseL
 			fnl.get_cellular_return_type(),
 			fnl.get_cellular_jitter()
 	);
-	Ref<ZN_FastNoiseLiteGradient> fnlg = fnl.get_warp_noise();
+	Ref<VOXEL_FastNoiseLiteGradient> fnlg = fnl.get_warp_noise();
 	if (fnlg.is_valid()) {
 		add_fast_noise_lite_gradient_state_config(ctx, **fnlg);
 	}
@@ -160,7 +160,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			Ref<Noise> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
 				return;
 			}
 			Params p;
@@ -169,7 +169,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_NOISE_2D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_NOISE_2D");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			Runtime::Buffer &out = ctx.get_output(0);
@@ -191,12 +191,12 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
 			Ref<Noise> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
 				return;
 			}
 			Ref<FastNoiseLite> fnl = noise;
 			if (fnl.is_null()) {
-				ctx.make_error(String(ZN_TTR("Shader generation with {0} is not supported."))
+				ctx.make_error(String(VOXEL_TTR("Shader generation with {0} is not supported."))
 									   .format(varray(noise->get_class())));
 				return;
 			}
@@ -244,7 +244,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			Ref<Noise> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
 				return;
 			}
 			Params p;
@@ -253,7 +253,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_NOISE_3D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_NOISE_3D");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			const Runtime::Buffer &z = ctx.get_input(2);
@@ -277,12 +277,12 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
 			Ref<Noise> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Noise::get_class_static())));
 				return;
 			}
 			Ref<FastNoiseLite> fnl = noise;
 			if (fnl.is_null()) {
-				ctx.make_error(String(ZN_TTR("Shader generation with {0} is not supported."))
+				ctx.make_error(String(VOXEL_TTR("Shader generation with {0} is not supported."))
 									   .format(varray(noise->get_class())));
 				return;
 			}
@@ -314,7 +314,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const ZN_FastNoiseLite *noise;
+			const VOXEL_FastNoiseLite *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_2D];
@@ -325,15 +325,15 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.outputs.push_back(NodeType::Port("out"));
 		t.params.push_back(
 				NodeType::Param(
-						"noise", ZN_FastNoiseLite::get_class_static(), &create_resource_to_variant<ZN_FastNoiseLite>
+						"noise", VOXEL_FastNoiseLite::get_class_static(), &create_resource_to_variant<VOXEL_FastNoiseLite>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<ZN_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(ZN_TTR("{0} instance is null")).format(varray(ZN_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -343,7 +343,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_2D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_2D");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			Runtime::Buffer &out = ctx.get_output(0);
@@ -363,10 +363,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<ZN_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(ZN_TTR("{0} instance is null")).format(varray(ZN_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -396,7 +396,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const ZN_FastNoiseLite *noise;
+			const VOXEL_FastNoiseLite *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_3D];
@@ -408,15 +408,15 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.outputs.push_back(NodeType::Port("out"));
 		t.params.push_back(
 				NodeType::Param(
-						"noise", ZN_FastNoiseLite::get_class_static(), &create_resource_to_variant<ZN_FastNoiseLite>
+						"noise", VOXEL_FastNoiseLite::get_class_static(), &create_resource_to_variant<VOXEL_FastNoiseLite>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<ZN_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(ZN_TTR("{0} instance is null")).format(varray(ZN_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -426,7 +426,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_3D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_3D");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			const Runtime::Buffer &z = ctx.get_input(2);
@@ -448,10 +448,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<ZN_FastNoiseLite> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLite> noise = ctx.get_param(0);
 			if (noise.is_null()) {
 				ctx.make_error(
-						String(ZN_TTR("{0} instance is null")).format(varray(ZN_FastNoiseLite::get_class_static()))
+						String(VOXEL_TTR("{0} instance is null")).format(varray(VOXEL_FastNoiseLite::get_class_static()))
 				);
 				return;
 			}
@@ -484,7 +484,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const ZN_FastNoiseLiteGradient *noise;
+			const VOXEL_FastNoiseLiteGradient *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_GRADIENT_2D];
@@ -497,16 +497,16 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.params.push_back(
 				NodeType::Param(
 						"noise",
-						ZN_FastNoiseLiteGradient::get_class_static(),
-						&create_resource_to_variant<ZN_FastNoiseLiteGradient>
+						VOXEL_FastNoiseLiteGradient::get_class_static(),
+						&create_resource_to_variant<VOXEL_FastNoiseLiteGradient>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<ZN_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null"))
-									   .format(varray(ZN_FastNoiseLiteGradient::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
+									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			Params p;
@@ -515,7 +515,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_GRADIENT_2D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_GRADIENT_2D");
 			const Runtime::Buffer &xb = ctx.get_input(0);
 			const Runtime::Buffer &yb = ctx.get_input(1);
 			Runtime::Buffer &out_x = ctx.get_output(0);
@@ -542,10 +542,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<ZN_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null"))
-									   .format(varray(ZN_FastNoiseLiteGradient::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
+									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			ctx.require_lib_code("vg_fnl", g_fast_noise_lite_shader);
@@ -566,7 +566,7 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			const ZN_FastNoiseLiteGradient *noise;
+			const VOXEL_FastNoiseLiteGradient *noise;
 		};
 
 		NodeType &t = types[VoxelGraphFunction::NODE_FAST_NOISE_GRADIENT_3D];
@@ -581,16 +581,16 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.params.push_back(
 				NodeType::Param(
 						"noise",
-						ZN_FastNoiseLiteGradient::get_class_static(),
-						&create_resource_to_variant<ZN_FastNoiseLiteGradient>
+						VOXEL_FastNoiseLiteGradient::get_class_static(),
+						&create_resource_to_variant<VOXEL_FastNoiseLiteGradient>
 				)
 		);
 
 		t.compile_func = [](CompileContext &ctx) {
-			Ref<ZN_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null"))
-									   .format(varray(ZN_FastNoiseLiteGradient::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
+									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			Params p;
@@ -599,7 +599,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_GRADIENT_3D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_GRADIENT_3D");
 			const Runtime::Buffer &xb = ctx.get_input(0);
 			const Runtime::Buffer &yb = ctx.get_input(1);
 			const Runtime::Buffer &zb = ctx.get_input(2);
@@ -632,10 +632,10 @@ void register_noise_nodes(Span<NodeType> types) {
 
 #ifdef VOXEL_ENABLE_GPU
 		t.shader_gen_func = [](ShaderGenContext &ctx) {
-			Ref<ZN_FastNoiseLiteGradient> noise = ctx.get_param(0);
+			Ref<VOXEL_FastNoiseLiteGradient> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null"))
-									   .format(varray(ZN_FastNoiseLiteGradient::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null"))
+									   .format(varray(VOXEL_FastNoiseLiteGradient::get_class_static())));
 				return;
 			}
 			ctx.require_lib_code("vg_fnl", g_fast_noise_lite_shader);
@@ -677,12 +677,12 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			Ref<FastNoise2> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(FastNoise2::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(FastNoise2::get_class_static())));
 				return;
 			}
 			noise->update_generator();
 			if (!noise->is_valid()) {
-				ctx.make_error(String(ZN_TTR("{0} setup is invalid")).format(varray(FastNoise2::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} setup is invalid")).format(varray(FastNoise2::get_class_static())));
 				return;
 			}
 			Params p;
@@ -691,7 +691,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_2_2D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_2_2D");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			Runtime::Buffer &out = ctx.get_output(0);
@@ -707,7 +707,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			// const Interval x = ctx.get_input(0);
 			// const Interval y = ctx.get_input(1);
 			const Params p = ctx.get_params<Params>();
-			ZN_ASSERT_RETURN(p.noise != nullptr);
+			VOXEL_ASSERT_RETURN(p.noise != nullptr);
 			ctx.set_output(0, p.noise->get_estimated_output_range());
 		};
 	}
@@ -730,12 +730,12 @@ void register_noise_nodes(Span<NodeType> types) {
 		t.compile_func = [](CompileContext &ctx) {
 			Ref<FastNoise2> noise = ctx.get_param(0);
 			if (noise.is_null()) {
-				ctx.make_error(String(ZN_TTR("{0} instance is null")).format(varray(FastNoise2::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(FastNoise2::get_class_static())));
 				return;
 			}
 			noise->update_generator();
 			if (!noise->is_valid()) {
-				ctx.make_error(String(ZN_TTR("{0} setup is invalid")).format(varray(FastNoise2::get_class_static())));
+				ctx.make_error(String(VOXEL_TTR("{0} setup is invalid")).format(varray(FastNoise2::get_class_static())));
 				return;
 			}
 			Params p;
@@ -744,7 +744,7 @@ void register_noise_nodes(Span<NodeType> types) {
 		};
 
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_2_3D");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_FAST_NOISE_2_3D");
 			const Runtime::Buffer &x = ctx.get_input(0);
 			const Runtime::Buffer &y = ctx.get_input(1);
 			const Runtime::Buffer &z = ctx.get_input(2);
@@ -763,7 +763,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			// const Interval y = ctx.get_input(1);
 			// const Interval z = ctx.get_input(2);
 			const Params p = ctx.get_params<Params>();
-			ZN_ASSERT_RETURN(p.noise != nullptr);
+			VOXEL_ASSERT_RETURN(p.noise != nullptr);
 			ctx.set_output(0, p.noise->get_estimated_output_range());
 		};
 	}
@@ -806,21 +806,21 @@ void register_noise_nodes(Span<NodeType> types) {
 			params.jitter = ctx.get_param(2);
 
 			if (params.jitter < 0.f) {
-				ctx.make_error(ZN_TTR("Jitter cannot be negative"));
+				ctx.make_error(VOXEL_TTR("Jitter cannot be negative"));
 				return;
 			}
 			if (params.jitter > 1.f) {
-				ctx.make_error(ZN_TTR("Jitter must be between 0 and 1"));
+				ctx.make_error(VOXEL_TTR("Jitter must be between 0 and 1"));
 				return;
 			}
 
 			if (params.cell_size < 0) {
-				ctx.make_error(ZN_TTR("Cell size cannot be negative"));
+				ctx.make_error(VOXEL_TTR("Cell size cannot be negative"));
 				return;
 			}
 			if (params.cell_size < 0.01) {
 				// To avoid division by zero
-				ctx.make_error(ZN_TTR("Cell size is too small"));
+				ctx.make_error(VOXEL_TTR("Cell size is too small"));
 				return;
 			}
 
@@ -895,21 +895,21 @@ void register_noise_nodes(Span<NodeType> types) {
 			params.jitter = ctx.get_param(2);
 
 			if (params.jitter < 0.f) {
-				ctx.make_error(ZN_TTR("Jitter cannot be negative"));
+				ctx.make_error(VOXEL_TTR("Jitter cannot be negative"));
 				return;
 			}
 			if (params.jitter > 1.f) {
-				ctx.make_error(ZN_TTR("Jitter must be between 0 and 1"));
+				ctx.make_error(VOXEL_TTR("Jitter must be between 0 and 1"));
 				return;
 			}
 
 			if (params.cell_size < 0) {
-				ctx.make_error(ZN_TTR("Cell size cannot be negative"));
+				ctx.make_error(VOXEL_TTR("Cell size cannot be negative"));
 				return;
 			}
 			if (params.cell_size < 0.01) {
 				// To avoid division by zero
-				ctx.make_error(ZN_TTR("Cell size is too small"));
+				ctx.make_error(VOXEL_TTR("Cell size is too small"));
 				return;
 			}
 
@@ -954,4 +954,4 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

@@ -1,5 +1,5 @@
-#ifndef ZN_FAST_NOISE_LITE_VIEWER_H
-#define ZN_FAST_NOISE_LITE_VIEWER_H
+#ifndef VOXEL_FAST_NOISE_LITE_VIEWER_H
+#define VOXEL_FAST_NOISE_LITE_VIEWER_H
 
 #include "../../util/godot/classes/control.h"
 #include "../../util/godot/macros.h"
@@ -8,15 +8,15 @@
 // Required in header for GDExtension builds, due to how virtual methods are implemented
 #include "../../util/godot/classes/input_event.h"
 
-ZN_GODOT_FORWARD_DECLARE(class TextureRect)
-ZN_GODOT_FORWARD_DECLARE(class PopupMenu)
+VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
+VOXEL_GODOT_FORWARD_DECLARE(class PopupMenu)
 
-namespace zylann {
+namespace voxel {
 
-class ZN_NoiseAnalysisWindow;
+class VOXEL_NoiseAnalysisWindow;
 
-class ZN_FastNoiseLiteViewer : public Control {
-	GDCLASS(ZN_FastNoiseLiteViewer, Control)
+class VOXEL_FastNoiseLiteViewer : public Control {
+	GDCLASS(VOXEL_FastNoiseLiteViewer, Control)
 public:
 	static const int PREVIEW_WIDTH = 300;
 	static const int PREVIEW_HEIGHT = 150;
@@ -25,18 +25,18 @@ public:
 		MENU_ANALYZE = 0
 	};
 
-	ZN_FastNoiseLiteViewer();
+	VOXEL_FastNoiseLiteViewer();
 
-	void set_noise(Ref<ZN_FastNoiseLite> noise);
-	void set_noise_gradient(Ref<ZN_FastNoiseLiteGradient> noise_gradient);
+	void set_noise(Ref<VOXEL_FastNoiseLite> noise);
+	void set_noise_gradient(Ref<VOXEL_FastNoiseLiteGradient> noise_gradient);
 
-	void set_noise_analysis_window(ZN_NoiseAnalysisWindow *win) {
+	void set_noise_analysis_window(VOXEL_NoiseAnalysisWindow *win) {
 		_noise_analysis_window = win;
 	}
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 	void gui_input(const Ref<InputEvent> &p_event) override;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	void _gui_input(const Ref<InputEvent> &p_event) override;
 #endif
 
@@ -51,14 +51,14 @@ private:
 
 	static void _bind_methods();
 
-	Ref<ZN_FastNoiseLite> _noise;
-	Ref<ZN_FastNoiseLiteGradient> _noise_gradient;
+	Ref<VOXEL_FastNoiseLite> _noise;
+	Ref<VOXEL_FastNoiseLiteGradient> _noise_gradient;
 	float _time_before_update = -1.f;
 	TextureRect *_texture_rect = nullptr;
 	PopupMenu *_context_menu = nullptr;
-	ZN_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
+	VOXEL_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_FAST_NOISE_LITE_VIEWER_H
+#endif // VOXEL_FAST_NOISE_LITE_VIEWER_H

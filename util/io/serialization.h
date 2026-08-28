@@ -5,7 +5,7 @@
 #include "../containers/std_vector.h"
 #include <cstring>
 
-namespace zylann {
+namespace voxel {
 
 enum Endianness { //
 	ENDIANNESS_BIG_ENDIAN,
@@ -110,7 +110,7 @@ struct ByteSpanWithPosition {
 
 	inline void push_back(uint8_t v) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(pos != data.size());
+		VOXEL_ASSERT(pos != data.size());
 #endif
 		data[pos++] = v;
 	}
@@ -120,7 +120,7 @@ struct ByteSpanWithPosition {
 	}
 
 	inline void resize(size_t new_size) {
-		ZN_ASSERT(new_size <= data.size());
+		VOXEL_ASSERT(new_size <= data.size());
 		pos = new_size;
 	}
 
@@ -213,7 +213,7 @@ struct MemoryReader {
 
 	inline size_t get_buffer(Span<uint8_t> p_dst) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(pos <= data.size());
+		VOXEL_ASSERT(pos <= data.size());
 #endif
 		size_t end = pos + p_dst.size();
 		if (end > data.size()) {
@@ -231,6 +231,6 @@ struct MemoryReader {
 	}
 };
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // VOXEL_UTIL_SERIALIZATION_H

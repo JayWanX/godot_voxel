@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Interprets voxel values as indexes to models in a VoxelBlockyLibrary, and batches them together.
 // Overlapping faces are removed from the final mesh.
@@ -61,9 +61,9 @@ public:
 	// This will lead to performance degradation and maybe unexpected behavior.
 	// The way it works has also changed in Godot 4.5 so I gave up trying to implement it.
 	//
-	// #if defined(ZN_GODOT)
+	// #if defined(VOXEL_GODOT)
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
-	// #elif defined(ZN_GODOT_EXTENSION)
+	// #elif defined(VOXEL_GODOT_EXTENSION)
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const;
 	// #endif
 
@@ -167,9 +167,9 @@ inline bool is_face_visible(
 
 } // namespace blocky
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelMesherBlocky::Side)
-VARIANT_ENUM_CAST(zylann::voxel::VoxelMesherBlocky::TintMode)
+VARIANT_ENUM_CAST(voxel::VoxelMesherBlocky::Side)
+VARIANT_ENUM_CAST(voxel::VoxelMesherBlocky::TintMode)
 
 #endif // VOXEL_MESHER_BLOCKY_H

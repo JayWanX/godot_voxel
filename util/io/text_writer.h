@@ -1,10 +1,10 @@
-#ifndef ZN_TEXT_WRITER_H
-#define ZN_TEXT_WRITER_H
+#ifndef VOXEL_TEXT_WRITER_H
+#define VOXEL_TEXT_WRITER_H
 
 #include "../containers/span.h"
 #include <cstdint>
 
-namespace zylann {
+namespace voxel {
 
 // Interface for an output stream of characters
 class TextWriter {
@@ -50,6 +50,6 @@ TextWriter &operator<<(TextWriter &w, const char *v);
 TextWriter &operator<<(TextWriter &w, const float v);
 TextWriter &operator<<(TextWriter &w, const double v);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_TEXT_WRITER_H
+#endif // VOXEL_TEXT_WRITER_H

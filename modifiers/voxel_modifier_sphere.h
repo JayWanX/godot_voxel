@@ -3,7 +3,7 @@
 
 #include "voxel_modifier_sdf.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelModifierSphere : public VoxelModifierSdf {
 public:
@@ -25,6 +25,6 @@ private:
 	float _radius = 10.f;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MODIFIER_SPHERE_H

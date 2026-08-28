@@ -1,16 +1,16 @@
 #include "editor_settings.h"
 #include "input_event_key.h"
-#if defined(ZN_GODOT_EXTENSION)
+#if defined(VOXEL_GODOT_EXTENSION)
 #include "../core/keyboard.h"
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 Ref<Shortcut> get_or_create_editor_shortcut(const String &p_path, const String &p_name, Key p_keycode) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return ED_SHORTCUT(p_path, p_name, p_keycode);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	// TODO GDX: `ED_SHORTCUT` and other `EditorSettings` shortcut APIs are not exposed
 	// See https://github.com/godotengine/godot/pull/58585
 
@@ -45,4 +45,4 @@ Ref<Shortcut> get_or_create_editor_shortcut(const String &p_path, const String &
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

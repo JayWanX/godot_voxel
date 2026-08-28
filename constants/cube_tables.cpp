@@ -1,6 +1,6 @@
 #include "cube_tables.h"
 
-namespace zylann::voxel::Cube {
+namespace voxel::Cube {
 
 // The following tables respect the following conventions
 //
@@ -235,8 +235,8 @@ Cube::Side dir_to_side(Vector3i d) {
 			return Cube::Side(side);
 		}
 	}
-	ZN_PRINT_ERROR("Side not found");
+	VOXEL_PRINT_ERROR("Side not found");
 	return Cube::SIDE_FRONT;
 }
 
-} // namespace zylann::voxel::Cube
+} // namespace voxel::Cube

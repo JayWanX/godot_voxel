@@ -4,7 +4,7 @@
 #include "../../util/containers/std_vector.h"
 #include "voxel_blocky_fluid.h"
 
-namespace zylann::voxel {
+namespace voxel {
 namespace blocky {
 
 struct MaterialIndexer;
@@ -19,6 +19,6 @@ struct ModelBakingContext {
 };
 
 } // namespace blocky
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_BAKING_CONTEXT_H

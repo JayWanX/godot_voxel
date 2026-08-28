@@ -12,7 +12,7 @@
 #include "../modifiers/voxel_modifier_stack.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelDataGrid;
 
@@ -191,7 +191,7 @@ public:
 		Lod &lod = _lods[block.get_lod_index()];
 #ifdef DEBUG_ENABLED
 		if (block.has_voxels()) {
-			ZN_ASSERT(block.get_voxels_const().get_size() == Vector3iUtil::create(get_block_size()));
+			VOXEL_ASSERT(block.get_voxels_const().get_size() == Vector3iUtil::create(get_block_size()));
 		}
 #endif
 		RWLockWrite wlock(lod.map_lock);
@@ -480,6 +480,6 @@ private:
 	Mutex _settings_mutex;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_DATA_H

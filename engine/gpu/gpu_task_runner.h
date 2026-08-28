@@ -16,12 +16,12 @@
 
 #include <atomic>
 
-ZN_GODOT_FORWARD_DECLARE(class RenderingDevice)
-#ifdef ZN_GODOT_EXTENSION
+VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice)
+#ifdef VOXEL_GODOT_EXTENSION
 using namespace godot;
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class GPUStorageBufferPool;
 
@@ -102,6 +102,6 @@ private:
 	std::atomic_uint32_t _pending_count = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GPU_TASK_RUNNER_H

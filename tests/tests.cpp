@@ -46,18 +46,18 @@
 #include "voxel/test_mesh_sdf.h"
 #endif
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 #define VOXEL_TEST(fname)                                                                                              \
 	if (options.can_run_print(#fname)) {                                                                               \
-		ZN_PROFILE_SCOPE_NAMED(#fname);                                                                                \
+		VOXEL_PROFILE_SCOPE_NAMED(#fname);                                                                                \
 		fname();                                                                                                       \
 	}
 
 void run_voxel_tests(const testing::TestOptions &options) {
 	print_line("------------ Voxel tests begin -------------");
 
-	using namespace zylann::tests;
+	using namespace voxel::tests;
 
 	VOXEL_TEST(test_wrap);
 	VOXEL_TEST(test_int32_to_string_base10);
@@ -184,4 +184,4 @@ void run_voxel_tests(const testing::TestOptions &options) {
 	print_line("------------ Voxel tests end -------------");
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

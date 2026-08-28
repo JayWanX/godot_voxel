@@ -1,9 +1,9 @@
-#ifndef ZN_BOX_BOUNDS_3I_H
-#define ZN_BOX_BOUNDS_3I_H
+#ifndef VOXEL_BOX_BOUNDS_3I_H
+#define VOXEL_BOX_BOUNDS_3I_H
 
 #include "box3i.h"
 
-namespace zylann {
+namespace voxel {
 
 // Alternative implementation of an integer axis-aligned box, storing min and max positions for faster intersection
 // checks.
@@ -72,6 +72,6 @@ struct BoxBounds3i {
 class TextWriter;
 TextWriter &operator<<(TextWriter &w, const BoxBounds3i &box);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_BOX_BOUNDS_3I_H
+#endif // VOXEL_BOX_BOUNDS_3I_H

@@ -7,7 +7,7 @@
 #include "../util/io/log.h"
 #include "../util/profiling.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 std::atomic_int g_debug_load_block_tasks_count = { 0 };
@@ -54,9 +54,9 @@ int LoadBlockDataTask::debug_get_running_count() {
 	return g_debug_load_block_tasks_count;
 }
 
-void LoadBlockDataTask::run(zylann::ThreadedTaskContext &ctx) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+void LoadBlockDataTask::run(voxel::ThreadedTaskContext &ctx) {
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	CRASH_COND(_stream_dependency == nullptr);
 	Ref<VoxelStream> stream = _stream_dependency->stream;
@@ -180,8 +180,8 @@ void LoadBlockDataTask::apply_result() {
 
 	} else {
 		// This can happen if the user removes the volume while requests are still about to return
-		ZN_PRINT_VERBOSE("Stream data request response came back but volume wasn't found");
+		VOXEL_PRINT_VERBOSE("Stream data request response came back but volume wasn't found");
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

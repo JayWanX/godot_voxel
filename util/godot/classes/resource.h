@@ -1,14 +1,14 @@
-#ifndef ZN_GODOT_RESOURCE_H
-#define ZN_GODOT_RESOURCE_H
+#ifndef VOXEL_GODOT_RESOURCE_H
+#define VOXEL_GODOT_RESOURCE_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/io/resource.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/resource.hpp>
 using namespace godot;
 #endif
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Godot doesn't have configuration warnings yet on resources.
 // But when we add them and they are nested, it can be difficult to put them into context when the warning appears in
@@ -32,15 +32,15 @@ inline void get_resource_configuration_warnings(
 		String context = get_context_string_func();
 		for (int i = prev_size; i < current_size; ++i) {
 			const String w = context + warnings[i];
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 			warnings.write[i] = w;
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 			warnings[i] = w;
 #endif
 		}
 	}
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_RESOURCE_H
+#endif // VOXEL_GODOT_RESOURCE_H

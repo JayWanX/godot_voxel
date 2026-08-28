@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string.h>
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_BEGIN
+MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
 // This work is based on:
 // Takio Kurita. An efficient agglomerative clustering algorithm using a heap. 1991
@@ -500,4 +500,4 @@ size_t meshopt_partitionClusters(unsigned int* destination, const unsigned int* 
 	return next_group;
 }
 
-MESHOPTIMIZER_ZYLANN_NAMESPACE_END
+MESHOPTIMIZER_VOXEL_NAMESPACE_END

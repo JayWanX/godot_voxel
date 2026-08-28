@@ -2,17 +2,17 @@
 #include "../../math/conv.h"
 #include "../../profiling.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r_result, Vector2i &r_size) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 	Vector<Vector2i> sizes;
 	sizes.resize(p_sizes.size());
 	Vector2i *sizes_data = sizes.ptrw();
-	ZN_ASSERT_RETURN(sizes_data != nullptr);
+	VOXEL_ASSERT_RETURN(sizes_data != nullptr);
 	memcpy(sizes_data, p_sizes.data(), p_sizes.size() * sizeof(Vector2i));
 
 	Vector<Vector2i> result;
@@ -21,7 +21,7 @@ void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r
 	r_result.resize(result.size());
 	memcpy(r_result.data(), result.ptr(), result.size() * sizeof(Vector2i));
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 
 	// PackedVector2iArray doesn't exist, so have to convert to float. Internally Godot allocates another array and
 	// converts back to ints. Then allocates another float array and converts results to floats, returns it, and then
@@ -30,7 +30,7 @@ void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r
 	PackedVector2Array sizes;
 	sizes.resize(p_sizes.size());
 	Vector2 *sizes_data = sizes.ptrw();
-	ZN_ASSERT_RETURN(sizes_data != nullptr);
+	VOXEL_ASSERT_RETURN(sizes_data != nullptr);
 	for (unsigned int i = 0; i < p_sizes.size(); ++i) {
 		sizes_data[i] = p_sizes[i];
 	}
@@ -41,7 +41,7 @@ void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r
 
 	r_result.resize(positions.size());
 	const Vector2 *positions_data = positions.ptr();
-	ZN_ASSERT_RETURN(positions_data != nullptr);
+	VOXEL_ASSERT_RETURN(positions_data != nullptr);
 	for (unsigned int i = 0; i < r_result.size(); ++i) {
 		r_result[i] = to_vec2i(positions_data[i]);
 	}
@@ -54,14 +54,14 @@ void geometry_2d_clip_polygons( //
 		const PackedVector2Array &polygon_b, //
 		StdVector<PackedVector2Array> &output //
 ) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	Vector<Vector<Vector2>> result = Geometry2D::clip_polygons(polygon_a, polygon_b);
 	output.resize(result.size());
 	for (unsigned int i = 0; i < output.size(); ++i) {
 		output[i] = result[i];
 	}
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	TypedArray<PackedVector2Array> result = Geometry2D::get_singleton()->clip_polygons(polygon_a, polygon_b);
 	output.resize(result.size());
 	for (unsigned int i = 0; i < output.size(); ++i) {
@@ -71,4 +71,4 @@ void geometry_2d_clip_polygons( //
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_RENDERING_SERVER_H
-#define ZN_GODOT_RENDERING_SERVER_H
+#ifndef VOXEL_GODOT_RENDERING_SERVER_H
+#define VOXEL_GODOT_RENDERING_SERVER_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include "../core/version.h"
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
@@ -17,7 +17,7 @@ using RenderingServerEnums = RenderingServer;
 #include <servers/rendering/rendering_server_enums.h>
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/rendering_server.hpp>
 using namespace godot;
 using RenderingServerEnums = RenderingServer;
@@ -26,19 +26,19 @@ using RenderingServerEnums = RenderingServer;
 #include "../../containers/std_vector.h"
 #include "../macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class ProjectSettings);
+VOXEL_GODOT_FORWARD_DECLARE(class ProjectSettings);
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 inline void free_rendering_server_rid(RenderingServer &rs, const RID &rid) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
 	rs.free(rid);
 #else
 	rs.free_rid(rid);
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	rs.free_rid(rid);
 #endif
 }
@@ -100,6 +100,6 @@ RenderThreadModel get_render_thread_model(const ProjectSettings &settings);
 // Tells if it is safe to call functions of the RenderingServer from a thread other than the main one.
 bool is_render_thread_model_safe(const RenderThreadModel mode);
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_RENDERING_SERVER_H
+#endif // VOXEL_GODOT_RENDERING_SERVER_H

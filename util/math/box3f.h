@@ -1,10 +1,10 @@
-#ifndef ZN_BOX3F_H
-#define ZN_BOX3F_H
+#ifndef VOXEL_BOX3F_H
+#define VOXEL_BOX3F_H
 
 #include "vector3t.h"
 #include <type_traits>
 
-namespace zylann {
+namespace voxel {
 
 // Axis-aligned 3D box using floating point coordinates.
 template <typename T>
@@ -58,6 +58,6 @@ public:
 
 using Box3f = Box3fT<float>;
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_BOX3F_H
+#endif // VOXEL_BOX3F_H

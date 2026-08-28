@@ -1,10 +1,10 @@
-#ifndef ZN_GODOT_KEYBOARD_H
-#define ZN_GODOT_KEYBOARD_H
+#ifndef VOXEL_GODOT_KEYBOARD_H
+#define VOXEL_GODOT_KEYBOARD_H
 
 // Key enums are not defined the same way between Godot and GDExtension.
 // This defines aliases so using them is the same in both module and extension builds.
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/os/keyboard.h>
 
 // Expose as in GodotCpp
@@ -27,7 +27,7 @@ static const Key KEY_DOWN = Key::DOWN;
 static const Key KEY_ENTER = Key::ENTER;
 }; // namespace godot
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/global_constants.hpp>
 
 // TODO GDX: The operator `Key & KeyModifierMask` is defined in core, but not in GDExtension...
@@ -47,4 +47,4 @@ constexpr godot::KeyModifierMask operator|(godot::KeyModifierMask a, godot::KeyM
 
 #endif
 
-#endif // ZN_GODOT_KEYBOARD_H
+#endif // VOXEL_GODOT_KEYBOARD_H

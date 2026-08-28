@@ -2,17 +2,17 @@
 #include "../../util/containers/fixed_array.h"
 #include "../../util/string/conv.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_int32_to_string_base10(const int32_t x, std::string_view expected) {
 	FixedArray<uint8_t, 64> buffer;
 	const unsigned int nchars = int32_to_string_base10(x, to_span(buffer));
 
 	const unsigned int expected_nchars = expected.size();
-	ZN_ASSERT(nchars == expected_nchars);
+	VOXEL_ASSERT(nchars == expected_nchars);
 
 	for (unsigned int i = 0; i < expected_nchars; ++i) {
-		ZN_ASSERT(buffer[i] == static_cast<uint8_t>(expected[i]));
+		VOXEL_ASSERT(buffer[i] == static_cast<uint8_t>(expected[i]));
 	}
 }
 
@@ -31,9 +31,9 @@ void test_string_base10_to_int32(const char *src, const int32_t expected, const 
 	int32_t x;
 	std::string_view src_sv(src);
 	const unsigned int nchars = string_base10_to_int32(src_sv, x);
-	ZN_ASSERT(expected_nchars <= src_sv.size());
-	ZN_ASSERT(nchars == expected_nchars);
-	ZN_ASSERT(x == expected);
+	VOXEL_ASSERT(expected_nchars <= src_sv.size());
+	VOXEL_ASSERT(nchars == expected_nchars);
+	VOXEL_ASSERT(x == expected);
 }
 
 void test_string_base10_to_int32() {
@@ -50,4 +50,4 @@ void test_string_base10_to_int32() {
 	test_string_base10_to_int32("2147483647", std::numeric_limits<int32_t>::max(), 10);
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

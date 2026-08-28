@@ -1,5 +1,5 @@
-#ifndef ZN_NOISE_RANGE_UTILITY_H
-#define ZN_NOISE_RANGE_UTILITY_H
+#ifndef VOXEL_NOISE_RANGE_UTILITY_H
+#define VOXEL_NOISE_RANGE_UTILITY_H
 
 #include "../math/interval.h"
 
@@ -9,7 +9,7 @@
 // TODO We could skew max derivative estimation if the anchor is on a bump or a dip
 // because in these cases, it becomes impossible for noise to go further up or further down
 
-namespace zylann {
+namespace voxel {
 
 template <typename Noise_F>
 inline math::Interval get_noise_range_2d(
@@ -57,6 +57,6 @@ inline math::Interval get_noise_range_3d(
 	);
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_NOISE_RANGE_UTILITY_H
+#endif // VOXEL_NOISE_RANGE_UTILITY_H

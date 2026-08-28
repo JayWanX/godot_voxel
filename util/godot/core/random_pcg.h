@@ -27,12 +27,12 @@
 /* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
-// Zylann: added the `godot` namespace, adapted so it can compile with GodotCpp
+// Voxel: added the `godot` namespace, adapted so it can compile with GodotCpp
 
-#ifndef ZN_RANDOM_PCG_H
-#define ZN_RANDOM_PCG_H
+#ifndef VOXEL_RANDOM_PCG_H
+#define VOXEL_RANDOM_PCG_H
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 
 // Use built-in version
 #include <core/math/random_pcg.h>
@@ -117,7 +117,7 @@ public:
 	inline double randd() {
 #if defined(CLZ32)
 		uint32_t proto_exp_offset = rand();
-		if (ZN_UNLIKELY(proto_exp_offset == 0)) {
+		if (VOXEL_UNLIKELY(proto_exp_offset == 0)) {
 			return 0;
 		}
 		uint64_t significand = (((uint64_t)rand()) << 32) | rand() | 0x8000000000000001U;
@@ -130,7 +130,7 @@ public:
 	inline float randf() {
 #if defined(CLZ32)
 		uint32_t proto_exp_offset = rand();
-		if (ZN_UNLIKELY(proto_exp_offset == 0)) {
+		if (VOXEL_UNLIKELY(proto_exp_offset == 0)) {
 			return 0;
 		}
 		return LDEXPF((float)(rand() | 0x80000001), -32 - CLZ32(proto_exp_offset));
@@ -143,12 +143,12 @@ public:
 	inline double randfn(double p_mean, double p_deviation) {
 		return p_mean +
 				p_deviation *
-				(cos(zylann::math::TAU<double> * randd()) * sqrt(-2.0 * log(randd()))); // Box-Muller transform
+				(cos(voxel::math::TAU<double> * randd()) * sqrt(-2.0 * log(randd()))); // Box-Muller transform
 	}
 	inline float randfn(float p_mean, float p_deviation) {
 		return p_mean +
 				p_deviation *
-				(cos(zylann::math::TAU<float> * randf()) * sqrt(-2.0 * log(randf()))); // Box-Muller transform
+				(cos(voxel::math::TAU<float> * randf()) * sqrt(-2.0 * log(randf()))); // Box-Muller transform
 	}
 
 	double random(double p_from, double p_to);
@@ -160,5 +160,5 @@ public:
 
 using namespace godot;
 
-#endif // ZN_GODOT
+#endif // VOXEL_GODOT
 #endif // RANDOM_PCG_H

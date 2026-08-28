@@ -11,7 +11,7 @@
 #include "../../util/thread/mutex.h"
 #include "instance_library_item_listener.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstanceLibraryItem;
 class VoxelInstanceGenerator;
@@ -45,7 +45,7 @@ public:
 	template <typename F>
 	void for_each_item(F f) {
 		for (auto it = _items.begin(); it != _items.end(); ++it) {
-			ZN_ASSERT(it->second.is_valid());
+			VOXEL_ASSERT(it->second.is_valid());
 			f(it->first, **it->second);
 		}
 	}
@@ -53,7 +53,7 @@ public:
 	template <typename F>
 	void for_each_item(F f) const {
 		for (auto it = _items.begin(); it != _items.end(); ++it) {
-			ZN_ASSERT(it->second.is_valid());
+			VOXEL_ASSERT(it->second.is_valid());
 			f(it->first, **it->second);
 		}
 	}
@@ -61,7 +61,7 @@ public:
 	template <typename TPredicate>
 	int find_item(TPredicate pred) const {
 		for (auto it = _items.begin(); it != _items.end(); ++it) {
-			ZN_ASSERT(it->second.is_valid());
+			VOXEL_ASSERT(it->second.is_valid());
 			if (pred(**it->second)) {
 				return it->first;
 			}
@@ -134,6 +134,6 @@ private:
 #endif
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCER_LIBRARY_H

@@ -15,7 +15,7 @@
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
@@ -24,7 +24,7 @@
 #pragma warning(disable : 4701) // Potentially uninitialized local variable used.
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
@@ -60,18 +60,18 @@ void snap_surface_points_from_generator_sdf(
 		const Vector3f chunk_min_pos,
 		const Vector3f chunk_max_pos
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (!generator.supports_series_generation()) {
-		ZN_PRINT_ERROR_ONCE(
+		VOXEL_PRINT_ERROR_ONCE(
 				format("Can't snap instance positions from generator SDF, {} doesn't support series generation.",
 					   generator.get_class())
 		);
 		return;
 	}
 
-	ZN_ASSERT_RETURN(sample_count >= GEN_SDF_SAMPLE_COUNT_MIN);
-	ZN_ASSERT_RETURN_MSG(sample_count <= GEN_SDF_SAMPLE_COUNT_MAX, "Sample count is too high");
+	VOXEL_ASSERT_RETURN(sample_count >= GEN_SDF_SAMPLE_COUNT_MIN);
+	VOXEL_ASSERT_RETURN_MSG(sample_count <= GEN_SDF_SAMPLE_COUNT_MAX, "Sample count is too high");
 
 	// TODO Candidates for temp allocator
 	StdVector<float> x_buffer;
@@ -84,7 +84,7 @@ void snap_surface_points_from_generator_sdf(
 	const float distance_between_samples = 2.f * search_distance / (sample_count - 1);
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Buffer preparation");
+		VOXEL_PROFILE_SCOPE_NAMED("Buffer preparation");
 
 		const unsigned int buffer_len = positions.size() * sample_count;
 
@@ -189,7 +189,7 @@ void snap_surface_points_from_generator_sdf(
 		}
 	}
 
-	// ZN_PRINT_VERBOSE(format("Gen SDF snap hits {} misses {}", debug_hits, debug_misses));
+	// VOXEL_PRINT_VERBOSE(format("Gen SDF snap hits {} misses {}", debug_hits, debug_misses));
 }
 
 struct TexAttrib {
@@ -258,7 +258,7 @@ inline bool triangle_contains_enough_material_interpolated(
 	{
 		// We assume each vertex actually has the same indices, it's a property of the mesh for
 		// interpolation to make sense
-		ZN_ASSERT(
+		VOXEL_ASSERT(
 				attrib_array[vi0].packed_indices == attrib_array[vi1].packed_indices &&
 				attrib_array[vi1].packed_indices == attrib_array[vi2].packed_indices
 		);
@@ -321,7 +321,7 @@ void filter_instances_by_voxel_materials(
 		const uint32_t material_mask,
 		const VoxelInstanceGenerator::EmitMode emit_mode
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	switch (emit_mode) {
 		case VoxelInstanceGenerator::EMIT_FROM_VERTICES: {
@@ -346,7 +346,7 @@ void filter_instances_by_voxel_materials(
 		case VoxelInstanceGenerator::EMIT_FROM_FACES_FAST:
 		case VoxelInstanceGenerator::EMIT_ONE_PER_TRIANGLE: {
 #ifdef DEV_ENABLED
-			ZN_ASSERT(instance_barycentrics.size() / 3 == instance_positions.size());
+			VOXEL_ASSERT(instance_barycentrics.size() / 3 == instance_positions.size());
 #endif
 
 			// Indices are the index in the index buffer of the first vertex of the triangle in which the instance
@@ -379,7 +379,7 @@ void filter_instances_by_voxel_materials(
 		} break;
 
 		default:
-			ZN_PRINT_ERROR_ONCE("Unhandled emit mode");
+			VOXEL_PRINT_ERROR_ONCE("Unhandled emit mode");
 			break;
 	}
 }
@@ -836,7 +836,7 @@ void filter_instances_by_octant(
 		const float block_size,
 		const uint8_t octant_mask
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	const float h = block_size / 2.f;
 	for (unsigned int i = 0; i < instance_positions.size();) {
 		const Vector3f &pos = instance_positions[i];
@@ -968,7 +968,7 @@ void VoxelInstanceGenerator::generate_transforms(
 		const float block_size,
 		Ref<VoxelGenerator> voxel_generator
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (_density <= 0.f) {
 		return;
@@ -1021,7 +1021,7 @@ void VoxelInstanceGenerator::generate_transforms(
 
 	// Do an early check to see if there is any material that we can potentially find
 	if (voxel_material_filter_enabled) {
-		ZN_PROFILE_SCOPE_NAMED("material filter mesh-wide early check");
+		VOXEL_PROFILE_SCOPE_NAMED("material filter mesh-wide early check");
 
 		bool found_any = false;
 		for (const TexAttrib &attrib : mesh.texture_data) {
@@ -1098,13 +1098,13 @@ void VoxelInstanceGenerator::generate_transforms(
 			break;
 
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 
 #ifdef DEV_ENABLED
 	if (barycentrics_used) {
-		ZN_ASSERT((barycentrics.size() % 3) == 0);
-		ZN_ASSERT(barycentrics.size() / 3 == vertex_cache.size());
+		VOXEL_ASSERT((barycentrics.size() % 3) == 0);
+		VOXEL_ASSERT(barycentrics.size() / 3 == vertex_cache.size());
 	}
 #endif
 
@@ -1208,7 +1208,7 @@ void VoxelInstanceGenerator::generate_transforms(
 
 	// Filter out by noise
 	if (use_noise) {
-		ZN_PROFILE_SCOPE_NAMED("Noise filter");
+		VOXEL_PROFILE_SCOPE_NAMED("Noise filter");
 
 		const float falloff = _noise_falloff;
 
@@ -1877,7 +1877,7 @@ float VoxelInstanceGenerator::get_snap_to_generator_sdf_search_distance() const 
 
 void VoxelInstanceGenerator::set_snap_to_generator_sdf_sample_count(int new_sample_count) {
 	const uint8_t checked_sample_count =
-			zylann::math::clamp<int>(new_sample_count, GEN_SDF_SAMPLE_COUNT_MIN, GEN_SDF_SAMPLE_COUNT_MAX);
+			voxel::math::clamp<int>(new_sample_count, GEN_SDF_SAMPLE_COUNT_MIN, GEN_SDF_SAMPLE_COUNT_MAX);
 	if (checked_sample_count == _gen_sdf_snap_settings.sample_count) {
 		return;
 	}
@@ -1905,9 +1905,9 @@ void VoxelInstanceGenerator::_b_set_voxel_material_filter_array(PackedInt32Array
 	uint32_t mask = 0;
 	Span<const int32_t> indices = to_span(material_indices);
 	for (const int32_t si : indices) {
-		ZN_ASSERT_CONTINUE(si >= 0);
+		VOXEL_ASSERT_CONTINUE(si >= 0);
 		const unsigned int i = static_cast<unsigned int>(si);
-		ZN_ASSERT_CONTINUE(i < bit_count);
+		VOXEL_ASSERT_CONTINUE(i < bit_count);
 		mask |= (1 << i);
 	}
 #if TOOLS_ENABLED
@@ -1916,7 +1916,7 @@ void VoxelInstanceGenerator::_b_set_voxel_material_filter_array(PackedInt32Array
 	if (!Engine::get_singleton()->is_editor_hint()) {
 		const DuplicateSearchResult res = find_duplicate(indices);
 		if (res.is_valid()) {
-			ZN_PRINT_WARNING(format(
+			VOXEL_PRINT_WARNING(format(
 					"The array of material indices contains a duplicate (at indices {} and {}).", res.first, res.second
 			));
 		}
@@ -1940,7 +1940,7 @@ void VoxelInstanceGenerator::get_configuration_warnings(PackedStringArray &warni
 
 	if (noise_graph.is_valid()) {
 		// Graph compiles?
-		zylann::godot::get_resource_configuration_warnings(**noise_graph, warnings, []() { return "noise_graph: "; });
+		voxel::godot::get_resource_configuration_warnings(**noise_graph, warnings, []() { return "noise_graph: "; });
 
 		// Check I/Os
 		const int expected_input_count = (_noise_dimension == DIMENSION_2D ? 2 : 3);
@@ -2310,4 +2310,4 @@ void VoxelInstanceGenerator::_bind_methods() {
 	BIND_ENUM_CONSTANT(DIMENSION_COUNT);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

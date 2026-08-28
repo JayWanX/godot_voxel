@@ -1,14 +1,14 @@
-#ifndef ZN_AXES_3D_CONTROL_H
-#define ZN_AXES_3D_CONTROL_H
+#ifndef VOXEL_AXES_3D_CONTROL_H
+#define VOXEL_AXES_3D_CONTROL_H
 
 #include "../../util/godot/classes/control.h"
 
-namespace zylann {
+namespace voxel {
 
 // Displays 3D axes in a Control node using only 2D drawing.
 // Similar to `ViewportRotationControl`, but much smaller to fit in smaller editors.
-class ZN_Axes3DControl : public Control {
-	GDCLASS(ZN_Axes3DControl, Control)
+class VOXEL_Axes3DControl : public Control {
+	GDCLASS(VOXEL_Axes3DControl, Control)
 public:
 	void set_basis_3d(Basis basis);
 
@@ -22,6 +22,6 @@ private:
 	Basis _basis;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_AXES_3D_CONTROL_H
+#endif // VOXEL_AXES_3D_CONTROL_H

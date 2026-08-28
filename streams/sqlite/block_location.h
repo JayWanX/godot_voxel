@@ -8,7 +8,7 @@
 #include "../../util/string/conv.h"
 #include <limits>
 
-namespace zylann::voxel::sqlite {
+namespace voxel::sqlite {
 
 // x,y,z,lod where lod in [0..24[
 static constexpr unsigned int STRING_LOCATION_MAX_LENGTH = MAX_INT32_CHAR_COUNT_BASE10 * 3 + 3 + 2;
@@ -95,29 +95,29 @@ struct BlockLocation {
 		BlockLocation location;
 
 		int res = string_base10_to_int32(s, location.position.x);
-		ZN_ASSERT_RETURN_V(res > 0, false);
+		VOXEL_ASSERT_RETURN_V(res > 0, false);
 		unsigned int pos = res;
-		ZN_ASSERT_RETURN_V(s[pos] == ',', false);
+		VOXEL_ASSERT_RETURN_V(s[pos] == ',', false);
 		++pos;
 
 		res = string_base10_to_int32(s.substr(pos), location.position.y);
-		ZN_ASSERT_RETURN_V(res > 0, false);
+		VOXEL_ASSERT_RETURN_V(res > 0, false);
 		pos += res;
-		ZN_ASSERT_RETURN_V(s[pos] == ',', false);
+		VOXEL_ASSERT_RETURN_V(s[pos] == ',', false);
 		++pos;
 
 		res = string_base10_to_int32(s.substr(pos), location.position.z);
-		ZN_ASSERT_RETURN_V(res > 0, false);
+		VOXEL_ASSERT_RETURN_V(res > 0, false);
 		pos += res;
-		ZN_ASSERT_RETURN_V(s[pos] == ',', false);
+		VOXEL_ASSERT_RETURN_V(s[pos] == ',', false);
 		++pos;
 
 		int32_t lod_index;
 		res = string_base10_to_int32(s.substr(pos), lod_index);
-		ZN_ASSERT_RETURN_V(res > 0, false);
+		VOXEL_ASSERT_RETURN_V(res > 0, false);
 		pos += res;
-		ZN_ASSERT_RETURN_V(lod_index >= 0, false);
-		ZN_ASSERT_RETURN_V(lod_index < static_cast<int32_t>(constants::MAX_LOD), false);
+		VOXEL_ASSERT_RETURN_V(lod_index >= 0, false);
+		VOXEL_ASSERT_RETURN_V(lod_index < static_cast<int32_t>(constants::MAX_LOD), false);
 		location.lod = lod_index;
 
 		out_location = location;
@@ -126,7 +126,7 @@ struct BlockLocation {
 
 	void encode_blob80(Span<uint8_t> dst) const {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(dst.size() == BLOB80_LENGTH);
+		VOXEL_ASSERT(dst.size() == BLOB80_LENGTH);
 #endif
 		const uint32_t xb = static_cast<uint32_t>(position.x);
 		const uint32_t yb = static_cast<uint32_t>(position.y);
@@ -149,7 +149,7 @@ struct BlockLocation {
 
 	static BlockLocation decode_blob80(Span<const uint8_t> src) {
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(src.size() == BLOB80_LENGTH);
+		VOXEL_ASSERT(src.size() == BLOB80_LENGTH);
 #endif
 		const uint32_t xb = //
 				static_cast<uint32_t>(src[0]) | //
@@ -182,7 +182,7 @@ struct BlockLocation {
 			case FORMAT_INT64_X19_Y19_Z19_L7:
 				return encode_x19_y19_z19_l7();
 			default:
-				ZN_CRASH_MSG("Invalid coordinate format");
+				VOXEL_CRASH_MSG("Invalid coordinate format");
 				return 0;
 		}
 	}
@@ -194,7 +194,7 @@ struct BlockLocation {
 			case FORMAT_INT64_X19_Y19_Z19_L7:
 				return decode_x19_y19_z19_l7(id);
 			default:
-				ZN_CRASH_MSG("Invalid coordinate format");
+				VOXEL_CRASH_MSG("Invalid coordinate format");
 				return BlockLocation();
 		}
 	}
@@ -215,7 +215,7 @@ struct BlockLocation {
 			case FORMAT_BLOB80_X25_Y25_Z25_L5:
 				return Box3i::from_min_max(Vector3iUtil::create(-(1 << 24)), Vector3iUtil::create((1 << 24) - 1));
 			default:
-				ZN_PRINT_ERROR("Invalid coordinate format");
+				VOXEL_PRINT_ERROR("Invalid coordinate format");
 				return Box3i();
 		}
 	}
@@ -229,6 +229,6 @@ struct BlockLocation {
 	}
 };
 
-} // namespace zylann::voxel::sqlite
+} // namespace voxel::sqlite
 
 #endif // VOXEL_STREAM_SQLITE_BLOCK_LOCATION_H

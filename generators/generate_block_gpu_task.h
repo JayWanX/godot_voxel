@@ -14,7 +14,7 @@
 #include "../modifiers/voxel_modifier.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class GenerateBlockGPUTaskResult {
 public:
@@ -92,6 +92,6 @@ private:
 	StdVector<RID> _uniform_sets_to_free;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATE_BLOCK_GPU_TASK_H

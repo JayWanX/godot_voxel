@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_CALLABLE_H
-#define ZN_GODOT_CALLABLE_H
+#ifndef VOXEL_GODOT_CALLABLE_H
+#define VOXEL_GODOT_CALLABLE_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include "version.h"
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 6
@@ -12,4 +12,4 @@
 
 #endif
 
-#endif // ZN_GODOT_CALLABLE_H
+#endif // VOXEL_GODOT_CALLABLE_H

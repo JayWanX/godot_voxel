@@ -20,7 +20,7 @@
 #include "voxel_mesh_sdf_gd.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelToolLodTerrain::VoxelToolLodTerrain(VoxelLodTerrain *terrain) : _terrain(terrain) {
 	ERR_FAIL_COND(terrain == nullptr);
@@ -53,7 +53,7 @@ Ref<VoxelRaycastResult> VoxelToolLodTerrain::raycast(
 }
 
 void VoxelToolLodTerrain::do_box(Vector3i begin, Vector3i end) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	ops::DoShapeChunked<ops::SdfAxisAlignedBox, ops::VoxelDataGridAccess> op;
@@ -68,7 +68,7 @@ void VoxelToolLodTerrain::do_box(Vector3i begin, Vector3i end) {
 	op.strength = get_sdf_strength();
 
 	if (!is_area_editable(op.box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -89,7 +89,7 @@ void VoxelToolLodTerrain::do_box(Vector3i begin, Vector3i end) {
 }
 
 void VoxelToolLodTerrain::do_sphere(Vector3 center, float radius) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	ops::DoSphere op;
@@ -106,7 +106,7 @@ void VoxelToolLodTerrain::do_sphere(Vector3 center, float radius) {
 	const Box3i world_box = op.box;
 
 	if (!is_area_editable(world_box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -127,7 +127,7 @@ void VoxelToolLodTerrain::do_sphere(Vector3 center, float radius) {
 }
 
 void VoxelToolLodTerrain::do_hemisphere(Vector3 center, float radius, Vector3 flat_direction, float smoothness) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	ops::DoShapeChunked<ops::SdfHemisphere, ops::VoxelDataGridAccess> op;
@@ -145,7 +145,7 @@ void VoxelToolLodTerrain::do_hemisphere(Vector3 center, float radius, Vector3 fl
 	op.strength = get_sdf_strength();
 
 	if (!is_area_editable(op.box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -166,7 +166,7 @@ void VoxelToolLodTerrain::do_hemisphere(Vector3 center, float radius, Vector3 fl
 }
 
 void VoxelToolLodTerrain::do_path(Span<const Vector3> positions, Span<const float> radii) {
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 	do_path_chunked(_terrain->get_storage(), positions, radii, true);
 }
 
@@ -182,8 +182,8 @@ public:
 	}
 
 	void run(ThreadedTaskContext &ctx) override {
-		ZN_PROFILE_SCOPE();
-		ZN_ASSERT(_data != nullptr);
+		VOXEL_PROFILE_SCOPE();
+		VOXEL_ASSERT(_data != nullptr);
 		// TODO May want to fail if not all blocks were found
 		// TODO Need to apply modifiers
 		_data->get_blocks_grid(_op.blocks, _op.box, 0);
@@ -217,13 +217,13 @@ void VoxelToolLodTerrain::do_sphere_async(Vector3 center, float radius) {
 	op.strength = get_sdf_strength();
 
 	if (!is_area_editable(op.box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
 	std::shared_ptr<VoxelData> data = _terrain->get_storage_shared();
 
-	VoxelToolAsyncEdit<ops::DoSphere> *task = ZN_NEW(VoxelToolAsyncEdit<ops::DoSphere>(op, data));
+	VoxelToolAsyncEdit<ops::DoSphere> *task = VOXEL_NEW(VoxelToolAsyncEdit<ops::DoSphere>(op, data));
 	_terrain->push_async_edit(task, op.box, task->get_tracker());
 }
 
@@ -233,7 +233,7 @@ void VoxelToolLodTerrain::copy(
 		const uint8_t p_channels_mask,
 		const bool with_metadata
 ) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_terrain == nullptr);
 	const unsigned int channels_mask = (p_channels_mask == 0 ? (1 << _channel) : p_channels_mask);
 	_terrain->get_storage().copy(pos, dst, channels_mask, with_metadata);
@@ -246,7 +246,7 @@ void VoxelToolLodTerrain::paste(Vector3i pos, const VoxelBuffer &src, uint8_t ch
 	}
 	const Box3i box(pos, src.get_size());
 	if (!is_area_editable(box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -259,20 +259,20 @@ void VoxelToolLodTerrain::paste(Vector3i pos, const VoxelBuffer &src, uint8_t ch
 }
 
 void VoxelToolLodTerrain::set_voxel_metadata(const Vector3i pos, const Variant &meta) {
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 	VoxelData &data = _terrain->get_storage();
 	data.set_voxel_metadata(pos, meta);
 	_terrain->post_edit_area(Box3i(pos, Vector3i(1, 1, 1)), false);
 }
 
 Variant VoxelToolLodTerrain::get_voxel_metadata(const Vector3i pos) const {
-	ZN_ASSERT_RETURN_V(_terrain != nullptr, Variant());
+	VOXEL_ASSERT_RETURN_V(_terrain != nullptr, Variant());
 	VoxelData &data = _terrain->get_storage();
 	return data.get_voxel_metadata(pos);
 }
 
 float VoxelToolLodTerrain::get_voxel_f_interpolated(Vector3 position) const {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V(_terrain == nullptr, 0);
 	const int channel = get_channel();
 	VoxelData &data = _terrain->get_storage();
@@ -328,9 +328,9 @@ void VoxelToolLodTerrain::set_raycast_binary_search_iterations(int iterations) {
 	_raycast_binary_search_iterations = math::clamp(iterations, 0, 16);
 }
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 Array VoxelToolLodTerrain::separate_floating_chunks(AABB world_box, Node *parent_node) {
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 Array VoxelToolLodTerrain::separate_floating_chunks(AABB world_box, Object *parent_node_o) {
 	Node *parent_node = Object::cast_to<Node>(parent_node_o);
 #endif
@@ -340,7 +340,7 @@ Array VoxelToolLodTerrain::separate_floating_chunks(AABB world_box, Object *pare
 	Array materials;
 	materials.append(_terrain->get_material());
 	const Box3i int_world_box(math::floor_to_int(world_box.position), math::ceil_to_int(world_box.size));
-	return zylann::voxel::separate_floating_chunks(
+	return voxel::separate_floating_chunks(
 			*this, int_world_box, parent_node, _terrain->get_global_transform(), mesher, materials
 	);
 }
@@ -363,8 +363,8 @@ void VoxelToolLodTerrain::stamp_sdf(
 		float isolevel,
 		float sdf_scale
 ) {
-	ZN_PRINT_WARNING_ONCE("This method is deprecated. Use `do_mesh` instead.");
-	ZN_PROFILE_SCOPE();
+	VOXEL_PRINT_WARNING_ONCE("This method is deprecated. Use `do_mesh` instead.");
+	VOXEL_PROFILE_SCOPE();
 
 	ERR_FAIL_COND(_terrain == nullptr);
 	ERR_FAIL_COND(mesh_sdf.is_null());
@@ -387,7 +387,7 @@ void VoxelToolLodTerrain::stamp_sdf(
 	// This could be avoided with a box/transformed-box intersection algorithm. Might investigate if the use case
 	// occurs. It won't happen with full load mode. This also affects other shapes.
 	if (!is_area_editable(voxel_box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -411,7 +411,7 @@ void VoxelToolLodTerrain::stamp_sdf(
 	op.shape.sdf_scale = sdf_scale;
 	// Note, the passed buffer must not be shared with another thread.
 	// buffer.decompress_channel(channel);
-	ZN_ASSERT_RETURN(buffer.get_channel_data_read_only(channel, op.shape.buffer));
+	VOXEL_ASSERT_RETURN(buffer.get_channel_data_read_only(channel, op.shape.buffer));
 
 	VoxelDataGrid grid;
 	data.get_blocks_grid(grid, voxel_box, 0);
@@ -421,7 +421,7 @@ void VoxelToolLodTerrain::stamp_sdf(
 }
 
 void VoxelToolLodTerrain::do_mesh(const VoxelMeshSDF &mesh_sdf, const Transform3D &transform, const float isolevel) {
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 	do_mesh_chunked(mesh_sdf, _terrain->get_storage(), transform, isolevel, true);
 }
 
@@ -432,8 +432,8 @@ void VoxelToolLodTerrain::do_mesh(const VoxelMeshSDF &mesh_sdf, const Transform3
 // The transform contains the position of the edit, its orientation and scale.
 // Graph base size is the original size of the brush, as designed in the graph. It will be scaled using the transform.
 void VoxelToolLodTerrain::do_graph(Ref<VoxelGeneratorGraph> graph, Transform3D transform, Vector3 graph_base_size) {
-	ZN_PROFILE_SCOPE();
-	ZN_DSTACK();
+	VOXEL_PROFILE_SCOPE();
+	VOXEL_DSTACK();
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	const Vector3 area_size = math::abs(transform.basis.xform(graph_base_size));
@@ -446,7 +446,7 @@ void VoxelToolLodTerrain::do_graph(Ref<VoxelGeneratorGraph> graph, Transform3D t
 							  .clipped(_terrain->get_voxel_bounds());
 
 	if (!is_area_editable(box)) {
-		ZN_PRINT_WARNING("Area not editable");
+		VOXEL_PRINT_WARNING("Area not editable");
 		return;
 	}
 
@@ -482,7 +482,7 @@ void VoxelToolLodTerrain::do_graph(Ref<VoxelGeneratorGraph> graph, Transform3D t
 	const Transform3D inv_transform = transform.affine_inverse();
 
 	const int output_sdf_buffer_index = graph->get_sdf_output_port_address();
-	ZN_ASSERT_RETURN_MSG(output_sdf_buffer_index != -1, "The graph has no SDF output, cannot use it as a brush");
+	VOXEL_ASSERT_RETURN_MSG(output_sdf_buffer_index != -1, "The graph has no SDF output, cannot use it as a brush");
 
 	// The graph works at a fixed dimension, so if we scale the operation with the Transform3D then we have to also
 	// scale the distance field the graph is working at
@@ -496,7 +496,7 @@ void VoxelToolLodTerrain::do_graph(Ref<VoxelGeneratorGraph> graph, Transform3D t
 	const float op_strength = get_sdf_strength();
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Slices");
+		VOXEL_PROFILE_SCOPE_NAMED("Slices");
 		// For each deck of the box (doing this to reduce memory usage since the graph will allocate temporary buffers
 		// for each operation, which can be a lot depending on the complexity of the graph)
 		Vector3i pos;
@@ -557,22 +557,22 @@ void VoxelToolLodTerrain::run_blocky_random_tick(
 		const int block_batch_count,
 		const uint32_t tags_mask
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT_RETURN(_terrain != nullptr);
+	VOXEL_ASSERT_RETURN(_terrain != nullptr);
 
 	Ref<VoxelMesherBlocky> mesher = _terrain->get_mesher();
-	ZN_ASSERT_RETURN_MSG(
+	VOXEL_ASSERT_RETURN_MSG(
 			mesher.is_valid(),
-			format("This function requires a volume using {} with a valid library", ZN_CLASS_NAME_C(VoxelMesherBlocky))
+			format("This function requires a volume using {} with a valid library", VOXEL_CLASS_NAME_C(VoxelMesherBlocky))
 	);
 	Ref<VoxelBlockyLibraryBase> library = mesher->get_library();
-	ZN_ASSERT_RETURN_MSG(library.is_valid(), format("{} has no library assigned", ZN_CLASS_NAME_C(VoxelMesherBlocky)));
+	VOXEL_ASSERT_RETURN_MSG(library.is_valid(), format("{} has no library assigned", VOXEL_CLASS_NAME_C(VoxelMesherBlocky)));
 
-	ZN_ASSERT_RETURN(callback.is_valid());
-	ZN_ASSERT_RETURN(block_batch_count > 0);
-	ZN_ASSERT_RETURN(voxel_count >= 0);
-	ZN_ASSERT_RETURN(math::is_valid_size(voxel_area.size));
+	VOXEL_ASSERT_RETURN(callback.is_valid());
+	VOXEL_ASSERT_RETURN(block_batch_count > 0);
+	VOXEL_ASSERT_RETURN(voxel_count >= 0);
+	VOXEL_ASSERT_RETURN(math::is_valid_size(voxel_area.size));
 
 	if (voxel_count == 0) {
 		return;
@@ -580,13 +580,13 @@ void VoxelToolLodTerrain::run_blocky_random_tick(
 
 	VoxelData &data = _terrain->get_storage();
 
-	zylann::voxel::run_blocky_random_tick(
+	voxel::run_blocky_random_tick(
 			data, voxel_area, **library, _random, voxel_count, block_batch_count, tags_mask, callback
 	);
 }
 
 VoxelFormat VoxelToolLodTerrain::get_format() const {
-	ZN_ASSERT(_terrain != nullptr);
+	VOXEL_ASSERT(_terrain != nullptr);
 	return _terrain->get_storage().get_format();
 }
 
@@ -617,4 +617,4 @@ void VoxelToolLodTerrain::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

@@ -5,9 +5,9 @@
 #include "../../util/godot/classes/v_box_container.h"
 #include "../../util/godot/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Tree)
+VOXEL_GODOT_FORWARD_DECLARE(class Tree)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelInstancer;
 
@@ -31,6 +31,6 @@ private:
 	StdUnorderedMap<uint32_t, uint32_t> _count_per_layer;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_INSTANCER_STAT_VIEW_H

@@ -18,7 +18,7 @@
 #include "../../util/godot/debug_renderer.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelTool;
 class VoxelStream;
@@ -148,7 +148,7 @@ public:
 	void set_voxel_bounds(Box3i p_box);
 
 	inline Box3i get_voxel_bounds() const {
-		ZN_ASSERT(_data != nullptr);
+		VOXEL_ASSERT(_data != nullptr);
 		return _data->get_bounds();
 	}
 
@@ -390,7 +390,7 @@ private:
 	struct FadingOutMesh {
 		// Position in space coordinates local to the volume
 		Vector3 local_position;
-		zylann::godot::DirectMeshInstance mesh_instance;
+		voxel::godot::DirectMeshInstance mesh_instance;
 		// Changing properties is the reason we may want to fade the mesh, so we may hold on a copy of the material with
 		// properties before the fade starts.
 		Ref<ShaderMaterial> shader_material;
@@ -451,7 +451,7 @@ private:
 	bool _debug_draw_shadow_occluders = false;
 	uint16_t _debug_draw_flags = 0;
 
-	zylann::godot::DebugRenderer _debug_renderer;
+	voxel::godot::DebugRenderer _debug_renderer;
 
 	struct DebugMeshUpdateItem {
 		static constexpr uint32_t LINGER_FRAMES = 10;
@@ -474,10 +474,10 @@ private:
 	Stats _stats;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelLodTerrain::ProcessCallback)
-VARIANT_ENUM_CAST(zylann::voxel::VoxelLodTerrain::DebugDrawFlag)
-VARIANT_ENUM_CAST(zylann::voxel::VoxelLodTerrain::StreamingSystem);
+VARIANT_ENUM_CAST(voxel::VoxelLodTerrain::ProcessCallback)
+VARIANT_ENUM_CAST(voxel::VoxelLodTerrain::DebugDrawFlag)
+VARIANT_ENUM_CAST(voxel::VoxelLodTerrain::StreamingSystem);
 
 #endif // VOXEL_LOD_TERRAIN_HPP

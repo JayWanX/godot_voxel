@@ -6,9 +6,9 @@
 #include "../../util/godot/macros.h"
 #include "../../util/math/interval.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Image)
+VOXEL_GODOT_FORWARD_DECLARE(class Image)
 
-namespace zylann {
+namespace voxel {
 
 // Stores minimum and maximum values over a 2D image at multiple levels of detail
 class ImageRangeGrid {
@@ -50,6 +50,6 @@ private:
 	FixedArray<Lod, MAX_LODS> _lods;
 };
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // IMAGE_RANGE_GRID_H

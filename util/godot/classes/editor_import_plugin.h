@@ -1,9 +1,9 @@
-#ifndef ZN_GODOT_EDITOR_IMPORT_PLUGIN_H
-#define ZN_GODOT_EDITOR_IMPORT_PLUGIN_H
+#ifndef VOXEL_GODOT_EDITOR_IMPORT_PLUGIN_H
+#define VOXEL_GODOT_EDITOR_IMPORT_PLUGIN_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <editor/import/editor_import_plugin.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/editor_import_plugin.hpp>
 using namespace godot;
 #endif
@@ -12,7 +12,7 @@ using namespace godot;
 
 #include "../../containers/std_vector.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 struct ImportOptionWrapper {
 	PropertyInfo option;
@@ -24,7 +24,7 @@ struct ImportOptionWrapper {
 
 // Exposes the same interface for different equivalent dictionary types, depending on the compiling target.
 struct KeyValueWrapper {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 
 	const HashMap<StringName, Variant> &_map;
 
@@ -45,7 +45,7 @@ struct KeyValueWrapper {
 		return Variant();
 	}
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 
 	const Dictionary &_dict;
 
@@ -66,12 +66,12 @@ struct KeyValueWrapper {
 
 // Exposes the same interface for different equivalent lists of strings, depending on the compiling target.
 struct StringListWrapper {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	List<String> &_list;
 	inline void append(const String s) {
 		_list.push_back(s);
 	}
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	TypedArray<String> &_array;
 	inline void append(const String s) {
 		_array.append(s);
@@ -81,10 +81,10 @@ struct StringListWrapper {
 
 // Wraps up differences between compiling as a module and compiling as a GDExtension.
 // There are too many annoying differences for this to be done in-place.
-class ZN_EditorImportPlugin : public EditorImportPlugin {
-	GDCLASS(ZN_EditorImportPlugin, EditorImportPlugin)
+class VOXEL_EditorImportPlugin : public EditorImportPlugin {
+	GDCLASS(VOXEL_EditorImportPlugin, EditorImportPlugin)
 public:
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	String get_importer_name() const override;
 	String get_visible_name() const override;
 	void get_recognized_extensions(List<String> *p_extensions) const override;
@@ -117,7 +117,7 @@ public:
 	bool can_import_threaded() const override;
 #endif
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	String _get_importer_name() const override;
 	String _get_visible_name() const override;
 	PackedStringArray _get_recognized_extensions() const override;
@@ -148,30 +148,30 @@ public:
 protected:
 	// These methods can be implemented once, wrappers above take care of converting.
 
-	virtual String _zn_get_importer_name() const;
-	virtual String _zn_get_visible_name() const;
-	virtual PackedStringArray _zn_get_recognized_extensions() const;
-	virtual String _zn_get_preset_name(int p_idx) const;
-	virtual int _zn_get_preset_count() const;
-	virtual String _zn_get_save_extension() const;
-	virtual String _zn_get_resource_type() const;
-	virtual float _zn_get_priority() const;
-	virtual int _zn_get_import_order() const;
-	virtual bool _zn_can_import_threaded() const;
+	virtual String _voxel_get_importer_name() const;
+	virtual String _voxel_get_visible_name() const;
+	virtual PackedStringArray _voxel_get_recognized_extensions() const;
+	virtual String _voxel_get_preset_name(int p_idx) const;
+	virtual int _voxel_get_preset_count() const;
+	virtual String _voxel_get_save_extension() const;
+	virtual String _voxel_get_resource_type() const;
+	virtual float _voxel_get_priority() const;
+	virtual int _voxel_get_import_order() const;
+	virtual bool _voxel_can_import_threaded() const;
 
-	virtual void _zn_get_import_options(
+	virtual void _voxel_get_import_options(
 			StdVector<ImportOptionWrapper> &p_out_options,
 			const String &p_path,
 			int p_preset_index
 	) const;
 
-	virtual bool _zn_get_option_visibility(
+	virtual bool _voxel_get_option_visibility(
 			const String &p_path,
 			const StringName &p_option_name,
 			const KeyValueWrapper p_options
 	) const;
 
-	virtual Error _zn_import(
+	virtual Error _voxel_import(
 			const String &p_source_file,
 			const String &p_save_path,
 			const KeyValueWrapper p_options,
@@ -183,6 +183,6 @@ private:
 	static void _bind_methods() {}
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_EDITOR_IMPORT_PLUGIN_H
+#endif // VOXEL_GODOT_EDITOR_IMPORT_PLUGIN_H

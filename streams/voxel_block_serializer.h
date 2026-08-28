@@ -8,12 +8,12 @@
 
 #include <cstdint>
 
-ZN_GODOT_FORWARD_DECLARE(class FileAccess)
-#ifdef ZN_GODOT_EXTENSION
+VOXEL_GODOT_FORWARD_DECLARE(class FileAccess)
+#ifdef VOXEL_GODOT_EXTENSION
 using namespace godot;
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBuffer;
 
@@ -47,6 +47,6 @@ StdVector<uint8_t> &get_tls_data();
 StdVector<uint8_t> &get_tls_compressed_data();
 
 } // namespace BlockSerializer
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCK_SERIALIZER_H

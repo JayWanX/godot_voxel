@@ -1,11 +1,11 @@
-#ifndef ZN_CANCELLATION_TOKEN_H
-#define ZN_CANCELLATION_TOKEN_H
+#ifndef VOXEL_CANCELLATION_TOKEN_H
+#define VOXEL_CANCELLATION_TOKEN_H
 
 #include "../errors.h"
 #include "../memory/memory.h"
 #include <atomic>
 
-namespace zylann {
+namespace voxel {
 
 // Simple object shared between a task and the requester of the task. Allows the requester to cancel the task before it
 // runs or finishes.
@@ -27,14 +27,14 @@ public:
 
 	inline void cancel() {
 #ifdef TOOLS_ENABLED
-		ZN_ASSERT(_cancelled != nullptr);
+		VOXEL_ASSERT(_cancelled != nullptr);
 #endif
 		*_cancelled = true;
 	}
 
 	inline bool is_cancelled() const {
 #ifdef TOOLS_ENABLED
-		ZN_ASSERT(_cancelled != nullptr);
+		VOXEL_ASSERT(_cancelled != nullptr);
 #endif
 		return *_cancelled;
 	}
@@ -43,6 +43,6 @@ private:
 	std::shared_ptr<std::atomic_bool> _cancelled;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_CANCELLATION_TOKEN_H
+#endif // VOXEL_CANCELLATION_TOKEN_H

@@ -1,13 +1,13 @@
 #include "input_event_key.h"
 #include "../core/keyboard.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 Ref<InputEventKey> create_input_event_from_key(Key p_keycode_with_modifier_masks, bool p_physical) {
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 	return InputEventKey::create_reference(p_keycode_with_modifier_masks, p_physical);
 
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 	Key p_keycode = p_keycode_with_modifier_masks;
 
 	// Ported from core `InputEventKey::create_reference`
@@ -48,4 +48,4 @@ Ref<InputEventKey> create_input_event_from_key(Key p_keycode_with_modifier_masks
 #endif
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

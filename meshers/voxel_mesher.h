@@ -9,9 +9,9 @@
 #include "../util/godot/classes/mesh.h"
 #include "../util/macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class ShaderMaterial)
+VOXEL_GODOT_FORWARD_DECLARE(class ShaderMaterial)
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace godot {
 class VoxelBuffer;
@@ -142,6 +142,6 @@ private:
 	unsigned int _maximum_padding = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MESHER_H

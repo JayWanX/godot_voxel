@@ -3,7 +3,7 @@
 
 #include "blocky_baked_library.h"
 
-namespace zylann::voxel::blocky {
+namespace voxel::blocky {
 
 void generate_preview_fluid_model(
 		const BakedModel &model,
@@ -13,6 +13,6 @@ void generate_preview_fluid_model(
 		const FixedArray<FixedArray<BakedModel::SideSurface, MAX_SURFACES>, Cube::SIDE_COUNT> *&out_model_sides_surfaces
 );
 
-} // namespace zylann::voxel::blocky
+} // namespace voxel::blocky
 
 #endif // VOXEL_BLOCKY_FLUIDS_H

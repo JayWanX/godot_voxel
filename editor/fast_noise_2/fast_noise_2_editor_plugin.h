@@ -3,17 +3,17 @@
 
 #include "../../util/godot/classes/editor_plugin.h"
 
-namespace zylann {
+namespace voxel {
 
-class ZN_NoiseAnalysisWindow;
+class VOXEL_NoiseAnalysisWindow;
 
-class FastNoise2EditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(FastNoise2EditorPlugin, zylann::godot::ZN_EditorPlugin)
+class FastNoise2EditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(FastNoise2EditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	FastNoise2EditorPlugin();
 
 protected:
-	String _zn_get_plugin_name() const override {
+	String _voxel_get_plugin_name() const override {
 		return "FastNoise2";
 	}
 
@@ -23,9 +23,9 @@ private:
 
 	static void _bind_methods() {}
 
-	ZN_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
+	VOXEL_NoiseAnalysisWindow *_noise_analysis_window = nullptr;
 };
 
-} // namespace zylann
+} // namespace voxel
 
 #endif // FAST_NOISE_2_EDITOR_PLUGIN_H

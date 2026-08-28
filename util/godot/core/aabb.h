@@ -1,14 +1,14 @@
-#ifndef ZN_GODOT_AABB_H
-#define ZN_GODOT_AABB_H
+#ifndef VOXEL_GODOT_AABB_H
+#define VOXEL_GODOT_AABB_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/math/aabb.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/variant/aabb.hpp>
 using namespace godot;
 #endif
 
-namespace zylann {
+namespace voxel {
 
 class TextWriter;
 TextWriter &operator<<(TextWriter &ss, const AABB &v);
@@ -18,6 +18,6 @@ inline real_t distance_squared(const AABB &aabb, const Vector3 p) {
 	return d.length_squared();
 }
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_GODOT_AABB_H
+#endif // VOXEL_GODOT_AABB_H

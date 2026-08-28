@@ -5,14 +5,14 @@
 #include "../../util/noise/spot_noise_gd.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_fnl_range() {
-	Ref<ZN_FastNoiseLite> noise;
+	Ref<VOXEL_FastNoiseLite> noise;
 	noise.instantiate();
-	noise->set_noise_type(ZN_FastNoiseLite::TYPE_OPEN_SIMPLEX_2S);
-	noise->set_fractal_type(ZN_FastNoiseLite::FRACTAL_NONE);
-	// noise->set_fractal_type(ZN_FastNoiseLite::FRACTAL_FBM);
+	noise->set_noise_type(VOXEL_FastNoiseLite::TYPE_OPEN_SIMPLEX_2S);
+	noise->set_fractal_type(VOXEL_FastNoiseLite::FRACTAL_NONE);
+	// noise->set_fractal_type(VOXEL_FastNoiseLite::FRACTAL_FBM);
 	noise->set_fractal_octaves(1);
 	noise->set_fractal_lacunarity(2.0);
 	noise->set_fractal_gain(0.5);
@@ -47,11 +47,11 @@ void test_fnl_range() {
 		}
 	}
 
-	ZN_TEST_ASSERT(analytic_range.contains(empiric_range));
+	VOXEL_TEST_ASSERT(analytic_range.contains(empiric_range));
 }
 
 void test_spot_noise() {
-	Ref<ZN_SpotNoise> noise;
+	Ref<VOXEL_SpotNoise> noise;
 	noise.instantiate();
 	const float cell_size = 42.f;
 	noise->set_cell_size(cell_size);
@@ -67,7 +67,7 @@ void test_spot_noise() {
 
 	const int minimum_expected_spot_count = csize.x * csize.y;
 	const int obtained_spot_count = positions.size();
-	ZN_TEST_ASSERT(obtained_spot_count >= minimum_expected_spot_count);
+	VOXEL_TEST_ASSERT(obtained_spot_count >= minimum_expected_spot_count);
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

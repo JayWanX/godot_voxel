@@ -3,7 +3,7 @@
 
 #include "voxel_blocky_attribute.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // `direction`
 class VoxelBlockyAttributeDirection : public VoxelBlockyAttribute {
@@ -35,8 +35,8 @@ private:
 	// TODO Corresponding ortho rotations
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelBlockyAttributeDirection::Direction);
+VARIANT_ENUM_CAST(voxel::VoxelBlockyAttributeDirection::Direction);
 
 #endif // VOXEL_BLOCKY_ATTRIBUTE_DIRECTION_H

@@ -1,10 +1,10 @@
 #include "voxel_color_palette.h"
 #include "../../util/containers/span.h"
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelColorPalette::VoxelColorPalette() {
 	// Default palette
@@ -92,4 +92,4 @@ void VoxelColorPalette::_bind_methods() {
 	BIND_CONSTANT(MAX_COLORS);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

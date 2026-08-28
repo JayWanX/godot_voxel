@@ -1,11 +1,11 @@
-#ifndef ZN_INTERVAL_H
-#define ZN_INTERVAL_H
+#ifndef VOXEL_INTERVAL_H
+#define VOXEL_INTERVAL_H
 
 #include "funcs.h"
 #include <limits>
 #include <type_traits>
 
-namespace zylann {
+namespace voxel {
 namespace math {
 
 namespace interval_impl {
@@ -31,7 +31,7 @@ struct IntervalT {
 
 	inline IntervalT(T p_min, T p_max) : min(p_min), max(p_max) {
 #if DEV_ENABLED
-		ZN_ASSERT(p_min <= p_max);
+		VOXEL_ASSERT(p_min <= p_max);
 #elif DEBUG_ENABLED
 		// Don't crash but keep signaling
 		interval_impl::check_range_once(p_min, p_max);
@@ -543,6 +543,6 @@ inline IntervalT<T> pow(IntervalT<T> x, IntervalT<T> p) {
 class TextWriter;
 TextWriter &operator<<(TextWriter &ss, const math::Interval &v);
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_INTERVAL_H
+#endif // VOXEL_INTERVAL_H

@@ -5,7 +5,7 @@
 #include "../../util/containers/std_vector.h"
 #include "transvoxel.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Implement the generic interface to iterate voxel mesh cells, which can be used to compute virtual textures.
 // This one is optimized to gather results of the Transvoxel mesher, which comes with cell information out of the box.
@@ -54,6 +54,6 @@ private:
 	unsigned int _triangle_begin_index;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_TRANSVOXEL_CELL_ITERATOR_H

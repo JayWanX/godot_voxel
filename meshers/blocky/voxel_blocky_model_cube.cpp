@@ -5,11 +5,11 @@
 #include "blocky_model_baking_context.h"
 #include "voxel_blocky_model_mesh.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyModelCube::VoxelBlockyModelCube() {
 	_atlas_size_in_tiles = Vector2i(16, 16);
@@ -104,8 +104,8 @@ void VoxelBlockyModelCube::set_height(float h) {
 // Allow to specify AtlasTextures?
 
 void VoxelBlockyModelCube::set_atlas_size_in_tiles(Vector2i s) {
-	ZN_ASSERT_RETURN(s.x > 0);
-	ZN_ASSERT_RETURN(s.y > 0);
+	VOXEL_ASSERT_RETURN(s.x > 0);
+	VOXEL_ASSERT_RETURN(s.y > 0);
 	if (s != _atlas_size_in_tiles) {
 		_atlas_size_in_tiles = s;
 		emit_changed();
@@ -251,8 +251,8 @@ void bake_cube_geometry(
 	};
 
 	const Vector2f atlas_size = to_vec2f(p_atlas_size);
-	ZN_ASSERT_RETURN(atlas_size.x > 0);
-	ZN_ASSERT_RETURN(atlas_size.y > 0);
+	VOXEL_ASSERT_RETURN(atlas_size.x > 0);
+	VOXEL_ASSERT_RETURN(atlas_size.y > 0);
 	const Vector2f s = Vector2f(1.0f) / atlas_size;
 
 	for (unsigned int side = 0; side < Cube::SIDE_COUNT; ++side) {
@@ -375,4 +375,4 @@ void VoxelBlockyModelCube::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

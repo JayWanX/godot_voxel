@@ -11,11 +11,11 @@
 #include "../../util/macros.h"
 #include <memory>
 
-ZN_GODOT_FORWARD_DECLARE(class Image);
-ZN_GODOT_FORWARD_DECLARE(class Curve);
-ZN_GODOT_FORWARD_DECLARE(class RenderingDevice);
+VOXEL_GODOT_FORWARD_DECLARE(class Image);
+VOXEL_GODOT_FORWARD_DECLARE(class Curve);
+VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice);
 
-namespace zylann::voxel {
+namespace voxel {
 
 // This is our own thin wrapper for resources created with RenderingDevice. We can't use Godot's regular resources
 // because they either don't exist, or assume that we use the main RenderingDevice (the one used for rendering).
@@ -108,6 +108,6 @@ private:
 // Converts a 3D transform into a 4x4 matrix with a layout usable in GLSL.
 void transform3d_to_mat4(const Transform3D &t, Span<float> dst);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_COMPUTE_SHADER_RESOURCE_H

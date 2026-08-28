@@ -3,7 +3,7 @@
 #include "../../util/math/vector2i.h"
 #include "../../util/string/format.h"
 
-namespace zylann {
+namespace voxel {
 
 using namespace math;
 
@@ -13,8 +13,8 @@ Interval get_heightmap_range(const Image &im) {
 
 Interval get_heightmap_range(const Image &im, Rect2i rect) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT_RETURN_V_MSG(!im.is_compressed(), Interval(), format("Image format not supported: {}", im.get_format()));
-	ZN_ASSERT_RETURN_V_MSG(
+	VOXEL_ASSERT_RETURN_V_MSG(!im.is_compressed(), Interval(), format("Image format not supported: {}", im.get_format()));
+	VOXEL_ASSERT_RETURN_V_MSG(
 			Rect2i(0, 0, im.get_width(), im.get_height()).encloses(rect),
 			Interval(0, 0),
 			format("Rectangle out of range: image size is {}, rectangle is {}", im.get_size(), rect)
@@ -38,4 +38,4 @@ Interval get_heightmap_range(const Image &im, Rect2i rect) {
 	return r;
 }
 
-} // namespace zylann
+} // namespace voxel

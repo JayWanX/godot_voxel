@@ -1,13 +1,13 @@
-#ifndef ZN_CODE_GEN_HELPER_H
-#define ZN_CODE_GEN_HELPER_H
+#ifndef VOXEL_CODE_GEN_HELPER_H
+#define VOXEL_CODE_GEN_HELPER_H
 
 #include "../../util/containers/std_unordered_set.h"
 #include "../../util/string/std_string.h"
 // Stopped using StdStringstream for the time being, because of issues supporting some Linux distros
-// https://github.com/Zylann/godot_voxel/issues/842
+// https://github.com/Voxel/godot_voxel/issues/842
 // #include "../../util/string/std_stringstream.h"
 
-namespace zylann {
+namespace voxel {
 
 class CodeGenHelper {
 public:
@@ -71,6 +71,6 @@ private:
 	bool _newline = true;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_CODE_GEN_HELPER_H
+#endif // VOXEL_CODE_GEN_HELPER_H

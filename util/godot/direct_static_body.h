@@ -6,12 +6,12 @@
 #include "direct_mesh_instance.h"
 #include "macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class World3D);
+VOXEL_GODOT_FORWARD_DECLARE(class World3D);
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Thin wrapper around static body API
-class DirectStaticBody : public zylann::NonCopyable {
+class DirectStaticBody : public voxel::NonCopyable {
 public:
 	DirectStaticBody();
 	~DirectStaticBody();
@@ -37,6 +37,6 @@ private:
 	DirectMeshInstance _debug_mesh_instance;
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
 #endif // DIRECT_STATIC_BODY_H

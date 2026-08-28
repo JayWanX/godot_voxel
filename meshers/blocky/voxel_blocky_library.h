@@ -5,7 +5,7 @@
 #include "voxel_blocky_library_base.h"
 #include "voxel_blocky_model.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Library exposing every model in a simple array. Indices in the array correspond to voxel data.
 // Rotations and variants have to be setup manually as separate models. You may use this library if your models are
@@ -41,7 +41,7 @@ public:
 
 	// inline const VoxelBlockyModel &get_model_const(unsigned int id) const {
 	// 	const Ref<VoxelBlockyModel> &model = _voxel_models[id];
-	// 	ZN_ASSERT(model.is_valid());
+	// 	VOXEL_ASSERT(model.is_valid());
 	// 	return **model;
 	// }
 
@@ -64,6 +64,6 @@ private:
 	StdVector<Ref<VoxelBlockyModel>> _voxel_models;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_LIBRARY_H

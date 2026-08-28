@@ -1,9 +1,9 @@
-#ifndef ZN_GODOT_RENDERING_DEVICE_H
-#define ZN_GODOT_RENDERING_DEVICE_H
+#ifndef VOXEL_GODOT_RENDERING_DEVICE_H
+#define VOXEL_GODOT_RENDERING_DEVICE_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <servers/rendering/rendering_device.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/classes/rendering_device.hpp>
 using namespace godot;
 #endif
@@ -11,9 +11,9 @@ using namespace godot;
 #include "../macros.h"
 #include "rd_shader_spirv.h"
 
-ZN_GODOT_FORWARD_DECLARE(class RDShaderSource)
+VOXEL_GODOT_FORWARD_DECLARE(class RDShaderSource)
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 void free_rendering_device_rid(RenderingDevice &rd, RID rid);
 
@@ -38,6 +38,6 @@ Error update_storage_buffer(
 		const PackedByteArray &pba
 );
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
-#endif // ZN_GODOT_RENDERING_DEVICE_H
+#endif // VOXEL_GODOT_RENDERING_DEVICE_H

@@ -7,9 +7,9 @@
 #include "../../util/thread/rw_lock.h"
 #include "../voxel_generator.h"
 
-ZN_GODOT_FORWARD_DECLARE(class FastNoiseLite)
+VOXEL_GODOT_FORWARD_DECLARE(class FastNoiseLite)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGeneratorNoise : public VoxelGenerator {
 	GDCLASS(VoxelGeneratorNoise, VoxelGenerator)
@@ -55,6 +55,6 @@ private:
 	RWLock _parameters_lock;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GENERATOR_NOISE_H

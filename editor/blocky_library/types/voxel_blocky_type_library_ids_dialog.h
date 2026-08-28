@@ -4,9 +4,9 @@
 #include "../../../meshers/blocky/types/voxel_blocky_type_library.h"
 #include "../../../util/godot/classes/accept_dialog.h"
 
-ZN_GODOT_FORWARD_DECLARE(class ItemList);
+VOXEL_GODOT_FORWARD_DECLARE(class ItemList);
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelBlockyTypeLibraryIDSDialog : public AcceptDialog {
 	GDCLASS(VoxelBlockyTypeLibraryIDSDialog, AcceptDialog)
@@ -23,6 +23,6 @@ private:
 	ItemList *_item_list = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TYPE_LIBRARY_IDS_DIALOG_H

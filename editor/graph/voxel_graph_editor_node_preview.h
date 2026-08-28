@@ -11,9 +11,9 @@
 #include "graph_preview_mode.h"
 #include "voxel_graph_editor_node_preview_info.h"
 
-ZN_GODOT_FORWARD_DECLARE(class TextureRect)
+VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct GraphEditorAdapter;
 
@@ -55,6 +55,6 @@ private:
 	Ref<ShaderMaterial> _material;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_NODE_PREVIEW_H

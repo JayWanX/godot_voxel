@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/resource.h"
 #include "../../util/math/color8.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Associates small numbers to colors, so colored voxels can be specified using less memory.
 class VoxelColorPalette : public Resource {
@@ -42,6 +42,6 @@ private:
 	FixedArray<Color8, MAX_COLORS> _colors;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_COLOR_PALETTE_H

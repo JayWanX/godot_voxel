@@ -7,9 +7,9 @@
 #include "classes/rendering_server.h"
 #include "macros.h"
 
-ZN_GODOT_FORWARD_DECLARE(class World3D);
+VOXEL_GODOT_FORWARD_DECLARE(class World3D);
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 // Thin wrapper around VisualServer mesh instance API
 class DirectMeshInstance : public NonCopyable {
@@ -44,6 +44,6 @@ private:
 	Ref<Mesh> _mesh;
 };
 
-} // namespace zylann::godot
+} // namespace voxel::godot
 
 #endif // DIRECT_MESH_INSTANCE_H

@@ -3,105 +3,105 @@
 #include "../../util/string/expression_parser.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_expression_parser() {
 	using namespace ExpressionParser;
 
 	{
 		Result result = parse("", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("   ", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("42", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root != nullptr);
-		ZN_TEST_ASSERT(result.root->type == Node::NUMBER);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root != nullptr);
+		VOXEL_TEST_ASSERT(result.root->type == Node::NUMBER);
 		const NumberNode &nn = static_cast<NumberNode &>(*result.root);
-		ZN_TEST_ASSERT(Math::is_equal_approx(nn.value, 42.f));
+		VOXEL_TEST_ASSERT(Math::is_equal_approx(nn.value, 42.f));
 	}
 	{
 		Result result = parse("()", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("((()))", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("42)", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_UNEXPECTED_TOKEN);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_UNEXPECTED_TOKEN);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("(42)", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root != nullptr);
-		ZN_TEST_ASSERT(result.root->type == Node::NUMBER);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root != nullptr);
+		VOXEL_TEST_ASSERT(result.root->type == Node::NUMBER);
 		const NumberNode &nn = static_cast<NumberNode &>(*result.root);
-		ZN_TEST_ASSERT(Math::is_equal_approx(nn.value, 42.f));
+		VOXEL_TEST_ASSERT(Math::is_equal_approx(nn.value, 42.f));
 	}
 	{
 		Result result = parse("(", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_UNCLOSED_PARENTHESIS);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_UNCLOSED_PARENTHESIS);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("(666", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_UNCLOSED_PARENTHESIS);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_UNCLOSED_PARENTHESIS);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("1+", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_MISSING_OPERAND_ARGUMENTS);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_MISSING_OPERAND_ARGUMENTS);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("++", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_MISSING_OPERAND_ARGUMENTS);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_MISSING_OPERAND_ARGUMENTS);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("1 2 3", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_MULTIPLE_OPERANDS);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_MULTIPLE_OPERANDS);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("???", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_INVALID_TOKEN);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_INVALID_TOKEN);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		Result result = parse("1+2-3*4/5", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root != nullptr);
-		ZN_TEST_ASSERT(result.root->type == Node::NUMBER);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root != nullptr);
+		VOXEL_TEST_ASSERT(result.root->type == Node::NUMBER);
 		const NumberNode &nn = static_cast<NumberNode &>(*result.root);
-		ZN_TEST_ASSERT(Math::is_equal_approx(nn.value, 0.6f));
+		VOXEL_TEST_ASSERT(Math::is_equal_approx(nn.value, 0.6f));
 	}
 	{
 		Result result = parse("1*2-3/4+5", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root != nullptr);
-		ZN_TEST_ASSERT(result.root->type == Node::NUMBER);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root != nullptr);
+		VOXEL_TEST_ASSERT(result.root->type == Node::NUMBER);
 		const NumberNode &nn = static_cast<NumberNode &>(*result.root);
-		ZN_TEST_ASSERT(Math::is_equal_approx(nn.value, 6.25f));
+		VOXEL_TEST_ASSERT(Math::is_equal_approx(nn.value, 6.25f));
 	}
 	{
 		Result result = parse("(5 - 3)^2 + 2.5/(4 + 6)", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root != nullptr);
-		ZN_TEST_ASSERT(result.root->type == Node::NUMBER);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root != nullptr);
+		VOXEL_TEST_ASSERT(result.root->type == Node::NUMBER);
 		const NumberNode &nn = static_cast<NumberNode &>(*result.root);
-		ZN_TEST_ASSERT(Math::is_equal_approx(nn.value, 4.25f));
+		VOXEL_TEST_ASSERT(Math::is_equal_approx(nn.value, 4.25f));
 	}
 	{
 		/*
@@ -135,8 +135,8 @@ void test_expression_parser() {
 				make_unique_instance<OperatorNode>(OperatorNode::SUBTRACT, std::move(node_mul), std::move(node_sub));
 
 		Result result = parse("4*(a+b)^2-(c-d)", Span<const Function>());
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root != nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root != nullptr);
 		// {
 		// 	const std::string s1 = tree_to_string(*expected_root, Span<const Function>());
 		// 	print_line(String(s1.c_str()));
@@ -144,7 +144,7 @@ void test_expression_parser() {
 		// 	const std::string s2 = tree_to_string(*result.root, Span<const Function>());
 		// 	print_line(String(s2.c_str()));
 		// }
-		ZN_TEST_ASSERT(is_tree_equal(*result.root, *expected_root, Span<const Function>()));
+		VOXEL_TEST_ASSERT(is_tree_equal(*result.root, *expected_root, Span<const Function>()));
 	}
 	{
 		FixedArray<Function, 2> functions;
@@ -171,11 +171,11 @@ void test_expression_parser() {
 		}
 
 		Result result = parse("clamp(sqrt(20 + sqrt(25)), 1, 2.0 * 2.0)", to_span_const(functions));
-		ZN_TEST_ASSERT(result.error.id == ERROR_NONE);
-		ZN_TEST_ASSERT(result.root != nullptr);
-		ZN_TEST_ASSERT(result.root->type == Node::NUMBER);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_NONE);
+		VOXEL_TEST_ASSERT(result.root != nullptr);
+		VOXEL_TEST_ASSERT(result.root->type == Node::NUMBER);
 		const NumberNode &nn = static_cast<NumberNode &>(*result.root);
-		ZN_TEST_ASSERT(Math::is_equal_approx(nn.value, 4.f));
+		VOXEL_TEST_ASSERT(Math::is_equal_approx(nn.value, 4.f));
 	}
 	{
 		FixedArray<Function, 2> functions;
@@ -206,8 +206,8 @@ void test_expression_parser() {
 
 		Result result = parse("x+sin(y, clamp(z, 0, 1))", to_span_const(functions));
 
-		ZN_TEST_ASSERT(result.error.id == ERROR_TOO_MANY_ARGUMENTS);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_TOO_MANY_ARGUMENTS);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		FixedArray<Function, 1> functions;
@@ -227,8 +227,8 @@ void test_expression_parser() {
 
 		Result result = parse("clamp(z,", to_span_const(functions));
 
-		ZN_TEST_ASSERT(result.error.id == ERROR_EXPECTED_ARGUMENT);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_EXPECTED_ARGUMENT);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		FixedArray<Function, 1> functions;
@@ -248,8 +248,8 @@ void test_expression_parser() {
 
 		Result result = parse("clamp(z)", to_span_const(functions));
 
-		ZN_TEST_ASSERT(result.error.id == ERROR_TOO_FEW_ARGUMENTS);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_TOO_FEW_ARGUMENTS);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 	{
 		FixedArray<Function, 1> functions;
@@ -269,9 +269,9 @@ void test_expression_parser() {
 
 		Result result = parse("clamp(z,)", to_span_const(functions));
 
-		ZN_TEST_ASSERT(result.error.id == ERROR_EXPECTED_ARGUMENT);
-		ZN_TEST_ASSERT(result.root == nullptr);
+		VOXEL_TEST_ASSERT(result.error.id == ERROR_EXPECTED_ARGUMENT);
+		VOXEL_TEST_ASSERT(result.root == nullptr);
 	}
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

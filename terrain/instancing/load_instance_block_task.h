@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <memory>
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct InstancerQuickReloadingCache;
 
@@ -57,6 +57,6 @@ private:
 	UpMode _up_mode;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_LOAD_INSTANCE_BLOCK_TASK_H

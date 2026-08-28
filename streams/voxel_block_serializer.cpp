@@ -8,14 +8,14 @@
 #include "../util/profiling.h"
 #include "../util/string/format.h"
 
-#if defined(ZN_GODOT) || defined(ZN_GODOT_EXTENSION)
+#if defined(VOXEL_GODOT) || defined(VOXEL_GODOT_EXTENSION)
 #include "../storage/metadata/voxel_metadata_factory.h"
 #include "../storage/metadata/voxel_metadata_variant.h"
 #endif
 
 #include <limits>
 
-namespace zylann::voxel {
+namespace voxel {
 namespace BlockSerializer {
 
 const unsigned int BLOCK_TRAILING_MAGIC = 0x900df00d;
@@ -52,7 +52,7 @@ size_t get_metadata_size_in_bytes(const VoxelMetadata &meta) {
 				const ICustomVoxelMetadata &custom = meta.get_custom();
 				size += custom.get_serialized_size();
 			} else {
-				ZN_PRINT_ERROR("Unknown metadata type");
+				VOXEL_PRINT_ERROR("Unknown metadata type");
 				return 0;
 			}
 	}
@@ -128,10 +128,10 @@ void serialize_metadata(const VoxelMetadata &meta, MemoryWriterExistingBuffer &m
 			if (type >= VoxelMetadata::TYPE_CUSTOM_BEGIN) {
 				mw.store_8(type);
 				const size_t written_size = meta.get_custom().serialize(mw.data.data.sub(mw.data.pos));
-				ZN_ASSERT(mw.data.pos + written_size <= mw.data.data.size());
+				VOXEL_ASSERT(mw.data.pos + written_size <= mw.data.data.size());
 				mw.data.pos += written_size;
 			} else {
-				ZN_PRINT_ERROR("Unknown metadata type");
+				VOXEL_PRINT_ERROR("Unknown metadata type");
 				mw.store_8(VoxelMetadata::TYPE_EMPTY);
 			}
 			break;
@@ -188,7 +188,7 @@ bool deserialize_metadata(VoxelMetadata &meta, MemoryReader &mr) {
 		default:
 			if (type >= VoxelMetadata::TYPE_CUSTOM_BEGIN) {
 				ICustomVoxelMetadata *custom = VoxelMetadataFactory::get_singleton().try_construct(type);
-				ZN_ASSERT_RETURN_V_MSG(
+				VOXEL_ASSERT_RETURN_V_MSG(
 						custom != nullptr, false, format("Could not deserialize custom metadata with type {}", type)
 				);
 
@@ -197,15 +197,15 @@ bool deserialize_metadata(VoxelMetadata &meta, MemoryReader &mr) {
 				temp.set_custom(type, custom);
 
 				uint64_t read_size = 0;
-				ZN_ASSERT_RETURN_V(custom->deserialize(mr.data.sub(mr.pos), read_size), false);
-				ZN_ASSERT_RETURN_V(mr.pos + read_size <= mr.data.size(), false);
+				VOXEL_ASSERT_RETURN_V(custom->deserialize(mr.data.sub(mr.pos), read_size), false);
+				VOXEL_ASSERT_RETURN_V(mr.pos + read_size <= mr.data.size(), false);
 				mr.pos += read_size;
 
 				meta = std::move(temp);
 				return true;
 
 			} else {
-				ZN_PRINT_ERROR("Unknown metadata type");
+				VOXEL_PRINT_ERROR("Unknown metadata type");
 				return false;
 			}
 	}
@@ -214,7 +214,7 @@ bool deserialize_metadata(VoxelMetadata &meta, MemoryReader &mr) {
 bool deserialize_metadata(Span<const uint8_t> p_src, VoxelBuffer &buffer) {
 	MemoryReader mr(p_src, ENDIANNESS_LITTLE_ENDIAN);
 
-	ZN_ASSERT_RETURN_V(deserialize_metadata(buffer.get_block_metadata(), mr), false);
+	VOXEL_ASSERT_RETURN_V(deserialize_metadata(buffer.get_block_metadata(), mr), false);
 
 	typedef FlatMapMoveOnly<Vector3i, VoxelMetadata>::Pair Pair;
 	static thread_local StdVector<Pair> tls_pairs;
@@ -227,7 +227,7 @@ bool deserialize_metadata(Span<const uint8_t> p_src, VoxelBuffer &buffer) {
 		pos.y = mr.get_16();
 		pos.z = mr.get_16();
 
-		ZN_ASSERT_CONTINUE_MSG(
+		VOXEL_ASSERT_CONTINUE_MSG(
 				buffer.is_position_valid(pos),
 				format("Invalid voxel metadata position {} for buffer of size {}", pos, buffer.get_size())
 		);
@@ -236,7 +236,7 @@ bool deserialize_metadata(Span<const uint8_t> p_src, VoxelBuffer &buffer) {
 		tls_pairs.resize(tls_pairs.size() + 1);
 		Pair &p = tls_pairs.back();
 		p.key = pos;
-		ZN_ASSERT_RETURN_V_MSG(
+		VOXEL_ASSERT_RETURN_V_MSG(
 				deserialize_metadata(p.value, mr), false, format("Failed to deserialize voxel metadata {}", pos)
 		);
 	}
@@ -286,7 +286,7 @@ size_t get_size_in_bytes(const VoxelBuffer &buffer, size_t &metadata_size) {
 }
 
 SerializeResult serialize(const VoxelBuffer &voxel_buffer) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	StdVector<uint8_t> &dst_data = get_tls_data();
 	StdVector<uint8_t> &metadata_tmp = get_tls_metadata_tmp();
@@ -385,7 +385,7 @@ namespace legacy {
 bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 	// In v3, metadata was always a Godot Variant. In v4, metadata uses an independent format.
 
-#if defined(ZN_GODOT) || defined(ZN_GODOT_EXTENSION)
+#if defined(VOXEL_GODOT) || defined(VOXEL_GODOT_EXTENSION)
 
 	// Constants used at the time of this version
 	const unsigned int channel_count = 8;
@@ -395,7 +395,7 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 	MemoryReader mr(p_data, ENDIANNESS_LITTLE_ENDIAN);
 
 	const uint8_t rv = mr.get_8(); // version
-	ZN_ASSERT(rv == 3);
+	VOXEL_ASSERT(rv == 3);
 
 	const uint16_t size_x = mr.get_16(); // size_x
 	const uint16_t size_y = mr.get_16(); // size_y
@@ -408,8 +408,8 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 		const uint8_t compression_value = fmt & 0xf;
 		const uint8_t depth_value = (fmt >> 4) & 0xf;
 
-		ZN_ASSERT_RETURN_V(compression_value < 2, false);
-		ZN_ASSERT_RETURN_V(depth_value < 4, false);
+		VOXEL_ASSERT_RETURN_V(compression_value < 2, false);
+		VOXEL_ASSERT_RETURN_V(depth_value < 4, false);
 
 		if (compression_value == no_compression) {
 			mr.pos += volume << depth_value;
@@ -419,7 +419,7 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 		}
 	}
 
-	ZN_ASSERT(mr.pos <= mr.data.size());
+	VOXEL_ASSERT(mr.pos <= mr.data.size());
 
 	// Copy everything up to beginning of metadata
 	dst.resize(mr.pos);
@@ -439,16 +439,16 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 				// Read Variant
 				Variant src_meta;
 				size_t read_length;
-				const bool decode_success = zylann::godot::decode_variant(
+				const bool decode_success = voxel::godot::decode_variant(
 						Span<const uint8_t>(&mr.data[mr.pos], mr.data.size() - mr.pos), src_meta, read_length
 				);
-				ZN_ASSERT_RETURN_V_MSG(decode_success, false, "Failed to deserialize v3 Variant metadata");
+				VOXEL_ASSERT_RETURN_V_MSG(decode_success, false, "Failed to deserialize v3 Variant metadata");
 				mr.pos += read_length;
-				ZN_ASSERT(mr.pos <= mr.data.size());
+				VOXEL_ASSERT(mr.pos <= mr.data.size());
 
 				// Write v4 equivalent
 				VoxelMetadata dst_meta;
-				godot::VoxelMetadataVariant *custom = ZN_NEW(godot::VoxelMetadataVariant);
+				godot::VoxelMetadataVariant *custom = VOXEL_NEW(godot::VoxelMetadataVariant);
 				custom->data = src_meta;
 				dst_meta.set_custom(godot::METADATA_TYPE_VARIANT, custom);
 				mw.store_8(dst_meta.get_type());
@@ -462,7 +462,7 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 			}
 		};
 
-		ZN_ASSERT_RETURN_V(L::convert_metadata_item(mr, mw), false);
+		VOXEL_ASSERT_RETURN_V(L::convert_metadata_item(mr, mw), false);
 
 		while (mr.pos < mr.data.size()) {
 			const uint16_t pos_x = mr.get_16();
@@ -473,12 +473,12 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 			mw.store_16(pos_y);
 			mw.store_16(pos_z);
 
-			ZN_ASSERT_RETURN_V(L::convert_metadata_item(mr, mw), false);
+			VOXEL_ASSERT_RETURN_V(L::convert_metadata_item(mr, mw), false);
 		}
 	}
 
 #else
-	ZN_PRINT_ERROR("Cannot migrate block from v3 to v4, Godot Engine is required");
+	VOXEL_PRINT_ERROR("Cannot migrate block from v3 to v4, Godot Engine is required");
 	return false;
 
 #endif
@@ -502,7 +502,7 @@ bool migrate_v2_to_v3(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 	MemoryReader mr(p_data, ENDIANNESS_LITTLE_ENDIAN);
 
 	const uint8_t rv = mr.get_8(); // version
-	ZN_ASSERT(rv == 2);
+	VOXEL_ASSERT(rv == 2);
 
 	dst[0] = 3;
 
@@ -516,8 +516,8 @@ bool migrate_v2_to_v3(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 		const uint8_t compression_value = fmt & 0xf;
 		const uint8_t depth_value = (fmt >> 4) & 0xf;
 
-		ZN_ASSERT_RETURN_V(compression_value < 2, false);
-		ZN_ASSERT_RETURN_V(depth_value < 4, false);
+		VOXEL_ASSERT_RETURN_V(compression_value < 2, false);
+		VOXEL_ASSERT_RETURN_V(depth_value < 4, false);
 
 		const unsigned int voxel_size = 1 << depth_value;
 
@@ -575,8 +575,8 @@ bool migrate_v2_to_v3(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 } // namespace legacy
 
 bool deserialize(Span<const uint8_t> p_data, VoxelBuffer &out_voxel_buffer) {
-	ZN_DSTACK();
-	ZN_PROFILE_SCOPE();
+	VOXEL_DSTACK();
+	VOXEL_PROFILE_SCOPE();
 
 	StdVector<uint8_t> &metadata_tmp = get_tls_metadata_tmp();
 
@@ -699,7 +699,7 @@ SerializeResult serialize_and_compress(
 		const VoxelBuffer &voxel_buffer,
 		const CompressedData::Compression compression_mode
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	StdVector<uint8_t> &compressed_data = get_tls_compressed_data();
 
@@ -716,7 +716,7 @@ SerializeResult serialize_and_compress(
 }
 
 bool decompress_and_deserialize(Span<const uint8_t> p_data, VoxelBuffer &out_voxel_buffer) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	StdVector<uint8_t> &data = get_tls_data();
 
@@ -727,7 +727,7 @@ bool decompress_and_deserialize(Span<const uint8_t> p_data, VoxelBuffer &out_vox
 }
 
 bool decompress_and_deserialize(FileAccess &f, unsigned int size_to_read, VoxelBuffer &out_voxel_buffer) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 #if defined(TOOLS_ENABLED) || defined(DEBUG_ENABLED)
 	const size_t fpos = f.get_position();
@@ -738,11 +738,11 @@ bool decompress_and_deserialize(FileAccess &f, unsigned int size_to_read, VoxelB
 	StdVector<uint8_t> &compressed_data = get_tls_compressed_data();
 
 	compressed_data.resize(size_to_read);
-	const unsigned int read_size = zylann::godot::get_buffer(f, to_span(compressed_data));
+	const unsigned int read_size = voxel::godot::get_buffer(f, to_span(compressed_data));
 	ERR_FAIL_COND_V(read_size != size_to_read, false);
 
 	return decompress_and_deserialize(to_span(compressed_data), out_voxel_buffer);
 }
 
 } // namespace BlockSerializer
-} // namespace zylann::voxel
+} // namespace voxel

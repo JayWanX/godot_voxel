@@ -6,7 +6,7 @@
 #include "transvoxel_materials_single_common.h"
 #include <array>
 
-namespace zylann::voxel::transvoxel::materials::single::s4 {
+namespace voxel::transvoxel::materials::single::s4 {
 
 // One 8-bit material per voxel. Up to 4 blending in shader.
 
@@ -207,7 +207,7 @@ struct Processor {
 		get_cell_materials<NVoxels>(voxel_material_indices, corner_voxel_indices, cell);
 #ifdef TOOLS_ENABLED
 		for (unsigned int i = 0; i < cell.component_indices.size(); ++i) {
-			ZN_ASSERT(cell.component_indices[i] < cell.selected_indices.size());
+			VOXEL_ASSERT(cell.component_indices[i] < cell.selected_indices.size());
 		}
 #endif
 		return cell.packed_indices;
@@ -244,6 +244,6 @@ struct Processor {
 	}
 };
 
-} // namespace zylann::voxel::transvoxel::materials::single::s4
+} // namespace voxel::transvoxel::materials::single::s4
 
 #endif // VOXEL_TRANSVOXEL_MATERIALS_SINGLE_S4_H

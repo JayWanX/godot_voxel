@@ -10,7 +10,7 @@
 #include "../../util/testing/test_macros.h"
 #include "test_util.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int voxel_count, const int batch_count) {
 	// Create library with tickable voxels
@@ -62,7 +62,7 @@ void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int vo
 			buffer->copy_channels_from(model_buffer);
 			VoxelDataBlock block(buffer, 0);
 			block.set_edited(true);
-			ZN_TEST_ASSERT(data.try_set_block(block_pos, block));
+			VOXEL_TEST_ASSERT(data.try_set_block(block_pos, block));
 		});
 	}
 
@@ -84,8 +84,8 @@ void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int vo
 		}
 
 		inline bool _exec(const Vector3i pos, const int block_id) {
-			ZN_TEST_ASSERT_V(block_id == tickable_id, false);
-			ZN_TEST_ASSERT_V(voxel_box.contains(pos), false);
+			VOXEL_TEST_ASSERT_V(block_id == tickable_id, false);
+			VOXEL_TEST_ASSERT_V(voxel_box.contains(pos), false);
 			if (first_pick) {
 				first_pick = false;
 				pick_box = Box3i(pos, Vector3i(1, 1, 1));
@@ -100,7 +100,7 @@ void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int vo
 
 	RandomPCG random;
 	random.seed(131183);
-	zylann::voxel::run_blocky_random_tick(
+	voxel::run_blocky_random_tick(
 			data,
 			voxel_box,
 			**library,
@@ -115,10 +115,10 @@ void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int vo
 			}
 	);
 
-	ZN_TEST_ASSERT(cb.ok);
+	VOXEL_TEST_ASSERT(cb.ok);
 
 	// Even though there is randomness, we expect to see at least one hit
-	ZN_TEST_ASSERT_MSG(!cb.first_pick, "At least one hit is expected, not none");
+	VOXEL_TEST_ASSERT_MSG(!cb.first_pick, "At least one hit is expected, not none");
 
 	// Check that the points were more or less uniformly sparsed within the provided box.
 	// They should, because we populated the world with a checkerboard of tickable voxels.
@@ -129,8 +129,8 @@ void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int vo
 		const int nd = cb.pick_box.position[axis_index] - voxel_box.position[axis_index];
 		const int pd = cb.pick_box.position[axis_index] + cb.pick_box.size[axis_index] -
 				(voxel_box.position[axis_index] + voxel_box.size[axis_index]);
-		ZN_TEST_ASSERT(Math::abs(nd) <= error_margin);
-		ZN_TEST_ASSERT(Math::abs(pd) <= error_margin);
+		VOXEL_TEST_ASSERT(Math::abs(nd) <= error_margin);
+		VOXEL_TEST_ASSERT(Math::abs(pd) <= error_margin);
 	}
 }
 
@@ -160,7 +160,7 @@ void test_box_blur() {
 	struct L {
 		static void save_image(const VoxelBuffer &vb, int y, const char *name) {
 			Ref<Image> im = godot::VoxelBuffer::debug_print_sdf_z_slice(vb, 1.f, y);
-			ZN_ASSERT(im.is_valid());
+			VOXEL_ASSERT(im.is_valid());
 			im->resize(im->get_width() * 4, im->get_height() * 4, Image::INTERPOLATE_NEAREST);
 			im->save_png(name);
 		}
@@ -176,7 +176,7 @@ void test_box_blur() {
 	ops::box_blur(voxels, voxels_blurred_2, blur_radius, sphere_pos, sphere_radius);
 	// L::save_image(voxels_blurred_2, 32 - blur_radius, "test_box_blur_blurred_2.png");
 
-	ZN_TEST_ASSERT(sd_equals_approx(voxels_blurred_1, voxels_blurred_2));
+	VOXEL_TEST_ASSERT(sd_equals_approx(voxels_blurred_1, voxels_blurred_2));
 }
 
 void test_discord_soakil_copypaste() {
@@ -201,7 +201,7 @@ void test_discord_soakil_copypaste() {
 	{
 		generator.instantiate();
 		Ref<pg::VoxelGraphFunction> graph = generator->get_main_function();
-		ZN_ASSERT(graph.is_valid());
+		VOXEL_ASSERT(graph.is_valid());
 
 		const uint32_t n_out_sdf = graph->create_node(pg::VoxelGraphFunction::NODE_OUTPUT_SDF, Vector2());
 
@@ -223,7 +223,7 @@ void test_discord_soakil_copypaste() {
 		graph->add_connection(n_box, 0, n_out_sdf, 0);
 
 		pg::CompilationResult compilation_result = generator->compile(false);
-		ZN_TEST_ASSERT_MSG(
+		VOXEL_TEST_ASSERT_MSG(
 				compilation_result.success,
 				String("Failed to compile graph: {0}: {1}")
 						.format(varray(compilation_result.node_id, compilation_result.message))
@@ -247,22 +247,22 @@ void test_discord_soakil_copypaste() {
 		// We signal that this block is loaded but doesn't have voxel data, therefore the generator should be used on
 		// the fly
 		const bool inserted = voxel_data.try_set_block(bpos, block);
-		ZN_ASSERT(inserted);
+		VOXEL_ASSERT(inserted);
 	});
 
 	struct L {
 		static void check_original(VoxelData &vd) {
 			// Air above platform
 			const float sd_above_platform = vd.get_voxel_f(Vector3i(0, 5, 0), VoxelBuffer::CHANNEL_SDF);
-			ZN_TEST_ASSERT(sd_above_platform > 0.01f);
+			VOXEL_TEST_ASSERT(sd_above_platform > 0.01f);
 
 			// Matter in platform
 			const float sd_in_platform = vd.get_voxel_f(Vector3i(0, 0, 0), VoxelBuffer::CHANNEL_SDF);
-			ZN_TEST_ASSERT(sd_in_platform < -0.01f);
+			VOXEL_TEST_ASSERT(sd_in_platform < -0.01f);
 
 			// Air below platform
 			const float sd_below_platform = vd.get_voxel_f(Vector3i(0, -5, 0), VoxelBuffer::CHANNEL_SDF);
-			ZN_TEST_ASSERT(sd_below_platform > 0.01f);
+			VOXEL_TEST_ASSERT(sd_below_platform > 0.01f);
 
 			// Material
 
@@ -284,14 +284,14 @@ void test_discord_soakil_copypaste() {
 		static void check_indices_and_weights_in_platform(uint16_t packed_indices, uint16_t packed_weights) {
 			const FixedArray<uint8_t, 4> indices_in_platform = mixel4::decode_indices_from_packed_u16(packed_indices);
 			unsigned int expected_material_index_index;
-			ZN_TEST_ASSERT(find(indices_in_platform, uint8_t(1), expected_material_index_index));
+			VOXEL_TEST_ASSERT(find(indices_in_platform, uint8_t(1), expected_material_index_index));
 
 			const FixedArray<uint8_t, 4> weights_in_platform = mixel4::decode_weights_from_packed_u16(packed_weights);
 			for (unsigned int i = 0; i < weights_in_platform.size(); ++i) {
 				if (i == expected_material_index_index) {
-					ZN_TEST_ASSERT(weights_in_platform[i] > 0);
+					VOXEL_TEST_ASSERT(weights_in_platform[i] > 0);
 				} else {
-					ZN_TEST_ASSERT(weights_in_platform[i] == 0);
+					VOXEL_TEST_ASSERT(weights_in_platform[i] == 0);
 				}
 			}
 		}
@@ -308,14 +308,14 @@ void test_discord_soakil_copypaste() {
 	// Check the copy
 	{
 		const float sd_above_platform = buffer_before_edit.get_voxel_f(Vector3i(10, 19, 10), VoxelBuffer::CHANNEL_SDF);
-		ZN_TEST_ASSERT(sd_above_platform > 0.01f);
+		VOXEL_TEST_ASSERT(sd_above_platform > 0.01f);
 
 		const Vector3i pos_in_platform(10, 10, 10);
 		const float sd_in_platform = buffer_before_edit.get_voxel_f(pos_in_platform, VoxelBuffer::CHANNEL_SDF);
-		ZN_TEST_ASSERT(sd_in_platform < -0.01f);
+		VOXEL_TEST_ASSERT(sd_in_platform < -0.01f);
 
 		const float sd_below_platform = buffer_before_edit.get_voxel_f(Vector3i(10, 0, 10), VoxelBuffer::CHANNEL_SDF);
-		ZN_TEST_ASSERT(sd_below_platform > 0.01f);
+		VOXEL_TEST_ASSERT(sd_below_platform > 0.01f);
 
 		const uint16_t packed_indices_in_platform =
 				buffer_before_edit.get_voxel(pos_in_platform, VoxelBuffer::CHANNEL_INDICES);
@@ -337,7 +337,7 @@ void test_discord_soakil_copypaste() {
 		op.channel = VoxelBuffer::CHANNEL_SDF;
 		op.strength = 1.f;
 
-		ZN_ASSERT(voxel_data.is_area_loaded(op.box));
+		VOXEL_ASSERT(voxel_data.is_area_loaded(op.box));
 
 		voxel_data.pre_generate_box(op.box);
 		voxel_data.get_blocks_grid(op.blocks, op.box, 0);
@@ -361,9 +361,9 @@ void test_sdf_hemisphere() {
 	shape.sdf_scale = 1.0;
 	shape.smoothness = 0.1;
 
-	ZN_TEST_ASSERT(shape(Vector3f(0, 0.5, 0)) > 0);
-	ZN_TEST_ASSERT(shape(Vector3f(0, -0.5, 0)) < 0);
-	ZN_TEST_ASSERT(shape(Vector3f(2, 0, 0)) > 0);
+	VOXEL_TEST_ASSERT(shape(Vector3f(0, 0.5, 0)) > 0);
+	VOXEL_TEST_ASSERT(shape(Vector3f(0, -0.5, 0)) < 0);
+	VOXEL_TEST_ASSERT(shape(Vector3f(2, 0, 0)) > 0);
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

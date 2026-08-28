@@ -8,7 +8,7 @@
 #include "../../util/tasks/threaded_task.h"
 #include "voxel_lod_terrain_update_data.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 struct StreamingDependency;
 struct MeshingDependency;
@@ -115,6 +115,6 @@ void update_transition_masks(
 
 void add_unloaded_saving_blocks(VoxelLodTerrainUpdateData::Lod &lod, Span<const VoxelData::BlockToSave> src);
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_LOD_TERRAIN_UPDATE_TASK_H

@@ -6,7 +6,7 @@
 #include "direct_mesh_instance.h"
 #include "direct_multimesh_instance.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 namespace {
 
@@ -139,4 +139,4 @@ void DebugRenderer::clear() {
 	}
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

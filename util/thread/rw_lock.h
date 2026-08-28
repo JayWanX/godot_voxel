@@ -1,22 +1,22 @@
-#ifndef ZN_RW_LOCK_H
-#define ZN_RW_LOCK_H
+#ifndef VOXEL_RW_LOCK_H
+#define VOXEL_RW_LOCK_H
 
 #include <shared_mutex>
 
-//#define ZN_PROFILE_RWLOCK
-#ifdef ZN_PROFILE_RWLOCK
+//#define VOXEL_PROFILE_RWLOCK
+#ifdef VOXEL_PROFILE_RWLOCK
 #include "../profiling.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
 class RWLock {
 public:
 	// Lock the rwlock, block if locked for write by another thread.
 	// WARNING: cannot be locked twice by the same thread, it is undefined behavior.
 	void read_lock() const {
-#ifdef ZN_PROFILE_RWLOCK
-		ZN_PROFILE_SCOPE();
+#ifdef VOXEL_PROFILE_RWLOCK
+		VOXEL_PROFILE_SCOPE();
 #endif
 		_mutex.lock_shared();
 	}
@@ -33,8 +33,8 @@ public:
 
 	// Lock the rwlock, block if locked by someone else
 	void write_lock() {
-#ifdef ZN_PROFILE_RWLOCK
-		ZN_PROFILE_SCOPE();
+#ifdef VOXEL_PROFILE_RWLOCK
+		VOXEL_PROFILE_SCOPE();
 #endif
 		_mutex.lock();
 	}
@@ -79,6 +79,6 @@ private:
 	RWLock &_lock;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_RW_LOCK_H
+#endif // VOXEL_RW_LOCK_H

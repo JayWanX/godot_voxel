@@ -1,10 +1,10 @@
 #include "voxel_save_completion_tracker.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 Ref<VoxelSaveCompletionTracker> VoxelSaveCompletionTracker::create(std::shared_ptr<AsyncDependencyTracker> tracker) {
 	Ref<VoxelSaveCompletionTracker> self;
@@ -15,12 +15,12 @@ Ref<VoxelSaveCompletionTracker> VoxelSaveCompletionTracker::create(std::shared_p
 }
 
 bool VoxelSaveCompletionTracker::is_complete() const {
-	ZN_ASSERT_RETURN_V(_tracker != nullptr, false);
+	VOXEL_ASSERT_RETURN_V(_tracker != nullptr, false);
 	return _tracker->is_complete();
 }
 
 bool VoxelSaveCompletionTracker::is_aborted() const {
-	ZN_ASSERT_RETURN_V(_tracker != nullptr, false);
+	VOXEL_ASSERT_RETURN_V(_tracker != nullptr, false);
 	return _tracker->is_aborted();
 }
 
@@ -29,7 +29,7 @@ int VoxelSaveCompletionTracker::get_total_tasks() const {
 }
 
 int VoxelSaveCompletionTracker::get_remaining_tasks() const {
-	ZN_ASSERT_RETURN_V(_tracker != nullptr, 0);
+	VOXEL_ASSERT_RETURN_V(_tracker != nullptr, 0);
 	return _tracker->get_remaining_count();
 }
 
@@ -40,4 +40,4 @@ void VoxelSaveCompletionTracker::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_remaining_tasks"), &VoxelSaveCompletionTracker::get_remaining_tasks);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

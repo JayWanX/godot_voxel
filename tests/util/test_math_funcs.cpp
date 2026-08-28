@@ -2,7 +2,7 @@
 #include "../../util/math/funcs.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_wrap() {
 	struct L {
@@ -15,7 +15,7 @@ void test_wrap() {
 			for (int x = range_min; x < range_max; ++x) {
 				const int result = math::wrap(x, d);
 
-				ZN_TEST_ASSERT(result == expected);
+				VOXEL_TEST_ASSERT(result == expected);
 
 				++expected;
 				if (expected == d) {
@@ -30,4 +30,4 @@ void test_wrap() {
 	}
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

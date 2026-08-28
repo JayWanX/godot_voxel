@@ -18,7 +18,7 @@
 #include <fstream>
 #endif
 
-namespace zylann::tests {
+namespace voxel::tests {
 
 void test_threaded_task_runner_misc() {
 	static const uint32_t task_duration_usec = 100'000;
@@ -43,8 +43,8 @@ void test_threaded_task_runner_misc() {
 		TestTask(std::shared_ptr<TaskCounter> p_counter) : counter(p_counter) {}
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_PROFILE_SCOPE();
-			ZN_ASSERT(counter != nullptr);
+			VOXEL_PROFILE_SCOPE();
+			VOXEL_ASSERT(counter != nullptr);
 
 			++counter->current_count;
 
@@ -64,16 +64,16 @@ void test_threaded_task_runner_misc() {
 		}
 
 		void apply_result() override {
-			ZN_TEST_ASSERT(completed);
+			VOXEL_TEST_ASSERT(completed);
 		}
 	};
 
 	struct L {
 		static void dequeue_tasks(ThreadedTaskRunner &runner) {
 			runner.dequeue_completed_tasks([](IThreadedTask *task) {
-				ZN_ASSERT(task != nullptr);
+				VOXEL_ASSERT(task != nullptr);
 				task->apply_result();
-				ZN_DELETE(task);
+				VOXEL_DELETE(task);
 			});
 		}
 	};
@@ -81,7 +81,7 @@ void test_threaded_task_runner_misc() {
 	const unsigned int test_thread_count = 4;
 	const unsigned int hw_concurrency = Thread::get_hardware_concurrency();
 	if (hw_concurrency < test_thread_count) {
-		ZN_PRINT_WARNING(format(
+		VOXEL_PRINT_WARNING(format(
 				"Hardware concurrency is {}, smaller than test requirement {}", test_thread_count, hw_concurrency
 		));
 	}
@@ -96,28 +96,28 @@ void test_threaded_task_runner_misc() {
 	// Parallel tasks only
 
 	for (unsigned int i = 0; i < 16; ++i) {
-		TestTask *task = ZN_NEW(TestTask(parallel_counter));
+		TestTask *task = VOXEL_NEW(TestTask(parallel_counter));
 		runner.enqueue(task, false);
 	}
 
 	runner.wait_for_all_tasks();
 	L::dequeue_tasks(runner);
-	ZN_TEST_ASSERT(parallel_counter->completed_count == 16);
-	ZN_TEST_ASSERT(parallel_counter->max_count <= test_thread_count);
-	ZN_TEST_ASSERT(parallel_counter->current_count == 0);
+	VOXEL_TEST_ASSERT(parallel_counter->completed_count == 16);
+	VOXEL_TEST_ASSERT(parallel_counter->max_count <= test_thread_count);
+	VOXEL_TEST_ASSERT(parallel_counter->current_count == 0);
 
 	// Serial tasks only
 
 	for (unsigned int i = 0; i < 16; ++i) {
-		TestTask *task = ZN_NEW(TestTask(serial_counter));
+		TestTask *task = VOXEL_NEW(TestTask(serial_counter));
 		runner.enqueue(task, true);
 	}
 
 	runner.wait_for_all_tasks();
 	L::dequeue_tasks(runner);
-	ZN_TEST_ASSERT(serial_counter->completed_count == 16);
-	ZN_TEST_ASSERT(serial_counter->max_count == 1);
-	ZN_TEST_ASSERT(serial_counter->current_count == 0);
+	VOXEL_TEST_ASSERT(serial_counter->completed_count == 16);
+	VOXEL_TEST_ASSERT(serial_counter->max_count == 1);
+	VOXEL_TEST_ASSERT(serial_counter->current_count == 0);
 
 	// Interleaved
 
@@ -126,22 +126,22 @@ void test_threaded_task_runner_misc() {
 
 	for (unsigned int i = 0; i < 32; ++i) {
 		if ((i & 1) == 0) {
-			TestTask *task = ZN_NEW(TestTask(parallel_counter));
+			TestTask *task = VOXEL_NEW(TestTask(parallel_counter));
 			runner.enqueue(task, false);
 		} else {
-			TestTask *task = ZN_NEW(TestTask(serial_counter));
+			TestTask *task = VOXEL_NEW(TestTask(serial_counter));
 			runner.enqueue(task, true);
 		}
 	}
 
 	runner.wait_for_all_tasks();
 	L::dequeue_tasks(runner);
-	ZN_TEST_ASSERT(parallel_counter->completed_count == 16);
-	ZN_TEST_ASSERT(parallel_counter->max_count <= test_thread_count);
-	ZN_TEST_ASSERT(parallel_counter->current_count == 0);
-	ZN_TEST_ASSERT(serial_counter->completed_count == 16);
-	ZN_TEST_ASSERT(serial_counter->max_count == 1);
-	ZN_TEST_ASSERT(serial_counter->current_count == 0);
+	VOXEL_TEST_ASSERT(parallel_counter->completed_count == 16);
+	VOXEL_TEST_ASSERT(parallel_counter->max_count <= test_thread_count);
+	VOXEL_TEST_ASSERT(parallel_counter->current_count == 0);
+	VOXEL_TEST_ASSERT(serial_counter->completed_count == 16);
+	VOXEL_TEST_ASSERT(serial_counter->max_count == 1);
+	VOXEL_TEST_ASSERT(serial_counter->current_count == 0);
 }
 
 void test_threaded_task_runner_debug_names() {
@@ -152,7 +152,7 @@ void test_threaded_task_runner_debug_names() {
 		NamedTestTask1(int p_sleep_amount_usec) : sleep_amount_usec(p_sleep_amount_usec) {}
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 			Thread::sleep_usec(sleep_amount_usec);
 		}
 
@@ -168,7 +168,7 @@ void test_threaded_task_runner_debug_names() {
 		NamedTestTask2(int p_sleep_amount_usec) : sleep_amount_usec(p_sleep_amount_usec) {}
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 			Thread::sleep_usec(sleep_amount_usec);
 		}
 
@@ -180,10 +180,10 @@ void test_threaded_task_runner_debug_names() {
 	struct L {
 		static void dequeue_tasks(ThreadedTaskRunner &runner, unsigned int &r_in_flight_count) {
 			runner.dequeue_completed_tasks([&r_in_flight_count](IThreadedTask *task) {
-				ZN_ASSERT(task != nullptr);
+				VOXEL_ASSERT(task != nullptr);
 				task->apply_result();
-				ZN_DELETE(task);
-				ZN_ASSERT(r_in_flight_count > 0);
+				VOXEL_DELETE(task);
+				VOXEL_ASSERT(r_in_flight_count > 0);
 				--r_in_flight_count;
 			});
 		}
@@ -192,7 +192,7 @@ void test_threaded_task_runner_debug_names() {
 	const unsigned int test_thread_count = 4;
 	const unsigned int hw_concurrency = Thread::get_hardware_concurrency();
 	if (hw_concurrency < test_thread_count) {
-		ZN_PRINT_WARNING(format(
+		VOXEL_PRINT_WARNING(format(
 				"Hardware concurrency is {}, smaller than test requirement {}", test_thread_count, hw_concurrency
 		));
 	}
@@ -208,16 +208,16 @@ void test_threaded_task_runner_debug_names() {
 	StdUnorderedMap<StdString, int> name_counts;
 
 	while (Time::get_singleton()->get_ticks_msec() - time_before < 5000) {
-		ZN_PROFILE_SCOPE();
+		VOXEL_PROFILE_SCOPE();
 
 		// Saturate task queue so a bunch should be running while we query their names
 		while (in_flight_count < 5000) {
 			for (unsigned int i = 0; i < 1000; ++i) {
 				if ((i % 3) != 0) {
-					NamedTestTask1 *task = ZN_NEW(NamedTestTask1(100 + i % 11));
+					NamedTestTask1 *task = VOXEL_NEW(NamedTestTask1(100 + i % 11));
 					runner.enqueue(task, false);
 				} else {
-					NamedTestTask2 *task = ZN_NEW(NamedTestTask2(60 + i % 7));
+					NamedTestTask2 *task = VOXEL_NEW(NamedTestTask2(60 + i % 7));
 					runner.enqueue(task, true);
 				}
 				++in_flight_count;
@@ -270,10 +270,10 @@ void test_threaded_task_runner_debug_names() {
 }
 
 void test_task_priority_values() {
-	ZN_TEST_ASSERT(TaskPriority(0, 0, 0, 0) < TaskPriority(1, 0, 0, 0));
-	ZN_TEST_ASSERT(TaskPriority(0, 0, 0, 0) < TaskPriority(0, 0, 0, 1));
-	ZN_TEST_ASSERT(TaskPriority(10, 0, 0, 0) < TaskPriority(0, 10, 0, 0));
-	ZN_TEST_ASSERT(TaskPriority(10, 10, 0, 0) < TaskPriority(10, 10, 10, 0));
+	VOXEL_TEST_ASSERT(TaskPriority(0, 0, 0, 0) < TaskPriority(1, 0, 0, 0));
+	VOXEL_TEST_ASSERT(TaskPriority(0, 0, 0, 0) < TaskPriority(0, 0, 0, 1));
+	VOXEL_TEST_ASSERT(TaskPriority(10, 0, 0, 0) < TaskPriority(0, 10, 0, 0));
+	VOXEL_TEST_ASSERT(TaskPriority(10, 10, 0, 0) < TaskPriority(10, 10, 10, 0));
 }
 
 // Simulates doing work in every chunk of a grid, where each task will want to access neighbors of each block. If any
@@ -350,7 +350,7 @@ void test_threaded_task_postponing() {
 		}
 
 		void run(ThreadedTaskContext &ctx) override {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 
 			static thread_local StdVector<Block *> locked_blocks;
 
@@ -364,7 +364,7 @@ void test_threaded_task_postponing() {
 #endif
 
 			{
-				ZN_PROFILE_SCOPE_NAMED("Work");
+				VOXEL_PROFILE_SCOPE_NAMED("Work");
 				Thread::sleep_usec(sleep_amount_usec);
 			}
 
@@ -386,10 +386,10 @@ void test_threaded_task_postponing() {
 	struct L {
 		static void dequeue_tasks(ThreadedTaskRunner &runner, unsigned int &r_in_flight_count) {
 			runner.dequeue_completed_tasks([&r_in_flight_count](IThreadedTask *task) {
-				ZN_ASSERT(task != nullptr);
+				VOXEL_ASSERT(task != nullptr);
 				task->apply_result();
-				ZN_DELETE(task);
-				ZN_ASSERT(r_in_flight_count > 0);
+				VOXEL_DELETE(task);
+				VOXEL_ASSERT(r_in_flight_count > 0);
 				--r_in_flight_count;
 			});
 		}
@@ -398,7 +398,7 @@ void test_threaded_task_postponing() {
 	const unsigned int test_thread_count = 4;
 	const unsigned int hw_concurrency = Thread::get_hardware_concurrency();
 	if (hw_concurrency < test_thread_count) {
-		ZN_PRINT_WARNING(format(
+		VOXEL_PRINT_WARNING(format(
 				"Hardware concurrency is {}, smaller than test requirement {}", test_thread_count, hw_concurrency
 		));
 	}
@@ -429,7 +429,7 @@ void test_threaded_task_postponing() {
 	for (bpos.z = 0; bpos.z < map_size; ++bpos.z) {
 		for (bpos.x = 0; bpos.x < map_size; ++bpos.x) {
 			for (bpos.y = 0; bpos.y < map_size; ++bpos.y) {
-				Task1 *task = ZN_NEW(Task1(1000 + rng.rand(2000), map, bpos, events));
+				Task1 *task = VOXEL_NEW(Task1(1000 + rng.rand(2000), map, bpos, events));
 				runner.enqueue(task, false);
 				++in_flight_count;
 			}
@@ -439,7 +439,7 @@ void test_threaded_task_postponing() {
 	runner.wait_for_all_tasks();
 	L::dequeue_tasks(runner, in_flight_count);
 
-	ZN_TEST_ASSERT(in_flight_count == 0);
+	VOXEL_TEST_ASSERT(in_flight_count == 0);
 
 #ifdef VOXEL_TEST_TASK_POSTPONING_DUMP_EVENTS
 	// Dump events
@@ -461,4 +461,4 @@ void test_threaded_task_postponing() {
 #endif
 }
 
-} // namespace zylann::tests
+} // namespace voxel::tests

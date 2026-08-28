@@ -12,7 +12,7 @@
 
 #include <limits>
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGenerator;
 
@@ -246,10 +246,10 @@ private:
 	mutable ShortLock _ptr_settings_lock;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
-VARIANT_ENUM_CAST(zylann::voxel::VoxelInstanceGenerator::EmitMode);
-VARIANT_ENUM_CAST(zylann::voxel::VoxelInstanceGenerator::Distribution);
-VARIANT_ENUM_CAST(zylann::voxel::VoxelInstanceGenerator::Dimension);
+VARIANT_ENUM_CAST(voxel::VoxelInstanceGenerator::EmitMode);
+VARIANT_ENUM_CAST(voxel::VoxelInstanceGenerator::Distribution);
+VARIANT_ENUM_CAST(voxel::VoxelInstanceGenerator::Dimension);
 
 #endif // VOXEL_INSTANCE_GENERATOR_H

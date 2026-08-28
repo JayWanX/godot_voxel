@@ -1,9 +1,9 @@
-#ifndef ZN_SPIN_LOCK_H
-#define ZN_SPIN_LOCK_H
+#ifndef VOXEL_SPIN_LOCK_H
+#define VOXEL_SPIN_LOCK_H
 
 #include <atomic>
 
-namespace zylann {
+namespace voxel {
 
 class SpinLock {
 public:
@@ -24,6 +24,6 @@ private:
 	std::atomic_flag _locked = ATOMIC_FLAG_INIT;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_SPIN_LOCK_H
+#endif // VOXEL_SPIN_LOCK_H

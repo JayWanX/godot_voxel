@@ -6,28 +6,28 @@
 #include "../../util/godot/editor_scale.h"
 #include "../../util/math/funcs.h"
 
-namespace zylann {
+namespace voxel {
 
-ZN_ControlSizer::ZN_ControlSizer() {
+VOXEL_ControlSizer::VOXEL_ControlSizer() {
 	set_default_cursor_shape(Control::CURSOR_VSIZE);
 	const real_t editor_scale = EDSCALE;
 	set_custom_minimum_size(Vector2(0, editor_scale * 5));
 }
 
-void ZN_ControlSizer::set_target_control(Control *control) {
+void VOXEL_ControlSizer::set_target_control(Control *control) {
 	_target_control.set(control);
 }
 
-#ifdef ZN_GODOT
-void ZN_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
-#elif defined(ZN_GODOT_EXTENSION)
-void ZN_ControlSizer::_gui_input(const Ref<InputEvent> &p_event) {
+#ifdef VOXEL_GODOT
+void VOXEL_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
+#elif defined(VOXEL_GODOT_EXTENSION)
+void VOXEL_ControlSizer::_gui_input(const Ref<InputEvent> &p_event) {
 #endif
 
 	Ref<InputEventMouseButton> mb = p_event;
 	if (mb.is_valid()) {
 		Control *target_control = _target_control.get();
-		ZN_ASSERT_RETURN(target_control != nullptr);
+		VOXEL_ASSERT_RETURN(target_control != nullptr);
 
 		if (mb->is_pressed()) {
 			if (mb->get_button_index() == ::godot::MOUSE_BUTTON_LEFT) {
@@ -42,7 +42,7 @@ void ZN_ControlSizer::_gui_input(const Ref<InputEvent> &p_event) {
 	if (mm.is_valid()) {
 		if (_dragging) {
 			Control *target_control = _target_control.get();
-			ZN_ASSERT_RETURN(target_control != nullptr);
+			VOXEL_ASSERT_RETURN(target_control != nullptr);
 
 			const Vector2 ms = target_control->get_custom_minimum_size();
 			// Assuming the UI is not scaled
@@ -56,7 +56,7 @@ void ZN_ControlSizer::_gui_input(const Ref<InputEvent> &p_event) {
 	}
 }
 
-void ZN_ControlSizer::_notification(int p_what) {
+void VOXEL_ControlSizer::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_MOUSE_ENTER: {
 			_mouse_inside = true;
@@ -84,12 +84,12 @@ void ZN_ControlSizer::_notification(int p_what) {
 	}
 }
 
-void ZN_ControlSizer::cache_theme() {
+void VOXEL_ControlSizer::cache_theme() {
 	// TODO I'd like to cache this, but `BIND_THEME_ITEM_CUSTOM` is not exposed to GDExtension...
 	// TODO Have a framework-level StringName cache singleton
 	_hover_icon = get_theme_icon("v_grabber", "SplitContainer");
 }
 
-void ZN_ControlSizer::_bind_methods() {}
+void VOXEL_ControlSizer::_bind_methods() {}
 
-} // namespace zylann
+} // namespace voxel

@@ -42,5 +42,5 @@ VoxelNode = "./editor/icons/VoxelNode.svg"
 VoxelTerrain = "./editor/icons/VoxelTerrain.svg"
 VoxelTerrainLarge = "./editor/icons/VoxelTerrainLarge.svg"
 VoxelViewer = "./editor/icons/VoxelViewer.svg"
-ZN_FastNoiseLite = "./editor/icons/ZN_FastNoiseLite.svg"
+VOXEL_FastNoiseLite = "./editor/icons/VOXEL_FastNoiseLite.svg"
 ;</generated-icons>

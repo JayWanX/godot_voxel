@@ -1,11 +1,11 @@
-#ifndef ZN_GODOT_RECT2_H
-#define ZN_GODOT_RECT2_H
+#ifndef VOXEL_GODOT_RECT2_H
+#define VOXEL_GODOT_RECT2_H
 
-#if defined(ZN_GODOT)
+#if defined(VOXEL_GODOT)
 #include <core/math/rect2.h>
-#elif defined(ZN_GODOT_EXTENSION)
+#elif defined(VOXEL_GODOT_EXTENSION)
 #include <godot_cpp/variant/rect2.hpp>
 using namespace godot;
 #endif
 
-#endif // ZN_GODOT_RECT2_H
+#endif // VOXEL_GODOT_RECT2_H

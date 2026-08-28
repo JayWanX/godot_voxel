@@ -9,12 +9,12 @@
 #include "blocky_model_baking_context.h"
 #include "voxel_blocky_library_base.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #include "../../util/godot/core/callable_mp.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelBlockyModelFluid::VoxelBlockyModelFluid() {}
 
@@ -84,11 +84,11 @@ Ref<Mesh> VoxelBlockyModelFluid::get_preview_mesh() const {
 			*model_sides_surfaces = nullptr;
 
 	blocky::generate_preview_fluid_model(library.models[1], 1, library, model_surfaces, model_sides_surfaces);
-	ZN_ASSERT_RETURN_V(model_sides_surfaces != nullptr, Ref<Mesh>());
+	VOXEL_ASSERT_RETURN_V(model_sides_surfaces != nullptr, Ref<Mesh>());
 
 	Ref<Mesh> mesh =
 			make_mesh_from_baked_data(model_surfaces, to_span(*model_sides_surfaces), Color(1, 1, 1), tangents_enabled);
-	ZN_ASSERT_RETURN_V(mesh.is_valid(), Ref<Mesh>());
+	VOXEL_ASSERT_RETURN_V(mesh.is_valid(), Ref<Mesh>());
 
 	mesh->surface_set_material(0, _fluid->get_material());
 
@@ -109,7 +109,7 @@ void bake_fluid_model(
 	baked_model.clear();
 
 	if (fluid.is_null()) {
-		ZN_PRINT_ERROR("Fluid model without assigned fluid");
+		VOXEL_PRINT_ERROR("Fluid model without assigned fluid");
 		return;
 	}
 
@@ -118,7 +118,7 @@ void bake_fluid_model(
 		fluid_index = indexed_fluids.size();
 
 		if (fluid_index >= VoxelBlockyLibraryBase::MAX_FLUIDS) {
-			ZN_PRINT_ERROR("Reached maximum fluids");
+			VOXEL_PRINT_ERROR("Reached maximum fluids");
 			return;
 		}
 
@@ -136,7 +136,7 @@ void bake_fluid_model(
 
 	// TODO Allow more than one model with the same level?
 	const int level = fluid_model.get_level();
-	ZN_ASSERT(level >= 0 && level < VoxelBlockyModelFluid::MAX_LEVELS);
+	VOXEL_ASSERT(level >= 0 && level < VoxelBlockyModelFluid::MAX_LEVELS);
 	baked_model.fluid_level = level;
 	baked_fluid.max_level = math::max(static_cast<uint8_t>(level), baked_fluid.max_level);
 
@@ -170,7 +170,7 @@ void VoxelBlockyModelFluid::_on_fluid_changed() {
 #ifdef TOOLS_ENABLED
 
 void VoxelBlockyModelFluid::get_configuration_warnings(PackedStringArray &warnings) const {
-	using namespace zylann::godot;
+	using namespace voxel::godot;
 
 	if (!_fluid.is_valid()) {
 		warnings.append(String("{0} has no fluid assigned.").format(varray(VoxelBlockyModelFluid::get_class_static())));
@@ -196,4 +196,4 @@ void VoxelBlockyModelFluid::_bind_methods() {
 	BIND_CONSTANT(MAX_LEVELS);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

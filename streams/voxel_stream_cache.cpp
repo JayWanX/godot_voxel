@@ -1,6 +1,6 @@
 #include "voxel_stream_cache.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 bool VoxelStreamCache::load_voxel_block(Vector3i position, uint8_t lod_index, VoxelBuffer &out_voxels) {
 	const Lod &lod = _cache[lod_index];
@@ -34,7 +34,7 @@ void VoxelStreamCache::save_voxel_block(Vector3i position, uint8_t lod_index, Vo
 	RWLockWrite wlock(lod.rw_lock);
 	auto it = lod.blocks.find(position);
 
-	ZN_ASSERT_RETURN_MSG(
+	VOXEL_ASSERT_RETURN_MSG(
 			!Vector3iUtil::is_empty_size(voxels.get_size()), "Saving voxel buffer with empty size is not expected. Bug?"
 	);
 
@@ -119,4 +119,4 @@ unsigned int VoxelStreamCache::get_indicative_block_count() const {
 	return _count;
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

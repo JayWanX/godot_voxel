@@ -4,7 +4,7 @@
 #include "voxel_blocky_fluid.h"
 #include "voxel_blocky_model.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Minecraft-style fluid model for a specific level.
 class VoxelBlockyModelFluid : public VoxelBlockyModel {
@@ -39,6 +39,6 @@ private:
 	unsigned int _level = 0;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_MODEL_FLUID_H

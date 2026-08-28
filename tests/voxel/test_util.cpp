@@ -5,7 +5,7 @@
 #include "../../util/string/std_string.h"
 #include <sstream>
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 bool sd_equals_approx(const VoxelBuffer &vb1, const VoxelBuffer &vb2) {
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
@@ -41,7 +41,7 @@ bool sd_equals_approx(const VoxelBuffer &vb1, const VoxelBuffer &vb2) {
 						}
 					} break;
 					default:
-						ZN_CRASH_MSG("Unhandled depth");
+						VOXEL_CRASH_MSG("Unhandled depth");
 						break;
 				}
 			}
@@ -79,4 +79,4 @@ void print_channel_as_ascii(const VoxelBuffer &vb, unsigned int channel, const u
 	print_line(ss.get_written());
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

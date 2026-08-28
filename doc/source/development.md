@@ -4,7 +4,7 @@ Development
 This page will give some info about the project's internals and how to compile it.
 It may be useful if you want to contribute, or write custom C++ code for your game in order to get better performance.
 
-The source code can be found on [Github](https://github.com/Zylann/godot_voxel).
+The source code can be found on [Github](https://github.com/Voxel/godot_voxel).
 
 !!! note
     While this project can compile both as a module or an extension, this documentation mainly refers to module development. The project is primarily worked on as a module, and GDExtension is a more recent addition. It may have some specific differences, but overall most things work the same.
@@ -25,7 +25,7 @@ Building
 
 #### Add Voxel Tools
 
-1. Download or clone the repository for [Voxel Tools](https://github.com/Zylann/godot_voxel). Use Git to clone the repository if you want to make it easy to update your builds (recommended).
+1. Download or clone the repository for [Voxel Tools](https://github.com/Voxel/godot_voxel). Use Git to clone the repository if you want to make it easy to update your builds (recommended).
 1. By default, the `master` branch of the module should work with the latest stable branch of Godot. There are "snapshot" branches of the module, which were created at the time specific Godot versions were released (such as `godot4.0`), but they are not updated.
 1. Place the Voxel Tools directory inside your Godot source tree, in the `godot/modules` directory. 
 1. Rename the Voxel Tools folder to `voxel`. When correct, the files (e.g. README.md) will be located in `godot/modules/voxel`. **This is important!**
@@ -52,7 +52,7 @@ If you cloned Godot and Voxel Tools, you can use git to update your local code.
 ### Build as a GDExtension
 
 !!! warning
-    This feature is under development and is not ready for production. It has bugs and can crash the engine. Check the [issue tracker](https://github.com/Zylann/godot_voxel/issues/333) for work in progress.
+    This feature is under development and is not ready for production. It has bugs and can crash the engine. Check the [issue tracker](https://github.com/Voxel/godot_voxel/issues/333) for work in progress.
 
 This module can compile as a GDExtension library. This allows to distribute it as a library file (`.dll`, `.so`...) without having to recompile Godot Engine.
 You should read Godot's documentation about GDExtension:
@@ -71,12 +71,12 @@ Example of build command on Windows (unoptimized debug build for use in editor):
 scons platform=windows target=debug -j4
 ```
 
-The built library will be placed inside the `project/addons/zylann.voxel/bin/` folder. `project/` contains a Godot 4 project. It is then possible to open it to test the extension.
+The built library will be placed inside the `project/addons/voxel/bin/` folder. `project/` contains a Godot 4 project. It is then possible to open it to test the extension.
 
 By default, the GDExtension config file of this project is setup for debug builds. You may want to modify `voxel.gdextension` for your needs.
 When doing release packages, the config file is replaced with `voxel.gdextension-release` instead, which is pre-configured with non-dev version of the library for all platforms.
 
-There are known issues with GDExtension, check the [issue tracker](https://github.com/Zylann/godot_voxel/issues/333).
+There are known issues with GDExtension, check the [issue tracker](https://github.com/Voxel/godot_voxel/issues/333).
 
 #### Web builds
 
@@ -99,7 +99,7 @@ Current guessses:
 
 Alternatively, you could [build your own Godot export template](https://docs.godotengine.org/en/stable/engine_details/development/compiling/compiling_for_web.html#compiling-for-the-web) using the version of Emscripten of your choice.
 
-There might be some other caveats: [https://github.com/Zylann/godot_voxel/issues/745](https://github.com/Zylann/godot_voxel/issues/745)
+There might be some other caveats: [https://github.com/Voxel/godot_voxel/issues/745](https://github.com/Voxel/godot_voxel/issues/745)
 
 
 Contributing
@@ -155,8 +155,8 @@ Layers
 
 This module has 3 main layers:
 
-- Voxel: the voxel engine. Wrapped into `zylann::voxel::` namespace.
-- Util: library of functions, helpers and data structures, which does not depend on Voxel. Wrapped into `zylann::` namespace.
+- Voxel: the voxel engine. Wrapped into `voxel::` namespace.
+- Util: library of functions, helpers and data structures, which does not depend on Voxel. Wrapped into `voxel::` namespace.
 - Thirdparty: third-party libraries.
 
 ### Folders
@@ -196,14 +196,14 @@ Same for `VoxelBuffer`: this class is actually not a full-fledged Godot object. 
 
 Namespace                 | Description
 --------------------------|--------------
-`zylann`                  | General-purpose, not necessarily related to Godot
-`zylann::math`            | Math utilities
-`zylann::godot`           | General-purpose Godot utilities
-`zylann::voxel`           | Voxel engine
-`zylann::voxel::ops`      | Voxel editing utilities
-`zylann::voxel::godot`    | Some classes have Godot-specific wrappers in order to be exposed to scripting APIs, which are in this namespace to allow using the same name as in `zylann::voxel`
-`zylann::voxel::magica`   | MagicaVoxel functions
-`zylann::voxel::pg`       | Graph processing functionality
+`voxel`                  | General-purpose, not necessarily related to Godot
+`voxel::math`            | Math utilities
+`voxel::godot`           | General-purpose Godot utilities
+`voxel`           | Voxel engine
+`voxel::ops`      | Voxel editing utilities
+`voxel::godot`    | Some classes have Godot-specific wrappers in order to be exposed to scripting APIs, which are in this namespace to allow using the same name as in `voxel`
+`voxel::magica`   | MagicaVoxel functions
+`voxel::pg`       | Graph processing functionality
 
 There might be more smaller namespaces that can be documented in code.
 
@@ -262,7 +262,7 @@ For the most part, use `clang-format` and follow most of Godot conventions.
 - Private wrapper functions can be used to adapt to the Godot script API and are prefixed with `_b_`.
 - Use Clang-format to automate most of these rules (there should be a file included at the root of the C++ project)
 - Prefer comments with `//` only
-- Some virtual functions from wrapper classes are prefixed with `_zn_` to encapsulate signature differences when compiling as a module or as a GDExtension.
+- Some virtual functions from wrapper classes are prefixed with `_voxel_` to encapsulate signature differences when compiling as a module or as a GDExtension.
 
 ### File structure
 
@@ -291,16 +291,16 @@ For the most part, use `clang-format` and follow most of Godot conventions.
 - `#include` what you use, don't assume a header transitively includes things. This has been broadly ignored for a while, but new code should attempt to follow it. `util/godot` micro-headers are an exception.
 - Don't do `using namespace` in headers (Except with `godot::`, but that's only to help supporting GDExtension using the same codebase, since Godot core does not have this namespace).
 - `mutable` must ONLY be used for thread synchronization primitives. Do not use it with "cache data" to make getters `const`, as it can be misleading in a multi-threaded context.
-- Use `ZN_NEW` and `ZN_DELETE` instead of `new` and `delete` on types that don't derive from Godot `Object`. This is intented for code that may be independent from Godot, yet be tracked in Godot's default allocator when used.
-- Use `ZN_ALLOC` and `ZN_FREE` instead of `malloc` and `free`. This is intented for code that may be independent from Godot, yet be tracked in Godot's default allocator when used.
+- Use `VOXEL_NEW` and `VOXEL_DELETE` instead of `new` and `delete` on types that don't derive from Godot `Object`. This is intented for code that may be independent from Godot, yet be tracked in Godot's default allocator when used.
+- Use `VOXEL_ALLOC` and `VOXEL_FREE` instead of `malloc` and `free`. This is intented for code that may be independent from Godot, yet be tracked in Godot's default allocator when used.
 - When using standard library containers, prefer aliases from `util/containers/` such as `StdVector`. These are using Godot's allocation functions so memory will be tracked.
 
 ### Error handling
 
 - Exceptions are not used.
-- Check invariants, fail early. Use `CRASH_COND` or `ZN_ASSERT` in debug mode to make sure states are as expected even if they don't cause immediate harm.
-- Crashes aren't nice to users, so in user-facing code (scripting) use `ERR_FAIL_COND` or `ZN_ASSERT_RETURN` macros for code that can recover from error, or to prevent hitting internal assertions
-- Macros prefixed with `ZN_` are Godot-agnostic and may be used for portability in areas that don't depend on Godot too much.
+- Check invariants, fail early. Use `CRASH_COND` or `VOXEL_ASSERT` in debug mode to make sure states are as expected even if they don't cause immediate harm.
+- Crashes aren't nice to users, so in user-facing code (scripting) use `ERR_FAIL_COND` or `VOXEL_ASSERT_RETURN` macros for code that can recover from error, or to prevent hitting internal assertions
+- Macros prefixed with `VOXEL_` are Godot-agnostic and may be used for portability in areas that don't depend on Godot too much.
 
 ### Performance
 
@@ -321,7 +321,7 @@ In performance-critical areas which run a lot:
 - In areas where performance matters, use the most direct APIs for the job. Especially, don't use nodes. See `RenderingServer` and `PhysicsServer`.
 - Only expose a function to the script API if it is safe to use and guaranteed to remain present for a while
 - Use `memnew` and `memdelete` instead of `new` and `delete` on types derived from Godot `Object`
-- Don't leave random prints. For verbose mode you may also use `ZN_PRINT_VERBOSE()` instead of `print_verbose()`.
+- Don't leave random prints. For verbose mode you may also use `VOXEL_PRINT_VERBOSE()` instead of `print_verbose()`.
 - Use `int` as argument for functions exposed to scripts if they don't need to exceed 2^31, even if they are never negative, so errors are clearer if the user makes a mistake
 - If possible, keep Godot usage to a minimum, to make the code more portable, and sometimes faster for GDExtension builds. Some areas use custom equivalents defined in `util/`.
 
@@ -332,9 +332,9 @@ Compiling as a module or an extension is both supported, so it involves some res
 
 ### Namespaces
 
-The intented namespaces are `zylann::` as main, and `zylann::voxel::` for voxel-related stuff. There may be others for different parts of the module.
+The intented namespaces are `voxel::` as main, and `voxel::` for voxel-related stuff. There may be others for different parts of the module.
 
-Registered classes are also namespaced to prevent conflicts. Namespaces do not appear in Godot's ClassDB, so voxel-related classes are also prefixed `Voxel`. Other more generic classes are prefixed `ZN_`.
+Registered classes are also namespaced to prevent conflicts. Namespaces do not appear in Godot's ClassDB, so voxel-related classes are also prefixed `Voxel`. Other more generic classes are prefixed `VOXEL_`.
 
 If a registered class needs the same name as an internal one, it can be placed into a `::godot` sub-namespace. On the other hand, internal classes can also be suffixed `Internal`.
 
@@ -452,7 +452,7 @@ A typical workflow is to launch Tracy, start a connection, and then launch the g
 !!! note
     These builds are experimental and will be reworked when Godot 4.6 is released with better Tracy support.
 
-Builds of Godot with the module and Tracy integrated are available for Windows, on [Github Actions](https://github.com/Zylann/godot_voxel/actions/workflows/windows.yml). The file to download will have `tracy` in the name. Note, you will need a Github account to download it.
+Builds of Godot with the module and Tracy integrated are available for Windows, on [Github Actions](https://github.com/Voxel/godot_voxel/actions/workflows/windows.yml). The file to download will have `tracy` in the name. Note, you will need a Github account to download it.
 
 !!! warning
     These builds start recording data immediately on startup. *That includes the project manager and the editor*. It can use a lot of memory (2 Gb just starting the editor). If you only want to profile the game, [use the command line](https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html#command-line-tutorial) to directly launch that build of Godot with your game, or just drop the executable at the root of your project and launch it.
@@ -495,7 +495,7 @@ You need to include `util/profiling.h` to access the macros.
 To profile a whole function:
 ```cpp
 void some_function() {
-    ZN_PROFILE_SCOPE();
+    VOXEL_PROFILE_SCOPE();
     //...
 }
 ```
@@ -507,7 +507,7 @@ void some_function() {
 
     // Could be an `if`, `for`, `while`, or a simple block as here
     {
-        ZN_PROFILE_SCOPE();
+        VOXEL_PROFILE_SCOPE();
         // Profiled code...
     }
 
@@ -515,7 +515,7 @@ void some_function() {
 }
 ```
 
-By default scopes take the name of the function, or file and a line number, but you can give a name explicitely using `ZN_PROFILE_SCOPE_NAMED("Hello")`. Only compile-time strings are supported, don't use `String` or `std::string`.
+By default scopes take the name of the function, or file and a line number, but you can give a name explicitely using `VOXEL_PROFILE_SCOPE_NAMED("Hello")`. Only compile-time strings are supported, don't use `String` or `std::string`.
 
 It is also possible to plot numeric values so they are displayed in the timeline too:
 
@@ -523,7 +523,7 @@ It is also possible to plot numeric values so they are displayed in the timeline
 void process_every_frame() {
     // Some code...
 
-    ZN_PROFILE_PLOT("Bunnies", bunnies.size());
+    VOXEL_PROFILE_PLOT("Bunnies", bunnies.size());
 }
 ```
 
@@ -556,9 +556,9 @@ SCons flag               | C++ Macro                       | Description
 
 ### Other macros
 
-- `MESHOPTIMIZER_ZYLANN_WRAP_LIBRARY_IN_NAMESPACE`: this one must be defined to prevent conflict with Godot's own version of MeshOptimizer. See [https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624](https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624)
-- `ZN_GODOT`: must be defined when compiling this project as a module.
-- `ZN_GODOT_EXTENSION`: must be defined when compiling this project as a GDExtension.
+- `MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE`: this one must be defined to prevent conflict with Godot's own version of MeshOptimizer. See [https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624](https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624)
+- `VOXEL_GODOT`: must be defined when compiling this project as a module.
+- `VOXEL_GODOT_EXTENSION`: must be defined when compiling this project as a GDExtension.
 
 
 Shaders
@@ -594,11 +594,11 @@ You will also need to define preprocessor macros in your `SCsub` file:
 
 ```py
 env_yourmodule.Append(CPPDEFINES = [
-    'ZN_GODOT'
+    'VOXEL_GODOT'
 ])
 ```
 
-TODO: since the implementation of [compiling-out features](https://github.com/Zylann/godot_voxel/issues/746), you will have a lot more of preprocessor symbols to define, since you may want to `#include` headers of the voxel engine that expect them to be defined or not. There is currently no helper to do this, so you have to add them manually in your `CPPDEFINES` array. See the [list of macros](#features).
+TODO: since the implementation of [compiling-out features](https://github.com/Voxel/godot_voxel/issues/746), you will have a lot more of preprocessor symbols to define, since you may want to `#include` headers of the voxel engine that expect them to be defined or not. There is currently no helper to do this, so you have to add them manually in your `CPPDEFINES` array. See the [list of macros](#features).
 
 !!! note
     While API docs cover functions you will also find in C++, internals sometimes only have comments. They are not documented outside, and there is no plan to do so. It is recommended to inspect the headers to find what is exposed, what namespaces to use etc. You may also read existing code in `.cpp` files to see how some things are used.

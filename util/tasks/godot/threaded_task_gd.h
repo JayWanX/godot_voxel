@@ -1,16 +1,16 @@
-#ifndef ZN_THREADED_TASK_GD
-#define ZN_THREADED_TASK_GD
+#ifndef VOXEL_THREADED_TASK_GD
+#define VOXEL_THREADED_TASK_GD
 
 #include "../../godot/classes/ref_counted.h"
 #include "../../godot/core/gdvirtual.h"
 #include "../threaded_task.h"
 
-namespace zylann {
+namespace voxel {
 
-class ZN_ThreadedTaskInternal;
+class VOXEL_ThreadedTaskInternal;
 
-class ZN_ThreadedTask : public RefCounted {
-	GDCLASS(ZN_ThreadedTask, RefCounted)
+class VOXEL_ThreadedTask : public RefCounted {
+	GDCLASS(VOXEL_ThreadedTask, RefCounted)
 public:
 	void run(int thread_index);
 	int get_priority();
@@ -29,10 +29,10 @@ private:
 	static void _bind_methods();
 
 	// Created upon scheduling, owned by the task runner
-	ZN_ThreadedTaskInternal *_scheduled_task = nullptr;
+	VOXEL_ThreadedTaskInternal *_scheduled_task = nullptr;
 	bool _completed = false;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_THREADED_TASK_GD
+#endif // VOXEL_THREADED_TASK_GD

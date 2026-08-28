@@ -6,7 +6,7 @@
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 
-namespace zylann::voxel::magica {
+namespace voxel::magica {
 
 const uint32_t PALETTE_SIZE = 256;
 
@@ -148,7 +148,7 @@ Basis parse_basis(uint8_t data) {
 
 	Vector3i magica_x, magica_y, magica_z;
 	transpose(x, y, z, magica_x, magica_y, magica_z);
-	// ZN_PRINT_VERBOSE(String("---\nX: {0}\nY: {1}\nZ: {2}")
+	// VOXEL_PRINT_VERBOSE(String("---\nX: {0}\nY: {1}\nZ: {2}")
 	// 					  .format(varray(magica_x.to_vec3(), magica_y.to_vec3(), magica_z.to_vec3())));
 	magica_x = magica_to_opengl(magica_x);
 	magica_y = magica_to_opengl(magica_y);
@@ -199,11 +199,11 @@ Error Data::load_from_file(String fpath) {
 }
 
 Error Data::_load_from_file(String fpath) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 	// https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
 	// https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox-extension.txt
 
-	ZN_PRINT_VERBOSE(format("Loading {}", fpath));
+	VOXEL_PRINT_VERBOSE(format("Loading {}", fpath));
 
 	Error open_err;
 	Ref<FileAccess> f_ref = godot::open_file(fpath, FileAccess::READ, open_err);
@@ -237,7 +237,7 @@ Error Data::_load_from_file(String fpath) {
 		const uint32_t chunk_size = f.get_32();
 		f.get_32(); // child_chunks_size
 
-		ZN_PRINT_VERBOSE(format("Reading chunk {} at {}, size={}", chunk_id, f.get_position(), chunk_size));
+		VOXEL_PRINT_VERBOSE(format("Reading chunk {} at {}, size={}", chunk_id, f.get_position(), chunk_size));
 
 		if (strcmp(chunk_id, "SIZE") == 0) {
 			Vector3i size;
@@ -323,7 +323,7 @@ Error Data::_load_from_file(String fpath) {
 				// It is 3 integers formatted as text
 				const PackedFloat64Array coords = t_it->second.split_floats(" ");
 				ERR_FAIL_COND_V(coords.size() < 3, ERR_PARSE_ERROR);
-				// ZN_PRINT_VERBOSE(String("Pos: {0}, {1}, {2}").format(varray(coords[0], coords[1], coords[2])));
+				// VOXEL_PRINT_VERBOSE(String("Pos: {0}, {1}, {2}").format(varray(coords[0], coords[1], coords[2])));
 				node.position = magica_to_opengl(Vector3i(coords[0], coords[1], coords[2]));
 			}
 
@@ -486,7 +486,7 @@ Error Data::_load_from_file(String fpath) {
 			_materials.insert(std::make_pair(material_id, std::move(material_ptr)));
 
 		} else {
-			ZN_PRINT_VERBOSE(format("Skipping chunk {}", chunk_id));
+			VOXEL_PRINT_VERBOSE(format("Skipping chunk {}", chunk_id));
 			// Ignore chunk
 			f.seek(f.get_position() + chunk_size);
 		}
@@ -576,7 +576,7 @@ Error Data::_load_from_file(String fpath) {
 		ERR_FAIL_COND_V_MSG(_root_node_id == -1, ERR_INVALID_DATA, "Root node not found");
 	}
 
-	ZN_PRINT_VERBOSE(format("Done loading {}", fpath));
+	VOXEL_PRINT_VERBOSE(format("Done loading {}", fpath));
 
 	return OK;
 }
@@ -631,4 +631,4 @@ const Material &Data::get_material_by_id(int id) const {
 	return *material;
 }
 
-} // namespace zylann::voxel::magica
+} // namespace voxel::magica

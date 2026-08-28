@@ -224,7 +224,7 @@ Graph generators can be modified from a script using the [VoxelGraphFunction](ap
 
 Nodes are identified by an ID, so you should give a name to nodes that you want to access so you can get their ID with `find_node_by_name`.
 
-Example in the Solar System demo: [https://github.com/Zylann/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306](https://github.com/Zylann/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306)
+Example in the Solar System demo: [https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306](https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306)
 
 
 Custom generator
@@ -306,7 +306,7 @@ Sometimes you need to write a custom generator that needs to produce structures 
 
 Contrary to other generators, `VoxelGeneratorMultipassCB` allows you to structure generation in several passes, where you can access neighbor chunks. It also works in columns, so you have access to a full vertical section of the world. Things like placing a structure across chunk borders just works.
 
-You may find early design information [in this issue](https://github.com/Zylann/godot_voxel/issues/545).
+You may find early design information [in this issue](https://github.com/Voxel/godot_voxel/issues/545).
 
 
 ### World model
@@ -430,7 +430,7 @@ In this case:
 - The reachable distance outside the main column is limited. It can be increased, but it gets expensive quickly. If you need to reach further to place very big structures spanning dozens of chunks across, you might have to think of a different approach. For example, generating a "blueprint" up-front (or deterministically), and rasterizing parts of it progressively when they intersect the column.
 - The same instance of generator cannot be shared between multiple terrains. If you need the same generator on two terrains, make a copy.
 - Implementation isn't ideal. `VoxelTerrain` is very generic and works with infinite cubic chunks, while this generator needed different constraints to work well. As a result, there is some overhead that could be avoided if the terrain was entirely rewritten and dedicated to this kind of column structure. It wasn't done because it would become less configurable, break compatibility and take time to develop. 
-- Currently, the column cache isn't saved, contrary to what was described in [issue 545](https://github.com/Zylann/godot_voxel/issues/545). So if the game restarts, some columns and their neighbors can be asked to generate again if blocks weren't saved in a `VoxelStream`. This can be mitigated by saving generated blocks with `VoxelStream.save_generator_output`. In general, don't expect `VoxelGenerator` to be called only once for a given chunk, because it might be called again in corner cases. Generators should be deterministic and not have race conditions.
+- Currently, the column cache isn't saved, contrary to what was described in [issue 545](https://github.com/Voxel/godot_voxel/issues/545). So if the game restarts, some columns and their neighbors can be asked to generate again if blocks weren't saved in a `VoxelStream`. This can be mitigated by saving generated blocks with `VoxelStream.save_generator_output`. In general, don't expect `VoxelGenerator` to be called only once for a given chunk, because it might be called again in corner cases. Generators should be deterministic and not have race conditions.
 
 
 Modifiers

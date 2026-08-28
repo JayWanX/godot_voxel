@@ -2,12 +2,12 @@
 #include "../../util/godot/classes/rd_uniform.h"
 #include "../voxel_engine.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 void add_uniform_params(const StdVector<ComputeShaderParameter> &params, Array &uniforms, const RID filtering_sampler) {
 	for (const ComputeShaderParameter &p : params) {
-		ZN_ASSERT(p.resource != nullptr);
-		ZN_ASSERT(p.resource->get_rid().is_valid());
+		VOXEL_ASSERT(p.resource != nullptr);
+		VOXEL_ASSERT(p.resource->get_rid().is_valid());
 
 		Ref<RDUniform> uniform;
 		uniform.instantiate();
@@ -27,7 +27,7 @@ void add_uniform_params(const StdVector<ComputeShaderParameter> &params, Array &
 
 			default:
 				// May add more types if necessary
-				ZN_CRASH_MSG("Unhandled type");
+				VOXEL_CRASH_MSG("Unhandled type");
 				break;
 		}
 
@@ -37,4 +37,4 @@ void add_uniform_params(const StdVector<ComputeShaderParameter> &params, Array &
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

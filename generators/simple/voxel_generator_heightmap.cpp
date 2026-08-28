@@ -2,11 +2,11 @@
 #include "../../util/containers/fixed_array.h"
 #include "../../util/containers/span.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel {
+namespace voxel {
 
 VoxelGeneratorHeightmap::VoxelGeneratorHeightmap() {}
 
@@ -114,4 +114,4 @@ void VoxelGeneratorHeightmap::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "iso_scale"), "set_iso_scale", "get_iso_scale");
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

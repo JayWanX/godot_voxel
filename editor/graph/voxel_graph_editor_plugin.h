@@ -8,17 +8,17 @@
 #include "../../util/macros.h"
 #include "voxel_graph_node_inspector_wrapper.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Button)
+VOXEL_GODOT_FORWARD_DECLARE(class Button)
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelGraphEditor;
 class VoxelNode;
 class VoxelGraphEditorWindow;
 class VoxelGraphEditorIODialog;
 
-class VoxelGraphEditorPlugin : public zylann::godot::ZN_EditorPlugin {
-	GDCLASS(VoxelGraphEditorPlugin, zylann::godot::ZN_EditorPlugin)
+class VoxelGraphEditorPlugin : public voxel::godot::VOXEL_EditorPlugin {
+	GDCLASS(VoxelGraphEditorPlugin, voxel::godot::VOXEL_EditorPlugin)
 public:
 	VoxelGraphEditorPlugin();
 
@@ -27,9 +27,9 @@ public:
 private:
 	void init();
 
-	bool _zn_handles(const Object *p_object) const override;
-	void _zn_edit(Object *p_object) override;
-	void _zn_make_visible(bool visible) override;
+	bool _voxel_handles(const Object *p_object) const override;
+	void _voxel_edit(Object *p_object) override;
+	void _voxel_make_visible(bool visible) override;
 
 	void _notification(int p_what);
 
@@ -54,7 +54,7 @@ private:
 	VoxelGraphEditorIODialog *_io_dialog = nullptr;
 	Button *_bottom_panel_button = nullptr;
 	bool _deferred_visibility_scheduled = false;
-	zylann::godot::ObjectWeakRef<VoxelNode> _voxel_node;
+	voxel::godot::ObjectWeakRef<VoxelNode> _voxel_node;
 	StdVector<Ref<VoxelGraphNodeInspectorWrapper>> _node_wrappers;
 	// Workaround for a new Godot 4 behavior:
 	// When we inspect an object, Godot calls `edit(nullptr)` on our plugin first, and `make_visible(false)`.
@@ -68,6 +68,6 @@ private:
 	bool _ignore_make_visible = false;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_GRAPH_EDITOR_PLUGIN_H

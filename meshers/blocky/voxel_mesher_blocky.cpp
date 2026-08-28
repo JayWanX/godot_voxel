@@ -15,13 +15,13 @@
 #include "blocky_lod_skirts.h"
 #include "blocky_shadow_occluders.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/class_db.h"
 #endif
 
-using namespace zylann::godot;
+using namespace voxel::godot;
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace blocky {
 
@@ -285,7 +285,7 @@ void generate_mesh(
 
 						VoxelMesherBlocky::Arrays &arrays = out_arrays_per_material[surface.material_id];
 
-						ZN_ASSERT(surface.material_id < index_offsets.size());
+						VOXEL_ASSERT(surface.material_id < index_offsets.size());
 						int &index_offset = index_offsets[surface.material_id];
 
 						const BakedModel::SideSurface &side_surface = (*side_surfaces)[surface_index];
@@ -423,7 +423,7 @@ void generate_mesh(
 
 					VoxelMesherBlocky::Arrays &arrays = out_arrays_per_material[surface.material_id];
 
-					ZN_ASSERT(surface.material_id < index_offsets.size());
+					VOXEL_ASSERT(surface.material_id < index_offsets.size());
 					int &index_offset = index_offsets[surface.material_id];
 
 					const StdVector<Vector3f> &positions = surface.positions;
@@ -558,7 +558,7 @@ VoxelMesherBlocky::TintMode VoxelMesherBlocky::get_tint_mode() const {
 }
 
 void VoxelMesherBlocky::set_tint_mode(const VoxelMesherBlocky::TintMode new_mode) {
-	ZN_ASSERT_RETURN(new_mode >= 0 && new_mode < TINT_MODE_COUNT);
+	VOXEL_ASSERT_RETURN(new_mode >= 0 && new_mode < TINT_MODE_COUNT);
 	RWLockWrite wlock(_parameters_lock);
 	_parameters.tint_mode = new_mode;
 }
@@ -831,7 +831,7 @@ int VoxelMesherBlocky::get_used_channels_mask() const {
 			mask |= (1 << VoxelBuffer::CHANNEL_COLOR);
 			break;
 		default:
-			ZN_PRINT_ERROR_ONCE("Unknown tint mode");
+			VOXEL_PRINT_ERROR_ONCE("Unknown tint mode");
 			break;
 	}
 	return mask;
@@ -859,7 +859,7 @@ void VoxelMesherBlocky::get_configuration_warnings(PackedStringArray &out_warnin
 	Ref<VoxelBlockyLibraryBase> library = get_library();
 
 	if (library.is_null()) {
-		out_warnings.append(String(ZN_TTR("{0} has no {1} assigned."))
+		out_warnings.append(String(VOXEL_TTR("{0} has no {1} assigned."))
 									.format(
 											varray(VoxelMesherBlocky::get_class_static(),
 												   VoxelBlockyLibraryBase::get_class_static())
@@ -871,7 +871,7 @@ void VoxelMesherBlocky::get_configuration_warnings(PackedStringArray &out_warnin
 	RWLockRead rlock(library->get_baked_data_rw_lock());
 
 	if (baked_data.models.size() == 0) {
-		out_warnings.append(String(ZN_TTR("The {0} assigned to {1} has no baked models."))
+		out_warnings.append(String(VOXEL_TTR("The {0} assigned to {1} has no baked models."))
 									.format(varray(library->get_class(), VoxelMesherBlocky::get_class_static())));
 		return;
 	}
@@ -949,4 +949,4 @@ void VoxelMesherBlocky::_bind_methods() {
 	BIND_ENUM_CONSTANT(TINT_RAW_COLOR);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

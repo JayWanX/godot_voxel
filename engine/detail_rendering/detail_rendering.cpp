@@ -11,12 +11,12 @@
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 namespace {
 
 void dilate_normalmap(Span<Vector3f> normals, Vector2i size) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	static const int s_dx[4] = { -1, 1, 0, 0 };
 	static const int s_dy[4] = { 0, 0, -1, 1 };
@@ -87,12 +87,12 @@ DetailTextureData::Tile compute_tile_info(
 	}
 
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(cell_info.position.x >= 0);
-	ZN_ASSERT(cell_info.position.y >= 0);
-	ZN_ASSERT(cell_info.position.z >= 0);
-	ZN_ASSERT(cell_info.position.x < 256);
-	ZN_ASSERT(cell_info.position.y < 256);
-	ZN_ASSERT(cell_info.position.z < 256);
+	VOXEL_ASSERT(cell_info.position.x >= 0);
+	VOXEL_ASSERT(cell_info.position.y >= 0);
+	VOXEL_ASSERT(cell_info.position.z >= 0);
+	VOXEL_ASSERT(cell_info.position.x < 256);
+	VOXEL_ASSERT(cell_info.position.y < 256);
+	VOXEL_ASSERT(cell_info.position.z < 256);
 #endif
 	const DetailTextureData::Tile tile{ //
 										uint8_t(cell_info.position.x), //
@@ -121,7 +121,7 @@ void get_axis_indices(math::Axis axis, unsigned int &ax, unsigned int &ay, unsig
 			az = math::AXIS_Z;
 			break;
 		default:
-			ZN_CRASH();
+			VOXEL_CRASH();
 	}
 }
 
@@ -139,7 +139,7 @@ unsigned int prepare_triangles(
 	for (unsigned int ti = 0; ti < cell_info.triangle_count; ++ti) {
 		const unsigned int ii0 = cell_info.triangle_begin_indices[ti];
 #ifdef DEBUG_ENABLED
-		ZN_ASSERT(ii0 + 2 < mesh_indices.size());
+		VOXEL_ASSERT(ii0 + 2 < mesh_indices.size());
 #endif
 		const unsigned vi0 = mesh_indices[ii0];
 		const unsigned vi1 = mesh_indices[ii0 + 1];
@@ -195,7 +195,7 @@ void query_sdf_with_edits(
 		Vector3f query_min_pos,
 		Vector3f query_max_pos
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	VoxelDataGrid::LockRead rlock(grid);
 
@@ -218,7 +218,7 @@ void query_sdf_with_edits(
 
 		// Gather 8 samples from edited voxels
 		{
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 			for (int z = 0; z < 2; ++z) {
 				for (int y = 0; y < 2; ++y) {
 					for (int x = 0; x < 2; ++x) {
@@ -244,7 +244,7 @@ void query_sdf_with_edits(
 		// Complete samples with generator. Note, these samples are not scaled since we are working with floats instead
 		// of encoded buffer values.
 		if (gen_count > 0) {
-			ZN_PROFILE_SCOPE();
+			VOXEL_PROFILE_SCOPE();
 			FixedArray<float, 8> gen_samples;
 
 			generator.generate_series(
@@ -301,7 +301,7 @@ bool try_query_edited_blocks(
 		Vector3f query_max_pos,
 		uint32_t &skipped_count_due_to_high_volume
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	// Pad by 1 in case there are neighboring edited voxels. If not done, it creates a grid pattern following LOD0 block
 	// boundaries because samples near there assume there was no edited neighbors when interpolating
@@ -353,13 +353,13 @@ inline void query_sdf(
 		Vector3f query_min_pos,
 		Vector3f query_max_pos
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	if (edited_voxel_data != nullptr) {
 #ifdef VOXEL_ENABLE_MODIFIERS
 		// Usually if there are edits, it means there is a modifier stack too. Could be optional, but currently no
 		// reason not to be there either.
-		ZN_ASSERT(modifiers != nullptr);
+		VOXEL_ASSERT(modifiers != nullptr);
 #endif
 
 		query_sdf_with_edits(
@@ -400,7 +400,7 @@ inline void query_sdf(
 
 #if DEBUG_ENABLED
 	for (const float sd : query_sdf_buffer) {
-		ZN_ASSERT(!(math::is_nan(sd) || math::is_inf(sd)));
+		VOXEL_ASSERT(!(math::is_nan(sd) || math::is_inf(sd)));
 	}
 #endif
 }
@@ -423,10 +423,10 @@ void compute_detail_texture_data(
 		float max_deviation_radians,
 		bool edited_tiles_only
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
-	ZN_ASSERT_RETURN(generator.supports_series_generation());
-	ZN_ASSERT_RETURN_MSG(max_deviation_radians > 0.001f, "Max deviation angle is too small.");
+	VOXEL_ASSERT_RETURN(generator.supports_series_generation());
+	VOXEL_ASSERT_RETURN_MSG(max_deviation_radians > 0.001f, "Max deviation angle is too small.");
 
 	const float max_deviation_cosine = Math::cos(max_deviation_radians);
 	const float max_deviation_sine = Math::sin(max_deviation_radians);
@@ -532,7 +532,7 @@ void compute_detail_texture_data(
 
 		// Fill query buffers
 		{
-			ZN_PROFILE_SCOPE_NAMED("Compute positions");
+			VOXEL_PROFILE_SCOPE_NAMED("Compute positions");
 			for (unsigned int yi = 0; yi < tile_resolution; ++yi) {
 				for (unsigned int xi = 0; xi < tile_resolution; ++xi) {
 					// TODO Add bias to center differences when calculating the normals?
@@ -620,8 +620,8 @@ void compute_detail_texture_data(
 
 		// Compute normals from SDF results
 		{
-			ZN_PROFILE_SCOPE_NAMED("Compute normals");
-			ZN_ASSERT(tls_tile_sample_positions.size() == tls_tile_sample_triangle_index.size());
+			VOXEL_PROFILE_SCOPE_NAMED("Compute normals");
+			VOXEL_ASSERT(tls_tile_sample_positions.size() == tls_tile_sample_triangle_index.size());
 
 			unsigned int bi = 0;
 
@@ -636,10 +636,10 @@ void compute_detail_texture_data(
 				bi += 4;
 				// TODO I wish this was solved https://github.com/godotengine/godot/issues/31608
 #ifdef DEBUG_ENABLED
-				ZN_ASSERT(bi000 < tls_sdf_buffer.size());
-				ZN_ASSERT(bi100 < tls_sdf_buffer.size());
-				ZN_ASSERT(bi010 < tls_sdf_buffer.size());
-				ZN_ASSERT(bi001 < tls_sdf_buffer.size());
+				VOXEL_ASSERT(bi000 < tls_sdf_buffer.size());
+				VOXEL_ASSERT(bi100 < tls_sdf_buffer.size());
+				VOXEL_ASSERT(bi010 < tls_sdf_buffer.size());
+				VOXEL_ASSERT(bi001 < tls_sdf_buffer.size());
 #endif
 				const float sd000 = tls_sdf_buffer[bi000];
 				const float sd100 = tls_sdf_buffer[bi100];
@@ -664,7 +664,7 @@ void compute_detail_texture_data(
 
 				const unsigned int normal_index = sample_position.x + sample_position.y * tile_resolution;
 #ifdef DEBUG_ENABLED
-				ZN_ASSERT(normal_index < tls_tile_normals.size());
+				VOXEL_ASSERT(normal_index < tls_tile_normals.size());
 #endif
 				tls_tile_normals[normal_index] = normal;
 			}
@@ -685,7 +685,7 @@ void compute_detail_texture_data(
 		if (octahedral_encoding) {
 			for (unsigned int i = 0; i < tls_tile_normals.size(); ++i) {
 				const unsigned int offset = tile_begin + i * encoded_normal_size;
-				ZN_ASSERT(offset + encoded_normal_size <= normal_map_data.normals.size());
+				VOXEL_ASSERT(offset + encoded_normal_size <= normal_map_data.normals.size());
 				const Vector2f n = encode_normal_octahedron(tls_tile_normals[i]);
 				normal_map_data.normals[offset + 0] = unorm_to_u8(n.x);
 				normal_map_data.normals[offset + 1] = unorm_to_u8(n.y);
@@ -693,7 +693,7 @@ void compute_detail_texture_data(
 		} else {
 			for (unsigned int i = 0; i < tls_tile_normals.size(); ++i) {
 				const unsigned int offset = tile_begin + i * encoded_normal_size; //
-				ZN_ASSERT(offset + encoded_normal_size <= normal_map_data.normals.size());
+				VOXEL_ASSERT(offset + encoded_normal_size <= normal_map_data.normals.size());
 				const Vector3f n = encode_normal_xyz(tls_tile_normals[i]);
 				normal_map_data.normals[offset + 0] = unorm_to_u8(n.x);
 				normal_map_data.normals[offset + 1] = unorm_to_u8(n.y);
@@ -704,7 +704,7 @@ void compute_detail_texture_data(
 
 	if (skipped_count_due_to_high_volume > 0) {
 		// Logging here to reduce spam
-		ZN_PRINT_VERBOSE(format(
+		VOXEL_PRINT_VERBOSE(format(
 				"Virtual normalmaps: fell back on generator for {} tiles, box too big to render edited voxels (lod {})",
 				skipped_count_due_to_high_volume,
 				lod_index
@@ -713,7 +713,7 @@ void compute_detail_texture_data(
 }
 
 Ref<Image> store_lookup_to_image(const StdVector<DetailTextureData::Tile> &tiles, Vector3i block_size) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const unsigned int sqri = get_square_grid_size_from_item_count(Vector3iUtil::get_volume_u64(block_size));
 
@@ -738,11 +738,11 @@ Ref<Image> store_lookup_to_image(const StdVector<DetailTextureData::Tile> &tiles
 #ifdef DEBUG_ENABLED
 			if (tile_index > 0x3fff && !tile_index_overflow) {
 				tile_index_overflow = true;
-				ZN_PRINT_VERBOSE("Tile index overflow");
+				VOXEL_PRINT_VERBOSE("Tile index overflow");
 			}
 #endif
 			const unsigned int pi = pixel_size * (tile.x + tile.y * block_size.x + tile.z * deck_size);
-			ZN_ASSERT(int(pi) < bytes.size());
+			VOXEL_ASSERT(int(pi) < bytes.size());
 			bytes_w[pi] = r;
 			bytes_w[pi + 1] = g;
 		}
@@ -760,7 +760,7 @@ Vector<Ref<Image>> store_atlas_to_image_array(
 		unsigned int tile_count,
 		bool octahedral_encoding
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const unsigned int pixel_size = octahedral_encoding ? 2 : 4;
 	const Image::Format format =
@@ -799,7 +799,7 @@ Ref<Image> store_atlas_to_image(
 		unsigned int tile_count,
 		bool octahedral_encoding
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	const unsigned int pixel_size = octahedral_encoding ? 2 : 4;
 	const Image::Format format =
@@ -843,7 +843,7 @@ DetailImages store_normalmap_data_to_images(
 		Vector3i block_size,
 		bool octahedral_encoding
 ) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	DetailImages images;
 #ifdef VOXEL_VIRTUAL_TEXTURE_USE_TEXTURE_ARRAY
@@ -857,17 +857,17 @@ DetailImages store_normalmap_data_to_images(
 
 // Converts normalmap data into textures. They can be used in a shader to apply normals and obtain extra visual details.
 DetailTextures store_normalmap_data_to_textures(const DetailImages &data) {
-	ZN_PROFILE_SCOPE();
+	VOXEL_PROFILE_SCOPE();
 
 	DetailTextures textures;
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Atlas texture");
+		VOXEL_PROFILE_SCOPE_NAMED("Atlas texture");
 #ifdef VOXEL_VIRTUAL_TEXTURE_USE_TEXTURE_ARRAY
 		Ref<Texture2DArray> atlas;
 		atlas.instantiate();
 		const Error err = atlas->create_from_images(data.atlas);
-		ZN_ASSERT_RETURN_V(err == OK, textures);
+		VOXEL_ASSERT_RETURN_V(err == OK, textures);
 		textures.atlas = atlas;
 #else
 		textures.atlas = ImageTexture::create_from_image(data.atlas);
@@ -875,7 +875,7 @@ DetailTextures store_normalmap_data_to_textures(const DetailImages &data) {
 	}
 
 	{
-		ZN_PROFILE_SCOPE_NAMED("Lookup texture");
+		VOXEL_PROFILE_SCOPE_NAMED("Lookup texture");
 		Ref<ImageTexture> lookup = ImageTexture::create_from_image(data.lookup);
 		textures.lookup = lookup;
 	}
@@ -905,15 +905,15 @@ void copy_2d_region_from_packed_to_atlased(
 		const unsigned int item_size_in_bytes
 ) {
 #ifdef DEBUG_ENABLED
-	ZN_ASSERT(src_size.x >= 0 && src_size.y >= 0);
-	ZN_ASSERT(dst_size.x >= 0 && dst_size.y >= 0);
-	ZN_ASSERT(
+	VOXEL_ASSERT(src_size.x >= 0 && src_size.y >= 0);
+	VOXEL_ASSERT(dst_size.x >= 0 && dst_size.y >= 0);
+	VOXEL_ASSERT(
 			dst_pos.x >= 0 && dst_pos.y >= 0 && dst_pos.x + src_size.x <= dst_size.x &&
 			dst_pos.y + src_size.y <= dst_size.y
 	);
-	ZN_ASSERT(src.size() == src_size.x * src_size.y * item_size_in_bytes);
-	ZN_ASSERT(dst.size() == dst_size.x * dst_size.y * item_size_in_bytes);
-	ZN_ASSERT(!src.overlaps(dst));
+	VOXEL_ASSERT(src.size() == src_size.x * src_size.y * item_size_in_bytes);
+	VOXEL_ASSERT(dst.size() == dst_size.x * dst_size.y * item_size_in_bytes);
+	VOXEL_ASSERT(!src.overlaps(dst));
 #endif
 	const unsigned int dst_begin = (dst_pos.x + dst_pos.y * dst_size.x) * item_size_in_bytes;
 	const unsigned int src_row_size = src_size.x * item_size_in_bytes;
@@ -927,4 +927,4 @@ void copy_2d_region_from_packed_to_atlased(
 	}
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

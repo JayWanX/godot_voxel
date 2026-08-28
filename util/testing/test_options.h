@@ -1,11 +1,11 @@
-#ifndef ZN_TEST_OPTIONS_H
-#define ZN_TEST_OPTIONS_H
+#ifndef VOXEL_TEST_OPTIONS_H
+#define VOXEL_TEST_OPTIONS_H
 
 #include "../containers/std_vector.h"
 #include "../godot/core/dictionary.h"
 #include "../string/std_string.h"
 
-namespace zylann::testing {
+namespace voxel::testing {
 
 class TestOptions {
 public:
@@ -19,6 +19,6 @@ private:
 	StdVector<StdString> _includes;
 };
 
-} // namespace zylann::testing
+} // namespace voxel::testing
 
-#endif // ZN_TEST_OPTIONS_H
+#endif // VOXEL_TEST_OPTIONS_H

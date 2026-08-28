@@ -1,10 +1,10 @@
-#ifndef ZN_MUTEX_H
-#define ZN_MUTEX_H
+#ifndef VOXEL_MUTEX_H
+#define VOXEL_MUTEX_H
 
 // #include "../profiling.h"
 #include <mutex>
 
-namespace zylann {
+namespace voxel {
 
 template <class StdMutexT>
 class MutexImpl {
@@ -12,7 +12,7 @@ class MutexImpl {
 
 public:
 	inline void lock() const {
-		// ZN_PROFILE_SCOPE();
+		// VOXEL_PROFILE_SCOPE();
 		mutex.lock();
 	}
 
@@ -53,6 +53,6 @@ using BinaryMutex = MutexImpl<std::mutex>; // Non-recursive, handle with care
 // extern template class MutexLock<MutexImpl<std::recursive_mutex>>;
 // extern template class MutexLock<MutexImpl<std::mutex>>;
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_MUTEX_H
+#endif // VOXEL_MUTEX_H

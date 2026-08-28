@@ -2,28 +2,28 @@
 #include "../constants/voxel_string_names.h"
 #include "../util/string/format.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../util/godot/core/class_db.h"
 #endif
 
-namespace zylann::voxel::godot {
+namespace voxel::godot {
 
 void VoxelFormat::set_channel_depth(const VoxelBuffer::ChannelId channel_index, const VoxelBuffer::Depth depth) {
-	ZN_ASSERT_RETURN(channel_index >= 0 && channel_index < _internal.depths.size());
+	VOXEL_ASSERT_RETURN(channel_index >= 0 && channel_index < _internal.depths.size());
 
-	zylann::voxel::VoxelBuffer::Depth idepth = static_cast<zylann::voxel::VoxelBuffer::Depth>(depth);
+	voxel::VoxelBuffer::Depth idepth = static_cast<voxel::VoxelBuffer::Depth>(depth);
 
-	zylann::voxel::VoxelBuffer::ChannelId ichannel_index =
-			static_cast<zylann::voxel::VoxelBuffer::ChannelId>(channel_index);
-	const zylann::voxel::VoxelFormat::DepthRange supported_range =
-			zylann::voxel::VoxelFormat::get_supported_depths(ichannel_index);
+	voxel::VoxelBuffer::ChannelId ichannel_index =
+			static_cast<voxel::VoxelBuffer::ChannelId>(channel_index);
+	const voxel::VoxelFormat::DepthRange supported_range =
+			voxel::VoxelFormat::get_supported_depths(ichannel_index);
 
-	const unsigned int byte_count = zylann::voxel::VoxelBuffer::get_depth_byte_count(idepth);
+	const unsigned int byte_count = voxel::VoxelBuffer::get_depth_byte_count(idepth);
 	if (!supported_range.contains(byte_count)) {
-		ZN_PRINT_ERROR(
+		VOXEL_PRINT_ERROR(
 				format("Depth of {}-bits is not supported by channel `{}`",
 					   byte_count,
-					   zylann::voxel::VoxelBuffer::get_channel_name(ichannel_index))
+					   voxel::VoxelBuffer::get_channel_name(ichannel_index))
 		);
 		return;
 	}
@@ -36,18 +36,18 @@ void VoxelFormat::set_channel_depth(const VoxelBuffer::ChannelId channel_index, 
 }
 
 VoxelBuffer::Depth VoxelFormat::get_channel_depth(const VoxelBuffer::ChannelId channel_index) const {
-	ZN_ASSERT_RETURN_V(channel_index >= 0 && channel_index < _internal.depths.size(), VoxelBuffer::DEPTH_COUNT);
+	VOXEL_ASSERT_RETURN_V(channel_index >= 0 && channel_index < _internal.depths.size(), VoxelBuffer::DEPTH_COUNT);
 	return static_cast<VoxelBuffer::Depth>(_internal.depths[channel_index]);
 }
 
 void VoxelFormat::configure_buffer(Ref<VoxelBuffer> buffer) const {
-	ZN_ASSERT_RETURN(buffer.is_valid());
+	VOXEL_ASSERT_RETURN(buffer.is_valid());
 	_internal.configure_buffer(buffer->get_buffer());
 }
 
 Ref<VoxelBuffer> VoxelFormat::create_buffer(const Vector3i size) const {
 	Ref<VoxelBuffer> buffer;
-	ZN_ASSERT_RETURN_V(Vector3iUtil::is_valid_size(size), buffer);
+	VOXEL_ASSERT_RETURN_V(Vector3iUtil::is_valid_size(size), buffer);
 	buffer.instantiate();
 	_internal.configure_buffer(buffer->get_buffer());
 	if (size != Vector3i()) {
@@ -57,15 +57,15 @@ Ref<VoxelBuffer> VoxelFormat::create_buffer(const Vector3i size) const {
 }
 
 void VoxelFormat::_b_set_data(const Array &data) {
-	ZN_ASSERT_RETURN(data.size() >= 1);
+	VOXEL_ASSERT_RETURN(data.size() >= 1);
 	const int version = data[0];
-	ZN_ASSERT_RETURN(version == 0);
+	VOXEL_ASSERT_RETURN(version == 0);
 
-	ZN_ASSERT_RETURN(data.size() == 9);
+	VOXEL_ASSERT_RETURN(data.size() == 9);
 	for (unsigned int channel_index = 0; channel_index < _internal.depths.size(); ++channel_index) {
 		const int depth = data[1 + channel_index];
-		ZN_ASSERT_CONTINUE(depth >= 0 && depth < VoxelBuffer::DEPTH_COUNT);
-		_internal.depths[channel_index] = static_cast<zylann::voxel::VoxelBuffer::Depth>(depth);
+		VOXEL_ASSERT_CONTINUE(depth >= 0 && depth < VoxelBuffer::DEPTH_COUNT);
+		_internal.depths[channel_index] = static_cast<voxel::VoxelBuffer::Depth>(depth);
 	}
 }
 
@@ -126,4 +126,4 @@ void VoxelFormat::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel::godot
+} // namespace voxel::godot

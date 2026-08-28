@@ -3,7 +3,7 @@
 #include "../node_type_db.h"
 #include "util.h"
 
-namespace zylann::voxel::pg {
+namespace voxel::pg {
 
 void register_sdf_nodes(Span<NodeType> types) {
 	using namespace math;
@@ -211,7 +211,7 @@ void register_sdf_nodes(Span<NodeType> types) {
 			ctx.set_params(p);
 		};
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_SDF_SMOOTH_UNION");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_SDF_SMOOTH_UNION");
 			bool a_ignored;
 			bool b_ignored;
 			const Runtime::Buffer &a = ctx.try_get_input(0, a_ignored);
@@ -315,7 +315,7 @@ void register_sdf_nodes(Span<NodeType> types) {
 			ctx.set_params(p);
 		};
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
-			ZN_PROFILE_SCOPE_NAMED("NODE_SDF_SMOOTH_SUBTRACT");
+			VOXEL_PROFILE_SCOPE_NAMED("NODE_SDF_SMOOTH_SUBTRACT");
 			bool a_ignored;
 			bool b_ignored;
 			const Runtime::Buffer &a = ctx.try_get_input(0, a_ignored);
@@ -420,4 +420,4 @@ void register_sdf_nodes(Span<NodeType> types) {
 	}
 }
 
-} // namespace zylann::voxel::pg
+} // namespace voxel::pg

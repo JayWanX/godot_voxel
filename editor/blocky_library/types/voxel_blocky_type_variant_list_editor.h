@@ -5,13 +5,13 @@
 #include "../../../util/containers/std_vector.h"
 #include "../../../util/godot/classes/v_box_container.h"
 
-ZN_GODOT_FORWARD_DECLARE(class Label);
-ZN_GODOT_FORWARD_DECLARE(class EditorResourcePicker);
-ZN_GODOT_FORWARD_DECLARE(class GridContainer);
-ZN_GODOT_FORWARD_DECLARE(class EditorInterface);
-ZN_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
+VOXEL_GODOT_FORWARD_DECLARE(class Label);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorResourcePicker);
+VOXEL_GODOT_FORWARD_DECLARE(class GridContainer);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorInterface);
+VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
 
-namespace zylann::voxel {
+namespace voxel {
 
 // Allows to edit a map of attribute combination and associated models.
 // This cannot be exposed as regular properties, therefore it is a custom comtrol.
@@ -48,6 +48,6 @@ private:
 	EditorUndoRedoManager *_undo_redo = nullptr;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_BLOCKY_TYPE_VARIANT_LIST_EDITOR_H

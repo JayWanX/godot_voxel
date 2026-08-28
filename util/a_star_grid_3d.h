@@ -1,5 +1,5 @@
-#ifndef ZN_ASTAR_GRID_3D_H
-#define ZN_ASTAR_GRID_3D_H
+#ifndef VOXEL_ASTAR_GRID_3D_H
+#define VOXEL_ASTAR_GRID_3D_H
 
 #include "../util/containers/std_unordered_map.h"
 #include "../util/containers/std_vector.h"
@@ -9,7 +9,7 @@
 #include <limits>
 #include <unordered_map>
 
-namespace zylann {
+namespace voxel {
 
 // Variant of AStar specialized in 3D grids.
 // This implementation can be executed step by step, for debugging or spreading cost over time.
@@ -164,6 +164,6 @@ private:
 	StdVector<Vector3i> _neighbor_positions;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_ASTAR_GRID_3D_H
+#endif // VOXEL_ASTAR_GRID_3D_H

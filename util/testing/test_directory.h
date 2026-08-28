@@ -1,9 +1,9 @@
-#ifndef ZN_TEST_DIRECTORY_H
-#define ZN_TEST_DIRECTORY_H
+#ifndef VOXEL_TEST_DIRECTORY_H
+#define VOXEL_TEST_DIRECTORY_H
 
 #include "../godot/core/string.h"
 
-namespace zylann::testing {
+namespace voxel::testing {
 
 // Creates a temporary directory when an instance of this class is created, and removes it after use
 class TestDirectory {
@@ -21,6 +21,6 @@ private:
 	bool _valid = false;
 };
 
-} // namespace zylann::testing
+} // namespace voxel::testing
 
-#endif // ZN_TEST_DIRECTORY_H
+#endif // VOXEL_TEST_DIRECTORY_H

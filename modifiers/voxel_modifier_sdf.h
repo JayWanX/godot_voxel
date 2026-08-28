@@ -3,7 +3,7 @@
 
 #include "voxel_modifier.h"
 
-namespace zylann::voxel {
+namespace voxel {
 
 class VoxelModifierSdf : public VoxelModifier {
 public:
@@ -39,6 +39,6 @@ private:
 	// float _margin = 0.f;
 };
 
-} // namespace zylann::voxel
+} // namespace voxel
 
 #endif // VOXEL_MODIFIER_SDF_H

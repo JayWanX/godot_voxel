@@ -6,23 +6,23 @@
 #include "fast_noise_lite_editor_inspector_plugin.h"
 #include "fast_noise_lite_viewer.h"
 
-namespace zylann {
+namespace voxel {
 
-ZN_FastNoiseLiteEditorPlugin::ZN_FastNoiseLiteEditorPlugin() {}
+VOXEL_FastNoiseLiteEditorPlugin::VOXEL_FastNoiseLiteEditorPlugin() {}
 
-String ZN_FastNoiseLiteEditorPlugin::_zn_get_plugin_name() const {
-	return ZN_FastNoiseLite::get_class_static();
+String VOXEL_FastNoiseLiteEditorPlugin::_voxel_get_plugin_name() const {
+	return VOXEL_FastNoiseLite::get_class_static();
 }
 
-void ZN_FastNoiseLiteEditorPlugin::_notification(int p_what) {
+void VOXEL_FastNoiseLiteEditorPlugin::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
 			Control *base_control = get_editor_interface()->get_base_control();
 
-			_noise_analysis_window = memnew(ZN_NoiseAnalysisWindow);
+			_noise_analysis_window = memnew(VOXEL_NoiseAnalysisWindow);
 			base_control->add_child(_noise_analysis_window);
 
-			Ref<ZN_FastNoiseLiteEditorInspectorPlugin> plugin;
+			Ref<VOXEL_FastNoiseLiteEditorInspectorPlugin> plugin;
 			plugin.instantiate();
 			plugin->set_noise_analysis_window(_noise_analysis_window);
 			add_inspector_plugin(plugin);
@@ -33,4 +33,4 @@ void ZN_FastNoiseLiteEditorPlugin::_notification(int p_what) {
 	}
 }
 
-} // namespace zylann
+} // namespace voxel

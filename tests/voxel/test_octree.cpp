@@ -10,7 +10,7 @@
 #include "../../util/profiling_clock.h"
 #include "../../util/testing/test_macros.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_octree_update() {
 	static const float lod_distance = 80;
@@ -28,7 +28,7 @@ void test_octree_update() {
 	const Box3i viewer_box_octrees = viewer_box_voxels.downscaled(octree_size);
 	viewer_box_octrees.for_each_cell([&octrees](Vector3i pos) {
 		std::pair<StdMap<Vector3i, LodOctree>::iterator, bool> p = octrees.insert({ pos, LodOctree() });
-		ZN_ASSERT(p.second);
+		VOXEL_ASSERT(p.second);
 		LodOctree &octree = p.first->second;
 		LodOctree::NoDestroyAction nda;
 		octree.create(lod_count, nda);
@@ -86,7 +86,7 @@ void test_octree_update() {
 		octree.update(actions);
 
 		initial_block_count += actions.created_count;
-		ZN_TEST_ASSERT(actions.destroyed_count == 0);
+		VOXEL_TEST_ASSERT(actions.destroyed_count == 0);
 	}
 
 	const int time_init = profiling_clock.restart();
@@ -98,8 +98,8 @@ void test_octree_update() {
 	}
 
 	print_line(String("Initial block count: {0}, time: {1} us").format(varray(initial_block_count, time_init)));
-	ZN_TEST_ASSERT(initial_block_count > 0);
-	ZN_TEST_ASSERT(initial_block_count == initial_block_count_rec);
+	VOXEL_TEST_ASSERT(initial_block_count > 0);
+	VOXEL_TEST_ASSERT(initial_block_count == initial_block_count_rec);
 
 	// Updates without moving
 	int created_block_count = 0;
@@ -127,8 +127,8 @@ void test_octree_update() {
 		const int time_stay = profiling_clock.restart();
 
 		// Block count should not change
-		ZN_TEST_ASSERT(created_block_count == 0);
-		ZN_TEST_ASSERT(destroyed_block_count == 0);
+		VOXEL_TEST_ASSERT(created_block_count == 0);
+		VOXEL_TEST_ASSERT(destroyed_block_count == 0);
 		print_line(String("Stay time: {0} us").format(varray(time_stay)));
 	}
 
@@ -150,7 +150,7 @@ void test_octree_update() {
 		block_count -= da.destroyed_blocks;
 	}
 
-	ZN_TEST_ASSERT(block_count == 0);
+	VOXEL_TEST_ASSERT(block_count == 0);
 }
 
 void test_octree_find_in_box() {
@@ -194,7 +194,7 @@ void test_octree_find_in_box() {
 		StdUnorderedSet<Vector3i> &area_positions = insert_result.first->second;
 		area_box.for_each_cell([&area_positions](Vector3i npos) {
 			auto it = area_positions.insert(npos);
-			ZN_TEST_ASSERT(it.second == true);
+			VOXEL_TEST_ASSERT(it.second == true);
 		});
 	});
 
@@ -203,7 +203,7 @@ void test_octree_find_in_box() {
 	full_box.for_each_cell([&octree, &expected_positions, &checksum](Vector3i pos) {
 		const Box3i area_box(pos - Vector3i(1, 1, 1), Vector3i(3, 3, 3));
 		auto it = expected_positions.find(pos);
-		ZN_TEST_ASSERT(it != expected_positions.end());
+		VOXEL_TEST_ASSERT(it != expected_positions.end());
 		const StdUnorderedSet<Vector3i> &expected_area_positions = it->second;
 		StdUnorderedSet<Vector3i> found_positions;
 		octree.for_leaves_in_box(
@@ -213,9 +213,9 @@ void test_octree_find_in_box() {
 				 &checksum](Vector3i node_pos, int lod, const LodOctree::NodeData &node_data) {
 					auto insert_result = found_positions.insert(node_pos);
 					// Must be one of the expected positions
-					ZN_TEST_ASSERT(expected_area_positions.find(node_pos) != expected_area_positions.end());
+					VOXEL_TEST_ASSERT(expected_area_positions.find(node_pos) != expected_area_positions.end());
 					// Must not be a duplicate
-					ZN_TEST_ASSERT(insert_result.second == true);
+					VOXEL_TEST_ASSERT(insert_result.second == true);
 					checksum += node_data.state;
 				}
 		);
@@ -233,7 +233,7 @@ void test_octree_find_in_box() {
 					}
 			);
 		});
-		ZN_TEST_ASSERT(checksum2 == checksum);
+		VOXEL_TEST_ASSERT(checksum2 == checksum);
 		const int for_each_cell_time = profiling_clock.restart();
 		const float single_query_time = float(for_each_cell_time) / Vector3iUtil::get_volume_u64(full_box.size);
 		print_line(String("for_each_cell time with {0} lods: total {1} us, single query {2} us, checksum: {3}")
@@ -241,4 +241,4 @@ void test_octree_find_in_box() {
 	}
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

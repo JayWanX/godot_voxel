@@ -6,14 +6,14 @@
 #include <cstring>
 #include <sstream>
 
-namespace zylann {
+namespace voxel {
 
 void CodeGenHelper::indent() {
 	++_indent_level;
 }
 
 void CodeGenHelper::dedent() {
-	ZN_ASSERT(_indent_level > 0);
+	VOXEL_ASSERT(_indent_level > 0);
 	--_indent_level;
 }
 
@@ -98,4 +98,4 @@ StdString CodeGenHelper::print() const {
 	return out;
 }
 
-} // namespace zylann
+} // namespace voxel

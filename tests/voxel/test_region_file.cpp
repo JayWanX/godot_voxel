@@ -8,14 +8,14 @@
 #include "../../util/testing/test_macros.h"
 #include "test_util.h"
 
-namespace zylann::voxel::tests {
+namespace voxel::tests {
 
 void test_region_file() {
 	const int block_size_po2 = 4;
 	const int block_size = 1 << block_size_po2;
 	const char *region_file_name = "test_region_file.vxr";
-	zylann::testing::TestDirectory test_dir;
-	ZN_TEST_ASSERT(test_dir.is_valid());
+	voxel::testing::TestDirectory test_dir;
+	VOXEL_TEST_ASSERT(test_dir.is_valid());
 	String region_file_path = test_dir.get_path().path_join(region_file_name);
 
 	struct RandomBlockGenerator {
@@ -76,24 +76,24 @@ void test_region_file() {
 		for (unsigned int channel_index = 0; channel_index < VoxelBuffer::MAX_CHANNELS; ++channel_index) {
 			region_format.channel_depths[channel_index] = voxel_buffer.get_channel_depth(channel_index);
 		}
-		ZN_TEST_ASSERT(region_file.set_format(region_format));
+		VOXEL_TEST_ASSERT(region_file.set_format(region_format));
 
 		// Open file
 		const Error open_error = region_file.open(region_file_path, true);
-		ZN_TEST_ASSERT(open_error == OK);
+		VOXEL_TEST_ASSERT(open_error == OK);
 
 		// Save block
 		const Error save_error =
 				region_file.save_block(Vector3i(1, 2, 3), voxel_buffer, CompressedData::COMPRESSION_LZ4);
-		ZN_TEST_ASSERT(save_error == OK);
+		VOXEL_TEST_ASSERT(save_error == OK);
 
 		// Read back
 		VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 		const Error load_error = region_file.load_block(Vector3i(1, 2, 3), loaded_voxel_buffer);
-		ZN_TEST_ASSERT(load_error == OK);
+		VOXEL_TEST_ASSERT(load_error == OK);
 
 		// Must be equal
-		ZN_TEST_ASSERT(voxel_buffer.equals(loaded_voxel_buffer));
+		VOXEL_TEST_ASSERT(voxel_buffer.equals(loaded_voxel_buffer));
 	}
 	// Load again but using a new region file object
 	{
@@ -101,15 +101,15 @@ void test_region_file() {
 
 		// Open file
 		const Error open_error = region_file.open(region_file_path, false);
-		ZN_TEST_ASSERT(open_error == OK);
+		VOXEL_TEST_ASSERT(open_error == OK);
 
 		// Read back
 		VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 		const Error load_error = region_file.load_block(Vector3i(1, 2, 3), loaded_voxel_buffer);
-		ZN_TEST_ASSERT(load_error == OK);
+		VOXEL_TEST_ASSERT(load_error == OK);
 
 		// Must be equal
-		ZN_TEST_ASSERT(voxel_buffer.equals(loaded_voxel_buffer));
+		VOXEL_TEST_ASSERT(voxel_buffer.equals(loaded_voxel_buffer));
 	}
 	// Save many blocks
 	{
@@ -117,7 +117,7 @@ void test_region_file() {
 
 		// Open file
 		const Error open_error = region_file.open(region_file_path, false);
-		ZN_TEST_ASSERT(open_error == OK);
+		VOXEL_TEST_ASSERT(open_error == OK);
 
 		RandomPCG rng;
 
@@ -139,7 +139,7 @@ void test_region_file() {
 
 			// Save block
 			const Error save_error = region_file.save_block(pos, voxel_buffer, CompressedData::COMPRESSION_LZ4);
-			ZN_TEST_ASSERT(save_error == OK);
+			VOXEL_TEST_ASSERT(save_error == OK);
 
 			// Note, the same position can occur twice, we just overwrite
 			buffers[pos].voxels = std::move(voxel_buffer);
@@ -149,23 +149,23 @@ void test_region_file() {
 		for (auto it = buffers.begin(); it != buffers.end(); ++it) {
 			VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 			const Error load_error = region_file.load_block(it->first, loaded_voxel_buffer);
-			ZN_TEST_ASSERT(load_error == OK);
-			ZN_TEST_ASSERT(it->second.voxels.equals(loaded_voxel_buffer));
+			VOXEL_TEST_ASSERT(load_error == OK);
+			VOXEL_TEST_ASSERT(it->second.voxels.equals(loaded_voxel_buffer));
 		}
 
 		const Error close_error = region_file.close();
-		ZN_TEST_ASSERT(close_error == OK);
+		VOXEL_TEST_ASSERT(close_error == OK);
 
 		// Open file
 		const Error open_error2 = region_file.open(region_file_path, false);
-		ZN_TEST_ASSERT(open_error2 == OK);
+		VOXEL_TEST_ASSERT(open_error2 == OK);
 
 		// Read back again
 		for (auto it = buffers.begin(); it != buffers.end(); ++it) {
 			VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 			const Error load_error = region_file.load_block(it->first, loaded_voxel_buffer);
-			ZN_TEST_ASSERT(load_error == OK);
-			ZN_TEST_ASSERT(it->second.voxels.equals(loaded_voxel_buffer));
+			VOXEL_TEST_ASSERT(load_error == OK);
+			VOXEL_TEST_ASSERT(it->second.voxels.equals(loaded_voxel_buffer));
 		}
 	}
 }
@@ -175,8 +175,8 @@ void test_voxel_stream_region_files() {
 	const int block_size_po2 = 4;
 	const int block_size = 1 << block_size_po2;
 
-	zylann::testing::TestDirectory test_dir;
-	ZN_TEST_ASSERT(test_dir.is_valid());
+	voxel::testing::TestDirectory test_dir;
+	VOXEL_TEST_ASSERT(test_dir.is_valid());
 
 	Ref<VoxelStreamRegionFiles> stream;
 	stream.instantiate();
@@ -213,8 +213,8 @@ void test_voxel_stream_region_files_lods() {
 	const uint32_t radius_blocks = 8;
 	const uint32_t seed = 131183;
 
-	zylann::testing::TestDirectory test_dir;
-	ZN_TEST_ASSERT(test_dir.is_valid());
+	voxel::testing::TestDirectory test_dir;
+	VOXEL_TEST_ASSERT(test_dir.is_valid());
 
 	Ref<VoxelStreamRegionFiles> stream;
 	stream.instantiate();
@@ -300,7 +300,7 @@ void test_voxel_stream_region_files_lods() {
 			};
 			stream->load_voxel_block(q);
 
-			ZN_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
+			VOXEL_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
 			if (!q.voxel_buffer.equals(expected_block.voxels)) {
 				for (unsigned int i = 0; i < saved_blocks.size(); ++i) {
 					if (i == index) {
@@ -308,7 +308,7 @@ void test_voxel_stream_region_files_lods() {
 					}
 					const SavedBlock &b = saved_blocks[i];
 					if (b.voxels.equals(q.voxel_buffer)) {
-						ZN_PRINT_VERBOSE(
+						VOXEL_PRINT_VERBOSE(
 								format("Loaded block #{} at {} lod {} found unequal, but is equal to #{} at {} lod {} "
 									   "overwritten: {}",
 									   index,
@@ -324,9 +324,9 @@ void test_voxel_stream_region_files_lods() {
 				print_channel_as_ascii(q.voxel_buffer, 0, 4);
 			}
 
-			ZN_TEST_ASSERT(q.voxel_buffer.equals(expected_block.voxels));
+			VOXEL_TEST_ASSERT(q.voxel_buffer.equals(expected_block.voxels));
 		}
 	}
 }
 
-} // namespace zylann::voxel::tests
+} // namespace voxel::tests

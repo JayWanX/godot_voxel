@@ -6,7 +6,7 @@ import os
 
 
 def get_icons(repo_dir):
-    icons_path = repo_dir / Path("project/addons/zylann.voxel/editor/icons")
+    icons_path = repo_dir / Path("project/addons/voxel/editor/icons")
     icons = list(icons_path.glob("*.svg"))
     return icons
 
@@ -50,8 +50,8 @@ def main():
 
     icons = get_icons(repo_dir)
 
-    generate_icon_entries(repo_dir / Path("project/addons/zylann.voxel/voxel.gdextension"), icons)
-    generate_icon_entries(repo_dir / Path("project/addons/zylann.voxel/voxel.gdextension-release"), icons)
+    generate_icon_entries(repo_dir / Path("project/addons/voxel/voxel.gdextension"), icons)
+    generate_icon_entries(repo_dir / Path("project/addons/voxel/voxel.gdextension-release"), icons)
 
 
 main()

@@ -1,7 +1,7 @@
-#ifndef ZN_GODOT_THREAD_HELPER_H
-#define ZN_GODOT_THREAD_HELPER_H
+#ifndef VOXEL_GODOT_THREAD_HELPER_H
+#define VOXEL_GODOT_THREAD_HELPER_H
 
-#ifndef ZN_GODOT_EXTENSION
+#ifndef VOXEL_GODOT_EXTENSION
 #error "This class is exclusive to Godot Extension"
 #endif
 
@@ -10,7 +10,7 @@
 #include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
-namespace zylann {
+namespace voxel {
 
 // Proxy-object to run a C-style callback using GDExtension threads.
 // This class isn't intented to be exposed.
@@ -19,10 +19,10 @@ namespace zylann {
 // because Godot sets up additional stuff in `Thread` (like script debugging and platform-specific stuff to set
 // priority). To use Godot threads in GDExtension, you are FORCED to send an object method as callback. And to do that,
 // the object must be registered.
-class ZN_GodotThreadHelper : public ::godot::Object {
-	GDCLASS(ZN_GodotThreadHelper, ::godot::Object)
+class VOXEL_GodotThreadHelper : public ::godot::Object {
+	GDCLASS(VOXEL_GodotThreadHelper, ::godot::Object)
 public:
-	ZN_GodotThreadHelper() {}
+	VOXEL_GodotThreadHelper() {}
 
 	void set_callback(Thread::Callback callback, void *data) {
 		_callback = callback;
@@ -38,6 +38,6 @@ private:
 	void *_callback_data = nullptr;
 };
 
-} // namespace zylann
+} // namespace voxel
 
-#endif // ZN_GODOT_THREAD_HELPER_H
+#endif // VOXEL_GODOT_THREAD_HELPER_H

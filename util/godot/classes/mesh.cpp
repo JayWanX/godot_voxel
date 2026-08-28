@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-namespace zylann::godot {
+namespace voxel::godot {
 
 bool is_surface_triangulated(const Array &surface) {
 	PackedVector3Array positions = surface[Mesh::ARRAY_VERTEX];
@@ -54,4 +54,4 @@ void offset_surface(Array &surface, Vector3 offset) {
 	surface[Mesh::ARRAY_VERTEX] = positions;
 }
 
-} // namespace zylann::godot
+} // namespace voxel::godot

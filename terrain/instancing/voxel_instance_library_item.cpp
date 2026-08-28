@@ -2,14 +2,14 @@
 #include "../../constants/voxel_string_names.h"
 #include "voxel_instancer.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
 #include <algorithm>
 
-namespace zylann::voxel {
+namespace voxel {
 
 // TODO Deprecate in favor of resource name?
 void VoxelInstanceLibraryItem::set_item_name(String p_name) {
@@ -181,4 +181,4 @@ void VoxelInstanceLibraryItem::_bind_methods() {
 	);
 }
 
-} // namespace zylann::voxel
+} // namespace voxel

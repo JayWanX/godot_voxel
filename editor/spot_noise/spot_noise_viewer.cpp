@@ -6,14 +6,14 @@
 #include "../../util/godot/classes/texture_rect.h"
 #include "../../util/godot/editor_scale.h"
 
-#ifdef ZN_GODOT
+#ifdef VOXEL_GODOT
 #include "../../util/godot/core/callable_mp.h"
 #include "../../util/godot/core/class_db.h"
 #endif
 
-namespace zylann {
+namespace voxel {
 
-ZN_SpotNoiseViewer::ZN_SpotNoiseViewer() {
+VOXEL_SpotNoiseViewer::VOXEL_SpotNoiseViewer() {
 	set_custom_minimum_size(Vector2(0, EDSCALE * PREVIEW_HEIGHT));
 
 	_texture_rect = memnew(TextureRect);
@@ -22,19 +22,19 @@ ZN_SpotNoiseViewer::ZN_SpotNoiseViewer() {
 	add_child(_texture_rect);
 }
 
-void ZN_SpotNoiseViewer::set_noise(Ref<ZN_SpotNoise> noise) {
+void VOXEL_SpotNoiseViewer::set_noise(Ref<VOXEL_SpotNoise> noise) {
 	if (_noise == noise) {
 		return;
 	}
 
 	if (_noise.is_valid()) {
-		_noise->disconnect("changed", callable_mp(this, &ZN_SpotNoiseViewer::_on_noise_changed));
+		_noise->disconnect("changed", callable_mp(this, &VOXEL_SpotNoiseViewer::_on_noise_changed));
 	}
 
 	_noise = noise;
 
 	if (_noise.is_valid()) {
-		_noise->connect("changed", callable_mp(this, &ZN_SpotNoiseViewer::_on_noise_changed));
+		_noise->connect("changed", callable_mp(this, &VOXEL_SpotNoiseViewer::_on_noise_changed));
 		set_process(true);
 		update_preview();
 
@@ -44,11 +44,11 @@ void ZN_SpotNoiseViewer::set_noise(Ref<ZN_SpotNoise> noise) {
 	}
 }
 
-void ZN_SpotNoiseViewer::_on_noise_changed() {
+void VOXEL_SpotNoiseViewer::_on_noise_changed() {
 	_time_before_update = 0.5f;
 }
 
-void ZN_SpotNoiseViewer::_notification(int p_what) {
+void VOXEL_SpotNoiseViewer::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS: {
 			if (_time_before_update > 0.f) {
@@ -64,7 +64,7 @@ void ZN_SpotNoiseViewer::_notification(int p_what) {
 namespace {
 
 void blend_rect(Image &im, Rect2i p_rect, Color color) {
-	ZN_ASSERT_RETURN(!im.is_compressed());
+	VOXEL_ASSERT_RETURN(!im.is_compressed());
 
 	const Rect2i rect = p_rect.intersection(Rect2i(Vector2i(), im.get_size()));
 	const Vector2i end = rect.get_end();
@@ -98,7 +98,7 @@ void draw_grid(Image &im, float cell_size, Color color) {
 } // namespace
 
 // TODO Use thread?
-void ZN_SpotNoiseViewer::update_preview() {
+void VOXEL_SpotNoiseViewer::update_preview() {
 	const Vector2i preview_size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 
 	Ref<Image> im = godot::create_empty_image(preview_size.x, preview_size.y, false, Image::FORMAT_L8);
@@ -121,6 +121,6 @@ void ZN_SpotNoiseViewer::update_preview() {
 	_texture_rect->set_texture(tex);
 }
 
-void ZN_SpotNoiseViewer::_bind_methods() {}
+void VOXEL_SpotNoiseViewer::_bind_methods() {}
 
-} // namespace zylann
+} // namespace voxel
