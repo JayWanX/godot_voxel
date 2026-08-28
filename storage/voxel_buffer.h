@@ -15,8 +15,6 @@ namespace voxel {
 
 class DynamicBitset;
 
-namespace voxel {
-
 struct VoxelFormat;
 
 static_assert(sizeof(uint32_t) == sizeof(float), "uint32_t and float cannot be marshalled back and forth");
@@ -684,7 +682,6 @@ void paste_src_masked_dst_writable_bitarray(
 		bool with_metadata
 );
 
-} // namespace voxel
 } // namespace voxel
 
 #endif // VOXEL_BUFFER_INTERNAL_H
