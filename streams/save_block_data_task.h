@@ -13,7 +13,7 @@ class AsyncDependencyTracker;
 
 class SaveBlockDataTask : public IThreadedTask {
 public:
-	// For saving voxels only
+	// 仅用于保存体素
 	SaveBlockDataTask(
 			VolumeID p_volume_id,
 			Vector3i p_block_pos,
@@ -25,7 +25,7 @@ public:
 	);
 
 #ifdef VOXEL_ENABLE_INSTANCER
-	// For saving instances only
+	// 仅用于保存实例
 	SaveBlockDataTask(
 			VolumeID p_volume_id,
 			Vector3i p_block_pos,
@@ -55,7 +55,7 @@ private:
 #ifdef VOXEL_ENABLE_INSTANCER
 	UniquePtr<InstanceBlockData> _instances;
 #endif
-	Vector3i _position; // In data blocks of the specified lod
+	Vector3i _position; // 以指定 lod 的数据块为单位
 	VolumeID _volume_id;
 	uint8_t _lod;
 	bool _has_run = false;
@@ -63,7 +63,7 @@ private:
 	bool _save_voxels = false;
 	bool _flush_on_last_tracked_task = false;
 	std::shared_ptr<StreamingDependency> _stream_dependency;
-	// Optional tracking, can be null
+	// 可选的追踪器，可以为空
 	std::shared_ptr<AsyncDependencyTracker> _tracker;
 };
 

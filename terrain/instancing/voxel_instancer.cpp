@@ -35,7 +35,7 @@
 #include "../../util/godot/core/packed_arrays.h"
 #endif
 
-// Only needed for debug purposes, otherwise RenderingServer is used directly
+// 仅用于调试目的，否则直接使用 RenderingServer
 #include "../../util/godot/classes/multimesh_instance_3d.h"
 
 #include <algorithm>
@@ -57,8 +57,8 @@ VoxelInstancer::VoxelInstancer() {
 }
 
 VoxelInstancer::~VoxelInstancer() {
-	// Destroy everything
-	// Note: we don't destroy instances using nodes, we assume they were detached already
+	// 销毁所有内容
+	// 注意：我们不通过节点销毁实例，假定它们已被分离
 
 	if (_library.is_valid()) {
 		_library->remove_listener(this);
@@ -67,7 +67,7 @@ VoxelInstancer::~VoxelInstancer() {
 
 void VoxelInstancer::clear_blocks() {
 	VOXEL_PROFILE_SCOPE();
-	// Destroy blocks, keep configured layers
+	// 销毁数据块，保留已配置的图层
 	for (auto it = _blocks.begin(); it != _blocks.end(); ++it) {
 		Block &block = **it;
 		for (unsigned int i = 0; i < block.bodies.size(); ++i) {
@@ -94,12 +94,12 @@ void VoxelInstancer::clear_blocks() {
 }
 
 void VoxelInstancer::clear_blocks_in_layer(int layer_id) {
-	// Not optimal, but should work for now
+	// 不是最优方案，但暂时应该能用
 	for (size_t i = 0; i < _blocks.size(); ++i) {
 		Block &block = *_blocks[i];
 		if (block.layer_id == layer_id) {
 			remove_block(i, false);
-			// remove_block does a remove-at-swap so we have to re-iterate on the same slot
+			// remove_block 执行交换删除，因此我们必须重新迭代同一槽位
 			--i;
 		}
 	}
@@ -150,7 +150,7 @@ void VoxelInstancer::_notification(int p_what) {
 					vt->set_instancer(this);
 				}
 			}
-			// TODO may want to reload all instances? Not sure if worth implementing that use case
+			// TODO 可能需要重新加载所有实例？不确定是否值得实现这种用例
 		} break;
 
 		case NOTIFICATION_UNPARENTED:
@@ -173,8 +173,8 @@ void VoxelInstancer::_notification(int p_what) {
 			VOXEL_PROFILE_SCOPE_NAMED("VoxelInstancer::NOTIFICATION_TRANSFORM_CHANGED");
 
 			if (!is_inside_tree() || _parent == nullptr) {
-				// The transform and other properties can be set by the scene loader,
-				// before we enter the tree
+				// 变换和其他属性可能在进入场景树之前由场景加载器设置，
+				// 此时我们尚未进入场景树
 				return;
 			}
 
@@ -185,12 +185,12 @@ void VoxelInstancer::_notification(int p_what) {
 			for (auto it = _blocks.begin(); it != _blocks.end(); ++it) {
 				Block &block = **it;
 				if (!block.multimesh_instance.is_valid()) {
-					// The block exists as an empty block (if it did not exist, it would get generated)
+					// 该数据块以空数据块形式存在（若它不存在，则会被生成）
 					continue;
 				}
 				const int block_size_po2 = base_block_size_po2 + block.lod_index;
 				const Vector3 block_local_pos(block.grid_position << block_size_po2);
-				// The local block transform never has rotation or scale so we can take a shortcut
+				// 局部数据块变换从不包含旋转或缩放，因此我们可以走捷径
 				const Transform3D block_transform(parent_transform.basis, parent_transform.xform(block_local_pos));
 				block.multimesh_instance.set_transform(block_transform);
 			}
@@ -245,7 +245,7 @@ void VoxelInstancer::process_task_results() {
 #endif
 	{
 		MutexLock mlock(_loading_results->mutex);
-		// Copy results to temporary buffer
+		// 将结果复制到临时缓冲区
 		StdVector<InstanceLoadingTaskOutput> &src = _loading_results->results;
 		results.resize(src.size());
 		for (unsigned int i = 0; i < src.size(); ++i) {
@@ -271,7 +271,7 @@ void VoxelInstancer::process_task_results() {
 	for (InstanceLoadingTaskOutput &output : results) {
 		auto layer_it = _layers.find(output.layer_id);
 		if (layer_it == _layers.end()) {
-			// Layer was removed since?
+			// 图层是否已被移除？
 			VOXEL_PRINT_VERBOSE(
 					format("Processing async instance generator results, but the layer isn't present ({}).",
 						   static_cast<int>(output.layer_id))
@@ -285,7 +285,7 @@ void VoxelInstancer::process_task_results() {
 
 		auto block_it = layer.blocks.find(output.render_block_position);
 		if (block_it == layer.blocks.end()) {
-			// The block was removed while the generation process was running?
+			// 生成过程运行时数据块是否已被移除？
 			VOXEL_PRINT_VERBOSE("Processing async instance generator results, but the block was removed.");
 			continue;
 		}
@@ -381,14 +381,14 @@ void VoxelInstancer::process_gizmos() {
 			Color8 color(0, 255, 0, 255);
 			if (block.multimesh_instance.is_valid()) {
 				if (block.multimesh_instance.get_multimesh().is_null()) {
-					// Allocated but without multimesh (wut?)
+					// 已分配但没有 multimesh（啥？）
 					color = Color8(128, 0, 0, 255);
 				} else if (get_visible_instance_count(**block.multimesh_instance.get_multimesh()) == 0) {
-					// Allocated but empty multimesh
+					// 已分配但 multimesh 为空
 					color = Color8(255, 64, 0, 255);
 				}
 			} else if (block.scene_instances.size() == 0) {
-				// Only draw blocks that are setup
+				// 仅绘制已设置好的数据块
 				continue;
 			}
 
@@ -462,9 +462,9 @@ void VoxelInstancer::update_mesh_from_mesh_lod(
 		bool instancer_is_visible
 ) {
 	if (hide_beyond_max_lod && block.current_mesh_lod == settings.mesh_lod_count) {
-		// Godot doesn't like null meshes, so we have to implement a different code path
+		// Godot 不喜欢空网格，因此我们必须实现不同的代码路径
 
-		// Can be invalid if there is currently no instance in this block
+		// 若此数据块中当前没有实例，则可能无效
 		if (block.multimesh_instance.is_valid()) {
 			block.multimesh_instance.set_visible(false);
 		}
@@ -498,9 +498,9 @@ void VoxelInstancer::process_mesh_lods() {
 	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(_library.is_null());
 
-	// Note, this form of LOD must be visual only. It supports only one camera.
+	// 注意，这种 LOD 必须仅是视觉上的。它仅支持一个相机。
 
-	// Get viewer position
+	// 获取观察者位置
 	const Transform3D gtrans = get_global_transform();
 	const Vector3 cam_pos_global = get_global_camera_position(*this);
 	const Vector3 cam_pos_local = gtrans.affine_inverse().xform(cam_pos_global);
@@ -517,7 +517,7 @@ void VoxelInstancer::process_mesh_lods() {
 	// const unsigned int initial_mesh_lod_time_sliced_block_index = _mesh_lod_time_sliced_block_index;
 
 	while (_mesh_lod_time_sliced_block_index < _blocks.size()) {
-		// Iterate a portion of blocks, then check timing budget once after that
+		// 迭代一部分数据块，然后检查一次时间预算
 		const unsigned int desired_portion_size = 64;
 		const unsigned int portion_end = math::min(
 				_mesh_lod_time_sliced_block_index + desired_portion_size, static_cast<unsigned int>(_blocks.size())
@@ -529,29 +529,28 @@ void VoxelInstancer::process_mesh_lods() {
 
 		for (UniquePtr<Block> &block_ptr : blocks_portion) {
 			Block &block = *block_ptr;
-			// Early exit for empty blocks (we only do this for multimeshes so no need to check other things)
+			// 空数据块提前退出（我们仅对 multimesh 执行此操作，因此无需检查其它内容）
 			if (!block.multimesh_instance.is_valid()) {
 				continue;
 			}
 
 			const VoxelInstanceLibraryItem *item_base = _library->get_item_const(block.layer_id);
 			ERR_CONTINUE(item_base == nullptr);
-			// TODO Optimization: would be nice to not need this cast by iterating only the same item types
+			// TODO 优化：如果仅迭代相同的项类型，就不需要这种转换了
 			const VoxelInstanceLibraryMultiMeshItem *item =
 					Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(item_base);
 			if (item == nullptr) {
-				// Not a multimesh item
+				// 不是 multimesh 项
 				continue;
 			}
 			const VoxelInstanceLibraryMultiMeshItem::Settings &settings = item->get_multimesh_settings();
 			const bool hide_beyond_max_lod = item->get_hide_beyond_max_lod();
 			const unsigned int extended_mesh_lod_count = settings.mesh_lod_count + (hide_beyond_max_lod ? 1 : 0);
-			// Note, "hide beyond max lod" counts as having an extra LOD where the mesh is hidden. So an item can have
-			// only one mesh setup, yet be considered having LOD
+			// 注意，“超出最大 LOD 时隐藏”计为多出一个网格被隐藏的 LOD。因此一个项可以只有
+			// 一个网格设置，却仍被视为具有 LOD
 			if (extended_mesh_lod_count <= 1) {
-				// This block has no LOD
-				// TODO Optimization: would be nice to not need this conditional by iterating only item types that
-				// define lods
+				// 此数据块没有 LOD
+				// TODO 优化：如果仅迭代定义了 LOD 的项类型，就不需要这个条件判断了
 				continue;
 			}
 
@@ -571,29 +570,29 @@ void VoxelInstancer::process_mesh_lods() {
 			const Vector3 block_center_local(block.grid_position * lod_block_size + Vector3i(hs, hs, hs));
 			const float distance_squared = cam_pos_local.distance_squared_to(block_center_local);
 
-			// Compute current mesh LOD index (note, block.current_mesh_lod can totally be out of range due to eventual
-			// config changes, or even as a way to force an update. This will bring it back in range)
+			// 计算当前网格 LOD 索引（注意，block.current_mesh_lod 可能因最终的配置更改而完全越界，
+			// 甚至可以作为强制更新的手段。这里会将其带回有效范围）
 			unsigned int current_mesh_lod = block.current_mesh_lod;
 			while (current_mesh_lod + 1 < extended_mesh_lod_count &&
 				   distance_squared > math::squared(
 											  distance_ratios[current_mesh_lod] *
 											  max_distance
-											  // Exit distance is slightly higher so it has less chance to oscillate
-											  // often when near the threshold
+											  // 退出距离略高，因此在接近阈值时更不容易振荡
+											  // 切换
 											  * hysteresis
 									  )) {
-				// Decrease detail
+				// 降低细节
 				++current_mesh_lod;
 			}
 			while (current_mesh_lod > 0 &&
 				   (distance_squared < math::squared(distance_ratios[current_mesh_lod - 1] * max_distance)
-					// Allow mesh LOD index to go down if count is set lower
+					// 若数量设置更低，则允许网格 LOD 索引下降
 					|| current_mesh_lod >= extended_mesh_lod_count)) {
-				// Increase detail
+				// 提高细节
 				--current_mesh_lod;
 			}
 
-			// Apply if it changed
+			// 若发生变化则应用
 			if (block.current_mesh_lod != current_mesh_lod) {
 				block.current_mesh_lod = current_mesh_lod;
 				update_mesh_from_mesh_lod(block, settings, hide_beyond_max_lod, instancer_is_visible);
@@ -610,7 +609,7 @@ void VoxelInstancer::process_mesh_lods() {
 	// updated_blocks_count / float(_blocks.size()) : 0; VOXEL_PROFILE_PLOT("Updated Instancer Blocks Mesh LOD",
 	// updated_blocks_ratio);
 
-	// Keep restarting the update every frame for now
+	// 目前每帧都重新启动更新
 	if (_mesh_lod_time_sliced_block_index >= _blocks.size()) {
 		_mesh_lod_time_sliced_block_index = 0;
 	}
@@ -620,15 +619,14 @@ void VoxelInstancer::process_collision_distances() {
 	VOXEL_PROFILE_SCOPE();
 	VOXEL_ASSERT_RETURN(_library.is_valid());
 
-	// Godot's physics engine (including Jolt) dies in mysterious ways when users want colliders on items that may
-	// appear tens of thousands of times.
-	// They don't want to reduce the distance at which they spawn, and instead do that only on colliders, which then
-	// appears to fix the issues.
+	// Godot 的物理引擎（包括 Jolt）在用户希望为可能出现数万次的项添加碰撞体时，
+	// 会以神秘的方式崩溃。
+	// 用户不想降低实例生成的间距，而是只对碰撞体这样做，这似乎就能解决问题。
 
-	// Note, this is a client-only process at the moment. In server-authoritative scenarios, this would have to be done
-	// for every VoxelViewer, which is more expensive.
+	// 注意，目前这是一个仅限客户端的过程。在服务器权威场景中，必须为每个 VoxelViewer
+	// 执行此操作，这会更加昂贵。
 
-	// Get viewer position
+	// 获取观察者位置
 	const Transform3D gtrans = get_global_transform();
 	const Vector3 cam_pos_global = get_global_camera_position(*this);
 	const Vector3 cam_pos_local = gtrans.affine_inverse().xform(cam_pos_global);
@@ -641,11 +639,11 @@ void VoxelInstancer::process_collision_distances() {
 	const uint64_t time_up_time =
 			Time::get_singleton()->get_ticks_usec() + _collision_distance_update_budget_microseconds;
 
-	// TODO Candidate for temp allocator
+	// TODO 临时分配器的候选
 	StdVector<Transform3f> transforms;
 
 	while (_collision_distance_time_sliced_block_index < _blocks.size()) {
-		// Iterate a portion of blocks, then check timing budget once after that
+		// 迭代一部分数据块，然后检查一次时间预算
 		const unsigned int desired_portion_size = 64;
 
 		const unsigned int portion_begin = _collision_distance_time_sliced_block_index;
@@ -660,23 +658,23 @@ void VoxelInstancer::process_collision_distances() {
 		for (unsigned int rel_block_index = 0; rel_block_index < blocks_portion.size(); ++rel_block_index) {
 			UniquePtr<Block> &block_ptr = blocks_portion[rel_block_index];
 			Block &block = *block_ptr;
-			// Early exit for empty blocks (we only do this for multimeshes so no need to check other things)
+			// 空数据块提前退出（我们仅对 multimesh 执行此操作，因此无需检查其它内容）
 			if (!block.multimesh_instance.is_valid()) {
 				continue;
 			}
 
 			const VoxelInstanceLibraryItem *item_base = _library->get_item_const(block.layer_id);
 			VOXEL_ASSERT_CONTINUE(item_base != nullptr);
-			// TODO Optimization: would be nice to not need this cast by iterating only the same item types
+			// TODO 优化：如果仅迭代相同的项类型，就不需要这种转换了
 			const VoxelInstanceLibraryMultiMeshItem *item =
 					Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(item_base);
 			if (item == nullptr) {
-				// Not a multimesh item
+				// 不是 multimesh 项
 				continue;
 			}
 			const float collision_distance = item->get_collision_distance();
 			if (collision_distance <= 0.f) {
-				// Disabled, the item must have a collider at all distances
+				// 已禁用，该项在所有距离都必须有碰撞体
 				continue;
 			}
 
@@ -688,8 +686,7 @@ void VoxelInstancer::process_collision_distances() {
 			);
 
 			if (block.distance_colliders_active) {
-				// Exit distance is slightly higher so it has less chance to oscillate
-				// often when near the threshold
+				// 退出距离略高一些，以减少在阈值附近频繁振荡的机会
 				if (distance_squared > math::squared(collision_distance * hysteresis)) {
 					destroy_multimesh_block_colliders(block);
 					block.distance_colliders_active = false;
@@ -713,7 +710,7 @@ void VoxelInstancer::process_collision_distances() {
 		}
 	}
 
-	// Keep restarting the update every frame for now
+	// 目前每帧都重新启动更新
 	if (_collision_distance_time_sliced_block_index >= _blocks.size()) {
 		_collision_distance_time_sliced_block_index = 0;
 	}
@@ -782,7 +779,7 @@ void VoxelInstancer::process_fading() {
 	}
 }
 
-// We need to do this ourselves because we don't use nodes for multimeshes
+// 我们需要自行处理，因为对于 multimesh 我们不使用节点
 void VoxelInstancer::update_visibility() {
 	if (!is_inside_tree()) {
 		return;
@@ -797,7 +794,7 @@ void VoxelInstancer::update_visibility() {
 			{
 				const VoxelInstanceLibraryItem *item_base = _library->get_item_const(block.layer_id);
 				ERR_CONTINUE(item_base == nullptr);
-				// TODO Optimization: would be nice to not need this cast by iterating only the same item types
+				// TODO 优化：如果仅迭代相同的项类型，就不需要这种转换了
 				const VoxelInstanceLibraryMultiMeshItem *item =
 						Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(item_base);
 				if (item != nullptr) {
@@ -925,14 +922,14 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 	const VoxelTerrain *parent_vt = Object::cast_to<VoxelTerrain>(_parent);
 
 	if (regenerate_blocks) {
-		// Create blocks
+		// 创建数据块
 		StdVector<Vector3i> positions;
 
 		if (parent_vlt != nullptr) {
 			parent_vlt->get_meshed_block_positions_at_lod(layer.lod_index, positions);
 
 		} else if (parent_vt != nullptr) {
-			// Only LOD 0 is supported
+			// 仅支持 LOD 0
 			if (layer.lod_index == 0) {
 				parent_vt->get_meshed_block_positions(positions);
 			}
@@ -954,8 +951,8 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 	ERR_FAIL_COND(render_to_data_factor <= 0 || render_to_data_factor > 2);
 
 	struct L {
-		// Does not return a bool so it can be used in bit-shifting operations without a compiler warning.
-		// Can be treated like a bool too.
+		// 不返回 bool，以便在移位运算中使用而不产生编译器警告。
+		// 也可将其视为 bool 使用。
 		static inline uint8_t has_edited_block(const Lod &lod, Vector3i pos) {
 			return lod.edited_data_blocks.find(pos) != lod.edited_data_blocks.end();
 		}
@@ -974,7 +971,7 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 			const int instance_count = voxel::godot::get_visible_instance_count(**multimesh);
 			const float h = render_block_size / 2;
 			for (int i = 0; i < instance_count; ++i) {
-				// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+				// TODO 优化：首次执行非常慢，之后仍有开销。
 				const Transform3D t = multimesh->get_instance_transform(i);
 				const uint8_t octant_index = VoxelInstanceGenerator::get_octant_index(to_vec3f(t.origin), h);
 				if ((octant_mask & (1 << octant_index)) != 0) {
@@ -986,7 +983,7 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 
 	Ref<VoxelGenerator> voxel_generator = _parent->get_generator();
 
-	// Update existing blocks
+	// 更新现有数据块
 	for (size_t block_index = 0; block_index < _blocks.size(); ++block_index) {
 		Block &block = *_blocks[block_index];
 		if (block.layer_id != layer_id) {
@@ -995,15 +992,15 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 		const int lod_index = block.lod_index;
 		const Lod &lod = _lods[lod_index];
 
-		// Each bit means "should this octant be generated". If 0, it means it was edited and should not change
+		// 每个位表示“是否应生成此卦限”。若为 0，表示它已被编辑且不应更改
 		uint8_t octant_mask = 0xff;
 		if (render_to_data_factor == 1) {
 			if (L::has_edited_block(lod, block.grid_position)) {
-				// Was edited, no regen on this
+				// 已被编辑，此数据块不重新生成
 				continue;
 			}
 		} else if (render_to_data_factor == 2) {
-			// The rendering block corresponds to 8 smaller data blocks
+			// 渲染数据块对应 8 个更小的数据块
 			uint8_t edited_mask = 0;
 			const Vector3i data_pos0 = block.grid_position * render_to_data_factor;
 			edited_mask |= L::has_edited_block(lod, Vector3i(data_pos0.x, data_pos0.y, data_pos0.z));
@@ -1016,7 +1013,7 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 			edited_mask |= (L::has_edited_block(lod, Vector3i(data_pos0.x + 1, data_pos0.y + 1, data_pos0.z + 1)) << 7);
 			octant_mask = ~edited_mask;
 			if (octant_mask == 0) {
-				// All data blocks were edited, no regen on the whole render block
+				// 所有数据块均已被编辑，整个渲染数据块不重新生成
 				continue;
 			}
 		}
@@ -1053,10 +1050,10 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 		);
 
 		if (render_to_data_factor == 2 && octant_mask != 0xff) {
-			// Complete transforms with edited ones
+			// 用已编辑的变换补全变换
 			L::extract_octant_transforms(block, transform_cache, ~octant_mask, mesh_block_size);
-			// TODO What if these blocks had loaded data which wasn't yet uploaded for render?
-			// We may setup a local transform list as well since it's expensive to get it from VisualServer
+			// TODO 如果这些数据块已加载数据但尚未上传用于渲染，该怎么办？
+			// 我们也可以设置本地变换列表，因为从 VisualServer 获取变换很昂贵
 		}
 
 		const Transform3D block_local_transform(Basis(), Vector3(block.grid_position * lod_block_size));
@@ -1079,7 +1076,7 @@ void VoxelInstancer::regenerate_layer(uint16_t layer_id, bool regenerate_blocks)
 void VoxelInstancer::update_layer_meshes(int layer_id) {
 	Ref<VoxelInstanceLibraryItem> item_base = _library->get_item(layer_id);
 	ERR_FAIL_COND(item_base.is_null());
-	// This method is expected to run on a multimesh layer
+	// 此方法预期在 multimesh 图层上运行
 	VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(*item_base);
 	ERR_FAIL_COND(item == nullptr);
 
@@ -1108,7 +1105,7 @@ void VoxelInstancer::update_layer_meshes(int layer_id) {
 void VoxelInstancer::update_layer_scenes(int layer_id) {
 	Ref<VoxelInstanceLibraryItem> item_base = _library->get_item(layer_id);
 	ERR_FAIL_COND(item_base.is_null());
-	// This method is expected to run on a scene layer
+	// 此方法预期在场景图层上运行
 	VoxelInstanceLibrarySceneItem *item = Object::cast_to<VoxelInstanceLibrarySceneItem>(*item_base);
 	ERR_FAIL_COND(item == nullptr);
 	const int data_block_size_po2 = _parent_data_block_size_po2;
@@ -1124,8 +1121,8 @@ void VoxelInstancer::update_layer_scenes(int layer_id) {
 			);
 			ERR_CONTINUE(instance.root == nullptr);
 			block.scene_instances[instance_index] = instance;
-			// We just drop the instance without saving, because this function is supposed to occur only in editor,
-			// or in the very rare cases where library is modified in game (which would invalidate saves anyways).
+			// 我们直接丢弃实例而不保存，因为此函数应仅在编辑器中调用，
+			// 或仅在游戏中修改库的极少数情况下调用（这无论如何都会使保存失效）。
 			prev_instance.root->queue_free();
 		}
 	}
@@ -1134,26 +1131,25 @@ void VoxelInstancer::update_layer_scenes(int layer_id) {
 void VoxelInstancer::on_library_item_changed(int item_id, IInstanceLibraryItemListener::ChangeType change) {
 	ERR_FAIL_COND(_library.is_null());
 
-	// TODO It's unclear yet if some code paths do the right thing in case instances got edited
+	// TODO 尚不清楚某些代码路径在实例被编辑时是否能正确处理
 
-	// This callback will fire after the library was loaded, so most of the time in the editor when the user changes
-	// things. If it happens in-game, it might cause performance issues. If so, it's better to configure the library
-	// before assigning it to the instancer.
+	// 此回调将在库加载后触发，因此大多发生在编辑器中用户更改配置时。
+	// 若发生在游戏中，可能会导致性能问题。若是如此，最好在将库分配给实例化器之前
+	// 配置好库。
 
 	switch (change) {
 		case IInstanceLibraryItemListener::CHANGE_ADDED: {
 			Ref<VoxelInstanceLibraryItem> item = _library->get_item(item_id);
 			ERR_FAIL_COND(item.is_null());
 			add_layer(item_id, item->get_lod_index());
-			// In the editor, if you delete a VoxelInstancer, Godot doesn't actually delete it. Instead, it removes it
-			// from the scene tree and keeps it around in the UndoRedo history. But the node still receives
-			// notifications when the library gets modified... this leads to several issues:
-			// - Errors because the node needs to have access to World3D to update
-			// - In theory we could not require World3D, but then it still means a lot of processing has to occur to
-			// re-generate layers, which is wasted CPU for a node that isn't active or is "currently" deleted by the
-			// user.
-			// So we stop it from re-generating layers while in that state. I'm not sure to which extent we should
-			// be supporting out-of-tree automatic refresh... There might be more corner cases than this.
+			// 在编辑器中，若删除 VoxelInstancer，Godot 并不会真正删除它。相反，它会将其从
+			// 场景树中移除并保留在 UndoRedo 历史中。但当库被修改时，该节点仍会收到
+			// 通知...这会导致几个问题：
+			// - 节点需要访问 World3D 才能更新，否则会报错
+			// - 理论上我们可以不要求 World3D，但这仍意味着需要大量处理来
+			// 重新生成图层，这对一个未激活或“当前”已被用户删除的节点来说浪费了 CPU。
+			// 因此，在该状态下我们停止其重新生成图层。我不确定我们应在多大程度上
+			// 支持树外自动刷新...可能还有比这更多的边界情况。
 			if (is_inside_tree()) {
 				regenerate_layer(item_id, true);
 			}
@@ -1166,7 +1162,7 @@ void VoxelInstancer::on_library_item_changed(int item_id, IInstanceLibraryItemLi
 			break;
 
 		case IInstanceLibraryItemListener::CHANGE_GENERATOR:
-			// Don't update in case the node was deleted in the editor...
+			// 若节点已在编辑器中删除，则不更新...
 			if (is_inside_tree()) {
 				regenerate_layer(item_id, false);
 			}
@@ -1196,7 +1192,7 @@ void VoxelInstancer::on_library_item_changed(int item_id, IInstanceLibraryItemLi
 			Lod &new_lod = _lods[layer.lod_index];
 			new_lod.layers.push_back(item_id);
 
-			// Don't update in case the node was deleted in the editor...
+			// 若节点已在编辑器中删除，则不更新...
 			if (is_inside_tree()) {
 				regenerate_layer(item_id, true);
 			}
@@ -1235,7 +1231,7 @@ void VoxelInstancer::add_layer(int layer_id, int lod_index) {
 void VoxelInstancer::remove_layer(int layer_id) {
 	Layer &layer = get_layer(layer_id);
 
-	// Unregister that layer from the corresponding LOD structure
+	// 从对应的 LOD 结构中注销该图层
 	Lod &lod = _lods[layer.lod_index];
 	for (size_t i = 0; i < lod.layers.size(); ++i) {
 		if (lod.layers[i] == layer_id) {
@@ -1263,10 +1259,9 @@ void VoxelInstancer::remove_block(const unsigned int block_index, const bool wit
 #ifdef DEBUG_ENABLED
 	CRASH_COND(block_index >= _blocks.size());
 #endif
-	// We will move the last block to the index previously occupied by the removed block.
-	// It is cheaper than offsetting every block in the array.
-	// Get this reference first, because if we are removing the last block, its address will become null due to move
-	// semantics
+	// 我们将最后一个数据块移动到被移除数据块原先占用的索引处。
+	// 这比移动数组中的每个数据块更便宜。
+	// 先获取此引用，因为如果移除的是最后一个数据块，其地址将因移动语义而变为空
 	const Block &moved_block = *_blocks.back();
 
 	UniquePtr<Block> block = std::move(_blocks[block_index]);
@@ -1277,7 +1272,7 @@ void VoxelInstancer::remove_block(const unsigned int block_index, const bool wit
 	_blocks[block_index] = std::move(_blocks.back());
 	_blocks.pop_back();
 
-	// Destroy objects linked to the block
+	// 销毁与该数据块关联的对象
 
 	destroy_multimesh_block_colliders(*block);
 
@@ -1289,10 +1284,10 @@ void VoxelInstancer::remove_block(const unsigned int block_index, const bool wit
 		instance.root->queue_free();
 	}
 
-	// Update block index references, since we had to change the index of the last block during swap-remove.
-	// If the block we removed was actually the last one, we don't enter here
+	// 更新数据块索引引用，因为在交换删除期间我们必须更改最后一个数据块的索引。
+	// 若被移除的数据块恰好是最后一个，则不会进入此处
 	if (block.get() != &moved_block) {
-		// Update the index of the moved block referenced in its layer
+		// 更新其图层中引用的被移动数据块的索引
 		Layer &layer = get_layer(moved_block.layer_id);
 		auto it = layer.blocks.find(moved_block.grid_position);
 		CRASH_COND(it == layer.blocks.end());
@@ -1335,7 +1330,7 @@ void VoxelInstancer::on_mesh_block_enter(
 
 void VoxelInstancer::on_mesh_block_exit(const Vector3i render_grid_position, const unsigned int lod_index) {
 	if (lod_index >= _lods.size()) {
-		// The instancer doesn't handle large LODs
+		// 实例化器不处理较大的 LOD
 		return;
 	}
 
@@ -1347,7 +1342,7 @@ void VoxelInstancer::on_mesh_block_exit(const Vector3i render_grid_position, con
 
 	const bool can_save = _parent != nullptr && _parent->get_stream().is_valid();
 
-	// Remove data blocks
+	// 移除数据块
 	const int render_to_data_factor = 1 << (_parent_mesh_block_size_po2 - _parent_data_block_size_po2);
 	ERR_FAIL_COND(render_to_data_factor <= 0 || render_to_data_factor > 2);
 	const Vector3i data_min_pos = render_grid_position * render_to_data_factor;
@@ -1356,8 +1351,8 @@ void VoxelInstancer::on_mesh_block_exit(const Vector3i render_grid_position, con
 	for (data_grid_pos.z = data_min_pos.z; data_grid_pos.z < data_max_pos.z; ++data_grid_pos.z) {
 		for (data_grid_pos.y = data_min_pos.y; data_grid_pos.y < data_max_pos.y; ++data_grid_pos.y) {
 			for (data_grid_pos.x = data_min_pos.x; data_grid_pos.x < data_max_pos.x; ++data_grid_pos.x) {
-				// If we loaded data there but it was never used, we'll unload it either way.
-				// Note, this data is what we loaded initially, it doesnt contain modifications.
+				// 若我们在那里加载了数据但从未使用过，无论如何都会将其卸载。
+				// 注意，这些数据是我们最初加载的，不包含修改。
 				lod.edited_data_blocks.erase(data_grid_pos);
 
 				auto modified_block_it = lod.modified_blocks.find(data_grid_pos);
@@ -1376,7 +1371,7 @@ void VoxelInstancer::on_mesh_block_exit(const Vector3i render_grid_position, con
 
 	scheduler.flush();
 
-	// Remove render blocks
+	// 移除渲染数据块
 	for (auto layer_it = lod.layers.begin(); layer_it != lod.layers.end(); ++layer_it) {
 		const int layer_id = *layer_it;
 
@@ -1443,12 +1438,12 @@ void VoxelInstancer::remove_instances_in_sphere(const Vector3 p_center, const fl
 			const Vector3 block_origin = Vector3i(block.grid_position * (base_block_size << block.lod_index));
 			const Vector3f center_local = to_vec3f(_center - block_origin);
 
-			// TODO Candidate for temp allocator
-			// TODO If we had our own cache, we might not need to allocate at all
+			// TODO 临时分配器的候选
+			// TODO 如果我们有自己的缓存，可能就完全不需要分配了
 			StdVector<Vector3f> instance_positions;
 			get_instance_positions_local(block, base_block_size, instance_positions, nullptr);
 
-			// TODO Candidate for temp allocator
+			// TODO 临时分配器的候选
 			StdVector<uint32_t> instances_to_remove;
 			unsigned int instance_index = 0;
 			for (const Vector3f &instance_pos : instance_positions) {
@@ -1476,7 +1471,7 @@ void VoxelInstancer::remove_instances_in_sphere(const Vector3 p_center, const fl
 				return;
 			}
 
-			// Re-cache item info
+			// 重新缓存项信息
 
 			_mm_removal_action = MMRemovalAction();
 			_mm_removal_action_item_id = item_id;
@@ -1539,7 +1534,7 @@ VoxelInstancer::SceneInstance VoxelInstancer::create_scene_instance(
 
 	instance.root->set_transform(transform);
 
-	// This is the SLOWEST part because Godot triggers all sorts of callbacks
+	// 这是最慢的部分，因为 Godot 会触发各种回调
 	add_child(instance.root);
 
 	return instance;
@@ -1560,7 +1555,7 @@ unsigned int VoxelInstancer::create_block(
 	const unsigned int block_index = _blocks.size();
 	_blocks.push_back(std::move(block));
 #ifdef DEBUG_ENABLED
-	// The block must not already exist
+	// 数据块必须尚不存在
 	CRASH_COND(layer.blocks.find(grid_position) != layer.blocks.end());
 #endif
 	layer.blocks.insert({ grid_position, block_index });
@@ -1580,7 +1575,7 @@ void VoxelInstancer::update_block_from_transforms(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Get or create block
+	// 获取或创建数据块
 	if (block_index == -1) {
 		block_index = create_block(layer, layer_id, grid_position, false);
 	}
@@ -1590,7 +1585,7 @@ void VoxelInstancer::update_block_from_transforms(
 #endif
 	Block &block = *_blocks[block_index];
 
-	// Update multimesh
+	// 更新 multimesh
 	const VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(&item_base);
 	if (item != nullptr) {
 		update_multimesh_block_from_transforms(
@@ -1599,7 +1594,7 @@ void VoxelInstancer::update_block_from_transforms(
 		return;
 	}
 
-	// Update scene instances
+	// 更新场景实例
 	const VoxelInstanceLibrarySceneItem *scene_item = Object::cast_to<VoxelInstanceLibrarySceneItem>(&item_base);
 	if (scene_item != nullptr) {
 		update_scene_block_from_transforms(block, block_index, block_local_position, transforms, *scene_item);
@@ -1639,17 +1634,16 @@ void VoxelInstancer::update_multimesh_block_from_transforms(
 		voxel::godot::DirectMultiMeshInstance::make_transform_3d_bulk_array(transforms, bulk_array);
 		multimesh->set_instance_count(transforms.size());
 
-		// Setting the mesh BEFORE `multimesh_set_buffer` because otherwise Godot computes the AABB inside
-		// `multimesh_set_buffer` BY DOWNLOADING BACK THE BUFFER FROM THE GRAPHICS CARD which can incur a very harsh
-		// performance penalty
-		// TODO If we could use custom AABBs, we would not need this reordering
+		// 在 `multimesh_set_buffer` 之前设置网格，因为否则 Godot 会在 `multimesh_set_buffer` 内部
+		// 通过从显卡下载回缓冲区来计算 AABB，这会带来非常严重的性能惩罚
+		// TODO 如果我们能使用自定义 AABB，就不需要这种重新排序
 		if (settings.mesh_lod_count > 0) {
 			if (block.current_mesh_lod < settings.mesh_lod_count) {
 				multimesh->set_mesh(settings.mesh_lods[block.current_mesh_lod]);
 			}
 		}
 
-		// TODO Waiting for Godot to expose the method on the resource object
+		// TODO 等待 Godot 在资源对象上公开该方法
 		// multimesh->set_as_bulk_array(bulk_array);
 		RenderingServer::get_singleton()->multimesh_set_buffer(multimesh->get_rid(), bulk_array);
 
@@ -1670,16 +1664,16 @@ void VoxelInstancer::update_multimesh_block_from_transforms(
 		block.multimesh_instance.set_gi_mode(settings.gi_mode);
 
 		if (settings.mesh_lod_count > 1 || (settings.mesh_lod_count == 1 && item.get_hide_beyond_max_lod())) {
-			// Hide for now, let the LOD system show/hide and assign the right mesh when it runs. We do this because
-			// the LOD system doesn't necessarily update every blocks every frame, which would flicker at their full
-			// LOD when spawning
+			// 暂时隐藏，让 LOD 系统运行时负责显示/隐藏并分配正确的网格。我们这样做是因为
+			// LOD 系统不一定每帧更新每个数据块，否则在生成时它们会以其完整
+			// LOD 闪烁
 			block.current_mesh_lod = settings.mesh_lod_count;
 			block.multimesh_instance.set_visible(false);
 		}
 	}
 
 	if (item.get_collision_distance() < 0.f) {
-		// Colliders always present, create them all right away
+		// 碰撞体始终存在，立即全部创建
 		update_multimesh_block_colliders(block, block_index, settings, transforms, block_local_position);
 	}
 }
@@ -1691,7 +1685,7 @@ void VoxelInstancer::update_multimesh_block_colliders(
 		Span<const Transform3f> transforms,
 		const Vector3 block_local_position
 ) {
-	// Update bodies
+	// 更新刚体
 	Span<const CollisionShapeInfo> collision_shapes = to_span(settings.collision_shapes);
 	if (collision_shapes.size() == 0) {
 		return;
@@ -1701,27 +1695,26 @@ void VoxelInstancer::update_multimesh_block_colliders(
 
 	const int data_block_size_po2 = _parent_data_block_size_po2;
 
-	// Add new bodies
+	// 添加新刚体
 	for (unsigned int instance_index = 0; instance_index < transforms.size(); ++instance_index) {
 		const Transform3D local_transform = to_transform3(transforms[instance_index]);
-		// Bodies are child nodes of the instancer, so we use local block coordinates
+		// 刚体是实例化器的子节点，因此我们使用本地数据块坐标
 		const Transform3D body_transform(local_transform.basis, local_transform.origin + block_local_position);
 
 		VoxelInstancerRigidBody *body;
 
 		if (instance_index < block.bodies.size()) {
-			// Body already exists, we'll only update its properties
+			// 刚体已存在，我们仅更新其属性
 			body = block.bodies[instance_index];
 
 		} else {
-			// Create body
+			// 创建刚体
 
-			// TODO Performance: removing nodes from the tree is slow. It causes framerate stalls.
-			// See https://github.com/godotengine/godot/issues/61929
-			// Instances with collisions can lead to the creation of thousands of nodes. While this works in
-			// practice, removal proved to be very slow. Not because of physics, but because of an issue in the
-			// node system itself. A possible workaround is to either use servers directly, or put nodes as
-			// children of more nodes acting as buckets.
+			// TODO 性能：从场景树中移除节点很慢，会导致帧率卡顿。
+			// 参见 https://github.com/godotengine/godot/issues/61929
+			// 带碰撞体的实例可能导致创建数千个节点。虽然这在实践中可行，
+			// 但移除被证明非常慢。不是因为物理引擎，而是因为节点系统本身的问题。
+			// 一种可能的解决方法是直接使用服务器，或者将节点作为更多充当桶的节点的子节点。
 			body = memnew(VoxelInstancerRigidBody);
 			body->attach(this);
 			body->set_instance_index(instance_index);
@@ -1749,7 +1742,7 @@ void VoxelInstancer::update_multimesh_block_colliders(
 		body->set_transform(body_transform);
 	}
 
-	// Remove excess bodies
+	// 移除多余的刚体
 	for (unsigned int instance_index = transforms.size(); instance_index < block.bodies.size(); ++instance_index) {
 		VoxelInstancerRigidBody *body = block.bodies[instance_index];
 		body->detach_and_destroy();
@@ -1780,7 +1773,7 @@ void VoxelInstancer::update_scene_block_from_transforms(
 
 	const int data_block_size_po2 = _parent_data_block_size_po2;
 
-	// Add new instances
+	// 添加新实例
 	for (unsigned int instance_index = 0; instance_index < transforms.size(); ++instance_index) {
 		const Transform3D local_transform = to_transform3(transforms[instance_index]);
 		const Transform3D body_transform(local_transform.basis, local_transform.origin + block_local_position);
@@ -1798,10 +1791,10 @@ void VoxelInstancer::update_scene_block_from_transforms(
 			block.scene_instances.push_back(instance);
 		}
 
-		// TODO Deserialize state
+		// TODO 反序列化状态
 	}
 
-	// Remove old instances
+	// 移除旧实例
 	for (unsigned int instance_index = transforms.size(); instance_index < block.scene_instances.size();
 		 ++instance_index) {
 		SceneInstance instance = block.scene_instances[instance_index];
@@ -1832,14 +1825,14 @@ void VoxelInstancer::create_render_blocks(
 
 	Lod &lod = _lods[lod_index];
 
-	// Create empty blocks in pending state
+	// 创建处于挂起状态的空数据块
 	for (auto layer_it = lod.layers.begin(); layer_it != lod.layers.end(); ++layer_it) {
 		const int layer_id = *layer_it;
 
 		Layer &layer = get_layer(layer_id);
 
 		if (layer.blocks.find(render_grid_position) != layer.blocks.end()) {
-			// The block was already made?
+			// 数据块已经创建过了？
 			continue;
 		}
 
@@ -1929,13 +1922,13 @@ SaveBlockDataTask *VoxelInstancer::save_block(
 			layer_data.scale_min = item->get_generator()->get_min_scale();
 			layer_data.scale_max = item->get_generator()->get_max_scale();
 		} else {
-			// TODO Calculate scale range automatically in the serializer
+			// TODO 在序列化器中自动计算缩放范围
 			layer_data.scale_min = 0.1f;
 			layer_data.scale_max = 10.f;
 		}
 
 		if (render_block.multimesh_instance.is_valid()) {
-			// Multimeshes
+			// Multimesh 网格
 
 			Ref<MultiMesh> multimesh = render_block.multimesh_instance.get_multimesh();
 			CRASH_COND(multimesh.is_null());
@@ -1947,16 +1940,16 @@ SaveBlockDataTask *VoxelInstancer::save_block(
 			if (render_to_data_factor == 1) {
 				layer_data.instances.resize(instance_count);
 
-				// TODO Optimization: it would be nice to get the whole array at once
+				// TODO 优化：如果能一次性获取整个数组就好了
 				for (int instance_index = 0; instance_index < instance_count; ++instance_index) {
-					// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+					// TODO 优化：首次执行非常慢，之后仍有开销。
 					layer_data.instances[instance_index].transform =
 							to_transform3f(multimesh->get_instance_transform(instance_index));
 				}
 
 			} else if (render_to_data_factor == 2) {
 				for (int instance_index = 0; instance_index < instance_count; ++instance_index) {
-					// TODO Optimize: This is terrible in MT mode! Think about keeping a local copy...
+					// TODO 优化：在多线程模式下这很糟糕！考虑保留一份本地副本...
 					const Transform3D rendered_instance_transform = multimesh->get_instance_transform(instance_index);
 					const int instance_octant_index = VoxelInstanceGenerator::get_octant_index(
 							to_vec3f(rendered_instance_transform.origin), half_render_block_size
@@ -1970,7 +1963,7 @@ SaveBlockDataTask *VoxelInstancer::save_block(
 			}
 
 		} else if (render_block.scene_instances.size() > 0) {
-			// Scenes
+			// 场景
 
 			VOXEL_PROFILE_SCOPE();
 			const unsigned int instance_count = render_block.scene_instances.size();
@@ -2000,19 +1993,18 @@ SaveBlockDataTask *VoxelInstancer::save_block(
 						d.transform = to_transform3f(t);
 						layer_data.instances.push_back(d);
 					}
-					// TODO Serialize state?
+					// TODO 序列化状态？
 				}
 			}
 
-			// Make scene transforms relative to render block
+			// 使场景变换相对于渲染数据块
 			// for (InstanceBlockData::InstanceData &d : layer_data.instances) {
 			// 	d.transform.origin -= render_block_origin;
 			// }
 		}
 
 		if (render_to_data_factor == 2) {
-			// Data blocks are on a smaller grid than render blocks so we may convert the relative position
-			// of the instances
+			// 数据块所在的网格比渲染数据块更小，因此我们可以转换实例的相对位置
 			const Vector3f rel = to_vec3f(data_block_size * (data_grid_pos - render_block_pos * render_to_data_factor));
 			for (InstanceBlockData::InstanceData &d : layer_data.instances) {
 				d.transform.origin -= rel;
@@ -2027,8 +2019,8 @@ SaveBlockDataTask *VoxelInstancer::save_block(
 
 	if (cache_while_saving) {
 		Lod &lod_mutable = _lods[lod_index];
-		// Keep data in memory in case it quickly gets reloaded
-		// TODO Making a pre-emptive copy isn't very efficient, we could keep a shared_ptr instead?
+		// 将数据保留在内存中，以防其很快被重新加载
+		// TODO 预先复制副本效率不高，我们是否可以改用 shared_ptr？
 		UniquePtr<InstanceBlockData> saving_cache = make_unique_instance<InstanceBlockData>();
 		block_data->copy_to(*saving_cache);
 		if (lod_mutable.quick_reload_cache == nullptr) {
@@ -2060,15 +2052,15 @@ inline bool detect_ground(
 	const Vector3 instance_pos_terrain = instance_position_local + block_origin;
 	const Vector3 instance_pos_terrain_below = instance_pos_terrain + normal_offset;
 
-	// TODO Optimize: use a transaction instead of random single queries
+	// TODO 优化：使用事务而不是随机单次查询
 	const float sdf_below = voxel_tool.get_voxel_f_interpolated(instance_pos_terrain_below);
 	if (sdf_below <= sd_threshold) {
-		// Still enough ground
+		// 仍留有足够的支撑地面
 		return true;
 	}
 
 	if (bidirectional) {
-		// Attempt sampling above instead, in case the instance is flipped over
+		// 改为尝试在上方采样，以防实例翻转
 		const Vector3 instance_pos_terrain_above = instance_pos_terrain - normal_offset;
 		const float sdf_above = voxel_tool.get_voxel_f_interpolated(instance_pos_terrain_above);
 		if (sdf_above <= sd_threshold) {
@@ -2114,8 +2106,8 @@ VoxelInstancer::MMRemovalAction VoxelInstancer::get_mm_removal_action(
 				Node3D *root_3d = Object::cast_to<Node3D>(root);
 				if (root_3d != nullptr) {
 					root_3d->set_transform(trans);
-					// We can't add_child when the callback occurs from within the removal of bodies, because Godot
-					// locks children of VoxelInstancer during the process, preventing from adding nodes...
+					// 当回调发生在移除刚体的过程中时，我们不能调用 add_child，因为 Godot
+					// 在该过程中会锁定 VoxelInstancer 的子节点，从而阻止添加节点...
 					// ctx.instancer->add_child(root);
 					ctx.instancer->call_deferred(VoxelStringNames::get_singleton().add_child, root);
 				} else {
@@ -2184,7 +2176,7 @@ void VoxelInstancer::get_instance_positions_local(
 
 	} else {
 		if (!block.multimesh_instance.is_valid()) {
-			// Empty block
+			// 空数据块
 			return;
 		}
 
@@ -2204,18 +2196,18 @@ void VoxelInstancer::get_instance_positions_local(
 			}
 
 			for (unsigned int instance_index = 0; instance_index < instance_count; ++instance_index) {
-				// TODO Optimize: This is very slow the first time, and there is overhead even after that.
-				//      Would it be better to use `multimesh_get_buffer`? Unfortunately it ALWAYS allocates (it
-				//      isn't even benefiting from CoW), and it also doesn't cache, so to force it we'd have to do a
-				//      dummy call to `get_instance_transform`. Using our own cache and carefully avoiding Godot
-				//      from populating its own is still better...
+				// TODO 优化：首次执行非常慢，之后仍有开销。
+				//      使用 `multimesh_get_buffer` 会更好吗？不幸的是它总是分配内存（它
+				//      甚至不利用 CoW），而且也不缓存，所以为了强制它我们就必须做一次
+				//      对 `get_instance_transform` 的伪调用。使用我们自己的缓存并小心避免 Godot
+				//      填充它自己的缓存仍然更好...
 				const Transform3D instance_transform = multimesh->get_instance_transform(instance_index);
 				dst_positions.push_back(to_vec3f(instance_transform.origin));
 				dst_normals->push_back(to_vec3f(voxel::godot::BasisUtility::get_up(instance_transform.basis)));
 			}
 		} else {
 			for (unsigned int instance_index = 0; instance_index < instance_count; ++instance_index) {
-				// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+				// TODO 优化：首次执行非常慢，之后仍有开销。
 				const Transform3D instance_transform = multimesh->get_instance_transform(instance_index);
 				dst_positions.push_back(to_vec3f(instance_transform.origin));
 			}
@@ -2233,7 +2225,7 @@ void VoxelInstancer::get_instance_transforms_local(const Block &block, StdVector
 	dst.resize(instance_count);
 
 	for (unsigned int instance_index = 0; instance_index < instance_count; ++instance_index) {
-		// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+		// TODO 优化：首次执行非常慢，之后仍有开销。
 		const Transform3D trans = multimesh->get_instance_transform(instance_index);
 		dst[instance_index] = to_transform3f(trans);
 	}
@@ -2276,11 +2268,11 @@ void VoxelInstancer::remove_scene_instances_by_index(Block &block, Span<const ui
 
 		const unsigned int last_instance_index = --instance_count;
 
-		// TODO In the case of scene instances, we could use an overlap check or a signal.
-		// Detach so it won't try to update our instances, we already do it here
+		// TODO 对于场景实例的情况，我们可以使用重叠检查或信号。
+		// 分离，这样它就不会尝试更新我们的实例，我们已经在这里做了
 		ERR_CONTINUE(instance.component == nullptr);
-		// Not using detach_as_removed(),
-		// this function is not marking the block as modified. It may be done by the caller.
+		// 不使用 detach_as_removed()，
+		// 该函数不会将数据块标记为已修改。这可以由调用方完成。
 		instance.component->detach();
 		instance.root->queue_free();
 
@@ -2329,26 +2321,25 @@ void VoxelInstancer::remove_multimesh_instances_by_index(
 			instance_transform = multimesh->get_instance_transform(instance_index);
 		}
 
-		// Remove the MultiMesh instance
+		// 移除 MultiMesh 实例
 		const int last_instance_index = --instance_count;
-		// TODO This is terrible in MT mode! Think about keeping a local copy...
+		// TODO 在多线程模式下这很糟糕！考虑保留一份本地副本...
 		const Transform3D last_trans = multimesh->get_instance_transform(last_instance_index);
-		// TODO Also, SETTING transforms internally DOWNLOADS the buffer back to RAM in case it wasn't already,
-		// which Godot presumably uses to update the VRAM buffer in regions. But regions it uses are 512 items wide,
-		// so given our terrain chunks size we often have less items than that so there is very little benefit
-		// compared to uploading the whole buffer. Therefore even if we had our own cache to improve performance on
-		// our side while avoiding the *need* for Godot to have its own cache, we get little to no benefit from the
-		// Godot side.
+		// TODO 另外，设置变换会在内部将缓冲区下载回内存（如果尚未这样做），
+		// Godot 大概用其按区域更新 VRAM 缓冲区。但它使用的区域是 512 个项目宽，
+		// 因此考虑到我们的地形数据块大小，我们通常拥有的项目更少，
+		// 与上传整个缓冲区相比几乎没有好处。因此即使我们有自己的缓存来提高我们这边的性能，
+		// 同时避免 Godot *需要* 自己的缓存，我们从 Godot 这边也得不到什么好处。
 		multimesh->set_instance_transform(instance_index, last_trans);
 
-		// Remove the body if this block has some
-		// TODO In the case of bodies, we could use an overlap check
+		// 如果该数据块有刚体，则移除它
+		// TODO 对于刚体的情形，我们可以使用重叠检查
 		if (block.bodies.size() > 0) {
 			VoxelInstancerRigidBody *rb = block.bodies[instance_index];
-			// Detach so it won't try to update our instances, we already do it here
+			// 分离，这样它就不会尝试更新我们的实例，我们已经在这里做了
 			rb->detach_and_destroy();
 
-			// Update the last body index since we did a swap-removal
+			// 由于我们做了交换移除，更新最后一个刚体索引
 			VoxelInstancerRigidBody *moved_rb = block.bodies[last_instance_index];
 			if (moved_rb != rb) {
 				moved_rb->set_instance_index(instance_index);
@@ -2365,7 +2356,7 @@ void VoxelInstancer::remove_multimesh_instances_by_index(
 	}
 
 	if (instance_count < initial_instance_count) {
-		// According to the docs, set_instance_count() resets the array so we only hide them instead
+		// 根据文档，set_instance_count() 会重置数组，因此我们改为只隐藏它们
 		multimesh->set_visible_instance_count(instance_count);
 
 		if (block.bodies.size() > 0) {
@@ -2401,7 +2392,7 @@ void VoxelInstancer::do_area_operation(const Box3i p_voxel_box, IAreaOperation &
 			const Layer &layer = get_layer(layer_id);
 			const StdVector<UniquePtr<Block>> &blocks = _blocks;
 
-			// Iterate blocks intersecting the area
+			// 迭代与该区域相交的数据块
 			const Vector3i bmax = render_blocks_box.position + render_blocks_box.size;
 			Vector3i block_pos;
 			for (block_pos.z = render_blocks_box.position.z; block_pos.z < bmax.z; ++block_pos.z) {
@@ -2410,7 +2401,7 @@ void VoxelInstancer::do_area_operation(const Box3i p_voxel_box, IAreaOperation &
 						//
 						const auto block_it = layer.blocks.find(block_pos);
 						if (block_it == layer.blocks.end()) {
-							// No instancing block here
+							// 这里没有实例化数据块
 							continue;
 						}
 
@@ -2425,8 +2416,8 @@ void VoxelInstancer::do_area_operation(const Box3i p_voxel_box, IAreaOperation &
 		if (modified) {
 			const Box3i data_blocks_box = p_voxel_box.downscaled(data_block_size << lod_index);
 
-			// All instances have to be frozen as edited.
-			// TODO Optimization: maybe we can narrow it down per item ID, if that's necessary
+			// 所有实例都必须被冻结为已编辑状态。
+			// TODO 优化：如有必要，也许可以按项 ID 缩小范围
 			data_blocks_box.for_each_cell([&lod](Vector3i data_block_pos) { //
 				lod.modified_blocks.insert(data_block_pos);
 			});
@@ -2465,7 +2456,7 @@ void VoxelInstancer::remove_floating_instances(const Box3i p_voxel_box) {
 
 		const Box3i render_blocks_box = p_voxel_box.downscaled(render_block_size << lod_index);
 
-		// Remove floating instances
+		// 移除悬空实例
 		for (const int layer_id : lod.layers) {
 			const Layer &layer = get_layer(layer_id);
 			const StdVector<UniquePtr<Block>> &blocks = _blocks;
@@ -2485,7 +2476,7 @@ void VoxelInstancer::remove_floating_instances(const Box3i p_voxel_box) {
 						//
 						const auto block_it = layer.blocks.find(block_pos);
 						if (block_it == layer.blocks.end()) {
-							// No instancing block here
+							// 这里没有实例化数据块
 							continue;
 						}
 
@@ -2541,10 +2532,9 @@ void VoxelInstancer::remove_floating_instances(const Box3i p_voxel_box) {
 
 		const Box3i data_blocks_box = p_voxel_box.downscaled(data_block_size << lod_index);
 
-		// All instances have to be frozen as edited.
-		// Because even if none of them were removed or added, the ground on which they can spawn has
-		// changed, and at the moment we don't want unexpected instances to generate when loading back
-		// this area.
+		// 所有实例都必须被冻结为已编辑状态。
+		// 因为即使它们中没有一个被移除或添加，它们可能生成的地面也
+		// 发生了变化，而目前我们不希望在重新加载该区域时生成意外的实例。
 		data_blocks_box.for_each_cell([&lod](Vector3i data_block_pos) { //
 			lod.modified_blocks.insert(data_block_pos);
 		});
@@ -2563,7 +2553,7 @@ void VoxelInstancer::remove_floating_multimesh_instances(
 		const MMRemovalAction removal_action
 ) {
 	if (!block.multimesh_instance.is_valid()) {
-		// Empty block
+		// 空数据块
 		return;
 	}
 
@@ -2577,12 +2567,12 @@ void VoxelInstancer::remove_floating_multimesh_instances(
 	// 		Transform3D(parent_transform.basis, parent_transform.xform(block.grid_position << block_size_po2));
 	const Vector3i block_origin_in_voxels = block.grid_position << block_size_po2;
 
-	// Let's check all instances one by one
-	// Note: the fact we have to query VisualServer in and out is pretty bad though.
-	// - We probably have to sync with its thread in MT mode
-	// - A hashmap RID lookup is performed to check `RID_Owner::id_map`
+	// 让我们逐个检查所有实例
+	// 注意：我们必须反复查询 VisualServer 这一点相当糟糕。
+	// - 在多线程模式下，我们可能必须与其线程同步
+	// - 执行哈希映射 RID 查找来检查 `RID_Owner::id_map`
 	for (int instance_index = 0; instance_index < instance_count; ++instance_index) {
-		// TODO Optimize: This is terrible in MT mode! Think about keeping a local copy...
+		// TODO 优化：在多线程模式下这很糟糕！考虑保留一份本地副本...
 		const Transform3D instance_transform = multimesh->get_instance_transform(instance_index);
 		const Vector3i voxel_pos(math::floor_to_int(instance_transform.origin) + block_origin_in_voxels);
 
@@ -2602,25 +2592,25 @@ void VoxelInstancer::remove_floating_multimesh_instances(
 			continue;
 		}
 
-		// Remove the MultiMesh instance
+		// 移除 MultiMesh 实例
 		const int last_instance_index = --instance_count;
-		// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+		// TODO 优化：首次执行非常慢，之后仍有开销。
 		const Transform3D last_trans = multimesh->get_instance_transform(last_instance_index);
-		// TODO Also, SETTING transforms internally DOWNLOADS the buffer back to RAM in case it wasn't already,
-		// which Godot presumably uses to update the VRAM buffer in regions. But regions it uses are 512 items wide, so
-		// given our terrain chunks size we often have less items than that so there is very little benefit compared to
-		// uploading the whole buffer. Therefore even if we had our own cache to improve performance on our side while
-		// avoiding the *need* for Godot to have its own cache, we get little to no benefit from the Godot side.
+		// TODO 另外，设置变换会在内部将缓冲区下载回内存（如果尚未这样做），
+		// Godot 大概用其按区域更新 VRAM 缓冲区。但它使用的区域是 512 个项目宽，
+		// 因此考虑到我们的地形数据块大小，我们通常拥有的项目更少，
+		// 与上传整个缓冲区相比几乎没有好处。因此即使我们有自己的缓存来提高我们这边的性能，
+		// 同时避免 Godot *需要* 自己的缓存，我们从 Godot 这边也得不到什么好处。
 		multimesh->set_instance_transform(instance_index, last_trans);
 
-		// Remove the body if this block has some
-		// TODO In the case of bodies, we could use an overlap check
+		// 如果该数据块有刚体，则移除它
+		// TODO 对于刚体的情形，我们可以使用重叠检查
 		if (block.bodies.size() > 0) {
 			VoxelInstancerRigidBody *rb = block.bodies[instance_index];
-			// Detach so it won't try to update our instances, we already do it here
+			// 分离，这样它就不会尝试更新我们的实例，我们已经在这里做了
 			rb->detach_and_destroy();
 
-			// Update the last body index since we did a swap-removal
+			// 由于我们做了交换移除，更新最后一个刚体索引
 			VoxelInstancerRigidBody *moved_rb = block.bodies[last_instance_index];
 			if (moved_rb != rb) {
 				moved_rb->set_instance_index(instance_index);
@@ -2649,7 +2639,7 @@ void VoxelInstancer::remove_floating_multimesh_instances(
 	}
 
 	if (instance_count < initial_instance_count) {
-		// According to the docs, set_instance_count() resets the array so we only hide them instead
+		// 根据文档，set_instance_count() 会重置数组，因此我们改为只隐藏它们
 		multimesh->set_visible_instance_count(instance_count);
 
 		if (block.bodies.size() > 0) {
@@ -2683,10 +2673,10 @@ void VoxelInstancer::remove_floating_scene_instances(
 	const Transform3D block_global_transform =
 			Transform3D(parent_transform.basis, parent_transform.xform(block.grid_position << block_size_po2));
 
-	// Let's check all instances one by one
-	// Note: the fact we have to query VisualServer in and out is pretty bad though.
-	// - We probably have to sync with its thread in MT mode
-	// - A hashmap RID lookup is performed to check `RID_Owner::id_map`
+	// 让我们逐个检查所有实例
+	// 注意：我们必须反复查询 VisualServer 这一点相当糟糕。
+	// - 在多线程模式下，我们可能必须与其线程同步
+	// - 执行哈希映射 RID 查找来检查 `RID_Owner::id_map`
 	for (unsigned int instance_index = 0; instance_index < instance_count; ++instance_index) {
 		SceneInstance instance = block.scene_instances[instance_index];
 		ERR_CONTINUE(instance.root == nullptr);
@@ -2700,7 +2690,7 @@ void VoxelInstancer::remove_floating_scene_instances(
 		if (detect_ground(
 					scene_transform.origin,
 					voxel::godot::BasisUtility::get_up(scene_transform.basis),
-					Vector3(), // Little hack, scenes are already in terrain space
+					Vector3(), // 小技巧，场景已经在地形空间中
 					sd_threshold,
 					sd_offset,
 					bidirectional,
@@ -2709,14 +2699,14 @@ void VoxelInstancer::remove_floating_scene_instances(
 			continue;
 		}
 
-		// Remove the MultiMesh instance
+		// 移除 MultiMesh 实例
 		const unsigned int last_instance_index = --instance_count;
 
-		// TODO In the case of scene instances, we could use an overlap check or a signal.
-		// Detach so it won't try to update our instances, we already do it here
+		// TODO 对于场景实例的情况，我们可以使用重叠检查或信号。
+		// 分离，这样它就不会尝试更新我们的实例，我们已经在这里做了
 		ERR_CONTINUE(instance.component == nullptr);
-		// Not using detach_as_removed(),
-		// this function is not marking the block as modified. It may be done by the caller.
+		// 不使用 detach_as_removed()，
+		// 该函数不会将数据块标记为已修改。这可以由调用方完成。
 		instance.component->detach();
 		instance.root->queue_free();
 
@@ -2775,15 +2765,15 @@ void VoxelInstancer::remove_floating_instances(const Box3i voxel_box) {
 		Result execute(Block &block) override {
 			VOXEL_PROFILE_SCOPE();
 
-			// TODO Candidate for temp allocator
-			// TODO If we had our own cache, we might not need to allocate at all
+			// TODO 临时分配器的候选
+			// TODO 如果我们有自己的缓存，可能就完全不需要分配了
 			StdVector<Vector3f> instance_positions;
 			StdVector<Vector3f> instance_normals;
 			get_instance_positions_local(block, _base_block_size, instance_positions, &instance_normals);
 
 			try_update_item_cache(block.layer_id);
 
-			// TODO We can get away with local positions if we use something more optimal than individual voxel queries
+			// TODO 如果我们使用比逐个体素查询更优化的方式，就可以只使用本地位置
 			const Vector3i block_origin_i = block.grid_position * (_base_block_size << block.lod_index);
 			const Vector3 block_origin(block_origin_i);
 
@@ -2792,7 +2782,7 @@ void VoxelInstancer::remove_floating_instances(const Box3i voxel_box) {
 					to_vec3f(_voxel_box.position - block_origin_i + _voxel_box.size)
 			);
 
-			// TODO Candidate for temp allocator
+			// TODO 临时分配器的候选
 			StdVector<uint32_t> instances_to_remove;
 			for (unsigned int instance_index = 0; instance_index < instance_positions.size(); ++instance_index) {
 				const Vector3f instance_pos = instance_positions[instance_index];
@@ -2828,7 +2818,7 @@ void VoxelInstancer::remove_floating_instances(const Box3i voxel_box) {
 				return;
 			}
 
-			// Re-cache item info
+			// 重新缓存项信息
 
 			_mm_removal_action = MMRemovalAction();
 			_mm_removal_action_item_id = item_id;
@@ -2866,7 +2856,7 @@ void VoxelInstancer::remove_floating_instances(const Box3i voxel_box) {
 
 #endif
 
-// This is called if a user destroys or unparents the body node while it's still attached to the ground
+// 当用户在其仍附着在地面上时销毁或移除刚体节点，会调用此函数
 void VoxelInstancer::on_body_removed(
 		Vector3i data_block_position,
 		unsigned int render_block_index,
@@ -2892,7 +2882,7 @@ void VoxelInstancer::on_body_removed(
 	}
 
 	if (block.multimesh_instance.is_valid()) {
-		// Remove the multimesh instance
+		// 移除 multimesh 实例
 
 		Ref<MultiMesh> multimesh = block.multimesh_instance.get_multimesh();
 		ERR_FAIL_COND(multimesh.is_null());
@@ -2902,7 +2892,7 @@ void VoxelInstancer::on_body_removed(
 			Ref<VoxelInstanceLibraryMultiMeshItem> mm_item = item;
 			MMRemovalAction action = get_mm_removal_action(this, mm_item.ptr());
 			if (action.is_valid()) {
-				// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+				// TODO 优化：首次执行非常慢，之后仍有开销。
 				const Transform3D ltrans = multimesh->get_instance_transform(instance_index);
 				const Vector3i block_origin_in_voxels = data_block_position
 						<< (_parent_mesh_block_size_po2 + block.lod_index);
@@ -2915,25 +2905,25 @@ void VoxelInstancer::on_body_removed(
 		ERR_FAIL_COND(static_cast<int>(instance_index) >= visible_count);
 
 		--visible_count;
-		// Swap-remove
-		// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+		// 交换移除
+		// TODO 优化：首次执行非常慢，之后仍有开销。
 		const Transform3D last_trans = multimesh->get_instance_transform(visible_count);
 		multimesh->set_instance_transform(instance_index, last_trans);
 		multimesh->set_visible_instance_count(visible_count);
 	}
 
-	// Unregister the body
+	// 注销该刚体
 	unsigned int body_count = block.bodies.size();
 	const unsigned int last_instance_index = --body_count;
 	VoxelInstancerRigidBody *moved_body = block.bodies[last_instance_index];
 	if (instance_index != last_instance_index) {
-		// Update last body index because we did a swap-remove
+		// 由于我们做了交换移除，更新最后一个刚体索引
 		moved_body->set_instance_index(instance_index);
 		block.bodies[instance_index] = moved_body;
 	}
 	block.bodies.resize(body_count);
 
-	// Mark data block as modified
+	// 将数据块标记为已修改
 	const Layer &layer = get_layer(block.layer_id);
 	Lod &lod = _lods[layer.lod_index];
 	lod.modified_blocks.insert(data_block_position);
@@ -2947,19 +2937,19 @@ void VoxelInstancer::on_scene_instance_removed(
 	Block &block = *_blocks[render_block_index];
 	VOXEL_ASSERT_RETURN(instance_index < block.scene_instances.size());
 
-	// Unregister the scene instance
+	// 注销该场景实例
 	unsigned int instance_count = block.scene_instances.size();
 	const unsigned int last_instance_index = --instance_count;
 	SceneInstance moved_instance = block.scene_instances[last_instance_index];
 	if (instance_index != last_instance_index) {
-		// Update last instance index because we did a swap-remove
+		// 由于我们做了交换移除，更新最后一个实例索引
 		ERR_FAIL_COND(moved_instance.component == nullptr);
 		moved_instance.component->set_instance_index(instance_index);
 		block.scene_instances[instance_index] = moved_instance;
 	}
 	block.scene_instances.resize(instance_count);
 
-	// Mark data block as modified
+	// 将数据块标记为已修改
 	const Layer &layer = get_layer(block.layer_id);
 	Lod &lod = _lods[layer.lod_index];
 	lod.modified_blocks.insert(data_block_position);
@@ -2968,7 +2958,7 @@ void VoxelInstancer::on_scene_instance_removed(
 void VoxelInstancer::on_scene_instance_modified(Vector3i data_block_position, unsigned int render_block_index) {
 	Block &block = *_blocks[render_block_index];
 
-	// Mark data block as modified
+	// 将数据块标记为已修改
 	const Layer &layer = get_layer(block.layer_id);
 	Lod &lod = _lods[layer.lod_index];
 	lod.modified_blocks.insert(data_block_position);
@@ -2999,7 +2989,7 @@ int VoxelInstancer::get_library_item_id_from_render_block_index(unsigned int ren
 	return block.layer_id;
 }
 
-// DEBUG LAND
+// 调试相关
 
 int VoxelInstancer::debug_get_block_count() const {
 	return _blocks.size();
@@ -3067,7 +3057,7 @@ Node3D *VoxelInstancer::convert_to_nodes(const uint32_t flags) const {
 
 	StdUnorderedMap<Ref<Mesh>, Ref<Mesh>> mesh_copies;
 
-	// For each layer
+	// 遍历每一层
 	for (auto layer_it = _layers.begin(); layer_it != _layers.end(); ++layer_it) {
 		const Layer &layer = layer_it->second;
 		const int lod_block_size = mesh_block_size << layer.lod_index;
@@ -3087,7 +3077,7 @@ Node3D *VoxelInstancer::convert_to_nodes(const uint32_t flags) const {
 			}
 		}
 
-		// For each block in layer
+		// 遍历层中的每个数据块
 		for (auto block_it = layer.blocks.begin(); block_it != layer.blocks.end(); ++block_it) {
 			const unsigned int block_index = block_it->second;
 			CRASH_COND(block_index >= _blocks.size());
@@ -3103,8 +3093,8 @@ Node3D *VoxelInstancer::convert_to_nodes(const uint32_t flags) const {
 
 				Ref<Mesh> mesh;
 				if ((flags & NODE_CONVERSION_DUPLICATE_MESHES) != 0) {
-					// Duplicating the meshes can be necessary because often they don't get saved even with
-					// `FLAG_BUNDLE_RESOURCES` when saving to a PackedScene
+					// 复制网格可能是必要的，因为即使使用 `FLAG_BUNDLE_RESOURCES`，
+					// 保存到 PackedScene 时它们也常常不会被保存
 					auto mesh_copy_it = mesh_copies.find(src_mesh);
 					Ref<Mesh> mesh_copy;
 					if (mesh_copy_it == mesh_copies.end()) {
@@ -3142,7 +3132,7 @@ Node3D *VoxelInstancer::convert_to_nodes(const uint32_t flags) const {
 				layer_node->add_child(mmi);
 			}
 
-			// TODO Dump scene instances too
+			// TODO 也导出场景实例
 		}
 	}
 
@@ -3240,7 +3230,7 @@ Dictionary VoxelInstancer::debug_get_block_infos(const Vector3 world_position, c
 			instances_array.resize(count);
 
 			for (unsigned int instance_index = 0; instance_index < count; ++instance_index) {
-				// TODO Optimize: This is very slow the first time, and there is overhead even after that.
+				// TODO 优化：首次执行非常慢，之后仍有开销。
 				const Transform3D instance_transform = mm->get_instance_transform(instance_index);
 				instances_array[instance_index] = instance_transform;
 			}

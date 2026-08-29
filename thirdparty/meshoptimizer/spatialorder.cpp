@@ -7,12 +7,12 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Fabian Giesen. Decoding Morton codes. 2009
+// 此作品基于：
+// Fabian Giesen。《解码 Morton 码》，2009
 namespace meshopt
 {
 
-// "Insert" two 0 bits after each of the 20 low bits of x
+// 在 x 的 20 个低位之后各插入两个 0 位
 inline unsigned long long part1By2(unsigned long long x)
 {
 	x &= 0x000fffffull;                          // x = ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- jihg fedc ba98 7654 3210
@@ -50,10 +50,10 @@ static void computeOrder(unsigned long long* result, const float* vertex_positio
 	extent = (maxv[1] - minv[1]) < extent ? extent : (maxv[1] - minv[1]);
 	extent = (maxv[2] - minv[2]) < extent ? extent : (maxv[2] - minv[2]);
 
-	// rescale each axis to 16 bits to get 48-bit Morton codes
+	// 将每个轴重新缩放到 16 位，以得到 48 位 Morton 码
 	float scale = extent == 0 ? 0.f : 65535.f / extent;
 
-	// generate Morton order based on the position inside a unit cube
+	// 基于单位立方体内的位置生成 Morton 顺序
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
 		const float* v = vertex_positions_data + i * vertex_stride_float;
@@ -80,7 +80,7 @@ static void radixSort10(unsigned int* destination, const unsigned int* source, c
 
 	unsigned int sum = 0;
 
-	// replace histogram data with prefix histogram sums in-place
+	// 就地用直方图前缀和替换直方图数据
 	for (int i = 0; i < 1024; ++i)
 	{
 		unsigned int h = hist[i];
@@ -90,7 +90,7 @@ static void radixSort10(unsigned int* destination, const unsigned int* source, c
 
 	assert(sum == count);
 
-	// reorder values
+	// 重新排序值
 	for (size_t i = 0; i < count; ++i)
 	{
 		unsigned int id = keys[source[i]];
@@ -103,7 +103,7 @@ static void computeHistogram(unsigned int (&hist)[256][2], const unsigned short*
 {
 	memset(hist, 0, sizeof(hist));
 
-	// compute 2 8-bit histograms in parallel
+	// 并行计算 2 个 8 位直方图
 	for (size_t i = 0; i < count; ++i)
 	{
 		unsigned long long id = data[i];
@@ -114,7 +114,7 @@ static void computeHistogram(unsigned int (&hist)[256][2], const unsigned short*
 
 	unsigned int sum0 = 0, sum1 = 0;
 
-	// replace histogram data with prefix histogram sums in-place
+	// 就地用直方图前缀和替换直方图数据
 	for (int i = 0; i < 256; ++i)
 	{
 		unsigned int h0 = hist[i][0], h1 = hist[i][1];
@@ -184,11 +184,11 @@ static void splitPoints(unsigned int* destination, unsigned int* orderx, unsigne
 
 	assert(bestk >= 0);
 
-	// split roughly in half, with the left split always being aligned to cluster size
+	// 大致分为两半，左侧部分始终与 cluster size 对齐
 	size_t split = ((count / 2) + cluster_size - 1) / cluster_size * cluster_size;
 	assert(split > 0 && split < count);
 
-	// mark sides of split for partitioning
+	// 为分区标记分割的两侧
 	unsigned char* sides = static_cast<unsigned char*>(scratch) + count * sizeof(unsigned int);
 
 	for (size_t i = 0; i < split; ++i)
@@ -197,7 +197,7 @@ static void splitPoints(unsigned int* destination, unsigned int* orderx, unsigne
 	for (size_t i = split; i < count; ++i)
 		sides[axes[bestk][i]] = 1;
 
-	// partition all axes into two sides, maintaining order
+	// 在保持顺序的同时，将所有轴分到两侧
 	unsigned int* temp = static_cast<unsigned int*>(scratch);
 
 	for (int k = 0; k < 3; ++k)
@@ -228,7 +228,7 @@ void meshopt_spatialSortRemap(unsigned int* destination, const float* vertex_pos
 	unsigned long long* keys = allocator.allocate<unsigned long long>(vertex_count);
 	computeOrder(keys, vertex_positions, vertex_count, vertex_positions_stride, /* morton= */ true);
 
-	unsigned int* scratch = allocator.allocate<unsigned int>(vertex_count * 2); // 4b for order + 2b for keys
+	unsigned int* scratch = allocator.allocate<unsigned int>(vertex_count * 2); // 4 位用于 order + 2 位用于 keys
 	unsigned short* keyk = (unsigned short*)(scratch + vertex_count);
 
 	for (size_t i = 0; i < vertex_count; ++i)
@@ -236,17 +236,17 @@ void meshopt_spatialSortRemap(unsigned int* destination, const float* vertex_pos
 
 	unsigned int* order[] = {scratch, destination};
 
-	// 5-pass radix sort computes the resulting order into scratch
+	// 5 趟基数排序将结果顺序计算到临时空间中
 	for (int k = 0; k < 5; ++k)
 	{
-		// copy 10-bit key segments into keyk to reduce cache pressure during radix pass
+		// 将 10 位键段复制到 keyk 中，以减少基数排序过程中的缓存压力
 		for (size_t i = 0; i < vertex_count; ++i)
 			keyk[i] = (unsigned short)((keys[i] >> (k * 10)) & 1023);
 
 		radixSort10(order[k % 2], order[(k + 1) % 2], keyk, vertex_count);
 	}
 
-	// since our remap table is mapping old=>new, we need to reverse it
+	// 由于我们的重映射表是 old=>new 映射，我们需要将其反转
 	for (size_t i = 0; i < vertex_count; ++i)
 		destination[scratch[i]] = unsigned(i);
 }
@@ -286,7 +286,7 @@ void meshopt_spatialSortTriangles(unsigned int* destination, const unsigned int*
 
 	meshopt_spatialSortRemap(remap, centroids, face_count, sizeof(float) * 3);
 
-	// support in-order remap
+	// 支持按序重映射
 	if (destination == indices)
 	{
 		unsigned int* indices_copy = allocator.allocate<unsigned int>(index_count);
@@ -319,12 +319,12 @@ void meshopt_spatialClusterPoints(unsigned int* destination, const float* vertex
 	computeOrder(keys, vertex_positions, vertex_count, vertex_positions_stride, /* morton= */ false);
 
 	unsigned int* order = allocator.allocate<unsigned int>(vertex_count * 3);
-	unsigned int* scratch = allocator.allocate<unsigned int>(vertex_count * 2); // 4b for order + 1b for side or 2b for keys
+	unsigned int* scratch = allocator.allocate<unsigned int>(vertex_count * 2); // 4 位用于 order + 1 位用于 side，或 2 位用于 keys
 	unsigned short* keyk = reinterpret_cast<unsigned short*>(scratch + vertex_count);
 
 	for (int k = 0; k < 3; ++k)
 	{
-		// copy 16-bit key segments into keyk to reduce cache pressure during radix pass
+		// 将 16 位键段复制到 keyk 中，以减少基数排序过程中的缓存压力
 		for (size_t i = 0; i < vertex_count; ++i)
 			keyk[i] = (unsigned short)(keys[i] >> (k * 20));
 

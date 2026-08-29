@@ -14,7 +14,7 @@ namespace voxel::godot {
 
 void free_rendering_device_rid(RenderingDevice &rd, RID rid);
 
-// The script-facing RenderingDevice API differs from the module one, so reimplement here.
+// 脚本可用的 RenderingDevice API 与模块版不同，所以在这里重新实现。
 
 Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShaderSource &p_source, bool p_allow_cache);
 PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSPIRV &p_spirv, String name = "");

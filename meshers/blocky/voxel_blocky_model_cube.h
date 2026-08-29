@@ -5,8 +5,8 @@
 
 namespace voxel {
 
-// Cubic model, with configurable tiles on each side
-// TODO Would it be better to add a new PrimitiveMesh doing this, and use VoxelBlockyMesh?
+// 立方体模型，每个侧面都有可配置的贴图
+// TODO 添加一个实现此功能的新 PrimitiveMesh 并使用 VoxelBlockyMesh 会更好吗？
 class VoxelBlockyModelCube : public VoxelBlockyModel {
 	GDCLASS(VoxelBlockyModelCube, VoxelBlockyModel)
 public:

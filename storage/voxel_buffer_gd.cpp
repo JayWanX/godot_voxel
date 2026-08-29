@@ -127,10 +127,10 @@ void op_buffer_buffer_f(
 	}
 }
 
-// Converts the SDF channel into a 3D texture. If the output format is R8 or L8, pixels will contain a normalized
-// distance field (so in shader, 0.5 will be the isolevel instead of 0, and values will go from 0 to 1). Note: in
-// shader, you should use the `yxz` swizzle to sample pixels of that texture, because this is how voxels are stored and
-// this function does not convert the coordinate system.
+// 将 SDF 通道转换为 3D 纹理。如果输出格式为 R8 或 L8，像素将包含归一化的
+// 距离场（因此在着色器中，0.5 将是等值面而不是 0，值范围从 0 到 1）。注意：在
+// 着色器中，你应该使用 `yxz` swizzle 来采样该纹理的像素，因为这就是体素的存储方式，
+// 而此函数不会转换坐标系。
 TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image::Format output_format) {
 	VOXEL_PROFILE_SCOPE();
 
@@ -139,15 +139,14 @@ TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image:
 	const uint64_t xy_area = vb.get_size().x * vb.get_size().y;
 	const VoxelBuffer::Compression channel_compression = vb.get_channel_compression(channel);
 
-	// TODO An array of images is going to waste resources... Godot should really have an Image3D class, or just allow
-	// to pass raw data... `Image` is more than 400 Kb, which is more than a single slice of 8-bit pixels in a 16x16x16
-	// chunk!
+	// TODO 一组图像会浪费资源... Godot 真应该有一个 Image3D 类，或者直接允许
+	// 传入原始数据... `Image` 超过 400 Kb，比单个 16x16x16 chunk 中的一张 8 位像素切片还大！
 	TypedArray<Image> images;
 	images.resize(vb.get_size().z);
 
-	// TODO Is it possible for a shader to specify that a 8-bit depth texture should be sampled as inorm8 and not
-	// unorm8? Because if not, we have to do extra work to convert every voxel here.
-	// That's why for now we have to do these conversions
+	// TODO 着色器能否指定将 8 位深度纹理按 inorm8 而不是 unorm8 采样？
+	// 因为如果不能，我们就必须在这里做额外的工作来转换每个体素。
+	// 这就是为什么目前我们不得不做这些转换
 	struct L {
 		static inline uint8_t s8_to_u8(const int8_t i) {
 			return static_cast<uint8_t>(static_cast<int16_t>(i) + 128);
@@ -158,7 +157,7 @@ TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image:
 		}
 	};
 
-	// Not all combinations are supported. For now we only implement those we need.
+	// 并非所有组合都受支持。目前只实现我们需要的。
 	switch (depth) {
 		case VoxelBuffer::DEPTH_8_BIT:
 			VOXEL_PRINT_ERROR("Channel depth not supported.");
@@ -168,8 +167,8 @@ TypedArray<Image> sdf_to_3d_texture_data_zxy(const VoxelBuffer &vb, const Image:
 			switch (output_format) {
 				case Image::FORMAT_R8:
 				case Image::FORMAT_L8: {
-					// Get fixed-point signed normalized 16-bit SDF to fixed-point unsigned normalized 8-bit SDF.
-					// Sampling this in shader may need something like `(texture(t, pos).r * 2.0 - 1.0) * scale`
+					// 将定点有符号归一化 16 位 SDF 转换为定点无符号归一化 8 位 SDF。
+					// 在着色器中采样时可能需要类似 `(texture(t, pos).r * 2.0 - 1.0) * scale` 的运算
 
 					if (channel_compression == VoxelBuffer::COMPRESSION_UNIFORM) {
 						const int16_t sd_s16 = vb.get_voxel(Vector3i(0, 0, 0), channel);
@@ -235,7 +234,7 @@ Ref<ImageTexture3D> create_3d_texture_from_sdf_zxy(const VoxelBuffer &vb, const 
 
 void update_3d_texture_from_sdf_zxy(const VoxelBuffer &vb, ImageTexture3D &texture) {
 	TypedArray<Image> images = sdf_to_3d_texture_data_zxy(vb, texture.get_format());
-	// Format and size must match
+	// 格式和大小必须匹配
 	voxel::godot::update_image_texture_3d(texture, images);
 }
 
@@ -251,9 +250,9 @@ PackedByteArray get_channel_as_byte_array(const VoxelBuffer &vb, const VoxelBuff
 
 	switch (compression) {
 		case VoxelBuffer::COMPRESSION_UNIFORM: {
-			// Decompress... can't just decompress the VoxelBuffer directly with existing methods, because it is const,
-			// and would waste intermediary memory.
-			// If this behavior is not desired, the caller must check compression first.
+			// 解压...不能直接用现有方法解压 VoxelBuffer，因为它是 const，
+			// 而且会浪费中间内存。
+			// 如果不想要这种行为，调用方必须先检查压缩状态。
 			switch (depth) {
 				case VoxelBuffer::DEPTH_8_BIT: {
 					pba.resize(volume);
@@ -345,7 +344,7 @@ void VoxelBuffer::create(int x, int y, int z) {
 	VOXEL_ASSERT_RETURN(x >= 0);
 	VOXEL_ASSERT_RETURN(y >= 0);
 	VOXEL_ASSERT_RETURN(z >= 0);
-	// Not exposing allocators to scripts for now. Will do if the need comes up.
+	// 目前不向脚本暴露分配器。如有需要以后再做。
 	// VOXEL_ASSERT_RETURN(allocator >= 0 && allocator < ALLOCATOR_COUNT);
 	// _buffer->create(Vector3i(x, y, z), static_cast<voxel::VoxelBuffer::Allocator>(allocator));
 	_buffer->create(Vector3i(x, y, z));
@@ -460,8 +459,8 @@ Ref<VoxelBuffer> VoxelBuffer::duplicate(bool include_metadata) const {
 }
 
 Ref<VoxelTool> VoxelBuffer::get_voxel_tool() {
-	// I can't make this function `const`, because `Ref<T>` has no constructor taking a `const T*`.
-	// The compiler would then choose Ref<T>(const Variant&), which fumbles `this` into a null pointer
+	// 我无法将此函数设为 `const`，因为 `Ref<T>` 没有接受 `const T*` 的构造函数。
+	// 编译器会选择 Ref<T>(const Variant&)，这会把 `this` 变成空指针
 	Ref<VoxelBuffer> vb(this);
 	return Ref<VoxelTool>(memnew(VoxelToolBuffer(vb)));
 }
@@ -480,7 +479,7 @@ void VoxelBuffer::remap_values(unsigned int channel_index, PackedInt32Array map)
 	Span<const int> map_r(map.ptr(), map.size());
 	const voxel::VoxelBuffer::Depth depth = _buffer->get_channel_depth(channel_index);
 
-	// TODO If `get_channel_data` could return a span of size 1 for this case, we wouldn't need this code
+	// TODO 如果 `get_channel_data` 在这种情况下能返回大小为 1 的 span，我们就不需要这段代码
 	if (_buffer->get_channel_compression(channel_index) == voxel::VoxelBuffer::COMPRESSION_UNIFORM) {
 		uint64_t v = _buffer->get_voxel(Vector3i(), channel_index);
 		if (v < map_r.size()) {
@@ -617,8 +616,8 @@ void VoxelBuffer::op_select_less_src_f_dst_i_values(
 	const voxel::VoxelBuffer &src = src_ref->get_buffer();
 	voxel::VoxelBuffer &dst = *_buffer;
 
-	// Optimizable, but a bit too many combinations of formats than it's worth.
-	// If necessary, only optimize common formats.
+	// 可优化，但格式组合太多，不值当。
+	// 如有必要，只优化常见格式。
 
 	if (src.get_channel_depth(src_channel) == voxel::VoxelBuffer::DEPTH_32_BIT &&
 		dst.get_channel_depth(dst_channel) == voxel::VoxelBuffer::DEPTH_16_BIT) {
@@ -646,7 +645,7 @@ void VoxelBuffer::op_select_less_src_f_dst_i_values(
 		}
 
 	} else {
-		// Generic, slower version
+		// 通用、较慢的版本
 		Vector3i pos;
 		const Vector3i size = get_size();
 		for (pos.z = 0; pos.z < size.z; ++pos.z) {
@@ -691,7 +690,7 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 		const Variant key = it->key;
 		const Variant *args[2] = { &key, &v };
 		Callable::CallError err;
-		Variant retval; // We don't care about the return value, Callable API requires it
+		Variant retval; // 我们不在乎返回值，Callable API 要求提供
 		callback.callp(args, 2, retval, err);
 		ERR_FAIL_COND_MSG(
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))
@@ -714,7 +713,7 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Vect
 		const Variant key = rel_pos;
 		const Variant *args[2] = { &key, &v };
 		Callable::CallError err;
-		Variant retval; // We don't care about the return value, Callable API requires it
+		Variant retval; // 我们不在乎返回值，Callable API 要求提供
 		callback.callp(args, 2, retval, err);
 		ERR_FAIL_COND_MSG(
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))

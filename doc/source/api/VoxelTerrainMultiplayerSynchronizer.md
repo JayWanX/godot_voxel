@@ -1,5 +1,5 @@
 # VoxelTerrainMultiplayerSynchronizer
 
-Inherits: [Node](https://docs.godotengine.org/en/stable/classes/class_node.html)
+继承自：[Node](https://docs.godotengine.org/en/stable/classes/class_node.html)
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

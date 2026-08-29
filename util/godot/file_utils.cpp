@@ -24,7 +24,7 @@ const char *to_string(FileResult res) {
 
 Error check_directory_created(const String &p_directory_path) {
 	if (!directory_exists(p_directory_path)) {
-		// Create if not exist
+		// 不存在则创建
 		const Error err = DirAccess::make_dir_recursive_absolute(p_directory_path);
 		if (err != OK) {
 			ERR_PRINT("Could not create directory");
@@ -35,18 +35,18 @@ Error check_directory_created(const String &p_directory_path) {
 	return OK;
 }
 
-// TODO Write tests
+// TODO 编写测试
 
-// Makes the file bigger to move the half from the current position further,
-// so that it makes room for the specified amount of bytes.
-// The new allocated "free" bytes have undefined values, which may be later overwritten by the caller anyways.
+// 使文件变大，从而把当前位置之后的那一半内容向后移动，
+// 为指定的字节数腾出空间。
+// 新分配出的"空闲"字节的值是未定义的，反正之后可能被调用者覆盖。
 void insert_bytes(FileAccess &f, size_t count, size_t temp_chunk_size) {
 	CRASH_COND(temp_chunk_size == 0);
 
 	const size_t prev_file_len = f.get_length();
 	const size_t insert_pos = f.get_position();
 
-	// Make the file larger
+	// 使文件变大
 	f.seek(prev_file_len);
 	for (size_t i = 0; i < count; ++i) {
 		f.store_8(0);
@@ -58,8 +58,8 @@ void insert_bytes(FileAccess &f, size_t count, size_t temp_chunk_size) {
 	size_t src_pos = prev_file_len;
 	size_t dst_pos = f.get_length();
 
-	// Copy chunks of the file at a later position, from last to first.
-	// The last copied chunk can be smaller.
+	// 从后往前，把文件后面的内容分块复制到更靠后的位置。
+	// 最后复制的块可能会更小。
 	while (bytes_to_move > 0) {
 		size_t chunk_size = bytes_to_move >= temp_chunk_size ? temp_chunk_size : bytes_to_move;
 		src_pos -= chunk_size;

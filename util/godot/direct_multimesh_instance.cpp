@@ -27,7 +27,7 @@ void DirectMultiMeshInstance::create() {
 	ERR_FAIL_COND(_multimesh_instance.is_valid());
 	RenderingServer &vs = *RenderingServer::get_singleton();
 	_multimesh_instance = vs.instance_create();
-	vs.instance_set_visible(_multimesh_instance, true); // TODO Is it needed?
+	vs.instance_set_visible(_multimesh_instance, true); // TODO 需要吗？
 }
 
 void DirectMultiMeshInstance::destroy() {
@@ -112,8 +112,8 @@ void DirectMultiMeshInstance::set_gi_mode(GeometryInstance3D::GIMode mode) {
 }
 
 void DirectMultiMeshInstance::set_interpolated(const bool enabled) {
-	// This was added in Godot 4.4, then moved to the SceneTree in 4.5
-	// See https://github.com/godotengine/godot/pull/104269
+	// 这在 Godot 4.4 中添加，后来在 4.5 中移到了 SceneTree
+	// 参见 https://github.com/godotengine/godot/pull/104269
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR == 4
 	RenderingServer &vs = *RenderingServer::get_singleton();
 	vs.instance_set_interpolated(_multimesh_instance, enabled);
@@ -151,8 +151,8 @@ inline void write_bulk_array_transform(float *dst, const TTransform3 &t) {
 	// dst[10] = t.basis.rows[2].z;
 	// dst[11] = t.origin.z;
 
-	// I had to transpose this matrix multiple times over several years, I dont know what's going on...
-	// I guess it should be like in Godot's source code `MeshStorage::multimesh_instance_set_transform`?
+	// 这几年来我不得不多次转置这个矩阵，我不知道到底怎么回事……
+	// 我猜它应该像 Godot 源码里的 `MeshStorage::multimesh_instance_set_transform` 那样？
 
 	dst[0] = t.basis.rows[0].x;
 	dst[1] = t.basis.rows[0].y;
@@ -176,17 +176,17 @@ void DirectMultiMeshInstance::make_transform_3d_bulk_array(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	const int item_size = 12; // In number of floats
+	const int item_size = 12; // 以 float 数量计
 
 	const unsigned int bulk_array_size = transforms.size() * item_size;
 	if (static_cast<unsigned int>(bulk_array.size()) != bulk_array_size) {
 		bulk_array.resize(bulk_array_size);
 	}
-	// Note, the actual size of `Transform3D` can be twice if `real_t` is `double`.
+	// 注意：如果 `real_t` 是 `double`，`Transform3D` 的实际大小可能是其两倍。
 	CRASH_COND(transforms.size() * sizeof(Transform3D) / sizeof(real_t) != static_cast<size_t>(bulk_array.size()));
 
 	// memcpy(w.ptr(), _transform_cache.data(), bulk_array.size() * sizeof(float));
-	// Nope, you can't memcpy that, nonono. It's said to be for performance, but doesnt specify why.
+	// 不行，你不能那样 memcpy，绝对不行。虽然据说这是为了性能，但没有说明原因。
 
 	float *w = bulk_array.ptrw();
 	for (size_t i = 0; i < transforms.size(); ++i) {
@@ -202,7 +202,7 @@ void DirectMultiMeshInstance::make_transform_3d_bulk_array(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	const int item_size = 12; // In number of floats
+	const int item_size = 12; // 以 float 数量计
 
 	const unsigned int bulk_array_size = transforms.size() * item_size;
 	if (static_cast<unsigned int>(bulk_array.size()) != bulk_array_size) {
@@ -224,14 +224,14 @@ void DirectMultiMeshInstance::make_transform_and_color8_3d_bulk_array(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	const int transform_size = 12; // In number of floats
+	const int transform_size = 12; // 以 float 数量计
 	const int item_size = transform_size + sizeof(Color8) / sizeof(float);
 
 	const unsigned int bulk_array_size = data.size() * item_size;
 	if (static_cast<unsigned int>(bulk_array.size()) != bulk_array_size) {
 		bulk_array.resize(bulk_array_size);
 	}
-	// Note, the actual size of `Transform3D` can be twice if `real_t` is `double`.
+	// 注意：如果 `real_t` 是 `double`，`Transform3D` 的实际大小可能是其两倍。
 	CRASH_COND(
 			data.size() * (sizeof(Transform3D) / sizeof(real_t) + sizeof(Color8) / sizeof(float)) !=
 			static_cast<size_t>(bulk_array.size())
@@ -252,15 +252,15 @@ void DirectMultiMeshInstance::make_transform_and_color32_3d_bulk_array(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	const int transform_size = 12; // In number of floats
+	const int transform_size = 12; // 以 float 数量计
 	const int item_size = transform_size + sizeof(Color) / sizeof(float);
 
 	const unsigned int bulk_array_size = data.size() * item_size;
 	if (static_cast<unsigned int>(bulk_array.size()) != bulk_array_size) {
 		bulk_array.resize(bulk_array_size);
 	}
-	// Note, the actual size of `Transform3D` can be twice if `real_t` is `double`.
-	// `Color` still uses `float` no matter the setting.
+	// 注意：如果 `real_t` 是 `double`，`Transform3D` 的实际大小可能是其两倍。
+	// `Color` 无论何种设置都仍然使用 `float`。
 	CRASH_COND(
 			data.size() * (sizeof(Transform3D) / sizeof(real_t) + sizeof(Color) / sizeof(float)) !=
 			static_cast<size_t>(bulk_array.size())

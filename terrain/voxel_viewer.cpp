@@ -89,8 +89,8 @@ void VoxelViewer::set_enabled_in_editor(bool enable) {
 	_enabled_in_editor = enable;
 
 #ifdef TOOLS_ENABLED
-	// This setting only has an effect when in the editor.
-	// Note, `is_editor_hint` is not supposed to change during execution.
+	// 此设置仅在编辑器中生效。
+	// 注意，`is_editor_hint` 在运行期间不应该发生变化。
 	if (Engine::get_singleton()->is_editor_hint()) {
 		set_notify_transform(_enabled_in_editor);
 
@@ -152,14 +152,13 @@ void VoxelViewer::_notification(int p_what) {
 		case NOTIFICATION_EXIT_TREE:
 			if (!Engine::get_singleton()->is_editor_hint() || _enabled_in_editor) {
 				if (!_pending_deferred_unregistration) {
-					// When users reparent nodes, Godot triggers an EXIT_TREE, followed by a separate ENTER_TREE. So
-					// reparenting viewers is indistinguishable from solely adding, or removing a node. If we unregister
-					// right now, it leads to unexpected issues with terrain pairing, like the whole area reloading
-					// because the viewer got unregistered and re-registered. Since reparenting usually takes place with
-					// `remove_child` immediately followed by `add_child`, we can workaround the issue by deferring
-					// unregistration. Unfortunately, we then have to workaround the case the node gets deleted
-					// (`remove_child` followed by `free`, or `queue_free`), otherwise the deferred call could end
-					// badly.
+					// 当用户重新挂载节点时，Godot 会触发 EXIT_TREE，随后是单独的 ENTER_TREE。因此
+					// 重新挂载观察者与单纯添加或移除节点无法区分。如果我们立即注销，
+					// 会导致与地形配对的意外问题，比如因为观察者被注销并重新注册
+					// 而整个区域重新加载。由于重新挂载通常以 `remove_child` 紧跟 `add_child`
+					// 的方式进行，我们可以通过延迟注销来解决这个问题。不幸的是，我们随后
+					// 还必须处理节点被删除的情况（`remove_child` 后跟 `free` 或 `queue_free`），
+					// 否则延迟调用可能会以糟糕的方式结束。
 					_pending_deferred_unregistration = true;
 					callable_mp_static(&VoxelViewer::unregister_deferred_callback)
 							.bind(get_instance_id(), Vector2i(_viewer_id.index, _viewer_id.version.value))
@@ -187,12 +186,12 @@ void VoxelViewer::unregister_deferred_callback(const int64_t viewer_node_id, con
 	if (viewer != nullptr) {
 		viewer->_pending_deferred_unregistration = false;
 		if (viewer->is_inside_tree()) {
-			// The viewer is still in tree, so we can assume it was only reparented, so don't unregister it
-			// TODO When multi-world becomes supported, we have to re-check if the viewer has changed world...
+			// 观察者仍在场景树中，因此可以假定它只是被重新挂载了，所以不要注销它
+			// TODO 当支持多世界时，我们必须重新检查观察者是否改变了世界……
 			return;
 		}
 	}
-	// The node got removed and not added back, or was destroyed
+	// 节点被移除且未被重新添加，或者已被销毁
 	ViewerID viewer_id;
 	viewer_id.index = encoded_viewer_id.x;
 	viewer_id.version.value = encoded_viewer_id.y;

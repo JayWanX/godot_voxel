@@ -32,13 +32,13 @@ class BufferedTaskScheduler;
 class VoxelInstancer;
 #endif
 
-// Infinite paged terrain made of voxel blocks all with the same level of detail.
-// Voxels are polygonized around the viewer by distance in a large cubic space.
-// Data is streamed using a VoxelStream.
+// 由体素数据块组成、具有相同细节层级（LOD）的无限分页地形。
+// 体素在大型立方体空间中按与观察者的距离进行多边形化。
+// 数据使用 VoxelStream 进行流式传输。
 class VoxelTerrain : public VoxelNode {
 	GDCLASS(VoxelTerrain, VoxelNode)
 public:
-	// Maximum view distance when any terrain boundary is larger than it
+	// 当任何地形边界大于它时的最大观察距离
 	static const unsigned int MAX_VIEW_DISTANCE_FOR_LARGE_VOLUME = 512;
 
 	VoxelTerrain();
@@ -110,9 +110,9 @@ public:
 
 	Ref<VoxelTool> get_voxel_tool() override;
 
-	// Creates or overrides whatever block data there is at the given position.
-	// The use case is multiplayer, client-side.
-	// If no local viewer is actually in range, the data will not be applied and the function returns `false`.
+	// 在给定位置创建或覆盖任何已有的数据块数据。
+	// 使用场景是多人在线、客户端侧。
+	// 如果本地没有观察者在范围内，数据将不会被应用，该函数返回 `false`。
 	bool try_set_block_data(Vector3i position, std::shared_ptr<VoxelBuffer> &voxel_data);
 
 	bool has_data_block(Vector3i position) const;
@@ -123,9 +123,9 @@ public:
 	void restart_stream() override;
 	void remesh_all_blocks() override;
 
-	// Asks to generate (or re-generate) a block at the given position asynchronously.
-	// If the block already exists once the block is generated, it will be cancelled.
-	// If the block is out of range of any viewer, it will be cancelled.
+	// 请求在给定位置异步生成（或重新生成）一个数据块。
+	// 如果在数据块生成完成时它已经存在，该请求将被取消。
+	// 如果数据块超出任何观察者的范围，它将被取消。
 	void generate_block_async(Vector3i block_position);
 
 	struct Stats {
@@ -147,7 +147,7 @@ public:
 
 	Node3D *convert_to_nodes(const BitField<NodeConversionFlags> flags) const override;
 
-	// Debug
+	// 调试
 
 	enum DebugDrawFlag {
 		DEBUG_DRAW_VOLUME_BOUNDS = 0,
@@ -166,7 +166,7 @@ public:
 	void debug_set_draw_shadow_occluders(bool enable);
 	bool debug_get_draw_shadow_occluders() const;
 
-	// Internal
+	// 内部
 
 #ifdef VOXEL_ENABLE_INSTANCER
 	void set_instancer(VoxelInstancer *instancer);
@@ -259,17 +259,17 @@ private:
 	void process_debug_draw();
 #endif
 
-	// Called each time a data block enters a viewer's area.
-	// This can be either when the block exists and the viewer gets close enough, or when it gets loaded.
-	// This only happens if data block enter notifications are enabled.
+	// 每当一个数据块进入观察者的区域时被调用。
+	// 这可以发生在数据块已存在且观察者足够接近时，也可以发生在数据块被加载时。
+	// 仅当启用了数据块进入通知时才发生。
 	GDVIRTUAL1(_on_data_block_entered, VoxelDataBlockEnterInfo *);
 
-	// Called each time voxels are edited within a region.
+	// 每当某个区域内的体素被编辑时被调用。
 	GDVIRTUAL2(_on_area_edited, Vector3i, Vector3i);
 
 	static void _bind_methods();
 
-	// Bindings
+	// 绑定
 	Vector3i _b_voxel_to_data_block(Vector3 pos) const;
 	Vector3i _b_data_block_to_voxel(Vector3i pos) const;
 	// void _force_load_blocks_binding(Vector3 center, Vector3 extents) { force_load_blocks(center, extents); }
@@ -286,11 +286,11 @@ private:
 
 	VolumeID _volume_id;
 
-	// Paired viewers are VoxelViewers which intersect with the boundaries of the volume
+	// 配对的观察者是那些与体积边界相交的 VoxelViewer
 	struct PairedViewer {
 		struct State {
 			Vector3i local_position_voxels;
-			Box3i data_box; // In block coordinates
+			Box3i data_box; // 以数据块坐标表示
 			Box3i mesh_box;
 			int horizontal_view_distance_voxels = 0;
 			int vertical_view_distance_voxels = 0;
@@ -304,40 +304,40 @@ private:
 
 	StdVector<PairedViewer> _paired_viewers;
 
-	// Voxel storage. Using a shared_ptr so threaded tasks can use it safely.
+	// 体素存储。使用 shared_ptr 以便线程任务可以安全地使用它。
 	std::shared_ptr<VoxelData> _data;
 
-	// Mesh storage
+	// 网格存储
 	VoxelMeshMap<VoxelMeshBlockVT> _mesh_map;
 	uint32_t _mesh_block_size_po2 = constants::DEFAULT_BLOCK_SIZE_PO2;
 
 	unsigned int _max_view_distance_voxels = 128;
 
-	// TODO Terrains only need to handle the visible portion of voxels, which reduces the bounds blocks to handle.
-	// Therefore, could a simple grid be better to use than a hashmap?
+	// TODO 地形只需要处理体素的可见部分，这可以减少需要处理边界的块的数量。
+	// 因此，简单的网格（grid）是否比哈希表更好用？
 
 	struct LoadingBlock {
 		RefCount viewers;
-		// TODO Optimize allocations here
+		// TODO 优化此处的分配
 		StdVector<ViewerID> viewers_to_notify;
 	};
 
-	// Blocks currently being loaded.
+	// 当前正在加载的数据块。
 	StdUnorderedMap<Vector3i, LoadingBlock> _loading_blocks;
-	// Blocks that should be loaded on the next process call.
-	// The order in that list does not matter.
+	// 应该在下次 process 调用时加载的数据块。
+	// 该列表中的顺序无关紧要。
 	StdVector<Vector3i> _blocks_pending_load;
-	// Block meshes that should be updated on the next process call.
-	// The order in that list does not matter.
+	// 应该在下次 process 调用时更新的数据块网格。
+	// 该列表中的顺序无关紧要。
 	StdVector<Vector3i> _blocks_pending_update;
-	// Blocks that should be saved on the next process call.
-	// The order in that list does not matter.
+	// 应该在下次 process 调用时保存的数据块。
+	// 该列表中的顺序无关紧要。
 	StdVector<VoxelData::BlockToSave> _blocks_to_save;
-	// Data blocks that have been unloaded and needed saving. They are temporarily stored here until saving completes,
-	// and is checked first before loading new blocks. This is in case players leave an area and come back to it faster
-	// than saving, because otherwise loading from stream would return an outdated version.
+	// 已卸载且需要保存的数据块。在保存完成前会临时存储在这里，
+	// 并且在加载新数据块之前会先检查它们。这是为了应对玩家离开一个区域后
+	// 在保存完成前又返回的情况，否则从流加载会返回过期的版本。
 	StdUnorderedMap<Vector3i, std::shared_ptr<VoxelBuffer>> _unloaded_saving_blocks;
-	// List of data blocks that will be used to simulate a loading response on the next process call.
+	// 将在下次 process 调用时用于模拟加载响应的数据块列表。
 	struct QuickReloadingBlock {
 		std::shared_ptr<VoxelBuffer> voxels;
 		Vector3i position;
@@ -346,8 +346,8 @@ private:
 
 	Ref<VoxelMesher> _mesher;
 
-	// Data stored with a shared pointer so it can be sent to asynchronous tasks, and these tasks can be cancelled by
-	// setting a bool to false and re-instantiating the structure
+	// 使用共享指针存储数据，以便可以发送给异步任务，并且这些任务可以通过将 bool 设为 false
+	// 并重新实例化该结构来取消
 	std::shared_ptr<StreamingDependency> _streaming_dependency;
 	std::shared_ptr<MeshingDependency> _meshing_dependency;
 
@@ -358,7 +358,7 @@ private:
 	// bool _stream_enabled = false;
 	bool _block_enter_notification_enabled = false;
 	bool _area_edit_notification_enabled = false;
-	// If enabled, VoxelViewers will cause blocks to automatically load around them.
+	// 如果启用，VoxelViewer 将使数据块在其周围自动加载。
 	bool _automatic_loading_enabled = true;
 	bool _generator_use_gpu = false;
 
@@ -366,7 +366,7 @@ private:
 
 	voxel::godot::ObjectUniquePtr<VoxelDataBlockEnterInfo> _data_block_enter_info_obj;
 
-	// References to external nodes.
+	// 对外部节点的引用。
 #ifdef VOXEL_ENABLE_INSTANCER
 	VoxelInstancer *_instancer = nullptr;
 #endif

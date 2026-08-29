@@ -200,7 +200,7 @@ void Voxel_NoiseAnalysisWindow::_on_calculate_button_pressed() {
 
 	ERR_FAIL_COND(_analysis_params.step_count <= 0);
 
-	// Clear previous results
+	// 清除先前的结果
 	_results.maximum_derivative_per_step_length.clear();
 	_results.maximum_derivative_per_step_length.resize(_analysis_params.step_count);
 	_results.maximum_derivative = 0.f;
@@ -215,7 +215,7 @@ void Voxel_NoiseAnalysisWindow::_on_calculate_button_pressed() {
 
 	_rng.seed(131183);
 
-	// Precompute unit vectors
+	// 预计算单位向量
 	const int precomputed_vectors_count = 256;
 	if (_analysis_params.dimension == DIMENSION_2D) {
 		StdVector<Vector2> &precomputed_unit_vectors_2d = get_tls_precomputed_unit_vectors_2d();
@@ -228,7 +228,7 @@ void Voxel_NoiseAnalysisWindow::_on_calculate_button_pressed() {
 		StdVector<Vector3> &precomputed_unit_vectors_3d = get_tls_precomputed_unit_vectors_3d();
 		precomputed_unit_vectors_3d.resize(precomputed_vectors_count);
 		for (int i = 0; i < precomputed_vectors_count; ++i) {
-			// TODO Uniform repartition of 3D vectors?
+			// TODO 3D 向量是否应该均匀分布？
 			precomputed_unit_vectors_3d[i] =
 					Vector3(_rng.random(-1.0, 1.0), _rng.random(-1.0, 1.0), _rng.random(-1.0, 1.0)).normalized();
 		}
@@ -249,7 +249,7 @@ void Voxel_NoiseAnalysisWindow::_notification(int p_what) {
 
 		case NOTIFICATION_VISIBILITY_CHANGED:
 			if (!is_visible()) {
-				// Release reference when the window is closed
+				// 窗口关闭时释放引用
 				set_noise(Ref<Voxel_FastNoiseLite>());
 			}
 			break;

@@ -1,39 +1,39 @@
-Navigation
+导航
 =============
 
-AI navigation can be implemented in different ways, but currently there is no general solution for dynamic voxel terrain.
+AI 导航可以通过不同的方式实现，但目前在动态体素地形方面还没有通用的解决方案。
 
 !!! warning
-    Most of what is described on this page is experimental. You may either try one of the approaches described, modify it, or roll your own.
+    本页介绍的大部分内容都是实验性的。你可以尝试其中一种方案，修改它，或者自行实现。
 
 
-Grid-based pathfinding
+基于网格的寻路
 -------------------------
 
-Voxels can be interpreted as a grid to do pathfinding on directly. This may be suitable for blocky voxels.
-You can implement your own logic this way, or you can use [VoxelAStarGrid3D](api/VoxelAStarGrid3D.md). This has a relatively limited range and only works well with "character" agents that are 1x2 voxels in size.
+体素可以解释为直接进行寻路的网格。这可能适合方块风体素。
+你可以用这种方式实现自己的逻辑，也可以使用 [VoxelAStarGrid3D](api/VoxelAStarGrid3D.md)。它的作用范围相对有限，只对尺寸为 1x2 体素的“角色”型智能体效果较好。
 
 
-Waypoint-based pathfinding
+基于路径点的寻路
 ----------------------------
 
-You can use Godot's `AStar3D` class to dyamically/progressively scatter loose waypoints through the world using a script, and connect them up. Doing raycasts or shape casts can help determining if a location is walkable or not. Agents may then complete this information by steering based on their immediate surroundings.
-This might be one of the cheapest options, though it is probably less accurate depending on how it's implemented.
+你可以使用 Godot 的 `AStar3D` 类，通过脚本动态/渐进地在世界中散布松散的路径点并连接它们。进行射线检测或形状检测有助于判断某个位置是否可以行走。然后，智能体可以根据周围环境进行转向，补充完成这条路径信息。
+这可能是成本最低的方案之一，不过根据实现方式的不同，它的精度可能较低。
 
 
-Navmesh-based navigation
+基于导航网格的导航
 ----------------------------
 
-Godot's general-purpose 3D [navigation system](https://docs.godotengine.org/en/stable/tutorials/navigation/navigation_introduction_3d.html) requires the use of `NavigationMesh` and `NavigationRegion3D`. However, there is currently no support for it out of the box.
+Godot 的通用 3D [导航系统](https://docs.godotengine.org/en/stable/tutorials/navigation/navigation_introduction_3d.html)需要使用 `NavigationMesh` 和 `NavigationRegion3D`。然而，目前还没有开箱即用的支持。
 
-A particular challenge in building navmeshes for voxel terrain, is the fact it can't be tweaked and baked perfectly like most terrains that are created by developers in the editor. Navmeshes are sensitive to the source geometry thrown at them. Voxel terrain is streamed, can be modified by players, and could have the most unforgiving variations of shapes in any direction, so it is a hard requirement for navigation to not break in-game. Even just the most basic noise-based terrain [can raise errors in Godot's baking process](https://github.com/godotengine/godot/issues/85548#issuecomment-2021774612), and produce navmeshes that can be expensive to traverse. In addition, any edit or streaming event requires to constantly re-bake navmeshes to match the areas players are in. Obstacles on top of the terrain must also be taken into account, as well as the fact agents have a size that could cross chunks. Multiple agent sizes also require multiple navmeshes.
+为体素地形构建导航网格的一个特殊挑战在于，它无法像开发者在编辑器中创建的大多数地形那样被完美地调整和烘焙。导航网格对提供给它的源几何体非常敏感。体素地形是流式加载的，可以由玩家修改，而且可能在任何方向上出现最严苛的形状变化，因此导航在游戏中不崩溃是一个硬性要求。即使是最基础的基于噪声的地形，也[可能引发 Godot 烘焙过程中的错误](https://github.com/godotengine/godot/issues/85548#issuecomment-2021774612)，并生成遍历成本高昂的导航网格。此外，任何编辑或流式加载事件都需要不断重新烘焙导航网格，以匹配玩家所处的区域。还必须考虑地形上的障碍物，以及智能体尺寸可能跨越区块这一事实。多种智能体尺寸也需要多个导航网格。
 
-![Screenshot of blobby smooth voxel terrain on top of which a complex navmesh has been generated](images/navmesh_bumpy_noise_terrain.webp)
+![团块状平滑体素地形的截图，其上已生成复杂的导航网格](images/navmesh_bumpy_noise_terrain.webp)
 
-On top of this, Godot's navigation system has limitations that make it difficult to bake navmeshes at runtime while avoiding CPU stutters. The baking process can be threaded relatively easily by conforming to strict scene parsing rules (the scene tree is not thread-safe). However, Godot still runs a lot of logic after that *on the main thread*, and that logic can badly affect framerate on a large scale.
-It is also hard to support planets because it assumes the world is flat.
+除此之外，Godot 的导航系统还有一些限制，使得在运行时烘焙导航网格的同时避免 CPU 卡顿变得困难。只要遵循严格的场景解析规则（场景树不是线程安全的），烘焙过程相对容易进行多线程处理。然而，Godot 之后仍会在*主线程*上运行大量逻辑，这些逻辑会在大规模场景下严重影响帧率。
+它也难以支持行星，因为它假定世界是平坦的。
 
-The `navigation` branch of the module attempts to implement a dynamic navmesh system, however it has performance issues and isn't ready for production.
-At time of writing, it is not actively developped (subject to change, eventually). You may check it out and tweak it for your needs if you want to use it.
+模块的 `navigation` 分支尝试实现动态导航网格系统，但它存在性能问题，尚未达到生产可用。
+截至撰写本文时，它并未得到积极开发（最终可能会有变动）。如果你想使用它，可以将其检出并根据你的需求进行调整。
 
-See also [issue 610](https://github.com/Voxel/godot_voxel/issues/610).
+另请参阅 [issue 610](https://github.com/Voxel/godot_voxel/issues/610)。

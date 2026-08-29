@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelBlockyModel" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Model stored in [VoxelBlockyLibrary] and used by [VoxelMesherBlocky].
+		存储在 [VoxelBlockyLibrary] 中并由 [VoxelMesherBlocky] 使用的模型。
 	</brief_description>
 	<description>
-		Represents a model to be used for voxels of a specific TYPE value. Such models must be contained within a [VoxelBlockyLibrary] to be used with [VoxelTerrain] or directly with a [VoxelMesherBlocky].
-		A model can be setup in various ways, see child classes.
+		表示用于特定 TYPE 值的体素的模型。此类模型必须包含在 [VoxelBlockyLibrary] 中，才能与 [VoxelTerrain] 配合使用，或直接与 [VoxelMesherBlocky] 配合使用。
+		模型可以通过多种方式设置，请参见子类。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -14,20 +14,20 @@
 			<return type="Material" />
 			<param index="0" name="index" type="int" />
 			<description>
-				Gets the material override for a specific surface of the model.
+				获取模型特定表面的材质覆盖。
 			</description>
 		</method>
 		<method name="get_mesh_ortho_rotation_index" qualifiers="const">
 			<return type="int" />
 			<description>
-				Gets the 90-degree rotation ID that will be applied to the model when the library is baked.
+				获取库烘焙时将应用到模型的 90 度旋转 ID。
 			</description>
 		</method>
 		<method name="is_mesh_collision_enabled" qualifiers="const">
 			<return type="bool" />
 			<param index="0" name="surface_index" type="int" />
 			<description>
-				Tells if a specific surface produces mesh-based collisions.
+				判断特定表面是否生成基于网格的碰撞。
 			</description>
 		</method>
 		<method name="rotate_90">
@@ -42,7 +42,7 @@
 			<param index="0" name="index" type="int" />
 			<param index="1" name="material" type="Material" />
 			<description>
-				Sets a material override for a specific surface of the model. It allows to use the same mesh on multiple models, but using different materials on each.
+				为模型的特定表面设置材质覆盖。它允许在多个模型上使用同一个网格，但每个模型使用不同的材质。
 			</description>
 		</method>
 		<method name="set_mesh_collision_enabled">
@@ -50,43 +50,43 @@
 			<param index="0" name="surface_index" type="int" />
 			<param index="1" name="enabled" type="bool" />
 			<description>
-				Enables or disables mesh-based collision on a specific surface. It allows a model to have solid parts and others where players can pass through.
+				启用或禁用特定表面上的基于网格的碰撞。它允许模型既有实心部分，也有玩家可以穿过的部分。
 			</description>
 		</method>
 		<method name="set_mesh_ortho_rotation_index">
 			<return type="void" />
 			<param index="0" name="i" type="int" />
 			<description>
-				Gets the 90-degree rotation ID that will be applied to the model when the library is baked. This is a number representing one of 24 possible 90-degree rotations. You can also use [method rotate_90].
+				获取库烘焙时将应用到模型的 90 度旋转 ID。这是一个代表 24 种可能 90 度旋转之一的数字。你也可以使用 [method rotate_90]。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="collision_aabbs" type="AABB[]" setter="set_collision_aabbs" getter="get_collision_aabbs" default="[]">
-			List of bounding boxes relative to the model. They are used for box-based collision, using [VoxelBoxMover]. They are not used with mesh-based collision.
+			相对于模型的包围盒列表。它们用于基于盒子的碰撞，使用 [VoxelBoxMover]。它们不用于基于网格的碰撞。
 		</member>
 		<member name="collision_mask" type="int" setter="set_collision_mask" getter="get_collision_mask" default="1">
-			Collision mask used for box-based collision [VoxelBoxMover] and voxel raycasts ([VoxelToolTerrain]). It is not used for mesh-based collisions.
+			用于基于盒子的碰撞 [VoxelBoxMover] 和体素射线检测（[VoxelToolTerrain]）的碰撞掩码。它不用于基于网格的碰撞。
 		</member>
 		<member name="color" type="Color" setter="set_color" getter="get_color" default="Color(1, 1, 1, 1)">
-			Color of the model. It will be used to modulate its color when built into a voxel mesh.
+			模型的颜色。当构建到体素网格中时，它将用于调整模型颜色。
 		</member>
 		<member name="culls_neighbors" type="bool" setter="set_culls_neighbors" getter="get_culls_neighbors" default="true">
-			If enabled, this voxel culls the faces of its neighbors. Disabling can be useful for denser transparent voxels, such as foliage.
+			如果启用，此体素会剔除其相邻体素的面。对于较密集的透明体素（如树叶），禁用可能会很有用。
 		</member>
 		<member name="lod_skirts_enabled" type="bool" setter="set_lod_skirts_enabled" getter="get_lod_skirts_enabled" default="true">
-			If enabled and the terrain has LODs, this model will produce skirts when located at the edge of a chunk. This is intented to hide "cracks" between chunks of different LOD.
-			You may turn this off if the model is transparent, as the skirt would become visible from behind other surfaces.
+			如果启用且地形具有 LOD，此模型在位于数据块边缘时会产生“裙边”。这是为了隐藏不同 LOD 数据块之间的“裂缝”。
+			如果模型是透明的，你可能需要关闭此选项，因为裙边会从其他表面背后显现出来。
 		</member>
 		<member name="random_tickable" type="bool" setter="set_random_tickable" getter="is_random_tickable" default="false">
-			If enabled, voxels having this ID in the TYPE channel will be used by [method VoxelToolTerrain.run_blocky_random_tick].
+			如果启用，TYPE 通道中具有此 ID 的体素将被 [method VoxelToolTerrain.run_blocky_random_tick] 使用。
 		</member>
 		<member name="tags_mask" type="int" setter="set_tags_mask" getter="get_tags_mask" default="1">
-			Bitmask used to filter this model in some operations. For example, see [member VoxelToolTerrain.run_blocky_random_tick].
+			用于在某些操作中过滤此模型的位掩码。例如，参见 [member VoxelToolTerrain.run_blocky_random_tick]。
 		</member>
 		<member name="transparency_index" type="int" setter="set_transparency_index" getter="get_transparency_index" default="0">
-			Determines how transparency is handled when the sides of the model are culled by neighbor voxels.
-			If the neighbor voxel at a given side has a transparency index lower or equal to the current voxel, the side will be culled.
+			确定当模型各面被相邻体素剔除时如何处理透明度。
+			如果某一侧的相邻体素的透明度索引低于或等于当前体素，则该面将被剔除。
 		</member>
 	</members>
 	<constants>

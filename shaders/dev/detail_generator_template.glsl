@@ -1,16 +1,16 @@
 #[compute]
 #version 450
 
-// Takes a list of positions and evaluates a signed distance field in 4 locations around them.
-// The 4 locations are picked such that the result can be used to compute a gradient.
-// This is similar to a modifier except there is no operation applied.
-// Values are generated as a base, so the shader is simpler.
+// 接收一组位置，并在其周围 4 个位置计算有符号距离场。
+// 这 4 个位置的选择使得结果可用于计算梯度。
+// 这类似于修改器，只是不应用任何操作。
+// 值作为基础生成，因此着色器更简单。
 
 layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
 
 layout (set = 0, binding = 0, std430) restrict readonly buffer PositionBuffer {
-	// X, Y, Z is hit position
-	// W is integer triangle index
+	// X、Y、Z 为命中位置
+	// W 为整数三角形索引
 	vec4 values[];
 } u_positions;
 
@@ -20,7 +20,7 @@ layout (set = 0, binding = 1, std430) restrict readonly buffer Params {
 } u_params;
 
 layout (set = 0, binding = 2, std430) restrict writeonly buffer OutSDBuffer {
-	// 4 values per index
+	// 每个索引 4 个值
 	float values[];
 } u_out_sd;
 

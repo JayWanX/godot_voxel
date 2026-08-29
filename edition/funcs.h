@@ -19,11 +19,11 @@ VOXEL_GODOT_FORWARD_DECLARE(class RandomPCG);
 
 namespace voxel {
 
-// Interpolates values from a 3D grid at a given position, using trilinear interpolation.
-// If the position is outside the grid, values are clamped.
+// 在给定位置对三维网格的值进行三线性插值。
+// 如果位置超出网格范围，则对值进行钳制。
 inline float interpolate_trilinear(Span<const float> grid, const Vector3i res, const Vector3f pos) {
 	const Vector3f pfi = math::floor(pos - Vector3f(0.5f));
-	// TODO Clamp pf too somehow?
+	// TODO 是否也应该对 pf 进行钳制？
 	const Vector3f pf = pos - pfi;
 	const Vector3i max_pos = math::max(res - Vector3i(2, 2, 2), Vector3i());
 	const Vector3i pi = math::clamp(Vector3i(pfi.x, pfi.y, pfi.z), Vector3i(), max_pos);
@@ -62,7 +62,7 @@ float get_sdf_interpolated(const Volume_F &f, Vector3 pos) {
 	return math::interpolate_trilinear(s000, s100, s101, s001, s010, s110, s111, s011, to_vec3f(math::fract(pos)));
 }
 
-// Standalone helper function to copy voxels from any 3D chunked container
+// 独立的辅助函数，用于从任意三维分块容器复制体素
 void copy_from_chunked_storage(
 		VoxelBuffer &dst_buffer,
 		const Vector3i min_pos,
@@ -73,7 +73,7 @@ void copy_from_chunked_storage(
 		const bool with_metadata
 );
 
-// Standalone helper function to paste voxels to any 3D chunked container
+// 独立的辅助函数，用于向任意三维分块容器粘贴体素
 void paste_to_chunked_storage(
 		const VoxelBuffer &src_buffer,
 		Vector3i min_pos,
@@ -123,7 +123,7 @@ void paste_to_chunked_storage_tp(
 
 namespace paste_functors {
 
-// Wraps calls to paste functions due to a few differences for now.
+// 由于目前存在一些差异，对粘贴函数的调用进行包装。
 
 struct Default {
 	void operator()(Span<const uint8_t> channels, const VoxelBuffer &src, VoxelBuffer &dst, Vector3i dst_base_pos) {
@@ -205,7 +205,7 @@ void paste_to_chunked_storage_masked_writable_list(
 		);
 
 	} else {
-		// TODO Candidate for TempAllocator
+		// TODO 可作为 TempAllocator 的候选
 		DynamicBitset bitarray;
 		indices_to_bitarray_u16(dst_writable_values, bitarray);
 		paste_to_chunked_storage_tp(
@@ -224,8 +224,8 @@ AABB get_path_aabb(Span<const Vector3> positions, Span<const float> radii);
 class VoxelData;
 class VoxelBlockyLibraryBase;
 
-// For easier unit testing (the regular one needs a terrain setup etc, harder to test atm)
-// The `_static` suffix is because it otherwise conflicts with the non-static method when registering the class
+// 为了便于单元测试（常规版本需要地形设置等，目前较难测试）
+// `_static` 后缀是因为否则在注册类时会与非静态方法冲突
 void run_blocky_random_tick(
 		VoxelData &data,
 		const Box3i voxel_box,
@@ -251,13 +251,13 @@ void run_blocky_random_tick(
 
 } // namespace voxel
 
-// Library of templates for executing per-voxel operations.
-// There is a bunch of compile-time abstraction boilerplate, which is to minimize the code to write when adding new
-// operations, and have them work with different chunked containers, different edition modes, different formats... while
-// also trying to avoid runtime per-voxel branching and checks for all these cases.
+// 用于执行逐体素操作的模板库。
+// 其中包含大量编译期抽象的样板代码，目的是在添加新操作时尽量减少需要编写的代码，
+// 并让这些操作适用于不同的分块容器、不同的编辑模式、不同的格式……同时
+// 也尽量避免为所有这些情况在运行时进行逐体素的分支和检查。
 namespace voxel::ops {
 
-// Operations
+// 操作
 
 template <typename Op, typename Shape>
 struct SdfOperation16bit {
@@ -306,29 +306,29 @@ inline Box3i get_sdf_sphere_box(Vector3f center, float radius) {
 				   math::floor_to_int(center - Vector3f(radius, radius, radius)),
 				   math::ceil_to_int(center + Vector3f(radius, radius, radius))
 	)
-			// That padding is for SDF to have some margin
-			// TODO Don't add padding from here, it must be done at higher level, where we know the type of operation
+			// 该内边距是为了让 SDF 留出一些余量
+			// TODO 不要从这里添加内边距，应在更高层级（我们知道操作类型的地方）完成
 			.padded(2);
 }
 
-// Shapes
+// 形状
 
 struct SdfSphere {
 	Vector3f center;
 	float radius;
 	float sdf_scale;
 
-	// TODO Rename get_signed_distance?
+	// TODO 重命名为 get_signed_distance？
 	inline float operator()(Vector3f pos) const {
 		return sdf_scale * math::sdf_sphere(pos, center, radius);
 	}
 
 	inline bool is_inside(Vector3f pos) const {
-		// Faster than the true SDF, we avoid a square root
+		// 比真正的 SDF 更快，避免了一次平方根计算
 		return math::distance_squared(center, pos) < radius * radius;
 	}
 
-	// TODO Seems unused?
+	// TODO 似乎未使用？
 	inline const char *name() const {
 		return "SdfSphere";
 	}
@@ -371,21 +371,21 @@ struct SdfHemisphere {
 struct SdfBufferShape {
 	Span<const float> buffer;
 	Vector3i buffer_size;
-	// TODO Use Transform3f and perform the operation in local space, better than using doubles considering SIMD
+	// TODO 使用 Transform3f 并在局部空间执行操作，考虑到 SIMD，比使用双精度更好
 	Transform3D world_to_buffer;
 	float isolevel;
 	float sdf_scale;
 
 	inline real_t operator()(const Vector3f &wpos) const {
-		// Transform terrain-space position to buffer-space
+		// 将地形空间坐标变换为缓冲区空间坐标
 		const Vector3f lpos = to_vec3f(world_to_buffer.xform(to_vec3(wpos)));
 		if (lpos.x < 0 || lpos.y < 0 || lpos.z < 0 || lpos.x >= buffer_size.x || lpos.y >= buffer_size.y ||
 			lpos.z >= buffer_size.z) {
-			// Outside the buffer
+			// 超出缓冲区范围
 			return constants::SDF_FAR_OUTSIDE;
 		}
-		// TODO Trilinear looks bad when the shape is scaled up.
-		// Use Hermite in 3D https://www.researchgate.net/publication/360206102_Hermite_interpolation_of_heightmaps
+		// TODO 当形状被放大时，三线性插值效果不佳。
+		// 在三维中使用 Hermite 插值 https://www.researchgate.net/publication/360206102_Hermite_interpolation_of_heightmaps
 		return interpolate_trilinear(buffer, buffer_size, lpos) * sdf_scale - isolevel;
 	}
 
@@ -416,9 +416,9 @@ struct SdfAxisAlignedBox {
 					   math::floor_to_int(center - half_size),
 					   math::ceil_to_int(center + half_size)
 		)
-				// That padding is for SDF to have some margin
-				// TODO Don't add padding from here, it must be done at higher level, where we know the type of
-				// operation
+				// 该内边距是为了让 SDF 留出一些余量
+				// TODO 不要从这里添加内边距，应在更高层级（我们知道操作类型的
+				// 地方）完成
 				.padded(2);
 	}
 };
@@ -448,7 +448,7 @@ struct TextureParams {
 	unsigned int index = 0;
 };
 
-// Optimized for spheres
+// 针对球体进行了优化
 struct TextureBlendSphereOp {
 	Vector3f center;
 	float radius;
@@ -464,7 +464,7 @@ struct TextureBlendSphereOp {
 
 	inline void operator()(Vector3i pos, uint16_t &indices, uint16_t &weights) const {
 		const float distance_squared = math::distance_squared(to_vec3f(pos), center);
-		// Avoiding square root on the hot path
+		// 在热路径上避免平方根计算
 		if (distance_squared < radius_squared) {
 			const float distance_from_radius = radius - math::sqrt(distance_squared);
 			const float target_weight =
@@ -482,7 +482,7 @@ struct TextureBlendOp {
 	inline void operator()(Vector3i pos, uint16_t &indices, uint16_t &weights) const {
 		const float sd = shape(to_vec3f(pos));
 		if (sd <= 0) {
-			// TODO We don't know the full size of the shape so sharpness may be adjusted
+			// TODO 我们不知道形状的完整大小，因此锐度可能需要调整
 			const float target_weight = texture_params.opacity * math::clamp(-sd * texture_params.sharpness, 0.f, 1.f);
 			mixel4::blend_texture_packed_u16(texture_params.index, target_weight, indices, weights);
 		}
@@ -496,7 +496,7 @@ enum Mode { //
 	MODE_TEXTURE_PAINT
 };
 
-// Single-value helper. Prefer using bulk APIs otherwise.
+// 单值辅助函数。其他情况请优先使用批量 API。
 inline float sdf_blend(float src_value, float dst_value, Mode mode) {
 	float res;
 	switch (mode) {
@@ -505,7 +505,7 @@ inline float sdf_blend(float src_value, float dst_value, Mode mode) {
 			break;
 
 		case MODE_REMOVE:
-			// Relative complement (or difference)
+			// 相对补集（或差集）
 			res = voxel::math::sdf_subtract(dst_value, src_value);
 			break;
 
@@ -520,9 +520,9 @@ inline float sdf_blend(float src_value, float dst_value, Mode mode) {
 	return res;
 }
 
-// This one is implemented manually for a fast-path in texture paint.
-// Also handles locking...
-// TODO Find a nicer way to do this without copypasta
+// 这个是为纹理绘制提供快速路径而手动实现的。
+// 还处理了锁……
+// TODO 找到一种无需复制粘贴的更优雅实现方式
 struct DoSphere {
 	SdfSphere shape;
 	Mode mode;
@@ -539,7 +539,7 @@ struct DoSphere {
 		if (channel == VoxelBuffer::CHANNEL_SDF) {
 			switch (mode) {
 				case MODE_ADD: {
-					// TODO Support other depths, format should be accessible from the volume
+					// TODO 支持其他位深，格式应可从 volume 获取
 					SdfOperation16bit<SdfUnion, SdfSphere> op;
 					op.shape = shape;
 					op.op.strength = strength;
@@ -660,7 +660,7 @@ struct VoxelDataGridAccess {
 	}
 };
 
-// Executes an operation in a box of a chunked voxel storage.
+// 在分块体素存储的某个盒形区域内执行操作。
 template <typename TShape, typename TBlockAccess>
 struct DoShapeChunked {
 	TShape shape;
@@ -680,7 +680,7 @@ struct DoShapeChunked {
 		if (channel == VoxelBuffer::CHANNEL_SDF) {
 			switch (mode) {
 				case MODE_ADD: {
-					// TODO Support other depths, format should be accessible from the volume. Or separate encoding?
+					// TODO 支持其他位深，格式应可从 volume 获取。或者采用单独编码？
 					SdfOperation16bit<SdfUnion, TShape> op;
 					op.shape = shape;
 					op.op.strength = strength;
@@ -729,7 +729,7 @@ struct DoShapeSingleBuffer {
 	TShape shape;
 	Mode mode;
 	VoxelBuffer *buffer = nullptr;
-	Box3i box; // Should be clipped by the user
+	Box3i box; // 应由用户进行裁剪
 	VoxelBuffer::ChannelId channel;
 	TextureParams texture_params;
 	uint32_t blocky_value;
@@ -744,7 +744,7 @@ struct DoShapeSingleBuffer {
 		if (channel == VoxelBuffer::CHANNEL_SDF) {
 			switch (mode) {
 				case MODE_ADD: {
-					// TODO Support other depths, format should be accessible from the volume. Or separate encoding?
+					// TODO 支持其他位深，格式应可从 volume 获取。或者采用单独编码？
 					SdfOperation16bit<SdfUnion, TShape> op;
 					op.shape = shape;
 					op.op.strength = strength;

@@ -1,30 +1,30 @@
 # VoxelBlockyModelFluid
 
-Inherits: [VoxelBlockyModel](VoxelBlockyModel.md)
+继承自：[VoxelBlockyModel](VoxelBlockyModel.md)
 
-Model representing a specific state of a fluid.
+表示流体某种特定状态的模型。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                  | Name               | Default 
---------------------------------------------------------------------- | ------------------ | --------
-[VoxelBlockyFluid](VoxelBlockyFluid.md)                               | [fluid](#i_fluid)  |         
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [level](#i_level)  | 0       
+类型                                                                    | 名称                 | 默认值 
+--------------------------------------------------------------------- | ------------------ | ----
+[VoxelBlockyFluid](VoxelBlockyFluid.md)                               | [fluid](#i_fluid)  |     
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [level](#i_level)  | 0   
 <p></p>
 
-## Constants: 
+## 常量：
 
-- <span id="i_MAX_LEVELS"></span>**MAX_LEVELS** = **256** --- Maximum amount of supported fluid levels.
+- <span id="i_MAX_LEVELS"></span>**MAX_LEVELS** = **256** --- 支持的流体液位最大数量。
 
-## Property Descriptions
+## 属性描述
 
 ### [VoxelBlockyFluid](VoxelBlockyFluid.md)<span id="i_fluid"></span> **fluid**
 
-Which fluid this model is part of. Note, fluid resources are supposed to be shared between multiple models, in order to make those models recognized as states of that fluid.
+此模型属于哪种流体。注意，流体资源应在多个模型之间共享，以便使这些模型被识别为该流体的状态。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_level"></span> **level** = 0
 
-Fluid level, usually representing how much fluid the model contains. Levels should start from 0, and must be lower than 256. Fluids can have multiple models with the same level. It is also preferable to define at least one model per level (avoid missing levels). It is also recommended to assign models with consecutive levels to consecutive library IDs, however this is not required.
+流体的液位，通常表示模型包含多少流体。液位应从 0 开始，且必须低于 256。流体可以有多个具有相同液位的模型。最好为每个液位至少定义一个模型（避免缺少液位）。还建议将液位连续的模型分配给连续的库 ID，但这不是必须的。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

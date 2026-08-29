@@ -7,7 +7,7 @@
 namespace voxel {
 
 VoxelColorPalette::VoxelColorPalette() {
-	// Default palette
+	// 默认调色板
 	_colors[0] = Color8(0, 0, 0, 0);
 	_colors[1] = Color8(255, 255, 255, 255);
 	for (unsigned int i = 2; i < _colors.size(); ++i) {
@@ -27,7 +27,7 @@ Color VoxelColorPalette::get_color(int index) const {
 
 PackedColorArray VoxelColorPalette::get_colors() const {
 	PackedColorArray dst;
-	// Not resizing up-front.
+	// 不预先调整大小。
 	for (unsigned int i = 0; i < _colors.size(); ++i) {
 		dst.push_back(_colors[i]);
 	}
@@ -35,7 +35,7 @@ PackedColorArray VoxelColorPalette::get_colors() const {
 }
 
 void VoxelColorPalette::set_colors(PackedColorArray colors) {
-	// Color count is fixed, but we can't easily prevent Godot from allowing users to set a dynamic array
+	// 颜色数量是固定的，但我们无法轻易阻止 Godot 允许用户设置动态数组
 	ERR_FAIL_COND(colors.size() != static_cast<int>(_colors.size()));
 	for (unsigned int i = 0; i < _colors.size(); ++i) {
 		_colors[i] = Color8(colors[i]);
@@ -50,7 +50,7 @@ void VoxelColorPalette::clear() {
 
 PackedInt32Array VoxelColorPalette::_b_get_data() const {
 	PackedInt32Array colors;
-	// Not resizing up-front.
+	// 不预先调整大小。
 	for (size_t i = 0; i < _colors.size(); ++i) {
 		colors.push_back(_colors[i].to_u32());
 	}
@@ -74,7 +74,7 @@ void VoxelColorPalette::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_data", "d"), &VoxelColorPalette::_b_set_data);
 	ClassDB::bind_method(D_METHOD("get_data"), &VoxelColorPalette::_b_get_data);
 
-	// This is just to allow editing colors in the editor
+	// 这只是为了允许在编辑器中编辑颜色
 	ADD_PROPERTY(
 			PropertyInfo(Variant::PACKED_COLOR_ARRAY, "colors", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR),
 			"set_colors",

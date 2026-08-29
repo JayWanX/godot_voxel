@@ -1,15 +1,15 @@
 # VoxelGeneratorHeightmap
 
-Inherits: [VoxelGenerator](VoxelGenerator.md)
+继承自：[VoxelGenerator](VoxelGenerator.md)
 
-Inherited by: [VoxelGeneratorImage](VoxelGeneratorImage.md), [VoxelGeneratorNoise2D](VoxelGeneratorNoise2D.md), [VoxelGeneratorWaves](VoxelGeneratorWaves.md)
+派生：[VoxelGeneratorImage](VoxelGeneratorImage.md), [VoxelGeneratorNoise2D](VoxelGeneratorNoise2D.md), [VoxelGeneratorWaves](VoxelGeneratorWaves.md)
 
-Base class for several basic height-based generators.
+多个基本高度生成器的基类。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                            | Name                             | Default         
+类型                                                                              | 名称                               | 默认值             
 ------------------------------------------------------------------------------- | -------------------------------- | ----------------
 [ChannelId](VoxelBuffer.md#enumerations)                                        | [channel](#i_channel)            | CHANNEL_SDF (1) 
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)        | [height_range](#i_height_range)  | 30.0            
@@ -18,28 +18,28 @@ Type                                                                            
 [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html)  | [offset](#i_offset)              | Vector2i(0, 0)  
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [ChannelId](VoxelBuffer.md#enumerations)<span id="i_channel"></span> **channel** = CHANNEL_SDF (1)
 
-Channel where voxels will be generated. If set to [VoxelBuffer.CHANNEL_SDF](VoxelBuffer.md#i_CHANNEL_SDF), voxels will be a signed distance field usable by smooth meshers. Otherwise, the value 1 will be set below ground, and the value 0 will be set above ground (blocky).
+生成体素时使用的通道。如果设置为 [VoxelBuffer.CHANNEL_SDF](VoxelBuffer.md#i_CHANNEL_SDF)，体素将是可由平滑网格生成器使用的有符号距离场。否则，地面以下将设置为值 1，地面以上将设置为值 0（方块风）。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_height_range"></span> **height_range** = 30.0
 
-Maximum distance between the lowest and highest surface points that can generate. 
+可生成的最低与最高表面点之间的最大距离。 
 
-NOTE: due to a bug in Godot's documentation tool, the default value shown here is not 30.0, but 200.0. This seems to be because one of the subclasses, `VoxelGeneratorWaves`, has a different default value, chosen for better practical results. This property also appears in some subclasses now, despite being defined in the base class.
+注意：由于 Godot 文档工具的 bug，此处显示的默认值不是 30.0，而是 200.0。这似乎是因为其中一个子类 `VoxelGeneratorWaves` 具有不同的默认值，该值是为了获得更好的实际效果而选择的。尽管该属性定义在基类中，现在它也出现在某些子类中。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_height_start"></span> **height_start** = -50.0
 
-Minimum height where the surface will generate.
+表面生成的最小高度。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_iso_scale"></span> **iso_scale** = 1.0
 
-Scale applied to the signed distance field when using a smooth terrain configuration.
+使用平滑地形配置时应用于有符号距离场的缩放。
 
 ### [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html)<span id="i_offset"></span> **offset** = Vector2i(0, 0)
 
-Offsets height generation along the X and Z axes.
+沿 X 和 Z 轴偏移高度生成。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

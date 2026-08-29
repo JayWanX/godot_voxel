@@ -5,10 +5,10 @@
 
 namespace voxel {
 
-// Changes string editors of the inspector to call setters only when enter key is pressed, similar to Unreal.
-// Because the default behavior of `EditorPropertyText` is to call the setter on every character typed, which is a
-// nightmare when editing an Expression node: inputs change constantly as the code is written which has much higher
-// chance of messing up existing connections, and creates individual UndoRedo actions as well.
+// 将检查器的字符串编辑器改为仅在按下回车键时调用 setter，类似 Unreal。
+// 因为 `EditorPropertyText` 的默认行为是每次输入字符都调用 setter，这在
+// 编辑 Expression 节点时是一场噩梦：随着代码书写，输入会不断变化，
+// 这大大增加了破坏现有连接的机会，并且还会产生大量的独立 UndoRedo 操作。
 class VoxelGraphEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
 	GDCLASS(VoxelGraphEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 protected:

@@ -10,18 +10,18 @@
 
 namespace voxel {
 
-// Dynamic sequence of elements using fixed capacity.
-// Meant for small amount of elements, where their maximum count is also known and small.
-// May be preferred to dynamic capacity vectors for performance, since no heap allocation occurs. It is not a drop-in
-// replacement, as it does not support adding elements over capacity.
+// 使用固定容量的动态元素序列。
+// 用于元素数量较少、且最大数量已知且较小的情况。
+// 出于性能考虑可优先于动态容量向量使用，因为它不发生堆分配。它并非可直接
+// 替换的等价物，因为它不支持在超出容量时添加元素。
 template <typename T, unsigned int N>
 class SmallVector {
 public:
-	// Initially added for natvis, for some reason (T*) doesnt work
+	// 最初为 natvis 添加，不知为何 (T*) 无法工作
 	using ValueType = T;
 
-	// TODO Bunch of features not supported, not needed for now.
-	// constexpr is not possible due to `reinterpret_cast`. However we have no need for it at the moment.
+	// TODO 许多功能未支持，目前也用不到。
+	// 由于 `reinterpret_cast`，无法使用 constexpr。不过目前我们也用不到。
 
 	SmallVector() = default;
 
@@ -45,7 +45,7 @@ public:
 	}
 
 	inline void clear() {
-		// Destroy all elements
+		// 销毁所有元素
 		for (unsigned int i = 0; i < _size; ++i) {
 			std::destroy_at(std::launder(reinterpret_cast<T *>(&_items[i])));
 		}
@@ -59,12 +59,12 @@ public:
 
 		VOXEL_ASSERT(new_size <= capacity());
 
-		// Default-construct new elements
+		// 默认构造新元素
 		for (; _size < new_size; ++_size) {
 			::new (&_items[_size]) T();
 		}
 
-		// Destroy excess elements
+		// 销毁多余的元素
 		for (; _size > new_size; --_size) {
 			std::destroy_at(std::launder(reinterpret_cast<T *>(&_items[_size])));
 		}
@@ -77,12 +77,12 @@ public:
 
 		VOXEL_ASSERT(new_size <= capacity());
 
-		// Copy-construct new elements
+		// 拷贝构造新元素
 		for (; _size < new_size; ++_size) {
 			::new (&_items[_size]) T(default_value);
 		}
 
-		// Destroy excess elements
+		// 销毁多余的元素
 		for (; _size > new_size; --_size) {
 			std::destroy_at(std::launder(reinterpret_cast<T *>(&_items[_size])));
 		}
@@ -201,9 +201,9 @@ public:
 	}
 
 private:
-	// The reference presents an implementation of small vector using std::aligned_storage:
+	// 该参考资料给出了使用 std::aligned_storage 实现 small vector 的方式：
 	// https://en.cppreference.com/w/cpp/types/aligned_storage
-	// However it is going to get deprecated in C++23
+	// 但它将在 C++23 中被弃用
 	// https://stackoverflow.com/questions/71828288/why-is-stdaligned-storage-to-be-deprecated-in-c23-and-what-to-use-instead
 
 	struct alignas(T) Item {
@@ -213,8 +213,8 @@ private:
 	static_assert(sizeof(T) == sizeof(Item), "Mismatch in size");
 	static_assert(alignof(T) == alignof(Item), "Mismatch in alignment");
 
-	// Logical number of elements. Smaller or equal to N.
-	// Would it be worth using uint16_t or uint8_t when N is small enough?
+	// 逻辑元素数量。小于或等于 N。
+	// 当 N 足够小时，是否值得改用 uint16_t 或 uint8_t？
 	unsigned int _size = 0;
 
 	Item _items[N];

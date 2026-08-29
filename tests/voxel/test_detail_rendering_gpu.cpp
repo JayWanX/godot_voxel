@@ -19,7 +19,7 @@ void test_normalmap_render_gpu() {
 	{
 		pg::VoxelGraphFunction &g = **generator->get_main_function();
 
-		// Flat plane
+		// 平坦平面
 		// const uint32_t n_y = g.create_node(pg::VoxelGraphFunction::NODE_INPUT_Y, Vector2());
 		// const uint32_t n_add = g.create_node(pg::VoxelGraphFunction::NODE_ADD, Vector2());
 		// const uint32_t n_out_sd = g.create_node(pg::VoxelGraphFunction::NODE_OUTPUT_SDF, Vector2());
@@ -27,7 +27,7 @@ void test_normalmap_render_gpu() {
 		// g.set_node_default_input(n_add, 1, -1.5f);
 		// g.add_connection(n_add, 0, n_out_sd, 0);
 
-		// Wavy plane
+		// 波浪形平面
 		// X --- Sin1 --- Add1 --- Add2 --- Add3 --- OutSDF
 		//               /        /       /
 		//     Z --- Sin2        Y     -3.5
@@ -104,7 +104,7 @@ void test_normalmap_render_gpu() {
 	nm_task.mesh_block_position = Vector3i();
 	nm_task.output_textures = detail_textures;
 	nm_task.detail_texture_settings = detail_texture_settings;
-	// We don't use priority here because we call the task directly instead of scheduling it into a runner
+	// 这里我们不使用优先级，因为我们是直接调用任务，而不是把它调度进一个运行器
 	// nm_task.priority_dependency;
 	nm_task.use_gpu = true;
 
@@ -123,7 +123,7 @@ void test_normalmap_render_gpu() {
 		while (VoxelEngine::get_singleton().get_pending_gpu_tasks_count() > 0) {
 			Thread::sleep_usec(1000);
 
-			// Check if the task times out
+			// 检查任务是否超时
 			const uint64_t timeout_seconds = 10;
 			const uint64_t now = Time::get_singleton()->get_ticks_usec();
 			const uint64_t time_elapsed_microseconds = now - time_before;
@@ -164,7 +164,7 @@ void test_normalmap_render_gpu() {
 
 	// VOXEL_DELETE(gpu_task);
 
-	// Make a comparison with the CPU version
+	// 与 CPU 版本作比较
 
 	nm_task.cell_iterator->rewind();
 	DetailTextureData detail_textures_data;
@@ -219,12 +219,12 @@ void test_normalmap_render_gpu() {
 		}
 	};
 
-	// Debug dumps
+	// 调试转储
 	// gpu_atlas_image->save_png("test_gpu_normalmap.png");
 	// cpu_atlas_image->save_png("test_cpu_normalmap.png");
 
-	// Simple compare for now. Ideally we should analyze more things. A challenge is that the two approaches produce
-	// slightly different images, even though they are functionally equivalent.
+	// 目前只是简单比较。理想情况下我们应该分析更多内容。难点在于两种方法会产生
+	// 略有差异的图像，即使它们功能上等价。
 	const float diff = L::compare(**cpu_atlas_image, **gpu_atlas_image);
 	VOXEL_TEST_ASSERT(diff < 0.1);
 }

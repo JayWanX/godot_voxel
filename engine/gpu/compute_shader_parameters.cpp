@@ -26,7 +26,7 @@ void add_uniform_params(const StdVector<ComputeShaderParameter> &params, Array &
 				break;
 
 			default:
-				// May add more types if necessary
+				// 如有需要可添加更多类型
 				VOXEL_CRASH_MSG("Unhandled type");
 				break;
 		}

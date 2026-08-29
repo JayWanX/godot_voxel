@@ -65,7 +65,7 @@ private:
 
 	StdUnorderedMap<uint32_t, UniquePtr<VoxelModifier>> _modifiers;
 	uint32_t _next_id = 1;
-	// TODO Later, replace this with a spatial acceleration structure based on AABBs, like BVH
+	// TODO 之后用基于 AABB 的空间加速结构（如 BVH）替换它
 	StdVector<VoxelModifier *> _stack;
 	RWLock _stack_lock;
 };

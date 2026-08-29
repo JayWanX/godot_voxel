@@ -13,7 +13,7 @@
 #include "../../streams/load_block_data_task.h"
 #include "../../streams/save_block_data_task.h"
 #include "../../util/containers/container_funcs.h"
-#include "../../util/godot/classes/base_material_3d.h" // For property hint in release mode
+#include "../../util/godot/classes/base_material_3d.h" // 用于发布模式下的属性提示
 #include "../../util/godot/classes/concave_polygon_shape_3d.h"
 #include "../../util/godot/classes/engine.h"
 #include "../../util/godot/classes/mesh_instance_3d.h"
@@ -45,16 +45,15 @@
 namespace voxel {
 
 VoxelTerrain::VoxelTerrain() {
-	// Note: don't do anything heavy in the constructor.
-	// Godot may create and destroy dozens of instances of all node types on startup,
-	// due to how ClassDB gets its default values.
+	// 注意：不要在构造函数中做任何繁重的事情。
+	// 由于 ClassDB 获取默认值的方式，Godot 可能在启动时创建和销毁所有节点类型的几十个实例。
 
 	set_notify_transform(true);
 
 	_data = make_shared_instance<VoxelData>();
 
-	// TODO Should it actually be finite for better discovery?
-	// Infinite by default
+	// TODO 是否应该为了更好的发现性而设为有限？
+	// 默认无限
 	_data->set_bounds(Box3i::from_center_extents(Vector3i(), Vector3iUtil::create(constants::MAX_VOLUME_EXTENT)));
 
 	_streaming_dependency = make_shared_instance<StreamingDependency>();
@@ -63,7 +62,7 @@ VoxelTerrain::VoxelTerrain() {
 	struct ApplyMeshUpdateTask : public ITimeSpreadTask {
 		void run(TimeSpreadTaskContext &ctx) override {
 			if (!VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
-				// The node can have been destroyed while this task was still pending
+				// 该任务仍在等待时，节点可能已被销毁
 				VOXEL_PRINT_VERBOSE("Cancelling ApplyMeshUpdateTask, volume_id is invalid");
 				return;
 			}
@@ -74,9 +73,9 @@ VoxelTerrain::VoxelTerrain() {
 		VoxelEngine::BlockMeshOutput data;
 	};
 
-	// Mesh updates are spread over frames by scheduling them in a task runner of VoxelEngine,
-	// but instead of using a reception buffer we use a callback,
-	// because this kind of task scheduling would otherwise delay the update by 1 frame
+	// 网格更新通过调度到 VoxelEngine 的任务运行器来分散到多帧执行，
+	// 但我们不用接收缓冲区，而是使用回调，
+	// 因为这种任务调度方式否则会使更新延迟 1 帧
 	VoxelEngine::VolumeCallbacks callbacks;
 	callbacks.data = this;
 	callbacks.mesh_output_callback = [](void *cb_data, VoxelEngine::BlockMeshOutput &ob) {
@@ -94,8 +93,8 @@ VoxelTerrain::VoxelTerrain() {
 
 	_volume_id = VoxelEngine::get_singleton().add_volume(callbacks);
 
-	// TODO Can't setup a default mesher anymore due to a Godot 4 warning...
-	// For ease of use in editor
+	// TODO 由于 Godot 4 的警告，无法再设置默认网格器……
+	// 为了编辑器中的易用性
 	// Ref<VoxelMesherBlocky> default_mesher;
 	// default_mesher.instantiate();
 	// _mesher = default_mesher;
@@ -161,8 +160,8 @@ void VoxelTerrain::set_generator(Ref<VoxelGenerator> p_generator) {
 	Ref<VoxelGenerator> prev_generator = get_generator();
 	if (prev_generator.is_valid()) {
 		prev_generator->clear_cache();
-		// TODO if we were to share this generator on multiple terrains, cache should not be entirely cleared. Instead,
-		// we should just remove the area from all paired viewers.
+		// TODO 如果我们要在多个地形上共享这个生成器，缓存不应被完全清空。相反，
+		// 我们应该只从所有配对的观察者中移除该区域。
 	}
 
 	_data->set_generator(p_generator);
@@ -211,20 +210,20 @@ void VoxelTerrain::set_mesh_block_size(unsigned int mesh_block_size) {
 
 	_mesh_block_size_po2 = po2;
 
-	// Unload all mesh blocks regardless of refcount
+	// 无论引用计数如何，卸载所有网格数据块
 	clear_mesh_map();
 
-	// Make paired viewers re-view the new meshable area
+	// 让配对的观察者重新观察新的可网格化区域
 	for (unsigned int i = 0; i < _paired_viewers.size(); ++i) {
 		PairedViewer &viewer = _paired_viewers[i];
-		// Resetting both because it's a re-initialization.
-		// We could also be doing that before or after their are shifted.
+		// 两者都重置，因为这是一次重新初始化。
+		// 我们也可以在它们被移位之前或之后做这件事。
 		viewer.state.mesh_box = Box3i();
 		viewer.prev_state.mesh_box = Box3i();
 	}
 
 #ifdef VOXEL_ENABLE_INSTANCER
-	// Doing this after because `on_mesh_block_exit` may use the old size
+	// 在此之后做，因为 `on_mesh_block_exit` 可能使用旧的尺寸
 	if (_instancer != nullptr) {
 		_instancer->set_mesh_block_size_po2(po2);
 	}
@@ -232,7 +231,7 @@ void VoxelTerrain::set_mesh_block_size(unsigned int mesh_block_size) {
 
 	// VoxelEngine::get_singleton().set_volume_render_block_size(_volume_id, mesh_block_size);
 
-	// No update on bounds because we can support a mismatch, as long as it is a multiple of data block size
+	// 不需要更新边界，因为只要它是数据块大小的倍数，我们就可以支持不匹配
 	// set_bounds(_bounds_in_voxels);
 }
 
@@ -249,7 +248,7 @@ void VoxelTerrain::_on_stream_params_changed() {
 	// 	_set_block_size_po2(stream_block_size_po2);
 	// }
 
-	// The whole map might change, so regenerate it
+	// 整个地图可能都会改变，因此重新生成它
 	reset_map();
 
 	_data->set_format(get_internal_format());
@@ -302,7 +301,7 @@ void VoxelTerrain::set_mesher(Ref<VoxelMesher> mesher) {
 
 	if (_mesher.is_valid()) {
 		start_updater();
-		// Voxel appearance might completely change
+		// 体素外观可能会完全改变
 		remesh_all_blocks();
 	}
 
@@ -407,11 +406,11 @@ bool VoxelTerrain::is_automatic_loading_enabled() const {
 void VoxelTerrain::try_schedule_mesh_update(VoxelMeshBlockVT &mesh_block) {
 	VOXEL_PROFILE_SCOPE();
 	if (mesh_block.is_in_update_list) {
-		// Already in the list
+		// 已在列表中
 		return;
 	}
 	if (mesh_block.mesh_viewers.get() == 0 && mesh_block.collision_viewers.get() == 0) {
-		// No viewers want mesh on this block (why even call this function then?)
+		// 没有观察者想要这个数据块的网格（那为什么还要调用这个函数？）
 		return;
 	}
 
@@ -420,14 +419,14 @@ void VoxelTerrain::try_schedule_mesh_update(VoxelMeshBlockVT &mesh_block) {
 	const Box3i data_box =
 			Box3i(mesh_block.position * render_to_data_factor, Vector3iUtil::create(render_to_data_factor)).padded(1);
 
-	// If we get an empty box at this point, something is wrong with the caller
+	// 如果此时得到空盒子，说明调用方出了问题
 	VOXEL_ASSERT_RETURN(!data_box.is_empty());
 
 	const bool data_available = _data->has_all_blocks_in_area(data_box, 0);
 
 	if (data_available) {
-		// Regardless of if the updater is updating the block already,
-		// the block could have been modified again so we schedule another update
+		// 无论更新器是否已经在更新该数据块，
+		// 数据块都可能已被再次修改，因此我们调度另一次更新
 		mesh_block.is_in_update_list = true;
 		_blocks_pending_update.push_back(mesh_block.position);
 	}
@@ -435,14 +434,14 @@ void VoxelTerrain::try_schedule_mesh_update(VoxelMeshBlockVT &mesh_block) {
 
 void VoxelTerrain::view_mesh_block(Vector3i bpos, bool mesh_flag, bool collision_flag) {
 	if (mesh_flag == false && collision_flag == false) {
-		// Why even call the function?
+		// 为什么还要调用这个函数？
 		return;
 	}
 
 	VoxelMeshBlockVT *block = _mesh_map.get_block(bpos);
 
 	if (block == nullptr) {
-		// Create if not found
+		// 未找到则创建
 		block = VOXEL_NEW(VoxelMeshBlockVT(bpos, get_mesh_block_size()));
 		block->set_world(get_world_3d());
 		_mesh_map.set_block(bpos, block);
@@ -456,28 +455,28 @@ void VoxelTerrain::view_mesh_block(Vector3i bpos, bool mesh_flag, bool collision
 		block->collision_viewers.add();
 	}
 
-	// This is needed in case a viewer wants to view meshes in places data blocks are already present.
-	// Before that, meshes were updated only when a data block was loaded or modified,
-	// so changing block size or viewer flags did not make meshes appear.
+	// 当观察者想要在已有数据块的位置查看网格时，需要这个调用。
+	// 在此之前，网格只在数据块被加载或修改时更新，
+	// 因此更改数据块大小或观察者标志不会让网格出现。
 	try_schedule_mesh_update(*block);
 
-	// TODO this logic schedules a mesh update even if there is a mesh already. It hides the fact that mixing up
-	// viewers with collisions and viewers without will not actually create colliders/meshes individually.
+	// TODO 即使已经有网格，此逻辑也会调度网格更新。它掩盖了一个事实：混用带碰撞的观察者
+	// 和不带碰撞的观察者，并不会单独创建碰撞体/网格。
 
-	// TODO viewers with varying flags during the game is not supported at the moment.
-	// They have to be re-created, which may cause world re-load...
+	// TODO 目前不支持游戏中观察者标志变化的情况。
+	// 它们必须被重新创建，这可能导致世界重新加载……
 }
 
 void VoxelTerrain::unview_mesh_block(Vector3i bpos, bool mesh_flag, bool collision_flag) {
 	VoxelMeshBlockVT *block = _mesh_map.get_block(bpos);
-	// Mesh blocks are created on first view call,
-	// so that would mean we unview one without viewing it in the first place
+	// 网格数据块在第一次 view 调用时创建，
+	// 因此如果我们来到这里，就意味着在没有先 view 的情况下 unview
 	ERR_FAIL_COND(block == nullptr);
 
 	if (mesh_flag) {
 		block->mesh_viewers.remove();
 		if (block->mesh_viewers.get() == 0) {
-			// Mesh no longer required
+			// 不再需要网格
 			block->drop_mesh();
 			block->set_visible(false);
 		}
@@ -486,7 +485,7 @@ void VoxelTerrain::unview_mesh_block(Vector3i bpos, bool mesh_flag, bool collisi
 	if (collision_flag) {
 		block->collision_viewers.remove();
 		if (block->collision_viewers.get() == 0) {
-			// Collision no longer required
+			// 不再需要碰撞
 			block->drop_collision();
 			block->set_collision_enabled(false);
 		}
@@ -503,8 +502,8 @@ void VoxelTerrain::unload_mesh_block(Vector3i bpos) {
 	bool was_loaded = false;
 	_mesh_map.remove_block(bpos, [&blocks_pending_update, &was_loaded](const VoxelMeshBlockVT &block) {
 		if (block.is_in_update_list) {
-			// That block was in the list of blocks to update later in the process loop, we'll need to unregister
-			// it. We expect that block to be in that list. If it isn't, something wrong happened with its state.
+			// 该数据块在流程循环稍后要更新的数据块列表中，我们需要将其注销。
+			// 我们期望该数据块就在那个列表中。如果不是，说明它的状态出了问题。
 			ERR_FAIL_COND(!unordered_remove_value(blocks_pending_update, block.position));
 		}
 		was_loaded = block.is_loaded;
@@ -516,7 +515,7 @@ void VoxelTerrain::unload_mesh_block(Vector3i bpos) {
 	}
 #endif
 
-	// It's possible the block was added as the viewer moved, but did not have the time to receive its first mesh update
+	// 数据块可能是在观察者移动时被添加的，但没有时间接收它的第一次网格更新
 	if (was_loaded) {
 		emit_mesh_block_exited(bpos);
 	}
@@ -529,7 +528,7 @@ void VoxelTerrain::save_all_modified_blocks(bool with_copy, std::shared_ptr<Asyn
 
 	BufferedTaskScheduler &task_scheduler = BufferedTaskScheduler::get_for_current_thread();
 
-	// That may cause a stutter, so should be used when the player won't notice
+	// 这可能会导致卡顿，因此应该在玩家注意不到的时候使用
 	_data->consume_all_modifications(_blocks_to_save, with_copy);
 
 #ifdef VOXEL_ENABLE_INSTANCER
@@ -541,17 +540,17 @@ void VoxelTerrain::save_all_modified_blocks(bool with_copy, std::shared_ptr<Asyn
 	consume_block_data_save_requests(
 			task_scheduler,
 			tracker,
-			// Require all data we just gathered to be written to disk if the stream uses a cache. So if the
-			// game crashes or gets killed after all tasks are done, data won't be lost.
+			// 如果流使用缓存，则要求我们刚收集的所有数据被写入磁盘。因此，如果
+			// 在所有任务完成后游戏崩溃或被终止，数据不会丢失。
 			true
 	);
 
 	if (tracker != nullptr) {
-		// Using buffered count instead of `_blocks_to_save` because it can also contain tasks from VoxelInstancer
+		// 使用缓冲计数而不是 `_blocks_to_save`，因为它也可能包含来自 VoxelInstancer 的任务
 		tracker->set_count(task_scheduler.get_io_count());
 	}
 
-	// Schedule all tasks
+	// 调度所有任务
 	task_scheduler.flush();
 }
 
@@ -643,9 +642,9 @@ void VoxelTerrain::get_meshed_block_positions(StdVector<Vector3i> &out_positions
 	});
 }
 
-// This function is primarily intended for editor use cases at the moment.
-// It will be slower than using the instancing generation events,
-// because it has to query VisualServer, which then allocates and decodes vertex buffers (assuming they are cached).
+// 这个函数目前主要用于编辑器用例。
+// 它比使用实例生成事件更慢，
+// 因为它必须查询 VisualServer，而 VisualServer 会分配并解码顶点缓冲区（假设它们被缓存）。
 Array VoxelTerrain::get_mesh_block_surface(Vector3i block_pos) const {
 	VOXEL_PROFILE_SCOPE();
 
@@ -667,7 +666,7 @@ Array VoxelTerrain::get_mesh_block_surface(Vector3i block_pos) const {
 Dictionary VoxelTerrain::_b_get_statistics() const {
 	Dictionary d;
 
-	// Breakdown of time spent in _process
+	// _process 中耗时细分
 	d["time_detect_required_blocks"] = _stats.time_detect_required_blocks;
 	d["time_request_blocks_to_load"] = _stats.time_request_blocks_to_load;
 	d["time_process_load_responses"] = _stats.time_process_load_responses;
@@ -685,8 +684,8 @@ void VoxelTerrain::start_updater() {
 	if (blocky_mesher.is_valid()) {
 		Ref<VoxelBlockyLibraryBase> library = blocky_mesher->get_library();
 		if (library.is_valid()) {
-			// TODO Any way to execute this function just after the TRES resource loader has finished to load?
-			// VoxelBlockyLibrary should be baked ahead of time, like MeshLibrary
+			// TODO 有没有办法在 TRES 资源加载器完成加载后立即执行此函数？
+			// VoxelBlockyLibrary 应该像 MeshLibrary 一样提前烘焙
 			library->bake();
 		}
 	}
@@ -695,12 +694,12 @@ void VoxelTerrain::start_updater() {
 }
 
 void VoxelTerrain::stop_updater() {
-	// Invalidate pending tasks
+	// 使待处理的任务失效
 	MeshingDependency::reset(_meshing_dependency, _mesher, get_generator());
 
 	// VoxelEngine::get_singleton().set_volume_mesher(_volume_id, Ref<VoxelMesher>());
 
-	// TODO We can still receive a few mesh delayed mesh updates after this. Is it a problem?
+	// TODO 在此之后我们仍可能收到一些延迟的网格更新。这会是个问题吗？
 	//_reception_buffers.mesh_output.clear();
 
 	for (const Vector3i bpos : _blocks_pending_update) {
@@ -719,14 +718,14 @@ void VoxelTerrain::remesh_all_blocks() {
 	});
 }
 
-// At the moment, this function is for client-side use case in multiplayer scenarios
+// 目前，这个函数用于多人在线场景中的客户端侧用例
 void VoxelTerrain::generate_block_async(Vector3i block_position) {
 	if (_data->has_block(block_position, 0)) {
-		// Already exists
+		// 已存在
 		return;
 	}
 	if (_loading_blocks.find(block_position) != _loading_blocks.end()) {
-		// Already loading
+		// 正在加载
 		return;
 	}
 
@@ -747,8 +746,8 @@ void VoxelTerrain::generate_block_async(Vector3i block_position) {
 		return;
 	}
 
-	// Schedule a loading request
-	// TODO This could also end up loading from stream
+	// 调度一个加载请求
+	// TODO 这也可能最终会从流中加载
 	_loading_blocks.insert({ block_position, new_loading_block });
 	_blocks_pending_load.push_back(block_position);
 }
@@ -759,7 +758,7 @@ void VoxelTerrain::start_streamer() {
 }
 
 void VoxelTerrain::stop_streamer() {
-	// Invalidate pending tasks
+	// 使待处理的任务失效
 	StreamingDependency::reset(_streaming_dependency, get_stream(), get_generator());
 	// VoxelEngine::get_singleton().set_volume_stream(_volume_id, Ref<VoxelStream>());
 	// VoxelEngine::get_singleton().set_volume_generator(_volume_id, Ref<VoxelGenerator>());
@@ -793,7 +792,7 @@ void VoxelTerrain::clear_mesh_map() {
 }
 
 void VoxelTerrain::reset_map() {
-	// Discard everything, to reload it all
+	// 丢弃一切，以便重新加载全部
 
 	_data->for_each_block_position([this](const Vector3i &bpos) { //
 		emit_data_block_unloaded(bpos);
@@ -807,7 +806,7 @@ void VoxelTerrain::reset_map() {
 	_blocks_pending_update.clear();
 	_blocks_to_save.clear();
 
-	// No need to care about refcounts, we drop everything anyways. Will pair it back on next process.
+	// 无需关心引用计数，反正我们会丢弃所有内容。将在下次 process 时重新配对。
 	_paired_viewers.clear();
 
 	Ref<VoxelGenerator> generator = get_generator();
@@ -823,15 +822,15 @@ void VoxelTerrain::post_edit_voxel(Vector3i pos) {
 void VoxelTerrain::try_schedule_mesh_update_from_data(const Box3i &box_in_voxels) {
 	VOXEL_PROFILE_SCOPE();
 	if (_mesher.is_null()) {
-		// No mesher, can't do updates
+		// 没有网格器，无法进行更新
 		return;
 	}
-	// We pad by 1 because neighbor blocks might be affected visually (for example, baked ambient occlusion)
+	// 我们填充 1，因为相邻数据块可能在视觉上受影响（例如，烘焙的环境光遮蔽）
 	const Box3i mesh_box = box_in_voxels.padded(1).downscaled(get_mesh_block_size());
 	mesh_box.for_each_cell([this](Vector3i pos) {
 		VoxelMeshBlockVT *block = _mesh_map.get_block(pos);
-		// There isn't necessarily a mesh block, if the edit happens in a boundary,
-		// or if it is done next to a viewer that doesn't need meshes
+		// 不一定存在网格数据块，如果编辑发生在边界处，
+		// 或者编辑发生在不需要网格的观察者旁边
 		if (block != nullptr) {
 			try_schedule_mesh_update(*block);
 		}
@@ -843,15 +842,15 @@ void VoxelTerrain::post_edit_area(Box3i box_in_voxels, bool update_mesh) {
 
 	box_in_voxels.clip(_data->get_bounds());
 
-	// TODO Maybe remove this in preference for multiplayer synchronizer virtual functions?
+	// TODO 也许可以删除这个，而优先使用多人同步器的虚函数？
 	if (_area_edit_notification_enabled) {
 		GDVIRTUAL_CALL(_on_area_edited, box_in_voxels.position, box_in_voxels.size);
 	}
 
 	if (_multiplayer_synchronizer != nullptr && _multiplayer_synchronizer->is_server()) {
-		// TODO This is not efficient when the user does many individual modifications in a specific area.
-		// We would either have to batch modified areas somehow, or expose a transactional API to the user
-		// (begin(area), edit in area, end(area))
+		// TODO 当用户在某区域内进行大量单独修改时，这样做效率不高。
+		// 我们要么需要以某种方式批量处理修改过的区域，要么向用户暴露一个事务性 API
+		// （begin(area)、在区域内编辑、end(area)）
 		_multiplayer_synchronizer->send_area(box_in_voxels);
 	}
 
@@ -888,10 +887,10 @@ void VoxelTerrain::_notification(int p_what) {
 			set_process(true);
 #ifdef TOOLS_ENABLED
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
-			// In the editor, auto-configure a default mesher, for convenience.
-			// Because Godot has a property hint to automatically instantiate a resource, but if that resource is
-			// abstract, it doesn't work... and it cannot be a default value because such practice was deprecated with a
-			// warning in Godot 4.
+			// 在编辑器中，为了方便，自动配置一个默认网格器。
+			// 因为 Godot 有一个属性提示可以自动实例化资源，但如果该资源是
+			// 抽象的，它就不起作用……而且它不能是默认值，因为这种做法在 Godot 4 中已被
+			// 弃用并带有警告。
 			if (Engine::get_singleton()->is_editor_hint() && !get_mesher().is_valid()) {
 				Ref<VoxelMesherTransvoxel> mesher;
 				mesher.instantiate();
@@ -902,9 +901,9 @@ void VoxelTerrain::_notification(int p_what) {
 			break;
 
 		case NOTIFICATION_PROCESS:
-			// Can't do that in enter tree because Godot is "still setting up children".
-			// Can't do that in ready either because Godot says node state is locked.
-			// This hack is quite miserable.
+			// 不能在这里做，因为 Godot 此时"仍在设置子节点"。
+			// 也不能在 ready 中做，因为 Godot 说节点状态已被锁定。
+			// 这个 hack 相当糟糕。
 			VoxelEngineUpdater::ensure_existence(get_tree());
 
 			process();
@@ -944,8 +943,8 @@ void VoxelTerrain::_notification(int p_what) {
 			// VoxelEngine::get_singleton().set_volume_transform(_volume_id, transform);
 
 			if (!is_inside_tree()) {
-				// The transform and other properties can be set by the scene loader,
-				// before we enter the tree
+				// 变换和其它属性可以由场景加载器设置，
+				// 在我们进入场景树之前
 				return;
 			}
 
@@ -980,9 +979,9 @@ void init_sparse_grid_priority_dependency(
 	const float transformed_block_radius =
 			volume_transform.basis.xform(Vector3(block_radius, block_radius, block_radius)).length();
 
-	// Distance beyond which no field of view can overlap the block.
-	// Doubling block radius to account for an extra margin of blocks,
-	// since they are used to provide neighbors when meshing
+	// 超出此距离后，任何视野都无法与该数据块重叠。
+	// 将数据块半径加倍，以计入额外的数据块边距，
+	// 因为网格化时需要它们作为邻居
 	dep.drop_distance_squared =
 			math::squared(shared_viewers_data->highest_view_distance + 2.f * transformed_block_radius);
 }
@@ -1031,7 +1030,7 @@ void request_block_load(
 		scheduler.push_io_task(task);
 
 	} else {
-		// Directly generate the block without checking the stream
+		// 不检查流，直接生成数据块
 		ERR_FAIL_COND(stream_dependency->generator.is_null());
 
 		VoxelGenerator::BlockTaskParams params;
@@ -1068,7 +1067,7 @@ void VoxelTerrain::send_data_load_requests() {
 
 		BufferedTaskScheduler &scheduler = BufferedTaskScheduler::get_for_current_thread();
 
-		// Blocks to load
+		// 要加载的数据块
 		for (size_t i = 0; i < _blocks_pending_load.size(); ++i) {
 			const Vector3i block_pos = _blocks_pending_load[i];
 
@@ -1077,27 +1076,27 @@ void VoxelTerrain::send_data_load_requests() {
 
 			if (quick_reloading) {
 				VOXEL_PROFILE_SCOPE_NAMED("Quick reloading");
-				// The block is unloaded and currently waiting to be saved but we already want it back. This simulates a
-				// request and will complete on the next process.
-				// Ideally this shouldn't happen often. This is a corner case that occurs if the player moves fast
-				// back and forth or the task runner is overloaded.
+				// 该数据块已卸载，正在等待保存，但我们希望立刻取回它。这模拟了一个
+				// 请求，并将在下次 process 时完成。
+				// 理想情况下这不应频繁发生。这是玩家快速来回移动或任务运行器过载时出现的
+				// 边缘情况。
 				std::shared_ptr<VoxelBuffer> voxel_data =
 						make_shared_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_POOL);
-				// Duplicating to make sure the saving version doesn't get altered by possible upcoming modifications.
+				// 复制一份，以确保正在保存的版本不会被后续可能的修改所改变。
 				saving_block_it->second->copy_to(*voxel_data, true);
 				_quick_reloading_blocks.push_back(QuickReloadingBlock{ voxel_data, block_pos });
-				// Don't erase it just yet, we may only do this once we know it is saved
+				// 先不要擦除它，我们可能只在确认它已保存后才这样做
 				// _unloaded_saving_blocks.erase(saving_block_it);
 
-				// Notes:
-				// Could we change the design so that saving tasks actually save a box of VoxelData?
-				// To do that we would have to NOT remove data blocks of which refcount becomes 0. Instead, ownership
-				// would sort of be given to a saving task. That task would make a copy of modified chunks and only then
-				// remove them if they still have 0 viewers.
-				// If a viewer moves back into the area, it would simply find the chunks again and no loading would be
-				// needed. If those chunks get modified while saving is underway, it would still work fine as the saving
-				// task would lock the saved regions for reading (which is currently a problem already, because no
-				// locking actually occurs!).
+				// 备注：
+				// 我们能否改变设计，让保存任务实际保存一盒 VoxelData？
+				// 要做到这一点，我们必须不删除引用计数变为 0 的数据块。相反，所有权
+				// 某种程度上会交给保存任务。该任务会复制修改过的数据块，然后
+				// 如果它们仍然有 0 个观察者才删除。
+				// 如果观察者移回该区域，它只需再次找到这些数据块，无需加载。
+				// 如果在保存期间这些数据块被修改，仍然可以正常工作，因为保存任务
+				// 会锁定要保存的区域以进行读取（这目前已经是个问题，因为实际上
+				// 根本没有发生任何锁定！）。
 
 			} else {
 				request_block_load(
@@ -1124,7 +1123,7 @@ void VoxelTerrain::consume_block_data_save_requests(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Blocks to save
+	// 需要保存的数据块
 	if (get_stream().is_valid()) {
 		for (const VoxelData::BlockToSave &b : _blocks_to_save) {
 			VOXEL_PRINT_VERBOSE(format("Requesting save of block {}", b.position));
@@ -1133,7 +1132,7 @@ void VoxelTerrain::consume_block_data_save_requests(
 					_volume_id, b.position, 0, b.voxels, _streaming_dependency, saving_tracker, with_flush
 			));
 
-			// No priority data, saving doesn't need sorting.
+			// 没有优先级数据，保存不需要排序。
 			task_scheduler.push_io_task(task);
 		}
 	} else {
@@ -1147,13 +1146,12 @@ void VoxelTerrain::consume_block_data_save_requests(
 }
 
 void VoxelTerrain::emit_data_block_loaded(Vector3i bpos) {
-	// Not sure about exposing buffers directly... some stuff on them is useful to obtain directly,
-	// but also it allows scripters to mess with voxels in a way they should not.
-	// Example: modifying voxels without locking them first, while another thread may be reading them at the same
-	// time. The same thing could happen the other way around (threaded task modifying voxels while you try to read
-	// them). It isn't planned to expose VoxelBuffer locks because there are too many of them, it may likely shift
-	// to another system in the future, and might even be changed to no longer inherit Reference. So unless this is
-	// absolutely necessary, buffers aren't exposed. Workaround: use VoxelTool
+	// 不确定是否要直接暴露缓冲区……它们上面的一些内容可以直接获取很有用，
+	// 但这也允许脚本编写者以他们本不该做的方式摆弄体素。
+	// 示例：在未先加锁的情况下修改体素，而另一个线程可能同时在读取它们。
+	// 反过来也可能发生（线程任务在修改体素时你试图读取它们）。目前不计划暴露
+	// VoxelBuffer 锁，因为数量太多，未来可能会转向另一个系统，甚至可能被改为不再继承
+	// Reference。因此除非绝对必要，缓冲区不会被暴露。解决办法：使用 VoxelTool
 	// const Variant vbuffer = block->voxels;
 	// const Variant *args[2] = { &vpos, &vbuffer };
 	emit_signal(VoxelStringNames::get_singleton().block_loaded, bpos);
@@ -1164,13 +1162,12 @@ void VoxelTerrain::emit_data_block_unloaded(Vector3i bpos) {
 }
 
 void VoxelTerrain::emit_mesh_block_entered(Vector3i bpos) {
-	// Not sure about exposing buffers directly... some stuff on them is useful to obtain directly,
-	// but also it allows scripters to mess with voxels in a way they should not.
-	// Example: modifying voxels without locking them first, while another thread may be reading them at the same
-	// time. The same thing could happen the other way around (threaded task modifying voxels while you try to read
-	// them). It isn't planned to expose VoxelBuffer locks because there are too many of them, it may likely shift
-	// to another system in the future, and might even be changed to no longer inherit Reference. So unless this is
-	// absolutely necessary, buffers aren't exposed. Workaround: use VoxelTool
+	// 不确定是否要直接暴露缓冲区……它们上面的一些内容可以直接获取很有用，
+	// 但这也允许脚本编写者以他们本不该做的方式摆弄体素。
+	// 示例：在未先加锁的情况下修改体素，而另一个线程可能同时在读取它们。
+	// 反过来也可能发生（线程任务在修改体素时你试图读取它们）。目前不计划暴露
+	// VoxelBuffer 锁，因为数量太多，未来可能会转向另一个系统，甚至可能被改为不再继承
+	// Reference。因此除非绝对必要，缓冲区不会被暴露。解决办法：使用 VoxelTool
 	// const Variant vbuffer = block->voxels;
 	// const Variant *args[2] = { &vpos, &vbuffer };
 	emit_signal(VoxelStringNames::get_singleton().mesh_block_entered, bpos);
@@ -1191,11 +1188,10 @@ bool VoxelTerrain::try_get_paired_viewer_index(ViewerID id, size_t &out_i) const
 	return false;
 }
 
-// TODO It is unclear yet if this API will stay. I have a feeling it might consume a lot of CPU
+// TODO 尚不清楚这个 API 是否会保留。我感觉到它可能会消耗大量 CPU
 void VoxelTerrain::notify_data_block_enter(const VoxelDataBlock &block, Vector3i bpos, ViewerID viewer_id) {
 	if (!VoxelEngine::get_singleton().viewer_exists(viewer_id)) {
-		// The viewer might have been removed between the moment we requested the block and the moment we finished
-		// loading it
+		// 观察者可能在我们请求数据块与加载完成之间的时刻被移除
 		return;
 	}
 	if (_data_block_enter_info_obj == nullptr) {
@@ -1236,7 +1232,7 @@ void VoxelTerrain::process() {
 				VoxelEngine::BlockDataOutput::TYPE_LOADED, //
 				qrb.voxels, //
 #ifdef VOXEL_ENABLE_INSTANCER
-				// TODO This doesn't work with VoxelInstancer because it unloads based on meshes...
+				// TODO 这不能与 VoxelInstancer 一起使用，因为它基于网格来卸载……
 				nullptr, //
 #endif
 				qrb.position, //
@@ -1266,34 +1262,34 @@ void VoxelTerrain::process() {
 void VoxelTerrain::process_viewers() {
 	ProfilingClock profiling_clock;
 
-	// Ordered by ascending index in paired viewers list
+	// 按配对观察者列表中的索引升序排列
 	StdVector<size_t> unpaired_viewer_indexes;
 
-	// Sync here to make sure tasks evaluate a more up-to-date distance. Otherwise, a viewer could spawn (or teleport
-	// far away), trigger tasks, but if sync still hasn't run by the time a task priority gets evaluated, the task could
-	// cancel itself because "too far from viewers".
-	// Not ideal since VoxelEngine already calls this, but it should be quick enough.
-	// An alternative is to use explicit cancellation tokens, which are used in VLT Clipbox.
+	// 在此同步，以确保任务评估到更新的距离。否则，观察者可能生成（或传送到
+	// 远处），触发任务，但如果任务优先级被评估时同步仍未运行，任务可能因为
+	// "距离观察者太远"而自我取消。
+	// 并不理想，因为 VoxelEngine 已经调用了它，但它应该足够快。
+	// 另一种方案是使用显式的取消令牌，VLT Clipbox 中使用了这种方法。
 	VoxelEngine::get_singleton().sync_viewers_task_priority_data();
 
-	// Update viewers
+	// 更新观察者
 	{
-		// Our node doesn't have bounds yet, so for now viewers are always paired.
-		// TODO Update: the node has bounds now, need to change this
+		// 我们的节点还没有边界，所以目前观察者总是配对的。
+		// TODO 更新：节点现在有边界了，需要改变这一点
 
-		// Destroyed viewers
+		// 已销毁的观察者
 		for (size_t i = 0; i < _paired_viewers.size(); ++i) {
 			PairedViewer &p = _paired_viewers[i];
 			if (!VoxelEngine::get_singleton().viewer_exists(p.id)) {
 				VOXEL_PRINT_VERBOSE(format("Detected destroyed viewer {} in VoxelTerrain", p.id));
-				// Interpret removal as nullified view distance so the same code handling loading of blocks
-				// will be used to unload those viewed by this viewer.
-				// We'll actually remove unpaired viewers in a second pass.
+				// 将移除解释为观察距离被置零，这样处理数据块加载的同一套代码
+				// 也会被用来卸载该观察者所观察的数据块。
+				// 我们实际上会在第二遍中移除未配对的观察者。
 				p.state.vertical_view_distance_voxels = 0;
 				p.state.horizontal_view_distance_voxels = 0;
-				// Also update boxes, they won't be updated since the viewer has been removed.
-				// Assign prev state, otherwise in some cases resetting boxes would make them equal to prev state,
-				// therefore causing no unload
+				// 同时更新盒子，它们不会更新，因为观察者已被移除。
+				// 赋值给 prev state，否则在某些情况下重置盒子会使它们等于 prev state，
+				// 从而不会发生卸载
 				p.prev_state = p.state;
 				p.state.data_box = Box3i();
 				p.state.mesh_box = Box3i();
@@ -1304,8 +1300,8 @@ void VoxelTerrain::process_viewers() {
 		const Transform3D local_to_world_transform = get_global_transform();
 		const Transform3D world_to_local_transform = local_to_world_transform.affine_inverse();
 
-		// Note, this does not support non-uniform scaling
-		// TODO There is probably a better way to do this
+		// 注意，这不支持非均匀缩放
+		// TODO 可能还有更好的办法
 		const float view_distance_scale = world_to_local_transform.basis.xform(Vector3(1, 0, 0)).length();
 
 		const Box3i bounds_in_voxels = _data->get_bounds();
@@ -1323,7 +1319,7 @@ void VoxelTerrain::process_viewers() {
 			inline void operator()(ViewerID viewer_id, const VoxelEngine::Viewer &viewer) {
 				size_t paired_viewer_index;
 				if (!self.try_get_paired_viewer_index(viewer_id, paired_viewer_index)) {
-					// New viewer
+					// 新观察者
 					PairedViewer p;
 					p.id = viewer_id;
 					paired_viewer_index = self._paired_viewers.size();
@@ -1353,7 +1349,7 @@ void VoxelTerrain::process_viewers() {
 				state.requires_meshes =
 						VoxelEngine::get_singleton().is_viewer_requiring_visuals(viewer_id) && self._mesher.is_valid();
 
-				// Update data and mesh view boxes
+				// 更新数据和网格观察盒子
 
 				const int data_block_size = self.get_data_block_size();
 				const int mesh_block_size = self.get_mesh_block_size();
@@ -1371,7 +1367,7 @@ void VoxelTerrain::process_viewers() {
 					const int render_to_data_factor = (mesh_block_size / data_block_size);
 					const Vector3i mesh_block_pos = math::floordiv(state.local_position_voxels, mesh_block_size);
 
-					// Adding one block of padding because meshing requires neighbors
+					// 添加一个数据块的填充，因为网格化需要邻居
 					view_distance_data_blocks_h = view_distance_mesh_blocks_h * render_to_data_factor + 1;
 					view_distance_data_blocks_v = view_distance_mesh_blocks_v * render_to_data_factor + 1;
 
@@ -1406,7 +1402,7 @@ void VoxelTerrain::process_viewers() {
 			}
 		};
 
-		// New viewers and updates. Removed viewers won't be iterated but are still paired until later.
+		// 新的观察者和更新。被移除的观察者不会被迭代，但会一直保持配对直到稍后。
 		UpdatePairedViewer u{
 			*this, bounds_in_data_blocks, bounds_in_mesh_blocks, world_to_local_transform, view_distance_scale
 		};
@@ -1419,7 +1415,7 @@ void VoxelTerrain::process_viewers() {
 			 ((get_stream().is_valid() && get_stream()->is_runnable()) ||
 			  (get_generator().is_valid() && get_generator()->is_runnable())));
 
-	// Find out which blocks need to appear and which need to be unloaded
+	// 找出哪些数据块需要出现，哪些需要被卸载
 	{
 		VOXEL_PROFILE_SCOPE();
 
@@ -1442,11 +1438,10 @@ void VoxelTerrain::process_viewers() {
 				if (prev_mesh_box != new_mesh_box) {
 					VOXEL_PROFILE_SCOPE();
 
-					// TODO Any reason to unview old blocks before viewing new blocks?
-					// Because if a viewer is removed and another is added, it will reload the whole area even if their
-					// box is the same.
+					// TODO 在观察新数据块之前取消观察旧数据块，有什么理由吗？
+					// 因为如果一个观察者被移除而另一个被添加，即使它们的盒子相同，也会重新加载整个区域。
 
-					// Unview blocks that just fell out of range
+					// 取消观察刚超出范围的数据块
 					prev_mesh_box.difference(new_mesh_box, [this, &viewer](Box3i out_of_range_box) {
 						out_of_range_box.for_each_cell([this, &viewer](Vector3i bpos) {
 							unview_mesh_block(
@@ -1455,17 +1450,17 @@ void VoxelTerrain::process_viewers() {
 						});
 					});
 
-					// View blocks that just entered the range
+					// 观察刚进入范围的数据块
 					new_mesh_box.difference(prev_mesh_box, [this, &viewer](Box3i box_to_load) {
 						box_to_load.for_each_cell([this, &viewer](Vector3i bpos) {
-							// Load or update block
+							// 加载或更新数据块
 							view_mesh_block(bpos, viewer.state.requires_meshes, viewer.state.requires_collisions);
 						});
 					});
 				}
 
-				// Blocks that remained within range of the viewer may need some changes too if viewer flags were
-				// modified. This operates on a DISTINCT set of blocks than the one above.
+				// 如果观察者标志被修改，那些仍保持在观察者范围内的数据块可能也需要一些改变。
+				// 这操作的是与上面不同的一组数据块。
 
 				if (viewer.state.requires_collisions != viewer.prev_state.requires_collisions) {
 					const Box3i box = new_mesh_box.clipped(prev_mesh_box);
@@ -1500,17 +1495,16 @@ void VoxelTerrain::process_viewers() {
 
 	_stats.time_detect_required_blocks = profiling_clock.restart();
 
-	// We no longer need unpaired viewers.
+	// 我们不再需要未配对的观察者。
 	for (size_t i = 0; i < unpaired_viewer_indexes.size(); ++i) {
-		// Iterating backward so indexes of paired viewers that need removal will not change because of the removal
-		// itself
+		// 反向迭代，这样需要移除的配对观察者的索引不会因为移除本身而改变
 		const size_t vi = unpaired_viewer_indexes[unpaired_viewer_indexes.size() - i - 1];
 		VOXEL_PRINT_VERBOSE(format("Unpairing viewer {} from VoxelTerrain", _paired_viewers[vi].id));
 		_paired_viewers[vi] = _paired_viewers.back();
 		_paired_viewers.pop_back();
 	}
 
-	// It's possible the user didn't set a stream yet, or it is turned off
+	// 用户可能还没有设置流，或者流已关闭
 	if (can_load_blocks) {
 		send_data_load_requests();
 		BufferedTaskScheduler &task_scheduler = BufferedTaskScheduler::get_for_current_thread();
@@ -1538,10 +1532,10 @@ void VoxelTerrain::process_viewer_data_box_change(
 		generator->process_viewer_diff(viewer_id, new_data_box, prev_data_box);
 	}
 
-	// Unview blocks that just fell out of range
+	// 取消观察刚超出范围的数据块
 	//
-	// TODO Any reason to unview old blocks before viewing new blocks?
-	// Because if a viewer is removed and another is added, it will reload the whole area even if their box is the same.
+	// TODO 在观察新数据块之前取消观察旧数据块，有什么理由吗？
+	// 因为如果一个观察者被移除而另一个被添加，即使它们的盒子相同，也会重新加载整个区域。
 	{
 		const bool may_save = get_stream().is_valid() && get_stream()->is_runnable();
 
@@ -1550,7 +1544,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 
 		const unsigned int to_save_index0 = _blocks_to_save.size();
 
-		// Decrement refcounts from loaded blocks, and unload them
+		// 递减已加载数据块的引用计数，并卸载它们
 		prev_data_box.difference(new_data_box, [this, may_save](Box3i out_of_range_box) {
 			// VOXEL_PRINT_VERBOSE(format("Unview data box {}", out_of_range_box));
 			_data->unview_area(
@@ -1562,7 +1556,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 			);
 		});
 
-		// Temporarily store unloaded blocks in a map until saving completes
+		// 将已卸载的数据块临时存储到映射中，直到保存完成
 		for (unsigned int i = to_save_index0; i < _blocks_to_save.size(); ++i) {
 			const VoxelData::BlockToSave &bts = _blocks_to_save[i];
 			_unloaded_saving_blocks[bts.position] = bts.voxels;
@@ -1570,23 +1564,23 @@ void VoxelTerrain::process_viewer_data_box_change(
 
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Unload signals");
-			// Remove loading blocks (those were loaded and had their refcount reach zero)
+			// 移除加载中的数据块（那些已加载且引用计数降为零的）
 			for (const Vector3i bpos : tls_found_blocks_positions) {
 				emit_data_block_unloaded(bpos);
-				// TODO If they were loaded, why would they be in loading blocks?
-				// Probably in case we move so fast that blocks haven't even finished loading
+				// TODO 如果它们已加载，为什么会在加载中的列表里？
+				// 可能是我们移动太快，数据块甚至还没完成加载
 				_loading_blocks.erase(bpos);
 			}
 		}
 
-		// Remove refcount from loading blocks, and cancel loading if it reaches zero
+		// 移除加载中数据块的引用计数，如果降为零则取消加载
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Cancel missing blocks");
 			for (const Vector3i bpos : tls_missing_blocks) {
 				auto loading_block_it = _loading_blocks.find(bpos);
 				if (loading_block_it == _loading_blocks.end()) {
 					VOXEL_PRINT_VERBOSE("Request to unview a loading block that was never requested");
-					// Not expected, but fine I guess
+					// 不符合预期，但我想也没关系
 					return;
 				}
 
@@ -1594,10 +1588,10 @@ void VoxelTerrain::process_viewer_data_box_change(
 				loading_block.viewers.remove();
 
 				if (loading_block.viewers.get() == 0) {
-					// No longer want to load it
+					// 不再想要加载它
 					_loading_blocks.erase(loading_block_it);
 
-					// TODO Do we really need that vector after all?
+					// TODO 我们真的还需要那个向量吗？
 					for (size_t i = 0; i < _blocks_pending_load.size(); ++i) {
 						if (_blocks_pending_load[i] == bpos) {
 							_blocks_pending_load[i] = _blocks_pending_load.back();
@@ -1610,12 +1604,12 @@ void VoxelTerrain::process_viewer_data_box_change(
 		}
 	}
 
-	// View blocks coming into range
+	// 观察进入范围的数据块
 	if (can_load_blocks) {
 		const bool require_notifications =
 				(_block_enter_notification_enabled ||
 				 (_multiplayer_synchronizer != nullptr && _multiplayer_synchronizer->is_server())) &&
-				VoxelEngine::get_singleton().viewer_exists(viewer_id) && // Could be a destroyed viewer
+				VoxelEngine::get_singleton().viewer_exists(viewer_id) && // 可能是已销毁的观察者
 				VoxelEngine::get_singleton().is_viewer_requiring_data_block_notifications(viewer_id);
 
 		static thread_local StdVector<VoxelDataBlock> tls_found_blocks;
@@ -1629,14 +1623,14 @@ void VoxelTerrain::process_viewer_data_box_change(
 			_data->view_area(box_to_load, 0, &tls_missing_blocks, &tls_found_blocks_positions, &tls_found_blocks);
 		});
 
-		// Schedule loading of missing blocks
+		// 调度缺失数据块的加载
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Gather missing blocks");
 			for (const Vector3i missing_bpos : tls_missing_blocks) {
 				auto loading_block_it = _loading_blocks.find(missing_bpos);
 
 				if (loading_block_it == _loading_blocks.end()) {
-					// First viewer to request it
+					// 第一个请求它的观察者
 					LoadingBlock new_loading_block;
 					new_loading_block.viewers.add();
 
@@ -1648,7 +1642,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 					_blocks_pending_load.push_back(missing_bpos);
 
 				} else {
-					// More viewers
+					// 更多观察者
 					LoadingBlock &loading_block = loading_block_it->second;
 					loading_block.viewers.add();
 
@@ -1661,7 +1655,7 @@ void VoxelTerrain::process_viewer_data_box_change(
 
 		if (require_notifications) {
 			VOXEL_PROFILE_SCOPE_NAMED("Enter notifications");
-			// Notifications for blocks that were already loaded
+			// 对已经加载的数据块发出通知
 			for (unsigned int i = 0; i < tls_found_blocks.size(); ++i) {
 				const Vector3i bpos = tls_found_blocks_positions[i];
 				const VoxelDataBlock &block = tls_found_blocks[i];
@@ -1669,12 +1663,12 @@ void VoxelTerrain::process_viewer_data_box_change(
 			}
 		}
 
-		// Make sure to clear this because it holds refcounted stuff. If we don't, it could crash on exit because the
-		// voxel engine deinitializes its stuff before thread_locals get destroyed
+		// 确保清空它，因为它持有带引用计数的内容。如果不这样做，可能在退出时崩溃，因为
+		// 体素引擎在 thread_locals 被销毁之前就反初始化了它的内容
 		tls_found_blocks.clear();
 
-		// TODO viewers with varying flags during the game is not supported at the moment.
-		// They have to be re-created, which may cause world re-load...
+		// TODO 目前不支持游戏中观察者标志变化的情况。
+		// 它们必须被重新创建，这可能导致世界重新加载……
 	}
 }
 
@@ -1688,10 +1682,10 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 			ERR_PRINT(String("Could not save block {0}").format(varray(ob.position)));
 
 		} else if (ob.had_voxels) {
-			// TODO What if the version that was saved is older than the one we cached here?
-			// For that to be a problem, you'd have to edit a chunk, move away, move back in, edit it again, move away,
-			// and have the first save complete before the second.
-			// But we may consider adding version numbers, which requires adding block metadata
+			// TODO 如果保存的版本比我们缓存的版本更旧怎么办？
+			// 要出现这个问题，你需要编辑一个数据块、离开、再回来、再次编辑、再离开，
+			// 并且让第一次保存先于第二次完成。
+			// 但我们可以考虑添加版本号，这需要添加数据块元数据
 			_unloaded_saving_blocks.erase(ob.position);
 
 		}
@@ -1712,11 +1706,11 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 
 	if (ob.dropped) {
 		if (_loading_blocks.find(block_pos) == _loading_blocks.end()) {
-			// We are no longer expecting this block, ignore
+			// 我们不再期望这个数据块，忽略
 			return;
 		}
-		// That block was cancelled, but we are still expecting it.
-		// We'll have to request it again.
+		// 那个数据块被取消了，但我们仍然在期望它。
+		// 我们必须再次请求它。
 		VOXEL_PRINT_VERBOSE(
 				format("Received a block loading drop while we were still expecting it: "
 					   "lod{} ({}, {}, {}), re-requesting it",
@@ -1737,15 +1731,15 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 		auto loading_block_it = _loading_blocks.find(block_pos);
 
 		if (loading_block_it == _loading_blocks.end()) {
-			// That block was not requested or is no longer needed, drop it.
+			// 那个数据块没有被请求，或已不再需要，丢弃它。
 			++_stats.dropped_block_loads;
 			return;
 		}
 
-		// Using move semantics because it can contain an allocated vector
+		// 使用移动语义，因为它可能包含一个已分配的向量
 		loading_block = std::move(loading_block_it->second);
 
-		// Now we got the block. If we still have to drop it, the cause will be an error.
+		// 现在我们已经得到数据块。如果仍然需要丢弃它，原因将是一个错误。
 		_loading_blocks.erase(loading_block_it);
 	}
 
@@ -1753,11 +1747,11 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 
 	VoxelDataBlock block(ob.voxels, ob.lod_index);
 	block.set_edited(ob.type == VoxelEngine::BlockDataOutput::TYPE_LOADED);
-	// Viewers will be set only if the block doesn't already exist
+	// 只有在数据块不存在时才会设置观察者
 	block.viewers = loading_block.viewers;
 
 	if (block.has_voxels() && block.get_voxels_const().get_size() != Vector3iUtil::create(_data->get_block_size())) {
-		// Voxel block size is incorrect, drop it
+		// 体素数据块尺寸不正确，丢弃它
 		VOXEL_PRINT_ERROR(
 				format("Block is different from expected size. Expected {}, got {}",
 					   Vector3iUtil::create(_data->get_block_size()),
@@ -1790,14 +1784,14 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 		notify_data_block_enter(block, block_pos, viewer_id);
 	}
 
-	// The block itself might not be suitable for meshing yet, but blocks surrounding it might be now
-	// TODO Optimize: initial loading can hang for a while here.
-	// Because lots of blocks are loaded at once, which leads to many block queries.
+	// 数据块本身可能还不适合进行网格化，但它周围的数据块现在可能可以了
+	// TODO 优化：初次加载在这里可能会卡住一段时间。
+	// 因为大量数据块同时被加载，导致大量数据块查询。
 	try_schedule_mesh_update_from_data(
 			Box3i(_data->block_to_voxel(block_pos), Vector3iUtil::create(get_data_block_size()))
 	);
 
-	// We might have requested some blocks again (if we got a dropped one while we still need them)
+	// 我们可能已经再次请求了一些数据块（如果我们仍然需要它们时得到一个被丢弃的）
 	// if (stream_enabled) {
 	// 	send_block_data_requests();
 	// }
@@ -1807,9 +1801,9 @@ void VoxelTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob) {
 	// }
 }
 
-// Sets voxel data of a block, discarding existing data if any.
-// If the given block coordinates are not inside any viewer's area, this function won't do anything and return
-// false. If a block is already loading or generating at this position, it will be cancelled.
+// 设置一个数据块的体素数据，如果有任何现有数据则丢弃。
+// 如果给定的数据块坐标不在任何观察者的区域内，此函数不做任何事并返回
+// false。如果某个数据块正在此位置加载或生成，它将被取消。
 bool VoxelTerrain::try_set_block_data(Vector3i position, std::shared_ptr<VoxelBuffer> &voxel_data) {
 	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND_V(voxel_data == nullptr, false);
@@ -1823,7 +1817,7 @@ bool VoxelTerrain::try_set_block_data(Vector3i position, std::shared_ptr<VoxelBu
 					.format(varray(expected_block_size, voxel_data->get_size()))
 	);
 
-	// Setup viewers count intersecting with this block
+	// 设置与此数据块相交的观察者计数
 	RefCount refcount;
 	for (unsigned int i = 0; i < _paired_viewers.size(); ++i) {
 		const PairedViewer &viewer = _paired_viewers[i];
@@ -1833,28 +1827,28 @@ bool VoxelTerrain::try_set_block_data(Vector3i position, std::shared_ptr<VoxelBu
 	}
 
 	if (refcount.get() == 0) {
-		// Actually, this block is not even in range. So we may ignore it.
-		// If we don't want this behavior, we could introduce a fake viewer that adds a reference to all blocks in
-		// this volume as long as it is enabled?
+		// 实际上，这个数据块甚至不在范围内。所以我们可以忽略它。
+		// 如果我们不想要这种行为，可以引入一个虚拟观察者，只要启用它，就会为
+		// 该体积中的所有数据块添加引用？
 		VOXEL_PRINT_VERBOSE("Trying to set a data block outside of any viewer range");
 		return false;
 	}
 
-	// Cancel loading version if any
+	// 取消加载中的版本（如果有）
 	_loading_blocks.erase(position);
 
 	VoxelDataBlock block(voxel_data, 0);
-	// TODO How to set the `edited` flag? Does it matter in use cases for this function?
+	// TODO 如何设置 `edited` 标志？它在这个函数的用例中重要吗？
 	block.set_edited(true);
 	block.viewers = refcount;
 
-	// Create or update block data
+	// 创建或更新数据块数据
 	_data->try_set_block(position, block, [](VoxelDataBlock &existing_block, const VoxelDataBlock &incoming_block) {
 		existing_block.set_voxels(incoming_block.get_voxels_shared());
 		existing_block.set_edited(incoming_block.is_edited());
 	});
 
-	// The block itself might not be suitable for meshing yet, but blocks surrounding it might be now
+	// 数据块本身可能还不适合进行网格化，但它周围的数据块现在可能可以了
 	try_schedule_mesh_update_from_data(
 			Box3i(_data->block_to_voxel(position), Vector3iUtil::create(get_data_block_size()))
 	);
@@ -1872,7 +1866,7 @@ void VoxelTerrain::process_meshing() {
 
 	_stats.dropped_block_meshs = 0;
 
-	// Send mesh updates
+	// 发送网格更新
 
 	const Transform3D volume_transform = get_global_transform();
 	std::shared_ptr<PriorityDependency::ViewersData> shared_viewers_data =
@@ -1889,16 +1883,16 @@ void VoxelTerrain::process_meshing() {
 
 		VoxelMeshBlockVT *mesh_block = _mesh_map.get_block(mesh_block_pos);
 
-		// If we got here, it must have been because of scheduling an update
+		// 如果我们来到这里，一定是因为调度了一次更新
 		VOXEL_ASSERT_CONTINUE(mesh_block != nullptr);
 		VOXEL_ASSERT_CONTINUE(mesh_block->is_in_update_list);
 
-		// Pad by 1 because meshing requires neighbors
+		// 填充 1，因为网格化需要邻居
 		const Box3i data_box =
 				Box3i(mesh_block_pos * mesh_to_data_factor, Vector3iUtil::create(mesh_to_data_factor)).padded(1);
 
 #ifdef DEBUG_ENABLED
-		// We must have picked up a valid data block
+		// 我们必须已经取到了有效的数据块
 		{
 			const Vector3i anchor_pos = data_box.position + Vector3i(1, 1, 1);
 			VOXEL_ASSERT_CONTINUE(_data->has_block(anchor_pos, 0));
@@ -1906,7 +1900,7 @@ void VoxelTerrain::process_meshing() {
 #endif
 
 		// print_line(String("DDD request {0}").format(varray(mesh_request.render_block_position.to_vec3())));
-		// We'll allocate this quite often. If it becomes a problem, it should be easy to pool.
+		// 我们会相当频繁地分配这个。如果它成为问题，应该很容易做对象池化。
 		MeshBlockTask *task = VOXEL_NEW(MeshBlockTask);
 		task->volume_id = _volume_id;
 		task->mesh_block_position = mesh_block_pos;
@@ -1916,7 +1910,7 @@ void VoxelTerrain::process_meshing() {
 		task->collision_hint = _generate_collisions && mesh_block->collision_viewers.get() > 0;
 		task->data = _data;
 
-		// This iteration order is specifically chosen to match VoxelEngine and threaded access
+		// 这个迭代顺序是特意选择的，以匹配 VoxelEngine 和线程化访问
 		_data->get_blocks_with_voxel_data(data_box, 0, to_span(task->blocks));
 		task->blocks_count = Vector3iUtil::get_volume_u64(data_box.size);
 
@@ -1928,7 +1922,7 @@ void VoxelTerrain::process_meshing() {
 					++count;
 				}
 			}
-			// Blocks that were in the list must have been scheduled because we have data for them!
+			// 列表中的这些数据块一定已被调度，因为我们有它们的数据！
 			if (count == 0) {
 				VOXEL_PRINT_ERROR("Unexpected empty block list in meshing block task");
 				VOXEL_DELETE(task);
@@ -1967,20 +1961,20 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 	VoxelMeshBlockVT *block = _mesh_map.get_block(ob.position);
 	if (block == nullptr) {
 		// print_line("- no longer loaded");
-		// That block is no longer loaded, drop the result
+		// 该数据块已不再加载，丢弃结果
 		++_stats.dropped_block_meshs;
 		return;
 	}
 
 	if (ob.type == VoxelEngine::BlockMeshOutput::TYPE_DROPPED) {
-		// That block is loaded, but its meshing request was dropped.
-		// TODO Not sure what to do in this case, the code sending update queries has to be tweaked
+		// 该数据块已加载，但其网格化请求被丢弃。
+		// TODO 不确定在这种情况下该怎么做，发送更新查询的代码需要调整
 		VOXEL_PRINT_VERBOSE("Received a block mesh drop while we were still expecting it");
 		++_stats.dropped_block_meshs;
 		return;
 	}
 
-	// There is a slim chance for some updates to come up just after setting the mesher to null. Avoids a crash.
+	// 在将 mesher 设为空之后，仍有可能出现一些更新。这样可以避免崩溃。
 	if (_mesher.is_null()) {
 		++_stats.dropped_block_meshs;
 		return;
@@ -1991,13 +1985,13 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 	StdVector<uint16_t> material_indices;
 	if (ob.visual_was_required) {
 		if (ob.has_mesh_resource) {
-			// The mesh was already built as part of the threaded task
+			// 网格已作为线程任务的一部分构建完成
 			mesh = ob.mesh;
 			shadow_occluder_mesh = ob.shadow_occluder_mesh;
-			// It can be empty
+			// 它可能为空
 			material_indices = std::move(ob.mesh_material_indices);
 		} else {
-			// Can't build meshes in threads, do it here
+			// 不能在线程中构建网格，在此处构建
 			material_indices.clear();
 			mesh = build_mesh(
 					to_span_const(ob.surfaces.surfaces),
@@ -2018,7 +2012,7 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 	}
 
 	if (mesh.is_null() && block->has_mesh()) {
-		// No surface anymore in this block
+		// 该数据块不再有表面
 #ifdef VOXEL_ENABLE_INSTANCER
 		if (_instancer != nullptr) {
 			_instancer->on_mesh_block_exit(ob.position, ob.lod);
@@ -2026,9 +2020,9 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 #endif
 	}
 	if (ob.surfaces.surfaces.size() > 0 && mesh.is_valid() && !block->has_mesh()) {
-		// TODO The mesh could come from an edited region!
-		// We would have to know if specific voxels got edited, or different from the generator
-		// TODO Support multi-surfaces in VoxelInstancer
+		// TODO 网格可能来自被编辑过的区域！
+		// 我们需要知道特定的体素是否被编辑过，或者是否与生成器的结果不同
+		// TODO 在 VoxelInstancer 中支持多表面
 #ifdef VOXEL_ENABLE_INSTANCER
 		if (_instancer != nullptr) {
 			_instancer->on_mesh_block_enter(
@@ -2090,8 +2084,8 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 	block->set_collision_enabled(gen_collisions);
 	block->set_parent_visible(is_visible());
 	block->set_parent_transform(get_global_transform());
-	// TODO We don't set MESH_UP_TO_DATE anywhere, but it seems to work?
-	// Can't set the state because there could be more than one update in progress. Perhaps it needs refactoring.
+	// TODO 我们没有在任何地方设置 MESH_UP_TO_DATE，但似乎能正常工作？
+	// 不能设置该状态，因为可能有多个更新正在进行。也许它需要重构。
 	// block->set_mesh_state(VoxelMeshBlockVT::MESH_UP_TO_DATE);
 
 	if (block->is_loaded == false) {
@@ -2103,7 +2097,7 @@ void VoxelTerrain::apply_mesh_update(const VoxelEngine::BlockMeshOutput &ob) {
 Ref<VoxelTool> VoxelTerrain::get_voxel_tool() {
 	Ref<VoxelTool> vt = memnew(VoxelToolTerrain(this));
 	const int used_channels_mask = get_used_channels_mask();
-	// Auto-pick first used channel
+	// 自动选择第一个使用的通道
 	for (int channel = 0; channel < VoxelBuffer::MAX_CHANNELS; ++channel) {
 		if ((used_channels_mask & (1 << channel)) != 0) {
 			vt->set_channel(VoxelBuffer::ChannelId(channel));
@@ -2120,7 +2114,7 @@ void VoxelTerrain::set_bounds(Box3i box) {
 	const int smallest_dimension = get_data_block_size();
 	bounds_in_voxels.size = math::max(bounds_in_voxels.size, Vector3iUtil::create(smallest_dimension));
 
-	// Round to block size
+	// 四舍五入到数据块大小
 	bounds_in_voxels = bounds_in_voxels.snapped(get_data_block_size());
 
 	_data->set_bounds(bounds_in_voxels);
@@ -2128,13 +2122,13 @@ void VoxelTerrain::set_bounds(Box3i box) {
 	const unsigned int largest_dimension =
 			static_cast<unsigned int>(math::max(math::max(box.size.x, box.size.y), box.size.z));
 	if (largest_dimension > MAX_VIEW_DISTANCE_FOR_LARGE_VOLUME) {
-		// Cap view distance to make sure you don't accidentally blow up memory when changing parameters
+		// 限制观察距离，确保在更改参数时不会意外耗尽内存
 		if (_max_view_distance_voxels > MAX_VIEW_DISTANCE_FOR_LARGE_VOLUME) {
 			_max_view_distance_voxels = math::min(_max_view_distance_voxels, MAX_VIEW_DISTANCE_FOR_LARGE_VOLUME);
 			notify_property_list_changed();
 		}
 	}
-	// TODO Editor gizmo bounds
+	// TODO 编辑器 gizmo 边界
 
 	update_configuration_warnings();
 }
@@ -2152,7 +2146,7 @@ const VoxelTerrainMultiplayerSynchronizer *VoxelTerrain::get_multiplayer_synchro
 }
 
 bool VoxelTerrain::is_area_meshed(const Box3i &box_in_voxels) const {
-	// This assumes we store mesh blocks even when there is no mesh
+	// 这里假设即使没有网格，我们也存储网格数据块
 	const Box3i mesh_box = box_in_voxels.downscaled(get_mesh_block_size());
 	return mesh_box.all_cells_match([this](Vector3i bpos) {
 		const VoxelMeshBlockVT *block = _mesh_map.get_block(bpos);
@@ -2186,7 +2180,7 @@ void VoxelTerrain::on_format_changed() {
 	_on_stream_params_changed();
 }
 
-// DEBUG LAND
+// 调试区
 
 void VoxelTerrain::debug_set_draw_enabled(bool enabled) {
 #ifdef TOOLS_ENABLED
@@ -2266,7 +2260,7 @@ void VoxelTerrain::process_debug_draw() {
 
 	const Transform3D parent_transform = get_global_transform();
 
-	// Volume bounds
+	// 体积边界
 	if (debug_get_draw_flag(DEBUG_DRAW_VOLUME_BOUNDS)) {
 		const Box3i bounds_in_voxels = get_bounds();
 		const float bounds_in_voxels_len = Vector3(bounds_in_voxels.size).length();
@@ -2331,7 +2325,7 @@ void VoxelTerrain::process_debug_draw() {
 
 #endif
 
-// BINDING LAND
+// 绑定区
 
 Vector3i VoxelTerrain::_b_voxel_to_data_block(Vector3 pos) const {
 	return _data->voxel_to_block(math::floor_to_int(pos));
@@ -2348,7 +2342,7 @@ Ref<VoxelSaveCompletionTracker> VoxelTerrain::_b_save_modified_blocks() {
 	return VoxelSaveCompletionTracker::create(tracker);
 }
 
-// Explicitly ask to save a block if it was modified
+// 显式请求保存被修改过的数据块
 void VoxelTerrain::_b_save_block(Vector3i p_block_pos) {
 	VoxelData::BlockToSave to_save;
 	if (_data->consume_block_modifications(p_block_pos, to_save)) {
@@ -2371,7 +2365,7 @@ bool VoxelTerrain::_b_try_set_block_data(Vector3i position, Ref<godot::VoxelBuff
 	std::shared_ptr<VoxelBuffer> buffer = voxel_data->get_buffer_shared();
 
 #ifdef DEBUG_ENABLED
-	// It is not allowed to call this function at two different positions with the same voxel buffer
+	// 不允许使用同一个体素缓冲区在两个不同位置调用此函数
 	const StringName &key = VoxelStringNames::get_singleton()._voxel_debug_vt_position;
 	if (voxel_data->has_meta(key)) {
 		const Vector3i meta_pos = voxel_data->get_meta(key);
@@ -2464,7 +2458,7 @@ void VoxelTerrain::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_generator_use_gpu"), &Self::get_generator_use_gpu);
 #endif
 
-	// TODO Rename `_voxel_bounds`
+	// TODO 重命名 `_voxel_bounds`
 	ClassDB::bind_method(D_METHOD("set_bounds", "bounds"), &Self::_b_set_bounds);
 	ClassDB::bind_method(D_METHOD("get_bounds"), &Self::_b_get_bounds);
 
@@ -2542,7 +2536,7 @@ void VoxelTerrain::_bind_methods() {
 			"is_area_edit_notification_enabled"
 	);
 
-	// This may be set to false in multiplayer designs where the server is the one sending the blocks
+	// 在多人在线设计中，当服务器负责发送数据块时，此值可能被设为 false
 	ADD_PROPERTY(
 			PropertyInfo(Variant::BOOL, "automatic_loading_enabled"),
 			"set_automatic_loading_enabled",
@@ -2558,7 +2552,7 @@ void VoxelTerrain::_bind_methods() {
 
 	ADD_GROUP("Debug", "debug_");
 
-	// Debug drawing is not persistent
+	// 调试绘制不是持久的
 
 	BIND_ENUM_CONSTANT(DEBUG_DRAW_VOLUME_BOUNDS);
 	BIND_ENUM_CONSTANT(DEBUG_DRAW_VISUAL_AND_COLLISION_BLOCKS);
@@ -2589,7 +2583,7 @@ void VoxelTerrain::_bind_methods() {
 			"debug_get_draw_shadow_occluders"
 	);
 
-	// TODO Add back access to block, but with an API securing multithreaded access
+	// TODO 重新提供对数据块的访问，但需使用保证多线程安全的 API
 	ADD_SIGNAL(MethodInfo("block_loaded", PropertyInfo(Variant::VECTOR3I, "position")));
 	ADD_SIGNAL(MethodInfo("block_unloaded", PropertyInfo(Variant::VECTOR3I, "position")));
 

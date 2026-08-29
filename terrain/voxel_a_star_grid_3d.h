@@ -16,9 +16,8 @@ class VoxelAStarGrid3DInternal : public AStarGrid3D {
 public:
 	VoxelAStarGrid3DInternal();
 
-	// Referring to VoxelData instead of using a VoxelTool because it allows to run the search in a threaded task.
-	// VoxelTool can't be used yet in threads because it holds a pointer to a terrain node, which could get deleted at
-	// any time.
+	// 直接引用 VoxelData 而不是使用 VoxelTool，因为这允许在后台线程任务中运行搜索。
+	// VoxelTool 目前还不能在线程中使用，因为它持有一个指向地形节点的指针，该节点可能随时被删除。
 	std::shared_ptr<VoxelData> data;
 
 	void init_cache();
@@ -27,15 +26,15 @@ protected:
 	bool is_solid(Vector3i pos) override;
 
 private:
-	// We store a cache of solid bits for the whole pathfindable region.
-	// To minimize multithreaded access to the main voxel data, we only load chunks of bits as they are needed.
+	// 我们为整个可寻路区域存储实心位（solid bits）缓存。
+	// 为尽量减少对主体素数据的多线程访问，我们只在需要时加载所需的数据块位。
 
 	struct Chunk {
 		static const int SIZE_PO2 = 2;
 		static const int SIZE = 1 << SIZE_PO2;
 		static const int SIZE_MASK = SIZE - 1;
 
-		// 4x4x4 bits in ZXY order
+		// 4x4x4 位，ZXY 顺序
 		uint64_t solid_bits = 0;
 
 		inline bool get_solid_bit(Vector3i rel) const {
@@ -45,23 +44,23 @@ private:
 		}
 	};
 
-	// Cached 3D bitmap
+	// 缓存的三维位图
 	StdVector<Chunk> _grid_cache;
 	Vector3i _grid_cache_size;
 
-	// Tracks which chunks are loaded
+	// 跟踪哪些数据块已加载
 	DynamicBitset _grid_chunk_states;
 
-	// Temporary buffer used to read voxels from the main voxel storage
+	// 用于从主体素存储读取体素的临时缓冲区
 	VoxelBuffer _voxel_buffer;
 };
 
-// Godot-facing API for voxel grid A* pathfinding. Suitable for blocky terrains.
+// 面向 Godot 的体素网格 A* 寻路 API。适用于块状地形。
 class VoxelAStarGrid3D : public RefCounted {
 	GDCLASS(VoxelAStarGrid3D, RefCounted)
 public:
-	// Bare bones at the moment. May need more configurations and customization.
-	// Also, it does not cache data between queries.
+	// 目前只是基础实现。未来可能需要更多的配置和自定义。
+	// 另外，它不会在查询之间缓存数据。
 
 	void set_terrain(VoxelTerrain *node);
 

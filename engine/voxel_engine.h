@@ -32,39 +32,38 @@ VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice);
 
 namespace voxel {
 
-// Singleton for common things, notably the task system and shared viewers list.
-// In Godot terminology this used to be called a "server", but I don't really agree with the term here, and it can be
-// confused with networking features.
+// 用于通用事务的单例，尤其是任务系统和共享的观察者列表。
+// 在 Godot 术语中这曾被称为“服务器”（server），但我不太认同这个说法，而且它容易
+// 与网络相关功能混淆。
 class VoxelEngine {
 public:
 	struct BlockMeshOutput {
 		enum Type {
-			TYPE_MESHED, // Contains mesh
-			TYPE_DROPPED // Indicates the meshing was cancelled
+			TYPE_MESHED, // 包含网格
+			TYPE_DROPPED // 表示网格化已被取消
 		};
 
 		Type type;
 		VoxelMesher::Output surfaces;
-		// Only used if `has_mesh_resource` is true (usually when meshes are allowed to be build in threads). Otherwise,
-		// mesh data will be in `surfaces` and has to be built on the main thread.
+		// 仅当 `has_mesh_resource` 为 true 时使用（通常是在允许在线程中构建网格的情况下）。否则，
+		// 网格数据将位于 `surfaces` 中，且必须在主线程上构建。
 		Ref<Mesh> mesh;
 		Ref<Mesh> shadow_occluder_mesh;
-		// Remaps Mesh surface indices to Mesher material indices. Only used if `has_mesh_resource` is true.
-		// TODO Optimize: candidate for small vector optimization. A big majority of meshes will have a handful of
-		// surfaces, which would fit here without allocating.
+		// 将 Mesh 表面索引重映射为 Mesher 材质索引。仅当 `has_mesh_resource` 为 true 时使用。
+		// TODO 优化：适合做小向量优化。绝大多数网格只有少量表面，
+		// 无需分配即可容纳在此。
 		StdVector<uint16_t> mesh_material_indices;
-		// In mesh block coordinates
+		// 以网格数据块坐标表示
 		Vector3i position;
-		// TODO Rename lod_index
+		// TODO 重命名为 lod_index
 		uint8_t lod;
-		// Tells if the mesh resource was built as part of the task. If not, you need to build it on the main thread if
-		// it is needed.
+		// 指示网格资源是否已作为任务的一部分构建完成。若未构建，则需在需要时于主线程上构建。
 		bool has_mesh_resource;
-		// Tells if the meshing task was required to build a rendering mesh if possible.
+		// 指示网格化任务是否被要求在可行时构建渲染网格。
 		bool visual_was_required;
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
-		// Can be null. Attached to meshing output so it is tracked more easily, because it is baked asynchronously
-		// starting from the mesh task, and it might complete earlier or later than the mesh.
+		// 可以为空。附加到网格化输出上以便于跟踪，因为它从网格任务开始异步烘焙，
+		// 完成时间可能早于或晚于网格。
 		std::shared_ptr<DetailTextureOutput> detail_textures;
 #endif
 	};
@@ -77,8 +76,8 @@ public:
 		};
 
 		Type type;
-		// If voxels are null with TYPE_LOADED, it means no block was found in the stream (if any) and no generator task
-		// was scheduled. This is the case when we don't want to cache blocks of generated data.
+		// 如果 TYPE_LOADED 时 voxels 为空，表示在流中（如果有）未找到任何数据块，且未调度生成器任务。
+		// 这种情况出现在我们不想缓存生成数据的数据块时。
 		std::shared_ptr<VoxelBuffer> voxels;
 #ifdef VOXEL_ENABLE_INSTANCER
 		UniquePtr<InstanceBlockData> instances;
@@ -87,9 +86,9 @@ public:
 		uint8_t lod_index;
 		bool dropped;
 		bool max_lod_hint;
-		// Blocks with this flag set should not be ignored.
-		// This is used when data streaming is off, all blocks are loaded at once.
-		// TODO Unused?
+		// 设置了此标志的数据块不应被忽略。
+		// 用于关闭数据流式加载、一次性加载所有数据块的情况。
+		// TODO 未使用？
 		bool initial_load;
 		bool had_instances;
 		bool had_voxels;
@@ -147,9 +146,9 @@ public:
 
 	struct Config {
 		int thread_count_minimum = 1;
-		// How many threads below available count on the CPU should we set as limit
+		// 我们希望线程数比 CPU 可用线程数少多少（作为上限）
 		int thread_count_margin_below_max = 1;
-		// Portion of available CPU threads to attempt using
+		// 尝试使用的可用 CPU 线程比例
 		float thread_count_ratio_over_max = 0.5;
 		unsigned int main_thread_budget_usec = DEFAULT_MAIN_THREAD_BUDGET_USEC;
 	};
@@ -158,10 +157,9 @@ public:
 	static void create_singleton(Config config);
 	static void destroy_singleton();
 
-	// This is a separate initialization step.
-	// It must be called when RenderingServer singleton is available (which is not the case during
-	// class registrations).
-	// See https://github.com/godotengine/godot-cpp/issues/1180
+	// 这是一个独立的初始化步骤。
+	// 必须在 RenderingServer 单例可用时调用（类注册期间并不可用）。
+	// 参见 https://github.com/godotengine/godot-cpp/issues/1180
 	void try_initialize_gpu_features();
 
 	VolumeID add_volume(VolumeCallbacks callbacks);
@@ -203,19 +201,19 @@ public:
 	int get_main_thread_time_budget_usec() const;
 	void set_main_thread_time_budget_usec(unsigned int usec);
 
-	// This should be fast and safe to access from multiple threads.
+	// 从多个线程访问应当快速且安全。
 	bool is_threaded_graphics_resource_building_enabled() const;
 	// void set_threaded_graphics_resource_building_enabled(bool enabled);
 
 	void push_main_thread_progressive_task(IProgressiveTask *task);
 
-	// Thread-safe.
+	// 线程安全。
 	void push_async_task(IThreadedTask *task);
-	// Thread-safe.
+	// 线程安全。
 	void push_async_tasks(Span<IThreadedTask *> tasks);
-	// Thread-safe.
+	// 线程安全。
 	void push_async_io_task(IThreadedTask *task);
-	// Thread-safe.
+	// 线程安全。
 	void push_async_io_tasks(Span<IThreadedTask *> tasks);
 
 #ifdef VOXEL_ENABLE_GPU
@@ -245,9 +243,9 @@ public:
 	}
 
 	static inline int get_octree_lod_block_region_extent(float lod_distance, float block_size) {
-		// This is a bounding radius of blocks around a viewer within which we may load them.
-		// `lod_distance` is the distance under which a block should subdivide into a smaller one.
-		// Each LOD is fractal so that value is the same for each of them, multiplied by 2^lod.
+		// 这是观察者周围可加载数据块的边界半径。
+		// `lod_distance` 是数据块应细分为更小块的距离阈值。
+		// 每个 LOD 都是分形的，因此该值对每一级都相同，乘以 2^lod。
 		return static_cast<int>(Math::ceil(lod_distance / block_size)) * 2 + 2;
 	}
 
@@ -279,11 +277,11 @@ public:
 	// 	return *_rendering_device;
 	// }
 
-	// TODO Should be private, but can't because `memdelete<T>` would be unable to call it otherwise...
+	// TODO 本应设为私有，但那样 `memdelete<T>` 将无法调用它……
 	~VoxelEngine();
 
 	inline void debug_increment_generate_block_task_counter() {
-		// Need to conditionally do this to avoid "unused variable" warnings in non-profiling builds
+		// 需要按条件执行此操作，以避免在非性能分析构建中出现“未使用变量”警告
 #ifdef VOXEL_PROFILER_ENABLED
 		int64_t v =
 #endif
@@ -306,17 +304,17 @@ public:
 private:
 	VoxelEngine(Config config);
 
-	// Since we are going to send data to tasks running in multiple threads, a few strategies are in place:
+	// 由于我们要向运行在多个线程中的任务发送数据，因此采用了以下几种策略：
 	//
-	// - Copy the data for each task. This is suitable for simple information that doesn't change after scheduling.
+	// - 为每个任务复制数据。适用于调度后不会改变的简单信息。
 	//
-	// - Per-thread instances. This is done if some heap-allocated class instances are not safe
-	//   to use in multiple threads, and don't change after being scheduled.
+	// - 每线程实例。当某些堆分配的类实例在多线程中使用不安全，
+	//   且在调度后不会改变时采用。
 	//
-	// - Shared pointers. This is used if the data can change after being scheduled.
-	//   This is often done without locking, but only if it's ok to have dirty reads.
-	//   If such data sets change structurally (like their size, or other non-dirty-readable fields),
-	//   then a new instance is created and old references are left to "die out".
+	// - 共享指针。当数据在调度后可能改变时采用。
+	//   通常在无锁情况下使用，但仅当允许脏读时才如此。
+	//   如果这类数据集发生结构性变化（例如大小变化，或其他不可脏读的字段），
+	//   则创建新实例，并让旧引用“自然消亡”。
 
 	struct Volume {
 		VolumeCallbacks callbacks;
@@ -326,31 +324,31 @@ private:
 		SlotMap<Volume, uint16_t, uint16_t> volumes;
 		SlotMap<Viewer, uint16_t, uint16_t> viewers;
 
-		// Must be overwritten with a new instance if count changes.
+		// 如果数量发生变化，必须用新实例覆盖。
 		std::shared_ptr<PriorityDependency::ViewersData> shared_priority_dependency;
 	};
 
-	// TODO multi-world support in the future
+	// TODO 未来支持多世界
 	World _world;
 
 	ThreadedTaskRunner _general_thread_pool;
-	// For tasks that can only run on the main thread and be spread out over frames
+	// 用于只能在主线程上运行并分散到多帧执行的任务
 	TimeSpreadTaskRunner _time_spread_task_runner;
 	unsigned int _main_thread_time_budget_usec = DEFAULT_MAIN_THREAD_BUDGET_USEC;
 	ProgressiveTaskRunner _progressive_task_runner;
 
 	FileLocker _file_locker;
 
-	// Caches whether building Mesh and Texture resources is allowed from inside threads.
-	// Depends on Godot's efficiency at doing so, and which renderer is used.
-	// For example, the OpenGL renderer does not support this well, but the Vulkan one should.
+	// 缓存是否允许在线程内构建 Mesh 和 Texture 资源。
+	// 取决于 Godot 在此方面的效率以及所使用的渲染器。
+	// 例如，OpenGL 渲染器对此支持不佳，而 Vulkan 渲染器应该没问题。
 	bool _threaded_graphics_resource_building_enabled = false;
 
 #ifdef VOXEL_ENABLE_GPU
 	GPUTaskRunner _gpu_task_runner;
 #endif
 
-	// There can be multiple types of generation tasks, so we count them with a common counter.
+	// 生成任务的类型可能有多种，因此用公共计数器统计它们。
 	std::atomic_int _debug_generate_block_task_count = { 0 };
 };
 

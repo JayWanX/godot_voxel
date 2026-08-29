@@ -26,20 +26,19 @@ struct ShaderOutput {
 	Type type;
 };
 
-// Generic processing graph made of operation nodes.
-// TODO This class had to be prefixed `VoxelGraph` but I wished it was just `pg::Function`.
-// It is that way because Godot classes have no namespaces.
-// This class is progressively becoming more generic, it doesn't have much relation to voxels (but is useful for
-// processing data).
+// 由操作节点构成的通用处理图。
+// TODO 这个类不得不加上 `VoxelGraph` 前缀，但我更希望它就叫 `pg::Function`。
+// 之所以如此，是因为 Godot 的类没有命名空间。
+// 这个类正逐渐变得更通用，与体素的关联不大（但对处理数据很有用）。
 class VoxelGraphFunction : public Resource {
 	GDCLASS(VoxelGraphFunction, Resource)
 public:
 	static const char *SIGNAL_NODE_NAME_CHANGED;
 	static const char *SIGNAL_COMPILED;
 
-	// Node indexes within the DB.
-	// Don't use these in saved data,
-	// they can change depending on which features the module is compiled with.
+	// 数据库中的节点索引。
+	// 不要将这些值用于保存的数据中，
+	// 它们会随模块编译时启用的功能而变化。
 	enum NodeTypeID {
 		NODE_CONSTANT,
 		NODE_INPUT_X,
@@ -75,7 +74,7 @@ public:
 		NODE_SDF_BOX,
 		NODE_SDF_SPHERE,
 		NODE_SDF_TORUS,
-		NODE_SDF_PREVIEW, // For debugging
+		NODE_SDF_PREVIEW, // 用于调试
 		NODE_SDF_SPHERE_HEIGHTMAP,
 		NODE_SDF_SMOOTH_UNION,
 		NODE_SDF_SMOOTH_SUBTRACT,
@@ -88,7 +87,7 @@ public:
 		NODE_OUTPUT_TYPE,
 		NODE_OUTPUT_SINGLE_TEXTURE,
 		NODE_EXPRESSION,
-		NODE_POWI, // pow(x, constant positive integer)
+		NODE_POWI, // pow(x, 常量正整数)
 		NODE_POW, // pow(x, y)
 		NODE_INPUT_SDF,
 		NODE_COMMENT,
@@ -99,8 +98,8 @@ public:
 		NODE_SPOTS_2D,
 		NODE_SPOTS_3D,
 
-	// Optional features down (to avoid diffs in docs when building both versions)
-	// Keep in mind this enum's values should not be used in persistent context (saves)
+	// 以下为可选功能（避免在构建两种版本时文档产生差异）
+	// 请记住，此枚举的值不应在持久化上下文（存档）中使用
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 		NODE_FAST_NOISE_2_2D,
@@ -112,10 +111,10 @@ public:
 
 	struct Port {
 		NodeTypeID type;
-		// Used for port types that can appear multiple times, but with different indices.
-		// Initially used for OutputWeight nodes.
+		// 用于可多次出现但索引不同的端口类型。
+		// 最初用于 OutputWeight 节点。
 		unsigned int sub_index = 0;
-		// Name of the port. If the port is custom, it identifies it (it doesn't matter otherwise).
+		// 端口名称。如果是自定义端口，它用于标识该端口（否则无关紧要）。
 		String name;
 
 		Port() {}
@@ -136,9 +135,9 @@ public:
 
 	void clear();
 
-	// Graph edition API
-	// Important: functions editing the graph are NOT thread-safe.
-	// They are expected to be used by the main thread (editor or game logic).
+	// 图的编辑 API
+	// 重要：编辑图的函数不是线程安全的。
+	// 它们预期由主线程（编辑器或游戏逻辑）使用。
 
 	uint32_t create_node(NodeTypeID type_id, Vector2 position = Vector2(), uint32_t id = ProgramGraph::NULL_ID);
 	void remove_node(uint32_t node_id);
@@ -149,7 +148,7 @@ public:
 			uint32_t p_id = ProgramGraph::NULL_ID
 	);
 
-	// Checks if the specified connection can be created
+	// 检查是否可以创建指定的连接
 	bool can_connect(
 			uint32_t src_node_id,
 			uint32_t src_port_index,
@@ -157,7 +156,7 @@ public:
 			uint32_t dst_port_index
 	) const;
 
-	// Checks if the specified connection is valid (without considering existing connections)
+	// 检查指定的连接是否有效（不考虑现有连接）
 	bool is_valid_connection(
 			uint32_t src_node_id,
 			uint32_t src_port_index,
@@ -174,8 +173,8 @@ public:
 	);
 	void get_connections(StdVector<ProgramGraph::Connection> &p_connections) const;
 
-	// Finds which source port is connected to the given destination.
-	// Returns false if `dst` has no inbound connection.
+	// 找出连接到给定目标端口的是哪个源端口。
+	// 如果 `dst` 没有入站连接，则返回 false。
 	bool try_get_connection_to(ProgramGraph::PortLocation dst, ProgramGraph::PortLocation &out_src) const;
 
 	bool has_node(uint32_t node_id) const;
@@ -216,14 +215,14 @@ public:
 
 	unsigned int get_nodes_count() const;
 
-	// Editor
+	// 编辑器
 
 #ifdef TOOLS_ENABLED
 	void get_configuration_warnings(PackedStringArray &out_warnings) const;
 
-	// Gets a hash that attempts to only change if the output of the graph is different.
-	// This is computed from the editable graph data, not the compiled result.
-	// Note: this is not guaranteed to work when comparing two graphs. This was designed initially to detect changes.
+	// 获取一个哈希，该哈希仅在图的输出不同时才会改变。
+	// 它是根据可编辑的图数据计算的，而非编译结果。
+	// 注意：在比较两个图时并不保证有效。它最初是为检测变化而设计的。
 	uint64_t get_output_graph_hash() const;
 
 	bool can_load_default_graph() const {
@@ -231,7 +230,7 @@ public:
 	}
 #endif
 
-	// Internal
+	// 内部
 
 	const ProgramGraph &get_graph() const;
 	void find_dependencies(uint32_t node_id, StdVector<uint32_t> &out_dependencies) const;
@@ -241,7 +240,7 @@ public:
 	unsigned int get_node_input_count(uint32_t node_id) const;
 	unsigned int get_node_output_count(uint32_t node_id) const;
 
-	// TODO Should this be directly a node type?
+	// TODO 这应该是直接作为一个节点类型吗？
 	enum AutoConnect { //
 		AUTO_CONNECT_NONE,
 		AUTO_CONNECT_X,
@@ -261,7 +260,7 @@ public:
 	String get_node_output_name(uint32_t node_id, unsigned int output_index) const;
 	Span<const Port> get_input_definitions() const;
 	Span<const Port> get_output_definitions() const;
-	// Currently used for testing
+	// 目前仅用于测试
 	void set_io_definitions(Span<const Port> inputs, Span<const Port> outputs);
 	bool contains_reference_to_function(Ref<VoxelGraphFunction> p_func, int max_recursion = 16) const;
 	bool contains_reference_to_function(const VoxelGraphFunction &p_func, int max_recursion = 16) const;
@@ -274,10 +273,9 @@ public:
 
 	void update_function_nodes(StdVector<ProgramGraph::Connection> *removed_connections);
 
-	// Copies nodes into another graph, and connections between them only.
-	// Resources in node parameters will be duplicated if they don't have a file path.
-	// If `dst_node_ids` is provided with non-zero size, defines the IDs of copied nodes. Otherwise, they are
-	// generated.
+	// 将节点及其相互之间的连接复制到另一个图中。
+	// 节点参数中的资源若没有文件路径则会被复制。
+	// 如果提供了非空大小的 `dst_node_ids`，则用于定义复制节点的 ID；否则将自动生成。
 	void duplicate_subgraph(
 			Span<const uint32_t> src_node_ids,
 			Span<const uint32_t> dst_node_ids,
@@ -296,7 +294,7 @@ public:
 
 	ShaderResult get_shader_source() const;
 
-	// Compiling and running
+	// 编译与运行
 
 	pg::CompilationResult compile(bool debug);
 	void execute(
@@ -309,14 +307,14 @@ public:
 	bool is_compiled() const;
 
 	struct CompiledGraph {
-		// This is read-only once it is compiled! Multiple threads can read it at the same time.
-		// In order to recompile the graph, a new instance is created.
+		// 编译完成后即为只读！多个线程可以同时读取它。
+		// 要重新编译图，需要创建新实例。
 		pg::Runtime runtime;
 	};
 
 	std::shared_ptr<CompiledGraph> get_compiled_graph() const;
 
-	// Per-thread re-used memory for runtime executions
+	// 用于运行时执行的每线程复用内存
 	struct RuntimeCache {
 		pg::Runtime::State state;
 		StdVector<Span<const float>> input_chunks;
@@ -327,8 +325,8 @@ public:
 
 	CompilationResult expand_and_reduce();
 
-	// Tests if two graphs are the same, considering their output branches. Object parameters are first compared by
-	// reference, and then compared by their properties. Nodes that the outputs don't depend on will be ignored.
+	// 测试两个图是否相同，考虑其输出分支。对象参数先按引用比较，再按属性比较。
+	// 输出不依赖的节点将被忽略。
 	bool equals(const VoxelGraphFunction &other);
 
 	void debug_analyze_range(Span<const math::Interval> input_ranges, const bool optimize_execution_map);
@@ -343,8 +341,8 @@ private:
 	int _b_get_node_type_count() const;
 	Dictionary _b_get_node_type_info(int type_id) const;
 	Array _b_get_connections() const;
-	// TODO Only exists because the UndoRedo API is confusing `null` with `absence of argument`...
-	// See https://github.com/godotengine/godot/issues/36895
+	// TODO 存在的原因仅仅是 UndoRedo API 将 `null` 与 `缺少参数` 混淆了...
+	// 参见 https://github.com/godotengine/godot/issues/36895
 	void _b_set_node_param_null(int node_id, int param_index);
 	void _b_set_node_name(int node_id, String node_name);
 
@@ -363,24 +361,23 @@ private:
 	static void _bind_methods();
 
 	ProgramGraph _graph;
-	// If enabled, inputs and outputs will be automatically setup from nodes of the graph when compiling.
-	// However this doesn't give fine control over the order I/Os appear in, so it may be disabled if that's desired.
+	// 若启用，编译时会根据图的节点自动设置输入和输出。
+	// 但这无法精细控制 I/O 出现的顺序，如果需要可将其禁用。
 	bool _automatic_io_setup_enabled = true;
 	StdVector<Port> _inputs;
 	StdVector<Port> _outputs;
-	StdVector<ObjectID> _subresources; // Can contain duplicates
+	StdVector<ObjectID> _subresources; // 可能包含重复项
 #ifdef TOOLS_ENABLED
-	// Godot doesn't make a difference between a resource newly created in the inspector, an existing empty one, or one
-	// created from script... It is necessary to know that in order to load a "hello world" graph in the editor when
-	// creating a new graph in the editor. True by default after being created, but will become false if cleared (which
-	// means it's not a brand new instance).
+	// Godot 无法区分在检查器中新建的资源、已存在的空资源或脚本创建的资源...
+	// 为了在编辑器中新建图时能加载一个"hello world"图，必须知道这一点。
+	// 创建后默认为 true，但如果被清空（意味着它不是全新的实例）则变为 false。
 	bool _can_load_default_graph = true;
 #endif
 	pg::CompilationResult _last_compiling_result;
 
-	// Compiled part.
-	// Must never be mutated after being assigned.
-	// This can be accessed by multiple threads so it needs to be protected.
+	// 已编译部分。
+	// 赋值后绝不能修改。
+	// 它可能被多个线程访问，因此需要保护。
 	std::shared_ptr<CompiledGraph> _compiled_graph = nullptr;
 	Mutex _compiled_graph_mutex;
 };
@@ -401,7 +398,7 @@ void auto_pick_inputs_and_outputs(
 
 Array serialize_io_definitions(Span<const VoxelGraphFunction::Port> ports);
 
-// Duplicates a node into the target graph (can be a different graph). Connections are not copied.
+// 将节点复制到目标图中（可以是不同的图）。不复制连接。
 ProgramGraph::Node *duplicate_node(
 		ProgramGraph &dst_graph,
 		const ProgramGraph::Node &src_node,

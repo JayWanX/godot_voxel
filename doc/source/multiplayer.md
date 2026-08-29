@@ -1,82 +1,81 @@
-Multiplayer
+多人联机
 =============
 
-Multiplayer in a voxel game can be implemented with lots of different details. Not all the features of the engine are supported, it is still very experimental and might change in the future. So how to setup multiplayer is explained in sections with a date, based on last experiments. The most recent one will often relate to a new/better/simpler way, and old ones might eventually be removed.
+体素游戏中的多人联机可以用很多不同的细节来实现。并非引擎的所有功能都受支持，它仍然非常实验性，并且未来可能会改变。因此如何设置多人联机将基于最新的实验，按带日期的章节进行说明。最近的章节通常会涉及新的/更好的/更简单的方式，而旧的可能最终会被移除。
 
 !!! note
-    This page assumes you already have knowledge in general multiplayer programming. It is strongly recommended you learn it beforehand. You can have a look at [Godot's documentation page about networking](https://docs.godotengine.org/en/stable/tutorials/networking/index.html).
+    本页假设你已经具备通用的多人联机编程知识。强烈建议你先学习它。你可以看看 [Godot 关于网络的文档页面](https://docs.godotengine.org/en/stable/tutorials/networking/index.html)。
 
 
-2023/04/13 - Server-side viewer with `VoxelTerrain` and `VoxelNetworkTerrain*` nodes
+2023/04/13 - 使用 `VoxelTerrain` 和 `VoxelNetworkTerrain*` 节点的服务端观察者
 -------------------------------------------------------------------------------------
 
-This is a new iteration over the previous method, based on the same principle, but integrating it to the engine with some speed improvements.
+这是对先前方法的又一次迭代，基于相同的原理，但将其集成到引擎中并做了一些速度改进。
 
-The server will be authoritative, and the client just receives information from it. Client and server will need a 
-different setup.
+服务端将是权威的，客户端只是接收来自它的信息。客户端和服务端将需要不同的设置。
 
-This will rely on Godot's high-level multiplayer API, using RPCs. It is important for a client or server to be setup before the terrain starts processing. This can be done before adding the game world to the tree, or initializing multiplayer in `_ready`.
+这将依赖 Godot 的高层多人联机 API，使用 RPC。对于客户端或服务端来说，在地形开始处理之前完成设置很重要。这可以在将游戏世界添加到场景树之前完成，或者在 `_ready` 中初始化多人联机。
 
-### On the server
+### 在服务端
 
-- Add `VoxelTerrain` to your scene.
-- Add a `VoxelTerrainMultiplayerSynchronizer` node as child of your `VoxelTerrain`.
-- When a player joins, make sure a `VoxelViewer` is created for it. Assign its `network_peer_id` and enable `requires_data_block_notifications`. You may also want to turn off `require_visuals` on viewers representing remote players, since it's normally not necessary to render their surroundings.
+- 向你的场景添加 `VoxelTerrain`。
+- 添加一个 `VoxelTerrainMultiplayerSynchronizer` 节点作为你的 `VoxelTerrain` 的子节点。
+- 当玩家加入时，确保为其创建一个 `VoxelViewer`。分配它的 `network_peer_id` 并启用 `requires_data_block_notifications`。你可能还想关闭代表远程玩家的观察者的 `require_visuals`，因为通常没有必要渲染他们的周围环境。
 
-### On the client
+### 在客户端
 
-- Add `VoxelTerrain` to your scene.
-- Add `VoxelTerrainMultiplayerSynchronizer` node as child of the `VoxelTerrain`. Make sure it has the same name as its server equivalent.
-- The client will still need a `VoxelViewer`, which will allow the terrain to detect when it can unload voxel data (the server does not send that information). To reduce the likelihood of "holes" in the terrain if blocks get unloaded too soon, you may give the `VoxelViewer` a slightly larger view distance than the server.
-- The client can have remote players synchronized so the player can see them, but you should not add a `VoxelViewer` to them (only the server does). The client should not have to stream terrain for remote players, it only has one for the local player.
+- 向你的场景添加 `VoxelTerrain`。
+- 添加 `VoxelTerrainMultiplayerSynchronizer` 节点作为 `VoxelTerrain` 的子节点。确保它与服务端对应节点的名称相同。
+- 客户端仍然需要一个 `VoxelViewer`，它允许地形检测何时可以卸载体素数据（服务端不会发送该信息）。为了减少区块过早卸载导致地形出现"空洞"的可能性，你可以给 `VoxelViewer` 一个比服务端稍大的视野距离。
+- 客户端可以同步远程玩家以便玩家能看到他们，但你不应该为他们添加 `VoxelViewer`（只有服务端会）。客户端不应该为远程玩家流式加载地形，它只为本地玩家加载一个。
 
 
-2022/01/31 - Server-side viewer with `VoxelTerrain` and some scripting
+2022/01/31 - 使用 `VoxelTerrain` 和一些脚本的服务端观察者
 --------------------------------------------------------------------
 
-This was the first iteration of support function allowing to implement multiplayer.
+这是支持实现多人联机功能的首个迭代。
 
-The idea is for the server to be authoritative, and the client just receives information from it.
+其思路是让服务端作为权威，客户端只是接收来自它的信息。
 
-`VoxelTerrain` has a `Networking` category in the inspector. These properties are not necessarily specific to multiplayer, but were actually added to experiment with it, so they are grouped together.
+`VoxelTerrain` 在检查器中有一个 `Networking` 类别。这些属性不一定特定于多人联机，但实际上是添加用于实验的，所以它们被分组在一起。
 
-Client and server will need a different setup.
+客户端和服务端将需要不同的设置。
 
-### On the server
+### 在服务端
 
-- Configure `VoxelTerrain` as normal, with a generator and maybe a stream.
-- On `VoxelTerrain`, Enable `block_enter_notification_enabled`
-- Add a script to `VoxelTerrain` implementing `func _on_data_block_entered(info)`. This function will be called each time a new voxel block enters a remote player's area. This will be a place where you may send the block to the client. You can use `VoxelBlockSerializer` to pack voxel data into bytes. The `info.are_voxels_edited()` boolean can tell if the block was ever edited: if it wasn't, you can avoid sending the whole data and just tell the client to generate the block locally.
-- When a player joins, make sure a `VoxelViewer` is created for it, assign its `network_peer_id` and enable `requires_data_block_notifications`. This will make the terrain load blocks around it and notify when blocks need to be sent to the peer.
-- On `VoxelTerrain`, enable `area_edit_notification_enabled`
-- In your `VoxelTerrain` script, implement `func _on_area_edited(origin, size)`. This function will be called each time voxels are edited within a bounding box. Voxels inside may have to be sent to all players close enough. You can get a list of network peer IDs by calling `get_viewer_network_peer_ids_in_area(origin, size)`.
+- 像平常一样配置 `VoxelTerrain`，带一个生成器，也许还有一个数据流。
+- 在 `VoxelTerrain` 上，启用 `block_enter_notification_enabled`
+- 给 `VoxelTerrain` 添加一个脚本，实现 `func _on_data_block_entered(info)`。每次新的体素区块进入远程玩家的区域时，都会调用此函数。这里是你可能向客户端发送区块的地方。你可以使用 `VoxelBlockSerializer` 将体素数据打包成字节。`info.are_voxels_edited()` 布尔值可以判断区块是否曾被编辑过：如果没有，你可以避免发送整个数据，只需告诉客户端在本地生成区块。
+- 当玩家加入时，确保为其创建一个 `VoxelViewer`，分配它的 `network_peer_id` 并启用 `requires_data_block_notifications`。这将使地形在其周围加载区块，并在需要向对等端发送区块时发出通知。
+- 在 `VoxelTerrain` 上，启用 `area_edit_notification_enabled`
+- 在你的 `VoxelTerrain` 脚本中，实现 `func _on_area_edited(origin, size)`。每次在包围盒内编辑体素时都会调用此函数。内部被编辑的体素可能需要发送给所有足够近的玩家。你可以通过调用 `get_viewer_network_peer_ids_in_area(origin, size)` 获取网络对等端 ID 的列表。
 
-### On the client
+### 在客户端
 
-- Configure `VoxelTerrain` with a mesher and maybe a generator, and turn off `automatic_loading_enabled`. Voxels will only load based on what the server sends.
-- Add a script handling network messages. When a block is received from the server, store it inside `VoxelTerrain` by using the `try_set_block_data` function.
-- When a box of edited voxels is received from the server, you may use a `VoxelTool` and the `paste` function to replace the edited voxels. If you want the client to generate the block locally, you could use the generator to make one with `generate_block_async()`. If you use asynchronous generation, note that blocks written with `try_set_block_data` will cancel blocks that are loading. That means if a client receives an edited block in the meantime, the generating block won't overwrite it.
-- The client will still need a `VoxelViewer`, which will allow the terrain to detect when it can unload voxel data (the server does not send that information). To reduce the likelihood of "holes" in the terrain if blocks get unloaded too soon, you may give the `VoxelViewer` a larger view distance than the server.
-- The client can have remote players synchronized so the player can see them, but you should not add a `VoxelViewer` to them (only the server does). The client should not have to stream terrain for remote players, it only has one for the local player.
+- 配置 `VoxelTerrain`，带一个网格生成器（mesher），也许还有一个生成器，并关闭 `automatic_loading_enabled`。体素将只基于服务端发送的内容加载。
+- 添加一个处理网络消息的脚本。当从服务端收到区块时，使用 `try_set_block_data` 函数将其存储到 `VoxelTerrain` 中。
+- 当从服务端收到一个被编辑的体素盒子时，你可以使用 `VoxelTool` 和 `paste` 函数来替换被编辑的体素。如果你希望客户端在本地生成区块，可以使用生成器通过 `generate_block_async()` 生成一个。如果你使用异步生成，请注意用 `try_set_block_data` 写入的区块会取消正在加载的区块。这意味着如果客户端在此期间收到被编辑的区块，正在生成的区块不会覆盖它。
+- 客户端仍然需要一个 `VoxelViewer`，它允许地形检测何时可以卸载体素数据（服务端不会发送该信息）。为了减少区块过早卸载导致地形出现"空洞"的可能性，你可以给 `VoxelViewer` 一个比服务端更大的视野距离。
+- 客户端可以同步远程玩家以便玩家能看到他们，但你不应该为他们添加 `VoxelViewer`（只有服务端会）。客户端不应该为远程玩家流式加载地形，它只为本地玩家加载一个。
 
 
-With `VoxelLodTerrain`
+使用 `VoxelLodTerrain`
 ------------------------
 
-There is no support for now, but it is planned.
+目前没有支持，但已列入计划。
 
 
-Protocol notes
+协议说明
 ---------------
 
-RPCs in Godot use UDP (reliable or unreliable), so sending large amounts of voxels to clients could have limited speed. Instead, it would be an option to use TCP to send blocks instead, as well as large edits. Small edits or deterministic edits with ligthweight info could keep using reliable UDP. Problem: you would have to use two ports, one for UDP, one for TCP. So maybe it is a better idea to keep using reliable UDP.
+Godot 中的 RPC 使用 UDP（可靠或不可靠），因此向客户端发送大量体素可能速度有限。作为替代，可以使用 TCP 来发送区块，以及大型编辑。小型的编辑或带有轻量信息的确定性编辑可以继续使用可靠的 UDP。问题在于：你必须使用两个端口，一个用于 UDP，一个用于 TCP。所以也许继续使用可靠的 UDP 是更好的主意。
 
-Note: Minecraft's network protocol is entirely built on top of TCP.
+注意：Minecraft 的网络协议完全建立在 TCP 之上。
 
 
-Other points to explore
+其他值得探索的点
 ---------------------------
 
-- Block caching and versionning: save blocks client-side so the server doesn't have to send them again next time if they didn't change
-- Client-requesting alternative model: having the client actively request blocks with custom code instead of passively receiving them from the server
-- Block diffing: if it is acceptable for clients to know the world seed, instead of expecting clients to cache data (which requires the server to know what the client knows), store a diff map in voxel data server-side, 1-bit per voxel. Then if less than 30% of a block has changed, send only the difference and let the client fill the gaps.
+- 区块缓存和版本控制：在客户端保存区块，这样如果它们没有变化，下次服务端就不用再发送它们
+- 客户端请求的替代模型：让客户端用自定义代码主动请求区块，而不是被动地从服务端接收
+- 区块差异比较：如果让客户端知道世界种子是可接受的，那么与其期望客户端缓存数据（这要求服务端知道客户端知道什么），不如在服务端将差异图存储在体素数据中，每个体素 1 位。然后，如果一个区块中少于 30% 发生了变化，只发送差异部分，让客户端填补空缺。

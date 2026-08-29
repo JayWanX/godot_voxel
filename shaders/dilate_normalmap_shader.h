@@ -1,16 +1,16 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
 const char *g_dilate_normalmap_shader =
 "#version 450\n"
 "\n"
-"// Dilates a normalmap by filling \"empty\" pixels with the average of surrounding pixels.\n"
-"// Assumes the input image is tiled: dilation will not interact across tiles.\n"
-"// One run of this shader will dilate by 1 pixel.\n"
+"// 通过用周围像素的平均值填充“空”像素来膨胀法线贴图。\n"
+"// 假定输入图像是分块的：膨胀不会跨块交互。\n"
+"// 该着色器运行一次将膨胀 1 个像素。\n"
 "\n"
 "layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;\n"
 "\n"
-"// We must use alternating images because each iteration reads neighbor pixels\n"
+"// 我们必须交替使用图像，因为每次迭代都会读取相邻像素\n"
 "layout (set = 0, binding = 0, rgba8ui) restrict readonly uniform uimage2D u_src_image;\n"
 "layout (set = 0, binding = 1, rgba8ui) restrict writeonly uniform uimage2D u_dst_image;\n"
 "\n"
@@ -19,7 +19,7 @@ const char *g_dilate_normalmap_shader =
 "};\n"
 "\n"
 "void main() {\n"
-"	// This color corresponds to a null normal.\n"
+"	// 此颜色对应空法线。\n"
 "	const ivec4 nocol = ivec4(127, 127, 127, 255);\n"
 "	const ivec2 pixel_pos = ivec2(gl_GlobalInvocationID.xy);\n"
 "\n"
@@ -40,9 +40,9 @@ const char *g_dilate_normalmap_shader =
 "	int count = 0;\n"
 "\n"
 "	const ivec4 col01 = ivec4(imageLoad(u_src_image, p01));\n"
-"	// Don't sample pixels of different tiles than the current one.\n"
-"	// This also takes care of image borders, but we must do it more explicitely for negative borders\n"
-"	// because of how division works\n"
+"	// 不要采样与当前 tile 不同的 tile 的像素。\n"
+"	// 这也能处理图像边界，但对于负向边界我们必须更明确地处理，\n"
+"	// 因为除法的工作方式如此\n"
 "	if (col01 != nocol && pixel_pos.x != 0 && (pixel_pos.x - 1) / u_tile_size == pixel_pos.x / u_tile_size) {\n"
 "		col_sum += col01;\n"
 "		++count;\n"

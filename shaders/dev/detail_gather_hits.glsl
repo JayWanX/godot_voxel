@@ -1,12 +1,12 @@
 #[compute]
 #version 450
 
-// Takes a mesh and a list of tiles, where each tile corresponds to a cubic cell of the mesh.
-// Each cell may contain a few triangles of the mesh,
-// and tiles are oriented with an axis such that they are facing as much triangles as possible.
-// We cast a ray from each pixel of each tile to triangles, to find world-space positions.
-// Hit positions and triangle indices will be used to evaluate voxel data at these positions,
-// which will in turn be used to bake a texture.
+// 接收一个网格和一组 tile，每个 tile 对应网格的一个立方体单元。
+// 每个单元可能包含网格的几个三角形，
+// 并且 tile 会沿某个轴定向，使其尽可能朝向更多的三角形。
+// 我们从每个 tile 的每个像素向三角形发射射线，以找到世界空间位置。
+// 命中位置和三角形索引将用于在这些位置求值体素数据，
+// 进而用于烘焙纹理。
 
 layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
 
@@ -19,36 +19,36 @@ layout (set = 0, binding = 1, std430) restrict readonly buffer MeshIndices {
 } u_indices;
 
 layout (set = 0, binding = 2, std430) restrict readonly buffer CellTris {
-	// List of triangle indices.
-	// Grouped in chunks corresponding to triangles within a tile.
-	// Each chunk can have up to 5 triangle indices.
+	// 三角形索引列表。
+	// 按块分组，对应 tile 内的三角形。
+	// 每个块最多可有 5 个三角形索引。
 	int data[];
 } u_cell_tris;
 
 layout (set = 0, binding = 3, std430) restrict readonly buffer AtlasInfo {
-	// [tile index] => cell info
-	// X:
-	// Packed 8-bit coordinates of the cell.
-	// Y:
+	// [tile index] => 单元格信息
+	// X：
+	// 单元格的打包 8 位坐标。
+	// Y：
 	// aaaaaaaa aaaaaaaa aaaaaaaa 0bbb00cc
-	// a: 24-bit index into `u_cell_tris.data` array.
-	// b: 3-bit number of triangles.
-	// c: 2-bit projection direction (0:X, 1:Y, 2:Z)
-	// Global invocation X and Y tell which pixel we are in.
+	// a：`u_cell_tris.data` 数组中的 24 位索引。
+	// b：3 位三角形数量。
+	// c：2 位投影方向（0:X，1:Y，2:Z）
+	// 全局调用 X 和 Y 表示我们在哪个像素中。
 	ivec2 data[];
 } u_tile_data;
 
 layout (set = 0, binding = 4, std430) restrict readonly buffer Params {
 	vec3 block_origin_world;
-	// How big is a pixel of the atlas in world space
+	// 图集中一个像素在世界空间中的大小
 	float pixel_world_step;
 	int tile_size_pixels;
 } u_params;
 
 layout (set = 0, binding = 5, std430) restrict writeonly buffer HitBuffer {
-	// X, Y, Z is hit position
-	// W is integer triangle index
-	// Index is `pixel_pos_in_tile.x + pixel_pos_in_tile.y * tile_resolution + tile_index * (tile_resolution ^ 2)`
+	// X、Y、Z 为命中位置
+	// W 为整数三角形索引
+	// 索引为 `pixel_pos_in_tile.x + pixel_pos_in_tile.y * tile_resolution + tile_index * (tile_resolution ^ 2)`
 	vec4 positions[];
 } u_hits;
 
@@ -86,16 +86,16 @@ int ray_intersects_triangle(vec3 p_from, vec3 p_dir, vec3 p_v0, vec3 p_v1, vec3 
 		return TRI_NO_INTERSECTION;
 	}
 
-	// At this stage we can compute t to find out where
-	// the intersection point is on the line.
+	// 在此阶段我们可以计算 t 以确定
+	// 交点在线上的位置。
 	const float t = f * dot(e2, q);
 
-	if (t > 0.00001) { // ray intersection
+	if (t > 0.00001) { // 射线相交
 		//r_res = p_from + p_dir * t;
 		out_distance = t;
 		return TRI_INTERSECTION;
 
-	} else { // This means that there is a line intersection but not a ray intersection.
+	} else { // 这意味着存在直线相交，但不存在射线相交。
 		out_distance = -1.0;
 		return TRI_NO_INTERSECTION;
 	}
@@ -125,7 +125,7 @@ void main() {
 	const float cell_size_world = u_params.pixel_world_step * float(u_params.tile_size_pixels);
 	const vec3 cell_origin_mesh = cell_size_world * cell_pos_cells;
 
-	// Choose a basis where Z is the axis we cast the ray. X and Y are lateral axes of the tile.
+	// 选择一个基，使 Z 为发射射线的轴。X 和 Y 为 tile 的横向轴。
 	const vec3 ray_dir = vec3(float(projection == 0), float(projection == 1), float(projection == 2));
 	const vec3 dx = vec3(float(projection == 1 || projection == 2), 0.0, float(projection == 0));
 	const vec3 dy = vec3(0.0, float(projection == 0 || projection == 2), float(projection == 1));
@@ -135,7 +135,7 @@ void main() {
 		 - 1.01 * ray_dir * cell_size_world
 		 + pos_in_tile.x * dx + pos_in_tile.y * dy;
 
-	// Find closest hit triangle
+	// 查找最近的命中三角形
 	const float no_hit_distance = 999999.0;
 	float nearest_hit_distance = no_hit_distance;
 	int nearest_hit_tri_index = -1;

@@ -6,10 +6,10 @@
 
 namespace voxel {
 
-// Limitations:
-// - Supports only one viewer
-// - Still assumes a viewer exists at world origin if there is actually no viewer
-// - Does not support viewer flags (separate collision/visual/voxel requirements)
+// 限制：
+// - 仅支持一个观察者
+// - 若实际没有观察者，仍假定世界原点处存在一个观察者
+// - 不支持观察者标志（单独的碰撞/视觉/体素需求）
 
 void process_octree_streaming(
 		VoxelLodTerrainUpdateData::State &state,

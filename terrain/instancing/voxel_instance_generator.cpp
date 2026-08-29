@@ -21,42 +21,41 @@
 #endif
 
 #if defined(_MSC_VER)
-#pragma warning(disable : 4701) // Potentially uninitialized local variable used.
+#pragma warning(disable : 4701) // 使用了可能未初始化的局部变量。
 #endif
 
 namespace voxel {
 
 namespace {
 
-// This cap is for sanity, to prevent potential crashing.
+// 此上限是为了安全，防止潜在崩溃。
 const float MAX_DENSITY = 10.f;
-// We expose a slider going below max density as it should not often be needed, but we allow greater if really necessary
+// 我们提供的滑块低于最大密度，因为通常不需要它，但如果确实需要，我们允许更大
 const char *DENSITY_HINT_STRING = "0.0, 1.0, 0.01, or_greater";
 
 static const unsigned int GEN_SDF_SAMPLE_COUNT_MIN = 2;
 static const unsigned int GEN_SDF_SAMPLE_COUNT_MAX = 16;
 
-// Repositions points by sampling SDF from the voxel generator, and putting them closer to a position where
-// the SDF crosses zero.
-// Side-effects:
-// - Points might appear buried or floating compared to their low-resolution mesh when seen from far away
-// - Generator queries can incur a significant performance cost
-// - Instance distribution may become less even in some cases
+// 通过从体素生成器采样 SDF 重新定位点，并将它们移到 SDF 过零的位置附近。
+// 副作用：
+// - 从远处看时，点可能相对于其低分辨率网格显得埋入或漂浮
+// - 生成器查询可能产生显著的性能成本
+// - 在某些情况下，实例分布可能变得不那么均匀
 void snap_surface_points_from_generator_sdf(
-		// Point positions relative to `positions_origin`, assumed to already be close to the surface
+		// 点位置相对于 `positions_origin`，假定它们已接近表面
 		Span<Vector3f> positions,
-		// Normals along which points will be moved
+		// 点将沿其移动的法线
 		Span<const Vector3f> normals,
 		const Vector3 positions_origin,
-		// TODO Need to investigate whether generate_series can be made const
+		// TODO 需要调查 generate_series 是否可以是 const
 		VoxelGenerator &generator,
-		// Distance to search below and above points along normals.
-		// It should be relatively small, otherwise points could get teleported away from their expected location.
+		// 沿法线在点上下搜索的距离。
+		// 应相对较小，否则点可能会被传送到远离预期位置的地方。
 		const float search_distance,
-		// How many samples are taken from the generator per point. Must be >= 2.
+		// 每个点从生成器采样的数量。必须 >= 2。
 		const unsigned int sample_count,
-		// Precalculated bounds within which input points are located. Does not have to be exact. Used for optimizing
-		// generator queries.
+		// 预计算的输入点所在边界。不必精确。用于优化
+		// 生成器查询。
 		const Vector3f chunk_min_pos,
 		const Vector3f chunk_max_pos
 ) {
@@ -73,7 +72,7 @@ void snap_surface_points_from_generator_sdf(
 	VOXEL_ASSERT_RETURN(sample_count >= GEN_SDF_SAMPLE_COUNT_MIN);
 	VOXEL_ASSERT_RETURN_MSG(sample_count <= GEN_SDF_SAMPLE_COUNT_MAX, "Sample count is too high");
 
-	// TODO Candidates for temp allocator
+	// TODO 临时分配器的候选
 	StdVector<float> x_buffer;
 	StdVector<float> y_buffer;
 	StdVector<float> z_buffer;
@@ -106,7 +105,7 @@ void snap_surface_points_from_generator_sdf(
 			for (unsigned int j = 0; j < sample_count; ++j) {
 				const unsigned int k = k0 + j;
 
-				// Goes from 0 to 1 included
+				// 从 0 到 1 含两端
 				const float t = static_cast<float>(j) * sample_count_inv_den;
 
 				const Vector3f pos = math::lerp(min_pos, max_pos, t);
@@ -137,7 +136,7 @@ void snap_surface_points_from_generator_sdf(
 		bool s0 = sd_samples[0] >= 0.f;
 		int zero_cross_index = -1;
 
-		// Find two samples where the sign becomes positive
+		// 找到两个符号变为正值的采样点
 		for (unsigned int j = 1; j < sd_samples.size(); ++j) {
 			const float sd = sd_samples[j];
 			const bool s1 = sd >= 0.f;
@@ -148,10 +147,10 @@ void snap_surface_points_from_generator_sdf(
 		}
 
 		if (zero_cross_index != -1) {
-			// Found surface nearby
+			// 在附近找到表面
 			const unsigned int i0 = zero_cross_index - 1;
 			const unsigned int i1 = zero_cross_index;
-			// Estimate where zero is between the two samples
+			// 估计零在两个采样点之间的位置
 			const float sd0 = sd_samples[i0];
 			const float sd1 = sd_samples[i1];
 			const float dsd = sd1 - sd0;
@@ -161,16 +160,16 @@ void snap_surface_points_from_generator_sdf(
 			} else {
 				zc_alpha = -sd0 / dsd;
 			}
-			// Compute offset
+			// 计算偏移
 			const float offset_distance_from_min = distance_between_samples * (static_cast<float>(i0) + zc_alpha);
 			positions[i] = positions[i] + (offset_distance_from_min - search_distance) * normals[i];
 
 			// ++debug_hits;
 			//
 		} else {
-			// The instance is either buried, floating beyond the search distance, or spawned in a gap so small that
-			// samples were not precise enough to find it.
-			// Fallback to the smallest sample to approach it.
+			// 实例要么被埋入，要么漂浮在搜索距离之外，要么生成在很小的间隙中，
+			// 以至于采样点不够精确而无法找到它。
+			// 回退到最小的采样点以接近它。
 			float min_sd = sd_samples[0];
 			unsigned int min_index = 0;
 			for (unsigned int j = 1; j < sd_samples.size(); ++j) {
@@ -185,7 +184,7 @@ void snap_surface_points_from_generator_sdf(
 			positions[i] = positions[i] + (offset_distance_from_min - search_distance) * normals[i];
 
 			// ++debug_misses;
-			// TODO Consider removing it?
+			// TODO 考虑移除它？
 		}
 	}
 
@@ -256,8 +255,8 @@ inline bool triangle_contains_enough_material_interpolated(
 
 #ifdef DEV_ENABLED
 	{
-		// We assume each vertex actually has the same indices, it's a property of the mesh for
-		// interpolation to make sense
+		// 我们假定每个顶点实际具有相同的索引，这是网格的属性，
+		// 以便插值有意义
 		VOXEL_ASSERT(
 				attrib_array[vi0].packed_indices == attrib_array[vi1].packed_indices &&
 				attrib_array[vi1].packed_indices == attrib_array[vi2].packed_indices
@@ -265,7 +264,7 @@ inline bool triangle_contains_enough_material_interpolated(
 	}
 #endif
 
-	// Early out
+	// 提前返回
 	const bool found_any = vertex_contains_enough_material({ packed_indices, packed_weights0 }, 0, material_mask) ||
 			vertex_contains_enough_material({ packed_indices, packed_weights1 }, 0, material_mask) ||
 			vertex_contains_enough_material({ packed_indices, packed_weights2 }, 0, material_mask);
@@ -273,7 +272,7 @@ inline bool triangle_contains_enough_material_interpolated(
 		return false;
 	}
 
-	// Unpack, normalize and compare
+	// 解包、归一化并比较
 
 	const Vector4f rweights0 = unpack_weights(packed_weights0);
 	const Vector4f rweights1 = unpack_weights(packed_weights1);
@@ -302,17 +301,16 @@ inline bool triangle_contains_enough_material_interpolated(
 	return false;
 }
 
-// Filter out by voxel materials
-// Assuming 4x8-bit weights and 4x8-bit indices as used in VoxelMesherTransvoxel for now, but might have other
-// formats in the future
+// 按体素材质过滤
+// 目前假定使用 VoxelMesherTransvoxel 中的 4x8 位权重和 4x8 位索引，但未来可能有其他格式
 void filter_instances_by_voxel_materials(
 		StdVector<Vector3f> &instance_positions,
 		StdVector<Vector3f> &instance_normals,
-		// Barycentric coordinates that were used to position the instance in the triangle.
-		// Not used in vertex emission mode.
+		// 用于在三角形中定位实例的重心坐标。
+		// 在顶点发射模式下不使用。
 		StdVector<float> &instance_barycentrics,
-		// In vertex emission mode, index in the mesh vertex array.
-		// In other modes, index of the first triangle index in the mesh's index array.
+		// 在顶点发射模式下，网格顶点数组中的索引。
+		// 在其他模式下，网格索引数组中第一个三角形索引的索引。
 		StdVector<uint32_t> &instance_indices,
 
 		Span<const int32_t> mesh_indices,
@@ -327,14 +325,14 @@ void filter_instances_by_voxel_materials(
 		case VoxelInstanceGenerator::EMIT_FROM_VERTICES: {
 			const unsigned int weight_threshold_i =
 					math::clamp(static_cast<unsigned int>(weight_threshold * 255.f), 0u, 255u);
-			// Indices are vertices
+			// 索引即顶点
 			for (unsigned int instance_index = 0; instance_index < instance_positions.size();) {
 				const unsigned int vi = instance_indices[instance_index];
 				const TexAttrib attrib = mesh_tex_attrib_array[vi];
 				if (vertex_contains_enough_material(attrib, weight_threshold_i, material_mask)) {
 					instance_index += 1;
 				} else {
-					// Remove instance
+					// 移除实例
 					unordered_remove(instance_positions, instance_index);
 					unordered_remove(instance_normals, instance_index);
 					unordered_remove(instance_indices, instance_index);
@@ -349,8 +347,7 @@ void filter_instances_by_voxel_materials(
 			VOXEL_ASSERT(instance_barycentrics.size() / 3 == instance_positions.size());
 #endif
 
-			// Indices are the index in the index buffer of the first vertex of the triangle in which the instance
-			// was spawned in
+			// 索引是实例所在三角形的第一个顶点在索引缓冲区中的索引
 			const Span<const float> barycentrics_s = to_span(instance_barycentrics);
 			for (unsigned int instance_index = 0; instance_index < instance_positions.size();) {
 				const uint32_t ii0 = instance_indices[instance_index];
@@ -366,7 +363,7 @@ void filter_instances_by_voxel_materials(
 					)) {
 					instance_index += 1;
 				} else {
-					// Remove instance
+					// 移除实例
 					unordered_remove(instance_positions, instance_index);
 					unordered_remove(instance_normals, instance_index);
 					unordered_remove(instance_indices, instance_index);
@@ -388,30 +385,30 @@ void generate_random_points_from_vertices(
 		Span<const Vector3> mesh_vertices,
 		Span<const Vector3> mesh_normals,
 		const float input_density,
-		// The mesh vertices are assumed to be within (0,0,0) and (block_size, block_size, block_size)
+		// 网格顶点假定位于 (0,0,0) 与 (block_size, block_size, block_size) 之间
 		const float block_size,
 		RandomPCG &pcg,
 		StdVector<Vector3f> &out_positions,
 		StdVector<Vector3f> &out_normals,
 		StdVector<uint32_t> *out_indices
 ) {
-	// Density is interpreted differently here,
-	// so it's possible a different emit mode will produce different amounts of instances.
-	// I had to use `uint64` and clamp it because floats can't contain `0xffffffff` accurately. Instead
-	// it results in `0x100000000`, one unit above.
+	// 此处密度的解释不同，
+	// 因此不同的发射模式可能产生不同数量的实例。
+	// 我必须使用 `uint64` 并钳制它，因为浮点数无法精确包含 `0xffffffff`。相反
+	// 它会产生 `0x100000000`，高出一个单位。
 	const float density = math::clamp(input_density, 0.f, 1.f);
 	static constexpr float max_density = 1.f;
 	const uint32_t density_u32 = math::min(uint64_t(double(0xffffffff) * density / max_density), uint64_t(0xffffffff));
 	const int size = mesh_vertices.size();
 	const float margin = block_size - block_size * 0.01f;
 	for (int i = 0; i < size; ++i) {
-		// TODO We could actually generate indexes and pick those,
-		// rather than iterating them all and rejecting
+		// TODO 我们实际上可以生成索引并挑选它们，
+		// 而不是全部迭代并拒绝
 		if (pcg.rand() >= density_u32) {
 			continue;
 		}
-		// Ignore vertices located on the positive faces of the block. They are usually shared with the
-		// neighbor block, which causes a density bias and overlapping instances
+		// 忽略位于数据块正面的顶点。它们通常与相邻数据块共享，
+		// 这会导致密度偏差和实例重叠
 		const Vector3f pos = to_vec3f(mesh_vertices[i]);
 		if (pos.x > margin || pos.y > margin || pos.z > margin) {
 			continue;
@@ -438,15 +435,15 @@ void generate_random_points_from_triangles_fast(
 ) {
 	const int triangle_count = mesh_indices.size() / 3;
 
-	// Assumes triangles are all roughly under the same size, and Transvoxel ones do (when not simplified),
-	// so we can use number of triangles as a metric proportional to the number of instances
+	// 假定三角形大小大致相同，Transvoxel 的三角形正是如此（未简化时），
+	// 因此我们可以使用三角形数量作为与实例数量成正比的度量
 	const int instance_count = density * triangle_count;
 
 	out_positions.resize(instance_count);
 	out_normals.resize(instance_count);
 
 	for (int instance_index = 0; instance_index < instance_count; ++instance_index) {
-		// Pick a random triangle
+		// 挑选一个随机三角形
 		const uint32_t ii = (pcg0.rand() % triangle_count) * 3;
 
 		const int ia = mesh_indices[ii];
@@ -464,10 +461,10 @@ void generate_random_points_from_triangles_fast(
 		const float t0 = pcg1.randf();
 		const float t1 = pcg1.randf();
 
-		// This formula gives pretty uniform distribution but involves a square root
+		// 此公式给出相当均匀的分布，但涉及平方根
 		// const Vector3 p = pa.linear_interpolate(pb, t0).linear_interpolate(pc, 1.f - sqrt(t1));
 
-		// This is an approximation
+		// 这是一种近似
 		// const Vector3 p = pa.lerp(pb, t0).lerp(pc, t1);
 		// const Vector3 n = na.lerp(nb, t0).lerp(nc, t1);
 
@@ -510,14 +507,14 @@ void generate_random_points_from_triangles(
 	// StdVector<float> &area_cache = g_area_cache;
 	// area_cache.resize(triangle_count);
 
-	// Does not assume triangles have the same size, so instead a "unit size" is used,
-	// and more instances will be placed in triangles larger than this.
-	// This is roughly the size of one voxel's triangle
+	// 不假定三角形大小相同，而是使用"单位大小"，
+	// 更大的三角形将放置更多实例。
+	// 这大致是一个体素三角形的大小
 	// const float unit_area = 0.5f * squared(block_size / 32.f);
 
 	float area_accumulator = 0.f;
-	// Here density means "instances per space unit squared".
-	// So inverse density means "units squared per instance"
+	// 此处密度表示"每平方空间单位的实例数"。
+	// 因此密度倒数表示"每个实例的平方单位数"
 	const float inv_density = 1.f / density;
 
 	for (int triangle_index = 0; triangle_index < triangle_count; ++triangle_index) {
@@ -548,10 +545,10 @@ void generate_random_points_from_triangles(
 			const float t0 = pcg.randf();
 			const float t1 = pcg.randf();
 
-			// This formula gives pretty uniform distribution but involves a square root
+			// 此公式给出相当均匀的分布，但涉及平方根
 			// const Vector3 p = pa.linear_interpolate(pb, t0).linear_interpolate(pc, 1.f - sqrt(t1));
 
-			// This is an approximation
+			// 这是一个近似值
 			// const Vector3f rp = math::lerp(math::lerp(pa, pb, t0), pc, t1);
 			// const Vector3f rn = math::lerp(math::lerp(na, nb, t0), nc, t1);
 
@@ -634,10 +631,10 @@ void generate_one_random_point_per_triangle(
 			const float t0 = pcg.randf();
 			const float t1 = pcg.randf();
 
-			// This formula gives pretty uniform distribution but involves a square root
+			// 此公式给出相当均匀的分布，但涉及平方根
 			// const Vector3 p = pa.linear_interpolate(pb, t0).linear_interpolate(pc, 1.f - sqrt(t1));
 
-			// This is an approximation
+			// 这是一个近似值
 			// const Vector3f rp = math::lerp(math::lerp(pa, pb, t0), pc, t1);
 			// const Vector3f rn = math::lerp(math::lerp(na, nb, t0), nc, t1);
 
@@ -665,14 +662,14 @@ void generate_one_random_point_per_triangle(
 void generate_noise_at_positions_with_graph(
 		StdVector<Vector3f> &instance_positions,
 		const Vector3 mesh_block_origin_d,
-		// TODO Should be const, investigate if it can be fixed
+		// TODO 应该是 const，调查一下是否可以修复
 		pg::VoxelGraphFunction &noise_graph,
 		const VoxelInstanceGenerator::Dimension noise_dimension,
 		StdVector<float> &out_noise
 ) {
 	out_noise.resize(instance_positions.size());
 
-	// Check noise graph validity
+	// 检查噪声图的有效性
 	std::shared_ptr<pg::VoxelGraphFunction::CompiledGraph> compiled_graph = noise_graph.get_compiled_graph();
 	if (compiled_graph != nullptr) {
 		const int input_count = compiled_graph->runtime.get_input_count();
@@ -701,9 +698,9 @@ void generate_noise_at_positions_with_graph(
 	}
 
 	if (compiled_graph != nullptr) {
-		// Execute graph
+		// 执行图
 
-		// TODO Candidates for temp allocator
+		// TODO 临时分配器的候选
 		static thread_local StdVector<float> g_noise_graph_x_cache;
 		static thread_local StdVector<float> g_noise_graph_y_cache;
 		static thread_local StdVector<float> g_noise_graph_z_cache;
@@ -755,7 +752,7 @@ void generate_noise_at_positions_with_graph(
 		}
 
 	} else {
-		// Error fallback
+		// 出错时的回退
 		for (float &v : out_noise) {
 			v = 0.f;
 		}
@@ -882,8 +879,8 @@ struct LinearFalloffRange {
 		if (v < min1) {
 			const float d = (v - min0) / min_falloff;
 			const float n = rng.randf();
-			// We use the square because it gives a better perceived gradient over a surface, as the notion of
-			// `density` for a surface would be proportional to `points/meters^2`
+			// 使用平方是因为它能在表面上提供更好的感知梯度，因为
+			// 表面的 "密度" 概念与 `points/meters^2` 成正比
 			return n > d * d;
 		} else if (v > max0) {
 			const float d = (max1 - v) / max_falloff;
@@ -919,7 +916,7 @@ struct AngularFalloffRange {
 		const float max0_rad = math::deg_to_rad(max_degrees - max_falloff_degrees);
 		max1_rad = math::deg_to_rad(max_degrees);
 
-		// Order is reversed because `cos` is decreasing in the 0..180 degree range
+		// 顺序颠倒是因为 `cos` 在 0..180 度范围内递减
 		min0_cosine = math::cos(max1_rad);
 		min1_cosine = math::cos(max0_rad);
 		max0_cosine = math::cos(min1_rad);
@@ -937,8 +934,8 @@ struct AngularFalloffRange {
 			const float angle = Math::acos(math::clamp(cosine, 0.f, 1.f));
 			const float d = (max1_rad - angle) / max_falloff_rad;
 			const float n = rng.randf();
-			// We use the square because it gives a better perceived gradient over a surface, as the notion of
-			// `density` for a surface would be proportional to `points/meters^2`
+			// 使用平方是因为它能在表面上提供更好的感知梯度，因为
+			// 表面的 "密度" 概念与 `points/meters^2` 成正比
 			return n > d * d;
 		}
 		if (cosine > max0_cosine) {
@@ -956,10 +953,10 @@ struct AngularFalloffRange {
 void VoxelInstanceGenerator::generate_transforms(
 		StdVector<Transform3f> &out_transforms,
 		const Vector3i grid_position,
-		// TODO `lod_index` has become unused, remove?
+		// TODO `lod_index` 已不再使用，删除？
 		const int lod_index,
 		const int layer_id,
-		// TODO Provide arrays or offset to ignore transition meshes (transvoxel)
+		// TODO 提供数组或偏移量以忽略过渡网格（transvoxel）
 		Array surface_arrays,
 		const int32_t vertex_range_end,
 		const int32_t index_range_end,
@@ -984,7 +981,7 @@ void VoxelInstanceGenerator::generate_transforms(
 
 	Vector3f global_up(0.f, 1.f, 0.f);
 
-	// Using different number generators so changing parameters affecting one doesn't affect the other
+	// 使用不同的随机数生成器，这样影响其中一个的参数变化不会影响另一个
 	const uint64_t seed = block_pos_hash + layer_id;
 	RandomPCG pcg0;
 	pcg0.seed(seed);
@@ -993,7 +990,7 @@ void VoxelInstanceGenerator::generate_transforms(
 
 	out_transforms.clear();
 
-	// TODO Candidates for temp allocator
+	// TODO 临时分配器的候选
 	static thread_local StdVector<Vector3f> g_vertex_cache;
 	static thread_local StdVector<Vector3f> g_normal_cache;
 	static thread_local StdVector<uint32_t> g_index_cache;
@@ -1019,7 +1016,7 @@ void VoxelInstanceGenerator::generate_transforms(
 	const bool index_cache_used = voxel_material_filter_enabled;
 	const bool barycentrics_used = voxel_material_filter_enabled && _emit_mode != EMIT_FROM_VERTICES;
 
-	// Do an early check to see if there is any material that we can potentially find
+	// 提前检查是否存在可能找到的材质
 	if (voxel_material_filter_enabled) {
 		VOXEL_PROFILE_SCOPE_NAMED("material filter mesh-wide early check");
 
@@ -1035,8 +1032,8 @@ void VoxelInstanceGenerator::generate_transforms(
 		}
 	}
 
-	// Pick random points
-	// Generate base positions
+	// 选取随机点
+	// 生成基础位置
 	switch (_emit_mode) {
 		case EMIT_FROM_VERTICES:
 			generate_random_points_from_vertices(
@@ -1082,7 +1079,7 @@ void VoxelInstanceGenerator::generate_transforms(
 			break;
 
 		case EMIT_ONE_PER_TRIANGLE:
-			// Density has no effect here.
+			// 密度在这里没有影响。
 			generate_one_random_point_per_triangle(
 					mesh.vertices,
 					mesh.normals,
@@ -1108,9 +1105,9 @@ void VoxelInstanceGenerator::generate_transforms(
 	}
 #endif
 
-	// Filter out by octants
-	// This is done so some octants can be filled with user-edited data instead,
-	// because mesh size may not necessarily match data block size
+	// 按卦限过滤
+	// 这样做是为了让某些卦限可以用用户编辑的数据填充，
+	// 因为网格大小不一定与数据块大小匹配
 	if ((octant_mask & 0xff) != 0xff) {
 		filter_instances_by_octant(
 				vertex_cache,
@@ -1135,16 +1132,16 @@ void VoxelInstanceGenerator::generate_transforms(
 				_emit_mode
 		);
 
-		// Index cache has no use yet after this. To detect future mistakes if any, make it obvious by clearing it
+		// 索引缓存在这之后暂时没有用处。为了将来能发现可能的错误，将其清空以使其显而易见
 		index_cache.clear();
 	}
 
-	// Position of the block relative to the instancer node.
-	// Use full-precision here because we deal with potentially large coordinates
+	// 数据块相对于实例化器节点的位置。
+	// 这里使用全精度，因为我们处理的是可能很大的坐标
 	const Vector3 mesh_block_origin_d = grid_position * block_size;
 
-	// Don't directly access member vars because they can be modified by the editor thread (the resources themselves can
-	// get modified with relatively no harm, but the pointers can't)
+	// 不要直接访问成员变量，因为它们可能被编辑器线程修改（资源本身被修改相对无害，
+	// 但指针不能）
 	Ref<pg::VoxelGraphFunction> noise_graph;
 	Ref<Noise> noise;
 	{
@@ -1155,29 +1152,29 @@ void VoxelInstanceGenerator::generate_transforms(
 
 	StdVector<float> &noise_cache = g_noise_cache;
 
-	// Filter out by noise graph
+	// 按噪声图过滤
 	if (noise_graph.is_valid()) {
 		generate_noise_at_positions_with_graph(
 				vertex_cache, mesh_block_origin_d, **noise_graph, _noise_dimension, noise_cache
 		);
 	}
 
-	// Legacy noise (noise graph is more versatile, but this remains for compatibility)
+	// 旧版噪声（噪声图更通用，但保留此逻辑以兼容）
 	if (noise.is_valid()) {
 		noise_cache.resize(vertex_cache.size());
 
 		switch (_noise_dimension) {
 			case DIMENSION_2D: {
 				if (noise_graph.is_valid()) {
-					// Multiply output of noise graph
+					// 乘以噪声图输出
 					for (size_t i = 0; i < vertex_cache.size(); ++i) {
 						const Vector3 &pos = to_vec3(vertex_cache[i]) + mesh_block_origin_d;
-						// Casting to float because Noise returns `real_t`, which is `double` in 64-bit float builds,
-						// but we don't need doubles for noise in this context...
+						// 转换为 float，因为 Noise 返回 `real_t`，在 64 位浮点构建中是 `double`，
+						// 但在此场景中我们不需要为噪声使用 double...
 						noise_cache[i] *= math::max(float(noise->get_noise_2d(pos.x, pos.z)), 0.f);
 					}
 				} else {
-					// Use noise directly
+					// 直接使用噪声
 					for (size_t i = 0; i < vertex_cache.size(); ++i) {
 						const Vector3 &pos = to_vec3(vertex_cache[i]) + mesh_block_origin_d;
 						noise_cache[i] = noise->get_noise_2d(pos.x, pos.z);
@@ -1206,7 +1203,7 @@ void VoxelInstanceGenerator::generate_transforms(
 
 	const bool use_noise = noise.is_valid() || noise_graph.is_valid();
 
-	// Filter out by noise
+	// 按噪声过滤
 	if (use_noise) {
 		VOXEL_PROFILE_SCOPE_NAMED("Noise filter");
 
@@ -1226,7 +1223,7 @@ void VoxelInstanceGenerator::generate_transforms(
 					unordered_remove(vertex_cache, i);
 					unordered_remove(normal_cache, i);
 					unordered_remove(noise_cache, i);
-					// We don't use the index cache after this... for now
+					// 这之后我们暂时不使用索引缓存...
 					// if (index_cache_used) {
 					// 	unordered_remove(index_cache, i);
 					// }
@@ -1243,7 +1240,7 @@ void VoxelInstanceGenerator::generate_transforms(
 					unordered_remove(vertex_cache, i);
 					unordered_remove(normal_cache, i);
 					unordered_remove(noise_cache, i);
-					// We don't use the index cache after this... for now
+					// 这之后我们暂时不使用索引缓存...
 					// if (index_cache_used) {
 					// 	unordered_remove(index_cache, i);
 					// }
@@ -1254,7 +1251,7 @@ void VoxelInstanceGenerator::generate_transforms(
 		}
 	}
 
-	// snap from generator SDF
+	// 从生成器 SDF 吸附表面
 	if (_gen_sdf_snap_settings.enabled && voxel_generator.is_valid()) {
 		const Vector3f min_pos = to_vec3f(mesh_block_origin_d);
 		const Vector3f max_pos = min_pos + Vector3f(block_size);
@@ -1290,13 +1287,13 @@ void VoxelInstanceGenerator::generate_transforms(
 	const Vector3f fixed_look_axis_alternative = up_mode == UP_MODE_POSITIVE_Y ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0);
 	const Vector3f mesh_block_origin = to_vec3f(grid_position * block_size);
 
-	// Calculate orientations and scales
+	// 计算朝向和缩放
 	for (size_t vertex_index = 0; vertex_index < vertex_cache.size(); ++vertex_index) {
 		Transform3f t;
 		t.origin = vertex_cache[vertex_index];
 
-		// Warning: sometimes mesh normals are not perfectly normalized.
-		// The cause is for meshing speed on CPU. It's normalized on GPU anyways.
+		// 警告：有时网格法线并未完全归一化。
+		// 原因是为了提高 CPU 上的网格化速度。反正 GPU 上会归一化。
 		Vector3f surface_normal = normal_cache[vertex_index];
 
 		Vector3f axis_y;
@@ -1331,8 +1328,8 @@ void VoxelInstanceGenerator::generate_transforms(
 				surface_normal = math::normalized(surface_normal);
 			}
 
-			// If the normal points straight up, it will be 1, and angle is considered to be 0. Then angle increases as
-			// ground gets sloped or goes upside down, up to 180 degrees
+			// 如果法线竖直向上，则为 1，角度视为 0。当地面倾斜或翻转时，
+			// 角度随之增大，最大到 180 度
 			float ny = surface_normal.y;
 			if (up_mode == UP_MODE_SPHERE) {
 				if (!sphere_up_is_computed) {
@@ -1365,27 +1362,27 @@ void VoxelInstanceGenerator::generate_transforms(
 
 		t.origin += offset_along_normal * axis_y;
 
-		// Allows to use two faces of a single rock to create variety in the same layer
+		// 允许使用单块岩石的两个面在同一层中创造多样性
 		if (random_vertical_flip && (pcg1.rand() & 1) == 1) {
 			axis_y = -axis_y;
-			// TODO Should have to flip another axis as well?
+			// TODO 是否也应该翻转另一个轴？
 		}
 
-		// Pick a random rotation from the floor's normal.
-		// We may check for cases too close to Y to avoid broken basis due to float precision limits,
-		// even if that could differ from the expected result
+		// 从地面的法线中选取随机旋转。
+		// 我们可能会检查过于接近 Y 轴的情况，以避免因浮点精度限制导致的基轴损坏，
+		// 即使这可能与预期结果不同
 		Vector3f dir;
 		if (_random_rotation) {
 			do {
-				// TODO Optimization: a pool of precomputed random directions would do the job too? Or would it waste
-				// the cache?
+				// TODO 优化：预计算的随机方向池是否也能胜任？或者会浪费
+				// 缓存？
 				dir = math::normalized(Vector3f(pcg1.randf() - 0.5f, pcg1.randf() - 0.5f, pcg1.randf() - 0.5f));
-				// TODO Any way to check if the two vectors are close to aligned without normalizing `dir`?
+				// TODO 有没有办法在不归一化 `dir` 的情况下检查两个向量是否接近对齐？
 			} while (Math::abs(math::dot(dir, axis_y)) > 0.9999f);
 
 		} else {
-			// If the surface is aligned with this axis, it will create a "pole" where all instances are looking at.
-			// When getting too close to it, we may pick a different axis.
+			// 如果表面与该轴对齐，将产生一个所有实例都朝向的"极点"。
+			// 当过于接近该轴时，我们可能会选择不同的轴。
 			dir = fixed_look_axis;
 			if (Math::abs(math::dot(dir, axis_y)) > 0.9999f) {
 				dir = fixed_look_axis_alternative;
@@ -1395,7 +1392,7 @@ void VoxelInstanceGenerator::generate_transforms(
 		const Vector3f axis_x = math::normalized(math::cross(axis_y, dir));
 		const Vector3f axis_z = math::cross(axis_x, axis_y);
 
-		// In Godot 3, the Basis constructor expected 3 rows, but in Godot 4 it was changed to take 3 columns...
+		// 在 Godot 3 中，Basis 构造函数期望 3 行，但在 Godot 4 中改为接收 3 列...
 		// t.basis = Basis3f(Vector3f(axis_x.x, axis_y.x, axis_z.x), Vector3f(axis_x.y, axis_y.y, axis_z.y),
 		// 		Vector3f(axis_x.z, axis_y.z, axis_z.z));
 		t.basis = Basis3f(axis_x, axis_y, axis_z);
@@ -1421,7 +1418,7 @@ void VoxelInstanceGenerator::generate_transforms(
 #ifdef DEBUG_ENABLED
 				CRASH_COND(vertex_index >= noise_cache.size());
 #endif
-				// Multiplied noise because it gives more pronounced results
+				// 噪声相乘，因为这样能产生更明显的结果
 				const float n = math::clamp(noise_cache[vertex_index] * 2.f, 0.f, 1.f);
 				r *= Math::lerp(1.f, n, _noise_on_scale);
 			}
@@ -1437,7 +1434,7 @@ void VoxelInstanceGenerator::generate_transforms(
 		out_transforms.push_back(t);
 	}
 
-	// TODO Investigate if this helps (won't help with authored terrain)
+	// TODO 调查这是否有帮助（对手工制作的地形无效）
 	// if (graph_generator.is_valid()) {
 	// 	for (size_t i = 0; i < _transform_cache.size(); ++i) {
 	// 		Transform &t = _transform_cache[i];
@@ -1708,7 +1705,7 @@ void VoxelInstanceGenerator::set_noise(Ref<Noise> noise) {
 			);
 		}
 	}
-	// Emit signal outside of the locked region to avoid eventual deadlocks if handlers want to access the property
+	// 在锁定区域外发出信号，以避免处理程序想要访问该属性时可能发生的死锁
 	emit_changed();
 	notify_property_list_changed();
 }
@@ -1739,7 +1736,7 @@ void VoxelInstanceGenerator::set_noise_graph(Ref<pg::VoxelGraphFunction> func) {
 		_noise_graph = func;
 
 		if (_noise_graph.is_valid()) {
-			// Compile on assignment because there isn't really a good place to do it...
+			// 在赋值时编译，因为没有真正合适的地方来做这件事...
 			func->compile(Engine::get_singleton()->is_editor_hint());
 
 			_noise_graph->connect(
@@ -1752,7 +1749,7 @@ void VoxelInstanceGenerator::set_noise_graph(Ref<pg::VoxelGraphFunction> func) {
 			);
 		}
 	}
-	// Emit signal outside of the locked region to avoid eventual deadlocks if handlers want to access the property
+	// 在锁定区域外发出信号，以避免处理程序想要访问该属性时可能发生的死锁
 	emit_changed();
 	notify_property_list_changed();
 }
@@ -1911,8 +1908,8 @@ void VoxelInstanceGenerator::_b_set_voxel_material_filter_array(PackedInt32Array
 		mask |= (1 << i);
 	}
 #if TOOLS_ENABLED
-	// Only warn when running the game, because when users add new items to the array in the editor,
-	// it is likely to have duplicates temporarily, until they set the desired values.
+	// 仅在运行游戏时发出警告，因为当用户在编辑器中向数组添加新项时，
+	// 在设置所需值之前，很可能会暂时出现重复项。
 	if (!Engine::get_singleton()->is_editor_hint()) {
 		const DuplicateSearchResult res = find_duplicate(indices);
 		if (res.is_valid()) {
@@ -1939,10 +1936,10 @@ void VoxelInstanceGenerator::get_configuration_warnings(PackedStringArray &warni
 	Ref<pg::VoxelGraphFunction> noise_graph = get_noise_graph();
 
 	if (noise_graph.is_valid()) {
-		// Graph compiles?
+		// 图能编译吗？
 		voxel::godot::get_resource_configuration_warnings(**noise_graph, warnings, []() { return "noise_graph: "; });
 
-		// Check I/Os
+		// 检查输入/输出
 		const int expected_input_count = (_noise_dimension == DIMENSION_2D ? 2 : 3);
 		const int expected_output_count = 1;
 		const int input_count = noise_graph->get_input_definitions().size();

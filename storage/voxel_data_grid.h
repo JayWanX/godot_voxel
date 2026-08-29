@@ -8,25 +8,25 @@
 
 namespace voxel {
 
-// Stores blocks of voxel data in a finite grid.
-// This is used as temporary storage for some operations, to avoid holding exclusive locks on maps for too long.
-// TODO Have a readonly version to enforce no writes?
+// 在有限网格中存储体素数据块。
+// 这被用作某些操作的临时存储，以避免长时间持有地图上的排他锁。
+// TODO 提供一个只读版本以强制禁止写入？
 class VoxelDataGrid {
 public:
-	// Rebuilds the grid and caches blocks intersecting the specified voxel box.
-	// WARNING: the given box is in voxels RELATIVE to the passed map. It that map is not LOD0, you may downscale the
-	// box if you expect LOD0 coordinates.
+	// 重建网格并缓存与指定体素盒相交的块。
+	// 警告：给定的盒是以体素为单位、相对于传入地图的。如果该地图不是 LOD0，
+	// 若你期望 LOD0 坐标，可能需要缩小盒。
 	// inline void reference_area(const VoxelDataMap &map, Box3i voxel_box, SpatialLock3D *sl) {
 	// 	const Box3i blocks_box = voxel_box.downscaled(map.get_block_size());
 	// 	reference_area_block_coords(map, blocks_box, sl);
 	// }
 
-	// TODO This API is a bit risky, it should just be encapsulated into VoxelData maybe
+	// TODO 这个 API 有点冒险，也许应该封装到 VoxelData 中
 	inline void reference_area_block_coords(
 			const VoxelDataMap &map,
 			RWLock &map_lock,
 			const Box3i blocks_box,
-			// Will be referenced for operations, assuming its lifetime is equal or greater than the grid
+			// 将被操作引用，假设其生命周期等于或长于网格
 			SpatialLock3D &spatial_lock
 	) {
 		VOXEL_PROFILE_SCOPE();
@@ -35,15 +35,15 @@ public:
 		_offset_in_blocks = blocks_box.position;
 		_logical_offset_in_blocks = blocks_box.position;
 
-		// Locking is needed because we access `has_voxels`
+		// 需要加锁，因为我们访问 `has_voxels`
 		spatial_lock.lock_read(blocks_box);
 
 		{
 			RWLockRead rlock(map_lock);
 			blocks_box.for_each_cell_zxy([&map, this](const Vector3i pos) {
 				const VoxelDataBlock *block = map.get_block(pos);
-				// TODO Might need to invoke the generator at some level for present blocks without voxels,
-				// or make sure all blocks contain voxel data
+				// TODO 可能需要为存在但没有体素的块在某个层级调用生成器，
+				// 或确保所有块都包含体素数据
 				if (block != nullptr && block->has_voxels()) {
 					set_block(pos, block->get_voxels_shared());
 				} else {
@@ -66,7 +66,7 @@ public:
 		return false;
 	}
 
-	// The grid must be locked before doing operations on it.
+	// 在对网格进行操作之前，必须先对其加锁。
 
 	struct LockRead {
 		LockRead(const VoxelDataGrid &p_grid) : grid(p_grid) {
@@ -233,7 +233,7 @@ private:
 			for (block_rpos.x = 0; block_rpos.x < _size_in_blocks.x; ++block_rpos.x) {
 				for (block_rpos.y = 0; block_rpos.y < _size_in_blocks.y; ++block_rpos.y) {
 					VoxelBuffer *block = _blocks[index].get();
-					// Flat grid and iteration order allows us to just increment the index since we iterate them all
+					// 扁平网格和迭代顺序允许我们直接递增索引，因为我们遍历了所有元素
 					++index;
 					if (block == nullptr) {
 						continue;
@@ -284,20 +284,20 @@ private:
 		return _blocks[index].get();
 	}
 
-	// Flat grid indexed in ZXY order
-	// TODO Ability to use thread-local/stack pool allocator? Such grids are often temporary
+	// 按 ZXY 顺序索引的扁平网格
+	// TODO 能使用线程局部/栈池分配器吗？这类网格往往是临时的
 	StdVector<std::shared_ptr<VoxelBuffer>> _blocks;
-	// Size of the grid in blocks
+	// 网格大小（以块为单位）
 	Vector3i _size_in_blocks;
-	// Block coordinates offset. This is used for when we cache a sub-region of a map, we need to keep the origin
-	// of the area in memory so we can keep using the same coordinate space
+	// 块坐标偏移。当我们缓存地图的一个子区域时，需要在内存中保留区域的
+	// 原点，以便继续使用相同的坐标空间
 	Vector3i _offset_in_blocks;
 	Vector3i _logical_offset_in_blocks;
-	// Size of a block in voxels
+	// 块大小（以体素为单位）
 	unsigned int _block_size_po2 = constants::DEFAULT_BLOCK_SIZE_PO2;
 	unsigned int _block_size = 1 << constants::DEFAULT_BLOCK_SIZE_PO2;
-	// For protecting voxel data against multithreaded accesses. Not owned. Lifetime must be guaranteed by the user, for
-	// example by having a std::shared_ptr<VoxelData> holding the spatial lock.
+	// 用于防止体素数据被多线程并发访问。不拥有此锁。其生命周期必须由用户保证，
+	// 例如通过持有空间锁的 std::shared_ptr<VoxelData>。
 	SpatialLock3D *_spatial_lock = nullptr;
 	mutable bool _locked = false;
 };

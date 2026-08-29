@@ -15,7 +15,7 @@ namespace voxel {
 
 class VoxelTerrain;
 
-// Implements multiplayer replication for `VoxelTerrain`
+// 为 `VoxelTerrain` 实现多人在线复制
 class VoxelTerrainMultiplayerSynchronizer : public Node {
 	GDCLASS(VoxelTerrainMultiplayerSynchronizer, Node)
 public:

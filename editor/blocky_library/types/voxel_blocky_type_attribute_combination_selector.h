@@ -10,8 +10,8 @@ VOXEL_GODOT_FORWARD_DECLARE(class Label);
 
 namespace voxel {
 
-// Editor with the list of attributes from a specific VoxelBlockyType, allowing to choose a combination
-// parametrically.
+// 编辑器，包含特定 VoxelBlockyType 的属性列表，允许参数化地
+// 选择组合。
 class VoxelBlockyTypeAttributeCombinationSelector : public GridContainer {
 	GDCLASS(VoxelBlockyTypeAttributeCombinationSelector, GridContainer)
 public:

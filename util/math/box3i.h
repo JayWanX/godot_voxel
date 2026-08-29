@@ -7,7 +7,7 @@
 
 namespace voxel {
 
-// Axis-aligned 3D box using integer coordinates
+// 使用整数坐标的轴对齐三维包围盒
 class Box3i {
 public:
 	Vector3i position;
@@ -19,14 +19,14 @@ public:
 
 	Box3i(int ox, int oy, int oz, int sx, int sy, int sz) : position(ox, oy, oz), size(sx, sy, sz) {}
 
-	// Creates a box centered on a point, specifying half its size.
-	// Warning: if you consider the center being a 1x1x1 box which would be extended, instead of a mathematical point,
-	// you may want to add 1 to extents.
+	// 创建一个以某点为中心、由半尺寸指定大小的包围盒。
+	// 注意：如果你把中心看作一个会被扩展的 1x1x1 包围盒，而非数学意义上的点，
+	// 你可能需要把 extents 加 1。
 	static inline Box3i from_center_extents(Vector3i center, Vector3i extents) {
 		return Box3i(center - extents, 2 * extents);
 	}
 
-	// max is exclusive
+	// max 为开区间（不含）
 	static inline Box3i from_min_max(Vector3i p_min, Vector3i p_max) {
 		return Box3i(p_min, p_max - p_min);
 	}
@@ -95,7 +95,7 @@ public:
 		inline void operator()(const Vector3i pos) {}
 	};
 
-	// Iteration is done in ZYX order.
+	// 迭代按 ZYX 顺序进行。
 	template <typename A>
 	inline void for_each_cell(A action) const {
 		const Vector3i max = position + size;
@@ -109,7 +109,7 @@ public:
 		}
 	}
 
-	// Iteration is done in ZXY order.
+	// 迭代按 ZXY 顺序进行。
 	template <typename A>
 	inline void for_each_cell_zxy(A action) const {
 		const Vector3i max = position + size;
@@ -123,8 +123,8 @@ public:
 		}
 	}
 
-	// Returns true if all cells of the box comply with the given predicate on their position.
-	// Iteration is done in ZYX order.
+	// 若包围盒内所有格子相对其位置满足给定谓词，则返回 true。
+	// 迭代按 ZYX 顺序进行。
 	template <typename A>
 	inline bool all_cells_match(A predicate) const {
 		const Vector3i max = position + size;
@@ -141,10 +141,10 @@ public:
 		return true;
 	}
 
-	// Subtracts another box from the current box,
-	// then execute a function on a set of boxes representing the remaining area.
+	// 从当前包围盒中减去另一个包围盒，
+	// 然后对表示剩余区域的包围盒集合依次调用函数。
 	//
-	// For example, seen from 2D, a possible result would be:
+	// 例如，从二维视角看，可能的结果如下：
 	//
 	// o-----------o                 o-----o-----o
 	// | A         |                 | C1  | C2  |
@@ -212,8 +212,8 @@ public:
 		}
 	}
 
-	// Subtracts another box from the current box.
-	// If any, boxes composing the remaining volume are added to the given vector.
+	// 从当前包围盒中减去另一个包围盒。
+	// 如有剩余体积，构成该体积的包围盒会被加入给定的向量中。
 	inline void difference_to_vec(const Box3i &b, StdVector<Box3i> &output) const {
 		difference(b, [&output](const Box3i &sub_box) { output.push_back(sub_box); });
 	}
@@ -222,8 +222,8 @@ public:
 		difference(b, [&output](const Box3i &sub_box) { output.push_back(sub_box); });
 	}
 
-	// Calls a function on all side cell positions belonging to the box.
-	// Cells don't follow a particular order and may not be relied on.
+	// 对属于该包围盒的所有侧面格子位置调用函数。
+	// 格子的遍历顺序不固定，不可依赖。
 	template <typename F>
 	void for_inner_outline(F f) const {
 		//     o-------o
@@ -238,7 +238,7 @@ public:
 		Vector3i min_pos = position;
 		Vector3i max_pos = position + size;
 
-		// Top and bottom
+		// 顶部与底部
 		for (int z = min_pos.z; z < max_pos.z; ++z) {
 			for (int x = min_pos.x; x < max_pos.x; ++x) {
 				f(Vector3i(x, min_pos.y, z));
@@ -246,7 +246,7 @@ public:
 			}
 		}
 
-		// Exclude top and bottom cells from the sides we'll iterate next
+		// 从下一步要迭代的侧面中排除顶部与底部的格子
 		++min_pos.y;
 		--max_pos.y;
 
@@ -258,7 +258,7 @@ public:
 			}
 		}
 
-		// Exclude cells belonging to edges of Z sides we did before
+		// 排除先前 Z 侧面中属于边的格子
 		++min_pos.z;
 		--max_pos.z;
 
@@ -275,21 +275,21 @@ public:
 		return Box3i(position.x - m, position.y - m, position.z - m, size.x + 2 * m, size.y + 2 * m, size.z + 2 * m);
 	}
 
-	// Converts the rectangle into a coordinate system of higher step size,
-	// rounding outwards of the area covered by the original rectangle if divided coordinates have remainders.
+	// 将该矩形转换到步长更大的坐标系，
+	// 若除以步长后有余数，则向外取整原始矩形所覆盖的区域。
 	inline Box3i downscaled(int step_size) const {
 		Box3i o;
 		o.position = math::floordiv(position, step_size);
-		// TODO Is that ceildiv?
+		// TODO 那是 ceildiv（向上取整除法）吗？
 		Vector3i max_pos = math::floordiv(position + size - Vector3i(1, 1, 1), step_size);
 		o.size = max_pos - o.position + Vector3i(1, 1, 1);
 		return o;
 	}
 
-	// Converts the rectangle into a coordinate system of higher step size,
-	// rounding inwards of the area covered by the original rectangle if divided coordinates have remainders.
-	// This is such that the result is included in the original rectangle (assuming a common coordinate system).
-	// The result can be an empty rectangle.
+	// 将该矩形转换到步长更大的坐标系，
+	// 若除以步长后有余数，则向内取整原始矩形所覆盖的区域。
+	// 这样结果会包含在原始矩形内（假设使用同一坐标系）。
+	// 结果可能是一个空矩形。
 	inline Box3i downscaled_inner(int step_size) const {
 		return Box3i::from_min_max(math::ceildiv(position, step_size), math::floordiv(position + size, step_size));
 	}

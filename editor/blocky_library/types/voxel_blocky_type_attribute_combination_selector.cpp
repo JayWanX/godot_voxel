@@ -113,25 +113,25 @@ void VoxelBlockyTypeAttributeCombinationSelector::update_attribute_editors() {
 
 	GridContainer *attributes_container = this;
 
-	// Add new attributes
+	// 添加新属性
 	for (const Ref<VoxelBlockyAttribute> &attrib : attributes) {
 		VOXEL_ASSERT_RETURN(attrib.is_valid());
 
-		// Check if already present
+		// 检查是否已存在
 		unsigned int editor_index = 0;
 		if (get_attribute_editor_index(attrib->get_attribute_name(), editor_index)) {
 			AttributeEditor &existing_editor = _attribute_editors[editor_index];
 			VOXEL_ASSERT_RETURN(existing_editor.attribute_copy.is_valid());
 			if (existing_editor.attribute_copy->is_equivalent(**attrib)) {
-				// Already present, skip
+				// 已存在，跳过
 				continue;
 			} else {
-				// Present, but is different now, remove.
+				// 存在，但现在不同了，移除。
 				remove_attribute_editor(editor_index);
 			}
 		}
 
-		// Add new
+		// 新增
 
 		editor_index = _attribute_editors.size();
 
@@ -156,13 +156,13 @@ void VoxelBlockyTypeAttributeCombinationSelector::update_attribute_editors() {
 			}
 		}
 
-		// Note, the default value can be invalid...
+		// 注意，默认值可能是无效的...
 		if (index_to_select == -1) {
 			ed.value = attrib->get_used_values()[0];
 			index_to_select = 0;
 		}
 
-		// Select before connecting the signal, we don't need the notification at this stage
+		// 在连接信号之前先选中，这个阶段我们不需要通知
 		ed.selector->select(index_to_select);
 
 		ed.selector->connect(
@@ -171,7 +171,7 @@ void VoxelBlockyTypeAttributeCombinationSelector::update_attribute_editors() {
 						.bind(editor_index)
 		);
 
-		// Make a copy so we can detect changes later. It should be cheap as attributes are small resources.
+		// 制作一份副本，以便以后检测变化。属性是小资源，这应该很廉价。
 		ed.attribute_copy = attrib->duplicate();
 
 		attributes_container->add_child(ed.label);
@@ -180,7 +180,7 @@ void VoxelBlockyTypeAttributeCombinationSelector::update_attribute_editors() {
 		_attribute_editors.push_back(ed);
 	}
 
-	// Remove editors from attributes no longer in the type
+	// 移除类型中已不再存在的属性对应的编辑器
 	for (unsigned int editor_index = 0; editor_index < _attribute_editors.size();) {
 		const AttributeEditor &ed = _attribute_editors[editor_index];
 		if (!contains_attribute_with_name(attributes, ed.name)) {

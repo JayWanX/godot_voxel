@@ -5,7 +5,7 @@
 
 namespace voxel {
 
-// Model using a mesh for visuals
+// 使用网格作为视觉效果的模型
 class VoxelBlockyModelMesh : public VoxelBlockyModel {
 	GDCLASS(VoxelBlockyModelMesh, VoxelBlockyModel)
 public:
@@ -29,8 +29,8 @@ private:
 	static void _bind_methods();
 
 	Ref<Mesh> _mesh;
-	// Margin near sides of the voxel where triangles will be considered to be "on the side". Those triangles will
-	// be processed by the neighbor side culling system.
+	// 体素侧面附近的边距，处于该边距内的三角形将被视为"在侧面上"。这些三角形将被
+	// 邻居侧面剔除系统处理。
 	float _side_vertex_tolerance = 0.001f;
 	bool _side_cutout_enabled = false;
 };

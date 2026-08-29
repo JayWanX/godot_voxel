@@ -27,7 +27,7 @@ Array generate_debug_seams_wireframe_surface(const ArrayMesh &src_mesh, int surf
 		int count = 0;
 	};
 
-	// Using a map so we can have a comparator with floating error
+	// 使用 map 以便可以用带浮点误差的比较器
 	StdMap<Vector3, Dupe> vertex_to_dupe;
 	StdUnorderedMap<int, int> src_index_to_dst_index;
 	StdVector<Vector3> dst_positions;

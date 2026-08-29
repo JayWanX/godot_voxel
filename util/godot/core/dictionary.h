@@ -14,9 +14,9 @@ inline bool try_get(const Dictionary &d, const Variant &key, T &out_value) {
 	if (v == nullptr) {
 		return false;
 	}
-	// TODO There is no easy way to return `false` if the value doesn't have the right type...
-	// Because multiple C++ types match Variant types, and Variant types match multiple C++ types, and silently convert
-	// between them.
+	// TODO 如果值类型不符，没有简单的方法返回 `false`……
+	// 因为多个 C++ 类型匹配同一个 Variant 类型，而 Variant 类型又匹配多个 C++ 类型，并且会
+	// 在它们之间静默转换。
 	out_value = *v;
 	return true;
 #endif

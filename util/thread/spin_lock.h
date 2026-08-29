@@ -9,10 +9,10 @@ class SpinLock {
 public:
 	inline void lock() {
 		while (_locked.test_and_set(std::memory_order_acquire)) {
-			; // Continue.
-			// Note: eventually investigate if yielding with intrinsics improves performance?
+			; // 继续。
+			// 注意：以后可研究使用内建指令让出 CPU 是否能提升性能？
 			// https://rigtorp.se/spinlock/
-			// Also we could eventually implement RWSpinLock
+			// 另外我们以后也可以实现 RWSpinLock
 		}
 	}
 

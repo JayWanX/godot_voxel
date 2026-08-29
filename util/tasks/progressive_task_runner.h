@@ -6,12 +6,12 @@
 
 namespace voxel {
 
-// TODO It would be really nice if Godot4 Vulkan buffer deallocation was better optimized.
-// This is originally to workaround the terribly slow Vulkan buffer deallocation in Godot4.
-// It happens on the main thread and causes deferred stutters when a terrain contains a lot of chunks
-// and the camera moves fast.
-// I hate this workaround because it feels like we are almost not in control of a stable framerate.
-// "Make less meshes" is not enough, if it can't be dynamically adressed.
+// TODO 如果 Godot4 的 Vulkan 缓冲区释放能优化得更好就太好了。
+// 这最初是为了规避 Godot4 中极其缓慢的 Vulkan 缓冲区释放。
+// 它在主线程上发生，当地形包含大量区块且
+// 摄像机移动较快时，会导致延迟卡顿。
+// 我讨厌这个变通方案，因为感觉我们几乎无法掌控稳定的帧率。
+// “减少网格数量”并不足够，如果无法动态处理的话。
 
 class IProgressiveTask {
 public:
@@ -19,13 +19,13 @@ public:
 	virtual void run() = 0;
 };
 
-// Runs a certain amount of tasks per frame such that all tasks should be completed in N seconds.
-// This has the effect of spreading the load over time and tends to smooth out CPU spikes.
-// This can be used in place of a time-slicing runner when the direct duration of tasks cannot be used as a cost metric.
-// This is the case of tasks that delegate their workload to another unreachable system to run later (I'm looking at you
-// Godot). It is far from perfect though, and is a last resort solution when optimization and threading are not
-// possible. Such tasks may preferably not require low latency in the game, because they will likely run a bit later
-// than a time-sliced task.
+// 每帧运行一定数量的任务，使得所有任务应在 N 秒内完成。
+// 这能将负载随时间分摊，并趋于平滑 CPU 峰值。
+// 当任务的直接耗时无法作为代价指标时，可用它替代时间切片运行器。
+// 这类任务会将工作负载委托给另一个稍后运行的、不可直达的系统（说的就是你，
+// Godot）。尽管它远非完美，且是在优化与多线程都不可行时的
+// 最后手段。这类任务最好不要要求低延迟，因为它们很可能会稍晚运行
+// 于时间切片任务。
 class ProgressiveTaskRunner {
 public:
 	~ProgressiveTaskRunner();

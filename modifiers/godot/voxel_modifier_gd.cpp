@@ -100,8 +100,8 @@ void VoxelModifier::_notification(int p_what) {
 
 				modifier->set_transform(get_transform());
 				_modifier_id = id;
-				// TODO Optimize: on loading of a scene, this could be very bad for performance because there could be,
-				// a lot of modifiers on the map, but there is no distinction possible in Godot at the moment...
+				// TODO 优化：加载场景时，这可能对性能非常不利，因为地图上可能
+				// 有大量修改器，但目前 Godot 中无法区分……
 				post_edit_modifier(*_volume, modifier->get_aabb());
 			}
 
@@ -134,10 +134,10 @@ void VoxelModifier::_notification(int p_what) {
 				post_edit_modifier(*_volume, prev_aabb);
 				post_edit_modifier(*_volume, aabb);
 
-				// TODO Handle nesting properly, though it's a pain in the ass
-				// When the terrain is moved, the local transform of modifiers technically changes too.
-				// However it did not change relative to the terrain. But because we don't have a way to check that,
-				// all modifiers will trigger updates at the same time...
+				// TODO 妥善处理嵌套，虽然这很麻烦
+				// 当地形移动时，修改器的局部变换在技术上也会改变。
+				// 但它相对于地形并未改变。然而由于我们无法检查这一点，
+				// 所有修改器都会同时触发更新……
 			}
 		} break;
 	}

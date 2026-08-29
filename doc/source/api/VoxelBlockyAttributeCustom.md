@@ -1,46 +1,46 @@
 # VoxelBlockyAttributeCustom
 
-Inherits: [VoxelBlockyAttribute](VoxelBlockyAttribute.md)
+继承自：[VoxelBlockyAttribute](VoxelBlockyAttribute.md)
 
 !!! warning
-    This class is marked as experimental. It is subject to likely change or possible removal in future versions. Use at your own discretion.
+    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                                | Name                                 | Default 
------------------------------------------------------------------------------------ | ------------------------------------ | --------
-[StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)  | [attribute_name](#i_attribute_name)  | &""     
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [default_value](#i_default_value)    | 0       
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [value_count](#i_value_count)        | 2       
+类型                                                                                  | 名称                                   | 默认值 
+----------------------------------------------------------------------------------- | ------------------------------------ | ----
+[StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)  | [attribute_name](#i_attribute_name)  | &"" 
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [default_value](#i_default_value)    | 0   
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [value_count](#i_value_count)        | 2   
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return     | Signature                                                                                                                                                                                                          
+返回值        | 函数签名                                                                                                                                                                                                               
 ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [void](#)  | [set_value_name](#i_set_value_name) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) value, [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) value_name )  
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)<span id="i_attribute_name"></span> **attribute_name** = &""
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_default_value"></span> **default_value** = 0
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_value_count"></span> **value_count** = 2
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-## Method Descriptions
+## 方法描述
 
 ### [void](#)<span id="i_set_value_name"></span> **set_value_name**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) value, [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) value_name ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

@@ -1,19 +1,19 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
 const char *g_detail_generator_shader_template_0 =
 "#version 450\n"
 "\n"
-"// Takes a list of positions and evaluates a signed distance field in 4 locations around them.\n"
-"// The 4 locations are picked such that the result can be used to compute a gradient.\n"
-"// This is similar to a modifier except there is no operation applied.\n"
-"// Values are generated as a base, so the shader is simpler.\n"
+"// 接收一组位置，并在其周围 4 个位置计算有符号距离场。\n"
+"// 这 4 个位置的选择使得结果可用于计算梯度。\n"
+"// 这类似于修改器，只是不应用任何操作。\n"
+"// 值作为基础生成，因此着色器更简单。\n"
 "\n"
 "layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;\n"
 "\n"
 "layout (set = 0, binding = 0, std430) restrict readonly buffer PositionBuffer {\n"
-"	// X, Y, Z is hit position\n"
-"	// W is integer triangle index\n"
+"	// X、Y、Z 为命中位置\n"
+"	// W 为整数三角形索引\n"
 "	vec4 values[];\n"
 "} u_positions;\n"
 "\n"
@@ -23,7 +23,7 @@ const char *g_detail_generator_shader_template_0 =
 "} u_params;\n"
 "\n"
 "layout (set = 0, binding = 2, std430) restrict writeonly buffer OutSDBuffer {\n"
-"	// 4 values per index\n"
+"	// 每个索引 4 个值\n"
 "	float values[];\n"
 "} u_out_sd;\n"
 "\n";

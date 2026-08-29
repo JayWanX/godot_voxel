@@ -8,7 +8,7 @@ namespace voxel {
 
 class VoxelColorPalette;
 
-// Simple loader for MagicaVoxel
+// MagicaVoxel 的简单加载器
 class VoxelVoxLoader : public RefCounted {
 	GDCLASS(VoxelVoxLoader, RefCounted);
 
@@ -19,8 +19,8 @@ public:
 			Ref<VoxelColorPalette> palette,
 			godot::VoxelBuffer::ChannelId dst_channel
 	);
-	// TODO Have chunked loading for better memory usage
-	// TODO Saving
+	// TODO 采用分块加载以获得更好的内存使用
+	// TODO 保存
 
 private:
 	static void _bind_methods();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelStreamSQLite" inherits="VoxelStream" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Saves voxel data into a single SQLite database file.
+		将体素数据保存到单个 SQLite 数据库文件中。
 	</brief_description>
 	<description>
 	</description>
@@ -17,31 +17,31 @@
 			<return type="void" />
 			<param index="0" name="enabled" type="bool" />
 			<description>
-				Enables caching keys of the database to speed up loading queries in terrains that only save sparse edited blocks. This won't provide any benefit if your terrain saves all its blocks (for example if the output of the generator is saved).
-				This must be called before any call to [code]load_voxel_block[/code] (before the terrain starts using it), otherwise it won't work properly. You may use a script to do this.
+				启用数据库键的缓存，以加快在只保存稀疏编辑数据块的地形中的加载查询。如果你的地形保存了其所有数据块（例如保存了生成器的输出），则这不会带来任何好处。
+				必须在任何对 [code]load_voxel_block[/code] 的调用之前（即在地形开始使用它之前）调用此方法，否则将无法正常工作。你可以使用脚本来完成此操作。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="database_path" type="String" setter="set_database_path" getter="get_database_path" default="&quot;&quot;">
-			Path to the database file. [code]res://[/code] and [code]user://[/code] should work, however [code]res://[/code] will not work after export (see [url=https://docs.godotengine.org/en/stable/tutorials/io/data_paths.html#accessing-persistent-user-data-user] why here[/url]). The path can be relative to the game's executable. Directories in the path must exist. If the file does not exist, it will be created.
+			数据库文件的路径。[code]res://[/code] 和 [code]user://[/code] 应该可用，但 [code]res://[/code] 在导出后将无法工作（原因参见 [url=https://docs.godotengine.org/en/stable/tutorials/io/data_paths.html#accessing-persistent-user-data-user]此处[/url]）。路径可以相对于游戏的可执行文件。路径中的目录必须存在。如果文件不存在，它将被创建。
 		</member>
 		<member name="preferred_coordinate_format" type="int" setter="set_preferred_coordinate_format" getter="get_preferred_coordinate_format" enum="VoxelStreamSQLite.CoordinateFormat" default="2">
-			Sets which block coordinate format will be used when creating new databases. This affects the range of supported coordinates and how quickly SQLite can execute queries (to a minor extent). When opening existing databases, this setting will be ignored, and the format of the database will be used instead. Changing the format of an existing database is currently not possible, and may require using a script to load individual blocks from one stream and save them to a new one.
+			设置创建新数据库时将使用的数据块坐标格式。这会影响支持的坐标范围以及 SQLite 执行查询的速度（影响较小）。打开现有数据库时，此设置将被忽略，而使用数据库本身的格式。目前无法更改现有数据库的格式，可能需要使用脚本从某个数据流加载各个数据块并将其保存到新的数据库中。
 		</member>
 	</members>
 	<constants>
 		<constant name="COORDINATE_FORMAT_INT64_X16_Y16_Z16_L16" value="0" enum="CoordinateFormat">
-			Coordinates are stored in a 64-bit integer key, where X, Y, Z and LOD are 16-bit signed integers.
+			坐标存储在 64 位整数键中，其中 X、Y、Z 和 LOD 为 16 位有符号整数。
 		</constant>
 		<constant name="COORDINATE_FORMAT_INT64_X19_Y19_Z19_L7" value="1" enum="CoordinateFormat">
-			Coordinates are stored in a 64-bit integer key, where X, Y and Z are 19-bit signed integers, and LOD is a 7-bit unsigned integer.
+			坐标存储在 64 位整数键中，其中 X、Y 和 Z 为 19 位有符号整数，LOD 为 7 位无符号整数。
 		</constant>
 		<constant name="COORDINATE_FORMAT_STRING_CSD" value="2" enum="CoordinateFormat">
-			Coordinates are stored in strings of comma-separated base 10 numbers "X,Y,Z,LOD".
+			坐标存储在由逗号分隔的十进制数字字符串中，格式为“X,Y,Z,LOD”。
 		</constant>
 		<constant name="COORDINATE_FORMAT_BLOB80_X25_Y25_Z25_L5" value="3" enum="CoordinateFormat">
-			Coordinates are stored in 80-bit blobs, where X, Y and Z are 25-bit signed integers and LOD is a 5-bit unsigned integer.
+			坐标存储在 80 位二进制大对象中，其中 X、Y 和 Z 为 25 位有符号整数，LOD 为 5 位无符号整数。
 		</constant>
 		<constant name="COORDINATE_FORMAT_COUNT" value="4" enum="CoordinateFormat">
 		</constant>

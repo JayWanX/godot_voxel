@@ -92,9 +92,9 @@ void VoxelBlockyTypeVariantListEditor::update_list() {
 
 		ed.resource_picker = memnew(EditorResourcePicker);
 		ed.resource_picker->set_base_type(VoxelBlockyModel::get_class_static());
-		// TODO It is currently not possible to integrate a sub-EditorInspector because it is not exposed to extensions.
-		// So users will have to leave the heavily-nested type inspector just to edit models from here, and use previous
-		// buttons to (hopefully) come back where they were
+		// TODO 目前无法集成子级 EditorInspector，因为它没有暴露给扩展。
+		// 因此用户不得不离开嵌套很深的类型检查器来从这里编辑模型，并借助先前的
+		// 按钮（但愿能）回到原来的位置
 		ed.resource_picker->set_edited_resource(model);
 		ed.resource_picker->set_h_size_flags(Control::SIZE_EXPAND_FILL);
 		ed.resource_picker->connect(
@@ -113,7 +113,7 @@ void VoxelBlockyTypeVariantListEditor::update_list() {
 }
 
 void VoxelBlockyTypeVariantListEditor::_on_type_changed() {
-	// This is in case the list of variants changes. We don't actually care about other changes...
+	// 这是为了处理变体列表变化的情况。我们实际上并不关心其他变化...
 	update_list();
 }
 
@@ -140,13 +140,13 @@ void VoxelBlockyTypeVariantListEditor::_on_model_picker_selected(Ref<VoxelBlocky
 	if (model.is_null()) {
 		return;
 	}
-	// TODO Can't unfold as a sub-inspector, Godot does not expose it to extensions and it seems to be a fairly
-	// complicated logic (it's far from just a "create inspector and unfold" inside the selected signal)... This is one
-	// reason why this sole feature would require an entirely separated editor, which is incredibly frustrating
+	// TODO 无法作为子检查器展开，Godot 没有将其暴露给扩展，而且这似乎是一个相当
+	// 复杂的逻辑（远不止在 selected 信号里“创建检查器并展开”）……这就是为什么仅此一个
+	// 功能就需要一个完全独立的编辑器，实在令人沮丧
 	VOXEL_ASSERT_RETURN(_editor_interface != nullptr);
-	// Can't call this directly because somehow it crashes Godot later in `_physics_process`???
-	// The current method isn't even in the call stack when this happens... so why would call_deferred even be proven to
-	// fix it? Nevertheless, it seems to workaround it...
+	// 不能直接调用这个方法，因为不知何故它会在之后的 `_physics_process` 中导致 Godot 崩溃？？？
+	// 发生这种情况时，当前方法甚至都不在调用栈里……所以为什么 call_deferred 就被证明能
+	// 修复它？不管怎样，它似乎确实绕过了这个问题...
 	//_editor_interface->inspect_object(model.ptr());
 	_editor_interface->call_deferred("inspect_object", model);
 }

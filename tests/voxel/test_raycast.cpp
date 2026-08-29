@@ -13,7 +13,7 @@ namespace voxel::tests {
 void test_raycast_sdf() {
 	const unsigned int approx_steps = 5;
 
-	// Very basic test with a flat plane
+	// 使用平坦平面的非常基础的测试
 	{
 		const float plane_height = 5.f;
 
@@ -42,7 +42,7 @@ void test_raycast_sdf() {
 		}
 
 		{
-			// Raycast from integer coordinates
+			// 从整数坐标进行射线投射
 			const Vector3 ray_origin(5, plane_height + 2, 5);
 			Ref<VoxelRaycastResult> hit = raycast_sdf(data, ray_origin, Vector3i(0, -1, 0), 10.0, approx_steps, true);
 			VOXEL_TEST_ASSERT(hit.is_valid());
@@ -50,7 +50,7 @@ void test_raycast_sdf() {
 			VOXEL_TEST_ASSERT(hit->normal.is_equal_approx(Vector3(0, 1, 0)));
 		}
 		{
-			// Raycast from decimal coordinates
+			// 从小数坐标进行射线投射
 			const Vector3 ray_origin(5.2, plane_height + 2.2, 5.2);
 			Ref<VoxelRaycastResult> hit = raycast_sdf(data, ray_origin, Vector3i(0, -1, 0), 10.0, approx_steps, true);
 			VOXEL_TEST_ASSERT(hit.is_valid());
@@ -59,7 +59,7 @@ void test_raycast_sdf() {
 		}
 	}
 
-	// Very basic test with a sphere
+	// 使用球体的非常基础的测试
 	{
 		const int sphere_radius = 5;
 
@@ -87,7 +87,7 @@ void test_raycast_sdf() {
 		}
 
 		{
-			// Raycast in diagonal across all axes
+			// 沿所有轴的对角线方向进行射线投射
 
 			const Vector3 ray_origin(sphere_radius, sphere_radius, sphere_radius);
 			const Vector3 ray_dir = Vector3(-1, -1, -1).normalized();
@@ -168,7 +168,7 @@ void test_raycast_blocky() {
 	}
 
 	{
-		// Raycast the ground away from the slab
+		// 对远离平板的地面进行射线投射
 
 		const Vector3 ray_origin(slab_position.x + 1.5, slab_position.y + 2, slab_position.z);
 		const Vector3 ray_dir(0, -1, 0);
@@ -186,7 +186,7 @@ void test_raycast_blocky() {
 	}
 
 	{
-		// Raycast the slab
+		// 对平板进行射线投射
 
 		const Vector3 ray_origin(slab_position.x, slab_position.y + 2, slab_position.z);
 		const Vector3 ray_dir(0, -1, 0);
@@ -217,7 +217,7 @@ void test_raycast_blocky_no_cache_graph() {
 	const int air_id = 0;
 	const int cube_id = 1;
 
-	// Make flat world with ground below Y=5
+	// 创建地面在 Y=5 下方的平坦世界
 	{
 		Ref<VoxelGraphFunction> main = graph->get_main_function();
 

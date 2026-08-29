@@ -9,19 +9,18 @@
 
 namespace voxel {
 
-// Note:
-// This streaming method allows every LOD to load in parallel, even before meshes are ready. That means if a data block
-// is loaded somewhere and gets edited, there is no guarantee its parent LODs are loaded! It can be made more likely,
-// but not guaranteed.
-// Hopefully however, this should not be a problem if LODs are just cosmetic representations of
-// LOD0. If an edit happens at LOD0 and sibling chunks are present, they can be used to produce the parent LOD.
-// Alternatively, LOD updates could wait. In worst case, parent LODs will not update.
+// 注意：
+// 这种流式加载方法允许每个 LOD 并行加载，甚至在网格就绪之前。这意味着如果某个数据块
+// 被加载并随后被编辑，无法保证其父级 LOD 已加载！虽然可以提高这种可能性，但无法保证。
+// 不过，如果 LOD 只是 LOD0 的视觉化表示，这通常不会成为问题。若在 LOD0 上发生编辑
+// 且兄弟数据块存在，则可用它们来生成父级 LOD。
+// 另一种方案是让 LOD 更新等待。最坏情况下，父级 LOD 将不会更新。
 
-// TODO Octree streaming was polling constantly, but clipbox isn't. So if a task is dropped due to being too far away,
-// it might cause a chunk hole or blocked lods, because it won't be requested again...
-// Either we should handle "dropped" responses and retrigger if still needed (as we did before), or we could track every
-// loading tasks with a shared boolean owned by both the task and the requester, which the requester sets to false if
-// it's not needed anymore, and otherwise doesn't get cancelled.
+// TODO 八叉树流式加载会持续轮询，但裁剪盒不会。因此若某个任务因距离过远而被丢弃，
+// 它可能会造成数据块空洞或 LOD 阻塞，因为不会再次请求它...
+// 我们要么处理“已丢弃”的响应并在仍需要时重新触发（就像之前那样），要么为每个加载任务
+// 使用一个由任务和请求者共同持有的共享布尔标志，请求者在不再需要时将其置为 false，
+// 否则任务不会被取消。
 
 namespace {
 
@@ -56,22 +55,21 @@ Box3i get_base_box_in_chunks(
 		int chunk_size,
 		bool make_even
 ) {
-	// Get min and max positions
+	// 获取最小和最大位置
 	Vector3i minp = viewer_position_voxels - distance_voxels;
 	Vector3i maxp = viewer_position_voxels +
 			distance_voxels
-			// When distance is a multiple of chunk size, we should be able to get a consistent box size,
-			// however without that +1 there are still very specific coordinates that makes the box shrink due
-			// to rounding
+			// 当距离是数据块大小的整数倍时，本应能得到一致的盒子大小，
+			// 但如果没有这个 +1，仍会有一些特定坐标使盒子因舍入而缩小
 			+ Vector3iUtil::create(1);
 
-	// Convert to chunk coordinates
+	// 转换为数据块坐标
 	minp = math::floordiv(minp, chunk_size);
 	maxp = math::ceildiv(maxp, chunk_size);
 
 	if (make_even) {
-		// Round to be even outwards (partly required for subdivision rule)
-		// TODO Maybe there is a more clever way to do this
+		// 向外取整为偶数（细分规则的部分要求）
+		// TODO 也许有更巧妙的方法来实现
 		minp = math::floordiv(minp, 2) * 2;
 		maxp = math::ceildiv(maxp, 2) * 2;
 	}
@@ -79,18 +77,18 @@ Box3i get_base_box_in_chunks(
 	return Box3i::from_min_max(minp, maxp);
 }
 
-// Gets the smallest box a parent LOD must have in order to keep respecting the neighboring rule
+// 获取父级 LOD 必须拥有的最小盒子，以便继续遵守相邻规则
 Box3i get_minimal_box_for_parent_lod(Box3i child_lod_box, bool make_even) {
 	const int min_pad = 1;
-	// Note, subdivision rule enforces the child box position and size to be even, so it won't round to
-	// zero when converted to the parent LOD's coordinate system.
+	// 注意，细分规则强制子盒子的位置和大小为偶数，因此在转换为父级 LOD 的坐标系时
+	// 不会舍入为零。
 	Box3i min_box = Box3i(child_lod_box.position >> 1, child_lod_box.size >> 1)
-							// Enforce neighboring rule by padding boxes outwards by a minimum amount,
-							// so there is at least N chunks in the current LOD between LOD+1 and LOD-1
+							// 通过向外填充盒子最小量来强制相邻规则，
+							// 以便在当前 LOD 中 LOD+1 和 LOD-1 之间至少有 N 个数据块
 							.padded(min_pad);
 
 	if (make_even) {
-		// Make sure it stays even to respect subdivision rule, rounding outwards
+		// 确保保持偶数以遵守细分规则，向外取整
 		min_box = min_box.downscaled(2).scaled(2);
 	}
 
@@ -107,7 +105,7 @@ inline int get_lod_distance_in_mesh_chunks(float lod_distance_in_voxels, int mes
 	return math::max(static_cast<int>(Math::ceil(lod_distance_in_voxels)) / mesh_block_size, 1);
 }
 
-// Compute distance in chunks relative to the current LOD, between the viewer and the end of that LOD
+// 计算观察者与该 LOD 末端之间、相对于当前 LOD 的以数据块为单位的距离
 Vector3i get_relative_lod_distance_in_chunks(
 		int lod_index,
 		int lod_count,
@@ -118,17 +116,17 @@ Vector3i get_relative_lod_distance_in_chunks(
 ) {
 	int ld;
 	if (lod_index == 0) {
-		// First LOD uses dedicated distance
+		// 第一个 LOD 使用专用距离
 		ld = lod0_distance_in_chunks;
 	} else {
-		// Following LODs use another distance.
-		// The returned distance is relative to chunks of the current LOD so we divide LOD0 distance rather than
-		// multiplying LODN distance
+		// 后续 LOD 使用另一个距离。
+		// 返回的距离相对于当前 LOD 的数据块，因此我们除以 LOD0 距离而不是
+		// 乘以 LODN 距离
 		ld = (lod0_distance_in_chunks >> lod_index) + lodn_distance_in_chunks;
 	}
 	Vector3i ld3(ld, ld, ld);
 	if (lod_index == lod_count - 1) {
-		// Last LOD may extend all the way to max view distance if possible
+		// 如果可能，最后一个 LOD 可以一直延伸到最大视距
 		ld3 = math::max(ld3, math::ceildiv(max_view_distance_voxels, Vector3iUtil::create(lod_chunk_size)));
 	}
 	return ld3;
@@ -143,26 +141,26 @@ void process_viewers(
 		Box3i volume_bounds_in_voxels,
 		int data_block_size_po2,
 		bool can_mesh,
-		// Ordered by ascending index in paired viewers list
+		// 按配对观察者列表中的升序索引排列
 		StdVector<unsigned int> &unpaired_viewers_to_remove
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Destroyed viewers
+	// 已销毁的观察者
 	for (size_t paired_viewer_index = 0; paired_viewer_index < cs.paired_viewers.size(); ++paired_viewer_index) {
 		VoxelLodTerrainUpdateData::PairedViewer &pv = cs.paired_viewers[paired_viewer_index];
 
 		if (!contains(viewers, pv.id)) {
 			VOXEL_PRINT_VERBOSE(format("Detected destroyed viewer {} in VoxelLodTerrain", pv.id));
 
-			// Interpret removal as nullified view distance so the same code handling loading of blocks
-			// will be used to unload those viewed by this viewer.
-			// We'll actually remove unpaired viewers in a second pass.
+			// 将移除解释为视距归零，这样处理数据块加载的同一套代码
+			// 也将用于卸载该观察者看到的数据块。
+			// 我们实际上会在第二遍中移除未配对的观察者。
 			pv.state.view_distance_voxels = VoxelLodTerrainUpdateData::PairedViewer::Distances();
 
-			// Also update boxes, they won't be updated since the viewer has been removed.
-			// Assign prev state, otherwise in some cases resetting boxes would make them equal to prev state,
-			// therefore causing no unload
+			// 同时更新盒子，因为观察者已被移除，它们不会再被更新。
+			// 赋值上一个状态，否则在某些情况下重置盒子会使它们与上一个状态相同，
+			// 从而不会触发卸载
 			pv.prev_state = pv.state;
 
 			for (unsigned int lod_index = 0; lod_index < pv.state.data_box_per_lod.size(); ++lod_index) {
@@ -176,12 +174,12 @@ void process_viewers(
 		}
 	}
 
-	// TODO Pair/Unpair viewers as they intersect volume bounds
+	// TODO 当观察者与体积边界相交时进行配对/取消配对
 
 	const Transform3D world_to_local_transform = volume_transform.affine_inverse();
 
-	// Note, this does not support non-uniform scaling
-	// TODO There is probably a better way to do this
+	// 注意，这不支持非均匀缩放
+	// TODO 可能还有更好的方法
 	const float view_distance_scale = world_to_local_transform.basis.xform(Vector3(1, 0, 0)).length();
 
 	const int data_block_size = 1 << data_block_size_po2;
@@ -194,22 +192,22 @@ void process_viewers(
 	const int lodn_distance_in_mesh_chunks =
 			get_lod_distance_in_mesh_chunks(volume_settings.secondary_lod_distance, mesh_block_size);
 
-	// Data chunks are driven by mesh chunks, because mesh needs data
+	// 数据块由网格数据块驱动，因为网格需要数据
 	const int lod0_distance_in_data_chunks = lod0_distance_in_mesh_chunks * mesh_to_data_factor;
 	const int lodn_distance_in_data_chunks = lodn_distance_in_mesh_chunks * mesh_to_data_factor;
 
 	// const Box3i volume_bounds_in_data_blocks = volume_bounds_in_voxels.downscaled(1 << data_block_size_po2);
 	// const Box3i volume_bounds_in_mesh_blocks = volume_bounds_in_voxels.downscaled(1 << mesh_block_size_po2);
 
-	// New viewers and existing viewers.
-	// Removed viewers won't be iterated but are still paired until later.
+	// 新观察者和现有观察者。
+	// 已移除的观察者不会被迭代，但仍保持配对，直到稍后处理。
 	for (const std::pair<ViewerID, VoxelEngine::Viewer> &viewer_and_id : viewers) {
 		const ViewerID viewer_id = viewer_and_id.first;
 		const VoxelEngine::Viewer &viewer = viewer_and_id.second;
 
 		unsigned int paired_viewer_index;
 		if (!find_index(to_span_const(cs.paired_viewers), viewer_id, paired_viewer_index)) {
-			// New viewer
+			// 新观察者
 			VoxelLodTerrainUpdateData::PairedViewer pv;
 			pv.id = viewer_id;
 			paired_viewer_index = cs.paired_viewers.size();
@@ -219,7 +217,7 @@ void process_viewers(
 
 		VoxelLodTerrainUpdateData::PairedViewer &paired_viewer = cs.paired_viewers[paired_viewer_index];
 
-		// Move current state to be the previous state
+		// 将当前状态保存为上一个状态
 		paired_viewer.prev_state = paired_viewer.state;
 
 		{
@@ -234,8 +232,8 @@ void process_viewers(
 					math::min(view_distance_voxels_v, static_cast<int>(volume_settings.view_distance_voxels));
 		}
 
-		// The last LOD should extend at least up to view distance. It must also be at least the distance specified by
-		// "lod distance"
+		// 最后一个 LOD 应至少延伸到视距。它还必须至少是
+		// “LOD 距离”指定的距离
 		// const int last_lod_mesh_block_size = mesh_block_size << (lod_count - 1);
 		// const int last_lod_distance_in_mesh_chunks =
 		// 		math::max(math::ceildiv(paired_viewer.state.view_distance_voxels, last_lod_mesh_block_size),
@@ -248,19 +246,19 @@ void process_viewers(
 		paired_viewer.state.requires_collisions = viewer.require_collisions && can_mesh;
 		paired_viewer.state.requires_visuals = viewer.require_visuals && can_mesh;
 
-		// Viewers can request any box they like, but they must follow these rules:
-		// - Boxes of parent LODs must contain child boxes (when converted into world coordinates)
-		// - Mesh boxes that have a parent LOD must have an even size and even position, in order to support subdivision
-		// - Mesh boxes must be contained within data boxes, in order to guarantee that meshes have access to consistent
-		//   voxel blocks and their neighbors
+		// 观察者可以请求任意盒子，但必须遵循以下规则：
+		// - 父级 LOD 的盒子必须包含子盒子（转换为世界坐标时）
+		// - 有父级 LOD 的网格盒子必须具有偶数的大小和位置，以支持细分
+		// - 网格盒子必须包含在数据盒子内，以保证网格能访问一致的
+		//   体素数据块及其相邻数据块
 
-		// TODO The root LOD should not need to have even size.
-		// However if we do that, one corner case is when LOD count is changed in the editor, it might cause errors
-		// since every LOD is assumed to have an even size when handling subdivisions
+		// TODO 根 LOD 不应需要偶数大小。
+		// 但如果我们这样做，一个边界情况是当编辑器中 LOD 数量发生变化时，可能会引发错误，
+		// 因为在处理细分时假定每个 LOD 都具有偶数大小
 
-		// Update data and mesh boxes
+		// 更新数据和网格盒子
 		if (paired_viewer.state.requires_collisions || paired_viewer.state.requires_visuals) {
-			// Meshes are required
+			// 需要网格
 
 			for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 				const int lod_mesh_block_size_po2 = volume_settings.mesh_block_size_po2 + lod_index;
@@ -282,13 +280,13 @@ void process_viewers(
 				// Box3i new_mesh_box = get_lod_box_in_chunks(
 				// 		paired_viewer.state.local_position_voxels, ld, volume_settings.mesh_block_size_po2, lod_index);
 
-				// Make min and max coordinates even in child LODs, to respect subdivision rule.
-				// Root LOD doesn't need to respect that.
+				// 使子 LOD 中的最小和最大坐标为偶数，以遵守细分规则。
+				// 根 LOD 不需要遵守该规则。
 				const bool even_coordinates_required = (lod_index != lod_count - 1);
 
 				Box3i new_mesh_box = get_base_box_in_chunks(
 						paired_viewer.state.local_position_voxels,
-						// Making sure that distance is a multiple of chunk size, for consistent box size
+						// 确保距离是数据块大小的整数倍，以获得一致的盒子大小
 						ld * lod_mesh_block_size,
 						lod_mesh_block_size,
 						even_coordinates_required
@@ -302,7 +300,7 @@ void process_viewers(
 				paired_viewer.state.mesh_box_per_lod[lod_index] = new_mesh_box;
 			}
 
-			// Clip all mesh boxes in a second pass, because `enforce_neighboring_rule` depends on the child LOD box
+			// 在第二遍中裁剪所有网格盒子，因为 `enforce_neighboring_rule` 依赖于子 LOD 盒子
 			for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 				const int lod_mesh_block_size_po2 = volume_settings.mesh_block_size_po2 + lod_index;
 				const int lod_mesh_block_size = 1 << lod_mesh_block_size_po2;
@@ -312,16 +310,16 @@ void process_viewers(
 				box.clip(volume_bounds_in_mesh_blocks);
 			}
 
-			// TODO We should have a flag server side to force data boxes to be based on mesh boxes, even though the
-			// server might not actually need meshes. That would help the server to provide data chunks to clients,
-			// which need them for visual meshes
+			// TODO 我们应该在服务器端提供一个标志，强制数据盒子基于网格盒子，即使
+			// 服务器实际上可能不需要网格。这将帮助服务器向需要数据块用于视觉网格的
+			// 客户端提供数据块
 
-			// Data boxes must be based on mesh boxes so the right data chunks are loaded to make the corresponding
-			// meshes (also including the tweaks we do to mesh boxes to enforce the neighboring rule)
+			// 数据盒子必须基于网格盒子，以便加载正确的数据块来生成相应的
+			// 网格（也包括我们为强制相邻规则而对网格盒子所做的调整）
 			for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 				const unsigned int lod_data_block_size_po2 = data_block_size_po2 + lod_index;
 
-				// Should be correct as long as bounds size is a multiple of the biggest LOD chunk
+				// 只要边界大小是最大 LOD 数据块的整数倍，这应该是正确的
 				const Box3i volume_bounds_in_data_blocks =
 						Box3i(volume_bounds_in_voxels.position >> lod_data_block_size_po2,
 							  volume_bounds_in_voxels.size >> lod_data_block_size_po2);
@@ -332,9 +330,9 @@ void process_viewers(
 				// const Box3i new_data_box =
 				// 		get_lod_box_in_chunks(paired_viewer.state.local_position_voxels, lod_distance_in_data_chunks,
 				// 				data_block_size_po2, lod_index)
-				// 				// To account for meshes requiring neighbor data chunks.
-				// 				// It technically breaks the subdivision rule (where every parent block always has 8
-				// 				// children), but it should only matter in areas where meshes must actually spawn
+				// 				// 考虑到网格需要相邻的（数据）区块。
+				// 				// 这从技术上说破坏了细分规则（即每个父区块总是有 8 个子区块），但
+				// 				// 应该只会在网格确实需要生成的地方产生影响
 				// 				.padded(1)
 				// 				.clipped(volume_bounds_in_data_blocks);
 
@@ -342,9 +340,9 @@ void process_viewers(
 
 				const Box3i data_box =
 						Box3i(mesh_box.position * mesh_to_data_factor, mesh_box.size * mesh_to_data_factor)
-								// To account for meshes requiring neighbor data chunks.
-								// It technically breaks the subdivision rule (where every parent block always has 8
-								// children), but it should only matter in areas where meshes must actually spawn
+								// 用于应对网格需要相邻数据块的情况。
+								// 这从技术上破坏了细分规则（每个父数据块始终有 8 个子数据块），
+								// 但它只在实际需要生成网格的区域才重要
 								.padded(1)
 								.clipped(volume_bounds_in_data_blocks);
 
@@ -360,7 +358,7 @@ void process_viewers(
 				const int lod_data_block_size_po2 = data_block_size_po2 + lod_index;
 				const int lod_data_block_size = 1 << lod_data_block_size_po2;
 
-				// Should be correct as long as bounds size is a multiple of the biggest LOD chunk
+				// 只要边界大小是最大 LOD 数据块的整数倍，这应该是正确的
 				const Box3i volume_bounds_in_data_blocks =
 						Box3i(volume_bounds_in_voxels.position >> lod_data_block_size_po2,
 							  volume_bounds_in_voxels.size >> lod_data_block_size_po2);
@@ -381,11 +379,11 @@ void process_viewers(
 				const Box3i new_data_box =
 						get_base_box_in_chunks(
 								paired_viewer.state.local_position_voxels,
-								// Making sure that distance is a multiple of chunk size, for consistent box size
+								// 确保距离是数据块大小的整数倍，以获得一致的盒子大小
 								ld * lod_data_block_size,
 								lod_data_block_size,
-								// Make min and max coordinates even in child LODs, to respect subdivision rule.
-								// Root LOD doesn't need to respect that,
+								// 使子 LOD 中的最小和最大坐标为偶数，以遵守细分规则。
+								// 根 LOD 不需要遵守该规则，
 								lod_index != lod_count - 1
 						)
 								.clipped(volume_bounds_in_data_blocks);
@@ -404,7 +402,7 @@ void remove_unpaired_viewers(
 		const StdVector<unsigned int> &unpaired_viewers_to_remove,
 		StdVector<VoxelLodTerrainUpdateData::PairedViewer> &paired_viewers
 ) {
-	// Iterating backward so indexes of paired viewers that need removal will not change because of the removal itself
+	// 向后迭代，以便需要移除的配对观察者的索引不会因移除本身而改变
 	for (auto it = unpaired_viewers_to_remove.rbegin(); it != unpaired_viewers_to_remove.rend(); ++it) {
 		const unsigned int vi = *it;
 		VOXEL_PRINT_VERBOSE(format("Unpairing viewer {} from VoxelLodTerrain", paired_viewers[vi].id));
@@ -422,7 +420,7 @@ void add_loading_block(
 	auto it = lod.loading_blocks.find(position);
 
 	if (it == lod.loading_blocks.end()) {
-		// First viewer to request it
+		// 第一个请求它的观察者
 		VoxelLodTerrainUpdateData::LoadingDataBlock new_loading_block;
 		new_loading_block.viewers.add();
 		new_loading_block.cancellation_token = TaskCancellationToken::create();
@@ -437,7 +435,7 @@ void add_loading_block(
 		);
 
 	} else {
-		// Already loaded
+		// 已加载
 		it->second.viewers.add();
 	}
 }
@@ -451,7 +449,7 @@ void unreference_data_block_from_loading_lists(
 	auto loading_block_it = loading_blocks.find(bpos);
 	if (loading_block_it == loading_blocks.end()) {
 		VOXEL_PRINT_VERBOSE("Request to unview a loading block that was never requested");
-		// Not expected, but fine I guess
+		// 意外情况，但应该没问题
 		return;
 	}
 
@@ -459,23 +457,22 @@ void unreference_data_block_from_loading_lists(
 	loading_block.viewers.remove();
 
 	if (loading_block.viewers.get() == 0) {
-		// No longer want to load it, no data box contains it
+		// 不再想加载它，没有任何数据盒子包含它
 
 		if (loading_block.cancellation_token.is_valid()) {
-			// Cancel loading task if still in queue
+			// 若任务仍在队列中则取消加载任务
 			loading_block.cancellation_token.cancel();
 		}
 
 		loading_blocks.erase(loading_block_it);
 
-		// Also remove from blocks about to be added to the loading queue
+		// 同时从即将加入加载队列的数据块中移除
 		VoxelLodTerrainUpdateData::BlockLocation bloc{ bpos, static_cast<uint8_t>(lod_index) };
 		for (size_t i = 0; i < data_blocks_to_load.size(); ++i) {
 			if (data_blocks_to_load[i].loc == bloc) {
 				data_blocks_to_load[i] = data_blocks_to_load.back();
 				data_blocks_to_load.pop_back();
-				// We don't touch the cancellation token since tasks haven't been spawned yet for
-				// these
+				// 我们不动取消令牌，因为任务尚未为这些数据块生成
 				break;
 			}
 		}
@@ -486,7 +483,7 @@ void process_data_blocks_sliding_box(
 		VoxelLodTerrainUpdateData::State &state,
 		VoxelData &data,
 		StdVector<VoxelData::BlockToSave> *blocks_to_save,
-		// TODO We should be able to work in BOXES to load, it can help compressing network messages
+		// TODO 我们应该能够在“盒子”级别工作以加载数据，这有助于压缩网络消息
 		StdVector<VoxelLodTerrainUpdateData::BlockToLoad> &data_blocks_to_load,
 		const VoxelLodTerrainUpdateData::Settings &settings,
 		int lod_count,
@@ -502,9 +499,9 @@ void process_data_blocks_sliding_box(
 
 	// const int lod_distance_in_mesh_chunks = get_lod_distance_in_mesh_chunks(settings.lod_distance, mesh_block_size);
 
-	// // Data chunks are driven by mesh chunks, because mesh needs data
+	// // 数据块由网格块驱动，因为网格需要数据
 	// const int lod_distance_in_data_chunks = lod_distance_in_mesh_chunks * mesh_to_data_factor
-	// 		// To account for the fact meshes need neighbor data chunks
+	// 		// 考虑到网格需要相邻数据块这一事实
 	// 		+ 1;
 
 	static thread_local StdVector<Vector3i> tls_missing_blocks;
@@ -515,17 +512,17 @@ void process_data_blocks_sliding_box(
 #endif
 
 	for (const VoxelLodTerrainUpdateData::PairedViewer &paired_viewer : state.clipbox_streaming.paired_viewers) {
-		// Iterating from big to small LOD so we can exit earlier if bounds don't intersect.
+		// 从大 LOD 向小 LOD 迭代，以便在边界不相交时提前退出。
 		for (int lod_index = lod_count - 1; lod_index >= 0; --lod_index) {
 			VOXEL_PROFILE_SCOPE();
 			VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
-			// Each LOD keeps a box of loaded blocks, and only some of the blocks will get polygonized.
-			// The player can edit them so changes can be propagated to lower lods.
+			// 每个 LOD 保存一个已加载数据块的盒子，只有部分数据块会被多边形化。
+			// 玩家可以编辑它们，因此更改可以传播到更低的 LOD。
 
 			const unsigned int lod_data_block_size_po2 = data_block_size_po2 + lod_index;
 
-			// Should be correct as long as bounds size is a multiple of the biggest LOD chunk
+			// 只要边界大小是最大 LOD 数据块的整数倍，这应该是正确的
 			const Box3i bounds_in_data_blocks =
 					Box3i(bounds_in_voxels.position >> lod_data_block_size_po2,
 						  bounds_in_voxels.size >> lod_data_block_size_po2);
@@ -551,12 +548,12 @@ void process_data_blocks_sliding_box(
 			// 									.clipped(bounds_in_data_blocks);
 
 			if (!new_data_box.intersects(bounds_in_data_blocks) && !prev_data_box.intersects(bounds_in_data_blocks)) {
-				// If this box doesn't intersect either now or before, there is no chance a smaller one will
+				// 若此盒子现在或之前都不相交，则更小的盒子也不会有机会相交
 				break;
 			}
 
 			if (prev_data_box != new_data_box) {
-				// Detect blocks to load.
+				// 检测需要加载的数据块。
 				if (can_load) {
 					tls_missing_blocks.clear();
 
@@ -573,7 +570,7 @@ void process_data_blocks_sliding_box(
 					}
 				}
 
-				// Detect blocks to unload
+				// 检测需要卸载的数据块
 				{
 					tls_missing_blocks.clear();
 					tls_found_blocks_positions.clear();
@@ -594,20 +591,19 @@ void process_data_blocks_sliding_box(
 						add_unloaded_saving_blocks(lod, to_span(*blocks_to_save).sub(to_save_index0));
 					}
 
-					// Remove loading blocks regardless of refcount (those were loaded and had their refcount reach
-					// zero)
+					// 无论引用计数如何都移除加载数据块（这些数据块已被加载且其引用计数已归零）
 					if (tls_found_blocks_positions.size() > 0) {
 						MutexLock mlock(lod.loading_blocks_mutex);
 						for (const Vector3i bpos : tls_found_blocks_positions) {
 							// emit_data_block_unloaded(bpos);
 
-							// TODO If they were loaded, why would they be in loading blocks?
-							// Maybe to make sure they are not in here regardless
+							// TODO 如果它们已加载，为什么会在加载数据块中？
+							// 也许是为了确保无论如何它们都不在这里
 							lod.loading_blocks.erase(bpos);
 						}
 					}
 
-					// Remove refcount from loading blocks, and cancel loading if it reaches zero
+					// 移除加载数据块的引用计数，若计数归零则取消加载
 					if (tls_missing_blocks.size() > 0) {
 						MutexLock mlock(lod.loading_blocks_mutex);
 						for (const Vector3i bpos : tls_missing_blocks) {
@@ -619,19 +615,19 @@ void process_data_blocks_sliding_box(
 				}
 			}
 
-			// Turned this off because I don't remember why I added it. Keeping it in case a bug occurs that could
-			// highlight why it was there.
-			// Was originally added in 17c6b1f557c5abc447cb62c200afcff1298fadff
-			// Perhaps that's in case there was updates pending in the list before we get here, so there needs to be
-			// some way of cancelling them? But with clipbox logic and multiple viewers, that no longer works
+			// 我已将其关闭，因为不记得当初为何添加它。将其保留，以防出现能揭示其
+			// 存在原因的 bug。
+			// 最初在 17c6b1f557c5abc447cb62c200afcff1298fadff 中引入
+			// 也许是为了处理在我们到达此处之前列表中已有待处理的更新，因此需要某种
+			// 取消它们的方法？但有了裁剪盒逻辑和多个观察者，这不再适用
 #if 0
-			// TODO Why do we do this here? Sounds like it should be done in the mesh clipbox logic
+			// TODO 为什么我们要在这里做这个？听起来应该在网格裁剪盒逻辑中完成
 			{
 				VOXEL_PROFILE_SCOPE_NAMED("Cancel updates");
-				// Cancel mesh block updates that are not within the padded region
-				// (since neighbors are always required to remesh)
+				// 取消不在填充区域内的网格数据块更新
+				// （因为始终需要相邻数据块来重新网格化）
 
-				// TODO This might break at terrain borders
+				// TODO 这可能会在地形边界处出错
 				const Box3i padded_new_box = new_data_box.padded(-1);
 				Box3i mesh_box;
 				if (mesh_block_size > data_block_size) {
@@ -656,31 +652,31 @@ void process_data_blocks_sliding_box(
 			}
 #endif
 
-		} // for each lod
-	} // for each viewer
+		} // 每个 lod
+	} // 每个 viewer
 
 	// state.clipbox_streaming.lod_distance_in_data_chunks_previous_update = lod_distance_in_data_chunks;
 }
 
-// TODO Copypasta from octree streaming file
+// TODO 从八叉树流式加载文件中复制的代码
 VoxelLodTerrainUpdateData::MeshBlockState &insert_new(
 		StdUnorderedMap<Vector3i, VoxelLodTerrainUpdateData::MeshBlockState> &mesh_map,
 		Vector3i pos
 ) {
 #ifdef DEBUG_ENABLED
-	// We got here because the map didn't contain the element. If it did contain it already, that's a bug.
+	// 我们之所以到这里，是因为映射中不包含该元素。若它已存在，那将是一个 bug。
 	static VoxelLodTerrainUpdateData::MeshBlockState s_default;
 	ERR_FAIL_COND_V(mesh_map.find(pos) != mesh_map.end(), s_default);
 #endif
-	// C++ standard says if the element is not present, it will be default-constructed.
-	// So here is how to insert a default, non-movable struct into an unordered_map.
+	// C++ 标准规定，若元素不存在，则会被默认构造。
+	// 因此这里演示了如何将默认的、不可移动的结构体插入到 unordered_map 中。
 	// https://stackoverflow.com/questions/22229773/map-unordered-map-with-non-movable-default-constructible-value-type
 	VoxelLodTerrainUpdateData::MeshBlockState &block = mesh_map[pos];
 
-	// This approach doesn't compile, had to workaround with the writing [] operator.
+	// 这种方法无法编译，不得不改用可写入的 [] 运算符。
 	/*
 	auto p = lod.mesh_map_state.map.emplace(pos, VoxelLodTerrainUpdateData::MeshBlockState());
-	// We got here because the map didn't contain the element. If it did contain it already, that's a bug.
+	// 我们之所以到这里，是因为映射中不包含该元素。若它已存在，那将是一个 bug。
 	CRASH_COND(p.second == false);
 	*/
 
@@ -732,7 +728,7 @@ inline void schedule_mesh_load(
 	// VOXEL_PROFILE_SCOPE();
 
 	if (mesh_block.update_list_index != -1) {
-		// Update settings before the task is scheduled
+		// 在任务被调度之前更新设置
 		VoxelLodTerrainUpdateData::MeshToUpdate &u = update_list[mesh_block.update_list_index];
 		u.require_visual |= require_visual;
 	} else {
@@ -740,7 +736,7 @@ inline void schedule_mesh_load(
 		mesh_block.update_list_index = update_list.size();
 		update_list.push_back(VoxelLodTerrainUpdateData::MeshToUpdate{ bpos, cancellation_token, require_visual });
 		mesh_block.cancellation_token = cancellation_token;
-		// TODO `MESH_UPDATE_NOT_SENT` is now redundant with `update_list_index`
+		// TODO `MESH_UPDATE_NOT_SENT` 现在与 `update_list_index` 冗余
 		mesh_block.state = VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT;
 	}
 
@@ -777,8 +773,8 @@ void view_mesh_box(
 			mesh_block = &insert_new(lod.mesh_map_state.map, bpos);
 
 			// if (is_full_load_mode) {
-			// 	// Everything is loaded up-front, so we directly trigger meshing instead of
-			// 	// reacting to data chunks being loaded
+			// 	// 由于所有内容在加载时一次性载入，因此我们直接触发网格构建，而无需
+			// 	// 等待数据块加载完成后再做出反应
 			// 	schedule_mesh_load(lod.mesh_blocks_pending_update, bpos, *mesh_block, require_visuals);
 			// }
 
@@ -799,37 +795,36 @@ void view_mesh_box(
 		}
 
 		if (first_visuals || first_collision) {
-			// TODO Optimize: don't schedule again if an update has been sent to the task system with the same options.
-			// Currently we only avoid that for requests in the list before they get sent to the task system.
-			// This could be a problem if many viewers with increasingly different options are spawned in the same area
-			// at consecutive frames.
+			// TODO 优化：若已向任务系统发送了具有相同选项的更新，则不要再次调度。
+			// 目前我们只对列表中尚未发送到任务系统的请求这样做。
+			// 若在连续帧中于同一区域生成大量选项各不相同的观察者，这可能会成为问题。
 
-			// TODO Optimize: don't trigger tasks with options we already scheduled calculations for.
-			// For example, in case there is no task in the update list, but the last scheduled ones did compute
-			// collision but not visual, if a viewer requests visuals then the scheduled task must only compute
-			// visuals. Recomputing collision is unnecessary because the mesh won't have changed in this scenario.
-			// (Voxel changes trigger an update of each refcounted option and use a different code path).
-			// We would still remesh (and so generate unedited voxel data in some cases) though, and to avoid that we'd
-			// need to keep a cache mesh data ourselves. The issue is that Godot is also caching mesh data in ArrayMesh
-			// (but for different reasons so it's not reliable), so it would come at a noticeable memory cost.
+			// TODO 优化：不要触发我们已为其调度过计算的任务。
+			// 例如，若更新列表中没有任务，但最后调度的任务计算了碰撞而未计算视觉，
+			// 当一个观察者请求视觉时，调度的任务只需计算视觉。重新计算碰撞没有必要，
+			// 因为在此场景下网格不会改变。
+			// （体素更改会触发每个引用计数选项的更新，并使用不同的代码路径）。
+			// 但我们仍然会重新网格化（在某些情况下还会生成未经编辑的体素数据），
+			// 为了避免这种情况，我们需要自己缓存网格数据。问题是 Godot 也在 ArrayMesh
+			// 中缓存网格数据（但原因不同，因此不可靠），所以这会带来可观的额外内存开销。
 
 			if (is_full_load_mode) {
-				// Everything is loaded up-front, so we have to directly trigger meshing instead of
-				// reacting to data chunks being loaded
+				// 所有内容都是预先加载的，因此我们必须直接触发网格化，而不是
+				// 响应已加载的数据块
 				schedule_mesh_load(lod.mesh_blocks_pending_update, bpos, *mesh_block, require_visuals);
 
 			} else {
-				// (Re-)Trigger meshing if data is already available.
-				// This is needed especially in streaming mode because then there won't be any "data loaded" event to
-				// react to if data is already there. Before that, meshes were updated only when a data block was loaded
-				// or modified, so changing block size or viewer flags did not make meshes appear. Having two viewer
-				// regions meet also caused problems.
+				// 若数据已可用，（重新）触发网格化。
+				// 这在流式加载模式下尤其需要，因为若数据已在那里，就不会有“数据已加载”事件可供
+				// 响应。在此之前，网格只会在数据块被加载或修改时更新，
+				// 因此更改数据块大小或观察者标志不会使网格出现。两个观察者
+				// 区域相接也会引发问题。
 
 				const Box3i data_box = Box3i(bpos * mesh_to_data_factor, Vector3iUtil::create(mesh_to_data_factor))
 											   .padded(1)
 											   .clipped(bounds_in_data_blocks);
 
-				// If we get an empty box at this point, something is wrong with the caller
+				// 若此时得到空盒子，说明调用方有问题
 				VOXEL_ASSERT_RETURN(!data_box.is_empty());
 
 				const bool data_available = voxel_data.has_all_blocks_in_area_unbound(data_box, lod_index);
@@ -837,37 +832,37 @@ void view_mesh_box(
 				if (data_available) {
 					schedule_mesh_load(lod.mesh_blocks_pending_update, bpos, *mesh_block, require_visuals);
 				}
-				// Else, we'll react to when data is loaded
+				// 否则，我们将在数据加载时作出响应
 			}
 		}
 
 #if 0
-		// TODO Trigger a mesh update with visuals if that's the first viewer with visuals.
-		// Disregard the fact a mesh update is already pending when that happens, unless it was triggered with
-		// the same flags.
+		// TODO 若这是第一个拥有视觉的观察者，则触发带视觉的网格更新。
+		// 当发生这种情况时，忽略已有待处理网格更新的事实，除非它是以
+		// 相同标志触发的。
 
-		// Trigger meshing if data is already available.
-		// This is needed because then there won't be any "data loaded" event to react to.
-		// Before that, meshes were updated only when a data block was loaded or modified,
-		// so changing block size or viewer flags did not make meshes appear. Having two
-		// viewer regions meet also caused problems.
+		// 若数据已可用则触发网格化。
+		// 这是必要的，因为否则就不会有“数据已加载”事件可供响应。
+		// 在此之前，网格只会在数据块被加载或修改时更新，
+		// 因此更改数据块大小或观察者标志不会使网格出现。两个
+		// 观察者区域相接也会引发问题。
 		//
-		// TODO This tends to suggest that data blocks should be allocated from here
-		// instead, however it would couple mesh loading to data loading, forcing to
-		// duplicate the data code path in case of viewers that don't need meshes.
+		// TODO 这似乎表明数据块应该从这里分配
+		// 而不是其他地方，但这会将网格加载与数据加载耦合，迫使在不需要网格的
+		// 观察者的情况下复制数据代码路径。
 		// try_schedule_mesh_update(*block);
-		// Alternative: in data diff, put every found block into a list which we'll also
-		// run through in `process_loaded_data_blocks_trigger_meshing`?
+		// 另一种方案：在数据差异中，将每个找到的数据块放入一个列表，我们也会在
+		// `process_loaded_data_blocks_trigger_meshing` 中遍历该列表？
 		//
 		if (!is_full_load_mode && (!mesh_block->loaded || first_visuals) &&
-				// Is an update already pending?
+				// 是否已有待处理的更新？
 				mesh_block->state != VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT &&
 				mesh_block->state != VoxelLodTerrainUpdateData::MESH_UPDATE_SENT) {
 			//
 			const Box3i data_box =
 					Box3i(bpos * mesh_to_data_factor, Vector3iUtil::create(mesh_to_data_factor)).padded(1);
 
-			// If we get an empty box at this point, something is wrong with the caller
+			// 若此时得到空盒子，说明调用方有问题
 			VOXEL_ASSERT_RETURN(!data_box.is_empty());
 
 			const bool data_available = voxel_data.has_all_blocks_in_area(data_box, lod_index);
@@ -900,7 +895,7 @@ void unview_mesh_box(
 
 			bool visual_needed;
 			if (visual_flag) {
-				visual_needed = (mesh_block.mesh_viewers.remove() > 1); // Note, remove() returns the previous count
+				visual_needed = (mesh_block.mesh_viewers.remove() > 1); // 注意，remove() 返回先前的计数
 			} else {
 				visual_needed = mesh_block.mesh_viewers.get() > 0;
 			}
@@ -913,7 +908,7 @@ void unview_mesh_box(
 			}
 
 			if (collision_needed == false && visual_needed == false) {
-				// No viewer needs this mesh anymore
+				// 不再有观察者需要此网格
 
 				if (mesh_block.cancellation_token.is_valid()) {
 					mesh_block.cancellation_token.cancel();
@@ -924,43 +919,42 @@ void unview_mesh_box(
 					mesh_block.update_list_index = -1;
 				}
 
-				// TODO What if a viewer causes unload, then another one updates afterward and would have kept the mesh
-				// loaded? That will trigger a reload, but if mesh load is fast, what if the main thread unloads the new
-				// mesh due to the old momentary unload? Very edge case, but keeping a note in case something weird
-				// happens in practice.
+				// TODO 如果一个观察者导致卸载，随后另一个观察者又更新并本会保持网格加载，
+				// 会怎样？那将触发重新加载，但如果网格加载很快，主线程是否会因为先前的
+				// 短暂卸载而卸载新网格？非常边缘的情况，但留个备忘，以防实践中出现异常。
 				lod.mesh_map_state.map.erase(mesh_block_it);
 				lod.mesh_blocks_to_unload.push_back(bpos);
 
 			} else {
-				// The block remains but we may unload one of its resources
+				// 数据块保留，但我们可以卸载其某个资源
 
 				if (visual_flag && !visual_needed) {
-					// Unload graphics to save memory
+					// 卸载图形以节省内存
 					lod.mesh_blocks_to_drop_visual.push_back(bpos);
-					// Note, `visuals_loaded` will remain true until they are actually unloaded.
+					// 注意，`visuals_loaded` 在它们真正被卸载之前将保持为 true。
 				}
 
 				if (collision_flag && !collision_needed) {
-					// Unload colliders to save memory
+					// 卸载碰撞体以节省内存
 					lod.mesh_blocks_to_drop_collision.push_back(bpos);
 				}
 			}
 		}
 	});
 
-	// Immediately show parent when children are removed.
-	// This is a cheap approach as the parent mesh will be available most of the time.
-	// However, at high speeds, if loading can't keep up, holes and overlaps will start happening in the
-	// opposite direction of movement.
+	// 当子节点被移除时立即显示父节点。
+	// 这是一种廉价的方法，因为父网格大多数时候都可用。
+	// 然而，在高速移动时，如果加载跟不上，就会在
+	// 移动的反方向开始出现空洞和重叠。
 	const unsigned int parent_lod_index = lod_index + 1;
 	if (parent_lod_index < lod_count) {
-		// Should always work without reaching zero size because non-max LODs are always
-		// multiple of 2 due to subdivision rules
+		// 应该始终有效且不会归零，因为非最大 LOD 由于细分规则
+		// 始终是 2 的倍数
 		const Box3i parent_box = Box3i(out_of_range_box.position >> 1, out_of_range_box.size >> 1);
 
 		VoxelLodTerrainUpdateData::Lod &parent_lod = state.lods[parent_lod_index];
 
-		// Show parents when children are removed
+		// 当子节点被移除时显示父节点
 		parent_box.for_each_cell([&parent_lod, //
 								  &lod, //
 								  visual_flag, //
@@ -978,11 +972,11 @@ void unview_mesh_box(
 
 			if (visual_flag) {
 				if (!mesh_block.visual_active) {
-					// Only do merging logic if child chunks were ACTUALLY removed.
-					// In multi-viewer scenarios, the clipbox might have moved away from chunks of the
-					// child LOD, but another viewer could still reference them, so we should not merge
-					// them yet.
-					// This check assumes there is always 8 children or no children
+					// 仅在子数据块确实被移除时才执行合并逻辑。
+					// 在多观察者场景中，裁剪盒可能已远离子 LOD 的数据块，
+					// 但另一个观察者仍可能引用它们，因此我们不应
+					// 立即合并它们。
+					// 此检查假定子节点要么始终有 8 个，要么没有
 					const Vector3i child_bpos0 = bpos << 1;
 					auto child_mesh0_it = lod.mesh_map_state.map.find(child_bpos0);
 
@@ -993,9 +987,9 @@ void unview_mesh_box(
 						activated = true;
 					}
 
-					// We know parent_lod_index must be > 0
+					// 我们知道 parent_lod_index 必须 > 0
 					// if (parent_lod_index > 0) {
-					// This would actually do nothing because children were removed
+					// 这实际上不会做任何事情，因为子节点已被移除
 					// hide_children_recursive(state, parent_lod_index, bpos);
 					// }
 				}
@@ -1015,21 +1009,19 @@ void unview_mesh_box(
 			}
 
 			if (activated) {
-				// Voxels of the mesh could have been modified while the mesh was inactive (notably LODs), so
-				// trigger an update.
+				// 网格的体素可能在其处于非活动状态时被修改过（尤其是 LOD），因此
+				// 触发一次更新。
 				//
-				// TODO This approach causes minor flickering. It would be nice to find a way to avoid that.
-				// After an edit and moving away from it, LOD1 meshes that don't have been updated immediately show
-				// up, and then they update, causing the flicker.
-				// The most naive option would be to update parent LOD meshes when they are inactive, but that would
-				// make edits unnecessarily expensive (and technically triggers physics updates too). Perhaps those
-				// updates could be given much lower task priority, but it remains work that isn't immediately
-				// needed.
-				// I tried to "delay" blocks switching up LODs when a clipbox moves away, but that ended up
-				// in a lot of headaches and corner cases due to states having to persist over time.
-				// That problem doesn't occur with Octree because it waits for parent meshes to be ready
-				// individually, it doesn't exploit the shape of the loaded area at all (which is partly what makes
-				// it slower)
+				// TODO 这种方法会引起轻微闪烁。希望能找到避免的方法。
+				// 在编辑后离开编辑区域，未及时更新的 LOD1 网格会立即出现，
+				// 然后它们再更新，从而引起闪烁。
+				// 最简单的方案是在父级 LOD 网格处于非活动状态时更新它们，但那样会
+				// 使编辑变得不必要地昂贵（从技术上也会触发物理更新）。也许可以给这些
+				// 更新非常低的任务优先级，但这仍然是并非立即可需要的工作。
+				// 我曾尝试在裁剪盒移开时“延迟”数据块切换 LOD，但由于状态需要随时间
+				// 持续，最终导致大量麻烦和边缘情况。
+				// 这个问题在八叉树中不会出现，因为它逐个等待父网格就绪，
+				// 完全不会利用已加载区域的形状（这在一定程度上也是它更慢的原因）
 				if (mesh_block.state == VoxelLodTerrainUpdateData::MESH_NEED_UPDATE) {
 					mesh_block.state = VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT;
 					mesh_block.update_list_index = parent_lod.mesh_blocks_pending_update.size();
@@ -1064,10 +1056,10 @@ void process_viewer_mesh_blocks_sliding_box(
 	Box3i debug_parent_box;
 #endif
 
-	// TODO Optimize: when a viewer doesn't need visuals, we only need to build meshes for collisions up to a certain
-	// LOD (collision max LOD property). That would be an optimization for servers, NPCs and player hosts
+	// TODO 优化：当观察者不需要视觉时，我们只需为碰撞构建网格直到某个
+	// LOD（碰撞最大 LOD 属性）。这将是针对服务器、NPC 和玩家主机的优化
 
-	// Iterating from big to small LOD so we can exit earlier if bounds don't intersect.
+	// 从大 LOD 向小 LOD 迭代，以便在边界不相交时提前退出。
 	for (int lod_index = lod_count - 1; lod_index >= 0; --lod_index) {
 		VOXEL_PROFILE_SCOPE();
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
@@ -1099,14 +1091,14 @@ void process_viewer_mesh_blocks_sliding_box(
 		// 									.clipped(bounds_in_mesh_blocks);
 
 		if (!new_mesh_box.intersects(bounds_in_mesh_blocks) && !prev_mesh_box.intersects(bounds_in_mesh_blocks)) {
-			// If this box doesn't intersect either now or before, there is no chance a smaller one will
+			// 若此盒子现在或之前都不相交，则更小的盒子也不会有机会相交
 			break;
 		}
 
 		if (prev_mesh_box != new_mesh_box) {
 			RWLockWrite wlock(lod.mesh_map_state.map_lock);
 
-			// Add meshes entering range
+			// 添加进入范围的网格
 			if (requires_meshes(paired_viewer.state) && can_load) {
 				SmallVector<Box3i, 6> new_mesh_boxes;
 				new_mesh_box.difference_to_vec(prev_mesh_box, new_mesh_boxes);
@@ -1125,7 +1117,7 @@ void process_viewer_mesh_blocks_sliding_box(
 				}
 			}
 
-			// Remove meshes out or range
+			// 移除超出范围的网格
 			if (requires_meshes(paired_viewer.prev_state)) {
 				SmallVector<Box3i, 6> old_mesh_boxes;
 				prev_mesh_box.difference_to_vec(new_mesh_box, old_mesh_boxes);
@@ -1137,7 +1129,7 @@ void process_viewer_mesh_blocks_sliding_box(
 							lod_index,
 							lod_count,
 							state,
-							// Use previous state because old boxes were loaded because of them
+							// 使用上一个状态，因为旧盒子是由它们加载的
 							paired_viewer.prev_state.requires_visuals,
 							paired_viewer.prev_state.requires_collisions
 					);
@@ -1145,19 +1137,19 @@ void process_viewer_mesh_blocks_sliding_box(
 			}
 		}
 
-		// Handle viewer flags changes at runtime. However I can't think of a use case at the moment, outside of
-		// temporary editor stuff. It should be rare, or just never happen.
-		// This operates on a DISTINCT set of blocks than the one above.
-		// Also, this won't do anything on new viewers that have no previous state, because the previous box will be
-		// empty.
+		// 处理观察者标志在运行时的变化。不过，除了临时的编辑器操作之外，我暂时想不到
+		// 什么使用场景。这种情况应该很少见，或者根本不会发生。
+		// 这操作的是与上述不同的数据块集合。
+		// 另外，对于没有先前状态的新观察者，这不会做任何事情，因为上一个盒子将是
+		// 空的。
 		if (!Vector3iUtil::is_empty_size(prev_mesh_box.size)) {
 			if (paired_viewer.state.requires_collisions != paired_viewer.prev_state.requires_collisions) {
 				const Box3i box = new_mesh_box.clipped(prev_mesh_box);
 				if (paired_viewer.state.requires_collisions) {
-					// Add refcount to just collisions
+					// 仅增加碰撞的引用计数
 					view_mesh_box(box, lod, lod_index, is_full_load_mode, mesh_to_data_factor, data, false, true);
 				} else {
-					// Remove refcount to just collisions
+					// 仅移除碰撞的引用计数
 					unview_mesh_box(box, lod, lod_index, lod_count, state, false, true);
 				}
 			}
@@ -1174,7 +1166,7 @@ void process_viewer_mesh_blocks_sliding_box(
 
 		// {
 		// 	VOXEL_PROFILE_SCOPE_NAMED("Cancel updates");
-		// 	// Cancel block updates that are not within the new region
+		// 	// 取消不在新区域内的区块更新
 		// 	unordered_remove_if(lod.mesh_blocks_pending_update,
 		// 			[new_mesh_box](const VoxelLodTerrainUpdateData::MeshToUpdate &mtu) { //
 		// 				return !new_mesh_box.contains(mtu.position);
@@ -1203,8 +1195,8 @@ void process_mesh_blocks_sliding_box(
 	const int mesh_to_data_factor = mesh_block_size / data_block_size;
 
 	for (const VoxelLodTerrainUpdateData::PairedViewer &paired_viewer : state.clipbox_streaming.paired_viewers) {
-		// Only update around viewers that need meshes.
-		// Check previous state too in case we have to handle them changing
+		// 只围绕需要网格的观察者进行更新。
+		// 也要检查上一个状态，以防需要处理它们的变化
 		if (requires_meshes(paired_viewer.state) || requires_meshes(paired_viewer.prev_state)) {
 			process_viewer_mesh_blocks_sliding_box(
 					state,
@@ -1231,17 +1223,16 @@ void process_loaded_data_blocks_trigger_meshing(
 		const Box3i bounds_in_voxels
 ) {
 	VOXEL_PROFILE_SCOPE();
-	// This function should only be used when data streaming is on.
-	// When everything is loaded, there is also the assumption that blocks can be generated on the fly, so loading
-	// events come in sparsely for only edited areas. So it doesn't make much sense to trigger meshing in reaction to
-	// data loading.
+	// 此函数只应在数据流式加载开启时使用。
+	// 当所有内容都已加载时，还假定数据块可以即时生成，因此加载事件只会
+	// 稀疏地出现在已编辑区域。所以在响应数据加载时触发网格化没有多大意义。
 	VOXEL_ASSERT_RETURN(data.is_streaming_enabled());
 
 	const int mesh_block_size_po2 = settings.mesh_block_size_po2;
 
 	VoxelLodTerrainUpdateData::ClipboxStreamingState &clipbox_streaming = state.clipbox_streaming;
 
-	// Get list of data blocks that were loaded since the last update
+	// 获取自上次更新以来加载的数据块列表
 	static thread_local StdVector<VoxelLodTerrainUpdateData::BlockLocation> tls_loaded_blocks;
 	tls_loaded_blocks.clear();
 	{
@@ -1250,16 +1241,16 @@ void process_loaded_data_blocks_trigger_meshing(
 		clipbox_streaming.loaded_data_blocks.clear();
 	}
 
-	// TODO Pool memory
+	// TODO 内存池化
 	FixedArray<StdUnorderedSet<Vector3i>, constants::MAX_LOD> checked_mesh_blocks_per_lod;
 
 	const int data_to_mesh_shift = mesh_block_size_po2 - data.get_block_size_po2();
 
 	for (VoxelLodTerrainUpdateData::BlockLocation bloc : tls_loaded_blocks) {
 		// VOXEL_PROFILE_SCOPE_NAMED("Block");
-		// Multiple mesh blocks may be interested because of neighbor dependencies.
+		// 由于相邻依赖，可能有多个网格数据块感兴趣。
 
-		// We could group loaded blocks by LOD so we could compute a few things less times?
+		// 我们可以按 LOD 对已加载的数据块进行分组，从而减少一些计算次数？
 		const int lod_data_block_size_po2 = data.get_block_size_po2() + bloc.lod;
 		const Box3i bounds_in_data_blocks =
 				Box3i(bounds_in_voxels.position >> lod_data_block_size_po2,
@@ -1283,25 +1274,25 @@ void process_loaded_data_blocks_trigger_meshing(
 
 			const Vector3i mesh_block_pos = data_bpos >> data_to_mesh_shift;
 			if (!checked_mesh_blocks.insert(mesh_block_pos).second) {
-				// Already checked
+				// 已检查过
 				return;
 			}
 
-			// We don't add/remove items from the map here, and only the update task can do that, so no need
-			// to lock
+			// 我们不会在这里向映射添加/移除条目，只有更新任务可以这样做，因此无需
+			// 加锁
 			// RWLockRead rlock(lod.mesh_map_state.map_lock);
 			auto mesh_it = lod.mesh_map_state.map.find(mesh_block_pos);
 			if (mesh_it == lod.mesh_map_state.map.end()) {
-				// Not requested
+				// 未被请求
 				return;
 			}
 			VoxelLodTerrainUpdateData::MeshBlockState &mesh_block = mesh_it->second;
 			const VoxelLodTerrainUpdateData::MeshState mesh_state = mesh_block.state;
 
-			// TODO Check if there is more flags to compute with the mesh (collider? rendering?)
+			// TODO 检查网格是否还有更多需要计算的标志（碰撞体？渲染？）
 			if (mesh_state != VoxelLodTerrainUpdateData::MESH_NEED_UPDATE &&
 				mesh_state != VoxelLodTerrainUpdateData::MESH_NEVER_UPDATED) {
-				// Already updated or updating
+				// 已更新或正在更新
 				return;
 			}
 
@@ -1310,7 +1301,7 @@ void process_loaded_data_blocks_trigger_meshing(
 			const Box3i data_box = Box3i((mesh_block_pos << data_to_mesh_shift) - Vector3i(1, 1, 1),
 										 Vector3iUtil::create((1 << data_to_mesh_shift) + 2))
 										   .clipped(bounds_in_data_blocks);
-			// TODO Do a single grid query up-front, they will overlap so we do redundant lookups!
+			// TODO 预先执行一次网格查询，它们会重叠，因此我们在做冗余查找！
 			data_available = data.has_all_blocks_in_area_unbound(data_box, lod_index);
 			// } else {
 			// 	if (!data.is_full_load_completed()) {
@@ -1322,8 +1313,8 @@ void process_loaded_data_blocks_trigger_meshing(
 				schedule_mesh_load(
 						lod.mesh_blocks_pending_update, mesh_block_pos, mesh_block, mesh_block.mesh_viewers.get() > 0
 				);
-				// We assume data blocks won't unload after this, until data is gathered, because unloading
-				// runs before this logic.
+				// 我们假定此后数据块不会卸载，直到数据被收集，因为卸载
+				// 在此逻辑之前运行。
 			}
 		});
 	}
@@ -1446,8 +1437,8 @@ void set_inactive(
 	}
 }
 
-// Activates mesh blocks when they are loaded. Activates higher LODs and hides lower LODs when possible.
-// This essentially runs octree subdivision logic, but only from a specific node and its descendants.
+// 当网格数据块加载完成时激活它们。在可能的情况下激活更高 LOD 并隐藏更低 LOD。
+// 这实质上运行八叉树细分逻辑，但仅从特定节点及其后代开始。
 void update_mesh_block_load(
 		VoxelLodTerrainUpdateData::State &state,
 		Vector3i bpos,
@@ -1467,14 +1458,14 @@ void update_mesh_block_load(
 		return;
 	}
 
-	// The mesh is loaded in specified flags
+	// 网格已按指定标志加载
 
 	const unsigned int parent_lod_index = lod_index + 1;
 	if (parent_lod_index == lod_count) {
-		// Root
-		// We don't need to bother about subdivison rules here (no need to check siblings) because there is no parent
+		// 根节点
+		// 这里无需担心细分规则（无需检查兄弟节点），因为没有父节点
 
-		// TODO Don't activate a block if it is already subdivided
+		// TODO 若数据块已被细分，则不要激活它
 		set_active(mesh_block, feature_index, lod, bpos);
 
 		if (lod_index > 0) {
@@ -1486,8 +1477,8 @@ void update_mesh_block_load(
 		}
 
 	} else {
-		// Not root
-		// We'll have to consider siblings since we can't activate only one at a time, it has to be all or none
+		// 非根节点
+		// 我们必须考虑兄弟节点，因为不能一次只激活一个，必须是全有或全无
 
 		const Vector3i parent_bpos = bpos >> 1;
 		VoxelLodTerrainUpdateData::Lod &parent_lod = state.lods[parent_lod_index];
@@ -1496,8 +1487,8 @@ void update_mesh_block_load(
 		// if (parent_mesh_it == parent_lod.mesh_map_state.map.end()) {
 		// 	debug_dump_mesh_maps(state, lod_count);
 		// }
-		// The parent must exist because sliding boxes contain each other. Maybe in the future that won't always be true
-		// if a viewer has special behavior?
+		// 父节点必须存在，因为滑动盒子相互包含。也许将来并不总是如此，
+		// 如果观察者有特殊行为的话？
 		VOXEL_ASSERT_RETURN_MSG(
 				parent_mesh_it != parent_lod.mesh_map_state.map.end(), "Expected parent due to subdivision rules, bug?"
 		);
@@ -1507,14 +1498,14 @@ void update_mesh_block_load(
 		if (is_active(parent_mesh_block, feature_index)) {
 			bool all_siblings_loaded = true;
 
-			// Test if all siblings are loaded
-			// TODO This needs to be optimized. Store a cache in parent?
+			// 测试所有兄弟节点是否都已加载
+			// TODO 这需要优化。在父节点中存储缓存？
 			for (unsigned int sibling_index = 0; sibling_index < 8; ++sibling_index) {
 				const Vector3i sibling_bpos = get_child_position(parent_bpos, sibling_index);
 				auto sibling_it = lod.mesh_map_state.map.find(sibling_bpos);
 				if (sibling_it == lod.mesh_map_state.map.end()) {
-					// Finding this in the mesh map would be weird due to subdivision rules. We don't expect a sibling
-					// to be missing, because every mesh block always has 8 children.
+					// 由于细分规则，在网格映射中找到这个会很奇怪。我们不期望兄弟节点
+					// 缺失，因为每个网格数据块始终有 8 个子节点。
 					VOXEL_PRINT_ERROR("Didn't expect missing sibling");
 					all_siblings_loaded = false;
 					break;
@@ -1527,20 +1518,20 @@ void update_mesh_block_load(
 			}
 
 			if (all_siblings_loaded) {
-				// Hide parent
+				// 隐藏父节点
 				set_inactive(parent_mesh_block, feature_index, parent_lod, parent_bpos);
 
-				// Show siblings
+				// 显示兄弟节点
 				for (unsigned int sibling_index = 0; sibling_index < 8; ++sibling_index) {
 					const Vector3i sibling_bpos = get_child_position(parent_bpos, sibling_index);
 					auto sibling_it = lod.mesh_map_state.map.find(sibling_bpos);
 					VoxelLodTerrainUpdateData::MeshBlockState &sibling = sibling_it->second;
-					// TODO Optimize: if that sibling itself subdivides, it should not need to be made visible.
-					// Maybe make `update_mesh_block_load` return that info so we can avoid scheduling activation?
+					// TODO 优化：若该兄弟节点自身会被细分，则无需将其设为可见。
+					// 也许可以让 `update_mesh_block_load` 返回该信息，从而避免调度激活？
 					set_active(sibling, feature_index, lod, sibling_bpos);
 
 					if (lod_index > 0) {
-						// Check if children are loaded too
+						// 检查子节点是否也已加载
 						const unsigned int child_lod_index = lod_index - 1;
 						for (unsigned int child_index = 0; child_index < 8; ++child_index) {
 							const Vector3i child_bpos = get_child_position(sibling_bpos, child_index);
@@ -1561,23 +1552,23 @@ void process_loaded_mesh_blocks_trigger_visibility_changes(
 
 	VoxelLodTerrainUpdateData::ClipboxStreamingState &clipbox_streaming = state.clipbox_streaming;
 
-	// Get list of mesh blocks that were loaded since the last update
-	// TODO Candidate for TempAllocator
+	// 获取自上次更新以来加载的网格数据块列表
+	// TODO 可考虑用于 TempAllocator
 	static thread_local StdVector<VoxelLodTerrainUpdateData::LoadedMeshBlockEvent> tls_loaded_blocks;
 	tls_loaded_blocks.clear();
 	{
-		// If this has contention, we can afford trying to lock and skip if it fails
+		// 如果这里有争用，我们可以尝试加锁并在失败时跳过
 		MutexLock mlock(clipbox_streaming.loaded_mesh_blocks_mutex);
 		append_array(tls_loaded_blocks, clipbox_streaming.loaded_mesh_blocks);
 		clipbox_streaming.loaded_mesh_blocks.clear();
 	}
 
 	for (const VoxelLodTerrainUpdateData::LoadedMeshBlockEvent event : tls_loaded_blocks) {
-		// TODO This isn't optimal. Cost of doing this is doubled if we want both visual and collision.
+		// TODO 这并非最优。若同时需要视觉和碰撞，执行此操作的成本会翻倍。
 		if (event.visual) {
 			update_mesh_block_load(state, event.position, event.lod_index, lod_count, MESH_VISUAL);
 		}
-		// TODO We should not need to run this at LODs that have no collision
+		// TODO 我们不应在没有碰撞的 LOD 上运行此操作
 		if (event.collision) {
 			update_mesh_block_load(state, event.position, event.lod_index, lod_count, MESH_COLLIDER);
 		}
@@ -1587,17 +1578,16 @@ void process_loaded_mesh_blocks_trigger_visibility_changes(
 		uint32_t lods_to_update_transitions = 0;
 		for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 			VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
-			// Only update transition masks when visuals change, this is a rendering feature
+			// 仅在视觉变化时更新过渡掩码，这是一个渲染特性
 			if (lod.mesh_blocks_to_activate_visuals.size() > 0 || lod.mesh_blocks_to_deactivate_visuals.size() > 0) {
 				lods_to_update_transitions |= (0b111 << lod_index);
 			}
 		}
-		// TODO This is quite slow (see implementation).
-		// Maybe there is a way to optimize it with the clipbox logic (updates could be grouped per new/old boxes,
-		// however it wouldn't work as-is because mesh updates take time before they actually become visible. Could
-		// also update masks incrementally somehow?). The initial reason this streaming system was added was to help
-		// with server-side performance. This feature is client-only, so it didn't need to be optimized too at the
-		// moment.
+		// TODO 这相当慢（参见实现）。
+		// 也许可以用裁剪盒逻辑来优化（更新可以按新/旧盒子分组，
+		// 但现状不可行，因为网格更新需要时间才能真正可见。也许
+		// 也可以以某种方式增量更新掩码？）。最初添加此流式加载系统是为了帮助
+		// 提升服务器端性能。此功能仅限客户端，所以暂时不需要过度优化。
 		update_transition_masks(state, lods_to_update_transitions, lod_count, true);
 	}
 }
@@ -1643,10 +1633,10 @@ void process_clipbox_streaming(
 		);
 	} else {
 		if (full_load_completed == false) {
-			// Don't do anything until things are loaded, because we'll trigger meshing directly when mesh blocks get
-			// created. If we let this happen before, mesh blocks will get created but we won't have a way to tell when
-			// to trigger meshing per block. If we need to do that in the future though, we could diff the "fully
-			// loaded" state and iterate all mesh blocks when it becomes true?
+			// 在加载完成之前不做任何事情，因为当网格数据块被创建时我们会直接触发网格化。
+			// 如果在此之前运行，网格数据块会被创建，但我们将无法判断何时
+			// 对每个数据块触发网格化。不过，如果将来需要这样做，我们可以在
+			// “完全加载”状态变为 true 时对其进行差异对比并迭代所有网格数据块？
 			return;
 		}
 	}
@@ -1655,13 +1645,12 @@ void process_clipbox_streaming(
 			state, settings, bounds_in_voxels, lod_count, !streaming_enabled, can_load, data, 1 << data_block_size_po2
 	);
 
-	// Removing paired viewers after box diffs because we interpret viewer removal as boxes becoming zero-size, so we
-	// need one processing step to handle that before actually removing them
+	// 在盒子差异之后移除配对观察者，因为我们将观察者移除解释为盒子大小归零，因此
+	// 在真正移除它们之前，需要一步处理来应对这一点
 	remove_unpaired_viewers(unpaired_viewers_to_remove, state.clipbox_streaming.paired_viewers);
 
 	if (streaming_enabled) {
-		// TODO Have an option to turn off meshing entirely (may be useful on servers if the game doesn't use mesh
-		// colliders)
+		// TODO 提供完全关闭网格化的选项（如果游戏不使用网格碰撞体，对服务器可能有用）
 		process_loaded_data_blocks_trigger_meshing(data, state, settings, bounds_in_voxels);
 	}
 

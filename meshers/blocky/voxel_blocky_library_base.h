@@ -10,9 +10,9 @@
 
 namespace voxel {
 
-// Base class for libraries that can be used with VoxelMesherBlocky.
-// A library provides a set of pre-processed models that can be efficiently batched into a voxel mesh.
-// Depending on the type of library, these models are provided differently.
+// 可与 VoxelMesherBlocky 一起使用的库的基类。
+// 库提供一组预处理过的模型，这些模型可以高效地批量合并进体素网格。
+// 根据库的类型不同，这些模型的提供方式也不同。
 class VoxelBlockyLibraryBase : public Resource {
 	GDCLASS(VoxelBlockyLibraryBase, Resource)
 
@@ -36,7 +36,7 @@ public:
 	virtual void bake();
 
 	//-------------------------
-	// Internal use
+	// 内部使用
 
 	const blocky::BakedLibrary &get_baked_data() const {
 		return _baked_data;
@@ -53,8 +53,8 @@ public:
 #endif
 
 private:
-	// Convenience method to get all indexed materials after baking,
-	// which can be passed to VoxelMesher::build for testing
+	// 获取烘焙后所有已索引材质的便捷方法，
+	// 可传给 VoxelMesher::build 用于测试
 	TypedArray<Material> _b_get_materials() const;
 	void _b_bake();
 
@@ -65,11 +65,10 @@ protected:
 	bool _needs_baking = true;
 	bool _bake_tangents = true;
 
-	// Used in multithread context by the mesher. Don't modify that outside of bake().
+	// 网格生成器在多线程环境中使用。除 bake() 外不要修改它。
 	RWLock _baked_data_rw_lock;
 	blocky::BakedLibrary _baked_data;
-	// One of the entries can be null to represent "The default material". If all non-empty models have materials, there
-	// won't be a null entry.
+	// 其中一个条目可以为 null，表示"默认材质"。如果所有非空模型都有材质，则不会有 null 条目。
 	StdVector<Ref<Material>> _indexed_materials;
 };
 

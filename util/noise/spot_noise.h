@@ -8,16 +8,16 @@
 
 namespace voxel::SpotNoise {
 
-// Very specialized kind of cellular noise for generating "spots" in a grid. Typical use case is ores in terrain.
-// There are limitations, but they should not be noticeable for this use case.
-// This implementation should be mostly self-contained and usable in GLSL too.
+// 一种非常特殊的细胞噪声，用于在网格中生成"斑点"。典型用途是地形中的矿脉。
+// 它有一些局限，但对于这个用途来说应该不会很明显。
+// 这个实现应当基本是自包含的，也可以在 GLSL 中使用。
 
-// Spot noise divides space into a grid, where each cell contains a "spot" at a random location. A distance is computed
-// to return wether or not we are inside the spot. Unlike common cellular noise, "spot noise" does not lookup neighbor
-// cells, so maximum jitter will cut-off the spots. However, the use case of ore generation makes the spots very sparse,
-// so we can afford reducing jitter just enough. Not having to lookup neighbors makes the algorithm faster. There will
-// be axis-aligned planes in which no spots can ever be found, but it's usually not an issue and can be masked with some
-// coordinate displacement.
+// 斑点噪声把空间划分为网格，每个格子包含一个位于随机位置的"斑点"。计算距离
+// 以判断我们是否在斑点内部。与常见的细胞噪声不同，"斑点噪声"不查询相邻
+// 格子，所以最大抖动会把斑点截断。不过，矿脉生成的用途使斑点非常稀疏，
+// 所以我们可以把抖动减小到恰到好处。不必查询邻居使算法更快。总会存在
+// 一些沿坐标轴的平面永远找不到斑点，但这通常不是问题，而且可以用一些
+// 坐标位移来掩盖。
 
 typedef Vector2i ivec2;
 typedef Vector3i ivec3;
@@ -28,21 +28,21 @@ const int PRIME_X = 501125321;
 const int PRIME_Y = 1136930381;
 const int PRIME_Z = 1720413743;
 
-// Derived from FastNoiseLite's cellular noise.
+// 派生自 FastNoiseLite 的细胞噪声。
 inline int hash2(Vector2i p, int seed) {
 	int hash = seed ^ (p.x * PRIME_X) ^ (p.y * PRIME_Y);
 	hash *= 0x27d4eb2d;
 	return hash;
 }
 
-// Derived from FastNoiseLite's cellular noise.
+// 派生自 FastNoiseLite 的细胞噪声。
 inline int hash3(ivec3 p, int seed) {
 	int hash = seed ^ (p.x * PRIME_X) ^ (p.y * PRIME_Y) ^ (p.z * PRIME_Z);
 	hash *= 0x27d4eb2d;
 	return hash;
 }
 
-// Standalone grid hash functions could be used in the future. Commenting for now cuz they are not used, yet
+// 独立的网格哈希函数将来可能会用到。暂时注释掉，因为它们还没被使用
 
 // inline float grid_hash_2d(vec2 pos, float cell_size, int seed) {
 // 	ivec2 pi = to_vec2i(math::floor(pos / cell_size));
@@ -63,12 +63,12 @@ inline int hash3(ivec3 p, int seed) {
 // }
 
 inline vec2 hash_to_vec2(int h) {
-	// 65536 possible locations along each axis
+	// 每个轴上有 65536 个可能位置
 	return to_vec2f(ivec2(h, h >> 16) & 0xffff) / 65535.0;
 }
 
 inline vec3 hash_to_vec3(int h) {
-	// 1024 possible locations along each axis
+	// 每个轴上有 1024 个可能位置
 	return to_vec3f(ivec3(h, h >> 10, h >> 20) & 0x3ff) / 1024.0;
 }
 
@@ -156,17 +156,17 @@ inline math::Interval spot_noise_2d_range(
 	ivec2 max_cell_origin_norm_i = to_vec2i(max_cell_origin_norm);
 
 	if (Vector2iUtil::get_area(max_cell_origin_norm_i - min_cell_origin_norm_i + ivec2(1, 1)) > 10) {
-		// Don't bother checking too many cells, assume we'll intersect a spot.
+		// 不要费心检查太多格子，假定我们一定会与某个斑点相交。
 		return math::Interval(0, 1);
 	}
 
 	vec2 box_size(pos.x.max - pos.x.min, pos.y.max - pos.y.min);
 	if (math::min(box_size.x, box_size.y) >= 2.f * cell_size) {
-		// We will intersect a spot.
+		// 我们一定会与某个斑点相交。
 		return math::Interval(0, 1);
 	}
 
-	// Check all cells intersecting with the area, and find if any spot intersects with it
+	// 检查所有与该区域相交的格子，看是否有斑点与它相交
 	for (int yi = min_cell_origin_norm_i.y; yi <= max_cell_origin_norm_i.y; ++yi) {
 		for (int xi = min_cell_origin_norm_i.x; xi <= max_cell_origin_norm_i.x; ++xi) {
 			int h = hash2(ivec2(xi, yi), seed);
@@ -202,17 +202,17 @@ inline math::Interval spot_noise_3d_range(
 	ivec3 max_cell_origin_norm_i = to_vec3i(max_cell_origin_norm);
 
 	if (Vector3iUtil::get_volume_u64(max_cell_origin_norm_i - min_cell_origin_norm_i + ivec3(1, 1, 1)) > 30) {
-		// Don't bother checking too many cells, assume we'll intersect a spot.
+		// 不要费心检查太多格子，假定我们一定会与某个斑点相交。
 		return math::Interval(0, 1);
 	}
 
 	vec3 box_size(pos.x.max - pos.x.min, pos.y.max - pos.y.min, pos.z.max - pos.z.min);
 	if (math::min(box_size.x, math::min(box_size.y, box_size.z)) >= 2.f * cell_size) {
-		// We will intersect a spot.
+		// 我们一定会与某个斑点相交。
 		return math::Interval(0, 1);
 	}
 
-	// Check all cells intersecting with the area, and find if any spot intersects with it
+	// 检查所有与该区域相交的格子，看是否有斑点与它相交
 	for (int zi = min_cell_origin_norm_i.z; zi <= max_cell_origin_norm_i.z; ++zi) {
 		for (int yi = min_cell_origin_norm_i.y; yi <= max_cell_origin_norm_i.y; ++yi) {
 			for (int xi = min_cell_origin_norm_i.x; xi <= max_cell_origin_norm_i.x; ++xi) {

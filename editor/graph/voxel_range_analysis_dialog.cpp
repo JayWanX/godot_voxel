@@ -26,8 +26,8 @@ VoxelRangeAnalysisDialog::VoxelRangeAnalysisDialog() {
 	vb->add_child(_enabled_checkbox);
 
 	Label *tip = memnew(Label);
-	// TODO Had to use `\n` and disable autowrap, otherwise the popup height becomes crazy high
-	// See https://github.com/godotengine/godot/issues/47005
+	// TODO 不得不使用 `\n` 并禁用自动换行，否则弹窗高度会变得离谱
+	// 参见 https://github.com/godotengine/godot/issues/47005
 	tip->set_text(
 			VOXEL_TTR("When enabled, hover node output labels to\ninspect their "
 				   "estimated range within the\nconfigured area.\n"

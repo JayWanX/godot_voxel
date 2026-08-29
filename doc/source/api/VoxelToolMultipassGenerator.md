@@ -1,24 +1,24 @@
 # VoxelToolMultipassGenerator
 
-Inherits: [VoxelTool](VoxelTool.md)
+继承自：[VoxelTool](VoxelTool.md)
 
-Provided to edit voxels in the context of multipass terrain generation.
+用于在多通道地形生成上下文中编辑体素。
 
-## Description: 
+## 描述：
 
-This tool allows to edit voxels within a 3D box, centered on a specific area corresponding to the current chunk or column to generate.
+此工具允许在 3D 长方体内部编辑体素，该长方体以与要生成的当前数据块或列相对应的特定区域为中心。
 
-Depending on context, it is also possible to edit voxels some distance away from the main area.
+根据上下文，还可以编辑距离主区域一定距离的体素。
 
-The difference between "main" and "total" areas, is that the "main" area is where you should generate stuff, while the "total area" is only available in case what you generate needs to overlap outside of the main area.
-
-
-Instances of this class are temporary and not thread-safe. They must never be re-used or stored in a member variable.
-
-## Methods: 
+“主”区域与“总”区域的区别在于，“主”区域是应该生成内容的地方，而“总”区域仅在你生成的内容需要与主区域外部重叠时可用。
 
 
-Return                                                                          | Signature                                                   
+此类的实例是临时的，并且不是线程安全的。它们绝不能重复使用或存储在成员变量中。
+
+## 方法：
+
+
+返回值                                                                             | 函数签名                                                        
 ------------------------------------------------------------------------------- | ------------------------------------------------------------
 [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)  | [get_editable_area_max](#i_get_editable_area_max) ( ) const 
 [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)  | [get_editable_area_min](#i_get_editable_area_min) ( ) const 
@@ -26,22 +26,22 @@ Return                                                                          
 [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)  | [get_main_area_min](#i_get_main_area_min) ( ) const         
 <p></p>
 
-## Method Descriptions
+## 方法描述
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_get_editable_area_max"></span> **get_editable_area_max**( ) 
 
-Gets the upper corner of the total editable area, in voxels, exclusive.
+获取总可编辑区域的上角，单位为体素，不包含该角。
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_get_editable_area_min"></span> **get_editable_area_min**( ) 
 
-Gets the lower corner of the total editable area, in voxels.
+获取总可编辑区域的下角，单位为体素。
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_get_main_area_max"></span> **get_main_area_max**( ) 
 
-Gets the upper corner of the main editable area, in voxels, exclusive.
+获取主可编辑区域的上角，单位为体素，不包含该角。
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_get_main_area_min"></span> **get_main_area_min**( ) 
 
-Gets the lower corner of the main editable area, in voxels.
+获取主可编辑区域的下角，单位为体素。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

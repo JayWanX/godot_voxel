@@ -42,7 +42,7 @@ void copy_from_chunked_storage(
 				if (src_buffer != nullptr) {
 					for (const uint8_t channel : channels) {
 						dst_buffer.set_channel_depth(channel, src_buffer->get_channel_depth(channel));
-						// Note: copy_from takes care of clamping the area if it's on an edge
+						// 注意：copy_from 会处理区域位于边缘时的钳制
 						dst_buffer.copy_channel_from(
 								*src_buffer, min_pos - src_block_origin, src_buffer->get_size(), Vector3i(), channel
 						);
@@ -58,8 +58,8 @@ void copy_from_chunked_storage(
 
 				} else {
 					for (const uint8_t channel : channels) {
-						// For now, inexistent blocks default to hardcoded defaults, corresponding to "empty space".
-						// If we want to change this, we may have to add an API for that.
+						// 目前，不存在的块默认使用硬编码的默认值，对应“空空间”。
+						// 如果我们要改变这一点，可能需要为此添加一个 API。
 						dst_buffer.fill_area(
 								VoxelBuffer::get_default_raw_value(
 										static_cast<VoxelBuffer::ChannelId>(channel),
@@ -158,7 +158,7 @@ void run_blocky_random_tick(
 
 	const int block_count = math::ceildiv(voxel_count, batch_count);
 
-	// Handle remainder in case voxel count is not a multiple of batch count
+	// 处理体素数量不是批次数量倍数时的余数
 	const int batch_rem = voxel_count % batch_count;
 	const int last_batch_count = batch_rem > 0 ? batch_rem : batch_count;
 
@@ -169,7 +169,7 @@ void run_blocky_random_tick(
 		uint64_t value;
 		Vector3i rpos;
 	};
-	// TODO Candidate for temp allocator
+	// TODO 可作为临时分配器的候选
 	static thread_local StdVector<Pick> picks;
 	picks.reserve(batch_count);
 
@@ -190,7 +190,7 @@ void run_blocky_random_tick(
 
 	const blocky::BakedLibrary &lib_data = lib.get_baked_data();
 
-	// Choose blocks at random
+	// 随机选择块
 	for (int block_index = 0; block_index < block_count; ++block_index) {
 		const Vector3i block_pos = block_box.position + L::urand_vec3i(random, block_box.size);
 
@@ -205,7 +205,7 @@ void run_blocky_random_tick(
 			std::shared_ptr<VoxelBuffer> voxels_ptr = data.try_get_block_voxels(block_pos);
 
 			if (voxels_ptr != nullptr) {
-				// Doing ONLY reads here.
+				// 这里只进行读取。
 				const VoxelBuffer &voxels = *voxels_ptr;
 
 				if (voxels.get_channel_compression(channel) == VoxelBuffer::COMPRESSION_UNIFORM) {
@@ -213,7 +213,7 @@ void run_blocky_random_tick(
 					if (lib_data.has_model(v)) {
 						const blocky::BakedModel &vt = lib_data.models[v];
 						if (vt.is_random_tickable == false || (vt.tags_mask & tags_mask) == 0) {
-							// Skip whole block
+							// 跳过整个块
 							continue;
 						}
 					}
@@ -227,8 +227,8 @@ void run_blocky_random_tick(
 						(block_index == block_count - 1 ? last_batch_count : batch_count);
 				const int local_batch_count = Math::ceil(local_batch_count_full_block * volume_ratio);
 
-				// Choose a bunch of voxels at random within the block.
-				// Batching this way improves performance a little by reducing block lookups.
+				// 在块内随机选择一批体素。
+				// 这样分批处理通过减少块查找次数，略微提升性能。
 				for (int vi = 0; vi < local_batch_count; ++vi) {
 					const Vector3i rpos = local_voxel_box.position + L::urand_vec3i(random, local_voxel_box.size);
 
@@ -238,9 +238,9 @@ void run_blocky_random_tick(
 			}
 		}
 
-		// The following may or may not read AND write voxels randomly due to its exposition to scripts.
-		// However, we don't send the buffer directly, so it will go through an API taking care of locking.
-		// So we don't (and shouldn't) lock anything here.
+		// 由于向脚本开放，以下操作可能随机读取和写入体素。
+		// 不过我们不直接发送缓冲区，而是通过负责加锁的 API。
+		// 所以我们在这里不需要（也不应该）加锁。
 		for (size_t i = 0; i < picks.size(); ++i) {
 			const Pick pick = picks[i];
 
@@ -290,12 +290,12 @@ void run_blocky_random_tick(
 				args[0] = &vpos;
 				args[1] = &vv;
 				Callable::CallError error;
-				Variant retval; // We don't care about the return value, Callable API requires it
+				Variant retval; // 我们不关心返回值，Callable API 需要它
 				cd->callable.callp(args, 2, retval, error);
-				// TODO I would really like to know what's the correct way to report such errors...
-				// Examples I found in the engine are inconsistent
+				// TODO 我很想知道报告这类错误的正确方式……
+				// 我在引擎中找到的示例并不一致
 				ERR_FAIL_COND_V(error.error != Callable::CallError::CALL_OK, false);
-		// Return if it fails, we don't want an error spam
+		// 失败时返回，我们不想看到错误刷屏
 #endif
 				return true;
 			}
@@ -305,7 +305,7 @@ void run_blocky_random_tick(
 bool indices_to_bitarray_u16(Span<const int32_t> indices, DynamicBitset &bitarray) {
 #ifdef DEBUG_ENABLED
 	const int32_t max_supported_value = 65535;
-	// Validate
+	// 校验
 	for (const int32_t i : indices) {
 		VOXEL_ASSERT_RETURN_V_MSG(
 				i >= 0 && i <= max_supported_value,
@@ -368,7 +368,7 @@ Box3i get_round_cone_int_bounds(Vector3f p0, Vector3f p1, float r0, float r1) {
 
 #if defined(DEBUG_ENABLED) || defined(VOXEL_TESTS)
 
-// Reference implementation. Correct but very slow.
+// 参考实现。正确但非常慢。
 void box_blur_slow_ref(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sphere_pos, float sphere_radius) {
 	VOXEL_PROFILE_SCOPE();
 
@@ -394,11 +394,11 @@ void box_blur_slow_ref(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vec
 
 				const float sphere_ds = math::distance_squared(sphere_pos, to_vec3f(dst_pos));
 				if (sphere_ds > sphere_radius_s) {
-					// Outside of brush
+					// 超出笔刷范围
 					dst.set_voxel_f(sd_src, dst_pos, VoxelBuffer::CHANNEL_SDF);
 					continue;
 				}
-				// Brush factor
+				// 笔刷系数
 				const float factor = math::clamp(1.f - sphere_ds / sphere_radius_s, 0.f, 1.f);
 
 				const Vector3i src_min = dst_pos; // - Vector3i(radius, radius, radius);
@@ -409,8 +409,8 @@ void box_blur_slow_ref(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vec
 				for (src_pos.z = src_min.z; src_pos.z < src_max.z; ++src_pos.z) {
 					for (src_pos.x = src_min.x; src_pos.x < src_max.x; ++src_pos.x) {
 						for (src_pos.y = src_min.y; src_pos.y < src_max.y; ++src_pos.y) {
-							// This is a hotspot. Could be optimized by separating XYZ blurs and caching reads in a
-							// ringbuffer
+							// 这是热点代码。可以通过分离 XYZ 模糊并将读取结果缓存在
+							// 环形缓冲区中来优化
 							sd_sum += src.get_voxel_f(src_pos, VoxelBuffer::CHANNEL_SDF);
 						}
 					}
@@ -445,12 +445,12 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 
 	const float sphere_radius_s = sphere_radius * sphere_radius;
 
-	// Box blur is separable: we can do 1-dimensional blur along the first axis, then the second axis, then the third
-	// axis. This reduces the amount of memory accesses, and simplifies the algorithm to 1-D.
+	// 盒式模糊是可分离的：我们可以先沿第一个轴做一维模糊，然后是第二个轴，再是第三个
+	// 轴。这减少了内存访问次数，并将算法简化为 1-D。
 
-	// Since separated blur is 1-D, we can use a ring buffer to optimize reading/summing values since we are
-	// just moving an averaging window by 1 voxel on each iteration. So no need to gather all values to average them on
-	// each iteration, we just get one and remove one.
+	// 由于分离后的模糊是一维的，我们可以使用环形缓冲区来优化读取/累加，因为每次
+	// 迭代只是将平均窗口移动 1 个体素。因此无需在每次迭代时收集所有值来求平均，
+	// 我们只需加入一个并移除一个。
 	StdVector<float> ring_buffer;
 	const unsigned int rb_power = math::get_next_power_of_two_32_shift(box_size);
 	const unsigned int rb_len = 1 << rb_power;
@@ -458,12 +458,12 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 	const unsigned int rb_mask = rb_len - 1;
 	VOXEL_ASSERT(static_cast<int>(ring_buffer.size()) >= box_size);
 
-	// Temporary buffer with extra length in two axes
+	// 在两个轴上带额外长度的临时缓冲区
 	StdVector<float> tmp;
 	const Vector3i tmp_size(dst_size.x + 2 * radius, dst_size.y, dst_size.z + 2 * radius);
 	tmp.resize(Vector3iUtil::get_volume_u64(tmp_size));
 
-	// Y blur
+	// Y 轴模糊
 	Vector3i dst_pos;
 	unsigned int tmp_stride = 1;
 	unsigned int tmp_i = 0;
@@ -472,10 +472,10 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 		for (dst_pos.z = 0; dst_pos.z < tmp_size.z; ++dst_pos.z) {
 			for (dst_pos.x = 0; dst_pos.x < tmp_size.x; ++dst_pos.x) {
 				float sd_sum = 0.f;
-				// Fill window with initial samples
+				// 用初始样本填充窗口
 				for (int y = 0; y < box_size; ++y) {
-					// TODO The fact we sample this way for the first axis makes it a lot slower than the others.
-					// Make tmp larger to fit the whole size and convert first into it?
+					// TODO 第一个轴这样采样的方式使其比其他轴慢得多。
+					// 是否将 tmp 放大以容纳整个尺寸并先转换进去？
 					const float sd = src.get_voxel_f(Vector3i(dst_pos.x, y, dst_pos.z), VoxelBuffer::CHANNEL_SDF);
 					ring_buffer[y] = sd;
 					sd_sum += sd;
@@ -484,23 +484,22 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 				tmp[tmp_i] = sd_sum / box_size_f;
 				tmp_i += tmp_stride;
 
-				// Read/write cursors in ring buffer:
-				// Assuming we move the window "from left to right"
-				int rbr = 0; // Left-most sample in the window
-				int rbw = box_size & rb_mask; // Right-most sample in the window + 1
+				// 环形缓冲区中的读/写游标：
+				// 假定窗口“从左向右”移动
+				int rbr = 0; // 窗口中最左侧的样本
+				int rbw = box_size & rb_mask; // 窗口中最右侧样本的下一个位置
 
 				for (dst_pos.y = 1; dst_pos.y < tmp_size.y; ++dst_pos.y) {
-					// Look 2*radius ahead because we sample from a buffer that's also bigger than tmp in Y
+					// 提前 2*radius 查看，因为我们从一个在 Y 方向上也比 tmp 大的缓冲区采样
 					const float sd = src.get_voxel_f(
 							Vector3i(dst_pos.x, dst_pos.y + radius * 2, dst_pos.z), VoxelBuffer::CHANNEL_SDF
 					);
-					// Remove sample exiting the window
+					// 移除离开窗口的样本
 					sd_sum -= ring_buffer[rbr];
-					// Add sample entering the window
+					// 添加进入窗口的样本
 					sd_sum += sd;
 					ring_buffer[rbw] = sd;
-					// Advance read and write cursors by 1. Masking handles wrapping around the ring buffer (faster than
-					// modulus)
+					// 将读和写游标向前推进 1。掩码处理环形缓冲区的环绕（比取模更快）
 					rbr = (rbr + 1) & rb_mask;
 					rbw = (rbw + 1) & rb_mask;
 
@@ -511,30 +510,30 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 		}
 	}
 
-	// X blur
+	// X 轴模糊
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("X blur");
 		tmp_stride = tmp_size.y;
 		for (dst_pos.z = 0; dst_pos.z < tmp_size.z; ++dst_pos.z) {
 			for (dst_pos.y = 0; dst_pos.y < tmp_size.y; ++dst_pos.y) {
-				// Initialize on each row, because we don't do a fully regular access this time
+				// 在每一行上初始化，因为这次我们不做完全规则的访问
 				tmp_i = Vector3iUtil::get_zxy_index(Vector3i(0, dst_pos.y, dst_pos.z), tmp_size);
 
 				float sd_sum = 0.f;
 				for (int x = 0; x < box_size; ++x) {
-					// This time we read samples from our temporary buffer itself.
-					// We are writing while we read the buffer, but it should be ok since we only read values
-					// before they get modified, and it won't retroactively affect the result when we reach them because
-					// the ringbuffer serves as copy of those values.
+					// 这次我们直接从临时缓冲区本身读取样本。
+					// 我们在读取缓冲区的同时进行写入，但这应该没问题，因为我们只读取
+					// 在它们被修改之前的值，并且当我们到达这些值时不会追溯性地影响结果，因为
+					// 环形缓冲区充当这些值的副本。
 					const float sd = tmp[tmp_i + x * tmp_stride];
 					ring_buffer[x] = sd;
 					sd_sum += sd;
 				}
 
-				// Compute X blur only for the final area (we had neighbors initially to capture blurred samples along
-				// Y, which X and Z will use)
+				// 仅对最终区域计算 X 轴模糊（我们最初保留邻居是为了捕获沿
+				// Y 轴方向的模糊样本，X 和 Z 将使用这些样本）
 
-				tmp_i += radius * tmp_stride; // Jump by +(radius, 0, 0)
+				tmp_i += radius * tmp_stride; // 按 +(radius, 0, 0) 跳跃
 				tmp[tmp_i] = sd_sum / box_size_f;
 
 				int rbr = 0;
@@ -547,7 +546,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 					sd_sum -= ring_buffer[rbr];
 					sd_sum += sd;
 					ring_buffer[rbw] = sd;
-					// Advance read and write cursors by 1
+					// 将读和写游标向前推进 1
 					rbr = (rbr + 1) & rb_mask;
 					rbw = (rbw + 1) & rb_mask;
 
@@ -557,7 +556,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 		}
 	}
 
-	// Z blur
+	// Z 轴模糊
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Z blur");
 		tmp_stride = tmp_size.y * tmp_size.x;
@@ -572,7 +571,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 					sd_sum += sd;
 				}
 
-				tmp_i += radius * tmp_stride; // Jump by +(0, 0, radius)
+				tmp_i += radius * tmp_stride; // 按 +(0, 0, radius) 跳跃
 				tmp[tmp_i] = sd_sum / box_size_f;
 
 				int rbr = 0;
@@ -585,7 +584,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 					sd_sum -= ring_buffer[rbr];
 					sd_sum += sd;
 					ring_buffer[rbw] = sd;
-					// Advance read and write cursors by 1
+					// 将读和写游标向前推进 1
 					rbr = (rbr + 1) & rb_mask;
 					rbw = (rbw + 1) & rb_mask;
 
@@ -595,7 +594,7 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 		}
 	}
 
-	// Blend using shape
+	// 使用形状进行混合
 
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Blend");
@@ -604,17 +603,17 @@ void box_blur(const VoxelBuffer &src, VoxelBuffer &dst, int radius, Vector3f sph
 				for (dst_pos.y = 0; dst_pos.y < dst_size.y; ++dst_pos.y) {
 					//
 					const Vector3i src_pos = dst_pos + Vector3i(radius, radius, radius);
-					// TODO It might be possible to optimize this read
+					// TODO 也许可以优化这次读取
 					const float src_sd = src.get_voxel_f(src_pos, VoxelBuffer::CHANNEL_SDF);
 
 					const float sphere_ds = math::distance_squared(sphere_pos, to_vec3f(dst_pos));
 					if (sphere_ds > sphere_radius_s) {
-						// Outside of brush
+						// 超出笔刷范围
 						dst.set_voxel_f(src_sd, dst_pos, VoxelBuffer::CHANNEL_SDF);
 						continue;
 					}
 
-					// Brush factor
+					// 笔刷系数
 					const float factor = math::clamp(1.f - sphere_ds / sphere_radius_s, 0.f, 1.f);
 
 					const Vector3i tmp_pos(dst_pos.x + radius, dst_pos.y, dst_pos.z + radius);
@@ -650,15 +649,15 @@ void grow_sphere(VoxelBuffer &src, float strength, Vector3f sphere_pos, float sp
 
 				const float sphere_ds = math::distance_squared(sphere_pos, to_vec3f(src_pos));
 				if (sphere_ds > sphere_radius_squared) {
-					// Outside of brush
+					// 超出笔刷范围
 					continue;
 				}
 
 				const float distance = Math::sqrt(sphere_ds);
 				const float sd_offset = strength * (sphere_radius - distance) * inv_sphere_radius;
 
-				// With signed distance fields, subtracting "grows" the shape.
-				// Negative strength is allowed so it can also be used to "shrink".
+				// 在有符号距离场中，相减会使形状“生长”。
+				// 允许负强度，这样也可以用于“收缩”。
 				src.set_voxel_f(src_sd - sd_offset, src_pos, VoxelBuffer::CHANNEL_SDF);
 			}
 		}

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="Voxel_ThreadedTask" inherits="RefCounted" is_experimental="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
+		允许在体素引擎线程池中运行自定义任务的抽象任务。
 	</brief_description>
 	<description>
+		此类允许你将自定义任务调度到体素引擎的线程池中运行。继承此类并实现 [method _run]（必须）、可选的 [method _get_priority] 和 [method _is_cancelled]。任务完成后会发出 [signal completed] 信号。此类为实验性质，其 API 可能会在未来的版本中发生变化。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -10,23 +12,27 @@
 		<method name="_get_priority" qualifiers="virtual">
 			<return type="int" />
 			<description>
+				获取任务的优先级。值越高，任务在队列中被提前执行的可能性越大。
 			</description>
 		</method>
 		<method name="_is_cancelled" qualifiers="virtual">
 			<return type="bool" />
 			<description>
+				在任务执行期间调用，用于检查任务是否已被取消。
 			</description>
 		</method>
 		<method name="_run" qualifiers="virtual">
 			<return type="void" />
 			<param index="0" name="thread_index" type="int" />
 			<description>
+				在后台线程中运行任务逻辑。必须实现此方法。
 			</description>
 		</method>
 	</methods>
 	<signals>
 		<signal name="completed">
 			<description>
+				任务完成时发出。
 			</description>
 		</signal>
 	</signals>

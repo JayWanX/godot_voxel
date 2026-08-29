@@ -67,15 +67,15 @@ DebugRenderer::DebugRenderer() {}
 void DebugRenderer::init() {
 	_multimesh_instance.create();
 	_multimesh_instance.set_interpolated(false);
-	// TODO When shadow casting is on, directional shadows completely break.
-	// The reason is still unknown.
-	// It should be off anyways, but it's rather concerning.
+	// TODO 开启阴影投射时，平行光阴影会完全失效。
+	// 原因仍不清楚。
+	// 反正它本就该关闭，但这种情况仍令人担忧。
 	_multimesh_instance.set_cast_shadows_setting(RenderingServerEnums::SHADOW_CASTING_SETTING_OFF);
 	_multimesh.instantiate();
 	Ref<Mesh> wirecube = create_debug_wirecube(Color(1, 1, 1));
 	_multimesh->set_mesh(wirecube);
 	_multimesh->set_transform_format(MultiMesh::TRANSFORM_3D);
-	// TODO Optimize: Godot needs to bring back 8-bit color attributes on multimesh, 32-bit colors are too much
+	// TODO 优化：Godot 需要在 multimesh 上恢复 8 位颜色属性，32 位颜色太浪费了
 	//_multimesh->set_color_format(MultiMesh::COLOR_8BIT);
 	_multimesh->set_use_colors(true);
 	_multimesh->set_use_custom_data(false);
@@ -87,9 +87,9 @@ void DebugRenderer::init() {
 }
 
 DebugRenderer::~DebugRenderer() {
-	// A MultiMeshInstance created without nodes does not hold ownership on its material.
-	// So we need to destroy it before we release ownership at the end of this destructor.
-	// Otherwise RenderingServer produces errors.
+	// 不使用节点创建的 MultiMeshInstance 不会持有其材质的引用。
+	// 因此需要在本析构函数末尾释放所有权之前先销毁它。
+	// 否则 RenderingServer 会报错。
 	_multimesh_instance.destroy();
 }
 
@@ -122,7 +122,7 @@ void DebugRenderer::end() {
 		_multimesh->set_instance_count(_items.size());
 	}
 
-	// Apparently Godot doesn't like empty bulk arrays, it breaks RasterizerStorageGLES3
+	// 显然 Godot 不喜欢空的批量数组，这会导致 RasterizerStorageGLES3 出错
 	if (_items.size() > 0) {
 		//_multimesh->set_as_bulk_array(_bulk_array);
 		RenderingServer::get_singleton()->multimesh_set_buffer(_multimesh->get_rid(), _bulk_array);
@@ -133,7 +133,7 @@ void DebugRenderer::end() {
 
 void DebugRenderer::clear() {
 	_items.clear();
-	// Can be null if `init()` hasn't been called
+	// 若尚未调用 `init()` 则可能为空
 	if (_multimesh.is_valid()) {
 		_multimesh->set_instance_count(0);
 	}

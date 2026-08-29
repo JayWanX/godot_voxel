@@ -25,8 +25,8 @@ protected:
 	void update_aabb() override;
 
 private:
-	// Originally I wanted to keep the core of modifiers separate from Godot stuff, but in order to also support
-	// GPU resources, putting this here was easier.
+	// 最初我想让修改器的核心与 Godot 相关的内容保持分离，但为了支持
+	// GPU 资源，把它放在这里更简单。
 	Ref<VoxelMeshSDF> _mesh_sdf;
 	float _isolevel;
 };

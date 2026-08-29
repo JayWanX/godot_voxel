@@ -134,7 +134,7 @@ void bake_fluid_model(
 
 	BakedFluid &baked_fluid = baked_fluids[fluid_index];
 
-	// TODO Allow more than one model with the same level?
+	// TODO 允许同一液位存在多个模型？
 	const int level = fluid_model.get_level();
 	VOXEL_ASSERT(level >= 0 && level < VoxelBlockyModelFluid::MAX_LEVELS);
 	baked_model.fluid_level = level;
@@ -148,12 +148,12 @@ void bake_fluid_model(
 	baked_model.tags_mask = fluid_model.get_tags_mask();
 	baked_model.box_collision_aabbs = fluid_model.get_collision_aabbs_v();
 
-	// This is to be decided dynamically. The top side is always empty.
+	// 这需要动态决定。顶面总是空的。
 	baked_model.model.empty_sides_mask = (1 << Cube::SIDE_POSITIVE_Y);
 
 	baked_model.model.surface_count = 1;
 	baked_model.model.surfaces[0].material_id = materials.get_or_create_index(fluid->get_material());
-	// Fluids have no mesh collision because mesh colliders are meant for solid stuff
+	// 流体没有网格碰撞，因为网格碰撞器是为固体物质准备的
 	baked_model.model.surfaces[0].collision_enabled = false; // fluid_model.is_mesh_collision_enabled(0);
 }
 

@@ -8,26 +8,26 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Graham Wihlidal. Optimizing the Graphics Pipeline with Compute. 2016
-// Matthaeus Chajdas. GeometryFX 1.2 - Cluster Culling. 2016
-// Jack Ritter. An Efficient Bounding Sphere. 1990
-// Thomas Larsson. Fast and Tight Fitting Bounding Spheres. 2008
-// Ingo Wald, Vlastimil Havran. On building fast kd-Trees for Ray Tracing, and on doing that in O(N log N). 2006
+// 此作品基于：
+// Graham Wihlidal. 使用 Compute 优化图形管线. 2016
+// Matthaeus Chajdas. GeometryFX 1.2 - 簇剔除. 2016
+// Jack Ritter. 一种高效的包围球. 1990
+// Thomas Larsson. 快速且紧贴的包围球. 2008
+// Ingo Wald, Vlastimil Havran. 关于为光线追踪构建快速 kd 树，并以 O(N log N) 完成. 2006
 namespace meshopt
 {
 
-// This must be <= 256 since meshlet indices are stored as bytes
+// 必须 <= 256，因为 meshlet 索引以字节存储
 const size_t kMeshletMaxVertices = 256;
 
-// A reasonable limit is around 2*max_vertices or less
+// 合理上限约为 2*max_vertices 或更小
 const size_t kMeshletMaxTriangles = 512;
 
-// We keep a limited number of seed triangles and add a few triangles per finished meshlet
+// 我们保留有限数量的种子三角形，并为每个已完成的 meshlet 添加少量三角形
 const size_t kMeshletMaxSeeds = 256;
 const size_t kMeshletAddSeeds = 4;
 
-// To avoid excessive recursion for malformed inputs, we limit the maximum depth of the tree
+// 为避免对畸形输入过度递归，我们限制树的最大深度
 const int kMeshletMaxTreeDepth = 50;
 
 struct TriangleAdjacency2
@@ -41,12 +41,12 @@ static void buildTriangleAdjacency(TriangleAdjacency2& adjacency, const unsigned
 {
 	size_t face_count = index_count / 3;
 
-	// allocate arrays
+	// 分配数组
 	adjacency.counts = allocator.allocate<unsigned int>(vertex_count);
 	adjacency.offsets = allocator.allocate<unsigned int>(vertex_count);
 	adjacency.data = allocator.allocate<unsigned int>(index_count);
 
-	// fill triangle counts
+	// 填充三角形计数
 	memset(adjacency.counts, 0, vertex_count * sizeof(unsigned int));
 
 	for (size_t i = 0; i < index_count; ++i)
@@ -56,7 +56,7 @@ static void buildTriangleAdjacency(TriangleAdjacency2& adjacency, const unsigned
 		adjacency.counts[indices[i]]++;
 	}
 
-	// fill offset table
+	// 填充偏移表
 	unsigned int offset = 0;
 
 	for (size_t i = 0; i < vertex_count; ++i)
@@ -67,7 +67,7 @@ static void buildTriangleAdjacency(TriangleAdjacency2& adjacency, const unsigned
 
 	assert(offset == index_count);
 
-	// fill triangle data
+	// 填充三角形数据
 	for (size_t i = 0; i < face_count; ++i)
 	{
 		unsigned int a = indices[i * 3 + 0], b = indices[i * 3 + 1], c = indices[i * 3 + 2];
@@ -77,7 +77,7 @@ static void buildTriangleAdjacency(TriangleAdjacency2& adjacency, const unsigned
 		adjacency.data[adjacency.offsets[c]++] = unsigned(i);
 	}
 
-	// fix offsets that have been disturbed by the previous pass
+	// 修复被上一轮处理扰乱的偏移
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
 		assert(adjacency.offsets[i] >= adjacency.counts[i]);
@@ -89,16 +89,16 @@ static void buildTriangleAdjacencySparse(TriangleAdjacency2& adjacency, const un
 {
 	size_t face_count = index_count / 3;
 
-	// sparse mode can build adjacency more quickly by ignoring unused vertices, using a bit to mark visited vertices
+	// 稀疏模式可通过忽略未使用的顶点更快地构建邻接关系，用一个位来标记已访问的顶点
 	const unsigned int sparse_seen = 1u << 31;
 	assert(index_count < sparse_seen);
 
-	// allocate arrays
+	// 分配数组
 	adjacency.counts = allocator.allocate<unsigned int>(vertex_count);
 	adjacency.offsets = allocator.allocate<unsigned int>(vertex_count);
 	adjacency.data = allocator.allocate<unsigned int>(index_count);
 
-	// fill triangle counts
+	// 填充三角形计数
 	for (size_t i = 0; i < index_count; ++i)
 		assert(indices[i] < vertex_count);
 
@@ -125,7 +125,7 @@ static void buildTriangleAdjacencySparse(TriangleAdjacency2& adjacency, const un
 
 	assert(offset == index_count);
 
-	// fill triangle data
+	// 填充三角形数据
 	for (size_t i = 0; i < face_count; ++i)
 	{
 		unsigned int a = indices[i * 3 + 0], b = indices[i * 3 + 1], c = indices[i * 3 + 2];
@@ -135,7 +135,7 @@ static void buildTriangleAdjacencySparse(TriangleAdjacency2& adjacency, const un
 		adjacency.data[adjacency.offsets[c]++] = unsigned(i);
 	}
 
-	// fix offsets that have been disturbed by the previous pass
+	// 修复被上一轮处理扰乱的偏移
 	// also fix counts (that were marked with sparse_seen by the first pass)
 	for (size_t i = 0; i < index_count; ++i)
 	{
@@ -202,7 +202,7 @@ static void computeBoundingSphere(float result[4], const float* points, size_t c
 		}
 	}
 
-	// find the pair of points with largest distance
+	// 找到距离最大的点对
 	size_t paxis = 0;
 	float paxisdr = 0;
 
@@ -223,7 +223,7 @@ static void computeBoundingSphere(float result[4], const float* points, size_t c
 		}
 	}
 
-	// use the longest segment as the initial sphere diameter
+	// 使用最长的线段作为初始球体直径
 	const float* p1 = points + pmin[paxis] * points_stride_float;
 	const float* p2 = points + pmax[paxis] * points_stride_float;
 	float r1 = radii[pmin[paxis] * radii_stride_float];
@@ -235,7 +235,7 @@ static void computeBoundingSphere(float result[4], const float* points, size_t c
 	float center[3] = {p1[0] + (p2[0] - p1[0]) * paxisk, p1[1] + (p2[1] - p1[1]) * paxisk, p1[2] + (p2[2] - p1[2]) * paxisk};
 	float radius = paxisdr / 2;
 
-	// iteratively adjust the sphere up until all points fit
+	// 迭代调整球体，直至所有点都容纳其中
 	for (size_t i = 0; i < count; ++i)
 	{
 		const float* p = points + i * points_stride_float;
@@ -354,7 +354,7 @@ static void finishMeshlet(meshopt_Meshlet& meshlet, unsigned char* meshlet_trian
 {
 	size_t offset = meshlet.triangle_offset + meshlet.triangle_count * 3;
 
-	// fill 4b padding with 0
+	// 用 0 填充 4b 填充
 	while (offset & 3)
 		meshlet_triangles[offset++] = 0;
 }
@@ -435,20 +435,20 @@ static unsigned int getNeighborTriangle(const meshopt_Meshlet& meshlet, const Co
 
 			int priority = -1;
 
-			// triangles that don't add new vertices to meshlets are max. priority
+			// 不向 meshlet 添加新顶点的三角形优先级最高
 			if (extra == 0)
 				priority = 0;
-			// artificially increase the priority of dangling triangles as they're expensive to add to new meshlets
+			// 人为提高悬挂三角形的优先级，因为它们加入新 meshlet 的成本较高
 			else if (live_triangles[a] == 1 || live_triangles[b] == 1 || live_triangles[c] == 1)
 				priority = 1;
 			// if two vertices have live count of 2, removing this triangle will make another triangle dangling which is good for overall flow
 			else if ((live_triangles[a] == 2) + (live_triangles[b] == 2) + (live_triangles[c] == 2) >= 2)
 				priority = 1 + extra;
-			// otherwise adjust priority to be after the above cases, 3 or 4 based on used[] count
+			// 否则将优先级调整到上述情况之后，根据 used[] 计数取 3 或 4
 			else
 				priority = 2 + extra;
 
-			// since topology-based priority is always more important than the score, we can skip scoring in some cases
+			// 由于基于拓扑的优先级总是比得分更重要，某些情况下可以跳过评分
 			if (priority > best_priority)
 				continue;
 
@@ -460,8 +460,8 @@ static unsigned int getNeighborTriangle(const meshopt_Meshlet& meshlet, const Co
 
 			float score = getMeshletScore(distance, spread, cone_weight, meshlet_expected_radius);
 
-			// note that topology-based priority is always more important than the score
-			// this helps maintain reasonable effectiveness of meshlet data and reduces scoring cost
+			// 注意：基于拓扑的优先级总是比得分更重要
+			// 这有助于保持 meshlet 数据的合理有效性并降低评分成本
 			if (priority < best_priority || score < best_score)
 			{
 				best_triangle = triangle;
@@ -494,7 +494,7 @@ static size_t appendSeedTriangles(unsigned int* seeds, const meshopt_Meshlet& me
 		unsigned int best_neighbor = ~0u;
 		unsigned int best_neighbor_live = ~0u;
 
-		// find the neighbor with the smallest live metric
+		// 找到活动度量最小的邻居
 		unsigned int* neighbors = &adjacency.data[0] + adjacency.offsets[index];
 		size_t neighbors_size = adjacency.counts[index];
 
@@ -531,7 +531,7 @@ static size_t appendSeedTriangles(unsigned int* seeds, const meshopt_Meshlet& me
 		}
 	}
 
-	// add surviving seeds to the meshlet
+	// 将幸存的种子添加到 meshlet
 	size_t seed_count = 0;
 
 	for (size_t i = 0; i < kMeshletAddSeeds; ++i)
@@ -590,7 +590,7 @@ struct KDNode
 	};
 
 	// leaves: axis = 3, children = number of extra points after this one (0 if 'index' is the only point)
-	// branches: axis != 3, left subtree = skip 1, right subtree = skip 1+children
+	// 分支：axis != 3，左子树 = 跳过 1，右子树 = 跳过 1+子节点
 	unsigned int axis : 2;
 	unsigned int children : 30;
 };
@@ -599,17 +599,17 @@ static size_t kdtreePartition(unsigned int* indices, size_t count, const float* 
 {
 	size_t m = 0;
 
-	// invariant: elements in range [0, m) are < pivot, elements in range [m, i) are >= pivot
+	// 不变式：[0, m) 范围内的元素 < pivot，[m, i) 范围内的元素 >= pivot
 	for (size_t i = 0; i < count; ++i)
 	{
 		float v = points[indices[i] * stride + axis];
 
-		// swap(m, i) unconditionally
+		// 无条件 swap(m, i)
 		unsigned int t = indices[m];
 		indices[m] = indices[i];
 		indices[i] = t;
 
-		// when v >= pivot, we swap i with m without advancing it, preserving invariants
+		// 当 v >= pivot 时，将 i 与 m 交换而不推进 i，从而保持不变式
 		m += v < pivot;
 	}
 
@@ -627,14 +627,14 @@ static size_t kdtreeBuildLeaf(size_t offset, KDNode* nodes, size_t node_count, u
 	result.axis = 3;
 	result.children = unsigned(count - 1);
 
-	// all remaining points are stored in nodes immediately following the leaf
+	// 所有剩余点都存储在紧随叶子之后的节点中
 	for (size_t i = 1; i < count; ++i)
 	{
 		KDNode& tail = nodes[offset + i];
 
 		tail.index = indices[i];
 		tail.axis = 3;
-		tail.children = ~0u >> 2; // bogus value to prevent misuse
+		tail.children = ~0u >> 2; // 用于阻止误用的无效值
 	}
 
 	return offset + count;
@@ -652,7 +652,7 @@ static size_t kdtreeBuild(size_t offset, KDNode* nodes, size_t node_count, const
 	float vars[3] = {};
 	float runc = 1, runs = 1;
 
-	// gather statistics on the points in the subtree using Welford's algorithm
+	// 使用 Welford 算法收集子树中点的统计信息
 	for (size_t i = 0; i < count; ++i, runc += 1.f, runs = 1.f / runc)
 	{
 		const float* point = points + indices[i] * stride;
@@ -665,13 +665,13 @@ static size_t kdtreeBuild(size_t offset, KDNode* nodes, size_t node_count, const
 		}
 	}
 
-	// split axis is one where the variance is largest
+	// 拆分轴是方差最大的那个轴
 	unsigned int axis = (vars[0] >= vars[1] && vars[0] >= vars[2]) ? 0 : (vars[1] >= vars[2] ? 1 : 2);
 
 	float split = mean[axis];
 	size_t middle = kdtreePartition(indices, count, points, stride, axis, split);
 
-	// when the partition is degenerate simply consolidate the points into a single node
+	// 当分区退化时，直接将点合并到单个节点
 	if (middle <= leaf_size / 2 || middle >= count - leaf_size / 2)
 		return kdtreeBuildLeaf(offset, nodes, node_count, indices, count);
 
@@ -680,10 +680,10 @@ static size_t kdtreeBuild(size_t offset, KDNode* nodes, size_t node_count, const
 	result.split = split;
 	result.axis = axis;
 
-	// left subtree is right after our node
+	// 左子树紧接在我们的节点之后
 	size_t next_offset = kdtreeBuild(offset + 1, nodes, node_count, points, stride, indices, middle, leaf_size);
 
-	// distance to the right subtree is represented explicitly
+	// 到右子树的距离被显式表示
 	result.children = unsigned(next_offset - offset - 1);
 
 	return kdtreeBuild(next_offset, nodes, node_count, points, stride, indices + middle, count - middle, leaf_size);
@@ -724,7 +724,7 @@ static void kdtreeNearest(KDNode* nodes, unsigned int root, const float* points,
 
 		kdtreeNearest(nodes, root + 1 + first, points, stride, emitted_flags, position, aa, result, limit);
 
-		// only process the other node if it can have a match based on closest distance so far
+		// 仅当基于迄今最近距离可能有匹配时才处理另一个节点
 		if (fabsf(delta) <= limit)
 			kdtreeNearest(nodes, root + 1 + second, points, stride, emitted_flags, position, aa, result, limit);
 	}
@@ -777,7 +777,7 @@ static void computeHistogram(unsigned int (&hist)[1024][3], const float* data, s
 
 	unsigned int sum0 = 0, sum1 = 0, sum2 = 0;
 
-	// replace histogram data with prefix histogram sums in-place
+	// 就地用直方图前缀和替换直方图数据
 	for (int i = 0; i < 1024; ++i)
 	{
 		unsigned int hx = hist[i][0], hy = hist[i][1], hz = hist[i][2];
@@ -797,7 +797,7 @@ static void computeHistogram(unsigned int (&hist)[1024][3], const float* data, s
 static void radixPass(unsigned int* destination, const unsigned int* source, const float* keys, size_t count, unsigned int (&hist)[1024][3], int pass)
 {
 	const unsigned int* bits = reinterpret_cast<const unsigned int*>(keys);
-	int bitoff = pass * 10 + 2; // drop 2 LSB to be able to use 3 10-bit passes
+	int bitoff = pass * 10 + 2; // 丢弃 2 个最低有效位，以便使用 3 次 10 位遍历
 
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -837,7 +837,7 @@ static void bvhPrepare(BVHBox* boxes, float* centroids, const unsigned int* indi
 
 static bool bvhPackLeaf(unsigned char* boundary, const unsigned int* order, size_t count, short* used, const unsigned int* indices, size_t max_vertices)
 {
-	// count number of unique vertices
+	// 统计唯一顶点的数量
 	size_t used_vertices = 0;
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -848,7 +848,7 @@ static bool bvhPackLeaf(unsigned char* boundary, const unsigned int* order, size
 		used[a] = used[b] = used[c] = 1;
 	}
 
-	// reset used[] for future invocations
+	// 为后续调用重置 used[]
 	for (size_t i = 0; i < count; ++i)
 	{
 		unsigned int index = order[i];
@@ -860,7 +860,7 @@ static bool bvhPackLeaf(unsigned char* boundary, const unsigned int* order, size
 	if (used_vertices > max_vertices)
 		return false;
 
-	// mark meshlet boundary for future reassembly
+	// 标记 meshlet 边界以供后续重新组装
 	assert(count > 0);
 
 	boundary[0] = 1;
@@ -881,7 +881,7 @@ static void bvhPackTail(unsigned char* boundary, const unsigned int* order, size
 			continue;
 		}
 
-		// chunk is vertex bound, split it into smaller meshlets
+		// 该 chunk 受顶点约束，将它拆分为更小的 meshlet
 		assert(chunk > max_vertices / 3);
 
 		bvhPackLeaf(boundary + i, order + i, max_vertices / 3, used, indices, max_vertices);
@@ -893,7 +893,7 @@ static bool bvhDivisible(size_t count, size_t min, size_t max)
 {
 	// count is representable as a sum of values in [min..max] if if it in range of [k*min..k*min+k*(max-min)]
 	// equivalent to ceil(count / max) <= floor(count / min), but the form below allows using idiv (see nv_cluster_builder)
-	// we avoid expensive integer divisions in the common case where min is <= max/2
+	// 在 min <= max/2 的常见情况下，我们避免昂贵的整数除法
 	return min * 2 <= max ? count >= min : count % min <= (count / min) * (max - min);
 }
 
@@ -902,7 +902,7 @@ static size_t bvhPivot(const BVHBox* boxes, const unsigned int* order, size_t co
 	BVHBox accuml = boxes[order[0]], accumr = boxes[order[count - 1]];
 	float* costs = static_cast<float*>(scratch);
 
-	// accumulate SAH cost in forward and backward directions
+	// 沿正向和反向累积 SAH 代价
 	for (size_t i = 0; i < count; ++i)
 	{
 		boxMerge(accuml, boxes[order[i]]);
@@ -917,7 +917,7 @@ static size_t bvhPivot(const BVHBox* boxes, const unsigned int* order, size_t co
 
 	float rmaxf = 1.f / float(int(max));
 
-	// find best split that minimizes SAH
+	// 找到使 SAH 最小的最佳分割
 	size_t bestsplit = 0;
 	float bestcost = FLT_MAX;
 
@@ -981,16 +981,16 @@ static void bvhSplit(const BVHBox* boxes, unsigned int* orderx, unsigned int* or
 
 	unsigned int* axes[3] = {orderx, ordery, orderz};
 
-	// we can use step=1 unconditionally but to reduce the cost for min=max case we use step=max
+	// 我们可以无条件使用 step=1，但为降低 min=max 情况的代价，使用 step=max
 	size_t step = min_triangles == max_triangles && count > max_triangles ? max_triangles : 1;
 
 	// if we could not pack the meshlet, we must be vertex bound
 	size_t mint = count <= max_triangles && max_vertices / 3 < min_triangles ? max_vertices / 3 : min_triangles;
 
-	// only use fill weight if we are optimizing for triangle count
+	// 仅当针对三角形数量进行优化时才使用填充权重
 	float fill = count <= max_triangles ? 0.f : fill_weight;
 
-	// find best split that minimizes SAH
+	// 找到使 SAH 最小的最佳分割
 	int bestk = -1;
 	size_t bestsplit = 0;
 	float bestcost = FLT_MAX;
@@ -1008,11 +1008,11 @@ static void bvhSplit(const BVHBox* boxes, unsigned int* orderx, unsigned int* or
 		}
 	}
 
-	// this may happen if SAH costs along the admissible splits are NaN
+	// 若各可行拆分的 SAH 代价为 NaN，就可能发生这种情况
 	if (bestk < 0)
 		return bvhPackTail(boundary, orderx, count, used, indices, max_vertices, max_triangles);
 
-	// mark sides of split for partitioning
+	// 为分区标记分割的两侧
 	unsigned char* sides = static_cast<unsigned char*>(scratch) + count * sizeof(unsigned int);
 
 	for (size_t i = 0; i < bestsplit; ++i)
@@ -1021,7 +1021,7 @@ static void bvhSplit(const BVHBox* boxes, unsigned int* orderx, unsigned int* or
 	for (size_t i = bestsplit; i < count; ++i)
 		sides[axes[bestk][i]] = 1;
 
-	// partition all axes into two sides, maintaining order
+	// 在保持顺序的同时，将所有轴分到两侧
 	unsigned int* temp = static_cast<unsigned int*>(scratch);
 
 	for (int k = 0; k < 3; ++k)
@@ -1047,14 +1047,14 @@ size_t meshopt_buildMeshletsBound(size_t index_count, size_t max_vertices, size_
 	assert(index_count % 3 == 0);
 	assert(max_vertices >= 3 && max_vertices <= kMeshletMaxVertices);
 	assert(max_triangles >= 1 && max_triangles <= kMeshletMaxTriangles);
-	assert(max_triangles % 4 == 0); // ensures the caller will compute output space properly as index data is 4b aligned
+	assert(max_triangles % 4 == 0); // 由于索引数据按 4 字节对齐，因而调用方会正确地计算输出空间
 
 	(void)kMeshletMaxVertices;
 	(void)kMeshletMaxTriangles;
 
-	// meshlet construction is limited by max vertices and max triangles per meshlet
-	// the worst case is that the input is an unindexed stream since this equally stresses both limits
-	// note that we assume that in the worst case, we leave 2 vertices unpacked in each meshlet - if we have space for 3 we can pack any triangle
+	// meshlet 的构造受每个 meshlet 的最大顶点数和最大三角形数限制
+	// 最坏情况是输入为未索引的流，因为这会对两个限制施加同等压力
+	// 注意：我们假定最坏情况下每个 meshlet 留 2 个顶点未打包 - 若还有 3 个空间则可打包任意三角形
 	size_t max_vertices_conservative = max_vertices - 2;
 	size_t meshlet_limit_vertices = (index_count + max_vertices_conservative - 1) / max_vertices_conservative;
 	size_t meshlet_limit_triangles = (index_count / 3 + max_triangles - 1) / max_triangles;
@@ -1072,9 +1072,9 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 
 	assert(max_vertices >= 3 && max_vertices <= kMeshletMaxVertices);
 	assert(min_triangles >= 1 && min_triangles <= max_triangles && max_triangles <= kMeshletMaxTriangles);
-	assert(min_triangles % 4 == 0 && max_triangles % 4 == 0); // ensures the caller will compute output space properly as index data is 4b aligned
+	assert(min_triangles % 4 == 0 && max_triangles % 4 == 0); // 由于索引数据按 4 字节对齐，因而调用方会正确地计算输出空间
 
-	assert(cone_weight <= 1); // negative cone weight switches metric to optimize for axis-aligned meshlets
+	assert(cone_weight <= 1); // 负锥权重可切换度量指标以优化轴对齐的 meshlet
 	assert(split_factor >= 0);
 
 	if (index_count == 0)
@@ -1096,7 +1096,7 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 	unsigned char* emitted_flags = allocator.allocate<unsigned char>(face_count);
 	memset(emitted_flags, 0, face_count);
 
-	// for each triangle, precompute centroid & normal to use for scoring
+	// 对每个三角形，预计算质心和法线用于评分
 	Cone* triangles = allocator.allocate<Cone>(face_count);
 	float mesh_area = computeTriangleCones(triangles, indices, index_count, vertex_positions, vertex_count, vertex_positions_stride);
 
@@ -1104,7 +1104,7 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 	float triangle_area_avg = face_count == 0 ? 0.f : mesh_area / float(face_count) * 0.5f;
 	float meshlet_expected_radius = sqrtf(triangle_area_avg * max_triangles) * 0.5f;
 
-	// build a kd-tree for nearest neighbor lookup
+	// 构建 kd 树用于最近邻查找
 	unsigned int* kdindices = allocator.allocate<unsigned int>(face_count);
 	for (size_t i = 0; i < face_count; ++i)
 		kdindices[i] = unsigned(i);
@@ -1112,7 +1112,7 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 	KDNode* nodes = allocator.allocate<KDNode>(face_count * 2);
 	kdtreeBuild(0, nodes, face_count * 2, &triangles[0].px, sizeof(Cone) / sizeof(float), kdindices, face_count, /* leaf_size= */ 8);
 
-	// find a specific corner of the mesh to use as a starting point for meshlet flow
+	// 找到网格的一个特定角点，作为 meshlet 流程的起点
 	float cornerx = FLT_MAX, cornery = FLT_MAX, cornerz = FLT_MAX;
 
 	for (size_t i = 0; i < face_count; ++i)
@@ -1124,11 +1124,11 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 		cornerz = cornerz > tri.pz ? tri.pz : cornerz;
 	}
 
-	// index of the vertex in the meshlet, -1 if the vertex isn't used
+	// 顶点在 meshlet 中的索引，若该顶点未被使用则为 -1
 	short* used = allocator.allocate<short>(vertex_count);
 	memset(used, -1, vertex_count * sizeof(short));
 
-	// initial seed triangle is the one closest to the corner
+	// 初始种子三角形是离角点最近的那个
 	unsigned int initial_seed = ~0u;
 	float initial_score = FLT_MAX;
 
@@ -1145,7 +1145,7 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 		}
 	}
 
-	// seed triangles to continue meshlet flow
+	// 用于延续 meshlet 流程的种子三角形
 	unsigned int seeds[kMeshletMaxSeeds] = {};
 	size_t seed_count = 0;
 
@@ -1160,8 +1160,8 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 
 		unsigned int best_triangle = ~0u;
 
-		// for the first triangle, we don't have a meshlet cone yet, so we use the initial seed
-		// to continue the meshlet, we select an adjacent triangle based on connectivity and spatial scoring
+		// 对于第一个三角形，还没有 meshlet 锥，因此使用初始种子
+		// 为延续 meshlet，基于连通性和空间评分选择一个相邻三角形
 		if (meshlet_offset == 0 && meshlet.triangle_count == 0)
 			best_triangle = initial_seed;
 		else
@@ -1196,7 +1196,7 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 
 			unsigned int best_seed = selectSeedTriangle(seeds, seed_count, indices, triangles, live_triangles, cornerx, cornery, cornerz);
 
-			// we may not find a valid seed triangle if the mesh is disconnected as seeds are based on adjacency
+			// 若网格不连通，可能找不到有效的种子三角形，因为种子基于邻接关系
 			best_triangle = best_seed != ~0u ? best_seed : best_triangle;
 		}
 
@@ -1210,9 +1210,9 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 			memset(&meshlet_cone_acc, 0, sizeof(meshlet_cone_acc));
 		}
 
-		// remove emitted triangle from adjacency data
-		// this makes sure that we spend less time traversing these lists on subsequent iterations
-		// live triangle counts are updated as a byproduct of these adjustments
+		// 从邻接数据中移除已发射的三角形
+		// 这能确保我们在后续迭代中花费更少时间遍历这些列表
+		// 活跃三角形计数会作为这些调整的副产品被更新
 		for (size_t k = 0; k < 3; ++k)
 		{
 			unsigned int index = indices[best_triangle * 3 + k];
@@ -1233,7 +1233,7 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 			}
 		}
 
-		// update aggregated meshlet cone data for scoring subsequent triangles
+		// 更新聚合的 meshlet 锥数据，用于对后续三角形评分
 		meshlet_cone_acc.px += triangles[best_triangle].px;
 		meshlet_cone_acc.py += triangles[best_triangle].py;
 		meshlet_cone_acc.pz += triangles[best_triangle].pz;
@@ -1258,7 +1258,7 @@ size_t meshopt_buildMeshletsFlex(meshopt_Meshlet* meshlets, unsigned int* meshle
 
 size_t meshopt_buildMeshlets(meshopt_Meshlet* meshlets, unsigned int* meshlet_vertices, unsigned char* meshlet_triangles, const unsigned int* indices, size_t index_count, const float* vertex_positions, size_t vertex_count, size_t vertex_positions_stride, size_t max_vertices, size_t max_triangles, float cone_weight)
 {
-	assert(cone_weight >= 0); // to use negative cone weight, use meshopt_buildMeshletsFlex
+	assert(cone_weight >= 0); // 要使用负锥权重，请使用 meshopt_buildMeshletsFlex
 
 	return meshopt_buildMeshletsFlex(meshlets, meshlet_vertices, meshlet_triangles, indices, index_count, vertex_positions, vertex_count, vertex_positions_stride, max_vertices, max_triangles, max_triangles, cone_weight, 0.0f);
 }
@@ -1271,11 +1271,11 @@ size_t meshopt_buildMeshletsScan(meshopt_Meshlet* meshlets, unsigned int* meshle
 
 	assert(max_vertices >= 3 && max_vertices <= kMeshletMaxVertices);
 	assert(max_triangles >= 1 && max_triangles <= kMeshletMaxTriangles);
-	assert(max_triangles % 4 == 0); // ensures the caller will compute output space properly as index data is 4b aligned
+	assert(max_triangles % 4 == 0); // 由于索引数据按 4 字节对齐，因而调用方会正确地计算输出空间
 
 	meshopt_Allocator allocator;
 
-	// index of the vertex in the meshlet, -1 if the vertex isn't used
+	// 顶点在 meshlet 中的索引，若该顶点未被使用则为 -1
 	short* used = allocator.allocate<short>(vertex_count);
 	memset(used, -1, vertex_count * sizeof(short));
 
@@ -1287,7 +1287,7 @@ size_t meshopt_buildMeshletsScan(meshopt_Meshlet* meshlets, unsigned int* meshle
 		unsigned int a = indices[i + 0], b = indices[i + 1], c = indices[i + 2];
 		assert(a < vertex_count && b < vertex_count && c < vertex_count);
 
-		// appends triangle to the meshlet and writes previous meshlet to the output if full
+		// 将三角形追加到 meshlet，若已满则将上一个 meshlet 写入输出
 		meshlet_offset += appendMeshlet(meshlet, a, b, c, used, meshlets, meshlet_vertices, meshlet_triangles, meshlet_offset, max_vertices, max_triangles);
 	}
 
@@ -1312,7 +1312,7 @@ size_t meshopt_buildMeshletsSpatial(struct meshopt_Meshlet* meshlets, unsigned i
 
 	assert(max_vertices >= 3 && max_vertices <= kMeshletMaxVertices);
 	assert(min_triangles >= 1 && min_triangles <= max_triangles && max_triangles <= kMeshletMaxTriangles);
-	assert(min_triangles % 4 == 0 && max_triangles % 4 == 0); // ensures the caller will compute output space properly as index data is 4b aligned
+	assert(min_triangles % 4 == 0 && max_triangles % 4 == 0); // 由于索引数据按 4 字节对齐，因而调用方会正确地计算输出空间
 
 	if (index_count == 0)
 		return 0;
@@ -1322,12 +1322,12 @@ size_t meshopt_buildMeshletsSpatial(struct meshopt_Meshlet* meshlets, unsigned i
 
 	meshopt_Allocator allocator;
 
-	// 3 floats plus 1 uint for sorting, or
-	// 2 floats for SAH costs, or
-	// 1 uint plus 1 byte for partitioning
+	// 排序用 3 个浮点数加 1 个 uint，或
+	// SAH 代价用的 2 个浮点数，或
+	// 分区用的 1 个 uint 加 1 个字节
 	float* scratch = allocator.allocate<float>(face_count * 4);
 
-	// compute bounding boxes and centroids for sorting
+	// 计算包围盒和质心用于排序
 	BVHBox* boxes = allocator.allocate<BVHBox>(face_count);
 	bvhPrepare(boxes, scratch, indices, face_count, vertex_positions, vertex_count, vertex_stride_float);
 
@@ -1342,7 +1342,7 @@ size_t meshopt_buildMeshletsSpatial(struct meshopt_Meshlet* meshlets, unsigned i
 		unsigned int hist[1024][3];
 		computeHistogram(hist, keys, face_count);
 
-		// 3-pass radix sort computes the resulting order into axes
+		// 3 趟基数排序将结果顺序计算到 axes 中
 		for (size_t i = 0; i < face_count; ++i)
 			temp[i] = unsigned(i);
 
@@ -1351,7 +1351,7 @@ size_t meshopt_buildMeshletsSpatial(struct meshopt_Meshlet* meshlets, unsigned i
 		radixPass(order, temp, keys, face_count, hist, 2);
 	}
 
-	// index of the vertex in the meshlet, -1 if the vertex isn't used
+	// 顶点在 meshlet 中的索引，若该顶点未被使用则为 -1
 	short* used = allocator.allocate<short>(vertex_count);
 	memset(used, -1, vertex_count * sizeof(short));
 
@@ -1369,7 +1369,7 @@ size_t meshopt_buildMeshletsSpatial(struct meshopt_Meshlet* meshlets, unsigned i
 
 	size_t meshlet_bound = meshopt_buildMeshletsBound(index_count, max_vertices, min_triangles);
 
-	// pack triangles into meshlets according to the order and boundaries marked by bvhSplit
+	// 依据 bvhSplit 标记的顺序和边界将三角形打包进 meshlet
 	meshopt_Meshlet meshlet = {};
 	size_t meshlet_offset = 0;
 	size_t meshlet_pending = meshlet_count;
@@ -1379,7 +1379,7 @@ size_t meshopt_buildMeshletsSpatial(struct meshopt_Meshlet* meshlets, unsigned i
 		assert(boundary[i] <= 1);
 		bool split = i > 0 && boundary[i] == 1;
 
-		// while we are over the limit, we ignore boundary[] data and disable splits until we free up enough space
+		// 超过限制期间，我们忽略 boundary[] 数据并禁用拆分，直至释放足够的空间
 		if (split && meshlet_count > meshlet_bound && meshlet_offset + meshlet_pending >= meshlet_bound)
 			split = false;
 
@@ -1388,7 +1388,7 @@ size_t meshopt_buildMeshletsSpatial(struct meshopt_Meshlet* meshlets, unsigned i
 
 		unsigned int a = indices[index * 3 + 0], b = indices[index * 3 + 1], c = indices[index * 3 + 2];
 
-		// appends triangle to the meshlet and writes previous meshlet to the output if full
+		// 将三角形追加到 meshlet，若已满则将上一个 meshlet 写入输出
 		meshlet_offset += appendMeshlet(meshlet, a, b, c, used, meshlets, meshlet_vertices, meshlet_triangles, meshlet_offset, max_vertices, max_triangles, split);
 		meshlet_pending -= boundary[i];
 	}
@@ -1417,7 +1417,7 @@ meshopt_Bounds meshopt_computeClusterBounds(const unsigned int* indices, size_t 
 
 	size_t vertex_stride_float = vertex_positions_stride / sizeof(float);
 
-	// compute triangle normals and gather triangle corners
+	// 计算三角形法线并收集三角形角点
 	float normals[kMeshletMaxTriangles][3];
 	float corners[kMeshletMaxTriangles][3][3];
 	size_t triangles = 0;
@@ -1440,7 +1440,7 @@ meshopt_Bounds meshopt_computeClusterBounds(const unsigned int* indices, size_t 
 
 		float area = sqrtf(normalx * normalx + normaly * normaly + normalz * normalz);
 
-		// no need to include degenerate triangles - they will be invisible anyway
+		// 无需包含退化三角形 - 反正它们不可见
 		if (area == 0.f)
 			continue;
 
@@ -1468,7 +1468,7 @@ meshopt_Bounds meshopt_computeClusterBounds(const unsigned int* indices, size_t 
 
 	float center[3] = {psphere[0], psphere[1], psphere[2]};
 
-	// treating triangle normals as points, find the bounding sphere - the sphere center determines the optimal cone axis
+	// 将三角形法线视为点，找到包围球 - 球心决定最优锥轴
 	float nsphere[4] = {};
 	computeBoundingSphere(nsphere, normals[0], triangles, sizeof(float) * 3, &rzero, 0, 3);
 
@@ -1496,9 +1496,9 @@ meshopt_Bounds meshopt_computeClusterBounds(const unsigned int* indices, size_t 
 	bounds.center[2] = center[2];
 	bounds.radius = psphere[3];
 
-	// degenerate cluster, normal cone is larger than a hemisphere => trivial accept
-	// note that if mindp is positive but close to 0, the triangle intersection code below gets less stable
-	// we arbitrarily decide that if a normal cone is ~168 degrees wide or more, the cone isn't useful
+	// 退化簇，法向锥大于半球 => 平凡接受
+	// 注意：若 mindp 为正但接近 0，下面的三角形相交代码会变得不太稳定
+	// 我们武断地决定：若法向锥约 168 度或更大，则该锥无用
 	if (mindp <= 0.1f)
 	{
 		bounds.cone_cutoff = 1;
@@ -1508,7 +1508,7 @@ meshopt_Bounds meshopt_computeClusterBounds(const unsigned int* indices, size_t 
 
 	float maxt = 0;
 
-	// we need to find the point on center-t*axis ray that lies in negative half-space of all triangles
+	// 需要在 center-t*axis 射线上找到位于所有三角形负半空间的点
 	for (size_t i = 0; i < triangles; ++i)
 	{
 		// dot(center-t*axis-corner, trinormal) = 0
@@ -1520,19 +1520,19 @@ meshopt_Bounds meshopt_computeClusterBounds(const unsigned int* indices, size_t 
 		float dc = cx * normals[i][0] + cy * normals[i][1] + cz * normals[i][2];
 		float dn = axis[0] * normals[i][0] + axis[1] * normals[i][1] + axis[2] * normals[i][2];
 
-		// dn should be larger than mindp cutoff above
+		// dn 应大于上面的 mindp 阈值
 		assert(dn > 0.f);
 		float t = dc / dn;
 
 		maxt = (t > maxt) ? t : maxt;
 	}
 
-	// cone apex should be in the negative half-space of all cluster triangles by construction
+	// 锥顶点按构造应位于所有簇三角形的负半空间
 	bounds.cone_apex[0] = center[0] - axis[0] * maxt;
 	bounds.cone_apex[1] = center[1] - axis[1] * maxt;
 	bounds.cone_apex[2] = center[2] - axis[2] * maxt;
 
-	// note: this axis is the axis of the normal cone, but our test for perspective camera effectively negates the axis
+	// 注意：此轴是法向锥的轴，但我们针对透视相机的测试实际上使该轴取反
 	bounds.cone_axis[0] = axis[0];
 	bounds.cone_axis[1] = axis[1];
 	bounds.cone_axis[2] = axis[2];
@@ -1541,17 +1541,17 @@ meshopt_Bounds meshopt_computeClusterBounds(const unsigned int* indices, size_t 
 	// which gives us -cos(a+90) = -(-sin(a)) = sin(a) = sqrt(1 - cos^2(a))
 	bounds.cone_cutoff = sqrtf(1 - mindp * mindp);
 
-	// quantize axis & cutoff to 8-bit SNORM format
+	// 将轴和阈值量化为 8 位 SNORM 格式
 	bounds.cone_axis_s8[0] = (signed char)(meshopt_quantizeSnorm(bounds.cone_axis[0], 8));
 	bounds.cone_axis_s8[1] = (signed char)(meshopt_quantizeSnorm(bounds.cone_axis[1], 8));
 	bounds.cone_axis_s8[2] = (signed char)(meshopt_quantizeSnorm(bounds.cone_axis[2], 8));
 
-	// for the 8-bit test to be conservative, we need to adjust the cutoff by measuring the max. error
+	// 为使 8 位测试保持保守，需通过测量最大误差来调整阈值
 	float cone_axis_s8_e0 = fabsf(bounds.cone_axis_s8[0] / 127.f - bounds.cone_axis[0]);
 	float cone_axis_s8_e1 = fabsf(bounds.cone_axis_s8[1] / 127.f - bounds.cone_axis[1]);
 	float cone_axis_s8_e2 = fabsf(bounds.cone_axis_s8[2] / 127.f - bounds.cone_axis[2]);
 
-	// note that we need to round this up instead of rounding to nearest, hence +1
+	// 注意：这需要向上取整而非取最近的整数，因此 +1
 	int cone_cutoff_s8 = int(127 * (bounds.cone_cutoff + cone_axis_s8_e0 + cone_axis_s8_e1 + cone_axis_s8_e2) + 1);
 
 	bounds.cone_cutoff_s8 = (cone_cutoff_s8 > 127) ? 127 : (signed char)(cone_cutoff_s8);
@@ -1621,9 +1621,9 @@ void meshopt_optimizeMeshlet(unsigned int* meshlet_vertices, unsigned char* mesh
 	unsigned char cache[kMeshletMaxVertices];
 	memset(cache, 0, vertex_count);
 
-	// note that we start from a value that means all vertices aren't in cache
+	// 注意：我们从表示所有顶点都不在缓存中的值开始
 	unsigned char cache_last = 128;
-	const unsigned char cache_cutoff = 3; // 3 triangles = ~5..9 vertices depending on reuse
+	const unsigned char cache_cutoff = 3; // 3 个三角形 = 视复用情况约 5..9 个顶点
 
 	for (size_t i = 0; i < triangle_count; ++i)
 	{
@@ -1635,8 +1635,8 @@ void meshopt_optimizeMeshlet(unsigned int* meshlet_vertices, unsigned char* mesh
 			unsigned char a = indices[j * 3 + 0], b = indices[j * 3 + 1], c = indices[j * 3 + 2];
 			assert(a < vertex_count && b < vertex_count && c < vertex_count);
 
-			// score each triangle by how many vertices are in cache
-			// note: the distance is computed using unsigned 8-bit values, so cache timestamp overflow is handled gracefully
+			// 依据每个三角形有多少顶点在缓存中对其进行评分
+			// 注意：距离使用无符号 8 位值计算，因此缓存时间戳溢出可被妥善处理
 			int aok = (unsigned char)(cache_last - cache[a]) < cache_cutoff;
 			int bok = (unsigned char)(cache_last - cache[b]) < cache_cutoff;
 			int cok = (unsigned char)(cache_last - cache[c]) < cache_cutoff;
@@ -1646,7 +1646,7 @@ void meshopt_optimizeMeshlet(unsigned int* meshlet_vertices, unsigned char* mesh
 				next = (int)j;
 				next_match = aok + bok + cok;
 
-				// note that we could end up with all 3 vertices in the cache, but 2 is enough for ~strip traversal
+				// 注意：三个顶点可能最终都在缓存中，但对于 ~strip 遍历而言 2 个已足够
 				if (next_match >= 2)
 					break;
 			}
@@ -1656,22 +1656,22 @@ void meshopt_optimizeMeshlet(unsigned int* meshlet_vertices, unsigned char* mesh
 
 		unsigned char a = indices[next * 3 + 0], b = indices[next * 3 + 1], c = indices[next * 3 + 2];
 
-		// shift triangles before the next one forward so that we always keep an ordered partition
-		// note: this could have swapped triangles [i] and [next] but that distorts the order and may skew the output sequence
+		// 将下一个三角形之前的三角形前移，以便始终维持有序划分
+		// 注意：本可交换三角形 [i] 和 [next]，但这会打乱顺序并可能使输出序列偏斜
 		memmove(indices + (i + 1) * 3, indices + i * 3, (next - i) * 3 * sizeof(unsigned char));
 
 		indices[i * 3 + 0] = a;
 		indices[i * 3 + 1] = b;
 		indices[i * 3 + 2] = c;
 
-		// cache timestamp is the same between all vertices of each triangle to reduce overflow
+		// 每个三角形所有顶点之间的缓存时间戳相同，以减少溢出
 		cache_last++;
 		cache[a] = cache_last;
 		cache[b] = cache_last;
 		cache[c] = cache_last;
 	}
 
-	// reorder meshlet vertices for access locality assuming index buffer is scanned sequentially
+	// 假定索引缓冲区顺序扫描，重新排序 meshlet 顶点以实现访问局部性
 	unsigned int order[kMeshletMaxVertices];
 
 	short remap[kMeshletMaxVertices];

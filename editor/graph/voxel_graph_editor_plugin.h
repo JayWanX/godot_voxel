@@ -56,14 +56,14 @@ private:
 	bool _deferred_visibility_scheduled = false;
 	voxel::godot::ObjectWeakRef<VoxelNode> _voxel_node;
 	StdVector<Ref<VoxelGraphNodeInspectorWrapper>> _node_wrappers;
-	// Workaround for a new Godot 4 behavior:
-	// When we inspect an object, Godot calls `edit(nullptr)` on our plugin first, and `make_visible(false)`.
-	// But this plugin needs to allow inspecting nodes of the graph. When a node is selected, it tells Godot to
-	// inspect an associated object.
-	// But with the new `edit(nullptr)` behavior, the plugin would clean up its UI, which destroys the UI GraphNode you
-	// selected, leading to nasty crashes and errors...
-	// Since this boils down to the plugin triggering a change in inspected object, we set a boolean to IGNORE
-	// `edit(nullptr)` calls.
+	// 针对 Godot 4 新行为的变通方法：
+	// 当我们检查一个对象时，Godot 会先在我们的插件上调用 `edit(nullptr)` 和 `make_visible(false)`。
+	// 但此插件需要允许检查图形的节点。当选中一个节点时，它告诉 Godot
+	// 去检查一个关联对象。
+	// 但在新的 `edit(nullptr)` 行为下，插件会清理其 UI，这会把选中的 UI GraphNode 销毁，
+	// 导致令人抓狂的崩溃和错误……
+	// 由于这归结为插件触发了被检查对象的变更，我们设置一个布尔值来忽略
+	// `edit(nullptr)` 调用。
 	bool _ignore_edit_null = false;
 	bool _ignore_make_visible = false;
 };

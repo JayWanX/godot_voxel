@@ -50,7 +50,7 @@ uint32_t g_default_palette[PALETTE_SIZE] = {
 Error parse_string(FileAccess &f, String &s) {
 	const int size = f.get_32();
 
-	// Sanity checks
+	// 健全性检查
 	ERR_FAIL_COND_V(size < 0, ERR_INVALID_DATA);
 	ERR_FAIL_COND_V(size > 4096, ERR_INVALID_DATA);
 
@@ -69,7 +69,7 @@ Error parse_string(FileAccess &f, String &s) {
 Error parse_dictionary(FileAccess &f, StdUnorderedMap<String, String> &dict) {
 	const int item_count = f.get_32();
 
-	// Sanity checks
+	// 健全性检查
 	ERR_FAIL_COND_V(item_count < 0, ERR_INVALID_DATA);
 	ERR_FAIL_COND_V(item_count > 256, ERR_INVALID_DATA);
 
@@ -90,8 +90,8 @@ Error parse_dictionary(FileAccess &f, StdUnorderedMap<String, String> &dict) {
 	return OK;
 }
 
-// MagicaVoxel uses a Z-up coordinate system similar to 3DS Max.
-// Here we read the data such that it follows OpenGL coordinate system.
+// MagicaVoxel 使用与 3DS Max 类似的 Z 轴向上坐标系。
+// 这里我们以下述方式读取数据，使其遵循 OpenGL 坐标系。
 //
 //     Z             Y
 //     | Y           | X
@@ -123,11 +123,11 @@ void transpose(Vector3i sx, Vector3i sy, Vector3i sz, Vector3i &dx, Vector3i &dy
 }
 
 Basis parse_basis(uint8_t data) {
-	// bits 0 and 1 are the index of the non-zero entry in the first row
+	// 第 0 位和第 1 位是第一行中非零条目的索引
 	const int xi = (data >> 0) & 0x03;
-	// bits 2 and 3 are the index of the non-zero entry in the second row
+	// 第 2 位和第 3 位是第二行中非零条目的索引
 	const int yi = (data >> 2) & 0x03;
-	// The index of the non-zero entry in the last row can be deduced as the last not "occupied" index
+	// 最后一行中非零条目的索引可以推断为最后一个未被“占用”的索引
 	bool occupied[3] = { false };
 	occupied[xi] = true;
 	occupied[yi] = true;
@@ -142,9 +142,9 @@ Basis parse_basis(uint8_t data) {
 	y[yi] = y_sign;
 	z[zi] = z_sign;
 
-	// The following is a bit messy, had a hard time figuring out the correct combination of conversions
-	// to bring MagicaVoxel rotations to Godot rotations.
-	// TODO Maybe this can be simplified?
+	// 下面有点杂乱，当时花了不少功夫才弄明白正确的转换组合，
+	// 以将 MagicaVoxel 的旋转转换为 Godot 的旋转。
+	// TODO 也许这可以简化？
 
 	Vector3i magica_x, magica_y, magica_z;
 	transpose(x, y, z, magica_x, magica_y, magica_z);
@@ -217,11 +217,11 @@ Error Data::_load_from_file(String fpath) {
 	ERR_FAIL_COND_V(strcmp(magic, "VOX ") != 0, ERR_PARSE_ERROR);
 
 	const uint32_t version = f.get_32();
-	// <2025/01/22>: at this time, the spec repo from ephtracy only indicates version 150. 200 was added at some point,
-	// supposedly adding new extensions, but I could not find a clue in the spec indicating that they were added at
-	// version 200 (the string "200" appears nowhere in the repo). For now, since there was no change to extensions our
-	// loader support, we just allow that version without other difference.
-	// See https://github.com/ephtracy/ephtracy.github.io/issues/264
+	// <2025/01/22>：目前，ephtracy 的规范仓库只标明版本 150。200 是在某个时点加入的，
+	// 据称是添加了新扩展，但我无法在规范中找到表明它们是在
+	// 版本 200 加入的线索（仓库中完全没有出现字符串 "200"）。目前，由于与我们加载器支持的扩展相比没有变化，
+	// 我们就只允许该版本而无其它差异。
+	// 参见 https://github.com/ephtracy/ephtracy.github.io/issues/264
 	ERR_FAIL_COND_V(version != 150 && version != 200, ERR_PARSE_ERROR);
 
 	const size_t file_length = f.get_length();
@@ -320,7 +320,7 @@ Error Data::_load_from_file(String fpath) {
 
 			auto t_it = frame.find("_t");
 			if (t_it != frame.end()) {
-				// It is 3 integers formatted as text
+				// 它是 3 个以文本形式格式化的整数
 				const PackedFloat64Array coords = t_it->second.split_floats(" ");
 				ERR_FAIL_COND_V(coords.size() < 3, ERR_PARSE_ERROR);
 				// VOXEL_PRINT_VERBOSE(String("Pos: {0}, {1}, {2}").format(varray(coords[0], coords[1], coords[2])));
@@ -330,7 +330,7 @@ Error Data::_load_from_file(String fpath) {
 			auto r_it = frame.find("_r");
 			if (r_it != frame.end()) {
 				Rotation rot;
-				// TODO Is it really an integer formatted as text?
+				// TODO 它真的是以文本形式格式化的整数吗？
 				rot.data = r_it->second.to_int();
 				rot.basis = parse_basis(rot.data);
 				node.rotation = rot;
@@ -348,7 +348,7 @@ Error Data::_load_from_file(String fpath) {
 			ERR_FAIL_COND_V(header_err != OK, header_err);
 
 			const unsigned int child_count = f.get_32();
-			// Sanity check
+			// 完整性检查
 			ERR_FAIL_COND_V(child_count > 65536, ERR_INVALID_DATA);
 			node.child_node_ids.resize(child_count);
 
@@ -487,22 +487,22 @@ Error Data::_load_from_file(String fpath) {
 
 		} else {
 			VOXEL_PRINT_VERBOSE(format("Skipping chunk {}", chunk_id));
-			// Ignore chunk
+			// 忽略块
 			f.seek(f.get_position() + chunk_size);
 		}
 	}
 
-	// There is no indication on the official spec to detect the root node of the scene graph.
-	// It might just be the first one we find in the file, but the specification does not explicitly enforce that.
-	// So we have to do it the long way, marking which nodes are referenced by others.
+	// 官方规范中没有说明如何检测场景图的根节点。
+	// 它也许只是我们在文件中找到的第一个节点，但规范并未明确强制执行这一点。
+	// 因此我们不得不费点功夫，标记出哪些节点被其它节点引用。
 	StdUnorderedSet<int> referenced_nodes;
 
-	// Validate scene graph
+	// 校验场景图
 	for (auto it = _scene_graph.begin(); it != _scene_graph.end(); ++it) {
 		const Node *node = it->second.get();
 		CRASH_COND(node == nullptr);
 
-		// TODO We should check for cycles too...
+		// TODO 我们也应该检查环……
 
 		switch (node->type) {
 			case Node::TYPE_TRANSFORM: {
@@ -518,7 +518,7 @@ Error Data::_load_from_file(String fpath) {
 				referenced_nodes.insert(child_id);
 
 				const int layer_id = transform_node->layer_id;
-				// Apparently it is possible to find nodes that are not attached to any layer
+				// 显然有可能找到未挂接到任何层上的节点
 				if (layer_id != -1) {
 					bool layer_exists = false;
 					for (size_t i = 0; i < _layers.size(); ++i) {
@@ -569,10 +569,10 @@ Error Data::_load_from_file(String fpath) {
 		_root_node_id = node_id;
 	}
 
-	// Some vox files don't have scene graph chunks
+	// 一些 vox 文件没有场景图块
 	if (_scene_graph.size() > 0) {
-		// But if they do, they must have a root.
-		// If this fails, that means there is a cycle (the opposite is not true)
+		// 但如果有，它们就必定有一个根。
+		// 若此处失败，则说明存在循环（反之则不然）
 		ERR_FAIL_COND_V_MSG(_root_node_id == -1, ERR_INVALID_DATA, "Root node not found");
 	}
 

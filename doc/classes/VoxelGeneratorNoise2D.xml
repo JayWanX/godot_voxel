@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGeneratorNoise2D" inherits="VoxelGeneratorHeightmap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Voxel generator producing noise-based heightmap terrain.
+		生成基于噪声的高度图地形的体素生成器。
 	</brief_description>
 	<description>
 	</description>
@@ -9,13 +9,13 @@
 	</tutorials>
 	<members>
 		<member name="curve" type="Curve" setter="set_curve" getter="get_curve">
-			When assigned, this curve will alter the distribution of height variations, allowing to give some kind of "profile" to the generated shapes.
-			By default, a linear curve from 0 to 1 is used.
-			It is assumed that the curve's domain goes from 0 to 1.
+			当赋值时，此曲线将改变高度变化的分布，从而可以为生成的形状提供某种"轮廓"。
+			默认情况下使用从 0 到 1 的线性曲线。
+			假定曲线的定义域从 0 到 1。
 		</member>
 		<member name="height_range" type="float" setter="set_height_range" getter="get_height_range" overrides="VoxelGeneratorHeightmap" default="200.0" />
 		<member name="noise" type="Noise" setter="set_noise" getter="get_noise">
-			Noise used to produce the heightmap. It is required for the generator to work.
+			用于生成高度图的噪声。生成器需要它才能工作。
 		</member>
 	</members>
 </class>

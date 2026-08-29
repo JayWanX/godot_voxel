@@ -48,7 +48,7 @@ void test_flat_map() {
 	}
 
 	{
-		// Insert pre-sorted pairs
+		// 插入已排序的键值对
 		FlatMap<int, Value> map;
 		for (size_t i = 0; i < sorted_pairs.size(); ++i) {
 			const Pair pair = sorted_pairs[i];
@@ -57,7 +57,7 @@ void test_flat_map() {
 		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
-		// Insert random pairs
+		// 插入随机顺序的键值对
 		FlatMap<int, Value> map;
 		for (size_t i = 0; i < shuffled_pairs.size(); ++i) {
 			const Pair pair = shuffled_pairs[i];
@@ -66,7 +66,7 @@ void test_flat_map() {
 		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
-		// Insert random pairs with duplicates
+		// 插入随机顺序且带重复项的键值对
 		FlatMap<int, Value> map;
 		for (size_t i = 0; i < shuffled_pairs.size(); ++i) {
 			const Pair pair = shuffled_pairs[i];
@@ -76,20 +76,20 @@ void test_flat_map() {
 		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
-		// Init from collection
+		// 从集合初始化
 		FlatMap<int, Value> map;
 		map.clear_and_insert(to_span(shuffled_pairs));
 		VOXEL_TEST_ASSERT(L::validate_map(map, sorted_pairs));
 	}
 	{
-		// Inexistent items
+		// 不存在的项
 		FlatMap<int, Value> map;
 		map.clear_and_insert(to_span(shuffled_pairs));
 		VOXEL_TEST_ASSERT(!map.has(inexistent_key1));
 		VOXEL_TEST_ASSERT(!map.has(inexistent_key2));
 	}
 	{
-		// Iteration
+		// 迭代遍历
 		FlatMap<int, Value> map;
 		map.clear_and_insert(to_span(shuffled_pairs));
 		size_t i = 0;

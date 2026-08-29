@@ -1,86 +1,86 @@
-Procedural generation
+程序化生成
 ==========================
 
-This section describes techniques involved in procedural generation of terrains. Some are experimental and may be adjusted. Articles will either use graphs or scripts, and can be more advanced than other sections of the documentation, so you should first get familiar with the API.
+本节描述地形程序化生成所涉及的技术。其中一些是实验性的，可能会被调整。文章会使用图形或脚本，并且可能比文档的其他部分更高级，因此你应该先熟悉 API。
 
 
-Caves with graph generator
+使用图形生成器生成洞穴
 ---------------------------------
 
-It is possible to generate caves by subtracting noise "worms" from a base SDF terrain. To simplify the approach, let's first look at what 2D noise looks like, with a few octaves:
+可以通过从基础 SDF 地形中减去噪声“蠕虫”来生成洞穴。为简化方法，让我们先看看带几个倍频程的 2D 噪声是什么样的：
 
-![Noise](images/noise.webp)
+![噪声](images/noise.webp)
 
-If we multiply that noise by itself (i.e square it), we obtain this:
+如果我们将该噪声乘以自身（即平方），会得到这样的结果：
 
-![Squared noise](images/squared_noise.webp)
+![平方后的噪声](images/squared_noise.webp)
 
-And if we clamp it to highlight values below a threshold close to zero, we can notice a path-like pattern going on:
+如果我们对其进行钳制以高亮低于接近零的阈值的部分，就能注意到类似路径的图案：
 
-![Squared noise path highlight](images/squared_noise_with_highlight.webp)
+![平方噪声的路径高亮](images/squared_noise_with_highlight.webp)
 
-In 2D (or in 3D when using normalized coordinates) this is the key to produce rivers, or ravines. But the problem with caves is to obtain 3D, round-shaped "worms", not just 2D shapes. So we can cheat a little, by still using 2D noise, but instead we modulate the threshold along the Y axis. We need a parabola-shaped curve for this, which can be obtained with a second-degree polynome like `y^2 - 1`:
+在 2D（或使用归一化坐标的 3D）中，这是生成河流或峡谷的关键。但洞穴的问题在于要获得 3D 的圆形“蠕虫”，而不仅仅是 2D 形状。所以我们可以稍微取巧，仍然使用 2D 噪声，但改为沿着 Y 轴调节阈值。为此我们需要一条抛物线形曲线，可以通过 `y^2 - 1` 这样的二次多项式获得：
 
-![Cave threshold modulation](images/cave_threshold_modulation.webp)
+![洞穴阈值调节](images/cave_threshold_modulation.webp)
 
-Back to the voxel graph, we may connect directly the cave generation nodes to the output just to preview what they look like, without the rest of the terrain:
+回到体素图形，我们可以直接将洞穴生成节点连接到输出，只预览它们的样子，而不包括其余地形：
 
-![Cave voxel graph](images/caves_flat.webp)
+![洞穴体素图形](images/caves_flat.webp)
 
-After tweaking noise and other values, we obtain those famous worms, but there are two problems:
+调整噪声和其他值之后，我们得到了那些著名的蠕虫，但有两个问题：
 
-- The caves are still flat, they don't go up or down
-- They go on endlessly, there are no dead-ends
+- 洞穴仍然是扁平的，它们不会上下起伏
+- 它们无限延伸，没有死胡同
 
-We can fix the first problem by adding an extra layer of 2D noise to the Y coordinate so it can perturb the caves vertically. Re-using the ground surface noise with an extra multiplier can prove effective sometimes, so we avoid computing extra noise.
+我们可以通过向 Y 坐标添加额外一层 2D 噪声来解决第一个问题，使其能垂直扰动洞穴。复用地面噪声并附加一个乘数有时会很有效，这样我们就能避免额外计算噪声。
 
-![Caves perturb](images/caves_perturb.webp)
+![洞穴扰动](images/caves_perturb.webp)
 
-The second problem can also be fixed with yet another layer of low-frequency noise, which can be added to the cave threshold so caves will shrink to become dead-ends on some regions. Again, adding multipliers may change how sharply that transition occurs.
+第二个问题也可以通过再添加一层低频噪声来解决，将其加到洞穴阈值上，使洞穴在某些区域收缩为死胡同。同样，添加乘数可能会改变这种过渡发生的陡峭程度。
 
-![Cave voxel graph perturb and modulated](images/caves_perturb_modulated.webp)
+![洞穴体素图形：扰动并调制](images/caves_perturb_modulated.webp)
 
-Finally, we can blend our terrain with caves by subtracting them. This can be done with the `SdfSmoothSubtract` node, essentially doing `terrain - caves`.
+最后，我们可以通过减去洞穴来将它们与地形混合。这可以使用 `SdfSmoothSubtract` 节点完成，本质上执行 `terrain - caves`。
 
-![Cave voxel graph terrain subtract](images/caves_composed.webp)
+![洞穴体素图形：减去地形](images/caves_composed.webp)
 
-There are likely variants of this to obtain different results.
+可能还有多种变体可以获得不同结果。
 
 
-Handling block boundaries with voxel structures
+使用体素结构处理数据块边界
 ---------------------------------------------------
 
-In Minecraft-style terrain, a very common problem that arises once base terrain is generated, is how to plant trees in it, because such structures would be voxels too.
-In that specific case, there are a number of caveats when doing that with generators, which mainly revolve about the fact they process chunks one by one, and not the entire world at once.
+在 Minecraft 风格的地形中，一旦基础地形生成，一个非常常见的问题就是如何在其中种植树木，因为这样的结构本身也是体素。
+在这种特定情况下，使用生成器处理时有一些注意事项，主要围绕这样一个事实：它们逐个处理区块，而不是一次性处理整个世界。
 
-There are several ways to deal with this:
+有几种方法可以处理这个问题：
 
-- Exploit procedural determinism to "guess" where trees would grow in neighbor chunks, without having to generate entire neighbor chunks
-- Split generation in multiple passes and provide access to neighbor chunks that have gone through previous passes
+- 利用程序化确定性来“猜测”树木会在相邻区块的什么位置生长，而无需生成完整的相邻区块
+- 将生成拆分为多个遍次，并允许访问已经历过之前遍次的相邻区块
 
-The following describes the first method, which does not involve accessing neighbors at all, and allows to generate trees in a terrain where the base height is both deterministic and easy to compute (2D noise heightmap for example).
+下文描述第一种方法，它完全不涉及访问相邻区块，并允许在基础高度既确定又易于计算的地形（例如 2D 噪声高度图）中生成树木。
 
-If you want to use the second method, you may check [multipass generators](generators.md#multi-pass-generation-with-voxelgeneratormultipasscb).
+如果你想使用第二种方法，可以查看[多遍生成器](generators.md#multi-pass-generation-with-voxelgeneratormultipasscb)。
 
-### Deterministic approach
+### 确定性方法<span id="deterministic-approach"></span>
 
-#### Finding where trees should grow in (X, Z)
+#### 找出树木应在 (X, Z) 的哪个位置生长
 
-The first thing to do is to figure out, in the current block, where should trees grow. For simplicity, we will consider it as a 2D problem, where trees can grow at specific (X, Z) positions (since Y is up). For that, we need to find positions of voxels just above ground, and do so in a deterministic manner, so that the same seed will produce the same results.
+首先要弄清楚在当前数据块中树木应该在哪些位置生长。为简单起见，我们将其视为 2D 问题，即树木可以在特定的 (X, Z) 位置生长（因为 Y 朝上）。为此，我们需要找到刚好在地面之上的体素位置，并以确定性的方式完成，以便相同的种子产生相同的结果。
 
-But how to make it deterministic? We can use the seed of a `RandomNumberGenerator` instance. But if we give it the seed of the world, every block will have trees at the same position in them. What we really need, is a seed that is unique per block. We can achieve that by using a hash of the 2D coordinates of the block:
+但如何使其具有确定性呢？我们可以使用 `RandomNumberGenerator` 实例的种子。但如果给它世界的种子，每个数据块中的树木都会位于相同的位置。我们真正需要的是每个数据块唯一的种子。我们可以通过使用数据块 2D 坐标的哈希来实现：
 
 ```gdscript
 var block_position := Vector3i(
     origin_in_voxels.x >> 4,
     origin_in_voxels.y >> 4,
-    origin_in_voxels.z >> 4) # floored division by 16
+    origin_in_voxels.z >> 4) # 向下取整除以 16
 
 var rng := RandomNumberGenerator.new()
 rng.seed = global_seed + hash(Vector2i(block_position.x, block_position.z))
 ```
 
-And now we can generate how many trees are in the block, and where:
+现在我们可以生成数据块中有多少棵树以及它们的位置：
 
 ```gdscript
 var block_size := out_buffer.get_size()
@@ -89,55 +89,55 @@ var tree_positions := []
 tree_positions.resize(tree_count)
 for i in tree_count:
     var tree_pos := Vector3i(
-        rng.randi_range(0, block_size.x), 0, # We leave Y for later
+        rng.randi_range(0, block_size.x), 0, # 我们稍后再处理 Y
         rng.randi_range(0, block_size.z))
-    # Note, those positions are local to the block
+    # 注意，这些位置是相对于数据块的局部坐标
     tree_positions[i] = tree_pos
 ```
 
-#### Finding the altitude (Y)
+#### 找出海拔（Y）
 
-But we still need to calculate the altitude from which the tree will grow (the Y coordinate). One issue is that the engine generates cubic blocks, so when generating a given 16x16x16 voxel, you can't access what's below, you only know what's inside the area of the block.
+但我们仍然需要计算树木将生长的高度（Y 坐标）。一个问题是引擎生成的是立方体数据块，因此在生成给定的 16x16x16 体素时，你无法访问其下方的内容，只能知道数据块区域内的情况。
 
-However, if base terrain is generated using 2D heightmap noise, then we can calculate how high terrain is at any (x, z) coordinate by computing the height function again, wherever we need.
-Assuming we already have such function as `func get_height(x: float, y: float) -> float`, we can complete the Y coordinate like so:
+然而，如果基础地形使用 2D 高度图噪声生成，那么我们可以在任何需要的地方重新计算高度函数，从而算出任意 (x, z) 坐标处的地形高度。
+假设我们已有这样的函数 `func get_height(x: float, y: float) -> float`，我们可以像这样补全 Y 坐标：
 
 ```gdscript
 for i in len(tree_positions):
     var tree_pos_local : Vector3i = tree_positions[i]
-    # Use world coordinates for this
+    # 这里使用世界坐标
     var tree_pos_global := tree_pos_local + origin_in_voxels
     tree_pos_global.y := get_height(tree_pos_global.x, tree_pos_global.z)
-    # And bring back to local
+    # 并转换回局部坐标
     tree_pos_local = tree_pos_global - origin_in_voxels
-    # And store back into the array
+    # 并存储回数组
     tree_positions[i] = tree_pos_local
 ```
 
-#### Placing the tree
+#### 放置树木
 
-Now we should be able to place the tree, but what if positions we found are outside the block? We can't set voxels at these positions.
+现在我们应该能够放置树木了，但如果我们找到的位置在数据块之外怎么办？我们无法在这些位置设置体素。
 
-What we can do, is to first determine how big the tree will be. Once we know its bounding box, we can place voxels, but only those intersecting our block.
+我们可以先确定树会有多大。一旦知道它的包围盒，我们就可以放置体素，但只放置那些与我们的数据块相交的体素。
 
-To determine how big the tree is, it sounds like we have to generate the tree first, and then determine its bounding box in voxels. We can do that in a separate blank buffer with large enough size, or using a `Dictionary` of `Vector3i` keys and `int` values. But at the end, it is preferable to store the result in an optimized `VoxelBuffer` of the right size.
+要确定树有多大，听起来我们必须先生成树，然后确定它的体素包围盒。我们可以在一个足够大的独立空白缓冲中完成，或者使用以 `Vector3i` 为键、`int` 为值的 `Dictionary`。但最终，最好将结果存储在大小合适的优化后的 `VoxelBuffer` 中。
 
-We won't describe how to generate the tree itself here, it's not really the point of this article and can be different with plenty of factors. But it could just be a vertical bar of trunk voxels, with a sphere of leaves on top.
-It is possible to optimize this step by pre-generating (or making by hand) a bunch of trees ahead of time and store them in a list, so all tree bounds are known and no need to spend time generating them in detail.
+我们不会在这里描述如何生成树本身，这并非本文的重点，而且可能因众多因素而不同。但它可以只是一根竖直的树干体素柱，顶部带一个球形树叶。
+可以通过预先（或手工）生成一批树并存储到列表中，来优化这一步，这样所有树的边界都是已知的，无需花时间详细生成它们。
 
-We can pack tree data into a class:
+我们可以将树的数据封装到一个类中：
 
 ```gdscript
 class TreeInfo:
-    # Position of the tree relative to our current block
+    # 树相对于当前数据块的位置
     var instance_position := Vector3i()
-    # Buffer storing only the tree, like a model, so it can later be pasted in the world
+    # 只存储树本身的缓冲，如同模型，以便之后粘贴到世界中
     var voxels : VoxelBuffer
-    # Position of the base of the tree, within the VoxelBuffer containing the model of the tree
+    # 树干底部在包含树模型的 VoxelBuffer 中的位置
     var trunk_base_position := Vector3i()
 ```
 
-So we can have a list of trees instead of just their positions:
+因此我们可以拥有一份树的列表，而不只是它们的位置：
 
 ```gdscript
 var trees : Array[TreeInfo] = []
@@ -147,67 +147,64 @@ for tree_pos in tree_positions:
     trees.append(tree)
 ```
 
-We may wrap this logic in a function `func generate_trees_for_block(block_position: Vector3i) -> Array[TreeInfo]`, because it may be useful later.
+我们可以将这段逻辑封装进函数 `func generate_trees_for_block(block_position: Vector3i) -> Array[TreeInfo]`，因为它以后可能会用到。
 
-Once we know the bounds of each tree, we can check if they intersect with the current block. If they do, we can use the `paste_masked` method to plant just the tree, without replacing solid voxels with empty ones from the tree's `VoxelBuffer`:
+一旦我们知道每棵树的边界，就可以检查它们是否与当前数据块相交。如果相交，我们可以使用 `paste_masked` 方法只种植树，而不会用树的 `VoxelBuffer` 中的空体素替换实心体素：
 
 ```gdscript
-# AABB of our current block, in local coordinates
+# 当前数据块的 AABB，使用局部坐标
 var block_aabb := AABB(Vector3(), block_size.get_size() + Vector3i(1, 1, 1))
 
 var voxel_tool := out_buffer.get_voxel_tool()
 
-# Paste intersecting trees
+# 粘贴相交的树
 for tree in trees:
     var lower_corner_pos := tree.instance_position - tree.trunk_base_position
     var tree_aabb := AABB(lower_corner_pos, tree.voxels.get_size() + Vector3(1,1,1))
     
     if tree_aabb.intersects(block_aabb):
         voxel_tool.paste_masked(lower_corner_pos, tree.voxels, 
-            # Which channel we want to paste
+            # 我们要粘贴哪个通道
             1 << VoxelBuffer.CHANNEL_TYPE,
-            # Masking 0, since 0 is considered air
+            # 掩码为 0，因为 0 被视为空气
             VoxelBuffer.CHANNEL_TYPE, 0)
 ```
 
-#### Fixing overlaps
+#### 修复重叠
 
-Now trees should appear in the world, but when they overlap block borders, they will be cutoff. The reason is that each block is unaware of its neighbors, they generate only trees that originate inside them in the X and Z axes, and only affect voxels in themselves, since they can't modify their neighbors.
+现在树木应该会出现在世界中，但当它们与数据块边界重叠时，会被截断。原因是每个数据块都不知道其相邻数据块，它们只在 X 和 Z 轴上生成源于自身内部的树，并且只影响自身的体素，因为它们无法修改相邻数据块。
 
-![Schema of individual blocks generating cutoff trees](images/tree_generation_cutoff_schema.webp)
+![单个数据块生成被截断树木的示意图](images/tree_generation_cutoff_schema.webp)
 
-We could decide to clamp their position so that they never overlap, but that might not be acceptable, given how "aligned" they will look in the game.
+我们可以决定钳制它们的位置，使它们永远不会重叠，但鉴于它们在游戏中看起来会非常“整齐划一”，这可能不可接受。
 
-We can workaround this by applying the same reasoning we did to obtain their altitude. Instead of just considering trees in the current block, we can also check trees that would generate in neighbor blocks, since we can re-run the function to get them deterministically from a given block position. Then all we have to do is keep only those intersecting our block. Each block will then generate with neighbor trees in the right locations.
+我们可以应用与获取高度时相同的推理来解决这个问题。除了只考虑当前数据块中的树，我们还可以检查会在相邻数据块中生成的树，因为我们可以从给定的数据块位置重新运行函数来确定性地获取它们。然后我们要做的只是保留那些与我们的数据块相交的树。这样每个数据块生成时都会在正确的位置包含相邻的树。
 
-![Schema of neighbor trees being generated to take into account overlaps with the current block](images/tree_generation_neighbor_fix_schema.webp)
+![生成相邻树木以考虑与当前数据块重叠的示意图](images/tree_generation_neighbor_fix_schema.webp)
 
-Note that it means each block will recalculate the locations of its own trees and neighbor trees, so trees in a given block will be calculated more than once during generation of the world. That also means `generate_tree` will be called more than once too. But if we cache generated tree models ahead of time (before the game starts), this process will be a lot cheaper.
+请注意，这意味着每个数据块都会重新计算自己的树和相邻树的位置，因此世界生成过程中，给定数据块中的树会被计算不止一次。这也意味着 `generate_tree` 会被调用不止一次。但如果我们提前（游戏开始前）缓存生成的树模型，这个过程会便宜得多。
 
 ```gdscript
 var trees : Array[TreeInfo] = []
 
-# Get trees that originate from the current block and its neighbors
+# 获取源自当前数据块及其相邻数据块的树
 for nz in range(-1, 2):
     for nx in range(-1, 2):
         var trees_in_block := generate_trees_for_block(block_position + Vector3i(nx, 0, nz))
         trees.append_array(trees_in_block)
 
-# Paste intersecting trees
+# 粘贴相交的树
 for tree in trees:
-    # Earlier code for pasting trees
+    # 之前粘贴树的代码
     # ...
 ```
 
-This method has been implemented [in this demo](https://github.com/Voxel/voxelgame/blob/2fa552abfdf52c688bbec27edd676018a31373e0/project/blocky_game/generator/generator.gd#L144), although the code is a bit different.
+这种方法已在[这个演示](https://github.com/Voxel/voxelgame/blob/2fa552abfdf52c688bbec27edd676018a31373e0/project/blocky_game/generator/generator.gd#L144)中实现，尽管代码略有不同。
 
-This approach is also used in Voronoi noise (also known as cellular noise in FastNoiseLite) to produce seamless cells.
+这种方法也用于 Voronoi 噪声（在 FastNoiseLite 中也称为细胞噪声），以生成无缝的单元格。
 
-#### Limitations
+#### 限制
 
-Of course this method has its limitations: if our terrain is more than just a heightmap, includes floating islands, complex carvings or 3D noise structures, it can make the process of finding altitude more complicated. At worse, generating neighbor columns of voxels or entire blocks would become necessary just to find the highest voxel, which would make it too slow.
+当然，这种方法也有其局限性：如果我们的地形不只是高度图，还包含浮空岛屿、复杂的雕刻或 3D 噪声结构，那么寻找高度的过程会变得更加复杂。在最坏的情况下，仅为了找到最高的体素，就必须生成相邻的体素列或整个数据块，这会使其变得太慢。
 
-To counter this, you can check [multipass generators](generators.md#multi-pass-generation-with-voxelgeneratormultipasscb).
-
-
-
+为了应对这一点，你可以查看[多遍生成器](generators.md#multi-pass-generation-with-voxelgeneratormultipasscb)。

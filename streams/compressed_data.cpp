@@ -69,14 +69,14 @@ bool decompress(Span<const uint8_t> src, StdVector<uint8_t> &dst) {
 
 	switch (comp) {
 		case COMPRESSION_NONE: {
-			// We still have to do a copy. The point of this container is compression,
-			// so we don't worry too much about the performance impact of not using `src` directly.
+			// 我们仍然需要复制一次。这个容器的意义就在于压缩，
+			// 因此不直接使用 `src` 带来的性能影响我们并不太在意。
 			dst.resize(src.size() - 1);
 			memcpy(dst.data(), src.data() + 1, dst.size());
 		} break;
 
 		case COMPRESSION_LZ4_BE:
-			// Legacy format
+			// 旧版格式
 			f.endianness = ENDIANNESS_BIG_ENDIAN;
 			VOXEL_ASSERT_RETURN_V(decompress_lz4(f, src, dst), false);
 			break;
@@ -118,7 +118,7 @@ bool compress_lz4(MemoryWriter &f, Span<const uint8_t> src, StdVector<uint8_t> &
 }
 
 bool compress_gd(MemoryWriter &f, Span<const uint8_t> src, const FileAccess::CompressionMode mode) {
-	// Falling back on Godot here, which is simple, but has overhead and more memory allocations.
+	// 此处回退到 Godot 的实现，虽然简单，但有额外开销且会分配更多内存。
 
 	f.store_32(src.size());
 
@@ -156,8 +156,8 @@ bool compress(Span<const uint8_t> src, StdVector<uint8_t> &dst, const Compressio
 		} break;
 
 		case COMPRESSION_LZ4: {
-			// Write header
-			// Must clear first because MemoryWriter writes from the end
+			// 写入头部
+			// 必须先清空，因为 MemoryWriter 是从末尾开始写入的
 			dst.clear();
 			MemoryWriter f(dst, ENDIANNESS_LITTLE_ENDIAN);
 			f.store_8(comp);

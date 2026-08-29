@@ -20,8 +20,8 @@ enum Tests { //
 	TEST_DERIVATIVES = 2
 };
 
-// Sample a maximum change across the given step.
-// The result is not normalized for performance.
+// 在给定步长范围内采样最大变化量。
+// 为了性能考虑，结果未做归一化。
 template <typename F2, typename FloatT>
 FloatT get_derivative(FloatT x, FloatT y, FloatT step, F2 noise_func_2d) {
 	FloatT n0, n1, d;
@@ -100,7 +100,7 @@ void test_min_max(F2 noise_func_2d, F3 noise_func_3d, RandomPCG &rng) {
 	print_line(format("3D | Min: {}, Max: {}", min_value_3d, max_value_3d));
 }
 
-// Generic analysis for noise functions
+// 针对噪声函数的通用分析
 template <typename F2, typename F3, typename FloatT>
 void test_derivatives_tpl(F2 noise_func_2d, F3 noise_func_3d, RandomPCG &rng) {
 	const int iterations = ITERATIONS;
@@ -246,10 +246,10 @@ void test_noises() {
 	fn.SetFractalType(fast_noise_lite::FastNoiseLite::FractalType_None);
 	fn.SetFrequency(1.f);
 
-	// According to OpenSimplex2 author, the 3D version is supposed to have a max derivative around 4.23718
+	// 根据 OpenSimplex2 作者的说法，3D 版本的最大导数应该在 4.23718 左右
 	// https://www.wolframalpha.com/input/?i=max+d%2Fdx+32.69428253173828125+*+x+*+%28%280.6-x%5E2%29%5E4%29+from+-0.6+to+0.6
-	// But empiric measures have shown it around 8. Discontinuities do exist in this noise though,
-	// which makes this measuring harder (and the reason why multiple step sizes are used)
+	// 但实测结果显示它在 8 左右。不过这种噪声中确实存在不连续点，
+	// 这使得测量更加困难（也正是使用多种步长的原因）
 
 	fn.SetNoiseType(fast_noise_lite::FastNoiseLite::NoiseType_OpenSimplex2);
 	test_fnl_noise(fn, "FNL_OpenSimplex2", TEST_MIN_MAX | TEST_DERIVATIVES);
@@ -263,7 +263,7 @@ void test_noises() {
 	fn.SetNoiseType(fast_noise_lite::FastNoiseLite::NoiseType_Value);
 	test_fnl_noise(fn, "FNL Value", TEST_MIN_MAX | TEST_DERIVATIVES);
 
-	// ValueCubic seems to be below -1..1
+	// ValueCubic 的取值范围似乎小于 -1..1
 	// 2D | Min: -0.714547, Max: 0.742197
 	// 3D | Min: -0.542093, Max: 0.499036
 	fn.SetNoiseType(fast_noise_lite::FastNoiseLite::NoiseType_ValueCubic);
@@ -313,7 +313,7 @@ void test_noises() {
 		}
 	}
 
-	// Spreadsheet helper:
+	// 电子表格辅助输出：
 	print_line("Steps:");
 	for (int i = 0; i < STEP_RESOLUTION_COUNT; ++i) {
 		const double step =
@@ -322,9 +322,9 @@ void test_noises() {
 	}
 }
 
-// These are not actually unit tests, but rather analysis. They could be used with tests in the future, but
-// it can be relatively hard for derivatives because empiric tests may bump on irregularities causing false-positives,
-// so for now derivative ranges are estimated manually from the results
+// 这些其实并不是单元测试，而是分析。将来它们可以配合测试使用，但
+// 对导数来说会比较困难，因为实测可能碰到不规则处从而产生误报，
+// 所以目前导数范围是根据结果手动估算的
 void run_noise_tests() {
 	test_noises();
 }

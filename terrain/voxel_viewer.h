@@ -7,22 +7,22 @@
 
 namespace voxel {
 
-// Triggers loading of voxel nodes around its position. Voxels will update in priority closer to viewers.
-// Usually added as child of the player's camera.
+// 触发其位置周围体素节点的加载。靠近观察者的体素会优先更新。
+// 通常添加为玩家相机的子节点。
 class VoxelViewer : public Node3D {
 	GDCLASS(VoxelViewer, Node3D)
 public:
 	VoxelViewer();
 
-	// Distance in world space units
+	// 以世界空间单位表示的距离
 	void set_view_distance(unsigned int distance);
 	unsigned int get_view_distance() const;
-	// TODO Collision distance
+	// TODO 碰撞距离
 
 	void set_view_distance_vertical_ratio(float p_ratio);
 	float get_view_distance_vertical_ratio() const;
 
-	// TODO Have an option to run in editor, could be useful for testing?
+	// TODO 增加一个在编辑器中运行的选项，可能对测试有用？
 
 	void set_requires_visuals(bool enabled);
 	bool is_requiring_visuals() const;

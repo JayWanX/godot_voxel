@@ -8,9 +8,9 @@ namespace voxel::tests {
 
 void test_encode_weights_packed_u16() {
 	FixedArray<uint8_t, 4> weights;
-	// There is data loss of the 4 smaller bits in this encoding,
-	// so to test this we may use values greater than 16.
-	// There is a compromise in decoding, where we choose that only values multiple of 16 are bijective.
+	// 在这种编码中，较低的 4 位存在数据丢失，
+	// 因此为了测试这个，我们可以使用大于 16 的值。
+	// 解码时存在一个折中，我们选择只有 16 的倍数才是双射的。
 	weights[0] = 1 << 4;
 	weights[1] = 5 << 4;
 	weights[2] = 10 << 4;
@@ -44,7 +44,7 @@ void test_copy_3d_region_zxy() {
 			}
 		}
 	};
-	// Sub-region
+	// 子区域
 	{
 		StdVector<uint16_t> src;
 		StdVector<uint16_t> dst;
@@ -97,7 +97,7 @@ void test_copy_3d_region_zxy() {
 
 		L::compare(srcs, src_size, src_min, src_max, to_span_const(dsts), dst_size, dst_min);
 	}
-	// Same size, full region
+	// 相同尺寸，完整区域
 	{
 		StdVector<uint16_t> src;
 		StdVector<uint16_t> dst;

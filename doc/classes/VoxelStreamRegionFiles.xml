@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelStreamRegionFiles" inherits="VoxelStream" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Loads and saves blocks to region files indexed by world position, under a directory.
+		在目录下，将数据块加载和保存到按世界位置索引的区域文件中。
 	</brief_description>
 	<description>
-		Loads and saves blocks to the filesystem, in multiple region files indexed by world position, under a directory. Regions pack many blocks together, so it reduces file switching and improves performance. Inspired by [url=https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game]Seed of Andromeda[/url] and Minecraft.
-		Region files are not thread-safe. Because of this, internal mutexing may often constrain the use by one thread only.
+		在目录下，将数据块加载和保存到文件系统中多个按世界位置索引的区域文件中。区域会将许多数据块打包在一起，从而减少文件切换并提高性能。灵感来自 [url=https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game]Seed of Andromeda[/url] 和 Minecraft。
+		区域文件不是线程安全的。因此，内部互斥锁可能常常将使用限制为仅单线程。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -26,7 +26,7 @@
 		<member name="block_size_po2" type="int" setter="set_block_size_po2" getter="get_block_size_po2" default="4">
 		</member>
 		<member name="directory" type="String" setter="set_directory" getter="get_directory" default="&quot;&quot;">
-			Directory under which the data is saved.
+			保存数据的目录。
 		</member>
 		<member name="region_size_po2" type="int" setter="set_region_size_po2" getter="get_region_size_po2" default="4">
 		</member>

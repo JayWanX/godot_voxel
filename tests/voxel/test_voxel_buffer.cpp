@@ -15,16 +15,16 @@
 namespace voxel::tests {
 
 void test_voxel_buffer_create() {
-	// This test was a repro for a memory corruption crash. The point of this test is to check it doesn't crash,
-	// so there is no particular conditions to check.
+	// 此测试是内存损坏崩溃的复现用例。本测试的重点是检查它不崩溃，
+	// 因此没有需要检查的特殊条件。
 	VoxelBuffer generated_voxels(VoxelBuffer::ALLOCATOR_DEFAULT);
 	generated_voxels.create(Vector3i(5, 5, 5));
 	generated_voxels.set_voxel_f(-0.7f, 3, 3, 3, VoxelBuffer::CHANNEL_SDF);
 	generated_voxels.create(Vector3i(16, 16, 18));
-	// This was found to cause memory corruption at this point because channels got re-allocated using the new size,
-	// but were filled using the old size, which was greater, and accessed out of bounds memory.
-	// The old size was used because the `_size` member was assigned too late in the process.
-	// The corruption did not cause a crash here, but somewhere random where malloc was used shortly after.
+	// 发现此处会引起内存损坏，因为通道是用新尺寸重新分配的，
+	// 却用旧尺寸（更大）来填充，从而访问了越界内存。
+	// 使用旧尺寸是因为 `_size` 成员在该过程中被赋值过晚。
+	// 该损坏没有在此处引发崩溃，而是在其之后不久使用 malloc 的某个随机位置引发崩溃。
 	generated_voxels.create(Vector3i(1, 16, 18));
 }
 
@@ -37,7 +37,7 @@ public:
 	uint8_t c;
 
 	size_t get_serialized_size() const override {
-		// Note, `sizeof(CustomMetadataTest)` gives 16 here. Probably because of vtable
+		// 注意，`sizeof(CustomMetadataTest)` 在此处得到 16。可能是因为虚函数表所致
 		return 3;
 	}
 
@@ -83,7 +83,7 @@ public:
 };
 
 void test_voxel_buffer_metadata() {
-	// Basic get and set
+	// 基本的 get 和 set
 	{
 		VoxelBuffer vb(VoxelBuffer::ALLOCATOR_DEFAULT);
 		vb.create(10, 10, 10);
@@ -170,7 +170,7 @@ void test_voxel_buffer_metadata() {
 }
 
 void test_voxel_buffer_metadata_gd() {
-	// Basic get and set (Godot)
+	// 基本的读取和设置（Godot）
 	{
 		Ref<godot::VoxelBuffer> vb;
 		vb.instantiate();
@@ -229,7 +229,7 @@ void test_voxel_buffer_metadata_gd() {
 		vb2->set_voxel_metadata(Vector3i(1, 2, 3), 43);
 		VOXEL_TEST_ASSERT(vb1->get_buffer().equals(vb2->get_buffer()));
 	}
-	// Serialization (Godot)
+	// 序列化（Godot）
 	{
 		Ref<godot::VoxelBuffer> vb;
 		vb.instantiate();
@@ -261,8 +261,8 @@ void test_voxel_buffer_metadata_gd() {
 
 		VOXEL_TEST_ASSERT(vb2->get_buffer().equals(vb->get_buffer()));
 
-		// `equals` does not compare metadata at the moment, mainly because it's not trivial and there is no use case
-		// for it apart from this test, so do it manually
+		// `equals` 目前不比较元数据，主要是因为它并不简单，而且除了本测试之外没有使用场景，
+		// 因此这里手动进行比较
 
 		const FlatMapMoveOnly<Vector3i, VoxelMetadata> &vb_meta_map = vb->get_buffer().get_voxel_metadata();
 		const FlatMapMoveOnly<Vector3i, VoxelMetadata> &vb2_meta_map = vb2->get_buffer().get_voxel_metadata();
@@ -447,11 +447,11 @@ void test_voxel_buffer_paste_masked_metadata() {
 	src_buffer->set_voxel_metadata(Vector3i(1, 2, 2), 106);
 	src_buffer->set_voxel_metadata(Vector3i(2, 2, 2), 107);
 
-	// This should not get copied due to masking
+	// 由于掩码作用，这个不应被拷贝
 	src_buffer->set_voxel_metadata(Vector3i(2, 2, 4), 200);
 
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_TYPE;
-	src_buffer->set_voxel(1, 0, 0, 0, channel); // Specifically to erase the metadata in dst_buffer
+	src_buffer->set_voxel(1, 0, 0, 0, channel); // 专门用于擦除 dst_buffer 中的元数据
 	src_buffer->set_voxel(1, 1, 1, 1, channel);
 	src_buffer->set_voxel(1, 2, 1, 1, channel);
 	src_buffer->set_voxel(1, 1, 2, 1, channel);
@@ -466,9 +466,9 @@ void test_voxel_buffer_paste_masked_metadata() {
 	dst_buffer->create(8, 8, 8);
 	const int dst_default_value = 2;
 	dst_buffer->fill(dst_default_value, channel);
-	// This metadata will get overwritten, since (0,0,0) has no metadata in src_buffer
+	// 该元数据将被覆盖，因为 src_buffer 中 (0,0,0) 处没有元数据
 	dst_buffer->set_voxel_metadata(Vector3i(1, 2, 3), 300);
-	// This one will not get erased because out of range of the pasted area
+	// 这一个不会被擦除，因为它超出了粘贴区域的范围
 	const Vector3i preserved_metadata_dst_pos(0, 2, 3);
 	dst_buffer->set_voxel_metadata(preserved_metadata_dst_pos, 301);
 
@@ -487,11 +487,11 @@ void test_voxel_buffer_paste_masked_metadata() {
 				const Vector3i dst_pos(x, y, z);
 
 				const int dst_v = dst_buffer->get_voxel(x, y, z, channel);
-				// 0 values must not have been copied
+				// 值为 0 的数据不得被拷贝
 				VOXEL_TEST_ASSERT(dst_v != 0);
 
 				if (dst_v == dst_default_value) {
-					// All cells not pasted onto must have kept their original metadata
+					// 所有未被粘贴到的单元必须保留其原始元数据
 					const Variant dst_m = dst_buffer->get_voxel_metadata(dst_pos);
 					const Variant dst_m_original = dst_buffer_original->get_voxel_metadata(dst_pos);
 					VOXEL_TEST_ASSERT(dst_m == dst_m_original);
@@ -508,7 +508,7 @@ void test_voxel_buffer_paste_masked_metadata() {
 				const Vector3i src_pos(x, y, z);
 				const Vector3i dst_pos = dst_paste_origin + src_pos;
 
-				// Voxel values in the copied area must be equal
+				// 拷贝区域内的体素值必须相等
 				const int src_v = src_buffer->get_voxel(src_pos.x, src_pos.y, src_pos.z, channel);
 				const int dst_v = dst_buffer->get_voxel(dst_pos.x, dst_pos.y, dst_pos.z, channel);
 				if (src_v == mask_value) {
@@ -517,11 +517,11 @@ void test_voxel_buffer_paste_masked_metadata() {
 					VOXEL_TEST_ASSERT(dst_v == src_v);
 				}
 
-				// Metadata in copied area must be equal
+				// 拷贝区域内的元数据必须相等
 				const Variant src_m = src_buffer->get_voxel_metadata(src_pos);
 				const Variant dst_m = dst_buffer->get_voxel_metadata(dst_pos);
 				if (src_v == mask_value) {
-					// Preserved cell
+					// 保留的单元
 					const Variant dst_m_original = dst_buffer_original->get_voxel_metadata(dst_pos);
 					VOXEL_TEST_ASSERT(dst_m == dst_m_original);
 				} else {
@@ -552,7 +552,7 @@ void test_voxel_buffer_paste_masked_metadata_oob() {
 	dst_buffer->create(4, 4, 4);
 	dst_buffer->fill(2);
 
-	// Paste it out of bounds, only one cell overlaps
+	// 在越界处粘贴它，只有一个单元重叠
 	Ref<VoxelTool> vt = dst_buffer->get_voxel_tool();
 	vt->paste_masked(Vector3i(3, 2, 2), src_buffer, (1 << VoxelBuffer::CHANNEL_TYPE), channel, 0);
 
@@ -570,7 +570,7 @@ void test_voxel_buffer_paste_masked_metadata_oob() {
 }
 
 void test_voxel_buffer_set_channel_bytes() {
-	// Set 8-bit non-empty data
+	// 设置 8 位非空数据
 	{
 		Ref<godot::VoxelBuffer> vb;
 		vb.instantiate();
@@ -604,8 +604,8 @@ void test_voxel_buffer_set_channel_bytes() {
 			}
 		}
 	}
-	// Set empty
-	// Might error, but should not crash
+	// 设置为空
+	// 可能会报错，但不应该崩溃
 	{
 		Ref<godot::VoxelBuffer> vb;
 		vb.instantiate();
@@ -616,7 +616,7 @@ void test_voxel_buffer_set_channel_bytes() {
 }
 
 void test_voxel_buffer_issue769() {
-	// indices_to_bitarray was incorrect
+	// indices_to_bitarray 是不正确的
 
 	const uint8_t base_values[] = {
 		// clang-format off
@@ -654,7 +654,7 @@ void test_voxel_buffer_issue769() {
 	DynamicBitset bitarray;
 	indices_to_bitarray(to_span(writable_values), bitarray);
 
-	// Check the bitarray
+	// 检查位数组
 	for (const uint8_t v : writable_values) {
 		VOXEL_TEST_ASSERT(v < bitarray.size());
 		VOXEL_TEST_ASSERT(bitarray.get(v));
@@ -705,7 +705,7 @@ void test_voxel_buffer_get_channel_bytes() {
 	}
 	{
 		// Issue #825
-		// `get_channel_as_bytes` was crashing due to missing resizing of the destination buffer.
+		// `get_channel_as_bytes` 因缺少对目标缓冲区的重新调整大小而崩溃。
 
 		Ref<godot::VoxelBuffer> vb;
 		vb.instantiate();

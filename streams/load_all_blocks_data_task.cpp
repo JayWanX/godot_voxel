@@ -29,9 +29,9 @@ bool LoadAllBlocksDataTask::is_cancelled() {
 
 void LoadAllBlocksDataTask::apply_result() {
 	if (VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
-		// TODO Comparing pointer may not be guaranteed
-		// The request response must match the dependency it would have been requested with.
-		// If it doesn't match, we are no longer interested in the result.
+		// TODO 比较指针未必可靠
+		// 请求的响应必须与当初请求时所使用的依赖项相匹配。
+		// 如果不匹配，说明我们已不再关心该结果。
 		if (stream_dependency->valid) {
 			VoxelEngine::VolumeCallbacks callbacks = VoxelEngine::get_singleton().get_volume_callbacks(volume_id);
 			ERR_FAIL_COND(callbacks.data_output_callback == nullptr);
@@ -57,7 +57,7 @@ void LoadAllBlocksDataTask::apply_result() {
 		}
 
 	} else {
-		// This can happen if the user removes the volume while requests are still about to return
+		// 如果用户在请求尚未返回时移除了体积，就可能发生这种情况
 		VOXEL_PRINT_VERBOSE("Stream data request response came back but volume wasn't found");
 	}
 }

@@ -1,17 +1,17 @@
 #[compute]
 #version 450
 
-// Takes a list of positions and evaluates a signed distance field in 4 locations around them.
-// The 4 locations are picked such that the result can be used to compute a gradient.
-// The result is then applied on top of previous values using a specified operation.
+// 接收一组位置，并在其周围 4 个位置求值有符号距离场。
+// 选择这 4 个位置，使结果可用于计算梯度。
+// 随后使用指定的操作将结果叠加到先前的值上。
 
-// This shader may be dispatched multiple times for each source of voxel data that we may combine for a given chunk.
+// 对于给定区块，此着色器可能针对我们可能组合的每个体素数据源被多次派发。
 
 layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
 
 layout (set = 0, binding = 0, std430) restrict readonly buffer PositionBuffer {
-	// X, Y, Z is hit position
-	// W is integer triangle index
+	// X、Y、Z 为命中位置
+	// W 为整数三角形索引
 	vec4 values[];
 } u_positions;
 
@@ -21,16 +21,16 @@ layout (set = 0, binding = 1, std430) restrict readonly buffer DetailParams {
 } u_detail_params;
 
 layout (set = 0, binding = 2, std430) restrict readonly buffer InSDBuffer {
-	// 4 values per index
+	// 每个索引 4 个值
 	float values[];
 } u_in_sd;
 
 layout (set = 0, binding = 3, std430) restrict writeonly buffer OutSDBuffer {
-	// 4 values per index
+	// 每个索引 4 个值
 	float values[];
 } u_out_sd;
 
-// Parameters common to all modifiers
+// 所有修改器共用的参数
 layout (set = 0, binding = 4, std430) restrict readonly buffer BaseModifierParams {
 	mat4 world_to_model;
 	int operation;
@@ -49,7 +49,7 @@ float sd_smooth_union(float a, float b, float s) {
 	return mix(b, a, h) - s * h * (1.0 - h);
 }
 
-// Inverted a and b because it subtracts SDF a from SDF b
+// 交换 a 和 b，因为它是从 SDF b 中减去 SDF a
 float sd_smooth_subtract(float b, float a, float s) {
 	const float h = clamp(0.5 - 0.5 * (b + a) / s, 0.0, 1.0);
 	return mix(b, -a, h) + s * h * (1.0 - h);

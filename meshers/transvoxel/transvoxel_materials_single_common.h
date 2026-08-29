@@ -9,7 +9,7 @@ struct WeightedIndex {
 	uint8_t index;
 	uint8_t weight;
 
-	// Higher weight comes first, otherwise lower index comes first
+	// 权重更高的排在前面，权重相同时索引较小的排在前面
 	static inline bool compare_higher_weight(const WeightedIndex &a, const WeightedIndex &b) {
 		return a.weight > b.weight || (a.weight == b.weight && a.index < b.index);
 	}

@@ -9,14 +9,14 @@
 
 namespace voxel::godot {
 
-/*// Creates a shared_ptr which will always use Godot's allocation functions
+/*// 创建始终使用 Godot 分配函数的 shared_ptr
 template <typename T>
 inline std::shared_ptr<T> gd_make_shared() {
-	// std::make_shared() apparently wont allow us to specify custom new and delete
+	// std::make_shared() 显然不允许我们指定自定义的 new 和 delete
 	return std::shared_ptr<T>(memnew(T), memdelete<T>);
 }*/
 
-// For use with smart pointers such as std::unique_ptr
+// 供智能指针（如 std::unique_ptr）使用
 template <typename T>
 struct ObjectDeleter {
 	inline void operator()(T *obj) {
@@ -24,11 +24,11 @@ struct ObjectDeleter {
 	}
 };
 
-// Specialization of `std::unique_ptr which always uses Godot's `memdelete()` as deleter.
+// `std::unique_ptr` 的特化版本，始终使用 Godot 的 `memdelete()` 作为删除器。
 template <typename T>
 using ObjectUniquePtr = std::unique_ptr<T, ObjectDeleter<T>>;
 
-// Creates a `GodotObjectUniquePtr<T>` with an object constructed with `memnew()` inside.
+// 用 `memnew()` 在内部构造对象，创建 `GodotObjectUniquePtr<T>`。
 template <typename T>
 ObjectUniquePtr<T> make_unique() {
 	return ObjectUniquePtr<T>(memnew(T));

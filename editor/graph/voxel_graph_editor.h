@@ -31,7 +31,7 @@ class VoxelNode;
 class VoxelGraphEditorShaderDialog;
 class VoxelGraphNodeDialog;
 
-// Main GUI of the graph editor
+// 图形编辑器的主 GUI
 class VoxelGraphEditor : public Control {
 	GDCLASS(VoxelGraphEditor, Control)
 public:
@@ -56,8 +56,8 @@ public:
 
 	void set_voxel_node(VoxelNode *node);
 
-	// To be called when the number of inputs in a node changes.
-	// Rebuilds the node's internal controls, and updates GUI connections going to it from the graph.
+	// 当节点输入数量变化时调用。
+	// 重建节点的内部控件，并更新图形中连接到该节点的 GUI 连线。
 	void update_node_layout(uint32_t node_id);
 
 	void update_node_comment(uint32_t node_id);
@@ -142,10 +142,10 @@ private:
 	Label *_compile_result_label = nullptr;
 	Label *_no_graph_open_label = nullptr;
 	VoxelRangeAnalysisDialog *_range_analysis_dialog = nullptr;
-	// Not owned.
-	// TODO Not sure if using `EditorUndoRedoManager` directly is the right thing to do?
-	// VisualShader did it that way when this manager got introduced in place of the old global UndoRedo...
-	// there doesn't seem to be any documentation yet for this class
+	// 不拥有。
+	// TODO 不确定直接使用 `EditorUndoRedoManager` 是否正确？
+	// 当这个管理器取代旧的全局 UndoRedo 时，VisualShader 就是这么做的...
+	// 这个类似乎还没有任何文档
 	EditorUndoRedoManager *_undo_redo = nullptr;
 	Vector2 _click_position;
 	bool _nothing_selected_check_scheduled = false;

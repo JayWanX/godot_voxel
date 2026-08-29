@@ -42,11 +42,11 @@ struct GPUTaskContext {
 	GPUStorageBufferPool &storage_buffer_pool;
 	const BaseGPUResources &base_resources;
 
-	// Buffer shared by multiple tasks in the current batch.
-	// It will be downloaded in one go before collection, which is faster than downloading multiple individual buffers,
-	// due to Godot's API only exposing blocking calls.
-	unsigned int shared_output_buffer_begin = 0; // In bytes
-	unsigned int shared_output_buffer_size = 0; // In bytes
+	// 由当前批次中的多个任务共享的缓冲区。
+	// 它会在收集前一次性下载，这比分别下载多个单独的缓冲区更快，
+	// 因为 Godot 的 API 只提供阻塞调用。
+	unsigned int shared_output_buffer_begin = 0; // 以字节为单位
+	unsigned int shared_output_buffer_size = 0; // 以字节为单位
 	RID shared_output_buffer_rid;
 	PackedByteArray downloaded_shared_output_data;
 
@@ -66,7 +66,7 @@ public:
 	virtual void collect(GPUTaskContext &ctx) = 0;
 };
 
-// Runs tasks that schedules compute shaders and collects their results.
+// 运行调度计算着色器并收集其结果的任务。
 class GPUTaskRunner {
 public:
 	GPUTaskRunner();
@@ -87,13 +87,13 @@ private:
 	GPUStorageBufferPool _storage_buffer_pool;
 	BaseGPUResources _base_resources;
 
-	// Queue of tasks to run. They will be run in the order they were submitted.
+	// 要运行的任务队列。它们将按提交顺序运行。
 	StdVector<IGPUTask *> _shared_tasks;
 	Mutex _mutex;
 	Semaphore _semaphore;
-	// Using a thread because so far it looks like the only way to submit and receive data with RenderingDevice is to
-	// block the calling thread and wait for the graphics card...
-	// Since we already have a thread pool, this thread is supposed to be mostly sleeping or waiting.
+	// 之所以使用线程，是因为到目前为止，使用 RenderingDevice 提交和接收数据的唯一方式似乎是
+	// 阻塞调用线程并等待显卡……
+	// 由于我们已经有一个线程池，这个线程大部分时间应该处于休眠或等待状态。
 	Thread _thread;
 	bool _running = false;
 	std::atomic_uint32_t _pending_count = 0;

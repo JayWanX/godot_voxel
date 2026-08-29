@@ -412,7 +412,7 @@ class ClassFormatter:
             desc = ""
             
             if constant.is_deprecated:
-                desc += "*This constant is deprecated."
+                desc += "*此常量已弃用。"
                 if constant.deprecated_message != "":
                     desc += " "
                     desc += constant.deprecated_message
@@ -490,21 +490,20 @@ def class_doc_to_markdown(
 
     # Header
     out = "# " + current_class_name + "\n\n"
-    out += "Inherits: " + fmt.make_type(klass.parent_name) + "\n\n"
+    out += "继承自：" + fmt.make_type(klass.parent_name) + "\n\n"
 
     if len(klass.children) > 0:
         links = []
         for child in klass.children:
             links.append(fmt.make_type(child.name))
-        out += "Inherited by: " + ', '.join(links) + "\n\n"
+        out += "派生：" + ', '.join(links) + "\n\n"
 
     if klass.is_experimental:
-        out += ("!!! warning\n    This class is marked as experimental. "
-            "It is subject to likely change or possible removal in future versions. Use at your own discretion.")
+        out += ("!!! warning\n    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。")
         out += "\n\n"
     
     if klass.is_deprecated:
-        out += "!!! warning\n    This class is deprecated."
+        out += "!!! warning\n    此类已弃用。"
         if klass.deprecated_message != "":
             out += " "
             out += fmt.make_text(klass.deprecated_message)
@@ -517,18 +516,18 @@ def class_doc_to_markdown(
 
     text = fmt.make_text(klass.description)
     if text.strip() != "":
-        out += "## Description: \n\n" + text + "\n\n"
+        out += "## 描述：\n\n" + text + "\n\n"
 
     # Tutorials
     if len(klass.tutorials) > 0:
-        out += "## Tutorials: \n\n"
+        out += "## 教程：\n\n"
         for tutorial in klass.tutorials:
             out += "- [" + tutorial.title + "](" + tutorial.link + ")\n"
 
     # Properties summary
     if len(klass.properties) > 0:
-        out += "## Properties: \n\n"
-        table = [["Type", "Name", "Default"]]
+        out += "## 属性：\n\n"
+        table = [["类型", "名称", "默认值"]]
         for prop in klass.properties:
             row = [
                 fmt.make_type(prop.type),
@@ -546,8 +545,8 @@ def class_doc_to_markdown(
         
     # Methods summary
     if len(klass.methods) > 0:
-        out += "## Methods: \n\n"
-        table = [["Return", "Signature"]]
+        out += "## 方法：\n\n"
+        table = [["返回值", "函数签名"]]
 
         # TODO Remove from list if it's a getter/setter of a property
         for method in klass.methods:
@@ -573,7 +572,7 @@ def class_doc_to_markdown(
     
     # Signals
     if len(klass.signals) > 0:
-        out += "## Signals: \n\n"
+        out += "## 信号：<span id=\"signals\"></span>\n\n"
 
         for signal in klass.signals:
             out += "### "
@@ -585,7 +584,7 @@ def class_doc_to_markdown(
             desc = ""
 
             if signal.is_deprecated:
-                desc += "*This signal is deprecated."
+                desc += "*此信号已弃用。"
                 if signal.deprecated_message != "":
                     desc += " "
                     desc += fmt.make_text(signal.deprecated_message)
@@ -594,7 +593,7 @@ def class_doc_to_markdown(
             if signal.description.strip() != "":
                 desc += fmt.make_text(signal.description)
             elif not signal.is_deprecated:
-                desc += "*(This signal has no documentation)*"
+                desc += "*(此信号暂无文档)*"
             
             if desc != "":
                 out += desc
@@ -602,10 +601,10 @@ def class_doc_to_markdown(
     
     # Enums
     if len(klass.enums) > 0:
-        out += "## Enumerations: \n\n"
+        out += "## 枚举：<span id=\"enumerations\"></span>\n\n"
 
         for enum in klass.enums:
-            out += "enum **" + enum.name + "**: \n\n"
+            out += "枚举 **" + enum.name + "**：\n\n"
             out += fmt.make_constants(enum.items)
             out += "\n"
         
@@ -613,13 +612,13 @@ def class_doc_to_markdown(
 
     # Constants
     if len(klass.constants) > 0:
-        out += "## Constants: \n\n"
+        out += "## 常量：\n\n"
         out += fmt.make_constants(klass.constants)
         out += "\n"
     
     # Property descriptions
     if len(klass.properties) > 0:
-        out += "## Property Descriptions\n\n"
+        out += "## 属性描述\n\n"
 
         for prop in klass.properties:
             out += "### " + fmt.make_type(prop.type) + make_custom_internal_anchor(prop.name) + " **" + prop.name + "**"
@@ -628,7 +627,7 @@ def class_doc_to_markdown(
             out += "\n\n"
 
             if prop.is_deprecated:
-                out += "*This property is deprecated."
+                out += "*此属性已弃用。"
                 if prop.deprecated_message != "":
                     out += " "
                     out += fmt.make_text(prop.deprecated_message)
@@ -639,14 +638,14 @@ def class_doc_to_markdown(
                 if text.strip() != "":
                     out += text
                 elif not prop.is_deprecated:
-                    out += "*(This property has no documentation)*"
+                    out += "*(此属性暂无文档)*"
                 out += "\n"
 
             out += "\n"
 
     # Method descriptions
     if len(klass.methods) > 0:
-        out += "## Method Descriptions\n\n"
+        out += "## 方法描述\n\n"
 
         for method in klass.methods:
             out += "### " + fmt.make_type(method.return_type) \
@@ -659,7 +658,7 @@ def class_doc_to_markdown(
             out += "\n\n"
 
             if method.is_deprecated:
-                out += "*This method is deprecated."
+                out += "*此方法已弃用。"
                 if method.deprecated_message != "":
                     out += " "
                     out += fmt.make_text(method.deprecated_message)
@@ -670,13 +669,13 @@ def class_doc_to_markdown(
                 if text.strip() != "":
                     out += text
                 elif not method.is_deprecated:
-                    out += "*(This method has no documentation)*"
+                    out += "*(此方法暂无文档)*"
                 out += "\n"
             
             out += "\n"
 
     # Footer
-    out += "_Generated on " + strftime("%b %d, %Y", gmtime()) + "_\n" 
+    out += "_生成于 " + strftime("%Y-%m-%d", gmtime()) + "_\n" 
     #Full time stamp "%Y-%m-%d %H:%M:%S %z"
 
     if f_out == '-':
@@ -693,7 +692,7 @@ def generate_classes_index(output_path, classes_by_name, verbose, module_class_n
         if klass.parent_name == "":
             root_classes.append(klass)
 
-    lines = ["# All classes", ""]
+    lines = ["# 全部类", ""]
     indent = "    "
 
     fmt = ClassFormatter('', module_class_names, {}, '')

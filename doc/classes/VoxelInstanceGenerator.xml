@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelInstanceGenerator" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Decides where to spawn instances on top of a voxel surface.
+		决定在体素表面何处生成实例。
 	</brief_description>
 	<description>
-		Generates the necessary information to spawn instances on top of a voxel surface. This may be used by a [VoxelInstancer].
-		Note: to generate voxels, see [VoxelGenerator].
+		生成在体素表面生成实例所需的必要信息。这可被 [VoxelInstancer] 使用。
+		注意：若要生成体素，请参见 [VoxelGenerator]。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -24,133 +24,133 @@
 	</methods>
 	<members>
 		<member name="density" type="float" setter="set_density" getter="get_density" default="0.1">
-			Controls how many instances are generated. Might give different results depending on the type of emission chosen.
+			控制生成的实例数量。根据所选发射类型的不同，结果可能会有所差异。
 		</member>
 		<member name="emit_mode" type="int" setter="set_emit_mode" getter="get_emit_mode" enum="VoxelInstanceGenerator.EmitMode" default="0">
-			In which way instances are primarily emitted.
+			实例主要按哪种方式发射。
 		</member>
 		<member name="jitter" type="float" setter="set_jitter" getter="get_jitter" default="1.0">
-			Controls randomness of spawning position when [member emit_mode] is set to [constant EMIT_ONE_PER_TRIANGLE].
+			当 [member emit_mode] 设置为 [constant EMIT_ONE_PER_TRIANGLE] 时，控制生成位置的随机程度。
 		</member>
 		<member name="max_height" type="float" setter="set_max_height" getter="get_max_height" default="3.4028235e+38">
-			Instances will not be created above this height.
-			This also depends on the chosen [member VoxelInstancer.up_mode].
+			实例不会在此高度以上创建。
+			这也取决于所选的 [member VoxelInstancer.up_mode]。
 		</member>
 		<member name="max_height_falloff" type="float" setter="set_max_height_falloff" getter="get_max_height_falloff" default="0.0">
-			Distance over which density will fade, when below [member max_height].
+			当低于 [member max_height] 时，密度逐渐衰减的距离范围。
 		</member>
 		<member name="max_scale" type="float" setter="set_max_scale" getter="get_max_scale" default="1.0">
-			Minimum scale instances will be randomized with.
+			实例随机化时所使用的最小缩放。
 		</member>
 		<member name="max_slope_degrees" type="float" setter="set_max_slope_degrees" getter="get_max_slope_degrees" default="180.0">
-			Instances will not spawn if the ground has a slope higher than this angle.
-			This also depends on the chosen [member VoxelInstancer.up_mode].
+			如果地面的坡度超过此角度，则不会生成实例。
+			这也取决于所选的 [member VoxelInstancer.up_mode]。
 		</member>
 		<member name="max_slope_falloff_degrees" type="float" setter="set_max_slope_falloff_degrees" getter="get_max_slope_falloff_degrees" default="0.0">
-			Angular distance over which density will fade, when below [member max_slope_degrees].
+			当低于 [member max_slope_degrees] 时，密度逐渐衰减的角度范围。
 		</member>
 		<member name="min_height" type="float" setter="set_min_height" getter="get_min_height" default="1.1754944e-38">
-			Instances will not be created below this height. This also depends on the chosen [member VoxelInstancer.up_mode].
+			实例不会在此高度以下创建。这也取决于所选的 [member VoxelInstancer.up_mode]。
 		</member>
 		<member name="min_height_falloff" type="float" setter="set_min_height_falloff" getter="get_min_height_falloff" default="0.0">
-			Distance over which density will fade, when above [member min_height].
+			当高于 [member min_height] 时，密度逐渐衰减的距离范围。
 		</member>
 		<member name="min_scale" type="float" setter="set_min_scale" getter="get_min_scale" default="1.0">
-			Maximum scale instances will be randomized with.
+			实例随机化时所使用的最大缩放。
 		</member>
 		<member name="min_slope_degrees" type="float" setter="set_min_slope_degrees" getter="get_min_slope_degrees" default="0.0">
-			Instances will not spawn if the ground has a slope lower than this angle.
-			This also depends on the chosen [member VoxelInstancer.up_mode].
+			如果地面的坡度低于此角度，则不会生成实例。
+			这也取决于所选的 [member VoxelInstancer.up_mode]。
 		</member>
 		<member name="min_slope_falloff_degrees" type="float" setter="set_min_slope_falloff_degrees" getter="get_min_slope_falloff_degrees" default="0.0">
-			Angular distance over which density will fade, when above [member min_slope_degrees].
+			当高于 [member min_slope_degrees] 时，密度逐渐衰减的角度范围。
 		</member>
 		<member name="noise" type="Noise" setter="set_noise" getter="get_noise">
-			Noise used to filter out spawned instances, so that they may spawn in patterns described by the noise.
+			用于过滤已生成实例的噪声，以便实例可以按噪声所描述的图案生成。
 		</member>
 		<member name="noise_dimension" type="int" setter="set_noise_dimension" getter="get_noise_dimension" enum="VoxelInstanceGenerator.Dimension" default="1">
-			Which dimension should be used when evaluating [member noise] and [member noise_graph].
+			在计算 [member noise] 和 [member noise_graph] 时应使用的维度。
 		</member>
 		<member name="noise_falloff" type="float" setter="set_noise_falloff" getter="get_noise_falloff" default="0.0">
-			Noise range over which density will fade. For example if falloff is 0.3, then density will fade when noise values are between 0 and 0.3.
+			密度会逐渐衰减的噪声取值范围。例如，若衰减值为 0.3，则当噪声值在 0 到 0.3 之间时密度会逐渐衰减。
 		</member>
 		<member name="noise_graph" type="VoxelGraphFunction" setter="set_noise_graph" getter="get_noise_graph">
-			Graph function used to filter out spawned instances, similar to [member noise], but allows more custom noise computations.
-			The graph must have 2 inputs (X and Z) if [member noise_dimension] is 2D, and 3 inputs (X, Y and Z) if 3D. There must be one SDF output.
+			用于过滤已生成实例的图函数，与 [member noise] 类似，但允许更自定义的噪声计算。
+			如果 [member noise_dimension] 为 2D，该图必须具有 2 个输入（X 和 Z）；如果为 3D，则必须具有 3 个输入（X、Y 和 Z）。且必须有一个 SDF 输出。
 		</member>
 		<member name="noise_on_scale" type="float" setter="set_noise_on_scale" getter="get_noise_on_scale" default="0.0">
-			How much [member noise] also affects the scale of instances.
+			[member noise] 对实例缩放的额外影响程度。
 		</member>
 		<member name="noise_threshold" type="float" setter="set_noise_threshold" getter="get_noise_threshold" default="0.0">
-			Expands or shrink noise filtering. Higher values expand the areas where instances will spawn, lower values shrinks them.
+			扩展或收缩噪声过滤。较高的值会扩大实例生成区域，较低的值会缩小这些区域。
 		</member>
 		<member name="offset_along_normal" type="float" setter="set_offset_along_normal" getter="get_offset_along_normal" default="0.0">
-			Offsets spawned instances along the normal of the ground.
-			The normal depends on [member VoxelInstancer.up_mode] and is also affected by [member vertical_alignment].
+			沿地面的法线偏移已生成的实例。
+			法线取决于 [member VoxelInstancer.up_mode]，并且还受 [member vertical_alignment] 影响。
 		</member>
 		<member name="random_rotation" type="bool" setter="set_random_rotation" getter="get_random_rotation" default="true">
-			When enbabled, instances will be given a random rotation. If not, they will use a consistent rotation depending on the ground slope.
+			启用后，实例将获得随机旋转。若未启用，它们将根据地面坡度使用一致的旋转。
 		</member>
 		<member name="random_vertical_flip" type="bool" setter="set_random_vertical_flip" getter="get_random_vertical_flip" default="false">
-			When enabled, instances will randomly be flipped upside down. This can be useful with small rocks to create illusion of more variety.
+			启用后，实例将随机上下翻转。这在配合小石头时可营造出更多样化的错觉。
 		</member>
 		<member name="scale_distribution" type="int" setter="set_scale_distribution" getter="get_scale_distribution" enum="VoxelInstanceGenerator.Distribution" default="1">
-			Sets how random scales are distributed.
+			设置随机缩放值的分布方式。
 		</member>
 		<member name="snap_to_generator_sdf_enabled" type="bool" setter="set_snap_to_generator_sdf_enabled" getter="get_snap_to_generator_sdf_enabled" default="false">
-			Enables snapping to generator SDF. The generator's SDF values will be queried to move instances along their normal to be closerr to ground. Can help reduce the occurrence of "floating" or "buried" instances when moving close to them. This requires the terrain's generator to support series generation. Side-effects: instances might become floating or buried when seen from far away; spawning might become less even.
+			启用吸附到生成器 SDF。将查询生成器的 SDF 值，使实例沿其法线移动以更接近地面。有助于减少靠近实例时出现“漂浮”或“埋入”的情况。这要求地形的生成器支持串联生成。副作用：从远处观看时实例可能会漂浮或埋入；生成可能变得不那么均匀。
 		</member>
 		<member name="snap_to_generator_sdf_sample_count" type="int" setter="set_snap_to_generator_sdf_sample_count" getter="get_snap_to_generator_sdf_sample_count" default="2">
-			How many samples per instance will be taken from the generator in order to approach the snapping position. More samples increases precision, but is more expensive.
+			每个实例将从生成器采样多少次以逼近吸附位置。采样越多精度越高，但开销也越大。
 		</member>
 		<member name="snap_to_generator_sdf_search_distance" type="float" setter="set_snap_to_generator_sdf_search_distance" getter="get_snap_to_generator_sdf_search_distance" default="1.0">
-			Distance up and down across which snapping will search for ground location.
+			吸附搜索地面位置的上下距离范围。
 		</member>
 		<member name="triangle_area_threshold" type="float" setter="set_triangle_area_threshold" getter="get_triangle_area_threshold" default="0.0">
-			If set greater than zero, triangles of the ground with an area lower than this threshold will be ignored.
-			Some meshing algorithms can often produce thin or small triangles that can affect distribution quality of spawned instances. If this happens, use this property to filter them out.
-			Note: this property is relative to LOD0. The generator will scale it when spawning instances on meshes of different LOD index.
+			若设置为大于零的值，则地面中面积低于此阈值的三角形将被忽略。
+			某些网格化算法常常会生成细长或细小的三角形，从而影响生成实例的分布质量。如果出现这种情况，可使用此属性将其过滤掉。
+			注意：此属性相对于 LOD0。在不同 LOD 索引的网格上生成实例时，生成器会对其缩放。
 		</member>
 		<member name="vertical_alignment" type="float" setter="set_vertical_alignment" getter="get_vertical_alignment" default="1.0">
-			Sets how much instances will align with the ground.
-			If 0, they will completely align with the ground.
-			If 1, they will completely align with whichever direction is considered "up".
-			This depends on [member VoxelInstancer.up_mode].
+			设置实例与地面的对齐程度。
+			若为 0，它们将完全与地面平齐。
+			若为 1，它们将完全与被视为“上方”的方向对齐。
+			这取决于 [member VoxelInstancer.up_mode]。
 		</member>
 		<member name="voxel_texture_filter_array" type="PackedInt32Array" setter="set_voxel_texture_filter_array" getter="get_voxel_texture_filter_array" default="PackedInt32Array(0)">
-			Specifies which voxel texture indices on top of which instances may spawn.
-			This only works when [member voxel_texture_filter_enabled] is enabled, and [VoxelMesherTransvoxel] is used with [member VoxelMesherTransvoxel.texturing_mode] set to [constant VoxelMesherTransvoxel.TEXTURES_MIXEL4_S4] or [constant VoxelMesherTransvoxel.TEXTURES_SINGLE_S4]. Indices are currently limited between 0 and 31 included.
+			指定允许实例在其上生成的体素纹理索引。
+			仅当启用了 [member voxel_texture_filter_enabled]，且 [VoxelMesherTransvoxel] 的 [member VoxelMesherTransvoxel.texturing_mode] 设置为 [constant VoxelMesherTransvoxel.TEXTURES_MIXEL4_S4] 或 [constant VoxelMesherTransvoxel.TEXTURES_SINGLE_S4] 时才有效。索引目前限制在 0 到 31（含）之间。
 		</member>
 		<member name="voxel_texture_filter_enabled" type="bool" setter="set_voxel_texture_filter_enabled" getter="is_voxel_texture_filter_enabled" default="false">
-			When true, enables filtering of instances based on voxel texture indices. See [member voxel_texture_filter_array].
+			为 true 时，启用基于体素纹理索引的实例过滤。参见 [member voxel_texture_filter_array]。
 		</member>
 		<member name="voxel_texture_filter_threshold" type="float" setter="set_voxel_texture_filter_threshold" getter="get_voxel_texture_filter_threshold" default="0.5">
-			When [member voxel_texture_filter_enabled] is active, controls how much of filtered texture has to be present for instances to spawn. The value must be betweem 0 and 1.
+			当 [member voxel_texture_filter_enabled] 生效时，控制过滤后的纹理需存在多少比例实例才会生成。该值必须在 0 到 1 之间。
 		</member>
 	</members>
 	<constants>
 		<constant name="EMIT_FROM_VERTICES" value="0" enum="EmitMode">
-			Use vertices of the mesh to spawn instances. This is the fasted option, but can produce noticeable patterns.
+			使用网格的顶点来生成实例。这是最快的选项，但可能会产生明显的图案。
 		</constant>
 		<constant name="EMIT_FROM_FACES_FAST" value="1" enum="EmitMode">
-			Uses faces of the mesh to spawn instances. It is a balanced option with some shortcuts taken, without causing too noticeable patterns.
+			使用网格的面来生成实例。这是一个较为均衡的选项，采取了一些快捷方式，且不会产生太明显的图案。
 		</constant>
 		<constant name="EMIT_FROM_FACES" value="2" enum="EmitMode">
-			Uses faces of the mesh to spawn instances. This is the slowest option, but should produce no noticeable patterns.
+			使用网格的面来生成实例。这是最慢的选项，但应不会产生明显的图案。
 		</constant>
 		<constant name="EMIT_ONE_PER_TRIANGLE" value="3" enum="EmitMode">
-			Uses faces of the mesh to spawn instances (where faces are triangles). Only one instance is spawned per triangle. By default, it spawns in the middle of triangles. Randomness can be added to this position with [member jitter].
+			使用网格的面（即三角形）来生成实例。每个三角形只生成一个实例。默认情况下，实例会生成在三角形的中心。可通过 [member jitter] 为该位置增加随机性。
 		</constant>
 		<constant name="EMIT_MODE_COUNT" value="4" enum="EmitMode">
 		</constant>
 		<constant name="DISTRIBUTION_LINEAR" value="0" enum="Distribution">
-			Uniform distribution.
+			均匀分布。
 		</constant>
 		<constant name="DISTRIBUTION_QUADRATIC" value="1" enum="Distribution">
-			Distribution with more small items, and fewer big ones.
+			小条目更多、大条目更少的分布。
 		</constant>
 		<constant name="DISTRIBUTION_CUBIC" value="2" enum="Distribution">
-			Distribution with even more small items, and even fewer big ones.
+			小条目更多、大条目更少的分布。
 		</constant>
 		<constant name="DISTRIBUTION_QUINTIC" value="3" enum="Distribution">
 		</constant>

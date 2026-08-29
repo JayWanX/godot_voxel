@@ -25,8 +25,8 @@ int VoxelBlockyAttribute::get_default_value() const {
 }
 
 void VoxelBlockyAttribute::set_default_value(int value) {
-	// TODO Can't validate that the value is in bounds, because we can't guarantee the order in which Godot will call
-	// setters of the resource when loading it
+	// TODO 无法验证该值是否在边界内，因为我们无法保证 Godot 在加载资源时
+	// 调用其 setter 的顺序
 	_default_value = math::max(value, 0);
 }
 
@@ -119,7 +119,7 @@ void VoxelBlockyAttribute::get_configuration_warnings(PackedStringArray &out_war
 
 // int VoxelBlockyAttribute::get_order() const {
 // 	VOXEL_PRINT_ERROR("Not implemented");
-// 	// Implemented in child classes
+// 	// 在子类中实现
 // 	return 0;
 // }
 

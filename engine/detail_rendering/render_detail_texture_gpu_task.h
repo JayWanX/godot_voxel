@@ -23,8 +23,8 @@ public:
 	uint16_t texture_width;
 	uint16_t texture_height;
 
-	// Using 4-component vectors to match alignment rules.
-	// See https://stackoverflow.com/a/38172697
+	// 使用 4 分量向量以匹配对齐规则。
+	// 参见 https://stackoverflow.com/a/38172697
 	StdVector<Vector4f> mesh_vertices;
 	StdVector<int32_t> mesh_indices;
 	StdVector<int32_t> cell_triangles;
@@ -35,13 +35,13 @@ public:
 		uint8_t cell_z = 0;
 		uint8_t _pad = 0;
 		// aaaaaaaa aaaaaaaa aaaaaaaa 0bbb00cc
-		// a: 24-bit index into `u_cell_tris.data` array.
-		// b: 3-bit number of triangles.
-		// c: 2-bit projection direction (0:X, 1:Y, 2:Z)
+		// a：`u_cell_tris.data` 数组的 24 位索引。
+		// b：三角形数量的 3 位字段。
+		// c：2 位投影方向（0:X，1:Y，2:Z）
 		uint32_t data = 0;
 	};
 
-	// Should fit as an `ivec2[]`
+	// 应能适配为 `ivec2[]`
 	StdVector<TileData> tile_data;
 
 	struct Params {
@@ -56,7 +56,7 @@ public:
 
 	Params params;
 
-	// Base modifier (generator)
+	// 基础修改器（生成器）
 	std::shared_ptr<ComputeShader> shader;
 	std::shared_ptr<ComputeShaderParameters> shader_params;
 
@@ -64,7 +64,7 @@ public:
 	StdVector<VoxelModifier::ShaderData> modifiers;
 #endif
 
-	// Stuff to carry over for the second CPU pass
+	// 需要传递给第二遍 CPU 处理的材料
 	std::shared_ptr<DetailTextureOutput> output;
 	DetailTextureData edited_tiles_texture_data;
 	Vector3i block_position;
@@ -78,7 +78,7 @@ public:
 	void prepare(GPUTaskContext &ctx) override;
 	void collect(GPUTaskContext &ctx) override;
 
-	// Exposed for testing
+	// 暴露给测试使用
 	PackedByteArray collect_texture_and_cleanup(RenderingDevice &rd, GPUStorageBufferPool &storage_buffer_pool);
 
 private:

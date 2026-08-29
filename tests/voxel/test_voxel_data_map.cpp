@@ -21,14 +21,14 @@ void test_voxel_data_map_paste_fill() {
 
 	map.paste(box.position, buffer, (1 << channel), true, true);
 
-	// All voxels in the area must be as pasted
+	// 区域内的所有体素必须与粘贴结果一致
 	const bool is_match = box.all_cells_match([&map](const Vector3i &pos) { //
 		return map.get_voxel(pos, channel) == voxel_value;
 	});
 
 	VOXEL_TEST_ASSERT(is_match);
 
-	// Check neighbor voxels to make sure they were not changed
+	// 检查相邻体素以确保它们未被改变
 	const Box3i padded_box = box.padded(1);
 	bool outside_is_ok = true;
 	padded_box.for_inner_outline([&map, &outside_is_ok](const Vector3i &pos) {
@@ -48,7 +48,7 @@ void test_voxel_data_map_paste_mask() {
 
 	VoxelBuffer buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 	buffer.create(32, 16, 32);
-	// Fill the inside of the buffer with a value, and outline it with another value, which we'll use as mask
+	// 用某个值填充缓冲区内部，并用另一个值勾勒其轮廓，我们将用它作为掩码
 	buffer.fill(masked_value, channel);
 	buffer.fill_area(voxel_value, Vector3i(1, 1, 1), buffer.get_size() - Vector3i(1, 1, 1), channel);
 
@@ -71,7 +71,7 @@ void test_voxel_data_map_paste_mask() {
 			true
 	);
 
-	// All voxels in the area must be as pasted. Ignoring the outline.
+	// 区域内的所有体素必须与粘贴结果一致。忽略轮廓。
 	const bool is_match = box.padded(-1).all_cells_match([&map](const Vector3i &pos) { //
 		return map.get_voxel(pos, channel) == voxel_value;
 	});
@@ -108,7 +108,7 @@ void test_voxel_data_map_paste_mask() {
 
 	VOXEL_TEST_ASSERT(is_match);
 
-	// Now check the outline voxels, they should be the same as before
+	// 现在检查轮廓体素，它们应与之前相同
 	bool outside_is_ok = true;
 	box.for_inner_outline([&map, &outside_is_ok](const Vector3i &pos) {
 		if (map.get_voxel(pos, channel) != default_value) {
@@ -162,8 +162,8 @@ void test_voxel_data_map_copy() {
 	VoxelBuffer buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 	buffer.create(box.size);
 
-	// Fill the inside of the buffer with a value, and leave outline to zero,
-	// so our buffer isn't just uniform
+	// 用某个值填充缓冲区内部，并让轮廓保持为零，
+	// 这样我们的缓冲区就不只是均匀的了
 	for (int z = 1; z < buffer.get_size().z - 1; ++z) {
 		for (int x = 1; x < buffer.get_size().x - 1; ++x) {
 			for (int y = 1; y < buffer.get_size().y - 1; ++y) {

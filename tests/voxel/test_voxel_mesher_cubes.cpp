@@ -43,10 +43,10 @@ void test_voxel_mesher_cubes() {
 	// 	println(format("v[{}]: {}", i, surface1_vertices[i]));
 	// }
 
-	// Greedy meshing with two cubes of the same color next to each other means it will be a single box.
-	// Each side has different normals, so vertices have to be repeated. 6 sides * 4 vertices = 24.
+	// 两个相同颜色的立方体相邻时的贪婪网格合并意味着它将是一个单独的盒子。
+	// 每个面的法线不同，因此顶点必须重复。6 个面 * 4 个顶点 = 24。
 	VOXEL_TEST_ASSERT(surface0_vertices_count == 24);
-	// The transparent cube has less vertices because one of its faces overlaps with a neighbor solid face,
+	// 透明立方体的顶点更少，因为它的一个面与相邻实体的面重叠，
 	// so it is culled
 	VOXEL_TEST_ASSERT(surface1_vertices_count == 20);
 }

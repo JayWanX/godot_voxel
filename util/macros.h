@@ -1,10 +1,10 @@
 #ifndef VOXEL_MACROS_H
 #define VOXEL_MACROS_H
 
-// Macros I couldn't put anywhere specific
+// 我无法放进其他特定位置的宏
 
-// Tell the compiler to favour a certain branch of a condition.
-// Until C++20 can be used with the [[likely]] and [[unlikely]] attributes.
+// 告诉编译器倾向于某个条件分支。
+// 在 C++20 之前，可用 [[likely]] 与 [[unlikely]] 属性实现。
 #if defined(__GNUC__)
 #define VOXEL_LIKELY(x) __builtin_expect(!!(x), 1)
 #define VOXEL_UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -14,20 +14,20 @@
 #endif
 
 #define VOXEL_INTERNAL_CONCAT(x, y) x##y
-// Helper to concatenate macro arguments if one of them is itself a macro like `__LINE__`,
-// otherwise doing `x##y` directly would not expand the arguments that are a macro
+// 若某个宏参数本身也是宏（如 `__LINE__`），用于拼接宏参数的辅助工具，
+// 否则直接写 `x##y` 不会展开作为宏的参数
 // https://stackoverflow.com/questions/1597007/creating-c-macro-with-and-line-token-concatenation-with-positioning-macr
 #define VOXEL_CONCAT(x, y) VOXEL_INTERNAL_CONCAT(x, y)
 
-// Gets the name of a class as a C-string with static lifetime, and causes a compiling error if the class doesn't exist.
+// 以具有静态生命周期的 C 字符串形式获取类名，若该类不存在则导致编译错误。
 #define VOXEL_CLASS_NAME_C(klass)                                                                                         \
 	[]() {                                                                                                             \
 		static_assert(sizeof(klass) > 0);                                                                              \
 		return #klass;                                                                                                 \
 	}()
 
-// Gets a method name as a C-string with static lifetime, and causes a compiling error if either the class or method
-// doesn't exist.
+// 以具有静态生命周期的 C 字符串形式获取方法名，若类或方法
+// 不存在则导致编译错误。
 #define VOXEL_METHOD_NAME_C(klass, method)                                                                                \
 	[]() {                                                                                                             \
 		static_assert(sizeof(&klass::method != nullptr));                                                              \

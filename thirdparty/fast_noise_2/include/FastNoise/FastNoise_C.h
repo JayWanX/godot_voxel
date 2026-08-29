@@ -53,7 +53,7 @@ FASTNOISE_API float fnGenSingle3D( const void* node, float x, float y, float z, 
 FASTNOISE_API float fnGenSingle4D( const void* node, float x, float y, float z, float w, int seed );
 
 FASTNOISE_API int fnGetMetadataCount();
-FASTNOISE_API const char* fnGetMetadataName( int id ); // valid IDs up to `fnGetMetadataCount() - 1`
+FASTNOISE_API const char* fnGetMetadataName( int id ); // 有效 ID 直至 `fnGetMetadataCount() - 1`
 FASTNOISE_API void* fnNewFromMetadata( int id, unsigned /*FastSIMD::eLevel*/ simdLevel /*0 = Auto*/ );
 
 FASTNOISE_API int fnGetMetadataVariableCount( int id );

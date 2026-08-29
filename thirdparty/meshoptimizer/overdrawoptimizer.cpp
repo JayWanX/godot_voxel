@@ -7,8 +7,8 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Pedro Sander, Diego Nehab and Joshua Barczak. Fast Triangle Reordering for Vertex Locality and Reduced Overdraw. 2007
+// 此作品基于：
+// Pedro Sander、Diego Nehab 和 Joshua Barczak。用于顶点局部性与减少过度绘制的高速三角形重排。2007
 namespace meshopt
 {
 
@@ -86,7 +86,7 @@ static void calculateSortData(float* sort_data, const unsigned int* indices, siz
 
 static void calculateSortOrderRadix(unsigned int* sort_order, const float* sort_data, unsigned short* sort_keys, size_t cluster_count)
 {
-	// compute sort data bounds and renormalize, using fixed point snorm
+	// 计算排序数据的边界并使用定点 snorm 重新归一化
 	float sort_data_max = 1e-3f;
 
 	for (size_t i = 0; i < cluster_count; ++i)
@@ -100,13 +100,13 @@ static void calculateSortOrderRadix(unsigned int* sort_order, const float* sort_
 
 	for (size_t i = 0; i < cluster_count; ++i)
 	{
-		// note that we flip distribution since high dot product should come first
+		// 注意：我们翻转分布，因为高点积应排在前面
 		float sort_key = 0.5f - 0.5f * (sort_data[i] / sort_data_max);
 
 		sort_keys[i] = meshopt_quantizeUnorm(sort_key, sort_bits) & ((1 << sort_bits) - 1);
 	}
 
-	// fill histogram for counting sort
+	// 为计数排序填充直方图
 	unsigned int histogram[1 << sort_bits];
 	memset(histogram, 0, sizeof(histogram));
 
@@ -115,7 +115,7 @@ static void calculateSortOrderRadix(unsigned int* sort_order, const float* sort_
 		histogram[sort_keys[i]]++;
 	}
 
-	// compute offsets based on histogram data
+	// 基于直方图数据计算偏移
 	size_t histogram_sum = 0;
 
 	for (size_t i = 0; i < 1 << sort_bits; ++i)
@@ -127,7 +127,7 @@ static void calculateSortOrderRadix(unsigned int* sort_order, const float* sort_
 
 	assert(histogram_sum == cluster_count);
 
-	// compute sort order based on offsets
+	// 基于偏移计算排序顺序
 	for (size_t i = 0; i < cluster_count; ++i)
 	{
 		sort_order[histogram[sort_keys[i]]++] = unsigned(i);
@@ -174,10 +174,10 @@ static size_t generateHardBoundaries(unsigned int* destination, const unsigned i
 	{
 		unsigned int m = updateCache(indices[i * 3 + 0], indices[i * 3 + 1], indices[i * 3 + 2], cache_size, &cache_timestamps[0], timestamp);
 
-		// when all three vertices are not in the cache it's usually relatively safe to assume that this is a new patch in the mesh
+		// 当三个顶点都不在缓存中时，通常可相对安全地假定这是网格中的新补丁
 		// that is disjoint from previous vertices; sometimes it might come back to reference existing vertices but that frequently
-		// suggests an inefficiency in the vertex cache optimization algorithm
-		// usually the first triangle has 3 misses unless it's degenerate - thus we make sure the first cluster always starts with 0
+		// 提示顶点缓存优化算法存在低效
+		// 通常第一个三角形有 3 次未命中，除非它是退化的 - 因此我们确保第一个簇总是从 0 开始
 		if (i == 0 || m == 3)
 		{
 			destination[result++] = unsigned(i);
@@ -203,10 +203,10 @@ static size_t generateSoftBoundaries(unsigned int* destination, const unsigned i
 		size_t end = (it + 1 < cluster_count) ? clusters[it + 1] : index_count / 3;
 		assert(start < end);
 
-		// reset cache
+		// 重置缓存
 		timestamp += cache_size + 1;
 
-		// measure cluster ACMR
+		// 度量簇的 ACMR
 		unsigned int cluster_misses = 0;
 
 		for (size_t i = start; i < end; ++i)
@@ -218,10 +218,10 @@ static size_t generateSoftBoundaries(unsigned int* destination, const unsigned i
 
 		float cluster_threshold = threshold * (float(cluster_misses) / float(end - start));
 
-		// first cluster always starts from the hard cluster boundary
+		// 第一个簇总是从硬簇边界开始
 		destination[result++] = unsigned(start);
 
-		// reset cache
+		// 重置缓存
 		timestamp += cache_size + 1;
 
 		unsigned int running_misses = 0;
@@ -236,12 +236,12 @@ static size_t generateSoftBoundaries(unsigned int* destination, const unsigned i
 
 			if (float(running_misses) / float(running_faces) <= cluster_threshold)
 			{
-				// we have reached the target ACMR with the current triangle so we need to start a new cluster on the next one
-				// note that this may mean that we add 'end` to destination for the last triangle, which will imply that the last
+				// 当前三角形已达到目标 ACMR，因此需要在下一个三角形上开始新簇
+				// 注意：这可能意味着为最后一个三角形向目标添加 'end`，这表明最后一个
 				// cluster is empty; however, the 'pop_back' after the loop will clean it up
 				destination[result++] = unsigned(i + 1);
 
-				// reset cache
+				// 重置缓存
 				timestamp += cache_size + 1;
 
 				running_misses = 0;
@@ -249,12 +249,12 @@ static size_t generateSoftBoundaries(unsigned int* destination, const unsigned i
 			}
 		}
 
-		// each time we reach the target ACMR we flush the cluster
-		// this means that the last cluster is by definition not very good - there are frequent cases where we are left with a few triangles
-		// in the last cluster, producing a very bad ACMR and significantly penalizing the overall results
-		// thus we remove the last cluster boundary, merging the last complete cluster with the last incomplete one
-		// there are sometimes cases when the last cluster is actually good enough - in which case the code above would have added 'end'
-		// to the cluster boundary array which we need to remove anyway - this code will do that automatically
+		// 每次达到目标 ACMR 时我们都刷新簇
+		// 这意味按定义最后一个簇不是很好 - 经常出现只剩几个三角形的
+		// 情况，从而产生很差的 ACMR 并显著拉低整体结果
+		// 因此我们移除最后一个簇边界，将最后一个完整簇与最后一个不完整簇合并
+		// 有时最后一个簇实际上足够好 - 这种情况下，上面的代码会在簇边界数组
+		// 中添加 'end'（无论如何都需要移除）- 此代码会自动完成该操作
 		if (destination[result - 1] != start)
 		{
 			result--;
@@ -279,11 +279,11 @@ void meshopt_optimizeOverdraw(unsigned int* destination, const unsigned int* ind
 
 	meshopt_Allocator allocator;
 
-	// guard for empty meshes
+	// 对空网格的防护
 	if (index_count == 0 || vertex_count == 0)
 		return;
 
-	// support in-place optimization
+	// 支持就地（in-place）优化
 	if (destination == indices)
 	{
 		unsigned int* indices_copy = allocator.allocate<unsigned int>(index_count);
@@ -295,27 +295,27 @@ void meshopt_optimizeOverdraw(unsigned int* destination, const unsigned int* ind
 
 	unsigned int* cache_timestamps = allocator.allocate<unsigned int>(vertex_count);
 
-	// generate hard boundaries from full-triangle cache misses
+	// 从完整三角形的缓存未命中生成硬边界
 	unsigned int* hard_clusters = allocator.allocate<unsigned int>(index_count / 3);
 	size_t hard_cluster_count = generateHardBoundaries(hard_clusters, indices, index_count, vertex_count, cache_size, cache_timestamps);
 
-	// generate soft boundaries
+	// 生成软边界
 	unsigned int* soft_clusters = allocator.allocate<unsigned int>(index_count / 3 + 1);
 	size_t soft_cluster_count = generateSoftBoundaries(soft_clusters, indices, index_count, vertex_count, hard_clusters, hard_cluster_count, cache_size, threshold, cache_timestamps);
 
 	const unsigned int* clusters = soft_clusters;
 	size_t cluster_count = soft_cluster_count;
 
-	// fill sort data
+	// 填充排序数据
 	float* sort_data = allocator.allocate<float>(cluster_count);
 	calculateSortData(sort_data, indices, index_count, vertex_positions, vertex_count, vertex_positions_stride, clusters, cluster_count);
 
-	// sort clusters using sort data
+	// 使用排序数据对簇排序
 	unsigned short* sort_keys = allocator.allocate<unsigned short>(cluster_count);
 	unsigned int* sort_order = allocator.allocate<unsigned int>(cluster_count);
 	calculateSortOrderRadix(sort_order, sort_data, sort_keys, cluster_count);
 
-	// fill output buffer
+	// 填充输出缓冲区
 	size_t offset = 0;
 
 	for (size_t it = 0; it < cluster_count; ++it)

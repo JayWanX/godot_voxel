@@ -9,8 +9,8 @@
 #include "../math/interval.h"
 
 #if defined(__GNUC__) && !defined(__clang__)
-// FastNoise2 uses virtual inheritance, but Godot 4.5 added a warning to enforce not using it.
-// See https://github.com/godotengine/godot/pull/103708
+// FastNoise2 使用了虚继承，但 Godot 4.5 添加了一个警告来强制禁止使用它。
+// 参见 https://github.com/godotengine/godot/pull/103708
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wvirtual-inheritance"
 #endif
@@ -27,27 +27,27 @@ class Image;
 
 namespace voxel {
 
-// Can't call it FastNoise? because FastNoise is a namespace already
+// 不能叫 FastNoise？因为 FastNoise 已经是一个命名空间了
 class FastNoise2 : public Resource {
 	GDCLASS(FastNoise2, Resource)
 public:
 	static const int MAX_OCTAVES = 32;
-	// This minimum size exists to fix an issue with SIMD operations, which need to use more than one element.
+	// 这个最小尺寸是为了修复 SIMD 操作的问题，它们需要使用不止一个元素。
 	static const unsigned int MIN_BUFFER_SIZE = 16;
 	static const int MAX_CELLULAR_INDEX = 3;
 
 	enum SIMDLevel {
-		SIMD_NULL = FastSIMD::Level_Null, // Uninitilised
-		SIMD_SCALAR = FastSIMD::Level_Scalar, // 80386 instruction set (Not SIMD)
-		SIMD_SSE = FastSIMD::Level_SSE, // SSE (XMM) supported by CPU (not testing for O.S. support)
+		SIMD_NULL = FastSIMD::Level_Null, // 未初始化
+		SIMD_SCALAR = FastSIMD::Level_Scalar, // 80386 指令集（非 SIMD）
+		SIMD_SSE = FastSIMD::Level_SSE, // CPU 支持 SSE（XMM）（不检测操作系统支持）
 		SIMD_SSE2 = FastSIMD::Level_SSE2, // SSE2
 		SIMD_SSE3 = FastSIMD::Level_SSE3, // SSE3
-		SIMD_SSSE3 = FastSIMD::Level_SSSE3, // Supplementary SSE3 (SSSE3)
+		SIMD_SSSE3 = FastSIMD::Level_SSSE3, // 补充版 SSE3（SSSE3）
 		SIMD_SSE41 = FastSIMD::Level_SSE41, // SSE4.1
 		SIMD_SSE42 = FastSIMD::Level_SSE42, // SSE4.2
-		SIMD_AVX = FastSIMD::Level_AVX, // AVX supported by CPU and operating system
+		SIMD_AVX = FastSIMD::Level_AVX, // CPU 和操作系统均支持 AVX
 		SIMD_AVX2 = FastSIMD::Level_AVX2, // AVX2
-		SIMD_AVX512 = FastSIMD::Level_AVX512, // AVX512, AVX512DQ supported by CPU and operating system
+		SIMD_AVX512 = FastSIMD::Level_AVX512, // CPU 和操作系统均支持 AVX512、AVX512DQ
 
 		SIMD_NEON = FastSIMD::Level_NEON, // ARM NEON
 	};
@@ -58,10 +58,10 @@ public:
 		TYPE_PERLIN,
 		TYPE_VALUE,
 		TYPE_CELLULAR,
-		// Special type overriding most options with a tree made in Auburn's NoiseTool
+		// 特殊类型，用 Auburn 的 NoiseTool 制作的节点树覆盖大多数选项
 		TYPE_ENCODED_NODE_TREE,
 		TYPE_CELLULAR_VALUE,
-		// TODO Implement NoiseTool graph editor inside Godot?
+		// TODO 在 Godot 内部实现 NoiseTool 图形编辑器？
 		// TYPE_NODE_TREE,
 	};
 
@@ -114,7 +114,7 @@ public:
 	void set_period(float p);
 	float get_period() const;
 
-	// Fractal
+	// 分形
 
 	void set_fractal_type(FractalType type);
 	FractalType get_fractal_type() const;
@@ -131,7 +131,7 @@ public:
 	void set_fractal_ping_pong_strength(float s);
 	float get_fractal_ping_pong_strength() const;
 
-	// Terrace modifier
+	// 梯田修饰器
 
 	void set_terrace_enabled(bool enable);
 	bool is_terrace_enabled() const;
@@ -142,7 +142,7 @@ public:
 	void set_terrace_smoothness(float s);
 	float get_terrace_smoothness() const;
 
-	// Remap
+	// 重映射
 
 	void set_remap_enabled(bool enabled);
 	bool is_remap_enabled() const;
@@ -159,7 +159,7 @@ public:
 	void set_remap_output_max(float max_value);
 	float get_remap_output_max() const;
 
-	// Cellular
+	// 细胞
 
 	void set_cellular_distance_function(CellularDistanceFunction cdf);
 	CellularDistanceFunction get_cellular_distance_function() const;
@@ -176,7 +176,7 @@ public:
 	void set_cellular_index1(int i);
 	int get_cellular_index1() const;
 
-	// Misc
+	// 杂项
 
 	void set_encoded_node_tree(String data);
 	String get_encoded_node_tree() const;
@@ -184,8 +184,8 @@ public:
 	void update_generator();
 	bool is_valid() const;
 
-	// Queries
-	// TODO Double-precision support. FastNoise2 doesn't have it yet, so it's all `float` for now.
+	// 查询
+	// TODO 双精度支持。FastNoise2 还没有，所以现在全部使用 `float`。
 
 	float get_noise_2d_single(Vector2 pos) const;
 	float get_noise_3d_single(Vector3 pos) const;

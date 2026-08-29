@@ -1,83 +1,83 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <nodes>
-	<node name="Abs" category="Math">
+	<node name="Abs" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<description>
-			If [code]x[/code] is negative, returns [code]x[/code] as a positive number. Otherwise, returns [code]x[/code].
+			如果 [code]x[/code] 为负，则返回 [code]x[/code] 的正数形式。否则返回 [code]x[/code]。
 		</description>
 	</node>
-	<node name="Add" category="Ops">
+	<node name="Add" category="运算">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the sum of [code]a[/code] and [code]b[/code]
+			返回 [code]a[/code] 和 [code]b[/code] 的和
 		</description>
 	</node>
-	<node name="Clamp" category="Math">
+	<node name="Clamp" category="数学">
 		<input name="x" default_value="0"/>
 		<input name="min" default_value="-1"/>
 		<input name="max" default_value="1"/>
 		<output name="out"/>
 		<description>
-			If [code]x[/code] is lower than [code]min[/code], returns [code]min[/code]. If [code]x[/code] is higher than [code]max[/code], returns [code]max[/code]. Otherwise, returns [code]x[/code].
+			如果 [code]x[/code] 低于 [code]min[/code]，返回 [code]min[/code]。如果 [code]x[/code] 高于 [code]max[/code]，返回 [code]max[/code]。否则返回 [code]x[/code]。
 		</description>
 	</node>
-	<node name="ClampC" category="Math">
+	<node name="ClampC" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<parameter name="min" type="float" default_value="-1"/>
 		<parameter name="max" type="float" default_value="1"/>
 		<description>
-			If [code]x[/code] is lower than [code]min[/code], returns [code]min[/code]. If [code]x[/code] is higher than [code]max[/code], returns [code]max[/code]. Otherwise, returns [code]x[/code].
-			This node is an alternative to [code]Clamp[/code], used internally as an optimization if [code]min[/code] and [code]max[/code] are constant.
+			如果 [code]x[/code] 低于 [code]min[/code]，返回 [code]min[/code]。如果 [code]x[/code] 高于 [code]max[/code]，返回 [code]max[/code]。否则返回 [code]x[/code]。
+			该节点是 [code]Clamp[/code] 的替代方案，当 [code]min[/code] 和 [code]max[/code] 为常量时，在内部用作优化。
 		</description>
 	</node>
-	<node name="Comment" category="Misc">
+	<node name="Comment" category="杂项">
 		<parameter name="text" type="String" default_value=""/>
 		<description>
-			A rectangular area with a description, to help organizing a graph.
+			一个带有描述的矩形区域，用于帮助组织图形。
 		</description>
 	</node>
-	<node name="Constant" category="Misc">
+	<node name="Constant" category="杂项">
 		<output name="value"/>
 		<parameter name="value" type="float" default_value="0"/>
 		<description>
-            Outputs a constant number.
+			输出一个常量数字。
 		</description>
 	</node>
-	<node name="Curve" category="Mapping">
+	<node name="Curve" category="映射">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<parameter name="curve" type="Object" default_value="null"/>
 		<description>
-			Returns the value of a custom [code]curve[/code] at coordinate [code]x[/code], where [code]x[/code] is in the range specified by its domain properties (in Godot 4.3 and earlier, it is in [code]\[0..1][/code]). The [code]curve[/code] is specified with a [Curve] resource.
+			返回坐标 [code]x[/code] 处自定义 [code]curve[/code] 的值，其中 [code]x[/code] 在其域属性指定的范围内（在 Godot 4.3 及更早版本中，它在 [code]\[0..1][/code] 范围内）。[code]curve[/code] 使用 [Curve] 资源指定。
 		</description>
 	</node>
-	<node name="CustomInput" category="Input">
+	<node name="CustomInput" category="输入">
 		<output name="value"/>
 		<description>
-			Outputs values from the custom input having the same name as the node. May be used in [VoxelGraphFunction]. It won't be used in [VoxelGeneratorGraph].
+			输出与节点同名的自定义输入的值。可用于 [VoxelGraphFunction]。不会在 [VoxelGeneratorGraph] 中使用。
 		</description>
 	</node>
-	<node name="CustomOutput" category="Output">
+	<node name="CustomOutput" category="输出">
 		<input name="value" default_value="0"/>
 		<description>
-			Sets the value of the custom output having the same name as the node. May be used in [VoxelGraphFunction]. It won't be used in [VoxelGeneratorGraph].
+			设置与节点同名的自定义输出的值。可用于 [VoxelGraphFunction]。不会在 [VoxelGeneratorGraph] 中使用。
 		</description>
 	</node>
-	<node name="Distance2D" category="Vector">
+	<node name="Distance2D" category="向量">
 		<input name="x0" default_value="0"/>
 		<input name="y0" default_value="0"/>
 		<input name="x1" default_value="0"/>
 		<input name="y1" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the distance between two 2D points [code](x0, y0)[/code] and [code](x1, y1)[/code].
+			返回两个 2D 点 [code](x0, y0)[/code] 和 [code](x1, y1)[/code] 之间的距离。
 		</description>
 	</node>
-	<node name="Distance3D" category="Vector">
+	<node name="Distance3D" category="向量">
 		<input name="x0" default_value="0"/>
 		<input name="y0" default_value="0"/>
 		<input name="z0" default_value="0"/>
@@ -86,24 +86,24 @@
 		<input name="z1" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the distance between two 3D points [code](x0, y0, z0)[/code] and [code](x1, y1, z1)[/code].
+			返回两个 3D 点 [code](x0, y0, z0)[/code] 和 [code](x1, y1, z1)[/code] 之间的距离。
 		</description>
 	</node>
-	<node name="Divide" category="Ops">
+	<node name="Divide" category="运算">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="1"/>
 		<output name="out"/>
 		<description>
-			Returns the result of [code]a / b[/code].
-			Note: dividing by zero outputs NaN. It should not cause crashes, but will likely mess up results. Consider using Multiply when possible.
+			返回 [code]a / b[/code] 的结果。
+			注意：除以零会输出 NaN。这不会导致崩溃，但很可能使结果出错。尽可能考虑使用 Multiply。
 		</description>
 	</node>
-	<node name="Expression" category="Math">
+	<node name="Expression" category="数学">
 		<output name="out"/>
 		<parameter name="expression" type="String" default_value="0"/>
 		<description>
-			Evaluates a math expression. Variable names can be written as inputs of the node. Some functions can be used, but they must be supported graph nodes in the first place, as the expression will be converted to nodes internally.
-			Available functions:
+			计算数学表达式。变量名可以写成节点的输入。可以使用一些函数，但它们首先必须是受支持的图形节点，因为表达式会在内部转换为节点。
+			可用函数：
 			[codeblock]
 			sin(x)
 			floor(x)
@@ -119,57 +119,57 @@
 			[/codeblock]
 		</description>
 	</node>
-	<node name="FastNoise2D" category="Noise">
+	<node name="FastNoise2D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<output name="out"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Returns computation of 2D noise at coordinates [code](x, y)[/code] using the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [Voxel_FastNoiseLite] resource.
-			Note: this node might be a little faster than [graph_node Noise2D].
+			使用 FastNoiseLite 库计算坐标 [code](x, y)[/code] 处的 2D 噪声并返回。[code]noise[/code] 参数使用 [Voxel_FastNoiseLite] 资源的实例指定。
+			注意：该节点可能比 [graph_node Noise2D] 稍快。
 		</description>
 	</node>
-	<node name="FastNoise2_2D" category="Noise">
+	<node name="FastNoise2_2D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<output name="out"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Returns computation of 2D SIMD noise at coordinates [code](x, y)[/code] using the FastNoise2 library. The `noise` parameter is specified with an instance of the [FastNoise2] resource. This is the fastest noise currently supported.
+			使用 FastNoise2 库计算坐标 [code](x, y)[/code] 处的 2D SIMD 噪声并返回。`noise` 参数使用 [FastNoise2] 资源的实例指定。这是当前支持的最快噪声。
 		</description>
 	</node>
-	<node name="FastNoise2_3D" category="Noise">
-		<input name="x" default_value="0"/>
-		<input name="y" default_value="0"/>
-		<input name="z" default_value="0"/>
-		<output name="out"/>
-		<parameter name="noise" type="Object" default_value="null"/>
-		<description>
-			Returns computation of 3D SIMD noise at coordinates [code](x, y, z)[/code] using the FastNoise2 library. The [code]noise[/code] parameter is specified with an instance of the [FastNoise2] resource. This is the fastest noise currently supported.
-		</description>
-	</node>
-	<node name="FastNoise3D" category="Noise">
+	<node name="FastNoise2_3D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<input name="z" default_value="0"/>
 		<output name="out"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Returns computation of 3D noise at coordinates [code](x, y, z)[/code] using the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [Voxel_FastNoiseLite] resource.
-			Note: this node might be a little faster than [graph_node Noise3D].
+			使用 FastNoise2 库计算坐标 [code](x, y, z)[/code] 处的 3D SIMD 噪声并返回。[code]noise[/code] 参数使用 [FastNoise2] 资源的实例指定。这是当前支持的最快噪声。
 		</description>
 	</node>
-	<node name="FastNoiseGradient2D" category="Noise">
+	<node name="FastNoise3D" category="噪声">
+		<input name="x" default_value="0"/>
+		<input name="y" default_value="0"/>
+		<input name="z" default_value="0"/>
+		<output name="out"/>
+		<parameter name="noise" type="Object" default_value="null"/>
+		<description>
+			使用 FastNoiseLite 库计算坐标 [code](x, y, z)[/code] 处的 3D 噪声并返回。[code]noise[/code] 参数使用 [Voxel_FastNoiseLite] 资源的实例指定。
+			注意：该节点可能比 [graph_node Noise3D] 稍快。
+		</description>
+	</node>
+	<node name="FastNoiseGradient2D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<output name="out_x"/>
 		<output name="out_y"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Warps 2D coordinates [code](x, y)[/code] using a noise gradient from the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [FastNoiseLiteGradient] resource.
+			使用 FastNoiseLite 库的噪声梯度扭曲 2D 坐标 [code](x, y)[/code]。[code]noise[/code] 参数使用 [FastNoiseLiteGradient] 资源的实例指定。
 		</description>
 	</node>
-	<node name="FastNoiseGradient3D" category="Noise">
+	<node name="FastNoiseGradient3D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<input name="z" default_value="0"/>
@@ -178,116 +178,116 @@
 		<output name="out_z"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Warps 3D coordinates [code](x, y, z)[/code] using a noise gradient from the FastNoiseLite library. The [code]noise[/code] parameter is specified with an instance of the [FastNoiseLiteGradient] resource.
+			使用 FastNoiseLite 库的噪声梯度扭曲 3D 坐标 [code](x, y, z)[/code]。[code]noise[/code] 参数使用 [FastNoiseLiteGradient] 资源的实例指定。
 		</description>
 	</node>
-	<node name="Floor" category="Math">
+	<node name="Floor" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the result of [code]floor(x)[/code], the nearest integer that is equal or lower to [code]x[/code].
+			返回 [code]floor(x)[/code] 的结果，即小于或等于 [code]x[/code] 的最近整数。
 		</description>
 	</node>
-	<node name="Fract" category="Math">
+	<node name="Fract" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the decimal part of [code]x[/code]. The result is always positive regardless of sign.
+			返回 [code]x[/code] 的小数部分。无论正负，结果始终为正。
 		</description>
 	</node>
-	<node name="Function" category="Misc">
+	<node name="Function" category="杂项">
 		<parameter name="_function" type="Object" default_value="null"/>
 		<description>
-			Runs a custom function, like a re-usable sub-graph. The first parameter (parameter 0) of this node is a reference to a [VoxelGraphFunction]. Further parameters (starting from 1) are those exposed by the function.
+			运行一个自定义函数，类似于可复用的子图形。该节点的第一个参数（参数 0）是对 [VoxelGraphFunction] 的引用。其余参数（从 1 开始）是函数暴露的参数。
 		</description>
 	</node>
-	<node name="Image" category="Mapping">
+	<node name="Image" category="映射">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<output name="out"/>
 		<parameter name="image" type="Object" default_value="null"/>
 		<parameter name="filter" type="int" default_value="0"/>
 		<description>
-			Returns the value of the red channel of an image at coordinates [code](x, y)[/code], where [code]x[/code] and [code]y[/code] are in pixels and the return value is in the range `[0..1]` (or more if the image has an HDR format). If coordinates are outside the image, they will be wrapped around. The image must have an uncompressed format.
+			返回图像在坐标 [code](x, y)[/code] 处红色通道的值，其中 [code]x[/code] 和 [code]y[/code] 以像素为单位，返回值在 `[0..1]` 范围内（如果图像具有 HDR 格式则可能更大）。如果坐标超出图像范围，将被环绕。不执行任何过滤。图像必须使用未压缩格式。
 		</description>
 	</node>
-	<node name="InputSDF" category="Input">
+	<node name="InputSDF" category="输入">
 		<output name="sdf"/>
 		<description>
-			Outputs the existing signed distance at the current voxel. This may only be used in specific situations, such as using the graph as a procedural brush.
+			输出当前体素处已有的符号距离。这只能在特定情况下使用，例如将图形用作程序化笔刷。
 		</description>
 	</node>
-	<node name="InputX" category="Input">
+	<node name="InputX" category="输入">
 		<output name="x"/>
 		<description>
-			Outputs the X coordinate of the current voxel.
+			输出当前体素的 X 坐标。
 		</description>
 	</node>
-	<node name="InputY" category="Input">
+	<node name="InputY" category="输入">
 		<output name="y"/>
 		<description>
-			Outputs the Y coordinate of the current voxel.
+			输出当前体素的 Y 坐标。
 		</description>
 	</node>
-	<node name="InputZ" category="Input">
+	<node name="InputZ" category="输入">
 		<output name="z"/>
 		<description>
-			Outputs the Z coordinate of the current voxel.
+			输出当前体素的 Z 坐标。
 		</description>
 	</node>
-	<node name="Max" category="Math">
+	<node name="Max" category="数学">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the highest value between [code]a[/code] and [code]b[/code].
+			返回 [code]a[/code] 和 [code]b[/code] 之间的较大值。
 		</description>
 	</node>
-	<node name="Min" category="Math">
+	<node name="Min" category="数学">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the lowest value between [code]a[/code] and [code]b[/code].
+			返回 [code]a[/code] 和 [code]b[/code] 之间的较小值。
 		</description>
 	</node>
-	<node name="Mix" category="Math">
+	<node name="Mix" category="数学">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="0"/>
 		<input name="ratio" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Interpolates between [code]a[/code] and [code]b[/code], using parameter value [code]t[/code]. If [code]t[/code] is [code]0[/code], [code]a[/code] will be returned. If [code]t[/code] is [code]1[/code], [code]b[/code] will be returned. If [code]t[/code] is beyond the [code]\[0..1][/code] range, the returned value will be an extrapolation.
+			使用参数值 [code]t[/code] 在 [code]a[/code] 和 [code]b[/code] 之间插值。如果 [code]t[/code] 为 [code]0[/code]，将返回 [code]a[/code]。如果 [code]t[/code] 为 [code]1[/code]，将返回 [code]b[/code]。如果 [code]t[/code] 超出 [code]\[0..1][/code] 范围，返回值将是一种外推。
 		</description>
 	</node>
-	<node name="Multiply" category="Ops">
+	<node name="Multiply" category="运算">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the result of [code]a * b[/code].
+			返回 [code]a * b[/code] 的结果。
 		</description>
 	</node>
-	<node name="Noise2D" category="Noise">
+	<node name="Noise2D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<output name="out"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Returns 2D noise at coordinates `(x, y)` using one of the [Noise] subclasses provided by Godot.
+			使用 Godot 提供的 [Noise] 子类之一返回坐标 `(x, y)` 处的 2D 噪声。
 		</description>
 	</node>
-	<node name="Noise3D" category="Noise">
+	<node name="Noise3D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<input name="z" default_value="0"/>
 		<output name="out"/>
 		<parameter name="noise" type="Object" default_value="null"/>
 		<description>
-			Returns 3D noise at coordinates `(x, y, z)` using one of the [Noise] subclasses provided by Godot.
+			使用 Godot 提供的 [Noise] 子类之一返回坐标 `(x, y, z)` 处的 3D 噪声。
 		</description>
 	</node>
-	<node name="Normalize" category="Vector">
+	<node name="Normalize" category="向量">
 		<input name="x" default_value="1"/>
 		<input name="y" default_value="1"/>
 		<input name="z" default_value="1"/>
@@ -296,58 +296,58 @@
 		<output name="nz"/>
 		<output name="len"/>
 		<description>
-			Returns the normalized coordinates of the given [code](x, y, z)[/code] 3D vector, such that the length of the output vector is 1.
+			返回给定 [code](x, y, z)[/code] 3D 向量的归一化坐标，使输出向量的长度为 1。
 		</description>
 	</node>
-	<node name="OutputSDF" category="Output">
+	<node name="OutputSDF" category="输出">
 		<input name="sdf" default_value="0"/>
 		<description>
-			Sets the Signed Distance Field value of the current voxel.
+			设置当前体素的符号距离场值。
 		</description>
 	</node>
-	<node name="OutputSingleTexture" category="Output">
+	<node name="OutputSingleTexture" category="输出">
 		<input name="index" default_value="0"/>
 		<description>
-			Sets the texture index of the current voxel. This is an alternative to using [graph_node OutputWeight] nodes, if your voxels only have one texture. This is easier to use but does not allow for long gradients. Using this node in combination with [graph_node OutputWeight] is not supported.
+			设置当前体素的纹理索引。如果你的体素只有一个纹理，这是使用 [graph_node OutputWeight] 节点的替代方案。它更易于使用，但不允许长渐变。不支持将此节点与 [graph_node OutputWeight] 组合使用。
 		</description>
 	</node>
-	<node name="OutputType" category="Output">
+	<node name="OutputType" category="输出">
 		<input name="type" default_value="0"/>
 		<description>
-			Sets the TYPE index of the current voxel. This is for use with [VoxelMesherBlocky]. If you use this output, you don't need to use [graph_node OutputSDF].
+			设置当前体素的 TYPE 索引。这用于 [VoxelMesherBlocky]。如果使用此输出，则无需使用 [graph_node OutputSDF]。
 		</description>
 	</node>
-	<node name="OutputWeight" category="Output">
+	<node name="OutputWeight" category="输出">
 		<input name="weight" default_value="0"/>
 		<parameter name="layer" type="int" default_value="0"/>
 		<description>
-			Sets the value of a specific texture weight for the current voxel. The texture is specified as an index with the [code]layer[/code] parameter. There can only be one output using a given layer index.
+			设置当前体素的特定纹理权重的值。纹理通过 [code]layer[/code] 参数以索引形式指定。使用给定图层索引的输出只能有一个。
 		</description>
 	</node>
-	<node name="Pow" category="Math">
+	<node name="Pow" category="数学">
 		<input name="x" default_value="0"/>
 		<input name="p" default_value="2"/>
 		<output name="out"/>
 		<description>
-			Returns the result of the power function ([code]x ^ power[/code]). It can be relatively slow.
+			返回幂函数（[code]x ^ power[/code]）的结果。它可能相对较慢。
 		</description>
 	</node>
-	<node name="Powi" category="Math">
+	<node name="Powi" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<parameter name="power" type="int" default_value="2"/>
 		<description>
-			Returns the result of the power function ([code]x ^ power[/code]), where the exponent is a constant positive integer. May be faster than [graph_node Pow].
+			返回幂函数（[code]x ^ power[/code]）的结果，其中指数是常量正整数。可能比 [graph_node Pow] 更快。
 		</description>
 	</node>
-	<node name="Relay" category="Misc">
+	<node name="Relay" category="杂项">
 		<input name="in" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Pass-through node, allowing to better organize the path of long connections.
+			直通节点，可以更好地组织长连接的路径。
 		</description>
 	</node>
-	<node name="Remap" category="Math">
+	<node name="Remap" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<parameter name="min0" type="float" default_value="-1"/>
@@ -355,7 +355,7 @@
 		<parameter name="min1" type="float" default_value="-1"/>
 		<parameter name="max1" type="float" default_value="1"/>
 		<description>
-			For an input value [code]x[/code] in the range [code]\[min0, max0][/code], converts linearly into the [code]\[min1, max1][/code] range. For example, if [code]x[/code] is [code]min0[/code], then [code]min1[/code] will be returned. If [code]x[/code] is [code]max0[/code], then [code]max1[/code] will be returned. If [code]x[/code] is beyond the [code]\[min0, max0][/code] range, the result will be an extrapolation.
+			对于 [code]\[min0, max0][/code] 范围内的输入值 [code]x[/code]，线性转换到 [code]\[min1, max1][/code] 范围。例如，如果 [code]x[/code] 是 [code]min0[/code]，将返回 [code]min1[/code]。如果 [code]x[/code] 是 [code]max0[/code]，将返回 [code]max1[/code]。如果 [code]x[/code] 超出 [code]\[min0, max0][/code] 范围，结果将是一种外推。
 		</description>
 	</node>
 	<node name="SdfBox" category="SDF">
@@ -367,7 +367,7 @@
 		<parameter name="size_y" type="float" default_value="10"/>
 		<parameter name="size_z" type="float" default_value="10"/>
 		<description>
-			Returns the signed distance field of an axis-aligned box centered at the origin, of size [code](size_x, size_y, size_z)[/code], at coordinates [code](x, y, z)[/code].
+			返回以原点为中心、大小为 [code](size_x, size_y, size_z)[/code] 的轴对齐盒体在坐标 [code](x, y, z)[/code] 处的符号距离场。
 		</description>
 	</node>
 	<node name="SdfPlane" category="SDF">
@@ -375,7 +375,7 @@
 		<input name="height" default_value="0"/>
 		<output name="sdf"/>
 		<description>
-			Returns the signed distance field of a plane facing the Y axis located at a given [code]height[/code], at coordinate [code]y[/code].
+			返回面向 Y 轴、位于给定 [code]height[/code] 处的平面在坐标 [code]y[/code] 处的符号距离场。
 		</description>
 	</node>
 	<node name="SdfPreview" category="SDF">
@@ -385,7 +385,7 @@
 		<parameter name="fraction_period" type="float" default_value="10"/>
 		<parameter name="mode" type="int" default_value="0"/>
 		<description>
-			Debug node, not used in the final result. In the editor, shows a slice of the values emitted from the output it is connected to, according to boundary [code]\[min_value, max_value][/code]. The slice will be either along the XY plane or the XZ plane, depending on current settings.
+			调试节点，不用于最终结果。在编辑器中，根据边界 [code]\[min_value, max_value][/code] 显示其所连接输出发出的值的一个切片。切片将沿 XY 平面或 XZ 平面，具体取决于当前设置。
 		</description>
 	</node>
 	<node name="SdfSmoothSubtract" category="SDF">
@@ -394,7 +394,7 @@
 		<output name="sdf"/>
 		<parameter name="smoothness" type="float" default_value="0"/>
 		<description>
-			Subtracts signed distance field [code]b[/code] from [code]a[/code], using the same smoothing as with the [graph_node SdfSmoothUnion] node.
+			使用与 [graph_node SdfSmoothUnion] 节点相同的平滑方式，从 [code]a[/code] 中减去符号距离场 [code]b[/code]。
 		</description>
 	</node>
 	<node name="SdfSmoothUnion" category="SDF">
@@ -403,7 +403,7 @@
 		<output name="sdf"/>
 		<parameter name="smoothness" type="float" default_value="0"/>
 		<description>
-			Returns the smooth union of two signed distance field values [code]a[/code] and [code]b[/code]. Smoothness is controlled with the [code]smoothness[/code] parameter. Higher smoothness will create a larger "weld" between the shapes formed by the two inputs.
+			返回两个符号距离场值 [code]a[/code] 和 [code]b[/code] 的平滑并集。平滑度通过 [code]smoothness[/code] 参数控制。平滑度越高，会在两个输入形成的形状之间产生更大的“焊接”区域。
 		</description>
 	</node>
 	<node name="SdfSphere" category="SDF">
@@ -413,7 +413,7 @@
 		<output name="sdf"/>
 		<parameter name="radius" type="float" default_value="1"/>
 		<description>
-			Returns the signed distance field of a sphere centered at the origin, of given [code]radius[/code], at coordinates [code](x, y, z)[/code].
+			返回以原点为中心、给定 [code]radius[/code] 的球体在坐标 [code](x, y, z)[/code] 处的符号距离场。
 		</description>
 	</node>
 	<node name="SdfSphereHeightmap" category="SDF">
@@ -425,7 +425,7 @@
 		<parameter name="radius" type="float" default_value="10"/>
 		<parameter name="factor" type="float" default_value="1"/>
 		<description>
-			Returns an approximation of the signed distance field of a spherical heightmap, at coordinates [code](x, y, z)[/code]. The heightmap is an [code]image[/code] using panoramic projection, similar to those used for environment sky in Godot. The radius of the sphere is specified with [code]radius[/code]. The heights from the heightmap can be scaled using the [code]factor[/code] parameter. The image must use an uncompressed format.
+			返回球形高度图在坐标 [code](x, y, z)[/code] 处的符号距离场近似值。高度图是使用全景投影的 [code]image[/code]，类似于 Godot 中用于环境天空的图像。球体的半径通过 [code]radius[/code] 指定。高度图的高度可以使用 [code]factor[/code] 参数缩放。图像必须使用未压缩格式。
 		</description>
 	</node>
 	<node name="SdfTorus" category="SDF">
@@ -436,36 +436,36 @@
 		<parameter name="radius1" type="float" default_value="16"/>
 		<parameter name="radius2" type="float" default_value="4"/>
 		<description>
-			Returns the signed distance field of a torus centered at the origin, facing the Y axis, at coordinates [code](x, y, z)[/code]. The radius of the ring is [code]radius1[/code], and its thickness is [code]radius2[/code].
+			返回以原点为中心、面向 Y 轴的环面在坐标 [code](x, y, z)[/code] 处的符号距离场。环的半径为 [code]radius1[/code]，其厚度为 [code]radius2[/code]。
 		</description>
 	</node>
-	<node name="Select" category="Math">
+	<node name="Select" category="数学">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="0"/>
 		<input name="t" default_value="0"/>
 		<output name="out"/>
 		<parameter name="threshold" type="float" default_value="0"/>
 		<description>
-			If [code]t[/code] is lower than [code]threshold[/code], returns [code]a[/code]. Otherwise, returns [code]b[/code]. 
+			如果 [code]t[/code] 低于 [code]threshold[/code]，返回 [code]a[/code]。否则返回 [code]b[/code]。 
 		</description>
 	</node>
-	<node name="Sin" category="Math">
+	<node name="Sin" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the result of [code]sin(x)[/code]
+			返回 [code]sin(x)[/code] 的结果
 		</description>
 	</node>
-	<node name="Smoothstep" category="Math">
+	<node name="Smoothstep" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<parameter name="edge0" type="float" default_value="0"/>
 		<parameter name="edge1" type="float" default_value="1"/>
 		<description>
-			Returns the result of smoothly interpolating the value of [code]x[/code] between [code]0[/code] and [code]1[/code], based on the where [code]x[/code] lies with respect to the edges [code]egde0[/code] and [code]edge1[/code]. The return value is [code]0[/code] if [code]x &lt;= edge0[/code], and [code]1[/code] if [code]x &gt;= edge1[/code]. If [code]x[/code] lies between [code]edge0[/code] and [code]edge1[/code], the returned value follows an S-shaped curve that maps [code]x[/code] between [code]0[/code] and [code]1[/code]. This S-shaped curve is the cubic Hermite interpolator, given by [code]f(y) = 3*y^2 - 2*y^3[/code] where [code]y = (x-edge0) / (edge1-edge0)[/code].
+			根据 [code]x[/code] 相对于边缘 [code]egde0[/code] 和 [code]edge1[/code] 的位置，在 [code]0[/code] 和 [code]1[/code] 之间平滑插值 [code]x[/code] 的值。如果 [code]x &lt;= edge0[/code]，返回值为 [code]0[/code]；如果 [code]x &gt;= edge1[/code]，返回值为 [code]1[/code]。如果 [code]x[/code] 位于 [code]edge0[/code] 和 [code]edge1[/code] 之间，返回值遵循一条 S 形曲线，将 [code]x[/code] 映射到 [code]0[/code] 和 [code]1[/code] 之间。这条 S 形曲线是三次 Hermite 插值，公式为 [code]f(y) = 3*y^2 - 2*y^3[/code]，其中 [code]y = (x-edge0) / (edge1-edge0)[/code]。
 		</description>
 	</node>
-	<node name="Spots2D" category="Noise">
+	<node name="Spots2D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<input name="spot_radius" default_value="5"/>
@@ -474,10 +474,10 @@
 		<parameter name="cell_size" type="float" default_value="32"/>
 		<parameter name="jitter" type="float" default_value="0.9"/>
 		<description>
-			Cellular noise optimized for "ore patch" generation: divides space into a 2D grid where each cell contains a circular "spot". Returns 1 when the position is inside the spot, 0 otherwise. [code]jitter[/code] more or less randomizes the position of the spot inside each cell. Limitation: high jitter can make spots clip with cell borders. This is intentional. If you need more generic cellular noise, use another node.
+			为“矿脉”生成优化的细胞噪声：将空间划分为 2D 网格，每个单元格包含一个圆形“斑点”。当位置在斑点内部时返回 1，否则返回 0。[code]jitter[/code] 或多或少会随机化斑点在每个单元格内的位置。限制：高抖动可能使斑点与单元格边界相交。这是有意为之的。如果你需要更通用的细胞噪声，请使用另一个节点。
 		</description>
 	</node>
-	<node name="Spots3D" category="Noise">
+	<node name="Spots3D" category="噪声">
 		<input name="x" default_value="0"/>
 		<input name="y" default_value="0"/>
 		<input name="z" default_value="0"/>
@@ -487,40 +487,40 @@
 		<parameter name="cell_size" type="float" default_value="32"/>
 		<parameter name="jitter" type="float" default_value="0.9"/>
 		<description>
-			Cellular noise optimized for "ore patch" generation: divides space into a 3D grid where each cell contains a circular "spot". Returns 1 when the position is inside the spot, 0 otherwise. [code]jitter[/code] more or less randomizes the position of the spot inside each cell. Limitation: high jitter can make spots clip with cell borders. This is intentional. If you need more generic cellular noise, use another node.
+			为“矿脉”生成优化的细胞噪声：将空间划分为 3D 网格，每个单元格包含一个圆形“斑点”。当位置在斑点内部时返回 1，否则返回 0。[code]jitter[/code] 或多或少会随机化斑点在每个单元格内的位置。限制：高抖动可能使斑点与单元格边界相交。这是有意为之的。如果你需要更通用的细胞噪声，请使用另一个节点。
 		</description>
 	</node>
-	<node name="Sqrt" category="Math">
+	<node name="Sqrt" category="数学">
 		<input name="x" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the square root of [code]x[/code].
-			Note: unlike classic square root, if [code]x[/code] is negative, this function returns [code]0[/code] instead of [code]NaN[/code].
+			返回 [code]x[/code] 的平方根。
+			注意：与经典平方根不同，如果 [code]x[/code] 为负，此函数返回 [code]0[/code] 而不是 [code]NaN[/code]。
 		</description>
 	</node>
-	<node name="Stepify" category="Math">
+	<node name="Stepify" category="数学">
 		<input name="x" default_value="0"/>
 		<input name="step" default_value="1"/>
 		<output name="out"/>
 		<description>
-			Snaps [code]x[/code] to a given step, similar to GDScript's function [code]stepify[/code].
+			将 [code]x[/code] 吸附到给定步长，类似于 GDScript 的函数 [code]stepify[/code]。
 		</description>
 	</node>
-	<node name="Subtract" category="Ops">
+	<node name="Subtract" category="运算">
 		<input name="a" default_value="0"/>
 		<input name="b" default_value="0"/>
 		<output name="out"/>
 		<description>
-			Returns the result of [code]a - b[/code]
+			返回 [code]a - b[/code] 的结果
 		</description>
 	</node>
-	<node name="Wrap" category="Math">
+	<node name="Wrap" category="数学">
 		<input name="x" default_value="0"/>
 		<input name="length" default_value="1"/>
 		<output name="out"/>
 		<description>
-			Wraps [code]x[/code] between [code]0[/code] and [code]length[/code], similar to GDScript's function [code]wrapf(x, 0, max)[/code].
-			Note: if [code]length[/code] is 0, this node will return [code]NaN[/code]. If it happens, it should not crash, but results will be messed up.
+			将 [code]x[/code] 环绕在 [code]0[/code] 和 [code]length[/code] 之间，类似于 GDScript 的函数 [code]wrapf(x, 0, max)[/code]。
+			注意：如果 [code]length[/code] 为 0，该节点将返回 [code]NaN[/code]。即使发生这种情况，也不应该崩溃，但结果会出错。
 		</description>
 	</node>
 </nodes>

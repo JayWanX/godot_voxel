@@ -1,21 +1,21 @@
 # VoxelModifierSphere
 
-Inherits: [VoxelModifier](VoxelModifier.md)
+继承自：[VoxelModifier](VoxelModifier.md)
 
-Voxel modifier that uses sphere shape.
+使用球体形状的体素修改器。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                      | Name                 | Default 
-------------------------------------------------------------------------- | -------------------- | --------
-[float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [radius](#i_radius)  | 10.0    
+类型                                                                        | 名称                   | 默认值  
+------------------------------------------------------------------------- | -------------------- | -----
+[float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [radius](#i_radius)  | 10.0 
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_radius"></span> **radius** = 10.0
 
-Radius of the sphere.
+球体的半径。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

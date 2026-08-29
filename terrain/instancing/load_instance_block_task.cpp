@@ -62,7 +62,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 
 	StdVector<Layer> layers;
 
-	// Try loading saved blocks
+	// 尝试加载已保存的数据块
 	if (_stream.is_valid()) {
 		VOXEL_PROFILE_SCOPE();
 
@@ -72,7 +72,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 		VOXEL_ASSERT(data_factor <= 2);
 		FixedArray<VoxelStream::InstancesQueryData, 8> queries;
 
-		// Create queries
+		// 创建查询
 		unsigned int query_count = 0;
 		data_box.for_each_cell([&query_count, &queries, this](Vector3i data_pos) {
 			VoxelStream::InstancesQueryData &query = queries[query_count];
@@ -92,8 +92,8 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 			}
 
 			if (_quick_reload_cache != nullptr) {
-				// Look first into quick reload cache and filter out queries to the stream... I don't like this,
-				// especially the fact it gets complicated with differing chunk sizes
+				// 首先查看快速重载缓存，并过滤出流向流的查询……我不喜欢这样，
+				// 尤其是不同数据块大小会使情况变得复杂
 				MutexLock mlock(_quick_reload_cache->mutex);
 				for (unsigned int query_index = 0; query_index < query_count; ++query_index) {
 					VoxelStream::InstancesQueryData &query = queries[query_index];
@@ -132,14 +132,14 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 		const Vector3i data_min_block_pos = _render_grid_position * data_factor;
 		const int data_block_size_at_lod = static_cast<int>(_data_block_size) << _lod_index;
 
-		// For each octant (will be only 1 if data chunks are the same size as render chunks, otherwise 8)
-		// Populate layers from what we found in stream
+		// 遍历每个卦限（如果数据块与渲染数据块大小相同则只有 1 个，否则为 8 个）
+		// 根据在流中找到的内容填充图层
 		for (unsigned int octant_index = 0; octant_index < query_count; ++octant_index) {
 			const VoxelStream::InstancesQueryData &query = queries[octant_index];
 
 			if (query.result == VoxelStream::RESULT_BLOCK_FOUND) {
 				if (query.data == nullptr) {
-					// There must be no instances here at all, they were edited out
+					// 这里一定没有任何实例，它们已被编辑移除
 
 					if (query_count > 1) {
 						for (Layer &layer : layers) {
@@ -158,7 +158,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 					const int layer_id = loaded_layer_data.id;
 					size_t layer_index;
 
-					// Not using a hashmap here, this array is usually small
+					// 这里不使用哈希表，该数组通常很小
 					if (!find(to_span_const(layers), layer_index, [layer_id](const Layer &layer) {
 							return layer.id == layer_id;
 						})) {
@@ -171,7 +171,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 					Layer &layer = layers[layer_index];
 
 					if (query_count > 1) {
-						// Mark octant as modified so the generator may skip it
+						// 将卦限标记为已修改，以便生成器可以跳过它
 						layer.edited_mask |= (1 << octant_index);
 					} else {
 						layer.edited_mask = 0xff;
@@ -185,8 +185,8 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 					}
 
 					if (data_factor == 2) {
-						// Data blocks store instances relative to a smaller grid than render blocks.
-						// So we need to adjust their relative position.
+						// 数据块相对于比渲染数据块更小的网格存储实例。
+						// 因此我们需要调整它们的相对位置。
 						const Vector3f rel =
 								to_vec3f((query.position_in_blocks - data_min_block_pos) * data_block_size_at_lod);
 						VOXEL_ASSERT(dst_index0 <= layer.transforms.size());
@@ -199,11 +199,11 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 		}
 	}
 
-	// Generate the rest
+	// 生成其余部分
 	if (_mesh_arrays.size() != 0 && _library.is_valid()) {
 		VOXEL_PROFILE_SCOPE();
 
-		// TODO Cache memory
+		// TODO 缓存内存
 		StdVector<VoxelInstanceLibrary::PackedItem> items;
 		_library->get_packed_items_at_lod(items, _lod_index);
 
@@ -213,7 +213,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 			for (const VoxelInstanceLibrary::PackedItem &item : items) {
 				if (item.generator.is_valid()) {
 					size_t layer_index;
-					// Not using a hashmap here, this array is usually small
+					// 这里不使用哈希表，该数组通常很小
 					const int layer_id = item.id;
 					if (!find(to_span_const(layers), layer_index, [layer_id](const Layer &layer) {
 							return layer.id == layer_id;
@@ -224,15 +224,15 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 
 					Layer &layer = layers[layer_index];
 					if (layer.edited_mask == 0xff) {
-						// Nothing to generate
+						// 无需生成
 						continue;
 					}
 
 					PackedVector3Array vertices = _mesh_arrays[ArrayMesh::ARRAY_VERTEX];
 
 					if (vertices.size() != 0) {
-						// Trigger a separate task because it may run in parallel, while the current one may not (until
-						// we figure out how to make VoxelStream I/Os parallel enough)
+						// 触发一个单独的任务，因为它可以并行运行，而当前任务可能不行（直到
+						// 我们弄清楚如何让 VoxelStream I/O 足够并行）
 						GenerateInstancesBlockTask *task = VOXEL_NEW(GenerateInstancesBlockTask);
 						task->mesh_block_grid_position = _render_grid_position;
 						task->layer_id = item.id;
@@ -251,7 +251,7 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 						task_scheduler.push_main_task(task);
 					}
 
-					// We delegated the rest of loading to another task so we remove it from our list.
+					// 我们将剩余加载委托给了另一个任务，因此将其从列表中移除。
 					layers[layer_index] = std::move(layers.back());
 					layers.pop_back();
 				}
@@ -261,11 +261,11 @@ void LoadInstanceChunkTask::run(ThreadedTaskContext &ctx) {
 		}
 	}
 
-	// Post results
+	// 发布结果
 	for (Layer &layer : layers) {
 		InstanceLoadingTaskOutput o;
 		o.layer_id = layer.id;
-		// Will normally be full
+		// 通常会是满的
 		o.edited_mask = layer.edited_mask;
 		o.render_block_position = _render_grid_position;
 		o.transforms = std::move(layer.transforms);

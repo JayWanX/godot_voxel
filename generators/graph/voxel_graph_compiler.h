@@ -10,7 +10,7 @@ namespace voxel::pg {
 
 struct PortRemap {
 	ProgramGraph::PortLocation original;
-	// Can have null ID, means the port expanded into nothing.
+	// ID 可为 null，表示该端口在展开后没有对应内容。
 	ProgramGraph::PortLocation expanded;
 };
 
@@ -20,14 +20,14 @@ struct ExpandedNodeRemap {
 };
 
 struct GraphRemappingInfo {
-	// Used for debug output previews in the editor
+	// 用于编辑器中的调试输出预览
 	StdVector<PortRemap> user_to_expanded_ports;
-	// Used for error reporting
+	// 用于错误报告
 	StdVector<ExpandedNodeRemap> expanded_to_user_node_ids;
 };
 
-// Pre-processes the graph and applies some optimizations before doing the main compilation pass.
-// This can involve some nodes getting removed or replaced with new ones.
+// 预处理图并在主编译阶段之前应用一些优化。
+// 这可能导致某些节点被移除或用新节点替换。
 CompilationResult expand_graph(
 		const ProgramGraph &graph,
 		ProgramGraph &expanded_graph,
@@ -38,7 +38,7 @@ CompilationResult expand_graph(
 		const bool debug
 );
 
-// Functions usable by node implementations during the compilation stage
+// 编译阶段可供节点实现使用的函数
 class CompileContext {
 public:
 	CompileContext(
@@ -53,43 +53,42 @@ public:
 		return _params[i];
 	}
 
-	// Stores compile-time parameters the node will need. T must be a POD struct.
+	// 存储节点所需的编译期参数。T 必须是 POD 结构体。
 	template <typename T>
 	void set_params(T params) {
 		static_assert(std::is_standard_layout_v<T> == true);
 		static_assert(std::is_trivial_v<T> == true);
 
-		// Can be called only once per node
+		// 每个节点只能调用一次
 		CRASH_COND(_params_added);
-		// We will need to align memory, so the struct will not be immediately stored here.
-		// Instead we put a header that tells how much to advance in order to reach the beginning of the struct,
-		// which will be at an aligned position.
-		// We align to the maximum alignment between the struct,
-		// and the type of word we store inside the program buffer, which is uint16.
+		// 我们需要对齐内存，因此结构体不会立即存储在这里。
+		// 取而代之的是放入一个头部，它告诉我们前进多少才能到达结构体的开头，
+		// 那将是已对齐的位置。
+		// 我们在结构体与存储在程序缓冲区中的字类型（即 uint16）之间取最大对齐。
 		const size_t params_alignment = math::max(alignof(T), alignof(uint16_t));
 		const size_t params_offset_index = _program.size();
-		// Prepare space to store the offset (at least 1 since that header is one word)
+		// 预留空间以存储偏移量（至少为 1，因为该头部是一个字）
 		_program.push_back(1);
-		// Align memory for the struct.
-		// Note, we index with words, not bytes.
+		// 为结构体对齐内存。
+		// 注意：我们按字而不是按字节索引。
 		const size_t struct_offset =
 				math::alignup(_program.size() * sizeof(uint16_t), params_alignment) / sizeof(uint16_t);
 		if (struct_offset > _program.size()) {
 			_program.resize(struct_offset);
 		}
-		// Write offset in header
+		// 在头部写入偏移量
 		_program[params_offset_index] = struct_offset - params_offset_index;
-		// Allocate space for the struct. It is measured in words, so it can be up to 1 byte larger.
+		// 为结构体分配空间。它以字为单位，因此可能最多多出 1 个字节。
 		_params_size_in_words = (sizeof(T) + sizeof(uint16_t) - 1) / sizeof(uint16_t);
 		_program.resize(_program.size() + _params_size_in_words);
-		// Write struct
+		// 写入结构体
 		T &p = *reinterpret_cast<T *>(&_program[struct_offset]);
 		p = params;
 
 		_params_added = true;
 	}
 
-	// In case the compilation step produces a resource to be deleted
+	// 当编译步骤产生需要删除的资源时使用
 	template <typename T>
 	void add_delete_cleanup(T *ptr) {
 		static_assert(!std::is_base_of<Object, T>::value);

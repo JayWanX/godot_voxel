@@ -17,7 +17,7 @@ class VoxelInstanceLibraryEditorPlugin : public voxel::godot::Voxel_EditorPlugin
 public:
 	VoxelInstanceLibraryEditorPlugin();
 
-	// Because this is protected in the base class when compiling as a module
+	// 因为编译为模块时这在基类中是 protected
 	EditorUndoRedoManager &get_undo_redo2();
 
 protected:

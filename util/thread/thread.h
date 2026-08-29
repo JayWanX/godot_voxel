@@ -26,14 +26,14 @@ public:
 	bool is_started() const;
 	void wait_to_finish();
 
-	// Gets a hint of the number of concurrent threads natively supported
+	// 获取原生支持的并发线程数的提示
 	static unsigned int get_hardware_concurrency();
 
-	// Targets the current thread
+	// 针对当前线程
 	static void set_name(const char *name);
 	static void sleep_usec(uint32_t microseconds);
 
-	// Get ID of the current thread
+	// 获取当前线程的 ID
 	static ID get_caller_id();
 
 private:

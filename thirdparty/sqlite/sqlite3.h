@@ -10424,10 +10424,10 @@ SQLITE_API int sqlite3_vtab_in(sqlite3_index_info*, int iCons, int bHandle);
 ** &nbsp;      rc==SQLITE_OK && pVal;
 ** &nbsp;      rc=sqlite3_vtab_in_next(pList, &pVal)
 ** &nbsp;  ){
-** &nbsp;    // do something with pVal
+** &nbsp;    // 对 pVal 执行某些操作
 ** &nbsp;  }
 ** &nbsp;  if( rc!=SQLITE_OK ){
-** &nbsp;    // an error has occurred
+** &nbsp;    // 发生了错误
 ** &nbsp;  }
 ** </pre></blockquote>)^
 **
@@ -10502,9 +10502,9 @@ SQLITE_API int sqlite3_vtab_rhs_value(sqlite3_index_info*, int, sqlite3_value **
 ** [SQLITE_ABORT] is also a [result code].
 */
 #define SQLITE_ROLLBACK 1
-/* #define SQLITE_IGNORE 2 // Also used by sqlite3_authorizer() callback */
+/* #define SQLITE_IGNORE 2 // 也由 sqlite3_authorizer() 回调使用 */
 #define SQLITE_FAIL     3
-/* #define SQLITE_ABORT 4  // Also an error code */
+/* #define SQLITE_ABORT 4  // 也是一种错误码 */
 #define SQLITE_REPLACE  5
 
 /*
@@ -12153,11 +12153,11 @@ SQLITE_API int sqlite3changeset_fk_conflicts(
 ** <pre>
 **   sqlite3changeset_start();
 **   while( SQLITE_ROW==sqlite3changeset_next() ){
-**     // Do something with change.
+**     // 对 change 执行某些操作。
 **   }
 **   rc = sqlite3changeset_finalize();
 **   if( rc!=SQLITE_OK ){
-**     // An error has occurred
+**     // 发生了错误
 **   }
 ** </pre>
 */
@@ -13435,7 +13435,7 @@ struct Fts5PhraseIter {
 **           iCol>=0;
 **           pApi->xPhraseNext(pFts, &iter, &iCol, &iOff)
 **       ){
-**         // An instance of phrase iPhrase at offset iOff of column iCol
+**         // 短语 iPhrase 在列 iCol 的偏移量 iOff 处的一个实例
 **       }
 **
 **   The Fts5PhraseIter structure is defined above. Applications should not
@@ -13469,7 +13469,7 @@ struct Fts5PhraseIter {
 **           iCol>=0;
 **           pApi->xPhraseNextColumn(pFts, &iter, &iCol)
 **       ){
-**         // Column iCol contains at least one instance of phrase iPhrase
+**         // 列 iCol 至少包含短语 iPhrase 的一个实例
 **       }
 **
 **   This API can be quite slow if used with an FTS5 table created with the

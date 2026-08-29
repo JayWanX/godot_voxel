@@ -4,7 +4,7 @@
 
 namespace voxel::pg {
 
-// Special case for division because we want to avoid NaNs caused by zeros
+// 除法的特殊情况，因为我们想避免由零引起的 NaN
 void do_division(Runtime::ProcessBufferContext &ctx) {
 	const Runtime::Buffer &a = ctx.get_input(0);
 	const Runtime::Buffer &b = ctx.get_input(1);
@@ -32,7 +32,7 @@ void do_division(Runtime::ProcessBufferContext &ctx) {
 				}
 			}
 		} else {
-			// Normally this case should have been optimized out at compile-time
+			// 正常情况下这种情况应在编译时就被优化掉
 			const float v = b.constant_value == 0.f ? 0.f : a.constant_value / b.constant_value;
 			for (uint32_t i = 0; i < buffer_size; ++i) {
 				out.data[i] = v;
@@ -106,7 +106,7 @@ void register_math_ops_nodes(Span<NodeType> types) {
 			const Interval a = ctx.get_input(0);
 			const Interval b = ctx.get_input(1);
 			if (ctx.get_input_address(0) == ctx.get_input_address(1)) {
-				// The two operands have the same source, we can optimize to a square function
+				// 两个操作数来源相同，可以优化为平方函数
 				ctx.set_output(0, squared(a));
 			} else {
 				ctx.set_output(0, a * b);

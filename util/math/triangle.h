@@ -8,7 +8,7 @@
 
 namespace voxel::math {
 
-// Float version of Geometry::is_point_in_triangle()
+// Geometry::is_point_in_triangle() 的浮点版本
 inline bool is_point_in_triangle(const Vector2f &s, const Vector2f &a, const Vector2f &b, const Vector2f &c) {
 	const Vector2f an = a - s;
 	const Vector2f bn = b - s;
@@ -38,9 +38,9 @@ inline float is_triangle_degenerate_approx(Vector3f p0, Vector3f p1, Vector3f p2
 // 	return p0 == p1 || p1 == p2 || p2 == p0;
 // }
 
-// Heron's formula is overly represented on SO but uses 4 square roots. This uses only one.
-// A parallelogram's area is found with the magnitude of the cross product of two adjacent side vectors,
-// so a triangle's area is half of it
+// Heron 公式在 SO 上被过度提及，但它要用 4 次平方根。本实现只用一次。
+// 平行四边形的面积等于两条相邻边的向量的叉积的模，
+// 因此三角形面积为其一半
 inline float get_triangle_area(Vector3 p0, Vector3 p1, Vector3 p2) {
 	const Vector3 p01 = p1 - p0;
 	const Vector3 p02 = p2 - p0;
@@ -70,7 +70,7 @@ inline Vector3f get_triangle_barycentric_coordinates(Vector2f p0, Vector2f p1, V
 	return weights;
 }
 
-// https://stackoverflow.com/questions/47410054/generate-random-locations-within-a-triangular-domain
+// TODO 模板化？
 inline Vector3f get_triangle_random_barycentric(const float rand1, const float rand2) {
 	const float s = abs(rand1 - rand2);
 	const float t = 0.5f * (rand1 + rand2 - s);
@@ -94,9 +94,9 @@ struct TriangleIntersectionResult {
 	double distance;
 };
 
-// TODO Templatize?
+// 最初来自 Godot Engine，经过调整以满足需求
 
-// Initially from Godot Engine, tweaked to suits needs
+// 最初来自 Godot Engine，经过调整以满足需求
 inline TriangleIntersectionResult ray_intersects_triangle(
 		const Vector3f &p_from,
 		const Vector3f &p_dir,
@@ -130,15 +130,15 @@ inline TriangleIntersectionResult ray_intersects_triangle(
 		return { TriangleIntersectionResult::NO_INTERSECTION, -1 };
 	}
 
-	// At this stage we can compute t to find out where
-	// the intersection point is on the line.
+	// 此时我们可以计算 t 来确定
+	// 交点在直线的什么位置。
 	const float t = f * math::dot(e2, q);
 
-	if (t > 0.00001f) { // ray intersection
+	if (t > 0.00001f) { // 射线相交
 		// r_res = p_from + p_dir * t;
 		return { TriangleIntersectionResult::INTERSECTION, t };
 
-	} else { // This means that there is a line intersection but not a ray intersection.
+	} else { // 这意味着存在直线相交，但不存在射线相交。
 		return { TriangleIntersectionResult::NO_INTERSECTION, -1 };
 	}
 }
@@ -155,7 +155,7 @@ inline TriangleIntersectionResult ray_intersects_triangle(
 	const Vector3d h = math::cross(p_dir, e2);
 	const double a = math::dot(e1, h);
 
-	if (Math::abs(a) < 0.000000001) { // Parallel test.
+	if (Math::abs(a) < 0.000000001) { // 平行性测试。
 		return { TriangleIntersectionResult::PARALLEL, -1 };
 	}
 
@@ -175,20 +175,20 @@ inline TriangleIntersectionResult ray_intersects_triangle(
 		return { TriangleIntersectionResult::NO_INTERSECTION, -1 };
 	}
 
-	// At this stage we can compute t to find out where
-	// the intersection point is on the line.
+	// 此时我们可以计算 t 来确定
+	// 交点在直线的什么位置。
 	const double t = f * math::dot(e2, q);
 
-	if (t > 0.000000001) { // ray intersection
+	if (t > 0.000000001) { // 射线相交
 		// r_res = p_from + p_dir * t;
 		return { TriangleIntersectionResult::INTERSECTION, t };
 
-	} else { // This means that there is a line intersection but not a ray intersection.
+	} else { // 这意味着存在直线相交，但不存在射线相交。
 		return { TriangleIntersectionResult::NO_INTERSECTION, -1 };
 	}
 }
 
-// If you need to do a lot of raycasts on a triangle using the same direction every time
+// 如果你需要对三角形用同一方向进行大量射线检测，
 struct BakedIntersectionTriangleForFixedDirection {
 	Vector3f v0;
 	Vector3f e1; // v1 - v0
@@ -204,14 +204,14 @@ struct BakedIntersectionTriangleForFixedDirection {
 		h = math::cross(p_dir, e2);
 		const float a = math::dot(e1, h);
 		if (Math::abs(a) < 0.00001f) {
-			// Parallel, will never hit
+			// 平行，永远不会命中
 			return false;
 		}
 		f = 1.0f / a;
 		return true;
 	}
 
-	// Note, `p_dir` must be the same value as used in `bake`
+	// 注意，`p_dir` 必须与 `bake` 中使用的值相同
 	inline TriangleIntersectionResult intersect(const Vector3f &p_from, const Vector3f &p_dir) {
 		const Vector3f s = p_from - v0;
 		const float u = f * math::dot(s, h);
@@ -228,15 +228,15 @@ struct BakedIntersectionTriangleForFixedDirection {
 			return { TriangleIntersectionResult::NO_INTERSECTION, -1 };
 		}
 
-		// At this stage we can compute t to find out where
-		// the intersection point is on the line.
+		// 此时我们可以计算 t 来确定
+		// 交点在直线的什么位置。
 		const float t = f * math::dot(e2, q);
 
-		if (t > 0.00001f) { // ray intersection
+		if (t > 0.00001f) { // 射线相交
 			// r_res = p_from + p_dir * t;
 			return { TriangleIntersectionResult::INTERSECTION, t };
 
-		} else { // This means that there is a line intersection but not a ray intersection.
+		} else { // 这意味着存在直线相交，但不存在射线相交。
 			return { TriangleIntersectionResult::NO_INTERSECTION, -1 };
 		}
 	}

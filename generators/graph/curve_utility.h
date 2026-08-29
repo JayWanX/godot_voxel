@@ -13,8 +13,8 @@ namespace voxel {
 struct CurveMonotonicSection {
 	float x_min;
 	float x_max;
-	// Note: Y values are not necessarily in increasing order.
-	// Their name only means to correspond to X coordinates.
+	// 注意：Y 值不一定按递增顺序排列。
+	// 它们的命名仅表示与 X 坐标对应。
 	float y_min;
 	float y_max;
 };
@@ -25,17 +25,17 @@ struct CurveRangeData {
 
 static const float CURVE_RANGE_MARGIN = CMP_EPSILON;
 
-// Gathers monotonic sections of a curve, at baked resolution.
-// Within one section, the curve has only one of the following properties:
-// - Be stationary or decrease
-// - Be stationary or increase
-// Which means, within one section, given a range of input values defined by a min and max,
-// we can quickly calculate an accurate range of output values by sampling the curve only at the two points.
+// 以烘焙分辨率收集曲线的单调区间。
+// 在一个区间内，曲线只具有以下属性之一：
+// - 保持不变或递减
+// - 保持不变或递增
+// 这意味着，在一个区间内，给定由最小值和最大值定义的输入值范围，
+// 我们只需在两端采样曲线，就能快速计算出准确的输出值范围。
 void get_curve_monotonic_sections(Curve &curve, StdVector<CurveMonotonicSection> &sections);
-// Gets the range of Y values for a range of X values on a curve, using precalculated monotonic segments
+// 获取曲线上某个 X 值范围对应的 Y 值范围，使用预计算的单调区间
 math::Interval get_curve_range(Curve &curve, const StdVector<CurveMonotonicSection> &sections, math::Interval x);
 
-// Legacy
+// 旧版
 math::Interval get_curve_range(Curve &curve, bool &is_monotonic_increasing);
 
 } // namespace voxel

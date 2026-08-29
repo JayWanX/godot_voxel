@@ -26,34 +26,34 @@
 namespace voxel {
 
 void VoxelNode::set_mesher(Ref<VoxelMesher> mesher) {
-	// Implemented in subclasses
+	// 在子类中实现
 }
 
 Ref<VoxelMesher> VoxelNode::get_mesher() const {
-	// Implemented in subclasses
+	// 在子类中实现
 	return Ref<VoxelMesher>();
 }
 
 void VoxelNode::set_stream(Ref<VoxelStream> stream) {
-	// Implemented in subclasses
+	// 在子类中实现
 }
 
 Ref<VoxelStream> VoxelNode::get_stream() const {
-	// Implemented in subclasses
+	// 在子类中实现
 	return Ref<VoxelStream>();
 }
 
 void VoxelNode::set_generator(Ref<VoxelGenerator> generator) {
-	// Implemented in subclasses
+	// 在子类中实现
 }
 
 Ref<VoxelGenerator> VoxelNode::get_generator() const {
-	// Implemented in subclasses
+	// 在子类中实现
 	return Ref<VoxelGenerator>();
 }
 
 VoxelData &VoxelNode::get_storage() const {
-	// Have to implement for the class to be bindable to Godot, but shouldnt be called
+	// 必须实现它才能将类绑定到 Godot，但不应该被调用
 	VOXEL_CRASH_MSG("Not available");
 	static VoxelData s_dummy;
 	return s_dummy;
@@ -89,38 +89,38 @@ VoxelFormat VoxelNode::get_internal_format() const {
 }
 
 void VoxelNode::on_format_changed() {
-	// Implemented in subclasses
+	// 在子类中实现
 }
 
 void VoxelNode::restart_stream() {
-	// Implemented in subclasses
+	// 在子类中实现
 }
 
 void VoxelNode::remesh_all_blocks() {
-	// Implemented in subclasses
+	// 在子类中实现
 }
 
 VolumeID VoxelNode::get_volume_id() const {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in subclasses
+	// 在子类中实现
 	return VolumeID();
 }
 
 std::shared_ptr<StreamingDependency> VoxelNode::get_streaming_dependency() const {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in subclasses
+	// 在子类中实现
 	return nullptr;
 }
 
 Ref<VoxelTool> VoxelNode::get_voxel_tool() {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in subclasses
+	// 在子类中实现
 	return Ref<VoxelTool>();
 }
 
 Node3D *VoxelNode::convert_to_nodes(const BitField<NodeConversionFlags> flags) const {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in subclasses
+	// 在子类中实现
 	return nullptr;
 }
 
@@ -167,8 +167,8 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 
 		if (stream_script.is_valid()) {
 			if (stream_script->is_tool()) {
-				// TODO This is very annoying. Probably needs an issue or proposal in Godot so we can handle this
-				// properly?
+				// TODO 这非常烦人。可能需要在 Godot 中提 issue 或 proposal 才能妥善处理
+				// 这个问题？
 				warnings.append(
 						VOXEL_TTR("Careful, don't edit your custom stream while it's running, "
 							   "it can cause crashes. To prevent it from running in the editor, remove tool mode from "
@@ -200,8 +200,8 @@ void VoxelNode::get_configuration_warnings(PackedStringArray &warnings) const {
 
 		if (generator_script.is_valid()) {
 			if (generator_script->is_tool()) {
-				// TODO This is very annoying. Probably needs an issue or proposal in Godot so we can handle this
-				// properly?
+				// TODO 这非常烦人。可能需要在 Godot 中提 issue 或 proposal 才能妥善处理
+				// 这个问题？
 				warnings.append(
 						VOXEL_TTR("Careful, don't edit your custom generator while it's running, "
 							   "it can cause crashes. To prevent it from running in the editor, remove tool mode from "

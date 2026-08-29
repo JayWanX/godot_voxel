@@ -73,14 +73,14 @@ VoxelGenerator::Result VoxelGeneratorFlat::generate_block(VoxelGenerator::VoxelQ
 	const int lod = input.lod;
 
 	if (origin.y > params.height + margin) {
-		// The bottom of the block is above the highest ground can go (default is air)
+		// 数据块底部高于地面所能达到的最高位置（默认是空气）
 		result.max_lod_hint = true;
 		return result;
 	}
 	if (origin.y + (bs.y << lod) < params.height - margin) {
-		// The top of the block is below the lowest ground can go
+		// 数据块顶部低于地面所能达到的最低位置
 		if (use_sdf) {
-			// Not consistent SDF but should work ok
+			// 不是一致的 SDF，但应该可以正常工作
 			out_buffer.clear_channel_f(params.channel, -100.0);
 		} else {
 			out_buffer.clear_channel(params.channel, params.voxel_type);
@@ -103,10 +103,10 @@ VoxelGenerator::Result VoxelGeneratorFlat::generate_block(VoxelGenerator::VoxelQ
 				}
 
 			} // for x
-		} // for z
+		} // 遍历 z
 
 	} else {
-		// Blocky
+		// 方块模式
 
 		const float rh_world = params.height - origin.y;
 		const int irh_world = static_cast<int>(rh_world);

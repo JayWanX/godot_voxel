@@ -5,8 +5,8 @@
 
 namespace voxel {
 
-// Displays 3D axes in a Control node using only 2D drawing.
-// Similar to `ViewportRotationControl`, but much smaller to fit in smaller editors.
+// 仅使用 2D 绘制在 Control 节点中显示 3D 坐标轴。
+// 类似 `ViewportRotationControl`，但体积小得多，适合较小的编辑器。
 class Voxel_Axes3DControl : public Control {
 	GDCLASS(Voxel_Axes3DControl, Control)
 public:

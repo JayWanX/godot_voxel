@@ -8,14 +8,14 @@
 
 namespace voxel::transvoxel::materials::single::s4 {
 
-// One 8-bit material per voxel. Up to 4 blending in shader.
+// 每个体素一个 8 位材质。着色器中最多混合 4 个。
 
 template <unsigned int NVoxels>
 struct CellMaterials {
-	// Selected indices of the 4 most-represented materials that will blend within the cell
+	// 单元内将混合的 4 种最具代表性材质的选中索引
 	std::array<uint8_t, 4> selected_indices;
 	uint32_t packed_indices = 0;
-	// Index of one of the 4 selected materials at each voxel of the cell
+	// 单元中每个体素处 4 种已选材质之一的索引
 	std::array<uint8_t, NVoxels> component_indices;
 };
 
@@ -27,8 +27,8 @@ inline uint32_t pack_bytes(std::array<uint8_t, 4> a) {
 			(static_cast<uint32_t>(a[3]) << 24);
 }
 
-// Inserts new item into a fixed collection of sorted items. If it doesn't fit, it is not inserted. If it fits, the last
-// item will get evicted to make room.
+// 将新项插入到已排序项的固定集合中。如果放不下，则不插入。如果放得下，最后一个
+// 项将被驱逐以腾出空间。
 void insert_sort(std::array<WeightedIndex, 4> &sorted_items, const WeightedIndex new_item) {
 	if (new_item.weight > sorted_items[0].weight) {
 		sorted_items[3] = sorted_items[2];
@@ -65,8 +65,8 @@ inline void assign_component_indices(
 ) {
 	for (unsigned int i = 0; i < component_indices.size(); ++i) {
 		const uint8_t mi = cell_voxel_material_indices[i];
-		// Pick corresponding material. If the material wasn't selected for blending, 0 will fallback on the
-		// most-represented material.
+		// 挑选对应的材质。如果该材质未被选中用于混合，0 将回退到
+		// 最具代表性的材质。
 		component_indices[i] = index_of_or_zero<NMaterials>(available_material_indices, mi);
 	}
 }
@@ -78,10 +78,10 @@ void get_cell_materials(
 		CellMaterials<NVoxels> &cell
 ) {
 	if (voxel_material_indices.size() == 1) {
-		// All indices in the chunk are the same
+		// 数据块中的所有索引都相同
 		const uint8_t material_index = voxel_material_indices[0];
 		cell.selected_indices[0] = material_index;
-		// Fill in 4 different indices with only one having full weight.
+		// 填入 4 个不同的索引，但只有一个具有完整权重。
 		for (uint8_t i = 1; i < 4; ++i) {
 			cell.selected_indices[i] = (material_index + i) & 255;
 		}
@@ -92,16 +92,16 @@ void get_cell_materials(
 
 	} else {
 		std::array<WeightedIndex, NVoxels> items;
-		// TODO This is pointless initialization, but without this the compiler complains...
-		// Compilers don't see that each case we handle guarantees that the N first items are initialized by
-		// `insert_combine`, so they emit a "potentially uninitialized usage" warning, which is treated as error and
-		// prevents from compiling. This is wasted cycles. I wonder if there is a better alternative that doesn't
-		// involve suppressing that warning.
+		// TODO 这是毫无意义的初始化，但没有它编译器会抱怨...
+		// 编译器看不到我们处理的每种情况都保证前 N 项由
+		// `insert_combine` 初始化，因此会发出“可能使用未初始化”的警告，
+		// 该警告被视为错误并阻止编译。这是浪费的周期。我想知道是否有更好的替代方案
+		// 不涉及抑制该警告。
 		for (WeightedIndex &wi : items) {
 			wi = { 0, 0 };
 		}
 
-		// Lookup voxels
+		// 查找体素
 		std::array<uint8_t, NVoxels> cell_voxel_material_indices;
 		for (unsigned int cvi = 0; cvi < voxel_indices.size(); ++cvi) {
 			const uint32_t vi = voxel_indices[cvi];
@@ -109,22 +109,22 @@ void get_cell_materials(
 			cell_voxel_material_indices[cvi] = mi;
 		}
 
-		// Count materials
+		// 统计材质
 		uint32_t item_count = 0;
 		for (const uint8_t mi : cell_voxel_material_indices) {
 			insert_combine(items, item_count, mi);
 		}
 
-		// Select 4 most-represented materials
+		// 选出 4 种最具代表性的材质
 		switch (item_count) {
-				// case 0: Not supposed to happen
+				// case 0: 不应发生
 
 			case 1: {
-				// Same material in whole cell.
-				// Probably the most common case.
+				// 整个单元使用同一种材质。
+				// 可能是最常见的情况。
 				const uint8_t i0 = items[0].index;
 				cell.selected_indices[0] = i0;
-				// Fill in different materials in other slots as placeholders
+				// 在其他槽位填入不同的材质作为占位符
 				for (uint8_t i = 1; i < 4; ++i) {
 					cell.selected_indices[i] = (i0 + i) & 0xff;
 				}
@@ -133,7 +133,7 @@ void get_cell_materials(
 				}
 			} break;
 			case 2: {
-				// Probably the second most common case.
+				// 可能是第二常见的情况。
 				math::sort2_array(items, WeightedIndex::compare_higher_weight);
 				for (unsigned int i = 0; i < 2; ++i) {
 					cell.selected_indices[i] = items[i].index;
@@ -167,8 +167,8 @@ void get_cell_materials(
 				);
 				break;
 			default: {
-				// More than 4 materials.
-				// General sort. Should be rare.
+				// 多于 4 种材质。
+				// 通用排序。应该很少见。
 				std::array<WeightedIndex, 4> selected_items;
 				for (WeightedIndex &it : selected_items) {
 					it = { 0, 0 };
@@ -216,11 +216,11 @@ struct Processor {
 	inline uint32_t on_transition_cell(const FixedArray<uint32_t, 9> &corner_voxel_indices, const uint8_t case_code) {
 		// const uint16_t alt_case_code = textures_skip_air_voxels ? reorder_transition_case_code(case_code) : 0;
 
-		// Get values from 9 significant corners
+		// 从 9 个关键角获取值
 		CellMaterials<9> cell_materials_partial;
 		get_cell_materials<9>(voxel_material_indices, corner_voxel_indices, cell_materials_partial);
 
-		// Fill in slots that are just repeating others
+		// 填充只是重复其它槽位的值
 
 		cell.selected_indices = cell_materials_partial.selected_indices;
 		cell.packed_indices = cell_materials_partial.packed_indices;

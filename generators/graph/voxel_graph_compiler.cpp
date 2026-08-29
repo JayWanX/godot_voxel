@@ -2,7 +2,7 @@
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_unordered_set.h"
-#include "../../util/godot/core/array.h" // for `varray`
+#include "../../util/godot/core/array.h" // 用于 `varray`
 #include "../../util/macros.h"
 #include "../../util/profiling.h"
 #include "../../util/string/expression_parser.h"
@@ -16,10 +16,10 @@ namespace voxel::pg {
 
 namespace {
 
-// Updates remaps for replacing one node with one other, where old and new nodes have the same number of outputs.
+// 更新重映射，用于将一个节点替换为另一个节点，其中旧节点和新节点的输出数量相同。
 void add_remap(GraphRemappingInfo &remaps, uint32_t old_node_id, uint32_t new_node_id, unsigned int output_count) {
 	bool existing_remap = false;
-	// Modify existing entries in case the old node was the result of a previous processing of the graph.
+	// 修改已有条目，以防旧节点是图先前处理的结果。
 	for (PortRemap &remap : remaps.user_to_expanded_ports) {
 		if (remap.expanded.node_id == old_node_id) {
 			remap.expanded.node_id = new_node_id;
@@ -32,8 +32,8 @@ void add_remap(GraphRemappingInfo &remaps, uint32_t old_node_id, uint32_t new_no
 		}
 	}
 	if (!existing_remap) {
-		// The old node wasn't the result of a previous processing of the graph.
-		// So we may add new entries.
+		// 旧节点不是图先前处理的结果。
+		// 因此可以添加新条目。
 		for (uint32_t output_index = 0; output_index < output_count; ++output_index) {
 			PortRemap port_remap;
 			port_remap.original = ProgramGraph::PortLocation{ old_node_id, output_index };
@@ -45,9 +45,8 @@ void add_remap(GraphRemappingInfo &remaps, uint32_t old_node_id, uint32_t new_no
 	}
 }
 
-// Updates remaps for replacing one node with multiple nodes. Outputs of the original node can become outputs of
-// different expanded nodes.
-// If an output is invalid or has no connection (therefore no existence), PortLocation::node_id is NULL_ID.
+// 更新重映射，用于将一个节点替换为多个节点。原始节点的输出可以成为不同展开节点的输出。
+// 如果某个输出无效或没有连接（因此不存在），则 PortLocation::node_id 为 NULL_ID。
 void add_remap(
 		GraphRemappingInfo &remaps,
 		uint32_t old_node_id,
@@ -55,12 +54,12 @@ void add_remap(
 		Span<const ProgramGraph::PortLocation> output_locations
 ) {
 	VOXEL_ASSERT(old_node_id != ProgramGraph::NULL_ID);
-	// Add remap for the output ports
+	// 为输出端口添加重映射
 	{
 		bool found = false;
 		for (PortRemap &pr : remaps.user_to_expanded_ports) {
 			if (pr.expanded.node_id == old_node_id) {
-				// The old node is the result of a previous expansion
+				// 旧节点是先前展开的结果
 				pr.expanded = output_locations[pr.expanded.port_index];
 				found = true;
 			}
@@ -75,12 +74,12 @@ void add_remap(
 			}
 		}
 	}
-	// Add remap for the nodes
+	// 为节点添加重映射
 	{
 		uint32_t original_node_id = old_node_id;
 		for (const ExpandedNodeRemap &nr : remaps.expanded_to_user_node_ids) {
 			if (nr.expanded_node_id == old_node_id) {
-				// The old node was itself an expanded node, trace it back to the original
+				// 旧节点本身是展开后的节点，回溯到原始节点
 				original_node_id = nr.original_node_id;
 				break;
 			}
@@ -165,7 +164,7 @@ ProgramGraph::Node &create_node(
 		const NodeTypeDB &db,
 		VoxelGraphFunction::NodeTypeID node_type_id
 ) {
-	// Not creating default sub-resources here, there are no use cases where we use such nodes.
+	// 这里不创建默认子资源，因为没有使用此类节点的场景。
 	ProgramGraph::Node *node = create_node_internal(graph, node_type_id, Vector2(), ProgramGraph::NULL_ID, false);
 	VOXEL_ASSERT(node != nullptr);
 	return *node;
@@ -181,8 +180,8 @@ uint32_t expand_node(
 ) {
 	switch (ep_node.type) {
 		case ExpressionParser::Node::NUMBER: {
-			// Note, this code should only run if the whole expression is only a number.
-			// Constant node inputs don't create a constant node, they just set the default value of the input.
+			// 注意，此代码只应在整个表达式仅为一个数字时运行。
+			// 常量节点输入不会创建常量节点，它们只是设置输入的默认值。
 			ProgramGraph::Node &pg_node = create_node(graph, db, VoxelGraphFunction::NODE_CONSTANT);
 			const ExpressionParser::NumberNode &nn = reinterpret_cast<const ExpressionParser::NumberNode &>(ep_node);
 			VOXEL_ASSERT(pg_node.params.size() == 1);
@@ -192,9 +191,9 @@ uint32_t expand_node(
 		}
 
 		case ExpressionParser::Node::VARIABLE: {
-			// Note, this code should only run if the whole expression is only a variable.
-			// Variable node inputs don't create a node each time, they are turned into connections in a later pass.
-			// Here we need a pass-through node, so let's use `var + 0`. It's not a common case anyways.
+			// 注意，此代码只应在整个表达式仅为一个变量时运行。
+			// 变量节点输入不会每次都创建节点，它们会在后续阶段转换为连接。
+			// 这里我们需要一个直通节点，所以使用 `var + 0`。反正这不是常见情况。
 			ProgramGraph::Node &pg_node = create_node(graph, db, VoxelGraphFunction::NODE_ADD);
 			const ExpressionParser::VariableNode &vn =
 					reinterpret_cast<const ExpressionParser::VariableNode &>(ep_node);
@@ -228,13 +227,13 @@ uint32_t expand_node(
 					break;
 				case ExpressionParser::OperatorNode::POWER:
 					if (on.n1->type == ExpressionParser::Node::NUMBER) {
-						// Attempt to use an optimized node if the power is constant
+						// 如果幂是常量，尝试使用优化节点
 						const ExpressionParser::NumberNode &arg1 =
 								static_cast<const ExpressionParser::NumberNode &>(*on.n1);
 
 						const int pi = int(arg1.value);
 						if (Math::is_equal_approx(arg1.value, pi) && pi >= 0) {
-							// Constant positive integer
+							// 常量正整数
 							ProgramGraph::Node &pg_node = create_node(graph, db, VoxelGraphFunction::NODE_POWI);
 							expanded_node_ids.push_back(pg_node.id);
 
@@ -251,12 +250,11 @@ uint32_t expand_node(
 							return pg_node.id;
 						}
 					}
-					// Fallback on generic power function
+					// 回退到通用幂函数
 					node_type_id = VoxelGraphFunction::NODE_POW;
 					break;
 				default:
-					// Fix uninitialized variable warning on Clang, even though it is not supposed to carry on after the
-					// switch
+					// 修复 Clang 上未初始化变量的警告，即使它本不该在 switch 之后继续执行
 					node_type_id = VoxelGraphFunction::NODE_CONSTANT;
 					VOXEL_CRASH();
 					break;
@@ -286,7 +284,7 @@ uint32_t expand_node(
 			const unsigned int arg_count = f->argument_count;
 
 			ProgramGraph::Node &pg_node = create_node(graph, db, VoxelGraphFunction::NodeTypeID(fn.function_id));
-			// TODO Optimization: per-function shortcuts
+			// TODO 优化：为每个函数设置快捷方式
 
 			for (unsigned int arg_index = 0; arg_index < arg_count; ++arg_index) {
 				const ExpressionParser::Node *arg = fn.args[arg_index].get();
@@ -320,12 +318,12 @@ CompilationResult expand_expression_node(
 
 	Span<const ExpressionParser::Function> functions = type_db.get_expression_parser_functions();
 
-	// Extract the AST, so we can convert it into graph nodes,
-	// and benefit from all features of range analysis and buffer processing
+	// 提取 AST，以便将其转换为图节点，
+	// 并利用范围分析和缓冲区处理的所有特性
 	ExpressionParser::Result parse_result = ExpressionParser::parse(code_utf8.get_data(), functions);
 
 	if (parse_result.error.id != ExpressionParser::ERROR_NONE) {
-		// Error in expression
+		// 表达式出错
 		const StdString error_message_utf8 = ExpressionParser::to_string(parse_result.error);
 		CompilationResult result;
 		result.success = false;
@@ -335,7 +333,7 @@ CompilationResult expand_expression_node(
 	}
 
 	if (parse_result.root == nullptr) {
-		// Expression is empty
+		// 表达式为空
 		CompilationResult result;
 		result.success = false;
 		result.node_id = original_node_id;
@@ -345,7 +343,7 @@ CompilationResult expand_expression_node(
 
 	StdVector<ToConnect> to_connect;
 
-	// Create nodes from the expression's AST and connect them together
+	// 从表达式的 AST 创建节点并将它们连接起来
 	const uint32_t expanded_root_node_id =
 			expand_node(graph, *parse_result.root, type_db, to_connect, expanded_nodes, functions);
 	if (expanded_root_node_id == ProgramGraph::NULL_ID) {
@@ -358,7 +356,7 @@ CompilationResult expand_expression_node(
 
 	expanded_output_port = { expanded_root_node_id, 0 };
 
-	// Add connections from outside the expression to entry nodes of the expression
+	// 添加从表达式外部到表达式入口节点的连接
 	for (const ToConnect tc : to_connect) {
 		unsigned int original_port_index;
 		if (!original_node.find_input_port_by_name(tc.var_name, original_port_index)) {
@@ -375,15 +373,15 @@ CompilationResult expand_expression_node(
 		}
 	}
 
-	// Copy first because we'll remove the original node
+	// 先复制，因为之后要移除原始节点
 	VOXEL_ASSERT(original_node.outputs.size() != 0);
 	const ProgramGraph::Port original_output_port_copy = original_node.outputs[0];
 
-	// Remove the original expression node
+	// 移除原始表达式节点
 	graph.remove_node(original_node_id);
 
-	// Add connections from the expression's final node.
-	// Must be done at the end because adding two connections to the same input (old and new) is not allowed.
+	// 添加来自表达式最终节点的连接。
+	// 必须在最后完成，因为同一输入（旧的和新的）不允许有两条连接。
 	for (const ProgramGraph::PortLocation dst : original_output_port_copy.connections) {
 		graph.connect(expanded_output_port, dst);
 	}
@@ -401,7 +399,7 @@ CompilationResult expand_expression_nodes(
 	VOXEL_PROFILE_SCOPE();
 	const unsigned int initial_node_count = graph.get_nodes_count();
 
-	// Gather expression node IDs first, as expansion could invalidate the iterator
+	// 首先收集表达式节点的 ID，因为展开可能使迭代器失效
 	StdVector<uint32_t> expression_node_ids;
 	graph.for_each_node([&expression_node_ids](ProgramGraph::Node &node) {
 		if (node.type_id == VoxelGraphFunction::NODE_EXPRESSION) {
@@ -424,7 +422,7 @@ CompilationResult expand_expression_nodes(
 		}
 	}
 
-	// Expanding expression nodes may produce more nodes, not remove any
+	// 展开表达式节点可能产生更多节点，而不会移除任何节点
 	VOXEL_ASSERT_RETURN_V(graph.get_nodes_count() >= initial_node_count, CompilationResult::make_error("Internal error"));
 
 	CompilationResult result;
@@ -433,8 +431,8 @@ CompilationResult expand_expression_nodes(
 }
 
 struct NodePair {
-	uint32_t node1_id; // On node1's branch
-	uint32_t node2_id; // On node2's branch
+	uint32_t node1_id; // 在 node1 的分支上
+	uint32_t node2_id; // 在 node2 的分支上
 
 	inline bool operator==(const NodePair &other) const {
 		return node1_id == other.node1_id && node2_id == other.node2_id;
@@ -452,37 +450,37 @@ bool is_node_equivalent(
 		StdVector<NodePair> &equivalences
 ) {
 	if (node1.id == node2.id) {
-		// They are the same node (this can happen while processing ancestors).
+		// 它们是同一个节点（处理祖先节点时可能发生）。
 		return true;
 	}
 	if (contains(equivalences, NodePair{ node1.id, node2.id })) {
-		// We already found that equivalence.
-		// This can happen in cases where the nodes have multiple inputs connected to the same equivalent ancestors.
-		// When evaluating inputs, we may recurse multiple times on the same ancestors.
+		// 我们已找到该等价关系。
+		// 当节点有多个输入连接到相同的等价祖先时，可能发生这种情况。
+		// 在评估输入时，我们可能会对同一祖先进行多次递归。
 		return true;
 	}
 	if (node1.type_id != node2.type_id) {
-		// Different type
+		// 类型不同
 		return false;
 	}
 	if (node1.type_id == VoxelGraphFunction::NODE_CUSTOM_INPUT) {
 		if (node1.name != node2.name) {
-			// Different custom inputs
+			// 自定义输入不同
 			return false;
 		}
 	}
-	// Note, some nodes can have dynamic inputs, so we don't check node type specs, we check the node instances
+	// 注意，某些节点可以有动态输入，因此我们不检查节点类型规格，而是检查节点实例
 	if (node1.inputs.size() != node2.inputs.size()) {
-		// Different input count
+		// 输入数量不同
 		return false;
 	}
 	VOXEL_ASSERT_RETURN_V(node1.params.size() == node2.params.size(), false);
 	for (unsigned int param_index = 0; param_index < node1.params.size(); ++param_index) {
 		const Variant v1 = node1.params[param_index];
 		const Variant v2 = node2.params[param_index];
-		// Not checking objects for now. i.e two equivalent Noise instances will not be considered equivalent.
+		// 暂时不检查对象。即两个等价的 Noise 实例不会被判定为等价。
 		if (v1 != v2) {
-			// Different parameter
+			// 参数不同
 			return false;
 		}
 	}
@@ -495,30 +493,30 @@ bool is_node_equivalent(
 		VOXEL_ASSERT_RETURN_V_MSG(
 				node1_input.connections.size() <= 1, false, "Multiple input connections isn't supported"
 		);
-		// TODO Some nodes like `*` and `+` have unordered inputs, we need to handle that
+		// TODO 某些节点如 `*` 和 `+` 的输入是无序的，我们需要处理这种情况
 		if (node1_input.connections.size() == 0) {
-			// Continuing the paranoia here, but that's because Godot doesn't define `_DEBUG` (and I can't define it in
-			// my module without failing to link), so standard library bound checks are in the toilet
+			// 继续这里的过度谨慎，但这是因为 Godot 没有定义 `_DEBUG`（而且我无法在不导致链接失败的情况下
+			// 在我的模块中定义它），所以标准库的边界检查形同虚设
 			VOXEL_ASSERT(node1.default_inputs.size() == node1.inputs.size());
 			VOXEL_ASSERT(node2.default_inputs.size() == node2.inputs.size());
-			// No ancestor, check default inputs (autoconnect is ignored, it must have been applied earlier)
+			// 没有祖先节点，检查默认输入（忽略自动连接，它必须在之前已应用）
 			const Variant v1 = node1.default_inputs[input_index];
 			const Variant v2 = node2.default_inputs[input_index];
 			if (v1 != v2) {
-				// Different default inputs
+				// 默认输入不同
 				return false;
 			}
 		} else {
 			const ProgramGraph::PortLocation &node1_src = node1_input.connections[0];
 			const ProgramGraph::PortLocation &node2_src = node2_input.connections[0];
 			if (node1_src.port_index != node2_src.port_index) {
-				// Different ancestor output
+				// 祖先节点输出不同
 				return false;
 			}
 			const ProgramGraph::Node &ancestor1 = graph.get_node(node1_src.node_id);
 			const ProgramGraph::Node &ancestor2 = graph.get_node(node2_src.node_id);
 			if (!is_node_equivalent(graph, ancestor1, ancestor2, equivalences)) {
-				// Different ancestors
+				// 祖先节点不同
 				equivalences.clear();
 				return false;
 			}
@@ -527,7 +525,7 @@ bool is_node_equivalent(
 	NodePair equivalence{ node1.id, node2.id };
 #ifdef DEBUG_ENABLED
 	for (const NodePair &p : equivalences) {
-		// We already check for this, if we still get duplicates here something is wrong
+		// 我们已经检查过这一点，如果这里仍然出现重复，说明有问题
 		VOXEL_ASSERT_RETURN_V(p != equivalence, true);
 	}
 #endif
@@ -535,16 +533,16 @@ bool is_node_equivalent(
 	return true;
 }
 
-// Removes node 2 and moves its output connections to node 1. The two nodes must have the same type.
+// 移除节点 2 并将其输出连接转移到节点 1。两个节点必须具有相同的类型。
 void merge_node(ProgramGraph &graph, uint32_t node1_id, uint32_t node2_id, GraphRemappingInfo *remap_info) {
 	const ProgramGraph::Node &node1 = graph.get_node(node1_id);
 	const ProgramGraph::Node &node2 = graph.get_node(node2_id);
 	VOXEL_ASSERT_RETURN(node1.type_id == node2.type_id);
 	VOXEL_ASSERT_RETURN(node1.outputs.size() == node2.outputs.size());
-	// Remove 2, keep 1
+	// 移除 2，保留 1
 	for (unsigned int output_index = 0; output_index < node2.outputs.size(); ++output_index) {
-		// Remove output connections, re-create them on the equivalent node.
-		// Copy output connections because they will get modified while iterating.
+		// 移除输出连接，在等价节点上重新创建它们。
+		// 复制输出连接，因为在迭代过程中它们会被修改。
 		StdVector<ProgramGraph::PortLocation> dsts = node2.outputs[output_index].connections;
 		for (ProgramGraph::PortLocation dst : dsts) {
 			graph.disconnect(ProgramGraph::PortLocation{ node2_id, output_index }, dst);
@@ -557,23 +555,23 @@ void merge_node(ProgramGraph &graph, uint32_t node1_id, uint32_t node2_id, Graph
 	graph.remove_node(node2_id);
 }
 
-// Finds nodes with equivalent parameters and equivalent ancestors, so they can be merged into a single branch.
-// This should be done preferably after expanding expressions and macros.
-// Automating this allows to create macros that use similar operations without loosing performance due to repetition.
-// For example, a SphereHeightNoise macro will want to normalize (X,Y,Z). Other branches may want to do this too,
-// so we should share that operation, but it's harder to do so with self-contained branches. So it's easier if that
-// can be delegated to an automated process.
+// 找到具有等价参数和等价祖先的节点，以便它们可以合并为单个分支。
+// 这最好在展开表达式和宏之后进行。
+// 自动化此过程可以创建使用相似操作的宏，而不会因重复而损失性能。
+// 例如，SphereHeightNoise 宏会想要归一化 (X,Y,Z)。其他分支可能也想这样做，
+// 因此我们应该共享该操作，但对于自包含的分支来说这比较困难。所以更简单的方式是
+// 将此委托给自动化过程。
 void merge_equivalences(ProgramGraph &graph, GraphRemappingInfo *remap_info) {
 	VOXEL_PROFILE_SCOPE();
 	StdVector<uint32_t> node_ids;
 	graph.get_node_ids(node_ids);
 
-	// Declaring here so we dont reallocate memory too much
+	// 在此声明以避免过多地重新分配内存
 	StdVector<NodePair> equivalences;
 
-	// For each unique pair of nodes
+	// 对每对唯一节点
 	for (unsigned int i = 0; i < node_ids.size(); ++i) {
-		// Nodes in the list might get removed in the process so we test if they still exist
+		// 列表中的节点可能在此过程中被移除，因此我们测试它们是否仍然存在
 		const uint32_t node1_id = node_ids[i];
 		const ProgramGraph::Node *node1 = graph.try_get_node(node1_id);
 		if (node1 == nullptr) {
@@ -583,18 +581,18 @@ void merge_equivalences(ProgramGraph &graph, GraphRemappingInfo *remap_info) {
 			const uint32_t node2_id = node_ids[j];
 			const ProgramGraph::Node *node2 = graph.try_get_node(node2_id);
 			if (node2 == nullptr) {
-				// Can have been merged
+				// 可能已被合并
 				continue;
 			}
 			equivalences.clear();
-			// Is the pair equivalent?
+			// 该对是否等价？
 			if (is_node_equivalent(graph, *node1, *node2, equivalences)) {
-				// Merge nodes to share their outputs
+				// 合并节点以共享它们的输出
 				for (NodePair equivalence : equivalences) {
 					merge_node(graph, equivalence.node1_id, equivalence.node2_id, remap_info);
 				}
 				if (graph.try_get_node(node1_id) == nullptr) {
-					// Node 1 has been merged, stop looking for equivalences with it
+					// 节点 1 已被合并，停止寻找与它的等价关系
 					break;
 				}
 			}
@@ -602,15 +600,15 @@ void merge_equivalences(ProgramGraph &graph, GraphRemappingInfo *remap_info) {
 	}
 }
 
-// For each node with auto-connect enabled, if they have non-connected ports supporting auto-connect, connects them to a
-// default input node. If no such node exists in the graph but it is present in input definitions of the graph, it is
-// created.
+// 对于每个启用了自动连接的节点，如果它们有支持自动连接但未连接的端口，则将其连接到
+// 默认输入节点。如果图中不存在此类节点，但它存在于图的输入定义中，则
+// 创建该节点。
 void apply_auto_connects(
 		ProgramGraph &graph,
 		Span<const VoxelGraphFunction::Port> input_defs,
 		const NodeTypeDB &type_db
 ) {
-	// Copy ids first because we might create new nodes
+	// 先复制 ID，因为可能要创建新节点
 	StdVector<uint32_t> node_ids;
 	graph.get_node_ids(node_ids);
 
@@ -618,14 +616,14 @@ void apply_auto_connects(
 		const ProgramGraph::Node &node = graph.get_node(node_id);
 
 		if (node.autoconnect_default_inputs == false) {
-			// Explicit constants will be used instead
+			// 将改用显式常量
 			continue;
 		}
 
 		for (unsigned int input_index = 0; input_index < node.inputs.size(); ++input_index) {
 			const ProgramGraph::Port &input_port = node.inputs[input_index];
 			if (input_port.connections.size() > 0) {
-				// Already connected
+				// 已连接
 				continue;
 			}
 
@@ -636,7 +634,7 @@ void apply_auto_connects(
 					VoxelGraphFunction::AutoConnect(input_port.autoconnect_hint);
 			VoxelGraphFunction::NodeTypeID src_type;
 			if (!VoxelGraphFunction::try_get_node_type_id_from_auto_connect(auto_connect, src_type)) {
-				// No hint or invalid hint
+				// 没有提示或提示无效
 				continue;
 			}
 
@@ -648,7 +646,7 @@ void apply_auto_connects(
 				}
 			}
 			if (!found_in_input_defs) {
-				// Not a declared input
+				// 不是声明的输入
 				VOXEL_PRINT_VERBOSE(
 						"Not applying auto-connect because the corresponding node type isn't present in input "
 						"definitions of the function."
@@ -656,10 +654,10 @@ void apply_auto_connects(
 				continue;
 			}
 
-			// Graph input node instances are all equivalent, so we can pick any
+			// 图输入节点的实例都是等价的，因此我们可以任选一个
 			uint32_t src_node_id = graph.find_node_by_type(src_type);
 			if (src_node_id == ProgramGraph::NULL_ID) {
-				// Not found, create it then
+				// 未找到，则创建它
 				const ProgramGraph::Node *src_node =
 						create_node_internal(graph, src_type, Vector2(), graph.generate_node_id(), false);
 				VOXEL_ASSERT_CONTINUE(src_node != nullptr);
@@ -692,52 +690,52 @@ void try_simplify_clamp_node(
 
 	if (node.inputs[clamp_min_input_id].connections.size() == 0 &&
 		node.inputs[clamp_max_input_id].connections.size() == 0) {
-		// Can be replaced with a clamp version with constant bounds
+		// 可以替换为具有常量边界的 clamp 版本
 
 		VOXEL_ASSERT(node.default_inputs.size() == node.inputs.size());
 
 		const float minv = node.default_inputs[clamp_min_input_id];
 		const float maxv = node.default_inputs[clamp_max_input_id];
 
-		// Create new node
+		// 创建新节点
 		ProgramGraph::Node &clampc_node = create_node(graph, type_db, VoxelGraphFunction::NODE_CLAMP_C);
 
-		// Assign new node params
+		// 为新节点分配参数
 		clampc_node.params[clampc_min_param_id] = minv;
 		clampc_node.params[clampc_max_param_id] = maxv;
 
-		// Connect inputs of new node
+		// 连接新节点的输入
 		const ProgramGraph::Port &clamp_input = node.inputs[clamp_x_input_id];
 		for (const ProgramGraph::PortLocation &src : clamp_input.connections) {
 			graph.connect(src, ProgramGraph::PortLocation{ clampc_node.id, clampc_x_input_id });
 		}
 
-		// Making a copy because we first need to disconnect those connections
+		// 制作副本，因为我们需要先断开这些连接
 		const StdVector<ProgramGraph::PortLocation> clamp_output_connections =
 				node.outputs[clamp_output_id].connections;
 		for (const ProgramGraph::PortLocation &dst : clamp_output_connections) {
 			graph.disconnect(ProgramGraph::PortLocation{ node.id, clamp_output_id }, dst);
 		}
 
-		// Connect outputs of new node
+		// 连接新节点的输出
 		for (const ProgramGraph::PortLocation &dst : clamp_output_connections) {
 			graph.connect(ProgramGraph::PortLocation{ clampc_node.id, clampc_output_id }, dst);
 		}
 
-		// Update remaps for debug tracing
+		// 更新重映射以用于调试追踪
 		if (remap_info != nullptr) {
 			add_remap(*remap_info, node.id, clampc_node.id, node.outputs.size());
 		}
 
-		// Remove old node
+		// 移除旧节点
 		graph.remove_node(node.id);
-		// From this point, `node` is invalid.
+		// 从此时起，`node` 已失效。
 	}
 }
 
 void replace_simplifiable_nodes(ProgramGraph &graph, const NodeTypeDB &type_db, GraphRemappingInfo *remap_info) {
 	StdVector<uint32_t> node_ids;
-	// TODO Optimize: only gather node IDs we are interested in?
+	// TODO 优化：只收集我们感兴趣的节点 ID？
 	graph.get_node_ids(node_ids);
 
 	for (const uint32_t &node_id : node_ids) {
@@ -749,7 +747,7 @@ void replace_simplifiable_nodes(ProgramGraph &graph, const NodeTypeDB &type_db, 
 	}
 }
 
-// If the passed node corresponds to a port, adds it to the list of nodes corresponding to the port.
+// 如果传入的节点与某个端口对应，则将其添加到与该端口对应的节点列表中。
 bool try_add_io_node(
 		Span<const VoxelGraphFunction::Port> ports,
 		const ProgramGraph::Node &node,
@@ -810,7 +808,7 @@ void get_input_node_ids(
 	});
 }
 
-// Replaces a function node with its contents in place, with equivalent connections to its surroundings.
+// 用一个函数的内部内容原地替换该函数节点，并建立与周围环境的等价连接。
 CompilationResult expand_function(
 		ProgramGraph &graph,
 		uint32_t node_id,
@@ -827,7 +825,7 @@ CompilationResult expand_function(
 		return CompilationResult::make_error("Function resource is invalid.", node_id);
 	}
 
-	// Check I/Os are up to date
+	// 检查输入输出是否是最新的
 	Span<const VoxelGraphFunction::Port> func_inputs = function->get_input_definitions();
 	Span<const VoxelGraphFunction::Port> func_outputs = function->get_output_definitions();
 	if (func_inputs.size() != fnode.inputs.size()) {
@@ -837,7 +835,7 @@ CompilationResult expand_function(
 		return CompilationResult::make_error("Function outputs are not up to date.", node_id);
 	}
 
-	// Copy original graph so we can do some local pre-processing to the function
+	// 复制原始图，以便我们可以对函数进行一些本地预处理
 	ProgramGraph fgraph;
 	{
 		const ProgramGraph &fgraph_original = function->get_graph();
@@ -848,12 +846,12 @@ CompilationResult expand_function(
 	StdUnorderedMap<uint32_t, uint32_t> fn_to_expanded_node_ids;
 	StdVector<uint32_t> nested_func_node_ids;
 
-	// Copy nodes. I/O nodes are replaced with relays temporarily, they will be simplified out in a later pass.
+	// 复制节点。I/O 节点暂时替换为中继节点，它们将在后续阶段被简化掉。
 	fgraph.for_each_node_const(
 			[&graph, &type_db, &fn_to_expanded_node_ids, &nested_func_node_ids](const ProgramGraph::Node &src_node) {
 				const NodeType &node_type = type_db.get_type(src_node.type_id);
 
-				// All nodes will have an unpacked equivalent
+				// 所有节点都会有一个解包后的等价节点
 				const ProgramGraph::Node *expanded_node;
 				if (node_type.category == pg::CATEGORY_INPUT || node_type.category == pg::CATEGORY_OUTPUT) {
 					expanded_node = create_node_internal(
@@ -871,7 +869,7 @@ CompilationResult expand_function(
 			}
 	);
 
-	// Copy internal connections
+	// 复制内部连接
 	for (auto it = fn_to_expanded_node_ids.begin(); it != fn_to_expanded_node_ids.end(); ++it) {
 		const uint32_t fn_node_id = it->first;
 		const uint32_t ex_node_id = it->second;
@@ -894,13 +892,13 @@ CompilationResult expand_function(
 		}
 	}
 
-	// Get nodes corresponding to each input and output
+	// 获取与每个输入和输出对应的节点
 	StdVector<StdVector<uint32_t>> inputs_node_ids;
 	StdVector<StdVector<uint32_t>> outputs_node_ids;
 	get_input_and_output_node_ids(fgraph, func_inputs, func_outputs, inputs_node_ids, outputs_node_ids);
 
-	// Disconnect outputs of the function node, because we are going to replace them.
-	// (destination ports are not allowed to have two connections at a given time)
+	// 断开函数节点的输出连接，因为我们要替换它们。
+	// （目标端口在同一时间不允许有两条连接）
 	StdVector<ProgramGraph::Port> fnode_outputs = fnode.outputs;
 	for (unsigned int output_index = 0; output_index < fnode_outputs.size(); ++output_index) {
 		const ProgramGraph::Port &port = fnode_outputs[output_index];
@@ -910,13 +908,13 @@ CompilationResult expand_function(
 		}
 	}
 
-	// Will tell which ports to lookup when inspecting outputs from the user-facing graph
+	// 将指示在检查面向用户的图中的输出时应查找哪些端口
 	StdVector<ProgramGraph::PortLocation> output_locations;
 	if (remap_info != nullptr) {
 		output_locations.resize(fnode_outputs.size(), ProgramGraph::PortLocation{ ProgramGraph::NULL_ID, 0 });
 	}
 
-	// Find mappings between inputs of the function to unpacked nodes
+	// 查找函数的输入与解包后节点之间的映射
 	StdVector<StdVector<ProgramGraph::PortLocation>> inputs_to_destinations;
 	inputs_to_destinations.resize(func_inputs.size());
 
@@ -926,21 +924,21 @@ CompilationResult expand_function(
 		VOXEL_ASSERT(input_index < inputs_node_ids.size());
 		const StdVector<uint32_t> &inner_input_node_ids = inputs_node_ids[input_index];
 
-		// For each inner node corresponding to this input
+		// 对于与此输入对应的每个内部节点
 		for (const uint32_t inner_input_node_id : inner_input_node_ids) {
 			auto it = fn_to_expanded_node_ids.find(inner_input_node_id);
-			// We create a node for every node present in the function, so there must be a match
+			// 我们为函数中的每个节点都创建了一个节点，因此必须存在匹配
 			VOXEL_ASSERT(it != fn_to_expanded_node_ids.end());
 			in_destinations.push_back(ProgramGraph::PortLocation{ it->second, 0 });
 		}
 	}
 
-	// Create connections coming from nodes connected to inputs of the function.
+	// 创建来自连接到函数输入的节点的连接。
 	for (unsigned int input_index = 0; input_index < inputs_to_destinations.size(); ++input_index) {
 		const StdVector<ProgramGraph::PortLocation> &destinations = inputs_to_destinations[input_index];
 		const ProgramGraph::Port &port = fnode.inputs[input_index];
 		if (port.connections.size() == 0) {
-			// Assign default input values
+			// 分配默认输入值
 			if (port.autoconnect_hint == VoxelGraphFunction::AUTO_CONNECT_NONE || !fnode.autoconnect_default_inputs) {
 				VOXEL_ASSERT(input_index < fnode.default_inputs.size());
 				const float defval = fnode.default_inputs[input_index];
@@ -951,7 +949,7 @@ CompilationResult expand_function(
 				}
 			}
 		} else {
-			// Create connections
+			// 创建连接
 			VOXEL_ASSERT_MSG(port.connections.size() == 1, "Input nodes are expected to have only 1 input");
 			const ProgramGraph::PortLocation src = port.connections[0];
 			for (const ProgramGraph::PortLocation &dst : destinations) {
@@ -960,44 +958,44 @@ CompilationResult expand_function(
 		}
 	}
 
-	// Create connections coming from outputs of the function
+	// 创建来自函数输出的连接
 	for (unsigned int output_index = 0; output_index < fnode_outputs.size(); ++output_index) {
 		const ProgramGraph::Port &port = fnode_outputs[output_index];
 		if (port.connections.size() == 0) {
-			// That output isn't connected outside the function
+			// 该输出在函数外部没有连接
 			continue;
 		}
 		VOXEL_ASSERT(output_index < outputs_node_ids.size());
 		const StdVector<uint32_t> &output_node_ids = outputs_node_ids[output_index];
 		if (output_node_ids.size() == 0) {
-			// This output isn't actually bound to any node.
+			// 该输出实际上没有绑定到任何节点。
 			VOXEL_PRINT_VERBOSE("Function output isn't bound to an output node");
 			continue;
 		}
-		// An output node can only appear once
+		// 输出节点只能出现一次
 		VOXEL_ASSERT(output_node_ids.size() == 1);
 		const ProgramGraph::Node &inner_fnode = fgraph.get_node(output_node_ids[0]);
 		VOXEL_ASSERT(inner_fnode.inputs.size() == 1);
 		const ProgramGraph::Port &foi = inner_fnode.inputs[0];
 
 		if (foi.connections.size() == 0) {
-			// That output isn't connected inside the function
+			// 该输出在函数内部没有连接
 			if (foi.autoconnect_hint == VoxelGraphFunction::AUTO_CONNECT_NONE ||
 				!inner_fnode.autoconnect_default_inputs) {
-				// Assign default values
+				// 分配默认值
 				for (const ProgramGraph::PortLocation dst : port.connections) {
 					ProgramGraph::Node &dst_node = graph.get_node(dst.node_id);
-					// TODO Not sure about outputs that process their values!
+					// TODO 不确定如何处理对其值进行处理的输出！
 					dst_node.default_inputs[dst.port_index] = inner_fnode.default_inputs[0];
 				}
 			}
 
 		} else {
-			// That output is connected inside the function
+			// 该输出在函数内部已连接
 			VOXEL_ASSERT(foi.connections.size() == 1);
 			const ProgramGraph::PortLocation fsrc = foi.connections[0];
 			auto it = fn_to_expanded_node_ids.find(fsrc.node_id);
-			// We create a node for every node present in the function, so there must be a match
+			// 我们为函数中的每个节点都创建了一个节点，因此必须存在匹配
 			VOXEL_ASSERT(it != fn_to_expanded_node_ids.end());
 			for (const ProgramGraph::PortLocation dst : port.connections) {
 				graph.connect(ProgramGraph::PortLocation{ it->second, fsrc.port_index }, dst);
@@ -1015,7 +1013,7 @@ CompilationResult expand_function(
 		for (auto it = fn_to_expanded_node_ids.begin(); it != fn_to_expanded_node_ids.end(); ++it) {
 			const uint32_t ex_node_id = it->second;
 			const ProgramGraph::Node &node = graph.get_node(ex_node_id);
-			// Don't add remaps to a function node, because they will be expanded anyways
+			// 不要为函数节点添加重映射，因为它们反正会被展开
 			if (node.type_id == VoxelGraphFunction::NODE_FUNCTION) {
 				continue;
 			}
@@ -1023,22 +1021,22 @@ CompilationResult expand_function(
 		}
 
 		add_remap(*remap_info, node_id, to_span(expanded_node_ids), to_span(output_locations));
-		// TODO If a function is a pass-through, it won't appear in `ExecutionMap::debug_nodes`.
-		// In a graph like `A --- Func --- B`, Func will disappear to only leave `A --- B`. Therefore there is no node
-		// in the final graph corresponding to the function in the user-facing graph.
-		// Technically, we could consider A is an equivalent to Func, but A already appears in the debug execution
-		// map. We'd need to have A in the `debug_nodes` list, and also have a pair (A => Func) in
-		// `expanded_node_id_to_user_node_id`, but if A is in the user-facing graph already, keep it in the list instead
-		// of replacing it with the remap. However doing this means `debug_nodes` indices no longer match execution map
-		// indices, which is a bit problematic for profiling.
-		// I didn't fix this for now, it doesn't feel worth it, it's an edge case for a degenerate situation.
+		// TODO 如果函数是直通的，它将不会出现在 `ExecutionMap::debug_nodes` 中。
+		// 在 `A --- Func --- B` 这样的图中，Func 会消失，只留下 `A --- B`。因此在最终图中
+		// 没有与面向用户图中的函数对应的节点。
+		// 从技术上讲，我们可以认为 A 与 Func 等价，但 A 已经出现在调试执行
+		// 映射中。我们需要让 A 出现在 `debug_nodes` 列表中，并在
+		// `expanded_node_id_to_user_node_id` 中有一个 (A => Func) 对，但如果 A 已经在面向用户的图中，
+		// 就保留它在列表中，而不是用重映射替换它。但这样做意味着 `debug_nodes` 的索引不再与执行映射的
+		// 索引匹配，这对性能分析来说有点问题。
+		// 我目前没有修复这个问题，感觉不值得，这是一个退化情况的边缘案例。
 	}
 
-	// Remove function node
+	// 移除函数节点
 	graph.remove_node(fnode.id);
-	// From this point, `fnode` is invalid.
+	// 从此时起，`fnode` 已失效。
 
-	// Expand nested functions
+	// 展开嵌套函数
 	for (const uint32_t nested_node_id : nested_func_node_ids) {
 		expand_function(graph, nested_node_id, type_db, remap_info);
 	}
@@ -1076,8 +1074,8 @@ void remove_relay(ProgramGraph &graph, const uint32_t node_id, GraphRemappingInf
 
 	const ProgramGraph::Port &node_input = node.inputs[0];
 	if (node_input.connections.size() == 0) {
-		// Just remove the node,
-		// But first we need to propagate default inputs. This is used by function expansion.
+		// 直接移除节点，
+		// 但首先需要传播默认输入。这用于函数展开。
 		if (node.autoconnect_default_inputs == false) {
 			VOXEL_ASSERT(node.default_inputs.size() > 0);
 			const float defval = node.default_inputs[0];
@@ -1150,7 +1148,7 @@ void combine_inputs(
 	merge_node(graph, node_id, node_id_to_combine, remap_info);
 }
 
-// Input nodes can appear more than once for convenience, but they should appear only once when we compile.
+// 输入节点为了便利可以出现多次，但编译时应只出现一次。
 CompilationResult combine_inputs(
 		ProgramGraph &graph,
 		Span<const VoxelGraphFunction::Port> input_defs,
@@ -1199,7 +1197,7 @@ CompilationResult compile_params(
 		StdVector<Runtime::HeapResource> &heap_resources,
 		Span<const Variant> params_source
 ) {
-	// Add space for params size, default is no params so size is 0
+	// 为参数大小预留空间，默认为无参数，因此大小为 0
 	const uint32_t params_size_index = program.size();
 	program.push_back(0);
 
@@ -1316,14 +1314,14 @@ bool has_ancestor(const ProgramGraph::Node &node) {
 	return false;
 }
 
-// Removes constant nodes and branches, leaving them as default values on inputs they were connected to.
-// Must be used after applying auto-connects.
+// 移除常量节点和分支，将它们作为默认值留在所连接的输入上。
+// 必须在应用自动连接之后使用。
 CompilationResult reduce_constants(ProgramGraph &graph, const NodeTypeDB &type_db) {
 	StdVector<uint32_t> src_node_ids;
 	StdVector<float> output_values;
 
-	// Test if any node is constant, remove them, and try again until none of them are
-	// TODO This can likely be optimized
+	// 测试是否有任何节点是常量，移除它们，然后重试，直到全部移除
+	// TODO 这可能可以进行优化
 	bool keep_going = true;
 	while (keep_going) {
 		keep_going = false;
@@ -1388,7 +1386,7 @@ CompilationResult expand_graph(
 		const bool enable_constant_reduction
 ) {
 	VOXEL_PROFILE_SCOPE();
-	// First make a copy of the graph which we'll modify
+	// 首先制作一份我们要修改的图的副本
 	expanded_graph.copy_from(graph, false);
 
 	apply_auto_connects(expanded_graph, input_defs, type_db);
@@ -1455,7 +1453,7 @@ CompilationResult Runtime::compile(const VoxelGraphFunction &function, bool debu
 	for (ExpandedNodeRemap r : remap_info.expanded_to_user_node_ids) {
 		_program.expanded_node_id_to_user_node_id.insert({ r.expanded_node_id, r.original_node_id });
 	}
-	// Remap debug nodes from the execution map to user-facing ones
+	// 将执行映射中的调试节点重映射为面向用户的节点
 	for (uint32_t &debug_node_id : _program.default_execution_map.debug_nodes) {
 		auto it = _program.expanded_node_id_to_user_node_id.find(debug_node_id);
 		if (it != _program.expanded_node_id_to_user_node_id.end()) {
@@ -1471,10 +1469,10 @@ CompilationResult Runtime::compile(const VoxelGraphFunction &function, bool debu
 
 namespace {
 
-// Optimize parts of the graph that only depend on inputs tagged as "outer group",
-// so they can be moved in the outer loop when blocks are generated, running less times.
-// Moves them all at the beginning.
-// `order` is a previously computed order of execution of each node.
+// 优化图中仅依赖于标记为"外部组"的输入的部分，
+// 以便在生成数据块时将它们移到外层循环中，减少运行次数。
+// 将它们全部移到开头。
+// `order` 是先前计算出的每个节点的执行顺序。
 uint32_t move_outer_group_operations_up(StdVector<uint32_t> &order, const ProgramGraph &graph) {
 	VOXEL_PROFILE_SCOPE();
 	StdVector<uint32_t> immediate_deps;
@@ -1485,7 +1483,7 @@ uint32_t move_outer_group_operations_up(StdVector<uint32_t> &order, const Progra
 	for (const uint32_t node_id : order) {
 		const ProgramGraph::Node &node = graph.get_node(node_id);
 
-		// We consider X and Z as the beginning of the outer group.
+		// 我们将 X 和 Z 视为外部组的起点。
 		bool is_outer_group =
 				node.type_id == VoxelGraphFunction::NODE_INPUT_X || node.type_id == VoxelGraphFunction::NODE_INPUT_Z;
 
@@ -1493,7 +1491,7 @@ uint32_t move_outer_group_operations_up(StdVector<uint32_t> &order, const Progra
 			immediate_deps.clear();
 			graph.find_immediate_dependencies(node_id, immediate_deps);
 
-			// Assume outer group, unless a dependency is not in the outer group
+			// 假定为外部组，除非某个依赖项不在外部组中
 			is_outer_group = true;
 			for (const uint32_t dep_node_id : immediate_deps) {
 				if (outer_group_node_ids.find(dep_node_id) == outer_group_node_ids.end()) {
@@ -1533,7 +1531,7 @@ void compute_node_execution_order(
 ) {
 	StdVector<uint32_t> terminal_nodes;
 
-	// Not using the generic `get_terminal_nodes` function because our terminal nodes do have outputs
+	// 不使用通用的 `get_terminal_nodes` 函数，因为我们的终端节点确实有输出
 	graph.for_each_node_const([&terminal_nodes, &type_db](const ProgramGraph::Node &node) {
 		const NodeType &type = type_db.get_type(node.type_id);
 		if (type.category == pg::CATEGORY_OUTPUT) {
@@ -1542,7 +1540,7 @@ void compute_node_execution_order(
 	});
 
 	if (!debug) {
-		// Exclude debug nodes
+		// 排除调试节点
 		unordered_remove_if(terminal_nodes, [&graph, &type_db](uint32_t node_id) {
 			const ProgramGraph::Node &node = graph.get_node(node_id);
 			const NodeType &type = type_db.get_type(node.type_id);
@@ -1623,10 +1621,10 @@ CompilationResult Runtime::compile_preprocessed_graph(
 	StdUnorderedMap<uint32_t, uint32_t> node_id_to_dependency_graph;
 	StdVector<uint16_t> input_buffer_indices;
 
-	// Allocate input slots
-	// Note, even if an input isn't connected to anything, it still gets its binding space (but it won't be in `order`).
-	// It means the query will still contain that input because it's how the source graph defines it, but the runtime
-	// won't use it.
+	// 分配输入槽
+	// 注意，即使输入未连接到任何东西，它仍然会获得其绑定空间（但它不会出现在 `order` 中）。
+	// 这意味着查询仍会包含该输入，因为源图就是这样定义的，但运行时
+	// 不会使用它。
 	for (unsigned int input_index = 0; input_index < input_node_ids.size(); ++input_index) {
 		const uint32_t node_id = input_node_ids[input_index];
 
@@ -1651,7 +1649,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		node_id_to_dependency_graph.insert(std::make_pair(node_id, dg_node_index));
 	}
 
-	// Run through each node in order, and turn them into program instructions
+	// 按顺序遍历每个节点，并将它们转换为程序指令
 	for (size_t order_index = 0; order_index < order.size(); ++order_index) {
 		const uint32_t node_id = order[order_index];
 		const ProgramGraph::Node &node = graph.get_node(node_id);
@@ -1674,15 +1672,15 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		dg_node.debug_node_id = node_id;
 		node_id_to_dependency_graph.insert(std::make_pair(node_id, dg_node_index));
 
-		// We still hardcode some of the nodes. Maybe we can abstract them too one day.
+		// 我们仍然硬编码一些节点。也许有一天我们也可以将它们抽象化。
 		switch (node.type_id) {
-			// TODO Get rid of constant nodes, replace them with default inputs wherever they are used?
+			// TODO 移除常量节点，在任何使用它们的地方用默认输入替换？
 			case VoxelGraphFunction::NODE_CONSTANT: {
 				VOXEL_ASSERT(type.outputs.size() == 1);
 				VOXEL_ASSERT(type.params.size() == 1);
 				const uint16_t a = mem.add_constant(node.params[0].operator float(), true);
 				program.output_port_addresses[ProgramGraph::PortLocation{ node_id, 0 }] = a;
-				// Technically not an input or an output, but is a dependency regardless so treat it like an input
+				// 从技术上讲不是输入或输出，但无论如何它都是一个依赖项，所以将其视为输入
 				dg_node.is_input = true;
 				continue;
 			}
@@ -1700,7 +1698,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					result.node_id = node_id;
 					return result;
 				}
-				// Handled earlier
+				// 在之前已处理
 				continue;
 			}
 
@@ -1716,8 +1714,8 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					const uint16_t a = it->second;
 					VOXEL_ASSERT(a < program.buffer_specs.size());
 					BufferSpec &src_buffer_spec = program.buffer_specs[a];
-					// Add a fake user, we want to see their result.
-					// Pinning would work too, but it allocates more buffers.
+					// 添加一个假用户，我们想看到它们的结果。
+					// 固定也可以，但它会分配更多缓冲区。
 					// src_buffer_spec.is_pinned = true;
 					++src_buffer_spec.users_count;
 				}
@@ -1725,7 +1723,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 			}
 		}
 
-		// Add actual operation
+		// 添加实际操作
 
 		VOXEL_ASSERT(node.type_id <= std::numeric_limits<uint16_t>::max());
 
@@ -1736,22 +1734,22 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				ExecutionMap::OperationInfo{ uint16_t(operations.size()), 0 }
 		);
 		if (debug) {
-			// Will be remapped later if the node is an expanded one
+			// 如果节点是展开后的节点，稍后将进行重映射
 			program.default_execution_map.debug_nodes.push_back(node_id);
 		}
 
 		operations.push_back(node.type_id);
 
-		// Inputs and outputs use a convention so we can have generic code for them.
-		// Parameters are more specific, and may be affected by alignment so better just do them by hand
+		// 输入和输出使用约定，以便我们为它们编写通用代码。
+		// 参数更具体，并且可能受对齐影响，因此最好手工处理
 
-		// Add inputs
+		// 添加输入
 		for (size_t j = 0; j < type.inputs.size(); ++j) {
 			const NodeType::Port &port = type.inputs[j];
 			uint16_t a;
 
 			if (node.inputs[j].connections.size() == 0) {
-				// No input, default it
+				// 没有输入，使用默认值
 				VOXEL_ASSERT(j < node.default_inputs.size());
 				float defval = node.default_inputs[j];
 				a = mem.add_constant(defval, port.require_input_buffer_when_constant);
@@ -1759,11 +1757,11 @@ CompilationResult Runtime::compile_preprocessed_graph(
 			} else {
 				const ProgramGraph::PortLocation src_port = node.inputs[j].connections[0];
 				auto address_it = program.output_port_addresses.find(src_port);
-				// Previous node ports must have been registered
+				// 之前的节点端口必须已经注册
 				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				a = address_it->second;
 
-				// Register dependency
+				// 注册依赖项
 				auto it = node_id_to_dependency_graph.find(src_port.node_id);
 				VOXEL_ASSERT(it != node_id_to_dependency_graph.end());
 				VOXEL_ASSERT(it->second < program.dependency_graph.nodes.size());
@@ -1780,22 +1778,22 @@ CompilationResult Runtime::compile_preprocessed_graph(
 			input_buffer_indices.push_back(a);
 		}
 
-		// Add outputs
+		// 添加输出
 		for (size_t j = 0; j < type.outputs.size(); ++j) {
-			// Note, outputs of output nodes could be pinned, however since they are given a fake user, their lifespan
-			// is undeterminate and will never be re-used by memory allocation. This is better than pinning, because the
-			// buffer can be re-used several times before stopping at the output, while pinned buffers are always unique
-			// to their locations.
+			// 注意，输出节点的输出可以被固定，但由于它们被赋予一个假用户，其生命周期
+			// 是不确定的，永远不会被内存分配重用。这比固定更好，因为
+			// 缓冲区在到达输出之前可以被多次重用，而固定的缓冲区始终
+			// 在其位置上唯一。
 			const uint16_t a = mem.add_var();
 
-			// This will be used by next nodes
+			// 这将被下一个节点使用
 			const ProgramGraph::PortLocation op{ node_id, static_cast<uint32_t>(j) };
 			program.output_port_addresses[op] = a;
 
 			operations.push_back(a);
 		}
 
-		// Get params, copy resources when used, and hold a reference to them
+		// 获取参数，使用时复制资源并持有对它们的引用
 		StdVector<Variant> params_copy;
 		params_copy.reserve(node.params.size());
 		for (size_t i = 0; i < node.params.size(); ++i) {
@@ -1805,8 +1803,8 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				Ref<Resource> res = v;
 
 				if (res.is_null()) {
-					// duplicate() is only available in Resource,
-					// so we have to limit to this instead of Reference or Object
+					// duplicate() 仅在 Resource 中可用，
+					// 因此我们必须限制为 Resource 而不是 Reference 或 Object
 					CompilationResult result;
 					result.success = false;
 					result.message = VOXEL_TTR("A parameter is an object but does not inherit Resource");
@@ -1845,7 +1843,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 
 			{
 				auto address_it = program.output_port_addresses.find(ProgramGraph::PortLocation{ node_id, 0 });
-				// Previous node ports must have been registered
+				// 之前的节点端口必须已经注册
 				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				OutputInfo &output_info = program.outputs[program.outputs_count];
 				output_info.buffer_address = address_it->second;
@@ -1854,33 +1852,33 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				++program.outputs_count;
 			}
 
-			// Add fake user for output ports so they can pass the local users check in optimizations
+			// 为输出端口添加假用户，以便它们能通过优化中的本地用户检查
 			for (unsigned int j = 0; j < type.outputs.size(); ++j) {
 				const ProgramGraph::PortLocation loc{ node_id, j };
 				auto address_it = program.output_port_addresses.find(loc);
 				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				BufferSpec &bs = program.buffer_specs[address_it->second];
-				// Not expecting existing users on that port
+				// 不期望该端口已有用户
 				VOXEL_ASSERT_RETURN_V(bs.users_count == 0, CompilationResult());
 				++bs.users_count;
 			}
 		}
 
 #ifdef VOXEL_DEBUG_GRAPH_PROG_SENTINEL
-		// Append a special value after each operation
+		// 在每个操作之后附加一个特殊值
 		append(operations, VOXEL_DEBUG_GRAPH_PROG_SENTINEL);
 #endif
 	}
 
 	program.buffer_count = mem.next_address;
 
-	// Pin buffers from the outer group that are read by operations of the inner group.
-	// Buffer data coming from the outer group must be pinned if it is read by the inner group,
-	// because it is re-used across multiple executions.
+	// 固定外部组中被子组操作读取的缓冲区。
+	// 来自外部组的缓冲区数据，如果被子组读取，则必须固定，
+	// 因为它在多次执行之间会被重用。
 	{
 		Span<BufferSpec> buffer_specs = to_span(program.buffer_specs);
 
-		// For each node of the inner group
+		// 对于子组的每个节点
 		for (unsigned int order_index = inner_group_start_index; order_index < order.size(); ++order_index) {
 			const uint32_t node_id = order[order_index];
 			const ProgramGraph::Node &node = graph.get_node(node_id);
@@ -1892,7 +1890,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				}
 				const ProgramGraph::PortLocation src_port = input.connections[0];
 
-				// Find if the source node is part of the XZ group
+				// 查找源节点是否属于 XZ 组
 				bool found = false;
 				for (unsigned int i = 0; i < inner_group_start_index; ++i) {
 					if (order[i] == src_port.node_id) {
@@ -1905,7 +1903,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				}
 
 				auto address_it = program.output_port_addresses.find(src_port);
-				// Previous node ports must have been registered
+				// 之前的节点端口必须已经注册
 				VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 				BufferSpec &src_buffer_spec = buffer_specs[address_it->second];
 				src_buffer_spec.is_pinned = true;
@@ -1913,7 +1911,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		}
 	}
 
-	// Assign buffer datas
+	// 分配缓冲区数据
 	{
 		struct DataHelper {
 			StdVector<uint16_t> free_indices;
@@ -1925,7 +1923,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 
 			uint16_t allocate(uint16_t users, bool pinned) {
 				VOXEL_ASSERT(users > 0);
-				// Note, pinned buffers must have unique data, so we may not re-use a previous buffer for them
+				// 注意，固定缓冲区必须有唯一的数据，因此我们不能为它们重用之前的缓冲区
 				if (free_indices.size() == 0 || pinned) {
 					const uint16_t i = datas.size();
 					datas.push_back(Data{ users, pinned });
@@ -1935,7 +1933,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					free_indices.pop_back();
 					VOXEL_ASSERT(i < datas.size());
 					Data &d = datas[i];
-					// Must not re-use a pinned buffer
+					// 不能重用固定的缓冲区
 					VOXEL_ASSERT(!d.pinned);
 					d.usages = users;
 					return i;
@@ -1957,10 +1955,10 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		DataHelper data_helper;
 
 		if (debug) {
-			// In debug, there is no buffer data re-use optimization
+			// 在调试模式下，不进行缓冲区数据重用优化
 			for (BufferSpec &buffer_spec : program.buffer_specs) {
 				if (!buffer_spec.is_binding) {
-					// Hardcode all uses to 1 in DataHelper, we are not going to track them at all.
+					// 在 DataHelper 中将所有用途硬编码为 1，我们完全不跟踪它们。
 					buffer_spec.data_index = data_helper.allocate(1, true);
 					buffer_spec.has_data = true;
 				}
@@ -1969,7 +1967,7 @@ CompilationResult Runtime::compile_preprocessed_graph(
 		} else {
 			Span<BufferSpec> buffer_specs = to_span(program.buffer_specs);
 
-			// Allocate unique buffers (this is used notably for compile-time constants requiring a buffer)
+			// 分配唯一缓冲区（主要用于需要缓冲区的编译期常量）
 			for (BufferSpec &buffer_spec : program.buffer_specs) {
 				if (!buffer_spec.is_binding && buffer_spec.is_pinned) {
 					buffer_spec.data_index = data_helper.allocate(1, true);
@@ -1977,10 +1975,10 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				}
 			}
 
-			// Allocate re-usable buffers.
-			// Run through every node in execution order, allocating buffers when they are needed using pooling logic,
-			// so we can precompute which buffers will actually be needed in total, ahead of running the generator.
-			// This results in less memory usage than giving every buffer unique data.
+			// 分配可重用的缓冲区。
+			// 按执行顺序遍历每个节点，在需要时使用池化逻辑分配缓冲区，
+			// 以便在运行生成器之前预先计算出总共实际需要哪些缓冲区。
+			// 这比给每个缓冲区唯一数据占用更少的内存。
 			for (unsigned int order_index = 0; order_index < order.size(); ++order_index) {
 				const uint32_t node_id = order[order_index];
 				const ProgramGraph::Node &node = graph.get_node(node_id);
@@ -1989,8 +1987,8 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				uint16_t throwaway_data_index = 0;
 				bool has_throwaway_data = false;
 
-				// Allocate data to store outputs.
-				// Note, we don't allocate for inputs. The only way to allocate them is to pin them.
+				// 分配数据以存储输出。
+				// 注意，我们不为输入分配数据。分配它们的唯一方法是固定它们。
 				for (unsigned int output_index = 0; output_index < type.outputs.size(); ++output_index) {
 					const ProgramGraph::PortLocation dst_port{ node_id, output_index };
 					auto address_it = program.output_port_addresses.find(dst_port);
@@ -2003,9 +2001,9 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					if (buffer_spec.users_count > 0) {
 						buffer_spec.data_index = data_helper.allocate(buffer_spec.users_count, false);
 					} else {
-						// The node will be run, but has an unused output. We'll have to allocate a throw-away buffer.
-						// We should be able to use the same buffer if more outputs are unused on the same node, but not
-						// the same as buffers that are used.
+						// 该节点将被运行，但有一个未使用的输出。我们必须分配一个一次性缓冲区。
+						// 如果同一节点上有更多未使用的输出，我们应该能够使用同一个缓冲区，但不能
+						// 与正在使用的缓冲区相同。
 						if (!has_throwaway_data) {
 							has_throwaway_data = true;
 							throwaway_data_index = data_helper.allocate(1, false);
@@ -2016,11 +2014,11 @@ CompilationResult Runtime::compile_preprocessed_graph(
 				}
 
 				if (has_throwaway_data) {
-					// Make this buffer available again once this node has run
+					// 一旦该节点运行完，就让此缓冲区可再次使用
 					data_helper.unref(throwaway_data_index);
 				}
 
-				// Release references on input datas, so they can be re-used by later operations
+				// 释放对输入数据的引用，以便它们可以被后续操作重用
 				for (const ProgramGraph::Port &input : node.inputs) {
 					if (input.connections.size() == 0) {
 						continue;
@@ -2030,8 +2028,8 @@ CompilationResult Runtime::compile_preprocessed_graph(
 					VOXEL_ASSERT(address_it != program.output_port_addresses.end());
 					const BufferSpec &buffer_spec = buffer_specs[address_it->second];
 
-					// Bindings are user-provided.
-					// Pinned buffers are never re-used.
+					// 绑定是用户提供的。
+					// 固定缓冲区永远不会被重用。
 					if (buffer_spec.is_binding || buffer_spec.is_pinned) {
 						continue;
 					}

@@ -7,9 +7,9 @@
 
 namespace voxel {
 
-// Full-on orthogonal rotation is actually hard to use directly as a single property... there cannot be straightforward
-// unique names for all 24 values, as well as the raw integer values. It may always need an intermediary tool or helper
-// function to get/set rotations, usually starting from an existing state and rotating around one or two axes.
+// 完整的正交旋转实际上很难直接作为单个属性使用……所有 24 个值以及原始整数值
+// 都无法有直接明了的唯一名称。它可能总是需要一个中间工具或辅助
+// 函数来获取/设置旋转，通常从现有状态开始并围绕一个或两个轴旋转。
 
 VoxelBlockyAttributeRotation::VoxelBlockyAttributeRotation() {
 	_name = VoxelStringNames::get_singleton().rotation;
@@ -51,7 +51,7 @@ void VoxelBlockyAttributeRotation::update_values() {
 		for (unsigned int ortho_index = 0; ortho_index < math::ORTHOGONAL_BASIS_COUNT; ++ortho_index) {
 			const math::OrthoBasis &basis = math::get_ortho_basis_from_index(ortho_index);
 			if (basis.y != Vector3i(0, 1, 0) && basis.z.y == 0) {
-				// Skip rotations where Y is not up and Z is not horizontal
+				// 跳过 Y 不朝上且 Z 不水平的旋转
 				continue;
 			}
 			_used_values.push_back(ortho_index);

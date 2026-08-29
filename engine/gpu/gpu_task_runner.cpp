@@ -17,8 +17,8 @@ GPUTaskRunner::GPUTaskRunner() {}
 GPUTaskRunner::~GPUTaskRunner() {
 	stop();
 
-	// There shouldn't be any tasks at this point, we delete them in the thread before destroying the RenderingDevice.
-	// But in theory nothing prevents tasks from being added yet after that...
+	// 此时不应有任何任务，我们在销毁 RenderingDevice 之前于线程中删除它们。
+	// 但理论上，在这之后仍然没有什么能阻止任务被添加……
 	for (IGPUTask *task : _shared_tasks) {
 		VOXEL_DELETE(task);
 	}
@@ -75,9 +75,8 @@ void GPUTaskRunner::thread_func() {
 	{
 		VOXEL_PRINT_VERBOSE("Creating Voxel RenderingDevice");
 		// MutexLock mlock(_rendering_device_ptr_mutex);
-		// We have to create this RenderingDevice in the same thread where we'll use it in, because otherwise it
-		// triggers errors from threading guards in some of its methods.
-		// This in turn affects a lot of other design decisions regarding how we manage resources with it...
+		// 我们必须在使用 RenderingDevice 的同一线程中创建它，否则其某些方法中的线程安全保护会触发错误。
+		// 这反过来影响了许多关于如何使用它管理资源的设计决策……
 		_rendering_device = RenderingServer::get_singleton()->create_local_rendering_device();
 	}
 
@@ -91,8 +90,8 @@ void GPUTaskRunner::thread_func() {
 
 	StdVector<IGPUTask *> tasks;
 
-	// We use a common output buffer for tasks that need to download results back to the CPU,
-	// because a single call to `buffer_get_data` is cheaper than multiple ones, due to Godot's API being synchronous.
+	// 对于需要将结果下载回 CPU 的任务，我们使用公共输出缓冲区，
+	// 因为由于 Godot 的 API 是同步的，调用一次 `buffer_get_data` 比多次调用更便宜。
 	RID shared_output_storage_buffer_rid;
 	unsigned int shared_output_storage_buffer_capacity = 0;
 	struct SBRange {
@@ -101,12 +100,11 @@ void GPUTaskRunner::thread_func() {
 	};
 	StdVector<SBRange> shared_output_storage_buffer_segments;
 
-	// Godot does not support async compute, so in order to get results from a compute shader, the only way is to sync
-	// with the device, waiting for everything to complete. So instead of running one shader at a time, we run a few of
-	// them.
-	// It's also unclear how much to execute per frame.
-	// 4 tasks was good enough on an nVidia 1060 for detail rendering, but for tasks with different costs it might need
-	// different quota to prevent rendering slowdowns...
+	// Godot 不支持异步计算，因此要从计算着色器获取结果，唯一的方法是同步设备，等待所有内容完成。
+	// 所以与其一次运行一个着色器，我们一次运行几个。
+	// 每帧执行多少也不明确。
+	// 在 nVidia 1060 上，4 个任务对于细节渲染来说已经足够了，但对于成本不同的任务，可能需要
+	// 不同的配额以防止渲染变慢……
 	const unsigned int batch_count = 16;
 
 	while (_running) {
@@ -130,22 +128,22 @@ void GPUTaskRunner::thread_func() {
 			unsigned int required_shared_output_buffer_size = 0;
 			shared_output_storage_buffer_segments.clear();
 
-			// Get how much data we'll want to download from the GPU for this batch
+			// 获取本批次需要从 GPU 下载多少数据
 			for (size_t i = begin_index; i < end_index; ++i) {
 				IGPUTask *task = tasks[i];
 				const unsigned size = task->get_required_shared_output_buffer_size();
-				// TODO Should we pad sections with some kind of alignment?
+				// TODO 我们是否应该用某种对齐方式来填充分段？
 				shared_output_storage_buffer_segments.push_back(SBRange{ required_shared_output_buffer_size, size });
 				required_shared_output_buffer_size += size;
 			}
 
-			// Make sure we allocate a storage buffer that can contain all output data in this batch
+			// 确保分配的存储缓冲区能够容纳本批次的所有输出数据
 			if (required_shared_output_buffer_size > shared_output_storage_buffer_capacity) {
 				VOXEL_PROFILE_SCOPE_NAMED("Resize shared output buffer");
 				if (shared_output_storage_buffer_rid.is_valid()) {
 					godot::free_rendering_device_rid(ctx.rendering_device, shared_output_storage_buffer_rid);
 				}
-				// TODO Resize to some multiplier above?
+				// TODO 是否要按某个倍数向上调整大小？
 				shared_output_storage_buffer_rid =
 						ctx.rendering_device.storage_buffer_create(required_shared_output_buffer_size);
 				shared_output_storage_buffer_capacity = required_shared_output_buffer_size;
@@ -154,7 +152,7 @@ void GPUTaskRunner::thread_func() {
 
 			ctx.shared_output_buffer_rid = shared_output_storage_buffer_rid;
 
-			// Prepare tasks
+			// 准备任务
 			for (size_t i = begin_index; i < end_index; ++i) {
 				VOXEL_PROFILE_SCOPE_NAMED("GPU Task Prepare");
 
@@ -166,7 +164,7 @@ void GPUTaskRunner::thread_func() {
 				task->prepare(ctx);
 			}
 
-			// Submit work and wait for completion
+			// 提交工作并等待完成
 			{
 				VOXEL_PROFILE_SCOPE_NAMED("RD Submit");
 				ctx.rendering_device.submit();
@@ -176,17 +174,17 @@ void GPUTaskRunner::thread_func() {
 				ctx.rendering_device.sync();
 			}
 
-			// Download data from shared buffer
+			// 从共享缓冲区下载数据
 			if (required_shared_output_buffer_size > 0 && shared_output_storage_buffer_rid.is_valid()) {
 				VOXEL_PROFILE_SCOPE_NAMED("Download shared output buffer");
-				// Unfortunately we can't re-use memory for that buffer, Godot will always want to allocate it using
-				// malloc. That buffer can be a few megabytes long...
+				// 遗憾的是，我们无法为该缓冲区复用内存，Godot 总是希望使用 malloc 分配它。
+				// 该缓冲区可能有几兆字节长……
 				ctx.downloaded_shared_output_data = ctx.rendering_device.buffer_get_data(
 						shared_output_storage_buffer_rid, 0, required_shared_output_buffer_size
 				);
 			}
 
-			// Collect results and complete tasks
+			// 收集结果并完成任务
 			for (size_t i = begin_index; i < end_index; ++i) {
 				VOXEL_PROFILE_SCOPE_NAMED("GPU Task Collect");
 
@@ -208,8 +206,7 @@ void GPUTaskRunner::thread_func() {
 
 	VOXEL_ASSERT(tasks.size() == 0);
 
-	// Cleanup
-
+	// 清理
 	if (shared_output_storage_buffer_rid.is_valid()) {
 		godot::free_rendering_device_rid(*_rendering_device, shared_output_storage_buffer_rid);
 	}
@@ -283,8 +280,8 @@ void BaseGPUResources::load(RenderingDevice &rd) {
 	{
 		Ref<RDSamplerState> sampler_state;
 		sampler_state.instantiate();
-		// Using samplers for their interpolation features.
-		// Otherwise I don't feel like there is a point in using one IMO.
+		// 使用采样器是为了利用它们的插值特性。
+		// 否则我认为没有理由使用采样器。
 		sampler_state->set_mag_filter(RenderingDevice::SAMPLER_FILTER_LINEAR);
 		sampler_state->set_min_filter(RenderingDevice::SAMPLER_FILTER_LINEAR);
 		filtering_sampler_rid = voxel::godot::sampler_create(rd, **sampler_state);

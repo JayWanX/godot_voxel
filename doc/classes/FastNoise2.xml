@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="FastNoise2" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Wrapper for the [url=https://github.com/Auburn/FastNoise2]FastNoise2[/url] library.
+		[url=https://github.com/Auburn/FastNoise2]FastNoise2[/url] 库的封装。
 	</brief_description>
 	<description>
-		Generates coherent noise with support for SIMD processing, which can speed up generation significantly compared to scalar implementations like [FastNoiseLite].
-		It uses a node-based structure internally for configuration, which is however not editable from within Godot at the moment. Instead, simplified properties are exposed. It possible to edit noise graphs with an external Noise Tool, which can export an encoded node tree as a base64 string.
-		The current integration uses FastNoise2 version 0.10.0-alpha. If you use encoded node trees made with the Noise Tool, it must match that version.
-		After changing properties, you must call [method update_generator] for the internal graph to be rebuilt and changes to take effect.
+		生成相干噪声，支持 SIMD 处理，与 [FastNoiseLite] 等标量实现相比可显著提升生成速度。
+		内部使用基于节点的结构进行配置，但目前无法在 Godot 内编辑。取而代之的是暴露简化的属性。可以使用外部 Noise Tool 编辑噪声图形，该工具可以将编码后的节点树导出为 base64 字符串。
+		当前集成使用 FastNoise2 0.10.0-alpha 版本。如果你使用 Noise Tool 制作的编码节点树，则必须与该版本匹配。
+		修改属性后，必须调用 [method update_generator] 以重建内部图形并使更改生效。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -17,171 +17,212 @@
 			<param index="0" name="image" type="Image" />
 			<param index="1" name="tileable" type="bool" />
 			<description>
-				Fills a greyscale image with noise values.
+				用噪声值填充一张灰度图像。
 			</description>
 		</method>
 		<method name="get_noise_2d_single" qualifiers="const">
 			<return type="float" />
 			<param index="0" name="pos" type="Vector2" />
 			<description>
-				Generates a single value of 2D noise.
-				Note that generating values one by one will not benefit from SIMD performance as much as generating multiple values at once.
+				生成单个 2D 噪声值。
+				注意，逐个生成值所获得的 SIMD 性能提升不如一次性生成多个值。
 			</description>
 		</method>
 		<method name="get_noise_3d_single" qualifiers="const">
 			<return type="float" />
 			<param index="0" name="pos" type="Vector3" />
 			<description>
-				Generates a single value of 3D noise.
-				Note that generating values one by one will not benefit from SIMD performance as much as generating multiple values at once.
+				生成单个 3D 噪声值。
+				注意，逐个生成值所获得的 SIMD 性能提升不如一次性生成多个值。
 			</description>
 		</method>
 		<method name="get_simd_level" qualifiers="const">
 			<return type="int" enum="FastNoise2.SIMDLevel" />
 			<description>
-				Gets which SIMD level was detected by the library. This gives an indication of performance on the current CPU, as different models can have different SIMD instructions available.
+				获取库检测到的 SIMD 级别。这可以反映当前 CPU 上的性能，因为不同型号可能支持不同的 SIMD 指令。
 			</description>
 		</method>
 		<method name="get_simd_level_name" qualifiers="static">
 			<return type="String" />
 			<param index="0" name="level" type="int" enum="FastNoise2.SIMDLevel" />
 			<description>
-				Gets the name of SIMD level.
+				获取 SIMD 级别的名称。
 			</description>
 		</method>
 		<method name="update_generator">
 			<return type="void" />
 			<description>
-				This method must be called after you change properties, so they can take effect.
+				修改属性后必须调用此方法，更改才会生效。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="cellular_distance_function" type="int" setter="set_cellular_distance_function" getter="get_cellular_distance_function" enum="FastNoise2.CellularDistanceFunction" default="0">
+			设置细胞噪声的距离函数。
 		</member>
 		<member name="cellular_index0" type="int" setter="set_cellular_index0" getter="get_cellular_index0" default="0">
-			N-th closest cell used in cellular distance or value calculations.
+			在细胞距离或值计算中使用的第 N 近的细胞。
 		</member>
 		<member name="cellular_index1" type="int" setter="set_cellular_index1" getter="get_cellular_index1" default="1">
-			N-th closest cell used as second component in some cellular distance calculations.
+			在某些细胞距离计算中用作第二分量的第 N 近的细胞。
 		</member>
 		<member name="cellular_jitter" type="float" setter="set_cellular_jitter" getter="get_cellular_jitter" default="1.0">
+			设置细胞噪声的抖动强度。
 		</member>
 		<member name="cellular_return_type" type="int" setter="set_cellular_return_type" getter="get_cellular_return_type" enum="FastNoise2.CellularReturnType" default="0">
+			设置细胞噪声的返回值类型。
 		</member>
 		<member name="encoded_node_tree" type="String" setter="set_encoded_node_tree" getter="get_encoded_node_tree" default="&quot;&quot;">
+			包含外部工具生成的编码节点树的 base64 字符串。设置后需要调用 [method update_generator] 使更改生效。
 		</member>
 		<member name="fractal_gain" type="float" setter="set_fractal_gain" getter="get_fractal_gain" default="0.5">
+			设置分形噪声的增益。
 		</member>
 		<member name="fractal_lacunarity" type="float" setter="set_fractal_lacunarity" getter="get_fractal_lacunarity" default="2.0">
+			设置分形噪声的隙度。
 		</member>
 		<member name="fractal_octaves" type="int" setter="set_fractal_octaves" getter="get_fractal_octaves" default="3">
+			设置分形噪声的八度数量。
 		</member>
 		<member name="fractal_ping_pong_strength" type="float" setter="set_fractal_ping_pong_strength" getter="get_fractal_ping_pong_strength" default="2.0">
+			设置乒乓分形的强度。
 		</member>
 		<member name="fractal_type" type="int" setter="set_fractal_type" getter="get_fractal_type" enum="FastNoise2.FractalType" default="0">
+			设置分形噪声的类型。
 		</member>
 		<member name="noise_type" type="int" setter="set_noise_type" getter="get_noise_type" enum="FastNoise2.NoiseType" default="0">
+			设置噪声的类型。
 		</member>
 		<member name="period" type="float" setter="set_period" getter="get_period" default="64.0">
+			设置噪声的周期。
 		</member>
 		<member name="remap_enabled" type="bool" setter="set_remap_enabled" getter="is_remap_enabled" default="false">
+			启用后，输出值将被重映射到 [member remap_output_min] 到 [member remap_output_max] 的范围。
 		</member>
 		<member name="remap_input_max" type="float" setter="set_remap_input_max" getter="get_remap_input_max" default="1.0">
+			重映射输入范围的最大值。
 		</member>
 		<member name="remap_input_min" type="float" setter="set_remap_input_min" getter="get_remap_input_min" default="-1.0">
+			重映射输入范围的最小值。
 		</member>
 		<member name="remap_output_max" type="float" setter="set_remap_output_max" getter="get_remap_output_max" default="1.0">
+			重映射输出范围的最大值。
 		</member>
 		<member name="remap_output_min" type="float" setter="set_remap_output_min" getter="get_remap_output_min" default="-1.0">
+			重映射输出范围的最小值。
 		</member>
 		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="1337">
+			设置随机种子。
 		</member>
 		<member name="terrace_enabled" type="bool" setter="set_terrace_enabled" getter="is_terrace_enabled" default="false">
+			启用后，输出值将被量化为阶梯状（terrace）。
 		</member>
 		<member name="terrace_multiplier" type="float" setter="set_terrace_multiplier" getter="get_terrace_multiplier" default="1.0">
+			设置阶梯（terrace）的乘数。
 		</member>
 		<member name="terrace_smoothness" type="float" setter="set_terrace_smoothness" getter="get_terrace_smoothness" default="0.0">
+			设置阶梯（terrace）的平滑度。
 		</member>
 	</members>
 	<constants>
 		<constant name="TYPE_OPEN_SIMPLEX_2" value="0" enum="NoiseType">
+			OpenSimplex2 噪声。
 		</constant>
 		<constant name="TYPE_SIMPLEX" value="1" enum="NoiseType">
+			Simplex 噪声。
 		</constant>
 		<constant name="TYPE_PERLIN" value="2" enum="NoiseType">
+			Perlin 噪声。
 		</constant>
 		<constant name="TYPE_VALUE" value="3" enum="NoiseType">
+			值噪声。
 		</constant>
 		<constant name="TYPE_CELLULAR" value="4" enum="NoiseType">
+			细胞（蜂窝）噪声。
 		</constant>
 		<constant name="TYPE_ENCODED_NODE_TREE" value="5" enum="NoiseType">
+			使用编码的节点树。
 		</constant>
 		<constant name="TYPE_CELLULAR_VALUE" value="6" enum="NoiseType">
+			细胞值噪声。
 		</constant>
 		<constant name="FRACTAL_NONE" value="0" enum="FractalType">
+			无分形。
 		</constant>
 		<constant name="FRACTAL_FBM" value="1" enum="FractalType">
+			FBM（分形布朗运动）分形。
 		</constant>
 		<constant name="FRACTAL_RIDGED" value="2" enum="FractalType">
+			脊状（Ridged）分形。
 		</constant>
 		<constant name="FRACTAL_PING_PONG" value="3" enum="FractalType">
+			乒乓（Ping-pong）分形。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_EUCLIDEAN" value="0" enum="CellularDistanceFunction">
+			欧几里得距离。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_EUCLIDEAN_SQ" value="1" enum="CellularDistanceFunction">
+			欧几里得距离的平方。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_MANHATTAN" value="2" enum="CellularDistanceFunction">
+			曼哈顿距离。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_HYBRID" value="3" enum="CellularDistanceFunction">
+			混合距离。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_MAX_AXIS" value="4" enum="CellularDistanceFunction">
+			最大轴距离。
 		</constant>
 		<constant name="CELLULAR_RETURN_INDEX_0" value="0" enum="CellularReturnType">
+			返回最近单元格的距离。
 		</constant>
 		<constant name="CELLULAR_RETURN_INDEX_0_ADD_1" value="1" enum="CellularReturnType">
+			返回最近与次近距离之和。
 		</constant>
 		<constant name="CELLULAR_RETURN_INDEX_0_SUB_1" value="2" enum="CellularReturnType">
+			返回最近与次近距离之差。
 		</constant>
 		<constant name="CELLULAR_RETURN_INDEX_0_MUL_1" value="3" enum="CellularReturnType">
+			返回最近与次近距离之积。
 		</constant>
 		<constant name="CELLULAR_RETURN_INDEX_0_DIV_1" value="4" enum="CellularReturnType">
+			返回最近与次近距离之商。
 		</constant>
 		<constant name="SIMD_NULL" value="0" enum="SIMDLevel">
-			Undefined level.
+			未定义的级别。
 		</constant>
 		<constant name="SIMD_SCALAR" value="1" enum="SIMDLevel">
-			Single numbers. Slowest level.
+			单个数字。最慢的级别。
 		</constant>
 		<constant name="SIMD_SSE" value="2" enum="SIMDLevel">
-			x86 CPU processing 4 floats in one instruction.
+			x86 CPU 单条指令处理 4 个浮点数。
 		</constant>
 		<constant name="SIMD_SSE2" value="4" enum="SIMDLevel">
-			x86 CPU Processing 4 floats in one instruction, with more instructions supported than SSE.
+			x86 CPU 单条指令处理 4 个浮点数，比 SSE 支持更多指令。
 		</constant>
 		<constant name="SIMD_SSE3" value="8" enum="SIMDLevel">
-			x86 CPU Processing 4 floats in one instruction, with more instructions supported than SSE3.
+			x86 CPU 单条指令处理 4 个浮点数，比 SSE3 支持更多指令。
 		</constant>
 		<constant name="SIMD_SSSE3" value="16" enum="SIMDLevel">
-			x86 CPU Processing 4 floats in one instruction, with more instructions supported than SSE4.
+			x86 CPU 单条指令处理 4 个浮点数，比 SSE4 支持更多指令。
 		</constant>
 		<constant name="SIMD_SSE41" value="32" enum="SIMDLevel">
-			x86 CPU Processing 4 floats in one instruction, with more instructions supported than SSE41.
+			x86 CPU 单条指令处理 4 个浮点数，比 SSE41 支持更多指令。
 		</constant>
 		<constant name="SIMD_SSE42" value="64" enum="SIMDLevel">
-			x86 CPU Processing 4 floats in one instruction, with more instructions supported than SSE42.
+			x86 CPU 单条指令处理 4 个浮点数，比 SSE42 支持更多指令。
 		</constant>
 		<constant name="SIMD_AVX" value="128" enum="SIMDLevel">
-			x86 CPU Processing 8 floats in one instruction.
+			x86 CPU 单条指令处理 8 个浮点数。
 		</constant>
 		<constant name="SIMD_AVX2" value="256" enum="SIMDLevel">
-			x86 CPU Processing 8 floats in one instruction, with more instructions supported than AVX.
+			x86 CPU 单条指令处理 8 个浮点数，比 AVX 支持更多指令。
 		</constant>
 		<constant name="SIMD_AVX512" value="512" enum="SIMDLevel">
-			x86 CPU Processing 16 floats in one instruction.
+			x86 CPU 单条指令处理 16 个浮点数。
 		</constant>
 		<constant name="SIMD_NEON" value="65536" enum="SIMDLevel">
-			ARM CPU processing 4 floats in one instruction.
+			ARM CPU 单条指令处理 4 个浮点数。
 		</constant>
 	</constants>
 </class>

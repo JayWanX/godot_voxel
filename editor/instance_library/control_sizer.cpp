@@ -43,10 +43,10 @@ void Voxel_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
 			VOXEL_ASSERT_RETURN(target_control != nullptr);
 
 			const Vector2 ms = target_control->get_custom_minimum_size();
-			// Assuming the UI is not scaled
+			// 假设 UI 未缩放
 			const Vector2 rel = mm->get_relative();
-			// Assuming vertical for now
-			// TODO Clamp min_size to `target.get_minimum_size()`?
+			// 目前假设是垂直方向
+			// TODO 将 min_size 限制为 `target.get_minimum_size()`？
 			target_control->set_custom_minimum_size(
 					Vector2(ms.x, math::clamp<real_t>(ms.y + rel.y, _min_size, _max_size))
 			);
@@ -83,8 +83,8 @@ void Voxel_ControlSizer::_notification(int p_what) {
 }
 
 void Voxel_ControlSizer::cache_theme() {
-	// TODO I'd like to cache this theme icon lookup.
-	// TODO Have a framework-level StringName cache singleton
+	// TODO 我想缓存这个主题图标查找。
+	// TODO 有一个框架级的 StringName 缓存单例
 	_hover_icon = get_theme_icon("v_grabber", "SplitContainer");
 }
 

@@ -7,11 +7,11 @@
 
 namespace voxel::godot {
 
-// TODO The following functions should be able to work on `Mesh`,
-// but the script/extension API exposes some methods only on `ArrayMesh`, even though they exist on `Mesh` internally...
+// TODO 以下函数本应能在 `Mesh` 上工作，
+// 但脚本/扩展 API 只把某些方法暴露在 `ArrayMesh` 上，尽管它们内部存在于 `Mesh` 上……
 
-// TODO I need a cheap way to check this at `Mesh` level, but it seems it would require getting the surface arrays,
-// which might not be cheap...
+// TODO 我需要在 `Mesh` 层面用廉价的方式检查这个，但看起来需要获取表面数组，
+// 而那可能并不便宜……
 inline bool is_mesh_empty(const ArrayMesh &mesh) {
 	if (mesh.get_surface_count() == 0) {
 		return true;
@@ -24,8 +24,8 @@ inline bool is_mesh_empty(const ArrayMesh &mesh) {
 
 #ifdef TOOLS_ENABLED
 
-// Generates a wireframe-mesh that highlights edges of a triangle-mesh where vertices are not shared.
-// Used for debugging.
+// 生成一个线框网格，高亮三角网格中顶点未共享的边。
+// 用于调试。
 Array generate_debug_seams_wireframe_surface(const ArrayMesh &src_mesh, int surface_index);
 
 #endif

@@ -1,89 +1,265 @@
-# VoxelGeneratorGraph nodes
+# VoxelGeneratorGraph 节点
 
-This page lists all nodes that can be used in [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md) and [VoxelGraphFunction](api/VoxelGraphFunction.md).
+本页面列出了所有可以在 [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md) 和 [VoxelGraphFunction](api/VoxelGraphFunction.md) 中使用的节点。
 
-## Input
+## 输入
 
 ### CustomInput
 
-Outputs: `value`
+输出: `value`
 
-Outputs values from the custom input having the same name as the node. May be used in [VoxelGraphFunction](api/VoxelGraphFunction.md). It won't be used in [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md).
+输出与节点同名的自定义输入的值。可用于 [VoxelGraphFunction](api/VoxelGraphFunction.md)。不会在 [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md) 中使用。
 
 ### InputSDF
 
-Outputs: `sdf`
+输出: `sdf`
 
-Outputs the existing signed distance at the current voxel. This may only be used in specific situations, such as using the graph as a procedural brush.
+输出当前体素处已有的符号距离。这只能在特定情况下使用，例如将图形用作程序化笔刷。
 
 ### InputX
 
-Outputs: `x`
+输出: `x`
 
-Outputs the X coordinate of the current voxel.
+输出当前体素的 X 坐标。
 
 ### InputY
 
-Outputs: `y`
+输出: `y`
 
-Outputs the Y coordinate of the current voxel.
+输出当前体素的 Y 坐标。
 
 ### InputZ
 
-Outputs: `z`
+输出: `z`
 
-Outputs the Z coordinate of the current voxel.
+输出当前体素的 Z 坐标。
 
-## Mapping
+## SDF
+
+### SdfBox
+
+输入: `x`, `y`, `z`
+输出: `sdf`
+参数: `size_x`, `size_y`, `size_z`
+
+返回以原点为中心、大小为 `(size_x, size_y, size_z)` 的轴对齐盒体在坐标 `(x, y, z)` 处的符号距离场。
+
+### SdfPlane
+
+输入: `y`, `height`
+输出: `sdf`
+
+返回面向 Y 轴、位于给定 `height` 处的平面在坐标 `y` 处的符号距离场。
+
+### SdfPreview
+
+输入: `value`
+参数: `min_value`, `max_value`, `fraction_period`, `mode`
+
+调试节点，不用于最终结果。在编辑器中，根据边界 `[min_value, max_value]` 显示其所连接输出发出的值的一个切片。切片将沿 XY 平面或 XZ 平面，具体取决于当前设置。
+
+### SdfSmoothSubtract
+
+输入: `a`, `b`
+输出: `sdf`
+参数: `smoothness`
+
+使用与 `SdfSmoothUnion` 节点相同的平滑方式，从 `a` 中减去符号距离场 `b`。
+
+### SdfSmoothUnion
+
+输入: `a`, `b`
+输出: `sdf`
+参数: `smoothness`
+
+返回两个符号距离场值 `a` 和 `b` 的平滑并集。平滑度通过 `smoothness` 参数控制。平滑度越高，会在两个输入形成的形状之间产生更大的“焊接”区域。
+
+### SdfSphere
+
+输入: `x`, `y`, `z`
+输出: `sdf`
+参数: `radius`
+
+返回以原点为中心、给定 `radius` 的球体在坐标 `(x, y, z)` 处的符号距离场。
+
+### SdfSphereHeightmap
+
+输入: `x`, `y`, `z`
+输出: `sdf`
+参数: `image`, `radius`, `factor`
+
+返回球形高度图在坐标 `(x, y, z)` 处的符号距离场近似值。高度图是使用全景投影的 `image`，类似于 Godot 中用于环境天空的图像。球体的半径通过 `radius` 指定。高度图的高度可以使用 `factor` 参数缩放。图像必须使用未压缩格式。
+
+### SdfTorus
+
+输入: `x`, `y`, `z`
+输出: `sdf`
+参数: `radius1`, `radius2`
+
+返回以原点为中心、面向 Y 轴的环面在坐标 `(x, y, z)` 处的符号距离场。环的半径为 `radius1`，其厚度为 `radius2`。
+
+## 向量
+
+### Distance2D
+
+输入: `x0`, `y0`, `x1`, `y1`
+输出: `out`
+
+返回两个 2D 点 `(x0, y0)` 和 `(x1, y1)` 之间的距离。
+
+### Distance3D
+
+输入: `x0`, `y0`, `z0`, `x1`, `y1`, `z1`
+输出: `out`
+
+返回两个 3D 点 `(x0, y0, z0)` 和 `(x1, y1, z1)` 之间的距离。
+
+### Normalize
+
+输入: `x`, `y`, `z`
+输出: `nx`, `ny`, `nz`, `len`
+
+返回给定 `(x, y, z)` 3D 向量的归一化坐标，使输出向量的长度为 1。
+
+## 噪声
+
+### FastNoise2D
+
+输入: `x`, `y`
+输出: `out`
+参数: `noise`
+
+使用 FastNoiseLite 库计算坐标 `(x, y)` 处的 2D 噪声并返回。`noise` 参数使用 [Voxel_FastNoiseLite](api/Voxel_FastNoiseLite.md) 资源的实例指定。
+
+注意：该节点可能比 `Noise2D` 稍快。
+
+### FastNoise2_2D
+
+输入: `x`, `y`
+输出: `out`
+参数: `noise`
+
+使用 FastNoise2 库计算坐标 `(x, y)` 处的 2D SIMD 噪声并返回。`noise` 参数使用 [FastNoise2](api/FastNoise2.md) 资源的实例指定。这是当前支持的最快噪声。
+
+### FastNoise2_3D
+
+输入: `x`, `y`, `z`
+输出: `out`
+参数: `noise`
+
+使用 FastNoise2 库计算坐标 `(x, y, z)` 处的 3D SIMD 噪声并返回。`noise` 参数使用 [FastNoise2](api/FastNoise2.md) 资源的实例指定。这是当前支持的最快噪声。
+
+### FastNoise3D
+
+输入: `x`, `y`, `z`
+输出: `out`
+参数: `noise`
+
+使用 FastNoiseLite 库计算坐标 `(x, y, z)` 处的 3D 噪声并返回。`noise` 参数使用 [Voxel_FastNoiseLite](api/Voxel_FastNoiseLite.md) 资源的实例指定。
+
+注意：该节点可能比 `Noise3D` 稍快。
+
+### FastNoiseGradient2D
+
+输入: `x`, `y`
+输出: `out_x`, `out_y`
+参数: `noise`
+
+使用 FastNoiseLite 库的噪声梯度扭曲 2D 坐标 `(x, y)`。`noise` 参数使用 [FastNoiseLiteGradient](https://docs.godotengine.org/en/stable/classes/class_fastnoiselitegradient.html) 资源的实例指定。
+
+### FastNoiseGradient3D
+
+输入: `x`, `y`, `z`
+输出: `out_x`, `out_y`, `out_z`
+参数: `noise`
+
+使用 FastNoiseLite 库的噪声梯度扭曲 3D 坐标 `(x, y, z)`。`noise` 参数使用 [FastNoiseLiteGradient](https://docs.godotengine.org/en/stable/classes/class_fastnoiselitegradient.html) 资源的实例指定。
+
+### Noise2D
+
+输入: `x`, `y`
+输出: `out`
+参数: `noise`
+
+使用 Godot 提供的 [Noise](https://docs.godotengine.org/en/stable/classes/class_noise.html) 子类之一返回坐标 `(x, y)` 处的 2D 噪声。
+
+### Noise3D
+
+输入: `x`, `y`, `z`
+输出: `out`
+参数: `noise`
+
+使用 Godot 提供的 [Noise](https://docs.godotengine.org/en/stable/classes/class_noise.html) 子类之一返回坐标 `(x, y, z)` 处的 3D 噪声。
+
+### Spots2D
+
+输入: `x`, `y`, `spot_radius`
+输出: `out`
+参数: `seed`, `cell_size`, `jitter`
+
+为“矿脉”生成优化的细胞噪声：将空间划分为 2D 网格，每个单元格包含一个圆形“斑点”。当位置在斑点内部时返回 1，否则返回 0。`jitter` 或多或少会随机化斑点在每个单元格内的位置。限制：高抖动可能使斑点与单元格边界相交。这是有意为之的。如果你需要更通用的细胞噪声，请使用另一个节点。
+
+### Spots3D
+
+输入: `x`, `y`, `z`, `spot_radius`
+输出: `out`
+参数: `seed`, `cell_size`, `jitter`
+
+为“矿脉”生成优化的细胞噪声：将空间划分为 3D 网格，每个单元格包含一个圆形“斑点”。当位置在斑点内部时返回 1，否则返回 0。`jitter` 或多或少会随机化斑点在每个单元格内的位置。限制：高抖动可能使斑点与单元格边界相交。这是有意为之的。如果你需要更通用的细胞噪声，请使用另一个节点。
+
+## 映射
 
 ### Curve
 
-Inputs: `x`
-Outputs: `out`
-Parameters: `curve`
+输入: `x`
+输出: `out`
+参数: `curve`
 
-Returns the value of a custom `curve` at coordinate `x`, where `x` is in the range `[0..1]`. The `curve` is specified with a [Curve](https://docs.godotengine.org/en/stable/classes/class_curve.html) resource.
+返回坐标 `x` 处自定义 `curve` 的值，其中 `x` 在其域属性指定的范围内（在 Godot 4.3 及更早版本中，它在 `[0..1]` 范围内）。`curve` 使用 [Curve](https://docs.godotengine.org/en/stable/classes/class_curve.html) 资源指定。
 
 ### Image
 
-Inputs: `x`, `y`
-Outputs: `out`
-Parameters: `image`
+输入: `x`, `y`
+输出: `out`
+参数: `image`, `filter`
 
-Returns the value of the red channel of an image at coordinates `(x, y)`, where `x` and `y` are in pixels and the return value is in the range `[0..1]` (or more if the image has an HDR format). If coordinates are outside the image, they will be wrapped around. No filtering is performed. The image must have an uncompressed format.
+返回图像在坐标 `(x, y)` 处红色通道的值，其中 `x` 和 `y` 以像素为单位，返回值在 `[0..1]` 范围内（如果图像具有 HDR 格式则可能更大）。如果坐标超出图像范围，将被环绕。不执行任何过滤。图像必须使用未压缩格式。
 
-## Math
+## 数学
 
 ### Abs
 
-Inputs: `x`
-Outputs: `out`
+输入: `x`
+输出: `out`
 
-If `x` is negative, returns `x` as a positive number. Otherwise, returns `x`.
+如果 `x` 为负，则返回 `x` 的正数形式。否则返回 `x`。
 
 ### Clamp
 
-Inputs: `x`, `min`, `max`
-Outputs: `out`
+输入: `x`, `min`, `max`
+输出: `out`
 
-If `x` is lower than `min`, returns `min`. If `x` is higher than `max`, returns `max`. Otherwise, returns `x`.
+如果 `x` 低于 `min`，返回 `min`。如果 `x` 高于 `max`，返回 `max`。否则返回 `x`。
 
 ### ClampC
 
-Inputs: `x`
-Outputs: `out`
-Parameters: `min`, `max`
+输入: `x`
+输出: `out`
+参数: `min`, `max`
 
-If `x` is lower than `min`, returns `min`. If `x` is higher than `max`, returns `max`. Otherwise, returns `x`.
-This node is an alternative to `Clamp`, used internally as an optimization if `min` and `max` are constant.
+如果 `x` 低于 `min`，返回 `min`。如果 `x` 高于 `max`，返回 `max`。否则返回 `x`。
+
+该节点是 `Clamp` 的替代方案，当 `min` 和 `max` 为常量时，在内部用作优化。
 
 ### Expression
 
-Outputs: `out`
-Parameters: `expression`
+输出: `out`
+参数: `expression`
 
-Evaluates a math expression. Variable names can be written as inputs of the node. Some functions can be used, but they must be supported graph nodes in the first place, as the expression will be converted to nodes internally.
-Available functions:
+计算数学表达式。变量名可以写成节点的输入。可以使用一些函数，但它们首先必须是受支持的图形节点，因为表达式会在内部转换为节点。
+
+可用函数：
+
 ```
 sin(x)
 floor(x)
@@ -100,368 +276,200 @@ lerp(a, b, ratio)
 
 ### Floor
 
-Inputs: `x`
-Outputs: `out`
+输入: `x`
+输出: `out`
 
-Returns the result of `floor(x)`, the nearest integer that is equal or lower to `x`.
+返回 `floor(x)` 的结果，即小于或等于 `x` 的最近整数。
 
 ### Fract
 
-Inputs: `x`
-Outputs: `out`
+输入: `x`
+输出: `out`
 
-Returns the decimal part of `x`. The result is always positive regardless of sign.
+返回 `x` 的小数部分。无论正负，结果始终为正。
 
 ### Max
 
-Inputs: `a`, `b`
-Outputs: `out`
+输入: `a`, `b`
+输出: `out`
 
-Returns the highest value between `a` and `b`.
+返回 `a` 和 `b` 之间的较大值。
 
 ### Min
 
-Inputs: `a`, `b`
-Outputs: `out`
+输入: `a`, `b`
+输出: `out`
 
-Returns the lowest value between `a` and `b`.
+返回 `a` 和 `b` 之间的较小值。
 
 ### Mix
 
-Inputs: `a`, `b`, `ratio`
-Outputs: `out`
+输入: `a`, `b`, `ratio`
+输出: `out`
 
-Interpolates between `a` and `b`, using parameter value `t`. If `t` is `0`, `a` will be returned. If `t` is `1`, `b` will be returned. If `t` is beyond the `[0..1]` range, the returned value will be an extrapolation.
+使用参数值 `t` 在 `a` 和 `b` 之间插值。如果 `t` 为 `0`，将返回 `a`。如果 `t` 为 `1`，将返回 `b`。如果 `t` 超出 `[0..1]` 范围，返回值将是一种外推。
 
 ### Pow
 
-Inputs: `x`, `p`
-Outputs: `out`
+输入: `x`, `p`
+输出: `out`
 
-Returns the result of the power function (`x ^ power`). It can be relatively slow.
+返回幂函数（`x ^ power`）的结果。它可能相对较慢。
 
 ### Powi
 
-Inputs: `x`
-Outputs: `out`
-Parameters: `power`
+输入: `x`
+输出: `out`
+参数: `power`
 
-Returns the result of the power function (`x ^ power`), where the exponent is a constant positive integer. May be faster than `Pow`.
+返回幂函数（`x ^ power`）的结果，其中指数是常量正整数。可能比 `Pow` 更快。
 
 ### Remap
 
-Inputs: `x`
-Outputs: `out`
-Parameters: `min0`, `max0`, `min1`, `max1`
+输入: `x`
+输出: `out`
+参数: `min0`, `max0`, `min1`, `max1`
 
-For an input value `x` in the range `[min0, max0]`, converts linearly into the `[min1, max1]` range. For example, if `x` is `min0`, then `min1` will be returned. If `x` is `max0`, then `max1` will be returned. If `x` is beyond the `[min0, max0]` range, the result will be an extrapolation.
+对于 `[min0, max0]` 范围内的输入值 `x`，线性转换到 `[min1, max1]` 范围。例如，如果 `x` 是 `min0`，将返回 `min1`。如果 `x` 是 `max0`，将返回 `max1`。如果 `x` 超出 `[min0, max0]` 范围，结果将是一种外推。
 
 ### Select
 
-Inputs: `a`, `b`, `t`
-Outputs: `out`
-Parameters: `threshold`
+输入: `a`, `b`, `t`
+输出: `out`
+参数: `threshold`
 
-If `t` is lower than `threshold`, returns `a`. Otherwise, returns `b`. 
+如果 `t` 低于 `threshold`，返回 `a`。否则返回 `b`。
 
 ### Sin
 
-Inputs: `x`
-Outputs: `out`
+输入: `x`
+输出: `out`
 
-Returns the result of `sin(x)`
+返回 `sin(x)` 的结果
 
 ### Smoothstep
 
-Inputs: `x`
-Outputs: `out`
-Parameters: `edge0`, `edge1`
+输入: `x`
+输出: `out`
+参数: `edge0`, `edge1`
 
-Returns the result of smoothly interpolating the value of `x` between `0` and `1`, based on the where `x` lies with respect to the edges `egde0` and `edge1`. The return value is `0` if `x <= edge0`, and `1` if `x >= edge1`. If `x` lies between `edge0` and `edge1`, the returned value follows an S-shaped curve that maps `x` between `0` and `1`. This S-shaped curve is the cubic Hermite interpolator, given by `f(y) = 3*y^2 - 2*y^3` where `y = (x-edge0) / (edge1-edge0)`.
+根据 `x` 相对于边缘 `egde0` 和 `edge1` 的位置，在 `0` 和 `1` 之间平滑插值 `x` 的值。如果 `x <= edge0`，返回值为 `0`；如果 `x >= edge1`，返回值为 `1`。如果 `x` 位于 `edge0` 和 `edge1` 之间，返回值遵循一条 S 形曲线，将 `x` 映射到 `0` 和 `1` 之间。这条 S 形曲线是三次 Hermite 插值，公式为 `f(y) = 3*y^2 - 2*y^3`，其中 `y = (x-edge0) / (edge1-edge0)`。
 
 ### Sqrt
 
-Inputs: `x`
-Outputs: `out`
+输入: `x`
+输出: `out`
 
-Returns the square root of `x`.
-Note: unlike classic square root, if `x` is negative, this function returns `0` instead of `NaN`.
+返回 `x` 的平方根。
+
+注意：与经典平方根不同，如果 `x` 为负，此函数返回 `0` 而不是 `NaN`。
 
 ### Stepify
 
-Inputs: `x`, `step`
-Outputs: `out`
+输入: `x`, `step`
+输出: `out`
 
-Snaps `x` to a given step, similar to GDScript's function `stepify`.
+将 `x` 吸附到给定步长，类似于 GDScript 的函数 `stepify`。
 
 ### Wrap
 
-Inputs: `x`, `length`
-Outputs: `out`
+输入: `x`, `length`
+输出: `out`
 
-Wraps `x` between `0` and `length`, similar to GDScript's function `wrapf(x, 0, max)`.
-Note: if `length` is 0, this node will return `NaN`. If it happens, it should not crash, but results will be messed up.
+将 `x` 环绕在 `0` 和 `length` 之间，类似于 GDScript 的函数 `wrapf(x, 0, max)`。
 
-## Misc
+注意：如果 `length` 为 0，该节点将返回 `NaN`。即使发生这种情况，也不应该崩溃，但结果会出错。
 
-### Comment
-
-Parameters: `text`
-
-A rectangular area with a description, to help organizing a graph.
-
-### Constant
-
-Outputs: `value`
-Parameters: `value`
-
-Outputs a constant number.
-
-### Function
-
-Parameters: `_function`
-
-Runs a custom function, like a re-usable sub-graph. The first parameter (parameter 0) of this node is a reference to a [VoxelGraphFunction](api/VoxelGraphFunction.md). Further parameters (starting from 1) are those exposed by the function.
-
-### Relay
-
-Inputs: `in`
-Outputs: `out`
-
-Pass-through node, allowing to better organize the path of long connections.
-
-## Noise
-
-### FastNoise2D
-
-Inputs: `x`, `y`
-Outputs: `out`
-Parameters: `noise`
-
-Returns computation of 2D noise at coordinates `(x, y)` using the FastNoiseLite library. The `noise` parameter is specified with an instance of the [Voxel_FastNoiseLite](api/Voxel_FastNoiseLite.md) resource.
-Note: this node might be a little faster than `Noise2D`.
-
-### FastNoise2_2D
-
-Inputs: `x`, `y`
-Outputs: `out`
-Parameters: `noise`
-
-Returns computation of 2D SIMD noise at coordinates `(x, y)` using the FastNoise2 library. The `noise` parameter is specified with an instance of the [FastNoise2](api/FastNoise2.md) resource. This is the fastest noise currently supported.
-
-### FastNoise2_3D
-
-Inputs: `x`, `y`, `z`
-Outputs: `out`
-Parameters: `noise`
-
-Returns computation of 3D SIMD noise at coordinates `(x, y, z)` using the FastNoise2 library. The `noise` parameter is specified with an instance of the [FastNoise2](api/FastNoise2.md) resource. This is the fastest noise currently supported.
-
-### FastNoise3D
-
-Inputs: `x`, `y`, `z`
-Outputs: `out`
-Parameters: `noise`
-
-Returns computation of 3D noise at coordinates `(x, y, z)` using the FastNoiseLite library. The `noise` parameter is specified with an instance of the [Voxel_FastNoiseLite](api/Voxel_FastNoiseLite.md) resource.
-Note: this node might be a little faster than `Noise3D`.
-
-### FastNoiseGradient2D
-
-Inputs: `x`, `y`
-Outputs: `out_x`, `out_y`
-Parameters: `noise`
-
-Warps 2D coordinates `(x, y)` using a noise gradient from the FastNoiseLite library. The `noise` parameter is specified with an instance of the [FastNoiseLiteGradient](https://docs.godotengine.org/en/stable/classes/class_fastnoiselitegradient.html) resource.
-
-### FastNoiseGradient3D
-
-Inputs: `x`, `y`, `z`
-Outputs: `out_x`, `out_y`, `out_z`
-Parameters: `noise`
-
-Warps 3D coordinates `(x, y, z)` using a noise gradient from the FastNoiseLite library. The `noise` parameter is specified with an instance of the [FastNoiseLiteGradient](https://docs.godotengine.org/en/stable/classes/class_fastnoiselitegradient.html) resource.
-
-### Noise2D
-
-Inputs: `x`, `y`
-Outputs: `out`
-Parameters: `noise`
-
-Returns 2D noise at coordinates `(x, y)` using one of the [Noise](https://docs.godotengine.org/en/stable/classes/class_noise.html) subclasses provided by Godot.
-
-### Noise3D
-
-Inputs: `x`, `y`, `z`
-Outputs: `out`
-Parameters: `noise`
-
-Returns 3D noise at coordinates `(x, y, z)` using one of the [Noise](https://docs.godotengine.org/en/stable/classes/class_noise.html) subclasses provided by Godot.
-
-### Spots2D
-
-Inputs: `x`, `y`, `spot_radius`
-Outputs: `out`
-Parameters: `seed`, `cell_size`, `jitter`
-
-Cellular noise optimized for "ore patch" generation: divides space into a 2D grid where each cell contains a circular "spot". Returns 1 when the position is inside the spot, 0 otherwise. `jitter` more or less randomizes the position of the spot inside each cell. Limitation: high jitter can make spots clip with cell borders. This is intentional. If you need more generic cellular noise, use another node.
-
-### Spots3D
-
-Inputs: `x`, `y`, `z`, `spot_radius`
-Outputs: `out`
-Parameters: `seed`, `cell_size`, `jitter`
-
-Cellular noise optimized for "ore patch" generation: divides space into a 3D grid where each cell contains a circular "spot". Returns 1 when the position is inside the spot, 0 otherwise. `jitter` more or less randomizes the position of the spot inside each cell. Limitation: high jitter can make spots clip with cell borders. This is intentional. If you need more generic cellular noise, use another node.
-
-## Ops
+## 运算
 
 ### Add
 
-Inputs: `a`, `b`
-Outputs: `out`
+输入: `a`, `b`
+输出: `out`
 
-Returns the sum of `a` and `b`
+返回 `a` 和 `b` 的和
 
 ### Divide
 
-Inputs: `a`, `b`
-Outputs: `out`
+输入: `a`, `b`
+输出: `out`
 
-Returns the result of `a / b`.
-Note: dividing by zero outputs NaN. It should not cause crashes, but will likely mess up results. Consider using Multiply when possible.
+返回 `a / b` 的结果。
+
+注意：除以零会输出 NaN。这不会导致崩溃，但很可能使结果出错。尽可能考虑使用 Multiply。
 
 ### Multiply
 
-Inputs: `a`, `b`
-Outputs: `out`
+输入: `a`, `b`
+输出: `out`
 
-Returns the result of `a * b`.
+返回 `a * b` 的结果。
 
 ### Subtract
 
-Inputs: `a`, `b`
-Outputs: `out`
+输入: `a`, `b`
+输出: `out`
 
-Returns the result of `a - b`
+返回 `a - b` 的结果
 
-## Output
+## 输出
 
 ### CustomOutput
 
-Inputs: `value`
+输入: `value`
 
-Sets the value of the custom output having the same name as the node. May be used in [VoxelGraphFunction](api/VoxelGraphFunction.md). It won't be used in [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md).
+设置与节点同名的自定义输出的值。可用于 [VoxelGraphFunction](api/VoxelGraphFunction.md)。不会在 [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md) 中使用。
 
 ### OutputSDF
 
-Inputs: `sdf`
+输入: `sdf`
 
-Sets the Signed Distance Field value of the current voxel.
+设置当前体素的符号距离场值。
 
 ### OutputSingleTexture
 
-Inputs: `index`
+输入: `index`
 
-Sets the texture index of the current voxel. This is an alternative to using `OutputWeight` nodes, if your voxels only have one texture. This is easier to use but does not allow for long gradients. Using this node in combination with `OutputWeight` is not supported.
+设置当前体素的纹理索引。如果你的体素只有一个纹理，这是使用 `OutputWeight` 节点的替代方案。它更易于使用，但不允许长渐变。不支持将此节点与 `OutputWeight` 组合使用。
 
 ### OutputType
 
-Inputs: `type`
+输入: `type`
 
-Sets the TYPE index of the current voxel. This is for use with [VoxelMesherBlocky](api/VoxelMesherBlocky.md). If you use this output, you don't need to use `OutputSDF`.
+设置当前体素的 TYPE 索引。这用于 [VoxelMesherBlocky](api/VoxelMesherBlocky.md)。如果使用此输出，则无需使用 `OutputSDF`。
 
 ### OutputWeight
 
-Inputs: `weight`
-Parameters: `layer`
+输入: `weight`
+参数: `layer`
 
-Sets the value of a specific texture weight for the current voxel. The texture is specified as an index with the `layer` parameter. There can only be one output using a given layer index.
+设置当前体素的特定纹理权重的值。纹理通过 `layer` 参数以索引形式指定。使用给定图层索引的输出只能有一个。
 
-## SDF
+## 杂项
 
-### SdfBox
+### Comment
 
-Inputs: `x`, `y`, `z`
-Outputs: `sdf`
-Parameters: `size_x`, `size_y`, `size_z`
+参数: `text`
 
-Returns the signed distance field of an axis-aligned box centered at the origin, of size `(size_x, size_y, size_z)`, at coordinates `(x, y, z)`.
+一个带有描述的矩形区域，用于帮助组织图形。
 
-### SdfPlane
+### Constant
 
-Inputs: `y`, `height`
-Outputs: `sdf`
+输出: `value`
+参数: `value`
 
-Returns the signed distance field of a plane facing the Y axis located at a given `height`, at coordinate `y`.
+输出一个常量数字。
 
-### SdfPreview
+### Function
 
-Inputs: `value`
-Parameters: `min_value`, `max_value`, `fraction_period`, `mode`
+参数: `_function`
 
-Debug node, not used in the final result. In the editor, shows a slice of the values emitted from the output it is connected to, according to boundary `[min_value, max_value]`. The slice will be either along the XY plane or the XZ plane, depending on current settings.
+运行一个自定义函数，类似于可复用的子图形。该节点的第一个参数（参数 0）是对 [VoxelGraphFunction](api/VoxelGraphFunction.md) 的引用。其余参数（从 1 开始）是函数暴露的参数。
 
-### SdfSmoothSubtract
+### Relay
 
-Inputs: `a`, `b`
-Outputs: `sdf`
-Parameters: `smoothness`
+输入: `in`
+输出: `out`
 
-Subtracts signed distance field `b` from `a`, using the same smoothing as with the `SdfSmoothUnion` node.
-
-### SdfSmoothUnion
-
-Inputs: `a`, `b`
-Outputs: `sdf`
-Parameters: `smoothness`
-
-Returns the smooth union of two signed distance field values `a` and `b`. Smoothness is controlled with the `smoothness` parameter. Higher smoothness will create a larger "weld" between the shapes formed by the two inputs.
-
-### SdfSphere
-
-Inputs: `x`, `y`, `z`
-Outputs: `sdf`
-Parameters: `radius`
-
-Returns the signed distance field of a sphere centered at the origin, of given `radius`, at coordinates `(x, y, z)`.
-
-### SdfSphereHeightmap
-
-Inputs: `x`, `y`, `z`
-Outputs: `sdf`
-Parameters: `image`, `radius`, `factor`
-
-Returns an approximation of the signed distance field of a spherical heightmap, at coordinates `(x, y, z)`. The heightmap is an `image` using panoramic projection, similar to those used for environment sky in Godot. The radius of the sphere is specified with `radius`. The heights from the heightmap can be scaled using the `factor` parameter. The image must use an uncompressed format.
-
-### SdfTorus
-
-Inputs: `x`, `y`, `z`
-Outputs: `sdf`
-Parameters: `radius1`, `radius2`
-
-Returns the signed distance field of a torus centered at the origin, facing the Y axis, at coordinates `(x, y, z)`. The radius of the ring is `radius1`, and its thickness is `radius2`.
-
-## Vector
-
-### Distance2D
-
-Inputs: `x0`, `y0`, `x1`, `y1`
-Outputs: `out`
-
-Returns the distance between two 2D points `(x0, y0)` and `(x1, y1)`.
-
-### Distance3D
-
-Inputs: `x0`, `y0`, `z0`, `x1`, `y1`, `z1`
-Outputs: `out`
-
-Returns the distance between two 3D points `(x0, y0, z0)` and `(x1, y1, z1)`.
-
-### Normalize
-
-Inputs: `x`, `y`, `z`
-Outputs: `nx`, `ny`, `nz`, `len`
-
-Returns the normalized coordinates of the given `(x, y, z)` 3D vector, such that the length of the output vector is 1.
+直通节点，可以更好地组织长连接的路径。
 

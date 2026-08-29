@@ -3,11 +3,11 @@
 
 #include "../math/interval.h"
 
-// Common utilities to obtain interval estimation for noise.
-// The main technique is to sample a middle point and use derivatives to find maximum variation.
+// 获取噪声区间估计的通用工具。
+// 主要技术是采样中点，并用导数找出最大变化量。
 
-// TODO We could skew max derivative estimation if the anchor is on a bump or a dip
-// because in these cases, it becomes impossible for noise to go further up or further down
+// TODO 如果锚点位于波峰或波谷，我们可以使最大导数估计出现偏差，
+// 因为在这些情况下，噪声不可能再往上或往下走更远
 
 namespace voxel {
 
@@ -18,8 +18,8 @@ inline math::Interval get_noise_range_2d(
 		const math::Interval &y,
 		float max_derivative
 ) {
-	// Any unit vector away from a given evaluation point, the maximum difference is a fixed number.
-	// We can use that number to find a bounding range within our rectangular interval.
+	// 从给定求值点向任意单位向量方向，最大差值是一个固定数。
+	// 我们可以用这个数在我们矩形区间内找出一个边界范围。
 	const float max_derivative_half_diagonal = 0.5f * max_derivative * math::SQRT2<float>;
 
 	const real_t mid_x = 0.5 * (x.min + x.max);

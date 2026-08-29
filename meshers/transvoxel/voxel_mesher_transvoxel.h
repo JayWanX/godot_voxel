@@ -60,24 +60,24 @@ public:
 
 	Ref<ShaderMaterial> get_default_lod_material() const override;
 
-	// Internal
+	// 内部
 
 	static void load_static_resources();
 	static void free_static_resources();
 
-	// Exposed for a fast-path. Return values are only valid until the next invocation of build() in the calling thread.
+	// 为快速路径暴露。返回值仅在调用线程下一次调用 build() 之前有效。
 	static const transvoxel::MeshArrays &get_mesh_cache_from_current_thread();
-	// Exposed for a fast-path. Return values are only valid if `detail_texture_hint` is true in the input given to
-	// `build`, and only remains valid until the next invocation of build() in the calling thread.
+	// 为快速路径暴露。只有当输入给 `build` 的 `detail_texture_hint` 为 true 时返回值才有效，
+	// 并且仅在调用线程下一次调用 build() 之前保持有效。
 	static Span<const transvoxel::CellInfo> get_cell_info_from_current_thread();
 
-	// Not sure if that's necessary, currently transitions are either combined or not generated
+	// 不确定是否有必要，目前过渡网格要么合并到主网格，要么不生成
 	// enum TransitionMode {
-	// 	// No transition meshes will be generated
+	// 	// 不会生成过渡网格
 	// 	TRANSITION_NONE,
-	// 	// Generates transition meshes as separate meshes
+	// 	// 生成独立的过渡网格
 	// 	TRANSITION_SEPARATE,
-	// 	// Transition meshes will be part of the main mesh
+	// 	// 过渡网格将是主网格的一部分
 	// 	TRANSITION_COMBINED
 	// };
 
@@ -95,10 +95,10 @@ private:
 
 	MeshOptimizationParams _mesh_optimization_params;
 
-	// When a marching cube cell is computed, vertices may be placed anywhere on edges of the cell, including very close
-	// to corners. This can lead to very thin or small triangles, which can be a problem notably for collision. this
-	// margin is the minimum distance from corners, below which vertices will be clamped to it. Increasing this value
-	// reduces quality of the mesh.
+	// 计算行进立方体单元时，顶点可能位于单元的边上的任意位置，包括非常接近
+	// 角点的位置。这可能导致非常薄或非常小的三角形，尤其是在碰撞方面会成为问题。该
+	// 边距是从角点的最小距离，低于该距离的顶点会被钳制到此值。增大此值
+	// 会降低网格质量。
 	float _edge_clamp_margin = 0.02f;
 
 	bool _transitions_enabled = true;

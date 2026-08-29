@@ -27,7 +27,7 @@ VoxelBlockyTypeViewer::VoxelBlockyTypeViewer() {
 }
 
 void VoxelBlockyTypeViewer::set_combination_selector(VoxelBlockyTypeAttributeCombinationSelector *selector) {
-	// Supposed to be setup only once.
+	// 应该只设置一次。
 	VOXEL_ASSERT_RETURN(_combination_selector == nullptr);
 	selector->connect(
 			VoxelBlockyTypeAttributeCombinationSelector::SIGNAL_COMBINATION_CHANGED,
@@ -57,7 +57,7 @@ void VoxelBlockyTypeViewer::set_type(Ref<VoxelBlockyType> type) {
 void VoxelBlockyTypeViewer::update_model() {
 	VOXEL_ASSERT_RETURN(_combination_selector != nullptr);
 	const VoxelBlockyType::VariantKey key = _combination_selector->get_variant_key();
-	// The mesh can be null
+	// 网格可能为 null
 	Ref<Mesh> mesh = _type->get_preview_mesh(key);
 	_mesh_instance->set_mesh(mesh);
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelLodTerrain" inherits="VoxelNode" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Voxel volume using variable level of detail.
+		使用可变细节层级的体素体积。
 	</brief_description>
 	<description>
-		Renders large terrain using variable level of details. This is preferably used with smooth meshing such as [VoxelMesherTransvoxel]. Blocky meshers can be used, but currently don't have as much support for LOD.
+		使用可变细节层级渲染大型地形。这最好与 [VoxelMesherTransvoxel] 等平滑网格化一起使用。可以使用方块风网格化器，但目前它们对 LOD 的支持没有那么好。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -14,13 +14,13 @@
 			<param index="0" name="path" type="String" />
 			<param index="1" name="include_instancer" type="bool" />
 			<description>
-				Saves the current state of the terrain as a Godot scene file. Can be used to inspect meshes and instances in more detail in the editor.
+				将地形的当前状态保存为 Godot 场景文件。可用于在编辑器中更详细地检查网格和实例。
 			</description>
 		</method>
 		<method name="debug_get_data_block_count" qualifiers="const">
 			<return type="int" />
 			<description>
-				Get how many voxel data chunks are currently loaded
+				获取当前加载了多少个体素数据区块。
 			</description>
 		</method>
 		<method name="debug_get_data_block_info" qualifiers="const">
@@ -28,7 +28,7 @@
 			<param index="0" name="block_pos" type="Vector3" />
 			<param index="1" name="lod" type="int" />
 			<description>
-				Gets some debug information about a specific voxel data chunk.
+				获取关于特定体素数据区块的一些调试信息。
 				[codeblock]
 				{
 					"loading_state": int,
@@ -40,14 +40,14 @@
 			<return type="bool" />
 			<param index="0" name="flag_index" type="int" enum="VoxelLodTerrain.DebugDrawFlag" />
 			<description>
-				Gets whether a specific debug drawing flag is enabled.
-				This method always returns false in exported games.
+				获取特定调试绘制标志是否已启用。
+				此方法在导出的游戏中始终返回 false。
 			</description>
 		</method>
 		<method name="debug_get_mesh_block_count" qualifiers="const">
 			<return type="int" />
 			<description>
-				Gets how many meshes the terrain currently has.
+				获取地形当前拥有多少个网格。
 			</description>
 		</method>
 		<method name="debug_get_mesh_block_info" qualifiers="const">
@@ -55,7 +55,7 @@
 			<param index="0" name="block_pos" type="Vector3" />
 			<param index="1" name="lod" type="int" />
 			<description>
-				Gets some debug information about a specific mesh.
+				获取关于特定网格的一些调试信息。
 				[codeblock]
 				{
 					"transition_mask": int,
@@ -73,8 +73,8 @@
 		<method name="debug_get_octrees_detailed" qualifiers="const">
 			<return type="Array" />
 			<description>
-				Gets debug information about the grid of octrees used to stream the terrain at multiple levels of detail.
-				The returned array contains alternating [Vector3i] and [Array] values, where each pair corresponds to one octree at a specific position:
+				获取用于在多个细节层级上流式加载地形的八叉树网格的调试信息。
+				返回的数组包含交替的 [Vector3i] 和 [Array] 值，其中每一对对应特定位置的一个八叉树：
 				[codeblock]
 				[
 					Vector3i,
@@ -85,14 +85,14 @@
 				]
 				[/codeblock]
 
-				The array after positions contains info about one octree:
+				位置后的数组包含一个八叉树的信息：
 				[codeblock]
 				[
 					int (node state),
-					null or Array (children info)
+					null 或 Array（子节点信息）
 				]
 				[/codeblock]
-				When children info is not null, it contains 8 arrays structured the same way, and may be recursively traversed to obtain the state of every node of the octree.
+				当子节点信息不为 null 时，它包含 8 个以相同方式结构的数组，可以递归遍历以获得八叉树中每个节点的状态。
 			</description>
 		</method>
 		<method name="debug_print_sdf_top_down">
@@ -100,7 +100,7 @@
 			<param index="0" name="center" type="Vector3i" />
 			<param index="1" name="extents" type="Vector3i" />
 			<description>
-				Captures a top-down representation of the signed distance field (SDF) at multiple LOD levels within a specific area. The returned array contains an image for each LOD.
+				捕获特定区域内多个 LOD 层级上有符号距离场（SDF）的俯视表示。返回的数组包含每个 LOD 的一张图像。
 			</description>
 		</method>
 		<method name="debug_raycast_mesh_block" qualifiers="const">
@@ -108,8 +108,8 @@
 			<param index="0" name="origin" type="Vector3" />
 			<param index="1" name="dir" type="Vector3" />
 			<description>
-				Gets the non-empty mesh chunk positions from a rough world-space ray, up to a distance of 256 units. All LODs are checked.
-				The returned array contains:
+				从一条粗略的世界空间射线获取非空网格区块位置，距离最多 256 个单位。会检查所有 LOD。
+				返回的数组包含：
 				[codeblock]
 				[
 					{
@@ -126,8 +126,8 @@
 			<param index="0" name="flag_index" type="int" enum="VoxelLodTerrain.DebugDrawFlag" />
 			<param index="1" name="enabled" type="bool" />
 			<description>
-				Sets a specific debug drawing flag. Note that debug drawing must also be enabled for it to be visible.
-				This method does nothing in exported games.
+				设置特定调试绘制标志。注意，还必须启用调试绘制才能使其可见。
+				此方法在导出的游戏中不起作用。
 			</description>
 		</method>
 		<method name="get_data_block_region_extent" qualifiers="const">
@@ -138,7 +138,7 @@
 		<method name="get_data_block_size" qualifiers="const">
 			<return type="int" />
 			<description>
-				Gets the size of one cunic data block in voxels.
+				获取一个数据区块在体素中的大小。
 			</description>
 		</method>
 		<method name="get_normalmap_generator_override" qualifiers="const">
@@ -154,14 +154,14 @@
 		<method name="get_process_callback" qualifiers="const">
 			<return type="int" enum="VoxelLodTerrain.ProcessCallback" />
 			<description>
-				Gets which callback is used to run the main thread update of this node.
+				获取用于运行此节点主线程更新的回调。
 			</description>
 		</method>
 		<method name="get_statistics" qualifiers="const">
 			<return type="Dictionary" />
 			<description>
-				Gets debug information about how much time is spent processing the terrain.
-				The returned dictionary has the following structure:
+				获取关于处理地形所花费时间的调试信息。
+				返回的字典具有以下结构：
 				[codeblock]
 				{
 					"time_detect_required_blocks": int,
@@ -176,7 +176,7 @@
 					"blocked_lods": int
 				}
 				[/codeblock]
-				Times are in microseconds.
+				时间以微秒为单位。
 			</description>
 		</method>
 		<method name="is_area_meshed" qualifiers="const">
@@ -184,17 +184,17 @@
 			<param index="0" name="area_in_voxels" type="AABB" />
 			<param index="1" name="lod_index" type="int" />
 			<description>
-				Returns true if the area has been processed by meshing. It does not mean the area actually contains a mesh.
-				Returns false if the area has not been processed by meshing (therefore it is unknown whethere there should be a mesh here or not).
-				When streaming terrain, this can be used to determine if an area has fully "loaded", in case the game relies meshes or mesh colliders.
+				如果该区域已被网格化处理，则返回 true。这并不意味着该区域实际包含网格。
+				如果该区域尚未经过网格化处理（因此此处是否存在网格未知），则返回 false。
+				对于流式加载的地形，可用于确定某个区域是否已完全"加载"，以防游戏依赖网格或网格碰撞体。
 			</description>
 		</method>
 		<method name="save_modified_blocks">
 			<return type="VoxelSaveCompletionTracker" />
 			<description>
-				Requests saving of all modified voxels. Saving is asynchronous and will complete some time in the future. If the game quits, the engine will ensure saving tasks get completed before the application shuts down.
-				Use the returned tracker object to know when saving has completed. However, saves occurring after calling this method won't be tracked by this object.
-				Note that blocks getting unloaded as the viewer moves around can also trigger saving tasks, independently from this function.
+				请求保存所有已修改的体素。保存是异步的，将在未来某个时间完成。如果游戏退出，引擎将确保保存任务在应用程序关闭前完成。
+				使用返回的跟踪器对象来了解保存何时完成。但是，在调用此方法之后发生的保存将不会被此对象跟踪。
+				注意，当观察者移动时被卸载的数据块也会触发保存任务，这与本函数无关。
 			</description>
 		</method>
 		<method name="set_normalmap_generator_override">
@@ -213,7 +213,7 @@
 			<return type="void" />
 			<param index="0" name="mode" type="int" enum="VoxelLodTerrain.ProcessCallback" />
 			<description>
-				Sets which process callback is used to run the main thread update of this node. By default, it uses [code]_process[/code].
+				设置用于运行此节点主线程更新的处理回调。默认使用 [code]_process[/code]。
 			</description>
 		</method>
 		<method name="voxel_to_data_block_position" qualifiers="const">
@@ -221,7 +221,7 @@
 			<param index="0" name="voxel_position" type="Vector3" />
 			<param index="1" name="lod_index" type="int" />
 			<description>
-				Converts a voxel position into a data block position for a specific LOD index.
+				将体素位置转换为特定 LOD 索引的数据块位置。
 			</description>
 		</method>
 		<method name="voxel_to_mesh_block_position" qualifiers="const">
@@ -229,29 +229,29 @@
 			<param index="0" name="voxel_position" type="Vector3" />
 			<param index="1" name="lod_index" type="int" />
 			<description>
-				Converts a voxel position into a mesh block position for a specific LOD index.
+				将体素位置转换为特定 LOD 索引的网格块位置。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="cache_generated_blocks" type="bool" setter="set_cache_generated_blocks" getter="get_cache_generated_blocks" default="false" is_experimental="true" experimental="">
-			If enabled, streaming the terrain will keep generated voxel data in memory around viewers, even if it wasn't edited. This can speedup voxel queries on non-edited areas and allows [member VoxelStream.save_generator_output] to work, but increases memory usage significantly.
-			This option is not supported when [member full_load_mode_enabled] is enabled.
+			如果启用，流式加载地形时将在观察者周围的内存中保留生成的体素数据，即使它未被编辑。这可以加快对未编辑区域的体素查询，并允许 [member VoxelStream.save_generator_output] 工作，但会显著增加内存使用。
+			当启用 [member full_load_mode_enabled] 时，不支持此选项。
 		</member>
 		<member name="collision_layer" type="int" setter="set_collision_layer" getter="get_collision_layer" default="1">
-			Collision layer used by generated colliders. Check Godot documentation for more information.
+			生成的碰撞体使用的碰撞层。有关更多信息，请查阅 Godot 文档。
 		</member>
 		<member name="collision_lod_count" type="int" setter="set_collision_lod_count" getter="get_collision_lod_count" default="0">
-			How many LOD levels are set to generate colliders, starting from LOD 0. Setting this property to 0 means all LODs have collision.
+			从 LOD 0 开始，有多少个 LOD 层级设置为生成碰撞体。将此属性设置为 0 意味着所有 LOD 都有碰撞。
 		</member>
 		<member name="collision_margin" type="float" setter="set_collision_margin" getter="get_collision_margin" default="0.04">
-			Collision margin used by generated colliders. Note that it may depend on which physics engine is used under the hood, as some don't use margins.
+			生成的碰撞体使用的碰撞边距。注意，它可能取决于底层使用的物理引擎，因为有些引擎不使用边距。
 		</member>
 		<member name="collision_mask" type="int" setter="set_collision_mask" getter="get_collision_mask" default="1">
-			Collision mask used by generated colliders. Check Godot documentation for more information.
+			生成的碰撞体使用的碰撞掩码。有关更多信息，请查阅 Godot 文档。
 		</member>
 		<member name="collision_update_delay" type="int" setter="set_collision_update_delay" getter="get_collision_update_delay" default="0">
-			How long to wait before updating colliders after an edit, in milliseconds. Collider generation is expensive, so the intent is to smooth it out.
+			编辑后更新碰撞体之前要等待多长时间，单位为毫秒。碰撞体生成开销较大，因此目的是使其平滑化。
 		</member>
 		<member name="debug_draw_active_mesh_blocks" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
 		</member>
@@ -282,87 +282,87 @@
 		<member name="debug_draw_voxel_metadata" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
 		</member>
 		<member name="full_load_mode_enabled" type="bool" setter="set_full_load_mode_enabled" getter="is_full_load_mode_enabled" default="false">
-			If enabled, data streaming will be turned off, and all voxel data will be loaded from the [member stream] into memory.
-			This removes several constraints, such as being able to edit anywhere and allowing distant normalmaps to include edited regions. This comes at the expense of more memory usage. However, only edited regions use memory, so in practice it can be good enough.
+			如果启用，数据流式加载将被关闭，所有体素数据将从 [member VoxelNode.stream] 加载到内存中。
+			这消除了若干限制，例如能够编辑任意位置，并允许远处法线贴图包含已编辑区域。代价是增加内存使用。然而，只有已编辑区域会占用内存，因此实际上可能足够好。
 		</member>
 		<member name="generate_collisions" type="bool" setter="set_generate_collisions" getter="get_generate_collisions" default="true">
-			If enabled, chunked colliders will be generated from meshes.
+			如果启用，将从网格生成区块化碰撞体。
 		</member>
 		<member name="lod_count" type="int" setter="set_lod_count" getter="get_lod_count" default="4">
-			How many LOD levels to use. This should be tuned alongside [member lod_distance]: if you want to see very far, you need more LOD levels. This allows blocks to become larger the further away they are, to keep their numbers to an acceptable amount. In contrast, too few LOD levels means regions far away will have to use too many small blocks, which can affect performance.
+			要使用的 LOD 层级数量。这应与 [member lod_distance] 一起调整：如果你想看得非常远，就需要更多 LOD 层级。这允许区块在距离越远时变得越大，以将其数量保持在可接受范围内。相反，LOD 层级太少意味着远处的区域将不得不使用太多的小区块，这会影响性能。
 		</member>
 		<member name="lod_distance" type="float" setter="set_lod_distance" getter="get_lod_distance" default="48.0">
-			How far LOD 0 extends from the viewer. Each parent LOD will extend twice as far as their children LOD levels. When [member full_load_mode_enabled] is disabled, this also defines how far edits are allowed.
-			For further control of LODs beyond 0, see [member secondary_lod_distance].
+			LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子级 LOD 层级的两倍。当 [member full_load_mode_enabled] 被禁用时，这也定义了允许编辑多远。
+			要进一步控制 0 以上的 LOD，请参见 [member secondary_lod_distance]。
 		</member>
 		<member name="lod_fade_duration" type="float" setter="set_lod_fade_duration" getter="get_lod_fade_duration" default="0.0">
-			When set greater than 0, enables LOD fading. When mesh blocks get split/merged as level of detail changes, they will fade to make the transition less noticeable (or at least more pleasant). This feature requires to use a specific shader, check the online documentation or examples for more information.
+			当设置为大于 0 时，启用 LOD 淡入淡出。当网格区块因细节层级变化而被拆分/合并时，它们将淡入淡出，使过渡不那么明显（或至少更舒适）。此功能需要使用特定的着色器，请查阅在线文档或示例获取更多信息。
 		</member>
 		<member name="material" type="Material" setter="set_material" getter="get_material">
-			Material used for the surface of the volume. The main usage of this node is with smooth voxels, which means if you want more than one "material" on the ground, you need to use splatmapping techniques with a shader. In addition, many features require shaders to work properly. Check the online documentation or examples for more information.
-			Note: if you use a [ShaderMaterial], it will be instanced on every chunk in order to support per-chunk/LOD features, so dynamic changes done to parameters will not apply. You can use [url=https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/shading_language.html#global-uniforms]global uniforms[/url] to workaround this limitation.
+			用于体积表面的材质。此节点的主要用途是平滑体素，这意味着如果你想在地面上拥有多个"材质"，需要使用着色器技术进行分层贴图。此外，许多功能需要着色器才能正常工作。请查阅在线文档或示例获取更多信息。
+			注意：如果你使用 [ShaderMaterial]，它将在每个区块上实例化，以支持每区块/LOD 的功能，因此对参数的动态更改将不会生效。你可以使用 [url=https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/shading_language.html#global-uniforms]全局 uniform[/url] 来绕开此限制。
 		</member>
 		<member name="mesh_block_size" type="int" setter="set_mesh_block_size" getter="get_mesh_block_size" default="16">
-			Sets how many voxels across meshes of the terrain span.
-			Voxel chunks are stored in cubic chunks of 16x16x16 voxels, and by default meshes of the terrain match that size. But you can set this to 32 so meshes will span 2x2x2 voxel chunks. This is a performance tradeoff. Higher mesh size may speed up rendering, at the cost of slower mesh updates.
-			Values other than 16 and 32 are not supported.
-			Note: this setting also affects [VoxelInstancer] chunks.
+			设置地形网格跨越多少个体素。
+			体素区块以 16x16x16 体素的立方区块存储，默认情况下地形网格与该尺寸匹配。但你可以将其设置为 32，使网格跨越 2x2x2 个体素区块。这是一种性能权衡。更大的网格尺寸可能加快渲染，但会减慢网格更新。
+			不支持 16 和 32 之外的值。
+			注意：此设置也会影响 [VoxelInstancer] 区块。
 		</member>
 		<member name="normalmap_begin_lod_index" type="int" setter="set_normalmap_begin_lod_index" getter="get_normalmap_begin_lod_index" default="2">
-			From which LOD index normalmaps will be generated. There won't be normalmaps below this index.
+			从哪个 LOD 索引开始生成法线贴图。此索引以下的层级不会有法线贴图。
 		</member>
 		<member name="normalmap_enabled" type="bool" setter="set_normalmap_enabled" getter="is_normalmap_enabled" default="false">
-			Enables generation of distant normalmaps. This is a feature used with smooth terrain only (SDF). It is an expensive feature but allows to bring a lot more detail to distant ground.
-			This feature requires to use a specific shader, check the online documentation or examples for more information.
+			启用远处法线贴图的生成。这是仅用于平滑地形（SDF）的功能。它是一项开销较大的功能，但能为远处地面带来更多细节。
+			此功能需要使用特定的着色器，请查阅在线文档或示例获取更多信息。
 		</member>
 		<member name="normalmap_max_deviation_degrees" type="int" setter="set_normalmap_max_deviation_degrees" getter="get_normalmap_max_deviation_degrees" default="60">
 		</member>
 		<member name="normalmap_octahedral_encoding_enabled" type="bool" setter="set_octahedral_normal_encoding" getter="get_octahedral_normal_encoding" default="false">
-			Enables octahedral compression of normalmaps, which reduces memory usage caused by distant normalmaps by about 33%, with some impact on visual quality. Your shader may be modified accordingly to decode them.
+			启用法线贴图的八面体压缩，可将远处法线贴图造成的内存使用减少约 33%，但对视觉质量有一定影响。你的着色器可能需要相应修改以解码它们。
 		</member>
 		<member name="normalmap_tile_resolution_max" type="int" setter="set_normalmap_tile_resolution_max" getter="get_normalmap_tile_resolution_max" default="8">
-			Maximum resolution of tiles in distant normalmaps.
+			远处法线贴图中瓦片的最大分辨率。
 		</member>
 		<member name="normalmap_tile_resolution_min" type="int" setter="set_normalmap_tile_resolution_min" getter="get_normalmap_tile_resolution_min" default="4">
-			Minimum resolution of tiles in distant normalmaps.
-			This is the resolution at which normalmaps will begin with, at the LOD level defined in [member normalmap_begin_lod_index]. Resolutions will double at each LOD level, until they reach [member normalmap_tile_resolution_max].
+			远处法线贴图中瓦片的最小分辨率。
+			这是在 [member normalmap_begin_lod_index] 定义的 LOD 层级上法线贴图开始时的分辨率。分辨率将在每个 LOD 层级翻倍，直到达到 [member normalmap_tile_resolution_max]。
 		</member>
 		<member name="normalmap_use_gpu" type="bool" setter="set_normalmap_use_gpu" getter="get_normalmap_use_gpu" default="false">
-			Enables GPU detail normalmaps generation, which can speed it up. This is only valid for generators that support it. Vulkan is required.
+			启用 GPU 细节法线贴图生成，可加快生成速度。仅对支持它的生成器有效。需要 Vulkan。
 		</member>
 		<member name="secondary_lod_distance" type="float" setter="set_secondary_lod_distance" getter="get_secondary_lod_distance" default="48.0">
-			Controls the size of each LOD above LOD 0, in voxels relative to those LODs (voxels of LOD N are twice as big than LOD N-1). Higher values allow to see further away before detail are decimated, but is more expensive.
-			Note that it will not necessarily be respected accurately, and will rather be used as a target minimum distance.
-			This is only used when [member streaming_system] is set to [constant STREAMING_SYSTEM_CLIPBOX]. In other cases, [member lod_distance] is used.
-			To control LOD 0, see [member lod_distance].
+			控制 LOD 0 之上每个 LOD 的大小，单位是相对于这些 LOD 的体素（LOD N 的体素是 LOD N-1 的两倍大）。较大的值允许在细节被削减之前看得更远，但开销更大。
+			注意，它不一定会被精确遵守，而是作为目标最小距离使用。
+			仅当 [member streaming_system] 设置为 [constant STREAMING_SYSTEM_CLIPBOX] 时使用。在其他情况下，使用 [member lod_distance]。
+			要控制 LOD 0，请参见 [member lod_distance]。
 		</member>
 		<member name="streaming_system" type="int" setter="set_streaming_system" getter="get_streaming_system" enum="VoxelLodTerrain.StreamingSystem" default="0">
-			Selects the underlying algorithm used to determine when to load and unload chunks around viewers as they move around.
+			选择用于确定观察者移动时何时在周围加载和卸载区块的底层算法。
 		</member>
 		<member name="threaded_update_enabled" type="bool" setter="set_threaded_update_enabled" getter="is_threaded_update_enabled" default="false">
-			When enabled, this node will run a large part of its update cycle in a separate thread. Otherwise, it will run on the main thread.
+			启用后，此节点将在单独的线程中运行其更新周期的大部分。否则，它将在主线程上运行。
 		</member>
 		<member name="use_gpu_generation" type="bool" setter="set_generator_use_gpu" getter="get_generator_use_gpu" default="false">
-			Enables GPU block generation, which can speed it up. This is only valid for generators that support it. Vulkan is required.
+			启用 GPU 数据块生成，可加快生成速度。仅对支持它的生成器有效。需要 Vulkan。
 		</member>
 		<member name="view_distance" type="int" setter="set_view_distance" getter="get_view_distance" default="512">
-			Maximum distance viewers can have. If a viewer has a larger distance, it will be clamped. Note that this is only a hint and not an exact boundary. Terrain may load within that distance, but can continue beyond it, rounding up to block size of the biggest LOD.
-			If your terrain size is finite (like an island or planet) and you want to keep it in view, you may want to set this value to a very large number. This is mainly useful for infinite terrains where a cap is desired.
+			观察者可以拥有的最大距离。如果观察者的距离更大，它将被钳制。注意，这只是一个提示，不是精确的边界。地形可能在该距离内加载，但可以继续超出它，向上取整到最大 LOD 的数据块大小。
+			如果你的地形尺寸有限（如岛屿或星球），并希望将其保持在视野内，你可能希望将此值设置为非常大的数字。这主要用于需要限制的无限地形。
 		</member>
 		<member name="voxel_bounds" type="AABB" setter="set_voxel_bounds" getter="get_voxel_bounds" default="AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)">
-			Bounds within which volume data can exist (loaded or not), in voxels. By default, it is pseudo-infinite. If you make a planet, island or some sort of arena, you may want to choose a finite size.
-			Note, because this volume uses chunks with LOD, these bounds will snap to the closest chunk boundary.
+			体积数据可以存在的边界（无论是否已加载），单位为体素。默认情况下，它是伪无限的。如果你制作星球、岛屿或某种竞技场，你可能希望选择有限尺寸。
+			注意，因为此体积使用带 LOD 的区块，这些边界将对齐到最近的区块边界。
 		</member>
 	</members>
 	<constants>
 		<constant name="PROCESS_CALLBACK_IDLE" value="0" enum="ProcessCallback">
-			The node will use [code]_process[/code] for the part of its logic running on the main thread.
+			节点将使用 [code]_process[/code] 运行其在主线程上执行的那部分逻辑。
 		</constant>
 		<constant name="PROCESS_CALLBACK_PHYSICS" value="1" enum="ProcessCallback">
-			The node will use [code]_physics_process[/code] for the part of its logic running on the main thread.
+			节点将使用 [code]_physics_process[/code] 运行其在主线程上执行的那部分逻辑。
 		</constant>
 		<constant name="PROCESS_CALLBACK_DISABLED" value="2" enum="ProcessCallback">
-			The node will not update. Use with caution!
+			节点将不会更新。请谨慎使用！
 		</constant>
 		<constant name="DEBUG_DRAW_OCTREE_NODES" value="0" enum="DebugDrawFlag">
 		</constant>
@@ -389,13 +389,13 @@
 		<constant name="DEBUG_DRAW_FLAGS_COUNT" value="12" enum="DebugDrawFlag">
 		</constant>
 		<constant name="STREAMING_SYSTEM_LEGACY_OCTREE" value="0" enum="StreamingSystem">
-			Loads chunks around the viewer in a spherical pattern.
-			Does not support multiple viewers. Does not support collision-only viewers. Does not support "no viewers" (will assume origin instead). Does not support per-viewer view distance, only [member view_distance] is used.
-			This was the first system to be implemented, therefore it remains available as default for compatibility.
+			以球形图案加载观察者周围的区块。
+			不支持多个观察者。不支持仅碰撞的观察者。不支持"无观察者"（将假定原点）。不支持按观察者设置视距，仅使用 [member view_distance]。
+			这是第一个实现的系统，因此出于兼容性考虑，它仍然作为默认系统可用。
 		</constant>
 		<constant name="STREAMING_SYSTEM_CLIPBOX" value="1" enum="StreamingSystem">
-			Loads chunks around the viewer in concentric boxes. Supports multiple viewers and collision-only viewers. This is a better system for multiplayer streaming.
-			Due to simplifications, chunk locations at each LOD might be less optimal than [constant STREAMING_SYSTEM_LEGACY_OCTREE].
+			以同心盒的形式加载观察者周围的区块。支持多个观察者和仅碰撞的观察者。这是更适合多人流式加载的系统。
+			由于简化，每个 LOD 的区块位置可能不如 [constant STREAMING_SYSTEM_LEGACY_OCTREE] 优化。
 		</constant>
 	</constants>
 </class>

@@ -63,7 +63,7 @@ ProgramGraph::Node *ProgramGraph::create_node(uint32_t type_id, uint32_t id) {
 	if (id == NULL_ID) {
 		id = generate_node_id();
 	} else {
-		// ID must not be taken already
+		// ID 必须未被占用
 		VOXEL_ASSERT_RETURN_V(_nodes.find(id) == _nodes.end(), nullptr);
 		if (_next_node_id <= id) {
 			_next_node_id = id + 1;
@@ -79,7 +79,7 @@ ProgramGraph::Node *ProgramGraph::create_node(uint32_t type_id, uint32_t id) {
 void ProgramGraph::remove_node(uint32_t node_id) {
 	Node &node = get_node(node_id);
 
-	// Remove input connections
+	// 移除输入连接
 	for (uint32_t dst_port_index = 0; dst_port_index < node.inputs.size(); ++dst_port_index) {
 		const Port &p = node.inputs[dst_port_index];
 		for (auto it = p.connections.begin(); it != p.connections.end(); ++it) {
@@ -92,7 +92,7 @@ void ProgramGraph::remove_node(uint32_t node_id) {
 		}
 	}
 
-	// Remove output connections
+	// 移除输出连接
 	for (uint32_t src_port_index = 0; src_port_index < node.outputs.size(); ++src_port_index) {
 		const Port &p = node.outputs[src_port_index];
 		for (auto it = p.connections.begin(); it != p.connections.end(); ++it) {
@@ -132,11 +132,11 @@ bool ProgramGraph::is_connected(PortLocation src, PortLocation dst) const {
 
 bool ProgramGraph::is_valid_connection(PortLocation src, PortLocation dst) const {
 	if (src.node_id == dst.node_id) {
-		// Can't connect to itself
+		// 不能连接到自身
 		return false;
 	}
 	if (has_path(dst.node_id, src.node_id)) {
-		// Would create a loop
+		// 会形成循环
 		return false;
 	}
 	return true;
@@ -144,14 +144,14 @@ bool ProgramGraph::is_valid_connection(PortLocation src, PortLocation dst) const
 
 bool ProgramGraph::can_connect(PortLocation src, PortLocation dst) const {
 	if (is_connected(src, dst)) {
-		// Already exists
+		// 已存在
 		return false;
 	}
 	if (!is_valid_connection(src, dst)) {
 		return false;
 	}
 	const Node &dst_node = get_node(dst.node_id);
-	// There can be only one connection from a source to a destination
+	// 从一个源到同一个目标只能有一个连接
 	return dst_node.inputs[dst.port_index].connections.size() == 0;
 }
 
@@ -237,7 +237,7 @@ bool ProgramGraph::has_path(uint32_t p_src_node_id, uint32_t p_dst_node_id) cons
 
 		uint32_t nodes_to_process_begin = nodes_to_process.size();
 
-		// Find destinations
+		// 查找目的地
 		for (uint32_t oi = 0; oi < node.outputs.size(); ++oi) {
 			const Port &p = node.outputs[oi];
 			for (auto cit = p.connections.begin(); cit != p.connections.end(); ++cit) {
@@ -245,7 +245,7 @@ bool ProgramGraph::has_path(uint32_t p_src_node_id, uint32_t p_dst_node_id) cons
 				if (dst.node_id == p_dst_node_id) {
 					return true;
 				}
-				// A node can have two connections to the same destination node
+				// 一个节点可以有两个指向同一目标节点的连接
 				if (range_contains(nodes_to_process, dst.node_id, nodes_to_process_begin, nodes_to_process.size())) {
 					continue;
 				}
@@ -273,23 +273,23 @@ void ProgramGraph::find_dependencies(uint32_t node_id, StdVector<uint32_t> &out_
 	find_dependencies(to_single_element_span(node_id), out_order);
 }
 
-// Finds dependencies of the given nodes, and returns them in the order they should be processed.
-// Given nodes are included in the result.
+// 查找给定节点的依赖项，并按应处理的顺序返回。
+// 结果包含给定的节点本身。
 void ProgramGraph::find_dependencies(Span<const uint32_t> p_nodes_to_process, StdVector<uint32_t> &out_order) const {
 	StdUnorderedSet<uint32_t> visited_nodes;
 
-	// TODO Candidate for temp allocator
+	// TODO 临时分配器的候选
 	StdVector<uint32_t> nodes_to_process;
 	nodes_to_process.resize(p_nodes_to_process.size());
 	p_nodes_to_process.copy_to(to_span(nodes_to_process));
 
 	while (nodes_to_process.size() > 0) {
 	found:
-		// The loop can come back multiple times to the same node, until all its dependencies have been processed.
+		// 循环可能会多次回到同一节点，直到它的所有依赖都被处理完。
 		const Node &node = get_node(nodes_to_process.back());
 		VOXEL_ASSERT_MSG(nodes_to_process.size() <= get_nodes_count(), "Invalid graph?");
 
-		// Pick first non-visited dependency
+		// 选取第一个未访问的依赖
 		for (const Port &port : node.inputs) {
 			for (const PortLocation src : port.connections) {
 				if (visited_nodes.find(src.node_id) == visited_nodes.end()) {
@@ -299,7 +299,7 @@ void ProgramGraph::find_dependencies(Span<const uint32_t> p_nodes_to_process, St
 			}
 		}
 
-		// No dependencies left to visit, process node
+		// 没有剩余的依赖项可访问，处理该节点
 		out_order.push_back(node.id);
 		visited_nodes.insert(node.id);
 		nodes_to_process.pop_back();
@@ -316,7 +316,7 @@ void ProgramGraph::find_immediate_dependencies(uint32_t node_id, StdVector<uint3
 
 	for (const Port &p : node.inputs) {
 		for (const PortLocation src : p.connections) {
-			// A node can have two connections to the same destination node
+			// 一个节点可以有两个指向同一目标节点的连接
 			if (range_contains(deps, src.node_id, begin, deps.size())) {
 				continue;
 			}
@@ -465,7 +465,7 @@ void ProgramGraph::copy_from(const ProgramGraph &other, bool copy_subresources) 
 			}
 		}
 
-		// IDs should be the same
+		// ID 应该相同
 		_nodes.insert(std::make_pair(node->id, node));
 	}
 }

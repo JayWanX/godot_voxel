@@ -39,7 +39,7 @@ int godot_domain_warp_to_fnl(FastNoiseLite::DomainWarpFractalType gd_domain_warp
 }
 
 void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const FastNoiseLite &fnl) {
-	// TODO Add missing options
+	// TODO 添加缺失的选项
 	ctx.add_format(
 			"fnl_state state = fnlCreateState({});\n"
 			"state.noise_type = {};\n"
@@ -106,7 +106,7 @@ void add_fast_noise_lite_gradient_state_config(ShaderGenContext &ctx, const Voxe
 }
 
 void add_fast_noise_lite_state_config(ShaderGenContext &ctx, const Voxel_FastNoiseLite &fnl) {
-	// TODO Add missing options
+	// TODO 添加缺失的选项
 	ctx.add_format(
 			"fnl_state state = fnlCreateState({});\n"
 			"state.noise_type = {};\n"
@@ -142,8 +142,8 @@ void register_noise_nodes(Span<NodeType> types) {
 
 	{
 		struct Params {
-			// TODO Cannot be `const` because of an oversight in Godot, but the devs are not sure to do it
-			// TODO We therefore have no guarantee it is thread-safe to use...
+			// TODO 因为 Godot 的一个疏忽而不能是 `const`，不过开发者们也不确定要不要改
+			// TODO 因此我们不能保证它可以线程安全地使用……
 			Noise *noise;
 		};
 
@@ -183,7 +183,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			const Interval x = ctx.get_input(0);
 			const Interval y = ctx.get_input(1);
 			const Params p = ctx.get_params<Params>();
-			// Shouldn't be null, it is checked when the graph is compiled
+			// 不应为空，在编译图时会进行检查
 			ctx.set_output(0, get_range_2d(*p.noise, x, y));
 		};
 
@@ -225,8 +225,8 @@ void register_noise_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			// TODO Cannot be `const` because of an oversight in Godot, but the devs are not sure to do it
-			// TODO We therefore have no guarantee it is thread-safe to use...
+			// TODO 因为 Godot 的一个疏忽而不能是 `const`，不过开发者们也不确定要不要改
+			// TODO 因此我们不能保证它可以线程安全地使用……
 			Noise *noise;
 		};
 
@@ -269,7 +269,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			const Interval y = ctx.get_input(1);
 			const Interval z = ctx.get_input(2);
 			const Params p = ctx.get_params<Params>();
-			// Shouldn't be null, it is checked when the graph is compiled
+			// 不应为空，在编译图时会进行检查
 			ctx.set_output(0, get_range_3d(*p.noise, x, y, z));
 		};
 
@@ -357,7 +357,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			const Interval x = ctx.get_input(0);
 			const Interval y = ctx.get_input(1);
 			const Params p = ctx.get_params<Params>();
-			// Shouldn't be null, it is checked when the graph is compiled
+			// 不应为空，在编译图时会进行检查
 			ctx.set_output(0, get_fnl_range_2d(*p.noise, x, y));
 		};
 
@@ -442,7 +442,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			const Interval y = ctx.get_input(1);
 			const Interval z = ctx.get_input(2);
 			const Params p = ctx.get_params<Params>();
-			// Shouldn't be null, it is checked when the graph is compiled
+			// 不应为空，在编译图时会进行检查
 			ctx.set_output(0, get_fnl_range_3d(*p.noise, x, y, z));
 		};
 
@@ -534,7 +534,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			const Interval x = ctx.get_input(0);
 			const Interval y = ctx.get_input(1);
 			const Params p = ctx.get_params<Params>();
-			// Shouldn't be null, it is checked when the graph is compiled
+			// 不应为空，在编译图时会进行检查
 			const math::Interval2 r = get_fnl_gradient_range_2d(*p.noise, x, y);
 			ctx.set_output(0, r.x);
 			ctx.set_output(1, r.y);
@@ -623,7 +623,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			const Interval y = ctx.get_input(1);
 			const Interval z = ctx.get_input(2);
 			const Params p = ctx.get_params<Params>();
-			// Shouldn't be null, it is checked when the graph is compiled
+			// 不应为空，在编译图时会进行检查
 			const math::Interval3 r = get_fnl_gradient_range_3d(*p.noise, x, y, z);
 			ctx.set_output(0, r.x);
 			ctx.set_output(1, r.y);
@@ -819,7 +819,7 @@ void register_noise_nodes(Span<NodeType> types) {
 				return;
 			}
 			if (params.cell_size < 0.01) {
-				// To avoid division by zero
+				// 避免除以零
 				ctx.make_error(VOXEL_TTR("Cell size is too small"));
 				return;
 			}
@@ -853,7 +853,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			);
 		};
 
-		// TODO Support shader code for the Spots2D node
+		// TODO 为 Spots2D 节点支持着色器代码
 		// t.shader_gen_func = [](ShaderGenContext &ctx) {
 		// };
 	}
@@ -908,7 +908,7 @@ void register_noise_nodes(Span<NodeType> types) {
 				return;
 			}
 			if (params.cell_size < 0.01) {
-				// To avoid division by zero
+				// 避免除以零
 				ctx.make_error(VOXEL_TTR("Cell size is too small"));
 				return;
 			}
@@ -948,7 +948,7 @@ void register_noise_nodes(Span<NodeType> types) {
 			);
 		};
 
-		// TODO Support shader code for the Spots3D node
+		// TODO 为 Spots3D 节点支持着色器代码
 		// t.shader_gen_func = [](ShaderGenContext &ctx) {
 		// };
 	}

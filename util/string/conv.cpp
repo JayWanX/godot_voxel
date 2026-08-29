@@ -13,16 +13,16 @@ namespace voxel {
 
 template <typename TFloat>
 unsigned int float_to_string_null_terminated(const TFloat x, Span<char> s, const unsigned int precision) {
-	// Using `%g` alone may strip unnecessary decimals:
+	// 单独使用 `%g` 可能会去掉不必要的尾数小数：
 	// https://stackoverflow.com/questions/35475425/sprintf-g-specifier-gives-too-few-digits-after-point
-	// So we also have to specify the precision.
+	// 所以我们还必须指定精度。
 
 	const int res = snprintf(s.data(), s.size(), "%.*g", precision, x);
 	if (res < 0) {
 		VOXEL_PRINT_ERROR(format("Failed to convert float to string, snprintf returned {}", res));
 		return 0;
 	}
-	// While `snprintf` writes a null-terminator, it is not included in the returned size.
+	// 虽然 `snprintf` 会写一个空终止符，但返回的大小并不包含它。
 	const unsigned int len_with_null_terminator = res + 1;
 	if (len_with_null_terminator > s.size()) {
 		VOXEL_PRINT_ERROR(
@@ -46,9 +46,9 @@ unsigned int float_to_string(const TFloat x, Span<char> s, const unsigned int pr
 	// );
 	// return res.ptr - begin;
 
-	// `snprintf` always puts a \0` at the end of what it writes, even when the number doesn't fit.
-	// But our function's API does not expect that.
-	// So we need extra boilerplate...
+	// `snprintf` 总是会在写入内容末尾加一个 \0`，即使数字放不下也一样。
+	// 但我们函数的 API 并不期望这样。
+	// 所以我们需要额外的样板代码……
 	std::array<char, max_float_chars_general<TFloat>() + 1> buf;
 	Span<char> buf_s(buf.data(), buf.size());
 	const unsigned int len_with_null_terminator = float_to_string_null_terminated(x, buf_s, precision);

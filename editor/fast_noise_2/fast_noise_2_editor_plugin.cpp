@@ -36,11 +36,11 @@ public:
 
 		_context_menu = memnew(PopupMenu);
 		_context_menu->add_item("Analyze...", MENU_ANALYZE);
-		// TODO Add dialog to generate a texture?
+		// TODO 添加生成纹理的对话框？
 		_context_menu->connect("id_pressed", callable_mp(this, &FastNoise2Viewer::_on_context_menu_id_pressed));
 		add_child(_context_menu);
 
-		// TODO SIMD level indicator
+		// TODO SIMD 级别指示器
 	}
 
 	void gui_input(const Ref<InputEvent> &p_event) override {
@@ -116,7 +116,7 @@ private:
 		}
 	}
 
-	// TODO Use thread?
+	// TODO 使用线程？
 	void update_preview() {
 		_noise->update_generator();
 
@@ -173,7 +173,7 @@ private:
 
 FastNoise2EditorPlugin::FastNoise2EditorPlugin() {}
 
-// EditorNode isn't ready during plugin construction, so defer work to `init()`.
+// 插件构造期间 EditorNode 尚未就绪，因此将工作推迟到 `init()`。
 void FastNoise2EditorPlugin::init() {
 	Control *base_control = get_editor_interface()->get_base_control();
 

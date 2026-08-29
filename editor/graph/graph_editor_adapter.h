@@ -6,8 +6,8 @@
 
 namespace voxel {
 
-// To workaround some legacy differences between graph types, so that the graph editor can offer the same features when
-// editing either. Eventually we should refactor things so these differences go away.
+// 用于绕开图形类型之间的一些历史遗留差异，以便图形编辑器在编辑任何一种时
+// 都能提供相同的功能。最终我们应该重构这些代码，让这些差异消失。
 struct GraphEditorAdapter {
 	Ref<VoxelGeneratorGraph> generator;
 	Ref<pg::VoxelGraphFunction> graph;
@@ -64,10 +64,10 @@ struct GraphEditorAdapter {
 			}
 		}
 
-		// Output is thrown away, we just want to run to get intermediates.
-		// We also don't constrain processing buffer size so generation happens in one pass and we can read full-size
-		// intermediates... but that's not great with big graphs. We should probably allow a way to consume the data
-		// after each pass? Or directly support Preview nodes as outputs?
+		// 输出会被丢弃，我们只是运行以获取中间结果。
+		// 我们也不限制处理缓冲区的大小，这样生成可以在一次遍历中完成，并且我们可以读取完整大小的
+		// 中间结果……但这对于大型图形并不好。我们或许应该允许一种方式在
+		// 每遍之后消费数据？或者直接将 Preview 节点作为输出支持？
 		graph->execute(to_span_const(input_buffers), Span<Span<float>>(), x.size(), true);
 	}
 

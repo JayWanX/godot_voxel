@@ -36,25 +36,25 @@ namespace godot {
 class VoxelBuffer;
 }
 
-// Non-encoded, generic voxel value.
-// (Voxels stored inside VoxelBuffers are encoded to take less space)
+// 未编码的通用体素值。
+// （存储在 VoxelBuffer 中的体素会被编码以占用更少空间）
 union VoxelSingleValue {
 	uint64_t i;
 	float f;
 };
 
-// Provides access to read-only generated voxels.
-// Must be implemented in a multi-thread-safe way.
+// 提供对只读生成的体素的访问。
+// 必须以多线程安全的方式实现。
 class VoxelGenerator : public Resource {
 	GDCLASS(VoxelGenerator, Resource)
 public:
 	VoxelGenerator();
 
 	struct Result {
-		// Used for block optimization when LOD is used.
-		// If this is `false`, more precise data may be found if a lower LOD index is requested.
-		// If `true`, any block below this LOD are considered to not bring more details or will be the same.
-		// This allows to reduce the number of blocks to load when LOD is used.
+		// 用于在使用 LOD 时对数据块进行优化。
+		// 如果为 `false`，请求更低的 LOD 索引时可能会找到更精确的数据。
+		// 如果为 `true`，低于该 LOD 的任何数据块都被认为不会带来更多细节，或者与当前相同。
+		// 这有助于在使用 LOD 时减少需要加载的数据块数量。
 		bool max_lod_hint = false;
 	};
 
@@ -74,18 +74,18 @@ public:
 		uint8_t block_size = 0;
 		bool drop_beyond_max_distance = true;
 #ifdef VOXEL_ENABLE_GPU
-		bool use_gpu = false; // This is a hint, if not supported it will just keep using CPU
+		bool use_gpu = false; // 这是一个提示，若不支持则继续使用 CPU
 #endif
 		PriorityDependency priority_dependency;
-		std::shared_ptr<StreamingDependency> stream_dependency; // For saving generator output
-		std::shared_ptr<VoxelData> data; // Just for modifiers
-		std::shared_ptr<AsyncDependencyTracker> tracker; // For async edits
-		std::shared_ptr<VoxelBuffer> voxels; // Optionally re-use a voxel buffer for the result
-		TaskCancellationToken cancellation_token; // For explicit cancellation
+		std::shared_ptr<StreamingDependency> stream_dependency; // 用于保存生成器输出
+		std::shared_ptr<VoxelData> data; // 仅用于 modifiers
+		std::shared_ptr<AsyncDependencyTracker> tracker; // 用于异步编辑
+		std::shared_ptr<VoxelBuffer> voxels; // 可选，为结果复用一个体素缓冲区
+		TaskCancellationToken cancellation_token; // 用于显式取消
 	};
 
-	// Creates a threaded task that will use the generator asynchronously to generate a block that will be returned to
-	// the requesting volume.
+	// 创建一个线程任务，该任务将异步使用生成器来生成一个数据块，并把结果返回给
+	// 请求它的 volume。
 	virtual IThreadedTask *create_block_task(const BlockTaskParams &params) const;
 
 	virtual bool supports_single_generation() const {
@@ -100,7 +100,7 @@ public:
 		return true;
 	}
 
-	// TODO Not sure if it's a good API regarding performance
+	// TODO 不确定这个 API 在性能方面是否合适
 	virtual VoxelSingleValue generate_single(Vector3i pos, unsigned int channel);
 
 	virtual void generate_series(
@@ -113,13 +113,12 @@ public:
 			Vector3f max_pos
 	);
 
-	// Declares the channels this generator will use
+	// 声明该生成器将使用的通道
 	virtual int get_used_channels_mask() const;
 
 #ifdef VOXEL_ENABLE_GPU
-	// GPU support
-	// The way this support works is by providing a shader and parameters that can produce the same results as the CPU
-	// version of the generator.
+	// GPU 支持
+	// 该支持的工作方式是提供着色器及参数，使其能够产生与 CPU 版本生成器相同的结果。
 
 	virtual bool supports_shaders() const {
 		return false;
@@ -136,15 +135,15 @@ public:
 	};
 
 	struct ShaderSourceData {
-		// Source code relevant to the generator only. Does not contain interface blocks (uniforms), because they may be
-		// generated depending on where the code is integrated.
+		// 仅与生成器相关的源代码。不包含接口块（uniforms），因为它们可能会
+		// 根据代码集成的位置而生成。
 		String glsl;
-		// Associated resources
+		// 关联的资源
 		StdVector<ShaderParameter> parameters;
 
-		// The generated source will contain a `generate` function starting with a `vec3 position` argument,
-		// followed by outputs like `out float out_sd, ...`, which determines what will be returned by the
-		// compute shader.
+		// 生成的源码将包含一个以 `vec3 position` 参数开头的 `generate` 函数，
+		// 其后是诸如 `out float out_sd, ...` 之类的输出，这决定了计算着色器
+		// 将返回什么。
 		StdVector<ShaderOutput> outputs;
 	};
 
@@ -156,40 +155,40 @@ public:
 	std::shared_ptr<ComputeShader> get_detail_rendering_shader();
 	std::shared_ptr<ComputeShaderParameters> get_detail_rendering_shader_parameters();
 	std::shared_ptr<ComputeShader> get_block_rendering_shader();
-	// TODO Shouldn't these parameters be shared for each shader type?
+	// TODO 这些参数难道不应该按每种着色器类型分别共享吗？
 	std::shared_ptr<ComputeShaderParameters> get_block_rendering_shader_parameters();
 	std::shared_ptr<ShaderOutputs> get_block_rendering_shader_outputs();
 	void compile_shaders();
-	// Drops currently compiled shaders if any, so that they get recompiled when they are needed again
+	// 若有已编译的着色器则将其丢弃，以便在再次需要时重新编译
 	void invalidate_shaders();
 #endif
 
-	// Requests to generate a broad result, which is supposed to be faster to obtain than full generation.
-	// If it returns true, the returned block may be used as if it was a result from `generate_block`.
-	// If it returns false, no block is returned and full generation should be used.
-	// Usually, `generate_block` can do this anyways internally, but in some cases like GPU generation it may be used
-	// to avoid sending work to the graphics card.
+	// 请求生成一个宽阶段（broad）结果，它应比完整生成更快获得。
+	// 如果返回 true，返回的数据块可以当作 `generate_block` 的结果来使用。
+	// 如果返回 false，则不返回任何数据块，应使用完整生成。
+	// 通常 `generate_block` 内部也能做到这一点，但在某些情况下（如 GPU 生成）它可能
+	// 被用来避免向显卡发送工作。
 	virtual bool generate_broad_block(VoxelQueryData input);
 
-	// Caching API
+	// 缓存 API
 	//
-	// Some generators might use an internal cache to optimize performance. The following methods provide some info for
-	// the generator to manage the lifetime of the cache.
-	// VoxelTerrain only at the moment.
+	// 某些生成器可能使用内部缓存来优化性能。以下方法为生成器管理缓存的
+	// 生命周期提供一些信息。
+	// 目前仅用于 VoxelTerrain。
 
-	// Must be called when a viewer gets paired, moved, or unpaired from the terrain.
-	// Pairing should send an empty previous box.
-	// Moving should send the the previous box and new box.
-	// Unpairing should send an empty box as the current box.
+	// 当观察者与地形配对、移动或取消配对时，必须调用此方法。
+	// 配对时应发送一个空的先前 box。
+	// 移动时应发送先前的 box 和新的 box。
+	// 取消配对时应发送一个空 box 作为当前 box。
 	virtual void process_viewer_diff(ViewerID viewer_id, Box3i p_requested_box, Box3i p_prev_requested_box);
 
 	virtual void clear_cache();
 
-	// Hints whether the stream's functions can be called. Mainly used in case of script implementations, to avoid error
-	// spams.
+	// 提示流（stream）的函数是否可以调用。主要用于脚本实现的情况，以避免
+	// 错误刷屏。
 	virtual bool is_runnable() const;
 
-	// Editor
+	// 编辑器
 
 #ifdef TOOLS_ENABLED
 	virtual void get_configuration_warnings(PackedStringArray &out_warnings) const {}

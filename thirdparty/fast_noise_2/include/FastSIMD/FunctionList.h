@@ -23,10 +23,10 @@
 #endif
 
 /// <summary>
-/// Number of 32 width elements that will fit into a vector
+/// 可容纳进一个向量的 32 位宽元素数量
 /// </summary>
 /// <remarks>
-/// Compile time constant
+/// 编译时常量
 /// </remarks>
 /// <code>
 /// size_t FS_Size_32()
@@ -34,10 +34,10 @@
 #define FS_Size_32() FS::template VectorSize<sizeof( int32_t )>
 
 
-// Vector builders
+// 向量构建器
 
 /// <summary>
-/// Vector with values incrementing from 0 based on element index {0, 1, 2, 3...}
+/// 依据元素索引从 0 递增的向量 {0, 1, 2, 3...}
 /// </summary>
 /// <code>
 /// example: int32v::FS_Incremented()
@@ -48,10 +48,10 @@
 // Load
 
 /// <summary>
-/// Copies sizeof(float32v) bytes from given memory location into float32v
+/// 将给定内存位置的 sizeof(float32v) 字节复制进 float32v
 /// </summary>
 /// <remarks>
-/// Memory does not need to be aligned
+/// 内存不需要对齐
 /// </remarks>
 /// <code>
 /// float32v FS_Load_f32( void const* ptr )
@@ -60,10 +60,10 @@
 
 
 /// <summary>
-/// Copies sizeof(int32v) bytes from given memory location into int32v
+/// 将给定内存位置的 sizeof(int32v) 字节复制进 int32v
 /// </summary>
 /// <remarks>
-/// Memory does not need to be aligned
+/// 内存不需要对齐
 /// </remarks>
 /// <code>
 /// int32v FS_Load_i32( void const* ptr )
@@ -74,7 +74,7 @@
 // Store
 
 /// <summary>
-/// Copies all elements of float32v to given memory location
+/// 将 float32v 的所有元素复制到给定内存位置
 /// </summary>
 /// <code>
 /// void FS_Store_f32( void* ptr, float32v f )
@@ -82,7 +82,7 @@
 #define FS_Store_f32( ... ) FS::Store_f32( __VA_ARGS__ )
 
 /// <summary>
-/// Copies all elements of int32v to given memory location
+/// 将 int32v 的所有元素复制到给定内存位置
 /// </summary>
 /// <code>
 /// void FS_Store_i32( void* ptr, int32v i )
@@ -93,7 +93,7 @@
 // Extract
 
 /// <summary>
-/// Retreive element 0 from vector
+/// 从 vector 中取出元素 0
 /// </summary>
 /// <code>
 /// float FS_Extract0_f32( float32v f )
@@ -101,7 +101,7 @@
 #define FS_Extract0_f32( ... ) FS::Extract0_f32( __VA_ARGS__ )
 
 /// <summary>
-/// Retreive element 0 from vector
+/// 从 vector 中取出元素 0
 /// </summary>
 /// <code>
 /// int32_t FS_Extract0_i32( int32v i )
@@ -109,7 +109,7 @@
 #define FS_Extract0_i32( ... ) FS::Extract0_i32( __VA_ARGS__ )
 
 /// <summary>
-/// Retreive element from vector at position
+/// 从 vector 中取出指定位置的元素
 /// </summary>
 /// <code>
 /// float FS_Extract_f32( float32v f, size_t idx )
@@ -117,7 +117,7 @@
 #define FS_Extract_f32( ... ) FS::Extract_f32( __VA_ARGS__ )
 
 /// <summary>
-/// Retreive element from vector at position
+/// 从 vector 中取出指定位置的元素
 /// </summary>
 /// <code>
 /// int32_t FS_Extract_i32( int32v i, size_t idx )
@@ -128,7 +128,7 @@
 // Cast
 
 /// <summary>
-/// Bitwise cast int to float
+/// 按位将 int 强转为 float
 /// </summary>
 /// <code>
 /// float32v FS_Casti32_f32( int32v i )
@@ -136,7 +136,7 @@
 #define FS_Casti32_f32( ... ) FS::Casti32_f32( __VA_ARGS__ )
 
 /// <summary>
-/// Bitwise cast float to int
+/// 按位将 float 强转为 int
 /// </summary>
 /// <code>
 /// int32v FS_Castf32_i32( float32v f )
@@ -147,10 +147,10 @@
 // Convert
 
 /// <summary>
-/// Convert int to float 
+/// 将 int 转换为 float
 /// </summary>
 /// <remarks>
-/// Rounding: truncate
+/// 舍入：截断
 /// </remarks>
 /// <code>
 /// float32v FS_Converti32_f32( int32v i )
@@ -158,7 +158,7 @@
 #define FS_Converti32_f32( ... ) FS::Converti32_f32( __VA_ARGS__ )
 
 /// <summary>
-/// Convert float to int
+/// 将 float 转换为 int
 /// </summary>
 /// <code>
 /// int32v FS_Convertf32_i32( float32v f )
@@ -185,7 +185,7 @@
 #define FS_Select_i32( ... ) FS::Select_i32( __VA_ARGS__ )
 
 
-// Min, Max
+// Min、Max
 
 /// <summary>
 /// return ( a < b ? a : b )
@@ -282,7 +282,7 @@
 #define FS_Abs_i32( ... ) FS::Abs_i32( __VA_ARGS__ )
 
 
-// Float math
+// 浮点运算
 
 /// <summary>
 /// return sqrt( a )
@@ -308,13 +308,13 @@
 /// </code>
 #define FS_Reciprocal_f32( ... ) FS::Reciprocal_f32( __VA_ARGS__ )
 
-// Floor, Ceil, Round
+// Floor、Ceil、Round
 
 /// <summary>
 /// return floor( a )
 /// </summary>
 /// <remarks>
-/// Rounding: Towards negative infinity
+/// 舍入：向负无穷
 /// </remarks>
 /// <code>
 /// float32v FS_Floor_f32( float32v a )
@@ -325,7 +325,7 @@
 /// return ceil( a )
 /// </summary>
 /// <remarks>
-/// Rounding: Towards positive infinity
+/// 舍入：向正无穷
 /// </remarks>
 /// <code>
 /// float32v FS_Ceil_f32( float32v a )
@@ -336,7 +336,7 @@
 /// return round( a )
 /// </summary>
 /// <remarks>
-/// Rounding: Banker's rounding
+/// 舍入：银行家舍入
 /// </remarks>
 /// <code>
 /// float32v FS_Round_f32( float32v a )
@@ -386,7 +386,7 @@
 /// return exp( a )
 /// </summary>
 /// <remarks>
-/// a will be clamped to -88.376, 88.376
+/// a 将被钳制到 -88.376, 88.376
 /// </remarks>
 /// <code>
 /// float32v FS_Exp_f32( float32v a )
@@ -456,7 +456,7 @@
 #define FS_FNMulAdd_f32( ... ) FastSIMD::FNMulAdd_f32<FS>( __VA_ARGS__ )
 
 
-// Masked float
+// 掩码 float
 
 /// <summary>
 /// return ( m ? (a + b) : a )
@@ -483,7 +483,7 @@
 #define FS_MaskedMul_f32( ... ) FastSIMD::MaskedMul_f32<FS>( __VA_ARGS__ )
 
 
-// Masked int32
+// 掩码 int32
 
 /// <summary>
 /// return ( m ? (a + b) : a )
@@ -526,7 +526,7 @@
 #define FS_MaskedDecrement_i32( ... ) FastSIMD::MaskedDecrement_i32<FS>( __VA_ARGS__ )
 
 
-// NMasked float
+// 非掩码 float
 
 /// <summary>
 /// return ( m ? a : (a + b) )
@@ -553,7 +553,7 @@
 #define FS_NMaskedMul_f32( ... ) FastSIMD::NMaskedMul_f32<FS>( __VA_ARGS__ )
 
 
-// NMasked int32
+// 非掩码 int32
 
 /// <summary>
 /// return ( m ? a : (a + b) )
@@ -596,7 +596,7 @@ namespace FastSIMD
         return -(a * b) + c;
     }
 
-    // Masked float
+    // 掩码 float
 
     template<typename FS>
     FS_INLINE typename FS::float32v MaskedAdd_f32( typename FS::float32v a, typename FS::float32v b, typename FS::mask32v m )
@@ -616,7 +616,7 @@ namespace FastSIMD
         return a * FS::Mask_f32( b, m );
     }
 
-    // Masked int32
+    // 掩码 int32
 
     template<typename FS>
     FS_INLINE typename FS::int32v MaskedAdd_i32( typename FS::int32v a, typename FS::int32v b, typename FS::mask32v m )
@@ -636,7 +636,7 @@ namespace FastSIMD
         return a * FS::Mask_i32( b, m );
     }
 
-    // NMasked float
+    // 非掩码 float
 
     template<typename FS>
     FS_INLINE typename FS::float32v NMaskedAdd_f32( typename FS::float32v a, typename FS::float32v b, typename FS::mask32v m )
@@ -656,7 +656,7 @@ namespace FastSIMD
         return a * FS::NMask_f32( b, m );
     }
 
-    // NMasked int32
+    // 非掩码 int32
 
     template<typename FS>
     FS_INLINE typename FS::int32v NMaskedAdd_i32( typename FS::int32v a, typename FS::int32v b, typename FS::mask32v m )
@@ -781,7 +781,7 @@ namespace FastSIMD
 
         /* build 2^n */
         int32v i = FS_Convertf32_i32( fx );
-        // another two AVX2 instructions
+        // 另外两条 AVX2 指令
         i += int32v( 0x7f );
         i <<= 23;
         float32v pow2n = FS_Casti32_f32( i );
@@ -800,14 +800,14 @@ namespace FastSIMD
 
         x = FS_Max_f32( x, FS_Casti32_f32( int32v( 0x00800000 ) ) );  /* cut off denormalized stuff */
 
-        // can be done with AVX2
+        // 可用 AVX2 完成
         int32v i = FS_BitwiseShiftRightZX_i32( FS_Castf32_i32( x ), 23 );
 
         /* keep only the fractional part */
         x &= FS_Casti32_f32( int32v( ~0x7f800000 ) );
         x |= float32v( 0.5f );
 
-        // this is again another AVX2 instruction
+        // 这又是一条 AVX2 指令
         i -= int32v( 0x7f );
         float32v e = FS_Converti32_f32( i );
 

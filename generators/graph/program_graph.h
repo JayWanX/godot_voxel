@@ -13,13 +13,13 @@
 
 namespace voxel {
 
-// Generic graph representing a program
+// 表示程序的通用图
 class ProgramGraph : NonCopyable {
 public:
 	static const uint32_t NULL_ID = 0;
 	static const uint32_t NULL_INDEX = -1;
 
-	// TODO Use typedef to make things explicit
+	// TODO 使用 typedef 使内容更明确
 	// typedef uint32_t NodeID;
 
 	struct PortLocation {
@@ -34,9 +34,9 @@ public:
 
 	struct Port {
 		StdVector<PortLocation> connections;
-		// Dynamic ports are ports that are not inherited from `type_id`, they exist solely for this node.
-		// Because it can't be deduced from `type_id`, they must be given a name.
-		// Initially needed for expression nodes.
+		// 动态端口不是从 `type_id` 继承而来的端口，它们仅为此节点而存在。
+		// 由于无法从 `type_id` 推断，因此必须为其命名。
+		// 最初是表达式节点所需要的。
 		StdString dynamic_name;
 		uint32_t autoconnect_hint = 0;
 
@@ -48,15 +48,15 @@ public:
 	struct Node {
 		uint32_t id;
 		uint32_t type_id;
-		StringName name; // User-defined
+		StringName name; // 用户自定义
 		Vector2 gui_position;
-		Vector2 gui_size; // Used on resizable nodes
+		Vector2 gui_size; // 用于可调整大小的节点
 		StdVector<Port> inputs;
 		StdVector<Port> outputs;
 		StdVector<Variant> params;
 		StdVector<Variant> default_inputs;
-		// When enabled, all disconnected inputs will automatically connect to a commonly used node when the graph is
-		// compiled. If not enabled, default input values will be used instead.
+		// 启用后，编译图时所有未连接的输入都会自动连接到常用的节点。
+		// 如果未启用，则将改用默认输入值。
 		bool autoconnect_default_inputs = false;
 
 		uint32_t find_input_connection(PortLocation src, uint32_t input_port_index) const;
@@ -75,10 +75,10 @@ public:
 
 	bool is_connected(PortLocation src, PortLocation dst) const;
 
-	// Checks if the specified connection can be created
+	// 检查是否可以创建指定的连接
 	bool can_connect(PortLocation src, PortLocation dst) const;
 
-	// Checks if the specified connection is valid (without considering existing connections)
+	// 检查指定的连接是否有效（不考虑现有连接）
 	bool is_valid_connection(PortLocation src, PortLocation dst) const;
 
 	void connect(PortLocation src, PortLocation dst);
@@ -135,9 +135,9 @@ public:
 	void get_node_ids(StdVector<uint32_t> &node_ids) const;
 	// void get_connections_from_and_to(StdVector<ProgramGraph::Connection> &connections, uint32_t node_id) const;
 
-	// Finds first node having the given name and returns its ID. Returns NULL_ID if not found.
+	// 查找具有给定名称的第一个节点并返回其 ID。如果未找到则返回 NULL_ID。
 	uint32_t find_node_by_name(StringName name) const;
-	// Finds first node having the given type and returns its ID. Returns NULL_ID if not found.
+	// 查找具有给定类型的第一个节点并返回其 ID。如果未找到则返回 NULL_ID。
 	uint32_t find_node_by_type(uint32_t type_id) const;
 
 	uint32_t generate_node_id();
@@ -157,7 +157,7 @@ inline bool operator==(const ProgramGraph::PortLocation &a, const ProgramGraph::
 	return a.node_id == b.node_id && a.port_index == b.port_index;
 }
 
-// For Godot
+// 供 Godot 使用
 struct ProgramGraphPortLocationHasher {
 	static inline uint32_t hash(const ProgramGraph::PortLocation &v) {
 		const uint32_t hash = hash_djb2_one_32(v.node_id);
@@ -167,7 +167,7 @@ struct ProgramGraphPortLocationHasher {
 
 } // namespace voxel
 
-// For STL
+// 用于 STL
 namespace std {
 template <>
 struct hash<voxel::ProgramGraph::PortLocation> {

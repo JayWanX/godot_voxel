@@ -22,12 +22,12 @@ VoxelToolTerrain::VoxelToolTerrain() {
 VoxelToolTerrain::VoxelToolTerrain(VoxelTerrain *terrain) {
 	ERR_FAIL_COND(terrain == nullptr);
 	_terrain = terrain;
-	// Don't destroy the terrain while a voxel tool still references it
+	// 当体素工具仍引用地形时，不要销毁地形
 }
 
 bool VoxelToolTerrain::is_area_editable(const Box3i &box) const {
 	ERR_FAIL_COND_V(_terrain == nullptr, false);
-	// TODO Take volume bounds into account
+	// TODO 需要考虑体积边界
 	return _terrain->get_storage().is_area_loaded(box);
 }
 
@@ -118,9 +118,9 @@ void VoxelToolTerrain::do_box(Vector3i begin, Vector3i end) {
 	ERR_FAIL_COND(_terrain == nullptr);
 
 	if (get_channel() != VoxelBuffer::CHANNEL_SDF) {
-		// Fallback on generic do_box, which pretty much does a naive fill in the exact boundaries, though it's still
-		// slower than necessary because it uses random access.
-		// TODO Make it so generic ops can do that too without an extra margin and without superfluous calculations
+		// 回退到通用的 do_box，它基本上是在精确边界内进行朴素填充，不过它仍然
+		// 比所需的更慢，因为它使用了随机访问。
+		// TODO 让通用操作也能做到这一点，且不需要额外的边距和多余的计算
 		VoxelTool::do_box(begin, end);
 		return;
 	}
@@ -270,9 +270,9 @@ Ref<VoxelBlockyLibraryBase> get_voxel_library(const VoxelTerrain &terrain) {
 }
 } // namespace
 
-// TODO This function snaps the given AABB to blocks, this is not intuitive. Should figure out a way to respect the
-// area. Executes a function on random voxels in the provided area, using the type channel. This allows to implement
-// slow "natural" cellular automata behavior, as can be seen in Minecraft.
+// TODO 这个函数将给定 AABB 对齐到区块，这不够直观。应该想办法尊重
+// 区域。它对所提供的区域内随机体素执行函数（使用 type 通道），从而可以实现
+// 如 Minecraft 中那样缓慢的“自然”元胞自动机行为。
 void VoxelToolTerrain::run_blocky_random_tick(
 		const AABB voxel_area,
 		const int voxel_count,
@@ -326,9 +326,9 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 
 		const Vector3i block_origin = block_pos * data.get_block_size();
 		const Box3i rel_voxel_box(voxel_box.position - block_origin, voxel_box.size);
-		// TODO Worth it locking blocks for metadata?
-		// For read or write? We'd have to specify as argument and trust the user... since metadata can contain
-		// reference types.
+		// TODO 为元数据锁定区块是否值得？
+		// 用于读取还是写入？我们必须将其作为参数指定并信任用户……因为元数据可能包含
+		// 引用类型。
 
 		voxels_ptr->for_each_voxel_metadata_in_area(
 				rel_voxel_box, [&callback, block_origin](Vector3i rel_pos, const VoxelMetadata &meta) {
@@ -338,7 +338,7 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 					const Variant key_v = key;
 					const Variant *args[2] = { &key_v, &v };
 					Callable::CallError err;
-					Variant retval; // We don't care about the return value, Callable API requires it
+					Variant retval; // 我们并不关心返回值，但 Callable API 要求提供它
 					callback.callp(args, 2, retval, err);
 
 					ERR_FAIL_COND_MSG(

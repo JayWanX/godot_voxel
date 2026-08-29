@@ -5,9 +5,9 @@
 #include "godot/core/version.h"
 
 #if GODOT_VERSION_MAJOR >= 4 && GODOT_VERSION_MINOR >= 6
-// Godot supports Tracy, but doesn't define global preprocessor symbols to let us detect it, instead it defines them in
-// generated headers. This is to avoid recompiling the whole engine, as not every file uses it. But then, we have to
-// include that header, regardless of profiling being enabled or not.
+// Godot 支持 Tracy，但没有定义全局预处理宏来让我们检测它，而是在
+// 生成的头文件中定义。这是为了避免重新编译整个引擎，因为并非每个文件都用到它。但这样一来，我们不得不
+// 包含那个头文件，无论是否启用了性能分析。
 #include "core/profiling/profiling.h"
 #endif
 
@@ -25,7 +25,7 @@
 #ifdef GODOT_USE_TRACY
 #define VOXEL_PROFILE_MARK_FRAME()
 #else
-// Only define our own frame tracking when Tracy is enabled from our own integration instead of Godot's.
+// 仅当 Tracy 由我们自己的集成（而非 Godot 的）启用时，才定义我们自己的帧跟踪。
 #define VOXEL_PROFILE_MARK_FRAME() FrameMark
 #endif
 
@@ -37,21 +37,21 @@
 #else
 
 #define VOXEL_PROFILE_SCOPE()
-// Name must be static const char* (usually string litteral)
+// 名称必须是 static const char*（通常是字符串字面量）
 #define VOXEL_PROFILE_SCOPE_NAMED(name)
 #define VOXEL_PROFILE_MARK_FRAME()
 #define VOXEL_PROFILE_PLOT(name, number)
 #define VOXEL_PROFILE_MESSAGE(message)
-// Name must be const char*. An internal copy will be made so it can be temporary.
-// Size does not include the terminating character.
+// 名称必须是 const char*。内部会创建一份副本，因此它可以作为临时值使用。
+// 大小不包含终止字符。
 #define VOXEL_PROFILE_MESSAGE_DYN(message, size)
-// Name must be const char*. An internal copy will be made so it can be temporary.
+// 名称必须是 const char*。内部会创建一份副本，因此它可以作为临时值使用。
 #define VOXEL_PROFILE_SET_THREAD_NAME(name)
 
 #endif
 
 /*
-To add Tracy support, clone it under thirdparty/tracy, and add the following lines in core/SCsub:
+要添加 Tracy 支持，请将其克隆到 thirdparty/tracy 下，并在 core/SCsub 中添加以下行：
 
 ```
 # tracy library

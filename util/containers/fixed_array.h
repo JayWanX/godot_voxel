@@ -6,13 +6,13 @@
 
 namespace voxel {
 
-// TODO Could use std::array, but due to how Godot compiles,
-// I couldn't find a way to enable boundary checks without failing to link my module with the rest of Godot...
-// See https://github.com/godotengine/godot/issues/31608
+// TODO 本可使用 std::array，但由于 Godot 的编译方式，
+// 我找不到在不导致模块与 Godot 其余部分链接失败的前提下启用边界检查的方法……
+// 参见 https://github.com/godotengine/godot/issues/31608
 template <typename T, unsigned int N>
 class FixedArray {
 public:
-	// TODO Optimization: move semantics
+	// TODO 优化：移动语义
 
 	inline T &operator[](unsigned int i) {
 #ifdef DEBUG_ENABLED
@@ -54,9 +54,9 @@ public:
 	}
 
 #if defined(__GNUC__)
-	// Tells GCC that this function only depends on its arguments (none) and doesn't access `this`.
-	// Workarounds calls to `size()` that sometimes produce a pedantic `maybe-uninitialized` warning,
-	// despite nothing needing initialization, and `this` not even being accessed.
+	// 告诉 GCC 该函数仅依赖于其参数（无）且不访问 `this`。
+	// 规避对 `size()` 的调用有时产生的过于严格的 `maybe-uninitialized` 警告，
+	// 尽管其实无需初始化，且根本未访问 `this`。
 	__attribute__((const))
 #endif
 	inline constexpr unsigned int
@@ -142,8 +142,8 @@ private:
 	T _data[N];
 };
 
-// Fills array with the same value.
-// Not a method because it would not compile with non-copyable types.
+// 用相同的值填充数组。
+// 不是成员函数，否则对不可拷贝类型无法编译。
 template <typename T, unsigned int N>
 inline void fill(FixedArray<T, N> &dst, const T v) {
 	for (unsigned int i = 0; i < dst.size(); ++i) {
@@ -188,14 +188,14 @@ Span<T> to_span(FixedArray<T, N> &a, unsigned int count) {
 	return Span<T>(a.data(), count);
 }
 
-// TODO Deprecate, now Span has a conversion constructor that can allow doing that
+// TODO 弃用，现在 Span 拥有转换构造函数可以实现这一点
 template <typename T, unsigned int N>
 Span<const T> to_span_const(const FixedArray<T, N> &a, unsigned int count) {
 	VOXEL_ASSERT(count <= a.size());
 	return Span<const T>(a.data(), count);
 }
 
-// TODO Deprecate, now Span has a conversion constructor that can allow doing that
+// TODO 弃用，现在 Span 拥有转换构造函数可以实现这一点
 template <typename T, unsigned int N>
 Span<const T> to_span_const(const FixedArray<T, N> &a) {
 	return Span<const T>(a.data(), 0, a.size());

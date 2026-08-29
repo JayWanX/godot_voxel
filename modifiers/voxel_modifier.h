@@ -14,8 +14,8 @@
 namespace voxel {
 
 struct VoxelModifierContext {
-	Span<float> sdf; // Signed distance values to modify
-	Span<const Vector3f> positions; // Positions associated to each signed distance
+	Span<float> sdf; // 待修改的有符号距离（SDF）值
+	Span<const Vector3f> positions; // 与每个有符号距离相关联的位置
 };
 
 struct BaseGPUResources;

@@ -22,8 +22,8 @@ namespace voxel {
 
 class AsyncDependencyTracker;
 
-// Settings and states needed for the multi-threaded part of the update loop of VoxelLodTerrain.
-// See `VoxelLodTerrainUpdateTask` for more info.
+// VoxelLodTerrain 更新循环中多线程部分所需的设置和状态。
+// 更多信息参见 `VoxelLodTerrainUpdateTask`。
 struct VoxelLodTerrainUpdateData {
 	struct TransitionUpdate {
 		Vector3i block_position;
@@ -55,24 +55,24 @@ struct VoxelLodTerrainUpdateData {
 		STREAMING_SYSTEM_CLIPBOX
 	};
 
-	// These values don't change during the update task.
+	// 这些值在更新任务期间不会改变。
 	struct Settings {
-		// Area within which voxels can exist.
-		// Note, these bounds might not be exactly represented. This volume is chunk-based, so the result will be
-		// approximated to the closest chunk.
+		// 体素可以存在的区域。
+		// 注意，这些边界可能无法精确表示。该体积基于数据块，因此结果将
+		// 近似到最近的数据块。
 		// Box3i bounds_in_voxels;
 		// unsigned int lod_count = 0;
 
-		// Distance between a viewer and the end of LOD0. May not be respected exactly, it can be rounded up
+		// 观察者与 LOD0 末端之间的距离。可能不会被精确遵守，会被向上取整
 		float lod_distance = 0.f;
-		// Distance between the end of LOD0 and the end of LOD1, carried over to other LODs
+		// LOD0 末端与 LOD1 末端之间的距离，并延续到其它 LOD
 		float secondary_lod_distance = 0.f;
 		unsigned int view_distance_voxels = 512;
 		StreamingSystem streaming_system = STREAMING_SYSTEM_LEGACY_OCTREE;
 		// bool full_load_mode = false;
-		// If true, try to generate blocks and store them in the data map before posting mesh requests.
-		// If false, meshing will generate non-edited voxels on the fly instead.
-		// If streaming is disabled, this option has no effect.
+		// 若为 true，则尝试生成数据块并在发出网格请求前将它们存储到数据映射中。
+		// 若为 false，则网格化将改为在运行时生成未编辑的体素。
+		// 若流式加载被禁用，此选项不生效。
 		bool cache_generated_blocks = false;
 		bool collision_enabled = true;
 		bool detail_textures_use_gpu = false;
@@ -86,12 +86,12 @@ struct VoxelLodTerrainUpdateData {
 	};
 
 	enum MeshState {
-		MESH_NEVER_UPDATED = 0, // TODO Redundant with MESH_NEED_UPDATE?
+		MESH_NEVER_UPDATED = 0, // TODO 与 MESH_NEED_UPDATE 冗余？
 		MESH_UP_TO_DATE,
-		MESH_NEED_UPDATE, // The mesh is out of date but was not yet scheduled for update
-		MESH_UPDATE_NOT_SENT, // The mesh is out of date and was scheduled for update, but no request have been sent
-							  // yet
-		MESH_UPDATE_SENT // The mesh is out of date, and an update request was sent, pending response
+		MESH_NEED_UPDATE, // 网格已过期，但尚未安排更新
+		MESH_UPDATE_NOT_SENT, // 网格已过期并已安排更新，但请求尚未
+							  // 发出
+		MESH_UPDATE_SENT // 网格已过期，且已发出更新请求，等待响应
 	};
 
 	enum DetailTextureState { //
@@ -104,31 +104,31 @@ struct VoxelLodTerrainUpdateData {
 		std::atomic<MeshState> state;
 		std::atomic<DetailTextureState> detail_texture_state;
 
-		// Refcount here to support multiple viewers, we can't do it on the main thread's mesh map since the
-		// streaming logic is in the update task.
-		// TODO Optimize: this could almost not need to be atomic.
-		// This is an atomic refcount only because the main thread needs to read it when receiving mesh updates. It
-		// could be made non-atomic if mesh updates were handled in the threaded update, but that has a more
-		// implications than making this atomic for now.
+		// 此处使用引用计数以支持多个观察者，由于流式加载逻辑位于更新任务中，
+		// 无法在主线程的网格映射上执行此操作。
+		// TODO 优化：这里几乎可以不需要原子操作。
+		// 之所以使用原子引用计数，只是因为主线程在接收网格更新时需要读取它。若
+		// 网格更新由线程化更新处理，则可以改为非原子，但这样做的
+		// 影响比暂时使用原子计数更多。
 		SafeRefCount mesh_viewers;
 		SafeRefCount collision_viewers;
 
-		// Cancelled when this mesh block is removed, so if tasks are still queued to do work for that block, they
-		// will be cancelled
+		// 当此网格数据块被移除时取消，因此若有任务仍在排队为该数据块工作，
+		// 它们将被取消
 		TaskCancellationToken cancellation_token;
 
-		// Index within the list of meshes to update during one update of the terrain. Used to avoid putting the same
-		// mesh more than once in the list, while allowing to change options after it's been added to the list. Should
-		// reset to -1 after each update (since the list is consumed)
+		// 在单次地形更新期间要更新的网格列表中的索引。用于避免将同一个
+		// 网格多次放入列表，同时允许在加入列表后更改选项。每次更新后应
+		// 重置为 -1（因为列表会被消耗）
 		int update_list_index;
 
 		uint8_t transition_mask;
 		bool visual_active;
 		bool collision_active;
 
-		// Tells whether the first meshing was done since this block was added.
-		// Written by the main thread only, when it receives mesh updates or when it unloads resources.
-		// Read by threaded update to decide when to subdivide LODs.
+		// 表示自该数据块添加以来是否已完成首次网格化。
+		// 仅由主线程写入，在主线程接收网格更新或卸载资源时。
+		// 由线程化更新读取，以决定何时细分 LOD。
 		std::atomic_bool visual_loaded;
 		std::atomic_bool collision_loaded;
 
@@ -146,19 +146,19 @@ struct VoxelLodTerrainUpdateData {
 				collision_loaded(false) {}
 	};
 
-	// Version of the mesh map designed to be mainly used for the threaded update task.
-	// It contains states used to determine when to actually load/unload meshes.
+	// 网格映射的版本，设计主要用于线程化更新任务。
+	// 它包含用于决定何时实际加载/卸载网格的状态。
 	struct MeshMapState {
-		// Values in this map are expected to have stable addresses.
+		// 该映射中的值应具有稳定的地址。
 		StdUnorderedMap<Vector3i, MeshBlockState> map;
-		// Locked for writing when blocks get inserted or removed from the map.
-		// If you need to lock more than one Lod, always do so in increasing order, to avoid deadlocks.
-		// IMPORTANT:
-		// - Only the update task will add and remove blocks from this map.
-		// - Threads outside the update task must never add or remove blocks to the map (even with locking),
-		//   unless the task is not running in parallel.
-		// - Threads outside the update task must always lock it, unless the update task isn't running.
-		// - The update task doesn't need to lock it, unless when adding or removing blocks.
+		// 当数据块被插入或从映射中移除时，写入需加锁。
+		// 若需同时锁定多个 LOD，务必按递增顺序锁定，以避免死锁。
+		// 重要提示：
+		// - 只有更新任务会向此映射添加和移除数据块。
+		// - 更新任务之外的线程绝不能向映射添加或移除数据块（即使加锁也不行），
+		//   除非该任务不是并行运行的。
+		// - 更新任务之外的线程必须始终对其加锁，除非更新任务未在运行。
+		// - 更新任务无需对其加锁，除非在添加或移除数据块时。
 		RWLock map_lock;
 	};
 
@@ -178,34 +178,34 @@ struct VoxelLodTerrainUpdateData {
 		Vector3i position;
 	};
 
-	// Each LOD works in a set of coordinates spanning 2x more voxels the higher their index is
+	// 每个 LOD 工作在一组坐标中，其索引越高，覆盖的体素范围为其 2 倍
 	struct Lod {
-		// Keeping track of asynchronously loading blocks so we don't try to redundantly load them
+		// 跟踪正在异步加载的数据块，以免重复加载
 		StdUnorderedMap<Vector3i, LoadingDataBlock> loading_blocks;
 		BinaryMutex loading_blocks_mutex;
 
-		// Blocks waiting to be saved after they got unloaded. This is to allow reloading them properly if a viewer
-		// needs them again before they even got saved. Items in this cache get removed when they are saved. Needs to be
-		// protected by mutex because the saved notification is received on the main thread at the moment.
+		// 卸载后等待保存的数据块。这是为了在观察者在它们保存完成前
+		// 再次需要它们时能正确重新加载。此缓存中的条目在保存后被移除。需要
+		// 用互斥锁保护，因为保存通知目前是在主线程上接收的。
 		StdUnorderedMap<Vector3i, std::shared_ptr<VoxelBuffer>> unloaded_saving_blocks;
 		BinaryMutex unloaded_saving_blocks_mutex;
-		// Blocks that will be loaded from the saving cache as if a loading task completed next time the terrain
-		// updates. It won't run while the threaded update runs so no locking is needed.
+		// 下次地形更新时，将像加载任务完成一样从保存缓存中加载的数据块。
+		// 它在线程化更新运行期间不会运行，因此无需加锁。
 		StdVector<QuickReloadingBlock> quick_reloading_blocks;
 
-		// These are relative to this LOD, in block coordinates
+		// 这些相对于此 LOD，以数据块坐标表示
 		Vector3i last_viewer_data_block_pos;
 		int last_view_distance_data_blocks = 0;
 
 		MeshMapState mesh_map_state;
 
-		// Positions of mesh blocks that will be scheduled for update next time the update task runs.
+		// 下次更新任务运行时将被安排更新的网格数据块位置。
 		StdVector<MeshToUpdate> mesh_blocks_pending_update;
 		Vector3i last_viewer_mesh_block_pos;
 		int last_view_distance_mesh_blocks = 0;
 
-		// Deferred outputs to main thread. Should only be read once the task is finished, so no need to lock.
-		// TODO These output actions are not particularly serialized, that might cause issues (havent so far).
+		// 延迟输出到主线程。任务结束后才能读取，因此无需加锁。
+		// TODO 这些输出操作并未特别序列化，可能会引起问题（目前尚未发生）。
 		StdVector<Vector3i> mesh_blocks_to_unload;
 		StdVector<TransitionUpdate> mesh_blocks_to_update_transitions;
 		StdVector<Vector3i> mesh_blocks_to_activate_visuals;
@@ -244,22 +244,22 @@ struct VoxelLodTerrainUpdateData {
 	};
 
 	struct OctreeStreamingState {
-		// This terrain type is a sparse grid of octrees.
-		// Indexed by a grid coordinate whose step is the size of the highest-LOD block.
-		// Not using a pointer because Map storage is stable.
-		// TODO Optimization: could be replaced with a grid data structure
+		// 这种地形类型是一个稀疏的八叉树网格。
+		// 通过网格坐标索引，其步长是最高 LOD 数据块的大小。
+		// 不使用指针，因为 Map 存储是稳定的。
+		// TODO 优化：可以用网格数据结构替换
 		StdMap<Vector3i, OctreeItem> lod_octrees;
 		Box3i last_octree_region_box;
 		Vector3i local_viewer_pos_previous_octree_update;
 
-		// Tells if there were nodes that needed to split or merge but could not due to pending dependencies.
-		// This affects whether octree streaming will need to be processed again on the next update.
+		// 表示是否存在需要分裂或合并但由于挂起的依赖而无法执行的节点。
+		// 这影响是否需要在下次更新时再次处理八叉树流式加载。
 		bool had_blocked_octree_nodes_previous_update = false;
 
 		bool force_update_octrees_next_update = false;
 	};
 
-	// Paired viewers are VoxelViewers which intersect with the boundaries of the volume
+	// 配对观察者是指与体积边界相交的 VoxelViewer
 	struct PairedViewer {
 		struct Distances {
 			unsigned int horizontal = 0;
@@ -268,7 +268,7 @@ struct VoxelLodTerrainUpdateData {
 		struct State {
 			Vector3i local_position_voxels;
 
-			// In block coordinates
+			// 以数据块坐标表示
 			FixedArray<Box3i, constants::MAX_LOD> data_box_per_lod;
 			FixedArray<Box3i, constants::MAX_LOD> mesh_box_per_lod;
 
@@ -294,33 +294,33 @@ struct VoxelLodTerrainUpdateData {
 		// int lod_distance_in_data_chunks_previous_update = 0;
 		// int lod_distance_in_mesh_chunks_previous_update = 0;
 
-		// Written by main thread when data blocks are received.
-		// Read by update thread to trigger meshing.
+		// 主线程在收到数据块时写入。
+		// 更新线程读取以触发网格化。
 		StdVector<BlockLocation> loaded_data_blocks;
 		BinaryMutex loaded_data_blocks_mutex;
 
-		// Written by main thread when mesh blocks are received (and there was previously no mesh).
-		// Read by update thread to trigger visibility changes.
+		// 主线程在收到网格数据块时写入（且之前没有网格）。
+		// 更新线程读取以触发可见性变化。
 		StdVector<LoadedMeshBlockEvent> loaded_mesh_blocks;
 		BinaryMutex loaded_mesh_blocks_mutex;
 	};
 
 	struct EditNotificationInputs {
-		// Entry point for notifying data changes, which will cause data LODs and mesh updates.
-		// Contains blocks that were edited and need their LOD counterparts to be updated.
-		// Scheduling is only done at LOD0 because it is the only editable LOD.
+		// 通知数据变化的入口，将导致数据 LOD 和网格更新。
+		// 包含被编辑且需要更新其对应 LOD 版本的数据块。
+		// 仅在 LOD0 上安排调度，因为它是唯一可编辑的 LOD。
 
-		// Used specifically for lodding voxels
+		// 专门用于生成体素的低 LOD 版本
 		StdVector<Vector3i> edited_blocks_lod0;
-		// Used specifically to update meshes
-		// TODO Maybe we could use only that? The reason we have edited blocks separately is because edits might affect
-		// only specific blocks and not the full area
+		// 专门用于更新网格
+		// TODO 也许我们可以只使用这一个？之所以单独维护已编辑数据块，是因为编辑可能只影响
+		// 特定数据块，而不影响整个区域
 		StdVector<Box3i> edited_voxel_areas_lod0;
 
 		BinaryMutex mutex;
 	};
 
-	// Data modified by the update task
+	// 由更新任务修改的数据
 	struct State {
 		OctreeStreamingState octree_streaming;
 		ClipboxStreamingState clipbox_streaming;
@@ -333,27 +333,27 @@ struct VoxelLodTerrainUpdateData {
 		BinaryMutex pending_async_edits_mutex;
 		StdVector<RunningAsyncEdit> running_async_edits;
 
-		// Areas where generated stuff has changed. Similar to an edit, but non-destructive.
+		// 生成内容发生变化的区域。类似于编辑，但非破坏性。
 		StdVector<Box3i> changed_generated_areas;
 		BinaryMutex changed_generated_areas_mutex;
 
 		Stats stats;
 	};
 
-	// Set to true when the update task is finished
+	// 更新任务完成时设为 true
 	std::atomic_bool task_is_complete = { true };
-	// Will be locked as long as the update task is running.
+	// 更新任务运行期间将保持锁定。
 	BinaryMutex completion_mutex;
 
 	Settings settings;
 	State state;
 
-	// Copy of all viewers, since accessing them directly in VoxelEngine is not thread safe at the moment
+	// 所有观察者的副本，因为当前在 VoxelEngine 中直接访问它们并非线程安全
 	StdVector<std::pair<ViewerID, VoxelEngine::Viewer>> viewers;
 
-	// After this call, no locking is necessary, as no other thread should be using the data.
-	// However it can stall for longer, so prefer using it when doing structural changes, such as changing LOD count,
-	// LOD distances, or the way the update logic runs.
+	// 此调用之后无需加锁，因为没有其它线程应再使用该数据。
+	// 但它可能阻塞更长时间，因此在做结构性更改（如更改 LOD 数量、
+	// LOD 距离或更新逻辑的运行方式）时优先使用。
 	void wait_for_end_of_task() {
 		MutexLock lock(completion_mutex);
 	}

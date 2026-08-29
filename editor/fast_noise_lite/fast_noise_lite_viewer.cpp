@@ -141,7 +141,7 @@ void Voxel_FastNoiseLiteViewer::_notification(int p_what) {
 	}
 }
 
-// TODO Use thread?
+// TODO 使用线程？
 void Voxel_FastNoiseLiteViewer::update_preview() {
 	const Vector2i preview_size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 
@@ -152,7 +152,7 @@ void Voxel_FastNoiseLiteViewer::update_preview() {
 
 		for (int y = 0; y < preview_size.y; ++y) {
 			for (int x = 0; x < preview_size.x; ++x) {
-				// Assuming -1..1 output. Some noise types can have different range though.
+				// 假设输出范围为 -1..1。不过某些噪声类型的范围可能不同。
 				const float v = _noise->get_noise_2d(x, y);
 				const float g = 0.5f * v + 0.5f;
 				im->set_pixel(x, y, Color(g, g, g));

@@ -7,10 +7,10 @@
 
 namespace voxel::math {
 
-// Signed-distance-field functions.
-// For more, see https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+// 有符号距离场（SDF）函数。
+// 更多信息，参见 https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 
-// TODO Use `float`, or templatize SDF values. Doubles may prevent some SIMD optimizations.
+// TODO 使用 `float`，或将 SDF 值模板化。double 可能妨碍部分 SIMD 优化。
 
 template <typename T>
 inline T sdf_box(const Vector3T<T> pos, const Vector3T<T> extents) {
@@ -58,12 +58,12 @@ inline IntervalT<T> sdf_torus(
 	return get_length(qx, y) - r1;
 }
 
-// Note: calculate `plane_d` as `dot(plane_normal, point_in_plane)`
+// 注意：将 `plane_d` 计算为 `dot(plane_normal, point_in_plane)`
 template <typename T>
 inline T sdf_plane(const Vector3T<T> pos, const Vector3T<T> plane_normal, const T plane_d) {
-	// On Inigo's website it's a `+h`, but it seems to be backward because then if a plane has normal (0,1,0) and height
-	// 1, a point at (0,1,0) will give a dot of 1, + height will be 2, which is wrong because the expected SDF here
-	// would be 0.
+	// 在 Inigo 的网站上使用的是 `+h`，但这似乎反了：因为如果平面的法线为 (0,1,0) 且高度为
+	// 1，点 (0,1,0) 的 dot 为 1，加上高度后变成 2，这是错误的，因为此处期望的 SDF
+	// 应为 0。
 	return dot(pos, plane_normal) - plane_d;
 }
 
@@ -72,7 +72,7 @@ inline T sdf_union(const T a, const T b) {
 	return min(a, b);
 }
 
-// Subtracts SDF b from SDF a
+// 从 SDF a 中减去 SDF b
 template <typename T>
 inline T sdf_subtract(const T a, const T b) {
 	return max(a, -b);
@@ -84,7 +84,7 @@ inline T sdf_smooth_union(const T a, const T b, const T s) {
 	return lerp(b, a, h) - s * h * (T(1) - h);
 }
 
-// Inverted a and b because it subtracts SDF a from SDF b
+// 交换了 a 与 b，因为该函数是从 SDF b 中减去 SDF a
 template <typename T>
 inline T sdf_smooth_subtract(T b, T a, T s) {
 	const T h = clamp(T(0.5) - T(0.5) * (b + a) / s, T(0), T(1));
@@ -96,7 +96,7 @@ inline IntervalT<T> sdf_union(const IntervalT<T> a, const IntervalT<T> b) {
 	return min_interval(a, b);
 }
 
-// Does a - b
+// 计算 a - b
 template <typename T>
 inline IntervalT<T> sdf_subtract(const IntervalT<T> a, const IntervalT<T> b) {
 	return max_interval(a, -b);
@@ -104,12 +104,12 @@ inline IntervalT<T> sdf_subtract(const IntervalT<T> a, const IntervalT<T> b) {
 
 template <typename T, typename F>
 inline IntervalT<T> sdf_smooth_op(const IntervalT<T> b, const IntervalT<T> a, T s, F smooth_op_func) {
-	// Smooth union and subtract are a generalization of `min(a, b)` and `max(-a, b)`, with a smooth junction.
-	// That junction runs in a diagonal crossing zero (with equation `y = -x`).
-	// Areas on the two sides of the junction are monotonic, i.e their derivatives should never cross zero,
-	// because they are linear functions modified by a "smoothing" polynomial for which the tip is on diagonal.
-	// So to find the output range, we can evaluate and sort the 4 corners,
-	// and diagonal intersections if it crosses the area.
+	// 平滑并集与差集是 `min(a, b)` 与 `max(-a, b)` 的推广，并带有平滑连接。
+	// 该连接沿一条穿过零点（方程为 `y = -x`）的对角线延伸。
+	// 连接线两侧的区域是单调的，即其导数不应穿过零，
+	// 因为它们是被“平滑”多项式修改的线性函数，而该多项式的顶点位于对角线上。
+	// 因此要找出输出范围，我们可以求取并对 4 个角点排序，
+	// 若穿过区域则还包括对角线交点。
 
 	//     |  \              |
 	//  ---1---x-------------3--- b.max
@@ -154,20 +154,20 @@ inline IntervalT<T> sdf_smooth_op(const IntervalT<T> b, const IntervalT<T> a, T 
 		return IntervalT<T>(min(v0, v1, v2, v3, v4, v5), max(v0, v1, v2, v3, v4, v5));
 	}
 
-	// The diagonal does not cross the area
+	// 对角线未穿过区域
 	return IntervalT<T>(min(v0, v1, v2, v3), max(v0, v1, v2, v3));
 }
 
 template <typename T>
 IntervalT<T> sdf_smooth_union(const IntervalT<T> p_b, const IntervalT<T> p_a, const T p_s) {
-	// TODO Not tested
-	// Had to use a lambda because otherwise it's ambiguous
+	// TODO 未测试
+	// 不得不使用 lambda，否则会产生二义性
 	return sdf_smooth_op(p_b, p_a, p_s, [](const T b, const T a, const T s) { //
 		return voxel::math::sdf_smooth_union(b, a, s);
 	});
 }
 
-// Does b - a
+// 计算 b - a
 template <typename T>
 IntervalT<T> sdf_smooth_subtract(const IntervalT<T> p_b, const IntervalT<T> p_a, const T p_s) {
 	return sdf_smooth_op(p_b, p_a, p_s, [](const T b, const T a, const T s) { //
@@ -181,8 +181,8 @@ enum SdfAffectingArguments { //
 	SDF_BOTH
 };
 
-// Tests which argument can affect the result.
-// for a - b
+// 测试哪个参数会影响结果。
+// 针对 a - b
 template <typename T>
 SdfAffectingArguments sdf_subtract_side(const IntervalT<T> a, const IntervalT<T> b) {
 	if (b.min > -a.min) {
@@ -194,7 +194,7 @@ SdfAffectingArguments sdf_subtract_side(const IntervalT<T> a, const IntervalT<T>
 	return SDF_BOTH;
 }
 
-// for a - b
+// 针对 a - b
 template <typename T>
 SdfAffectingArguments sdf_polynomial_smooth_subtract_side(const IntervalT<T> a, const IntervalT<T> b, const T s) {
 	//     |  \  \  \        |
@@ -240,14 +240,14 @@ SdfAffectingArguments sdf_polynomial_smooth_union_side(const IntervalT<T> a, con
 
 template <typename T>
 inline T sdf_round_cone(const Vector3T<T> p, const Vector3T<T> a, const Vector3T<T> b, const T r1, const T r2) {
-	// sampling independent computations (only depend on shape)
+	// 与采样无关的计算（仅取决于形状）
 	const Vector3T<T> ba = b - a;
 	const T l2 = dot(ba, ba);
 	const T rr = r1 - r2;
 	const T a2 = l2 - rr * rr;
 	const T il2 = 1.0 / l2;
 
-	// sampling dependant computations
+	// 依赖于采样的计算
 	const Vector3T<T> pa = p - a;
 	const T y = dot(pa, ba);
 	const T z = y - l2;
@@ -255,7 +255,7 @@ inline T sdf_round_cone(const Vector3T<T> p, const Vector3T<T> a, const Vector3T
 	const T y2 = y * y * l2;
 	const T z2 = z * z * l2;
 
-	// single square root!
+	// 只需一次平方根！
 	const T k = sign(rr) * rr * rr * x2;
 	if (sign(z) * a2 * z2 > k) {
 		return sqrt(x2 + z2) * il2 - r2;

@@ -13,7 +13,7 @@ namespace voxel {
 
 VoxelInstanceLibraryMultiMeshItemEditorPlugin::VoxelInstanceLibraryMultiMeshItemEditorPlugin() {}
 
-// EditorNode isn't ready during plugin construction, so defer work to `init()`.
+// 插件构造期间 EditorNode 尚未就绪，因此将工作推迟到 `init()`。
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::init() {
 	Control *base_control = get_editor_interface()->get_base_control();
 
@@ -31,10 +31,10 @@ void VoxelInstanceLibraryMultiMeshItemEditorPlugin::init() {
 }
 
 bool VoxelInstanceLibraryMultiMeshItemEditorPlugin::_voxel_handles(const Object *p_object) const {
-	// TODO Making a plugin handling sub-resources of `VoxelInstanceLibrary` breaks the inspector.
-	// There are also some caveats when using multiple sub-inspectors. To keep supporting multiple sub-inspectors open
-	// inside a library, we cannot rely on `edit` giving us edited resources.
-	// See https://github.com/godotengine/godot/issues/64700
+	// TODO 制作一个处理 `VoxelInstanceLibrary` 子资源的插件会破坏检查器。
+	// 使用多个子检查器时也有一些注意事项。为了支持在库中同时打开多个子检查器，
+	// 我们不能依赖 `edit` 提供给我们的被编辑资源。
+	// 参见 https://github.com/godotengine/godot/issues/64700
 	return false;
 	// const VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(p_object);
 	// return item != nullptr;
@@ -97,8 +97,8 @@ void update_multimesh_item_from_scene(
 	ur.add_do_method(&item, "_deserialize_multimesh_item_properties", data_after);
 	ur.add_undo_method(&item, "_deserialize_multimesh_item_properties", data_before);
 	ur.commit_action(
-			// We used `setup_from_template` earlier, which does the same work as `do`, so no need to run it again when
-			// committing the action.
+			// 我们之前已经使用了 `setup_from_template`，它做了与 `do` 相同的工作，
+			// 所以提交操作时不需要再运行一次。
 			false
 	);
 }
@@ -108,7 +108,7 @@ void update_multimesh_item_from_scene(
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_on_open_scene_dialog_file_selected(String fpath) {
 	ERR_FAIL_COND(_item.is_null());
 	update_multimesh_item_from_scene(**_item, fpath, *get_undo_redo());
-	// We are done with this item
+	// 我们已经处理完这个条目
 	_item.unref();
 }
 

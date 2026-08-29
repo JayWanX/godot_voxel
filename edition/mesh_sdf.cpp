@@ -4,10 +4,10 @@
 #include "../util/math/triangle.h"
 #include "../util/math/vector3d.h"
 #include "../util/profiling.h"
-#include "../util/string/format.h" // Debug
+#include "../util/string/format.h" // 调试
 #include "../util/voxel_raycast.h"
 
-// Debug
+// 调试
 // #define VOXEL_MESH_SDF_DEBUG_SLICES
 #ifdef VOXEL_MESH_SDF_DEBUG_SLICES
 #include "../util/math/color.h"
@@ -20,17 +20,17 @@
 
 namespace voxel::mesh_sdf {
 
-// Some papers for eventual improvements
-// Jump flood
+// 一些可供后续改进参考的论文
+// Jump flood（跳洪算法）
 // https://www.comp.nus.edu.sg/%7Etants/jfa/i3d06.pdf
-// GPU-based technique
+// 基于 GPU 的技术
 // https://www.researchgate.net/profile/Bastian-Krayer/publication/332921884_Generating_signed_distance_fields_on_the_GPU_with_ray_maps/links/5d63d921299bf1f70b0de26b/Generating-signed-distance-fields-on-the-GPU-with-ray-maps.pdf
-// In the future, maybe also gather gradients so it can be used efficiently with Dual Contouring?
+// 未来或许还可以顺便收集梯度，以便与 Dual Contouring（双轮廓）高效结合使用？
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// First tries with floats, as it is the most common case when data is float.
-// In case of occasional parallel results, retry with doubles, as it often clears it up.
+// 首先尝试使用 float，因为数据为 float 时是最常见的情况。
+// 如果偶尔出现并行结果，则改用 double 重试，这通常能解决问题。
 math::TriangleIntersectionResult ray_intersects_triangle2(
 		const Vector3f &p_from,
 		const Vector3f &p_dir,
@@ -95,7 +95,7 @@ inline bool is_valid_grid_position(const Vector3i &pos, const Vector3i &size) {
 const Triangle *raycast(const ChunkGrid &chunk_grid, Vector3f ray_position, Vector3f ray_dir, float max_distance) {
 	const Vector3f cposf = (ray_position - chunk_grid.min_pos) / chunk_grid.chunk_size;
 
-	// Compute a max distance for DDA
+	// 为 DDA 计算最大距离
 	// const float max_distance_chunks = int(chunk_grid.size.length());
 	const float max_distance_chunks = (max_distance / chunk_grid.chunk_size) + 2.f * math::SQRT3<float>;
 
@@ -128,9 +128,9 @@ const Triangle *raycast(const ChunkGrid &chunk_grid, Vector3f ray_position, Vect
 			float hit_distance;
 			hit_triangle = raycast(tris, ray_position, ray_dir, hit_distance);
 
-			// It is possible for the ray to hit a triangle outside the DDA box (since such triangle could partially
-			// intersect with the box), and beyond our maximum target in case DDA hasn't reached the box containing the
-			// final triangle. If that happens, clamp it to both distance to the final triangle and the DDA box.
+			// 射线有可能击中 DDA 盒之外的三角形（因为这样的三角形可能部分
+			// 与该盒相交），也可能超出我们的最大目标（当 DDA 尚未到达包含
+			// 最终三角形的盒时）。如果发生这种情况，将其钳制到最终三角形距离与 DDA 盒两者之间。
 			if (hit_distance > math::min(max_distance, rs.distance)) {
 				hit_triangle = nullptr;
 			}
@@ -154,8 +154,8 @@ const Triangle *raycast(const ChunkGrid &chunk_grid, Vector3f ray_position, Vect
 		}
 	};
 
-	// TODO Optimization: if the initial chunk contains triangles, pick one of them as reference.
-	// Then if empty, pick a default one. That could reduce a lot checked triangles.
+	// TODO 优化：如果初始块包含三角形，选取其中一个作为参考。
+	// 若为空则选默认的。这样可以减少大量被检查的三角形。
 
 	RaycastChunk raycast_chunk{ chunk_grid, ray_position, ray_dir, max_distance, hit_triangle };
 
@@ -174,8 +174,8 @@ const Triangle *raycast(const ChunkGrid &chunk_grid, Vector3f ray_position, Vect
 				distance_along_ray,
 				distance_along_ray_prev
 		)) {
-		// In case the distance to travel is smaller than a chunk, the voxel_raycast won't "enter" any chunk and return
-		// false. Note, `hit_position` isn't used.
+		// 当需要行进的距离小于一个块时，voxel_raycast 不会“进入”任何块并返回
+		// false。注意，`hit_position` 未被使用。
 		raycast_chunk({ math::floor_to_int(cposf), 0.f, Vector3i(), max_distance });
 	}
 	// }
@@ -199,14 +199,14 @@ bool find_sdf_sign_with_raycast(
 	DDD::draw_triangle(ref_triangle.v1, ref_triangle.v2, ref_triangle.v3, Color(0.5, 0, 0));
 #endif
 
-	// Max distance the ray can travel, with some margin to allow it to hit the final triangle.
+	// 射线可以行进的最大距离，留有一些余量以允许击中最终三角形。
 	const float max_distance = math::distance(ref_center, ray_position) * 1.01;
 
 	const Triangle *selected_triangle = raycast(chunk_grid, ray_position, ray_dir, max_distance);
 
 	if (selected_triangle == nullptr) {
 #if DEBUG_ENABLED
-		// This should usually not happen, unless `ref_triangle` is really perfectly parallel to the ray
+		// 这种情况通常不应发生，除非 `ref_triangle` 恰好与射线完全平行
 		static bool s_tri_not_found_error = false;
 		if (s_tri_not_found_error == false) {
 			s_tri_not_found_error = true;
@@ -220,8 +220,8 @@ bool find_sdf_sign_with_raycast(
 
 	const Vector3f triangle_normal = get_normal(*selected_triangle);
 	const float dp = math::dot(triangle_normal, ray_dir);
-	// Same direction (+): we are inside, sign is negative
-	// Opposite direction (-): we are outside, sign is positive
+	// 同向（+）：我们在内部，符号为负
+	// 反向（-）：我们在外部，符号为正
 	out_sign = dp < 0.f ? 1 : -1;
 	return true;
 }
@@ -235,7 +235,7 @@ bool find_sdf_sign_with_raycast(
 	const Triangle *selected_triangle = raycast(triangles, ray_position, ray_dir);
 	if (selected_triangle == nullptr) {
 #if DEBUG_ENABLED
-		// If this rare event ever happens, we could workaround it by picking another ref triangle until we get a hit
+		// 如果这种罕见情况发生，我们可以通过不断另选一个参考三角形，直到命中为止来规避它
 		static bool s_tri_not_found_error = false;
 		if (s_tri_not_found_error == false) {
 			s_tri_not_found_error = true;
@@ -247,8 +247,8 @@ bool find_sdf_sign_with_raycast(
 
 	const Vector3f triangle_normal = get_normal(*selected_triangle);
 	const float dp = triangle_normal.dot(ray_dir);
-	// Same direction (+): we are inside, sign is negative
-	// Opposite direction (-): we are outside, sign is positive
+	// 相同方向（+）：我们在内部，符号为负
+	// 相反方向（-）：我们在外部，符号为正
 	return dp < 0.f;
 }*/
 
@@ -291,9 +291,8 @@ void fix_sdf_sign_from_boundary(
 	const float max_variation = tolerance * get_max_sdf_variation(min_pos, max_pos, res);
 	const float min_sd = max_variation * 2.f;
 
-	// Spread positive sign from boundary.
-	// Has a bit of room for optimization, but profiling shows it accounts for a very small portion of time compared to
-	// calculating the distance field.
+	// 从边界向外扩散正符号。
+	// 还有一点优化空间，但性能分析显示与计算距离场相比，它只占很小一部分时间。
 	while (seeds.size() > 0) {
 		const Vector3i pos = seeds.back();
 		seeds.pop_back();
@@ -321,10 +320,10 @@ void fix_sdf_sign_from_boundary(
 			const float nv = sdf_grid[nloc];
 
 			if ((nv > 0.f && nv < min_sd) || ((nv > 0.f) != (v > 0.f) && Math::abs(nv - v) < max_variation)) {
-				// Too close to outer surface, or legit sign change occurs.
-				// If we keep floodfilling close to surface or where the sign flips at low distances,
-				// we would risk inverting the sign of the inside of the shape, removing all signedness.
-				// However, if sign flips with a high distance variation, we definitely want to correct that.
+				// 距离外表面太近，或发生了合理的符号变化。
+				// 如果我们继续在靠近表面或符号在低距离处翻转的位置进行洪泛填充，
+				// 就可能颠倒形状内部的符号，从而破坏有符号性。
+				// 但如果符号翻转伴随着较大的距离变化，我们肯定要修正它。
 				continue;
 			}
 
@@ -339,7 +338,7 @@ void fix_sdf_sign_from_boundary(
 void fix_sdf_sign_from_boundary(Span<float> sdf_grid, Vector3i res, Vector3f min_pos, Vector3f max_pos) {
 	StdVector<uint8_t> flag_grid;
 	flag_grid.resize(sdf_grid.size(), FLAG_NOT_VISITED);
-	// We'll start from the lower corner
+	// 我们将从较低的角落开始
 	flag_grid[0] = FLAG_VISITED;
 
 	StdVector<Vector3i> seeds;
@@ -351,7 +350,7 @@ void fix_sdf_sign_from_boundary(Span<float> sdf_grid, Vector3i res, Vector3f min
 void compute_near_chunks(ChunkGrid &chunk_grid) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Initialize chunk positions
+	// 初始化块位置
 	{
 		Vector3i cpos;
 		for (cpos.z = 0; cpos.z < chunk_grid.size.z; ++cpos.z) {
@@ -370,7 +369,7 @@ void compute_near_chunks(ChunkGrid &chunk_grid) {
 		}
 	}
 
-	// Gather chunks containing triangles
+	// 收集包含三角形的块
 	StdVector<const Chunk *> nonempty_chunks;
 	for (auto it = chunk_grid.chunks.begin(); it != chunk_grid.chunks.end(); ++it) {
 		const Chunk &chunk = *it;
@@ -379,9 +378,9 @@ void compute_near_chunks(ChunkGrid &chunk_grid) {
 		}
 	}
 
-	// TODO Optimization: this is actually very slow if many chunks contain triangles.
-	// Unfortunately that means simple shapes like an icosahedron would then be very slow.
-	// So for cases like this, other baking modes are better suited.
+	// TODO 优化：如果许多块都包含三角形，这实际上非常慢。
+	// 遗憾的是，这意味着像二十面体这样的简单形状也会变得非常慢。
+	// 因此对于此类情况，其他烘焙模式更合适。
 
 	Vector3i cpos;
 	for (cpos.z = 0; cpos.z < chunk_grid.size.z; ++cpos.z) {
@@ -393,10 +392,10 @@ void compute_near_chunks(ChunkGrid &chunk_grid) {
 				VOXEL_ASSERT(ci < chunk_grid.chunks.size());
 				Chunk &chunk = chunk_grid.chunks[ci];
 
-				// Find closest chunk
+				// 找到最近的块
 
 				const Chunk *closest_chunk = nullptr;
-				// Distance is in chunks
+				// 距离以块为单位
 				int closest_chunk_distance_squared = 0x0fffffff;
 
 				if (chunk.triangles.size() > 0) {
@@ -416,21 +415,18 @@ void compute_near_chunks(ChunkGrid &chunk_grid) {
 
 				VOXEL_ASSERT(closest_chunk != nullptr);
 
-				// Find other close chunks slightly beyond the closest chunk.
-				// This is to account for the fact the closest chunk might contain a triangle further away than
-				// a closer triangle found in a farther chunk.
+				// 寻找比最近块稍远一点的其他邻近块。
+				// 这是为了应对最近块中的三角形可能比更远块中的三角形距离更远的情况。
 
-				// TODO This creates artifacts when the mesh has few/big triangles and subdivision is high.
-				// A diagonal triangle D could have an AABB so large that it intersects many chunks while not
-				// relatively being close to them. Yet, 2 chunks away (>sqrt(3)) there could be a chunk intersected by
-				// an axis-aligned triangle A that would be closer than D. Yet it won't be detected.
+				// TODO 当网格包含较少/较大的三角形且细分度较高时，这会产生伪影。
+				// 对角三角形 D 的 AABB 可能很大，与许多块相交，但并未真正靠近它们。
+				// 然而在 2 个块之外（>sqrt(3)）可能有一个由轴对齐三角形 A 相交的块，它比 D 更近，但不会被检测到。
 				//
-				// To fix this we could:
-				// - Increase the margin we use to add more triangles? That might work but reduce efficiency.
-				// - Instead of using AABBs to figure if a triangle is in a chunk, we could attempt a box/triangle
-				//   intersection, or 3D rasterization. Then we could keep using the sqrt(3) margin since we know if
-				//   a triangle is in a chunk, and if we pick any point on the sides of hat chunk, the distance from
-				//   that point to the triangle is always closer than the diagonal of that chunk.
+				// 要修复此问题，我们可以：
+				// - 增大添加更多三角形时的余量？这可能有效但会降低效率。
+				// - 与其用 AABB 判断三角形是否在块内，不如尝试盒子/三角形相交检测，
+				//   或 3D 光栅化。这样我们就可以继续使用 sqrt(3) 余量，因为只要知道三角形在某个块内，
+				//   从该块边上任取一点到三角形的距离总是小于该块的对角线。
 
 				const int margin_distance_squared =
 						math::squared(sqrtf(closest_chunk_distance_squared) + math::SQRT3<float>);
@@ -438,7 +434,7 @@ void compute_near_chunks(ChunkGrid &chunk_grid) {
 				for (auto it = nonempty_chunks.begin(); it != nonempty_chunks.end(); ++it) {
 					const Chunk &nchunk = **it;
 					const int distance_squared = (nchunk.pos - chunk.pos).length_squared();
-					// Note, this will include the closest chunk
+					// 注意，这将包含最近的块
 					if (distance_squared <= margin_distance_squared) {
 						chunk.near_chunks.push_back(&nchunk);
 					}
@@ -460,7 +456,7 @@ void partition_triangles(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// TODO This rarely causes SDF errors, but not sure yet what it is yet
+	// TODO 这很少导致 SDF 错误，但还不确定具体原因
 
 	const Vector3f mesh_size = max_pos - min_pos;
 	const float chunk_size = math::max(mesh_size.x, math::max(mesh_size.y, mesh_size.z)) / subdiv;
@@ -474,13 +470,13 @@ void partition_triangles(
 
 	const Vector3f margin(chunk_size * 0.01f);
 
-	// Group triangles overlapping chunks
+	// 将重叠块的三角形分组
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Group triangles");
 
 		for (unsigned int triangle_index = 0; triangle_index < triangles.size(); ++triangle_index) {
 			const Triangle &t = triangles[triangle_index];
-			// TODO Optimiation: trangle-box intersection could yield better partitionning
+			// TODO 优化：三角形-盒子相交检测可能带来更好的分区
 
 			const Vector3f tri_min_pos = math::min(t.v1, math::min(t.v2, t.v3)) - margin;
 			const Vector3f tri_max_pos = math::max(t.v1, math::max(t.v2, t.v3)) + margin;
@@ -488,7 +484,7 @@ void partition_triangles(
 			const Vector3i tri_min_pos_grid = to_vec3i(math::floor((tri_min_pos - chunk_grid.min_pos) / chunk_size));
 			const Vector3i tri_max_pos_grid = to_vec3i(math::floor((tri_max_pos - chunk_grid.min_pos) / chunk_size));
 
-			// DEBUG
+			// 调试
 			// const Vector3f chunk_min_pos = to_vec3f(tri_min_pos_grid) * chunk_grid.chunk_size + chunk_grid.min_pos;
 			// const Vector3f chunk_max_pos =
 			// 		to_vec3f(tri_max_pos_grid + Vector3i(1, 1, 1)) * chunk_grid.chunk_size + chunk_grid.min_pos;
@@ -518,7 +514,7 @@ void partition_triangles(
 
 #ifdef DEBUG_ENABLED
 	{
-		// Make sure all triangles are picked up
+		// 确保所有三角形都被拾取
 		StdVector<const Triangle *> checked_triangles;
 		for (const Chunk &chunk : chunk_grid.chunks) {
 			for (const Triangle *t : chunk.triangles) {
@@ -540,7 +536,7 @@ void partition_triangles(
 }
 
 /*
-// Non-optimized version, suitable for single queries
+// 未优化的版本，适用于单次查询
 float get_distance_to_triangle_squared(const Vector3f v1, const Vector3f v2, const Vector3f v3, const Vector3f p) {
 	// https://iquilezles.org/articles/triangledistance/
 
@@ -560,21 +556,21 @@ float get_distance_to_triangle_squared(const Vector3f v1, const Vector3f v2, con
 			signf(v13.cross(nor).dot(p3));
 
 	if (det < 2.f) {
-		// Outside of the prism: get distance to closest edge
+		// 在棱柱之外：取到最近边的距离
 		return math::min(
 				math::min( //
 						(v21 * math::clamp(v21.dot(p1) / v21.length_squared(), 0.f, 1.f) - p1).length_squared(),
 						(v32 * math::clamp(v32.dot(p2) / v32.length_squared(), 0.f, 1.f) - p2).length_squared()),
 				(v13 * math::clamp(v13.dot(p3) / v13.length_squared(), 0.f, 1.f) - p3).length_squared());
 	} else {
-		// Inside the prism: get distance to plane
+		// 在棱柱之内：取到平面的距离
 		return math::squared(nor.dot(p1)) / nor.length_squared();
 	}
 }
 */
 
-// Returns the distance from a point to a triangle, where some terms are precalculated.
-// This may be preferred if the same triangles have to be queried many times.
+// 返回点到三角形的距离，其中部分项已预先计算。
+// 如果同一三角形需要被多次查询，这可能更受青睐。
 float get_distance_to_triangle_squared_precalc(const Triangle &t, const Vector3f p) {
 	// https://iquilezles.org/articles/triangledistance/
 
@@ -590,7 +586,7 @@ float get_distance_to_triangle_squared_precalc(const Triangle &t, const Vector3f
 			sign_nonzero(dot(t.v13_cross_nor, p3));
 
 	if (det < 2.f) {
-		// Outside of the prism: get distance to closest edge
+		// 在棱柱外：获取到最近边的距离
 		return min(
 				min( //
 						length_squared(t.v21 * clamp(dot(t.v21, p1) * t.inv_v21_length_squared, 0.f, 1.f) - p1),
@@ -599,7 +595,7 @@ float get_distance_to_triangle_squared_precalc(const Triangle &t, const Vector3f
 				length_squared(t.v13 * clamp(dot(t.v13, p3) * t.inv_v13_length_squared, 0.f, 1.f) - p3)
 		);
 	} else {
-		// Inside the prism: get distance to plane
+		// 在棱柱内：获取到平面的距离
 		return squared(dot(t.nor, p1)) * t.inv_nor_length_squared;
 	}
 }
@@ -649,11 +645,11 @@ float get_mesh_signed_distance_at(const Vector3f pos, Span<const Triangle> trian
 		// const float sqd = get_distance_to_triangle_squared(t.v1, t.v2, t.v3, pos);
 		const float sqd = get_distance_to_triangle_squared_precalc(t, pos);
 
-		// TODO What if two triangles of opposite directions share the same point?
-		// If the distance comes from that point, it makes finding the sign ambiguous.
-		// sometimes two triangles of opposite directions share an edge or point, and there is no quick way
-		// to figure out which one must be taken.
-		// For now this is worked around in a later pass with a floodfill.
+		// TODO 如果两个方向相反的三角形共享同一个点会怎样？
+		// 如果距离来自该点，就会使符号的确定变得模糊。
+		// 有时两个方向相反的三角形共享一条边或一个点，没有快速的方法
+		// 判断必须取哪一个。
+		// 目前这通过在后续的洪泛填充阶段来规避。
 
 		/*if (debug) {
 			if (sqd < min_distance_squared + 0.01f) {
@@ -710,11 +706,11 @@ float get_mesh_signed_distance_at(const Vector3f pos, const ChunkGrid &chunk_gri
 		for (auto tri_it = near_chunk.triangles.begin(); tri_it != near_chunk.triangles.end(); ++tri_it) {
 			const Triangle &t = **tri_it;
 
-			// TODO What if two triangles of opposite directions share the same point?
-			// If the distance comes from that point, it makes finding the sign ambiguous.
-			// sometimes two triangles of opposite directions share an edge or point, and there is no quick way
-			// to figure out which one must be taken.
-			// For now this is worked around in a later pass with a floodfill.
+			// TODO 如果两个方向相反的三角形共用同一个点，会怎样？
+			// 如果距离来自那个点，会使符号判定变得不明确。
+			// 有时两个方向相反的三角形会共用一条边或一个顶点，而且没有快速的方法
+			// 来确定应该采用哪一个。
+			// 目前这一情况会在后续的一遍 floodfill（泛洪填充）中规避。
 
 			// const float sqd = get_distance_to_triangle_squared(t.v1, t.v2, t.v3, pos);
 			const float sqd = get_distance_to_triangle_squared_precalc(t, pos);
@@ -749,7 +745,7 @@ struct GridToSpaceConverter {
 	const Vector3f mesh_size;
 	const Vector3f half_cell_size;
 
-	// Grid to space transform
+	// 网格到空间的变换
 	const Vector3f translation;
 	const Vector3f scale;
 
@@ -809,10 +805,10 @@ void generate_mesh_sdf_approx_interp(
 	StdVector<float> node_grid;
 	node_grid.resize(Vector3iUtil::get_volume_u64(node_grid_size));
 
-	// Fill SDF grid with far distances as "infinity", we'll use that to check if we computed it already
+	// 用远距离作为“无穷大”填充 SDF 网格，我们将用它来检查是否已计算
 	sdf_grid.fill(FAR_SD);
 
-	// Evaluate SDF at the corners of nodes
+	// 在节点的角点处计算 SDF
 	Vector3i node_pos;
 	for (node_pos.z = 0; node_pos.z < node_grid_size.z; ++node_pos.z) {
 		for (node_pos.x = 0; node_pos.x < node_grid_size.x; ++node_pos.x) {
@@ -833,7 +829,7 @@ void generate_mesh_sdf_approx_interp(
 		}
 	}
 
-	// Precompute flat-grid neighbor offsets
+	// 预计算扁平网格的邻居偏移
 	const unsigned int ni100 = Vector3iUtil::get_zxy_index(Vector3i(1, 0, 0), node_grid_size);
 	const unsigned int ni010 = Vector3iUtil::get_zxy_index(Vector3i(0, 1, 0), node_grid_size);
 	const unsigned int ni110 = Vector3iUtil::get_zxy_index(Vector3i(1, 1, 0), node_grid_size);
@@ -842,7 +838,7 @@ void generate_mesh_sdf_approx_interp(
 	const unsigned int ni011 = Vector3iUtil::get_zxy_index(Vector3i(0, 1, 1), node_grid_size);
 	const unsigned int ni111 = Vector3iUtil::get_zxy_index(Vector3i(1, 1, 1), node_grid_size);
 
-	// Then for every node
+	// 然后对每个节点
 	for (node_pos.z = 0; node_pos.z < node_grid_size.z - 1; ++node_pos.z) {
 		for (node_pos.x = 0; node_pos.x < node_grid_size.x - 1; ++node_pos.x) {
 			for (node_pos.y = 0; node_pos.y < node_grid_size.y - 1; ++node_pos.y) {
@@ -850,7 +846,7 @@ void generate_mesh_sdf_approx_interp(
 
 				const unsigned int ni = Vector3iUtil::get_zxy_index(node_pos, node_grid_size);
 
-				// Get signed distance at each corner we computed earlier
+				// 获取之前在每个角点计算的有符号距离
 				const float sd000 = node_grid[ni];
 				const float sd100 = node_grid[ni + ni100];
 				const float sd010 = node_grid[ni + ni010];
@@ -860,7 +856,7 @@ void generate_mesh_sdf_approx_interp(
 				const float sd011 = node_grid[ni + ni011];
 				const float sd111 = node_grid[ni + ni111];
 
-				// Get smallest one
+				// 取最小值
 				ud = math::min(ud, Math::abs(sd000));
 				ud = math::min(ud, Math::abs(sd100));
 				ud = math::min(ud, Math::abs(sd010));
@@ -873,21 +869,21 @@ void generate_mesh_sdf_approx_interp(
 				const Box3i cell_box = Box3i(node_pos * node_size_cells, Vector3iUtil::create(node_size_cells))
 											   .clipped(Box3i(Vector3i(), res));
 
-				// If the minimum distance at the corners of the node is lower than the threshold,
-				// subdivide the node.
+				// 如果节点角点处的最小距离低于阈值，
+				// 则细分该节点。
 				if (ud < node_subdiv_threshold) {
-					// Full-res SDF
+					// 全分辨率 SDF
 					cell_box.for_each_cell_zxy([&sdf_grid, eval, res](const Vector3i grid_pos) {
 						const size_t i = Vector3iUtil::get_zxy_index(grid_pos, res);
 						if (sdf_grid[i] != FAR_SD) {
-							// Already computed
+							// 已计算
 							return;
 						}
 						VOXEL_ASSERT(i < sdf_grid.size());
 						sdf_grid[i] = eval(grid_pos);
 					});
 				} else {
-					// We are far enough from the surface, approximate by interpolating corners
+					// 距离表面足够远，通过插值角点来近似
 					const Vector3i cell_box_end = cell_box.position + cell_box.size;
 					Vector3i grid_pos;
 					for (grid_pos.z = cell_box.position.z; grid_pos.z < cell_box_end.z; ++grid_pos.z) {
@@ -895,7 +891,7 @@ void generate_mesh_sdf_approx_interp(
 							for (grid_pos.y = cell_box.position.y; grid_pos.y < cell_box_end.y; ++grid_pos.y) {
 								const size_t i = Vector3iUtil::get_zxy_index(grid_pos, res);
 								if (sdf_grid[i] != FAR_SD) {
-									// Already computed
+									// 已计算
 									continue;
 								}
 								const Vector3f ipf = to_vec3f(grid_pos - cell_box.position) / float(node_size_cells);
@@ -997,7 +993,7 @@ void generate_mesh_sdf_partitioned(
 		const Vector3f max_pos,
 		int subdiv
 ) {
-	// TODO Make this thread-local?
+	// TODO 将此设为线程局部？
 	ChunkGrid chunk_grid;
 	partition_triangles(subdiv, triangles, min_pos, max_pos, chunk_grid);
 	compute_near_chunks(chunk_grid);
@@ -1017,7 +1013,7 @@ CheckResult check_sdf(
 	VOXEL_ASSERT_RETURN_V(math::is_valid_size(res), result);
 
 	if (res.x == 0 || res.y == 0 || res.z == 0) {
-		// Empty or incomparable, but ok
+		// 为空或无法比较，但可以接受
 		result.ok = true;
 		return result;
 	}
@@ -1112,11 +1108,11 @@ bool prepare_triangles(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// The mesh can't be closed if it has less than 4 vertices
+	// 如果顶点少于 4 个，网格无法闭合
 	VOXEL_ASSERT_RETURN_V(vertices.size() >= 4, false);
 
 	if (indices.size() != 0) {
-		// The mesh can't be closed if it has less than 4 triangles
+		// 如果三角形少于 4 个，网格无法闭合
 		VOXEL_ASSERT_RETURN_V(indices.size() >= 12, false);
 		VOXEL_ASSERT_RETURN_V(indices.size() % 3 == 0, false);
 
@@ -1133,7 +1129,7 @@ bool prepare_triangles(
 			t.v2 = to_vec3f(vertices[i1]);
 			t.v3 = to_vec3f(vertices[i2]);
 
-			// Hack to make sure all points are distinct
+			// 确保所有点互不相同的技巧
 			// const Vector3f midp = (t.v1 + t.v2 + t.v3) / 3.f;
 			// const float shrink_amount = 0.0001f;
 			// t.v1 = math::lerp(t.v1, midp, shrink_amount);
@@ -1142,9 +1138,9 @@ bool prepare_triangles(
 		}
 
 	} else {
-		// Non-indexed mesh
+		// 非索引网格
 
-		// The mesh can't be closed if it has less than 4 triangles
+		// 如果三角形少于 4 个，网格无法闭合
 		VOXEL_ASSERT_RETURN_V(vertices.size() >= 12, false);
 		VOXEL_ASSERT_RETURN_V(vertices.size() % 3 == 0, false);
 
@@ -1181,7 +1177,7 @@ Vector3i auto_compute_grid_resolution(const Vector3f box_size, int cell_count) {
 	return Vector3i(box_size.x / cs, box_size.y / cs, box_size.z / cs);
 }
 
-// Called from within the thread pool
+// 在线程池内调用
 void GenMeshSDFSubBoxTask::run(ThreadedTaskContext &ctx) {
 	VOXEL_PROFILE_SCOPE();
 	VOXEL_ASSERT(shared_data != nullptr);
@@ -1211,7 +1207,7 @@ void GenMeshSDFSubBoxTask::run(ThreadedTaskContext &ctx) {
 		if (shared_data->boundary_sign_fix) {
 			fix_sdf_sign_from_boundary(sdf_grid, buffer.get_size(), shared_data->min_pos, shared_data->max_pos);
 		}
-		// That was the last job
+		// 这是最后一个任务
 		on_complete();
 	}
 }
@@ -1224,23 +1220,23 @@ int find_sdf_sign_with_raycast_multi_attempt(
 		Vector3f pos,
 		unsigned int &ref_triangle_index
 ) {
-	// TODO Optimization: It could be faster to target a triangle close to the cell?
+	// TODO 优化：以靠近格子的三角形为目标可能会更快？
 	int sign_sum = 0;
-	// Do multiple raycasts to reduce ambiguity.
-	// Because unfortunately, float precision always hits one time or another when processing
-	// lots of cells over lots of triangles. It causes some triangles to be missed.
+	// 执行多次射线投射以减少歧义。
+	// 因为不幸的是，在处理大量格子上的大量三角形时，float 精度总会以某种方式出问题，
+	// 导致某些三角形被遗漏。
 	for (int attempt = 0; attempt < 3; ++attempt) {
 		int sign_value;
 		if (find_sdf_sign_with_raycast(chunk_grid, pos, triangles[ref_triangle_index], sign_value)) {
 			sign_sum += sign_value;
 		}
 		// else {
-		// 	// Cancel this attempt
+		// 	// 取消此次尝试
 		// 	--attempt;
 		// }
 		ref_triangle_index = (ref_triangle_index + 1) % triangles.size();
 		if (attempt == 1 && sign_sum != 0) {
-			// Another attempt can't make a difference
+			// 再尝试一次也不会有区别
 			break;
 		}
 	}
@@ -1261,7 +1257,7 @@ void generate_mesh_sdf_hull(
 	VOXEL_PROFILE_SCOPE();
 	VOXEL_ASSERT(sdf_grid.size() == flag_grid.size());
 
-	// Fill SDF grid with far distances as "infinity", we'll use that to check if we computed it already
+	// 用远距离作为“无穷大”填充 SDF 网格，我们将用它来检查是否已计算
 	sdf_grid.fill(FAR_SD);
 
 	const Vector3f mesh_size = max_pos - min_pos;
@@ -1283,12 +1279,12 @@ void generate_mesh_sdf_hull(
 			const Vector3f aabb_min = math::min(t.v1, math::min(t.v2, t.v3));
 			const Vector3f aabb_max = math::max(t.v1, math::max(t.v2, t.v3));
 
-			// Space to grid
+			// 空间到网格的变换
 			const Vector3f aabb_min_g = inv_gts_scale * (aabb_min - grid_to_space.translation);
 			const Vector3f aabb_max_g = inv_gts_scale * (aabb_max - grid_to_space.translation);
 
-			// The distance field will be accurate about `pad` cells around those interecting triangles.
-			// Beyond that, it will be an approximation, and outside bounding boxes, it will be unset.
+			// 距离场在这些相交三角形周围约 `pad` 个格子内是精确的。
+			// 超出该范围则是近似值，而在包围盒之外则未设置。
 			const Box3i tbox = Box3i::from_min_max(to_vec3i(math::floor(aabb_min_g)), to_vec3i(math::ceil(aabb_max_g)))
 									   .padded(pad)
 									   .clipped(grid_box);
@@ -1321,11 +1317,11 @@ void generate_mesh_sdf_hull(
 					float &df = sdf_grid[loc];
 
 					if (df != FAR_SD) {
-						// Apply square root because we had squared distances so far
+						// 应用平方根，因为到目前为止我们用的是平方距离
 						df = Math::sqrt(df);
 
 						if (df < mv) {
-							// Compute accurate sign in cells close to the surface
+							// 在靠近表面的格子中计算精确的符号
 							flag_grid[loc] = near_surface_flag_value;
 
 #ifdef VOXEL_MESH_SDF_DEBUG_BATCH
@@ -1513,12 +1509,12 @@ void generate_mesh_sdf_approx_floodfill(
 		VOXEL_PROFILE_SCOPE_NAMED("Iteration");
 
 #ifdef VOXEL_MESH_SDF_DEBUG_SLICES
-		// DEBUG
+		// 调试
 		// debug_print_sdf_image_slice(sdf_grid, res, 23, iteration, current_seeds);
 		// ++iteration;
 #endif
 
-		// Breadth-first, don't iterate seeds we create during this iteration
+		// 广度优先，不要遍历本次迭代中创建的种子
 		for (auto it = current_seeds->begin(); it != current_seeds->end(); ++it) {
 			const Seed seed = *it;
 			const Vector3i pos = seed.pos;
@@ -1528,7 +1524,7 @@ void generate_mesh_sdf_approx_floodfill(
 			const float src_sd = sdf_grid[loc];
 			VOXEL_ASSERT(src_sd != FAR_SD);
 
-			// Make sure not to go over grid borders
+			// 确保不越过网格边界
 			const int min_dz = pos.z == 0 ? 0 : -1;
 			const int min_dy = pos.y == 0 ? 0 : -1;
 			const int min_dx = pos.x == 0 ? 0 : -1;
@@ -1536,11 +1532,11 @@ void generate_mesh_sdf_approx_floodfill(
 			const int max_dy = pos.y == res_minus_one.y ? 1 : 2;
 			const int max_dx = pos.x == res_minus_one.x ? 1 : 2;
 
-			// 26 directions
+			// 26 个方向
 			for (int dz = min_dz; dz < max_dz; ++dz) {
 				for (int dy = min_dy; dy < max_dy; ++dy) {
 					for (int dx = min_dx; dx < max_dx; ++dx) {
-						// Exclude middle point
+						// 排除中间点
 						if (dx == 0 && dy == 0 && dz == 0) {
 							continue;
 						}
@@ -1559,7 +1555,7 @@ void generate_mesh_sdf_approx_floodfill(
 						float &dst_sd = sdf_grid[nloc];
 
 						if (nflag == FLAG_NOT_VISITED) {
-							// First visit
+							// 首次访问
 
 							if (dst_sd == FAR_SD) {
 								float sd;
@@ -1572,13 +1568,12 @@ void generate_mesh_sdf_approx_floodfill(
 								dst_sd = sd;
 
 							} else {
-								// If the cell was already set by the hull prepass, we may do a min/max because hull
-								// values can be a better approximation. Otherwise it could lead to a worse
-								// approximation close to the surface, which would in turn propagate into a worse
-								// result.
+								// 如果该格子已由外壳预处理阶段设置，我们可以做 min/max，因为外壳
+								// 值可能是更好的近似。否则可能导致靠近表面处的近似更差，
+								// 进而传播出更差的结果。
 								float sd;
 								if (src_sd < 0.f) {
-									// Non-frozen hull distances are unsigned
+									// 未冻结的外壳距离是无符号的
 									sd = math::max(-dst_sd, src_sd - dd);
 								} else {
 									sd = math::min(dst_sd, src_sd + dd);
@@ -1591,7 +1586,7 @@ void generate_mesh_sdf_approx_floodfill(
 							flag_grid[nloc] = FLAG_VISITED;
 
 						} else { // FLAG_VISITED
-							// Already visited by the floodfill, pick better signed distance if any
+							// 已被洪泛填充访问过，若有更好的有符号距离则采用
 							float sd;
 							if (src_sd < 0.f) {
 								sd = math::max(dst_sd, src_sd - dd);

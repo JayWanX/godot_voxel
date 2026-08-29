@@ -13,7 +13,7 @@
 namespace voxel::tests {
 
 void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int voxel_count, const int batch_count) {
-	// Create library with tickable voxels
+	// 创建带有可 tick 化体素的库
 	Ref<VoxelBlockyLibrary> library;
 	library.instantiate();
 
@@ -39,11 +39,11 @@ void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int vo
 
 	library->bake();
 
-	// Create test map
+	// 创建测试地图
 	VoxelData data;
 	{
-		// All blocks of this map will be the same,
-		// an interleaving of all block types
+		// 这张地图的所有数据块都是相同的，
+		// 即所有数据块类型的交错
 		VoxelBuffer model_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 		model_buffer.create(Vector3iUtil::create(data.get_block_size()));
 		for (int z = 0; z < model_buffer.get_size().z; ++z) {
@@ -117,13 +117,13 @@ void test_run_blocky_random_tick_with_params(const Box3i voxel_box, const int vo
 
 	VOXEL_TEST_ASSERT(cb.ok);
 
-	// Even though there is randomness, we expect to see at least one hit
+	// 即使存在随机性，我们也期望至少命中一次
 	VOXEL_TEST_ASSERT_MSG(!cb.first_pick, "At least one hit is expected, not none");
 
-	// Check that the points were more or less uniformly sparsed within the provided box.
-	// They should, because we populated the world with a checkerboard of tickable voxels.
-	// There is randomness at play, so unfortunately we may have to use a margin or pick the right seed,
-	// and we only check the enclosing area.
+	// 检查这些点在给定盒子内大致均匀散布。
+	// 它们应当如此，因为我们用可 tick 化体素构成的棋盘格充实了世界。
+	// 其中涉及随机性，因此遗憾的是我们可能不得不使用容差或挑选合适的种子，
+	// 并且我们只检查包围的区域。
 	const int error_margin = 0;
 	for (int axis_index = 0; axis_index < Vector3iUtil::AXIS_COUNT; ++axis_index) {
 		const int nd = cb.pick_box.position[axis_index] - voxel_box.position[axis_index];
@@ -180,23 +180,23 @@ void test_box_blur() {
 }
 
 void test_discord_soakil_copypaste() {
-	// That was a bug reported on Discord by Soakil.
+	// 这是 Soakil 在 Discord 上报告的一个 bug。
 	//
-	// 1) VoxelLodTerrain with data streaming enabled
-	// 2) Generate flat SDF terrain with voxel materials set to 1
-	// 3) Copy an area into a buffer
-	// 4) Add a sphere within the area
-	// 5) Paste the buffer back to "undo" the sphere
+	// 1) 启用了数据流式传输的 VoxelLodTerrain
+	// 2) 生成体素材质设置为 1 的平坦 SDF 地形
+	// 3) 把一个区域拷贝到缓冲区
+	// 4) 在区域内添加一个球体
+	// 5) 把缓冲区粘贴回去以“撤销”该球体
 	//
-	// Observed: the sphere remains present, and materials became 0 within the pasted area.
-	// Expected: terrain must be in the same state as it was before step 4.
-	// Notes: copy didn't work due to a defect in VoxelData ignoring blocks without cached voxels and not falling back
-	// on the generator.
+	// 观察到的现象：球体仍然存在，且粘贴区域内的材质变成了 0。
+	// 预期结果：地形必须保持与步骤 4 之前相同的状态。
+	// 备注：拷贝因 VoxelData 的一个缺陷而不起作用，该缺陷忽略了没有缓存体素的数据块，且没有回退
+	// 到生成器。
 
-	// We can't test nodes like VoxelLodTerrain without an integration test project, but we can test this using the
-	// underlying data structures.
+	// 没有集成测试项目我们就无法测试 VoxelLodTerrain 这类节点，但我们可以用
+	// 底层数据结构来测试这个问题。
 
-	// Generator producing a floating box platform centered on origin
+	// 生成一个以原点为中心、浮空盒子样式的平台的生成器
 	Ref<VoxelGeneratorGraph> generator;
 	{
 		generator.instantiate();
@@ -244,23 +244,22 @@ void test_discord_soakil_copypaste() {
 		// generator->generate_block(q);
 		VoxelDataBlock block;
 		// block.set_voxels(vb);
-		// We signal that this block is loaded but doesn't have voxel data, therefore the generator should be used on
-		// the fly
+		// 我们标记此数据块已加载但没有体素数据，因此应在运行时按需填充。
 		const bool inserted = voxel_data.try_set_block(bpos, block);
 		VOXEL_ASSERT(inserted);
 	});
 
 	struct L {
 		static void check_original(VoxelData &vd) {
-			// Air above platform
+			// 平台上方为空气
 			const float sd_above_platform = vd.get_voxel_f(Vector3i(0, 5, 0), VoxelBuffer::CHANNEL_SDF);
 			VOXEL_TEST_ASSERT(sd_above_platform > 0.01f);
 
-			// Matter in platform
+			// 平台中为实体
 			const float sd_in_platform = vd.get_voxel_f(Vector3i(0, 0, 0), VoxelBuffer::CHANNEL_SDF);
 			VOXEL_TEST_ASSERT(sd_in_platform < -0.01f);
 
-			// Air below platform
+			// 平台下方为空气
 			const float sd_below_platform = vd.get_voxel_f(Vector3i(0, -5, 0), VoxelBuffer::CHANNEL_SDF);
 			VOXEL_TEST_ASSERT(sd_below_platform > 0.01f);
 
@@ -297,7 +296,7 @@ void test_discord_soakil_copypaste() {
 		}
 	};
 
-	// Checks terrain is as we expect
+	// 检查地形是否与预期一致
 	L::check_original(voxel_data);
 
 	VoxelBuffer buffer_before_edit(VoxelBuffer::ALLOCATOR_DEFAULT);
@@ -305,7 +304,7 @@ void test_discord_soakil_copypaste() {
 	const Vector3i undo_pos(-10, -10, -10);
 	voxel_data.copy(undo_pos, buffer_before_edit, 0xff, true);
 
-	// Check the copy
+	// 检查拷贝结果
 	{
 		const float sd_above_platform = buffer_before_edit.get_voxel_f(Vector3i(10, 19, 10), VoxelBuffer::CHANNEL_SDF);
 		VOXEL_TEST_ASSERT(sd_above_platform > 0.01f);
@@ -347,8 +346,8 @@ void test_discord_soakil_copypaste() {
 	voxel_data.pre_generate_box(Box3i(undo_pos, buffer_before_edit.get_size()));
 	voxel_data.paste(undo_pos, buffer_before_edit, 0xff, false, true);
 
-	// Checks terrain is still as we expect. Not relying on copy() followed by equals(), because copy() is part of what
-	// we are testing
+	// 检查地形仍与预期一致。不依赖先调用 copy() 再调用 equals()，因为 copy() 正是
+	// 我们要测试的对象之一
 	L::check_original(voxel_data);
 }
 

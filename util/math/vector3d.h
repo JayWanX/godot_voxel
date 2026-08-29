@@ -5,7 +5,7 @@
 
 namespace voxel {
 
-// 3-dimensional vector using 64-bit floats, regardless on compiling options
+// 无论编译选项如何，均使用 64 位浮点数的三维向量
 typedef Vector3T<double> Vector3d;
 
 } // namespace voxel

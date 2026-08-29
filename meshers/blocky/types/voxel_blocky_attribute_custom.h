@@ -15,11 +15,11 @@ public:
 	void set_value_name(int index, StringName p_name);
 	void set_default_value(int v);
 
-	// Not exposing rotation like that, because we can't automate this properly at the moment (in the case of rails,
-	// there is rotation, but it is uneven as several values have the same rotation but different models). Users
-	// will have to rotate the model manually using editor tools, which gives more control.
-	// An easier approach is to separate rotation from rail shape as two attributes, but it will waste a few model IDs
-	// for straight shapes.
+	// 不那样暴露旋转，因为目前我们还无法自动化处理（以轨道为例，
+	// 存在旋转，但它是不均匀的：多个值具有相同的旋转却对应不同模型）。用户
+	// 将不得不使用编辑器工具手动旋转模型，这能提供更多控制。
+	// 更简单的做法是将旋转与轨道形状分离为两个属性，但会为直线形状
+	// 浪费一些模型 ID。
 	//
 	// void set_is_rotation(bool is_rotation);
 	// void set_value_ortho_rotation(int index, int ortho_rotation_index);

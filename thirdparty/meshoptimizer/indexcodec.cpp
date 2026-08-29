@@ -6,9 +6,9 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Fabian Giesen. Simple lossless index buffer compression & follow-up. 2013
-// Conor Stokes. Vertex Cache Optimised Index Buffer Compression. 2014
+// 此作品基于：
+// Fabian Giesen. 简单的无损索引缓冲区压缩及后续. 2013
+// Conor Stokes. 顶点缓存优化的索引缓冲区压缩. 2014
 namespace meshopt
 {
 
@@ -29,7 +29,7 @@ static const unsigned int kTriangleIndexOrder[3][3] = {
 
 static const unsigned char kCodeAuxEncodingTable[16] = {
     0x00, 0x76, 0x87, 0x56, 0x67, 0x78, 0xa9, 0x86, 0x65, 0x89, 0x68, 0x98, 0x01, 0x69,
-    0, 0, // last two entries aren't used for encoding
+    0, 0, // 最后两个条目不用于编码
 };
 
 static int rotateTriangle(unsigned int a, unsigned int b, unsigned int c, unsigned int next)
@@ -87,7 +87,7 @@ static void pushVertexFifo(VertexFifo fifo, unsigned int v, size_t& offset, int 
 
 static void encodeVByte(unsigned char*& data, unsigned int v)
 {
-	// encode 32-bit value in up to 5 7-bit groups
+	// 将 32 位值编码为最多 5 个 7 位组
 	do
 	{
 		*data++ = (v & 127) | (v > 127 ? 128 : 0);
@@ -99,12 +99,12 @@ static unsigned int decodeVByte(const unsigned char*& data)
 {
 	unsigned char lead = *data++;
 
-	// fast path: single byte
+	// 快速路径：单字节
 	if (lead < 128)
 		return lead;
 
-	// slow path: up to 4 extra bytes
-	// note that this loop always terminates, which is important for malformed data
+	// 慢速路径：最多 4 个额外字节
+	// 注意：该循环总会终止，这对畸形数据很重要
 	unsigned int result = lead & 127;
 	unsigned int shift = 7;
 
@@ -170,7 +170,7 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 
 	assert(index_count % 3 == 0);
 
-	// the minimum valid encoding is header, 1 byte per triangle and a 16-byte codeaux table
+	// 最小有效编码为：header、每个三角形 1 字节，以及一个 16 字节的 codeaux 表
 	if (buffer_size < 1 + index_count / 3 + 16)
 		return 0;
 
@@ -197,14 +197,14 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 	int fecmax = version >= 1 ? 13 : 15;
 
 	// use static encoding table; it's possible to pack the result and then build an optimal table and repack
-	// for now we keep it simple and use the table that has been generated based on symbol frequency on a training mesh set
+	// 目前我们保持简单，使用根据训练网格集上的符号频率生成的表
 	const unsigned char* codeaux_table = kCodeAuxEncodingTable;
 
 	for (size_t i = 0; i < index_count; i += 3)
 	{
-		// make sure we have enough space to write a triangle
-		// each triangle writes at most 16 bytes: 1b for codeaux and 5b for each free index
-		// after this we can be sure we can write without extra bounds checks
+		// 确保有足够空间写入一个三角形
+		// 每个三角形最多写入 16 字节：1b 用于 codeaux，每个空闲索引 5b
+		// 在此之后，我们可以确保无需额外的边界检查即可写入
 		if (data > data_safe_end)
 			return 0;
 
@@ -212,12 +212,12 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 
 		if (fer >= 0 && (fer >> 2) < 15)
 		{
-			// note: getEdgeFifo implicitly rotates triangles by matching a/b to existing edge
+			// 注意：getEdgeFifo 通过将 a/b 与现有边匹配来隐式旋转三角形
 			const unsigned int* order = kTriangleIndexOrder[fer & 3];
 
 			unsigned int a = indices[i + order[0]], b = indices[i + order[1]], c = indices[i + order[2]];
 
-			// encode edge index and vertex fifo index, next or free index
+			// 编码边索引和顶点 fifo 索引（next 或 free 索引）
 			int fe = fer >> 2;
 			int fc = getVertexFifo(vertexfifo, c, vertexfifooffset);
 
@@ -225,7 +225,7 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 
 			if (fec == 15 && version >= 1)
 			{
-				// encode last-1 and last+1 to optimize strip-like sequences
+				// 编码 last-1 和 last+1，以优化类似条带的序列
 				if (c + 1 == last)
 					fec = 13, last = c;
 				if (c == last + 1)
@@ -234,15 +234,15 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 
 			*code++ = (unsigned char)((fe << 4) | fec);
 
-			// note that we need to update the last index since free indices are delta-encoded
+			// 注意，我们需要更新最后一个索引，因为空闲索引是经 delta 编码的
 			if (fec == 15)
 				encodeIndex(data, c, last), last = c;
 
-			// we only need to push third vertex since first two are likely already in the vertex fifo
+			// 只需推入第三个顶点，因为前两个很可能已在顶点 fifo 中
 			if (fec == 0 || fec >= fecmax)
 				pushVertexFifo(vertexfifo, c, vertexfifooffset);
 
-			// we only need to push two new edges to edge fifo since the third one is already there
+			// 只需向边 fifo 推入两条新边，因为第三条已经在其中
 			pushEdgeFifo(edgefifo, c, b, edgefifooffset);
 			pushEdgeFifo(edgefifo, a, c, edgefifooffset);
 		}
@@ -261,25 +261,25 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 				reset = true;
 				next = 0;
 
-				// reset vertex fifo to make sure we don't accidentally reference vertices from that in the future
-				// this makes sure next continues to get incremented instead of being stuck
+				// 重置顶点 fifo，确保将来不会意外引用其中的顶点
+				// 这确保 next 能继续递增而不会卡住
 				memset(vertexfifo, -1, sizeof(vertexfifo));
 			}
 
 			int fb = getVertexFifo(vertexfifo, b, vertexfifooffset);
 			int fc = getVertexFifo(vertexfifo, c, vertexfifooffset);
 
-			// after rotation, a is almost always equal to next, so we don't waste bits on FIFO encoding for a
+			// 旋转后，a 几乎总是等于 next，因此不会在 a 的 FIFO 编码上浪费位数
 			// note: decoder implicitly assumes that if feb=fec=0, then fea=0 (reset code); this is enforced by rotation
 			int fea = (a == next) ? (next++, 0) : 15;
 			int feb = (fb >= 0 && fb < 14) ? fb + 1 : (b == next ? (next++, 0) : 15);
 			int fec = (fc >= 0 && fc < 14) ? fc + 1 : (c == next ? (next++, 0) : 15);
 
-			// we encode feb & fec in 4 bits using a table if possible, and as a full byte otherwise
+			// 我们尽可能用 4 位加表编码 feb 和 fec，否则用完整字节
 			unsigned char codeaux = (unsigned char)((feb << 4) | fec);
 			int codeauxindex = getCodeAuxIndex(codeaux, codeaux_table);
 
-			// <14 encodes an index into codeaux table, 14 encodes fea=0, 15 encodes fea=15
+			// <14 编码为 codeaux 表的索引，14 编码 fea=0，15 编码 fea=15
 			if (fea == 0 && codeauxindex >= 0 && codeauxindex < 14 && !reset)
 			{
 				*code++ = (unsigned char)((15 << 4) | codeauxindex);
@@ -290,7 +290,7 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 				*data++ = codeaux;
 			}
 
-			// note that we need to update the last index since free indices are delta-encoded
+			// 注意，我们需要更新最后一个索引，因为空闲索引是经 delta 编码的
 			if (fea == 15)
 				encodeIndex(data, a, last), last = a;
 
@@ -300,7 +300,7 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 			if (fec == 15)
 				encodeIndex(data, c, last), last = c;
 
-			// only push vertices that weren't already in fifo
+			// 只推入尚未在 fifo 中的顶点
 			if (fea == 0 || fea == 15)
 				pushVertexFifo(vertexfifo, a, vertexfifooffset);
 
@@ -317,22 +317,22 @@ size_t meshopt_encodeIndexBuffer(unsigned char* buffer, size_t buffer_size, cons
 		}
 	}
 
-	// make sure we have enough space to write codeaux table
+	// 确保有足够空间写入 codeaux 表
 	if (data > data_safe_end)
 		return 0;
 
 	// add codeaux encoding table to the end of the stream; this is used for decoding codeaux *and* as padding
-	// we need padding for decoding to be able to assume that each triangle is encoded as <= 16 bytes of extra data
-	// this is enough space for aux byte + 5 bytes per varint index which is the absolute worst case for any input
+	// 解码时需要填充，以便能假定每个三角形最多编码为 16 字节的额外数据
+	// 这足以为辅助字节加每个 varint 索引 5 字节留出空间，这是任何输入的最坏情况
 	for (size_t i = 0; i < 16; ++i)
 	{
-		// decoder assumes that table entries never refer to separately encoded indices
+		// 解码器假定表条目永远不会引用单独编码的索引
 		assert((codeaux_table[i] & 0xf) != 0xf && (codeaux_table[i] >> 4) != 0xf);
 
 		*data++ = codeaux_table[i];
 	}
 
-	// since we encode restarts as codeaux without a table reference, we need to make sure 00 is encoded as a table reference
+	// 由于我们将重启动编码为不带表引用的 codeaux，需要确保 00 被编码为表引用
 	assert(codeaux_table[0] == 0);
 
 	assert(data >= buffer + index_count / 3 + 16);
@@ -345,13 +345,13 @@ size_t meshopt_encodeIndexBufferBound(size_t index_count, size_t vertex_count)
 {
 	assert(index_count % 3 == 0);
 
-	// compute number of bits required for each index
+	// 计算每个索引所需的位数
 	unsigned int vertex_bits = 1;
 
 	while (vertex_bits < 32 && vertex_count > size_t(1) << vertex_bits)
 		vertex_bits++;
 
-	// worst-case encoding is 2 header bytes + 3 varint-7 encoded index deltas
+	// 最坏情况编码为 2 字节头 + 3 个 varint-7 编码的索引增量
 	unsigned int vertex_groups = (vertex_bits + 1 + 6) / 7;
 
 	return 1 + (index_count / 3) * (2 + 3 * vertex_groups) + 16;
@@ -388,7 +388,7 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 	assert(index_count % 3 == 0);
 	assert(index_size == 2 || index_size == 4);
 
-	// the minimum valid encoding is header, 1 byte per triangle and a 16-byte codeaux table
+	// 最小有效编码为：header、每个三角形 1 字节，以及一个 16 字节的 codeaux 表
 	if (buffer_size < 1 + index_count / 3 + 16)
 		return -2;
 
@@ -413,7 +413,7 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 
 	int fecmax = version >= 1 ? 13 : 15;
 
-	// since we store 16-byte codeaux table at the end, triangle data has to begin before data_safe_end
+	// 由于我们在尾部存储 16 字节的 codeaux 表，三角形数据必须在 data_safe_end 之前开始
 	const unsigned char* code = buffer + 1;
 	const unsigned char* data = code + index_count / 3;
 	const unsigned char* data_safe_end = buffer + buffer_size - 16;
@@ -422,9 +422,9 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 
 	for (size_t i = 0; i < index_count; i += 3)
 	{
-		// make sure we have enough data to read for a triangle
-		// each triangle reads at most 16 bytes of data: 1b for codeaux and 5b for each free index
-		// after this we can be sure we can read without extra bounds checks
+		// 确保有足够数据读取一个三角形
+		// 每个三角形最多读取 16 字节数据：1b 用于 codeaux，每个空闲索引 5b
+		// 在此之后，我们可以确保无需额外的边界检查即可读取
 		if (data > data_safe_end)
 			return -2;
 
@@ -434,57 +434,57 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 		{
 			int fe = codetri >> 4;
 
-			// fifo reads are wrapped around 16 entry buffer
+			// fifo 读取在 16 条目缓冲区上做回绕
 			unsigned int a = edgefifo[(edgefifooffset - 1 - fe) & 15][0];
 			unsigned int b = edgefifo[(edgefifooffset - 1 - fe) & 15][1];
 			unsigned int c = 0;
 
 			int fec = codetri & 15;
 
-			// note: this is the most common path in the entire decoder
-			// inside this if we try to stay branchless (by using cmov/etc.) since these aren't predictable
+			// 注意：这是整个解码器中最常见的路径
+			// 在此 if 内我们尽量保持无分支（通过使用 cmov 等），因为这几处分支不可预测
 			if (fec < fecmax)
 			{
-				// fifo reads are wrapped around 16 entry buffer
+				// fifo 读取在 16 条目缓冲区上做回绕
 				unsigned int cf = vertexfifo[(vertexfifooffset - 1 - fec) & 15];
 				c = (fec == 0) ? next : cf;
 
 				int fec0 = fec == 0;
 				next += fec0;
 
-				// push vertex fifo must match the encoding step *exactly* otherwise the data will not be decoded correctly
+				// 推送顶点 fifo 必须与编码步骤*完全*一致，否则数据将无法正确解码
 				pushVertexFifo(vertexfifo, c, vertexfifooffset, fec0);
 			}
 			else
 			{
-				// fec - (fec ^ 3) decodes 13, 14 into -1, 1
-				// note that we need to update the last index since free indices are delta-encoded
+				// fec - (fec ^ 3) 将 13、14 解码为 -1、1
+				// 注意，我们需要更新最后一个索引，因为空闲索引是经 delta 编码的
 				last = c = (fec != 15) ? last + (fec - (fec ^ 3)) : decodeIndex(data, last);
 
-				// push vertex/edge fifo must match the encoding step *exactly* otherwise the data will not be decoded correctly
+				// push 顶点/边 fifo 必须与编码步骤完全一致，否则数据将无法正确解码
 				pushVertexFifo(vertexfifo, c, vertexfifooffset);
 			}
 
-			// push edge fifo must match the encoding step *exactly* otherwise the data will not be decoded correctly
+			// 推送边 fifo 必须与编码步骤*完全*一致，否则数据将无法正确解码
 			pushEdgeFifo(edgefifo, c, b, edgefifooffset);
 			pushEdgeFifo(edgefifo, a, c, edgefifooffset);
 
-			// output triangle
+			// 输出三角形
 			writeTriangle(destination, i, index_size, a, b, c);
 		}
 		else
 		{
-			// fast path: read codeaux from the table
+			// 快速路径：从表读取 codeaux
 			if (codetri < 0xfe)
 			{
 				unsigned char codeaux = codeaux_table[codetri & 15];
 
-				// note: table can't contain feb/fec=15
+				// 注意：表不能包含 feb/fec=15
 				int feb = codeaux >> 4;
 				int fec = codeaux & 15;
 
-				// fifo reads are wrapped around 16 entry buffer
-				// also note that we increment next for all three vertices before decoding indices - this matches encoder behavior
+				// fifo 读取在 16 条目缓冲区上做回绕
+				// 还要注意，在解码索引之前我们会为所有三个顶点递增 next——这与编码器行为一致
 				unsigned int a = next++;
 
 				unsigned int bf = vertexfifo[(vertexfifooffset - feb) & 15];
@@ -499,10 +499,10 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 				int fec0 = fec == 0;
 				next += fec0;
 
-				// output triangle
+				// 输出三角形
 				writeTriangle(destination, i, index_size, a, b, c);
 
-				// push vertex/edge fifo must match the encoding step *exactly* otherwise the data will not be decoded correctly
+				// push 顶点/边 fifo 必须与编码步骤完全一致，否则数据将无法正确解码
 				pushVertexFifo(vertexfifo, a, vertexfifooffset);
 				pushVertexFifo(vertexfifo, b, vertexfifooffset, feb0);
 				pushVertexFifo(vertexfifo, c, vertexfifooffset, fec0);
@@ -513,24 +513,24 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 			}
 			else
 			{
-				// slow path: read a full byte for codeaux instead of using a table lookup
+				// 慢速路径：读取完整字节作为 codeaux，而非使用表查找
 				unsigned char codeaux = *data++;
 
 				int fea = codetri == 0xfe ? 0 : 15;
 				int feb = codeaux >> 4;
 				int fec = codeaux & 15;
 
-				// reset: codeaux is 0 but encoded as not-a-table
+				// 重置：codeaux 为 0，但编码为非表形式
 				if (codeaux == 0)
 					next = 0;
 
-				// fifo reads are wrapped around 16 entry buffer
-				// also note that we increment next for all three vertices before decoding indices - this matches encoder behavior
+				// fifo 读取在 16 条目缓冲区上做回绕
+				// 还要注意，在解码索引之前我们会为所有三个顶点递增 next——这与编码器行为一致
 				unsigned int a = (fea == 0) ? next++ : 0;
 				unsigned int b = (feb == 0) ? next++ : vertexfifo[(vertexfifooffset - feb) & 15];
 				unsigned int c = (fec == 0) ? next++ : vertexfifo[(vertexfifooffset - fec) & 15];
 
-				// note that we need to update the last index since free indices are delta-encoded
+				// 注意，我们需要更新最后一个索引，因为空闲索引是经 delta 编码的
 				if (fea == 15)
 					last = a = decodeIndex(data, last);
 
@@ -540,10 +540,10 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 				if (fec == 15)
 					last = c = decodeIndex(data, last);
 
-				// output triangle
+				// 输出三角形
 				writeTriangle(destination, i, index_size, a, b, c);
 
-				// push vertex/edge fifo must match the encoding step *exactly* otherwise the data will not be decoded correctly
+				// push 顶点/边 fifo 必须与编码步骤完全一致，否则数据将无法正确解码
 				pushVertexFifo(vertexfifo, a, vertexfifooffset);
 				pushVertexFifo(vertexfifo, b, vertexfifooffset, (feb == 0) | (feb == 15));
 				pushVertexFifo(vertexfifo, c, vertexfifooffset, (fec == 0) | (fec == 15));
@@ -555,7 +555,7 @@ int meshopt_decodeIndexBuffer(void* destination, size_t index_count, size_t inde
 		}
 	}
 
-	// we should've read all data bytes and stopped at the boundary between data and codeaux table
+	// 我们应该已读取所有数据字节，并在数据与 codeaux 表之间的边界处停止
 	if (data != data_safe_end)
 		return -3;
 
@@ -566,7 +566,7 @@ size_t meshopt_encodeIndexSequence(unsigned char* buffer, size_t buffer_size, co
 {
 	using namespace meshopt;
 
-	// the minimum valid encoding is header, 1 byte per index and a 4-byte tail
+	// 最小有效编码为：header、每个索引 1 字节，以及一个 4 字节的尾部
 	if (buffer_size < 1 + index_count + 4)
 		return 0;
 
@@ -582,32 +582,32 @@ size_t meshopt_encodeIndexSequence(unsigned char* buffer, size_t buffer_size, co
 
 	for (size_t i = 0; i < index_count; ++i)
 	{
-		// make sure we have enough data to write
+		// 确保有足够数据可供写入
 		// each index writes at most 5 bytes of data; there's a 4 byte tail after data_safe_end
-		// after this we can be sure we can write without extra bounds checks
+		// 在此之后，我们可以确保无需额外的边界检查即可写入
 		if (data >= data_safe_end)
 			return 0;
 
 		unsigned int index = indices[i];
 
-		// this is a heuristic that switches between baselines when the delta grows too large
-		// we want the encoded delta to fit into one byte (7 bits), but 2 bits are used for sign and baseline index
-		// for now we immediately switch the baseline when delta grows too large - this can be adjusted arbitrarily
+		// 这是一种启发式方法，当增量过大时在基线之间切换
+		// 我们希望编码增量能放入一个字节（7 位），但 2 位被用于符号和基线索引
+		// 目前当增量过大时我们立即切换基线 - 这可以任意调整
 		int cd = int(index - last[current]);
 		current ^= ((cd < 0 ? -cd : cd) >= 30);
 
-		// encode delta from the last index
+		// 编码相对最后索引的增量
 		unsigned int d = index - last[current];
 		unsigned int v = (d << 1) ^ (int(d) >> 31);
 
-		// note: low bit encodes the index of the last baseline which will be used for reconstruction
+		// 注意：低位编码将用于重建的最后基线的索引
 		encodeVByte(data, (v << 1) | current);
 
-		// update last for the next iteration that uses it
+		// 为使用它的下一次迭代更新 last
 		last[current] = index;
 	}
 
-	// make sure we have enough space to write tail
+	// 确保有足够空间写入尾部
 	if (data > data_safe_end)
 		return 0;
 
@@ -619,13 +619,13 @@ size_t meshopt_encodeIndexSequence(unsigned char* buffer, size_t buffer_size, co
 
 size_t meshopt_encodeIndexSequenceBound(size_t index_count, size_t vertex_count)
 {
-	// compute number of bits required for each index
+	// 计算每个索引所需的位数
 	unsigned int vertex_bits = 1;
 
 	while (vertex_bits < 32 && vertex_count > size_t(1) << vertex_bits)
 		vertex_bits++;
 
-	// worst-case encoding is 1 varint-7 encoded index delta for a K bit value and an extra bit
+	// 最坏情况编码为 K 位值用 1 个 varint-7 编码的索引增量外加 1 位
 	unsigned int vertex_groups = (vertex_bits + 1 + 1 + 6) / 7;
 
 	return 1 + index_count * vertex_groups + 4;
@@ -635,7 +635,7 @@ int meshopt_decodeIndexSequence(void* destination, size_t index_count, size_t in
 {
 	using namespace meshopt;
 
-	// the minimum valid encoding is header, 1 byte per index and a 4-byte tail
+	// 最小有效编码为：header、每个索引 1 字节，以及一个 4 字节的尾部
 	if (buffer_size < 1 + index_count + 4)
 		return -2;
 
@@ -653,23 +653,23 @@ int meshopt_decodeIndexSequence(void* destination, size_t index_count, size_t in
 
 	for (size_t i = 0; i < index_count; ++i)
 	{
-		// make sure we have enough data to read
+		// 确保有足够数据可供读取
 		// each index reads at most 5 bytes of data; there's a 4 byte tail after data_safe_end
-		// after this we can be sure we can read without extra bounds checks
+		// 在此之后，我们可以确保无需额外的边界检查即可读取
 		if (data >= data_safe_end)
 			return -2;
 
 		unsigned int v = decodeVByte(data);
 
-		// decode the index of the last baseline
+		// 解码最后基线的索引
 		unsigned int current = v & 1;
 		v >>= 1;
 
-		// reconstruct index as a delta
+		// 将索引重建为增量
 		unsigned int d = (v >> 1) ^ -int(v & 1);
 		unsigned int index = last[current] + d;
 
-		// update last for the next iteration that uses it
+		// 为使用它的下一次迭代更新 last
 		last[current] = index;
 
 		if (index_size == 2)
@@ -682,7 +682,7 @@ int meshopt_decodeIndexSequence(void* destination, size_t index_count, size_t in
 		}
 	}
 
-	// we should've read all data bytes and stopped at the boundary between data and tail
+	// 我们应该已读取所有数据字节，并在数据与尾部之间的边界处停止
 	if (data != data_safe_end)
 		return -3;
 

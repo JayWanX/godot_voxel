@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Axis-aligned 3D box using floating point coordinates.
+// 使用浮点坐标的轴对齐三维包围盒。
 template <typename T>
 class Box3fT {
 public:

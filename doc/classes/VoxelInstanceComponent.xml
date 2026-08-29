@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelInstanceComponent" inherits="Node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		This node gets attached to scene items instanced by [VoxelInstancer].
+		该节点会被附加到由 [VoxelInstancer] 实例化的场景条目上。
 	</brief_description>
 	<description>
-		[VoxelInstancer] internally adds this node to instanced scenes, so it can track when they get destroyed or removed from the scene tree.
+		[VoxelInstancer] 在内部将此节点添加到实例化场景中，以便追踪它们何时被销毁或从场景树中移除。
 	</description>
 	<tutorials>
 	</tutorials>

@@ -13,7 +13,7 @@
 
 namespace voxel {
 
-// Common base class for basic heightmap generators
+// 基本高度图生成器的公共基类
 class VoxelGeneratorHeightmap : public VoxelGenerator {
 	GDCLASS(VoxelGeneratorHeightmap, VoxelGenerator)
 public:
@@ -57,13 +57,13 @@ protected:
 		const bool use_sdf = channel == VoxelBuffer::CHANNEL_SDF;
 
 		if (origin.y > get_height_start() + get_height_range()) {
-			// The bottom of the block is above the highest ground can go (default is air)
+			// 数据块底部高于地面所能达到的最高位置（默认是空气）
 			Result result;
 			result.max_lod_hint = true;
 			return result;
 		}
 		if (origin.y + (bs.y << lod) < get_height_start()) {
-			// The top of the block is below the lowest ground can go
+			// 数据块顶部低于地面所能达到的最低位置
 			out_buffer.clear_channel(params.channel, use_sdf ? 0 : params.matter_type);
 			Result result;
 			result.max_lod_hint = true;
@@ -87,10 +87,10 @@ protected:
 					}
 
 				} // for x
-			} // for z
+			} // 遍历 z
 
 		} else {
-			// Blocky
+			// 方块模式
 
 			int gz = origin.z;
 
@@ -98,7 +98,7 @@ protected:
 				int gx = origin.x;
 
 				for (int x = 0; x < bs.x; ++x, gx += stride) {
-					// Output is blocky, so we can go for just one sample
+					// 输出是方块化的，所以只需采样一次即可
 					float h = params.range.xform(height_func(gx, gz));
 					h -= origin.y;
 					int ih = math::arithmetic_rshift(int(h), lod);
@@ -112,7 +112,7 @@ protected:
 					}
 
 				} // for x
-			} // for z
+			} // 遍历 z
 		} // use_sdf
 
 		return Result();
@@ -143,7 +143,7 @@ protected:
 			for (unsigned int i = 0; i < out_values.size(); ++i) {
 				const float h = params.range.xform(height_func(positions_x[i], positions_z[i]));
 				const float sd = positions_y[i] - h;
-				// Not scaling here, since the return values are uncompressed floats
+				// 这里不做缩放，因为返回值是未压缩的浮点数
 				out_values[i] = sd;
 			}
 		} else {

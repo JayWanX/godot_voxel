@@ -6,9 +6,9 @@
 
 namespace voxel {
 
-// 32-bit float precision 2D vector.
-// Because Godot's `Vector2` uses `real_t`, so when `real_t` is `double` it forces some things to use double-precision
-// vectors while they dont need that amount of precision.
+// 32 位浮点精度二维向量。
+// 因为 Godot 的 `Vector2` 使用 `real_t`，所以当 `real_t` 为 `double` 时，会强制某些东西使用双精度
+// 向量，而它们并不需要那么高的精度。
 typedef Vector2T<float> Vector2f;
 
 namespace math {

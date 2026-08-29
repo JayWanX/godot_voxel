@@ -10,7 +10,7 @@ VOXEL_GODOT_FORWARD_DECLARE(class World3D);
 
 namespace voxel::godot {
 
-// Thin wrapper around static body API
+// 静态刚体 API 的轻量封装
 class DirectStaticBody : public voxel::NonCopyable {
 public:
 	DirectStaticBody();

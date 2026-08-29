@@ -7,7 +7,7 @@
 namespace voxel::tests {
 
 void test_fast_noise_2_basic() {
-	// Very basic test. The point is to make sure it doesn't crash, so there is no special condition to check.
+	// 非常基础的测试。目的是确保它不会崩溃，因此没有需要检查的特殊条件。
 	Ref<FastNoise2> noise;
 	noise.instantiate();
 	float nv = noise->get_noise_2d_single(Vector2(42, 666));
@@ -22,7 +22,7 @@ void test_fast_noise_2_empty_encoded_node_tree() {
 	Ref<FastNoise2> noise;
 	noise.instantiate();
 	noise->set_noise_type(FastNoise2::TYPE_ENCODED_NODE_TREE);
-	// This can print an error, but should not crash
+	// 这可能会打印一个错误，但不应该崩溃
 	noise->update_generator();
 }
 

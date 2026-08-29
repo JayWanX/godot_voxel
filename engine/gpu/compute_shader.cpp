@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/file_access.h"
 #include "../../util/godot/classes/rd_shader_source.h"
 #include "../../util/godot/classes/rendering_server.h"
-#include "../../util/godot/core/array.h" // for `varray`
+#include "../../util/godot/core/array.h" // 供 `varray` 使用
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/godot/core/print_string.h"
 #include "../../util/godot/classes/project_settings.h"
@@ -141,7 +141,7 @@ Ref<RDShaderSPIRV> compile_compute_shader_spirv_from_glsl(RenderingDevice &rd, S
 
 RID load_compute_shader_from_glsl(RenderingDevice &rd, String source_text, String name, bool shader_cache_enabled) {
 	VOXEL_PRINT_VERBOSE(format("Creating VoxelRD compute shader {}", name));
-	// For debugging
+	// 用于调试
 	// {
 	// 	Ref<FileAccess> f = FileAccess::open("debug_" + name + ".txt", FileAccess::WRITE);
 	// 	VOXEL_ASSERT(f.is_valid());
@@ -165,7 +165,7 @@ RID load_compute_shader_from_glsl(RenderingDevice &rd, String source_text, Strin
 	PackedByteArray shader_binary;
 	RID shader_rid;
 
-	// Load the shader cache if enabled
+	// 若启用则加载着色器缓存
 	if(shader_cache_enabled){
 		shader_binary = load_compute_shader_binary_from_cache(binary_cache_file_path);
 	}
@@ -180,14 +180,14 @@ RID load_compute_shader_from_glsl(RenderingDevice &rd, String source_text, Strin
 		VOXEL_PRINT_VERBOSE(format("VoxelRD compute shader binary cache rejected by RenderingDevice for {}", name));
 	}  
 
-	// Either no cache existed or the cache was rejected, remake it
+	// 要么没有缓存，要么缓存被拒绝，重新创建
 	Ref<RDShaderSPIRV> shader_spirv = compile_compute_shader_spirv_from_glsl(rd, source_text, name);
 	ERR_FAIL_COND_V(shader_spirv.is_null(), RID());
 
 	shader_binary = voxel::godot::shader_compile_binary_from_spirv(rd, **shader_spirv, name);
 	ERR_FAIL_COND_V(shader_binary.is_empty(), RID());
 
-	// Only cache if enabled
+	// 仅在启用时才进行缓存
 	if(shader_cache_enabled)
 	{
 		save_compute_shader_binary_to_cache(binary_cache_file_path, shader_binary, name);
@@ -232,7 +232,7 @@ void ComputeShaderInternal::load_from_glsl(RenderingDevice &rd, String source_te
 ComputeShader::~ComputeShader() {
 	ComputeShaderInternal internal = _internal;
 	VoxelEngine::get_singleton().push_gpu_task_f([internal](GPUTaskContext &ctx) { //
-		// *sigh*
+		// 唉……
 		ComputeShaderInternal internal2 = internal;
 		internal2.clear(ctx.rendering_device);
 	});
@@ -251,7 +251,7 @@ std::shared_ptr<ComputeShader> ComputeShaderFactory::create_invalid() {
 }
 
 RID ComputeShader::get_rid() const {
-	// TODO Assert that we are on the GPU tasks thread
+	// TODO 断言我们位于 GPU 任务线程上
 	return _internal.rid;
 }
 

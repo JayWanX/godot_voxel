@@ -81,7 +81,7 @@ int VoxelGeneratorGraph::get_used_channels_mask() const {
 		runtime_ptr = _runtime;
 	}
 	if (runtime_ptr == nullptr) {
-		// The graph hasn't been compiled yet, we can't tell which channels it produces.
+		// 图尚未编译，我们无法判断它会生成哪些通道。
 		return 0;
 	}
 	int mask = 0;
@@ -151,9 +151,9 @@ VoxelGeneratorGraph::TextureMode VoxelGeneratorGraph::get_texture_mode() const {
 	return _texture_mode;
 }
 
-// TODO Optimization: generating indices and weights on every voxel of a block might be avoidable
-// Instead, we could only generate them near zero-crossings, because this is where materials will be seen.
-// The problem is that it's harder to manage at the moment, to support edited blocks and LOD...
+// TODO 优化：在块的每个体素上生成索引和权重可能是可以避免的
+// 相反，我们可以只在零交叉附近生成它们，因为那是材质可见的地方。
+// 问题是目前要支持编辑过的块和 LOD 会比较难管理……
 void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 		Span<const WeightOutput> weight_outputs,
 		const pg::Runtime::State &state,
@@ -166,20 +166,19 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// TODO Optimization: exclude up-front outputs that are known to be zero?
-	// So we choose the cases below based on non-zero outputs instead of total output count
+	// TODO 优化：排除那些已知为零的初始输出？
+	// 所以我们根据非零输出来选择下面的情况，而不是根据输出总数
 
-	// It is unfortunately not practical to handle all combinations of single-value/array-of-values for every
-	// layer, so for now we try to workaround that
+	// 不幸的是，要为每个层处理单值/值数组的所有组合并不实际，所以目前我们尝试绕过这个问题
 	struct WeightBufferArray {
 		FixedArray<Span<const float>, 16> array;
 
 		inline float get_weight(unsigned int output_index, size_t value_index) const {
 			Span<const float> s = array[output_index];
 #ifdef DEV_ENABLED
-			// That span can either have size 1 (means all values would be the same) or have regular buffer
-			// size. We use min() to quickly access that without branching, but that could hide actual OOB bugs, so
-			// make sure they are detected
+			// 该 span 的大小要么为 1（表示所有值都相同），要么为常规缓冲区
+			// 大小。我们使用 min() 快速访问而无需分支，但这可能隐藏实际的越界错误，所以
+			// 要确保它们被检测到
 			VOXEL_ASSERT(s.size() > 0 && (value_index < s.size() || s.size() == 1));
 #endif
 			const float weight = s[math::min(value_index, s.size() - 1)];
@@ -187,12 +186,12 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 		}
 	};
 
-	// TODO This should not be necessary!
-	// We could use a pointer to the `min` member of intervals inside State, however Interval uses `real_t`, which
-	// breaks our code in 64-bit float builds of Godot. We should refactor Interval so everything can line up.
+	// TODO 这不应该必要！
+	// 我们可以使用指向 State 内区间 `min` 成员的指针，但 Interval 使用 `real_t`，
+	// 这在 Godot 的 64 位浮点构建中会破坏我们的代码。我们应该重构 Interval，使所有内容都能对齐。
 	FixedArray<float, 16> constants;
 
-	// TODO Could maybe put this part outside?
+	// TODO 也许可以把这部分放到外面？
 	WeightBufferArray buffers;
 	const unsigned int buffers_count = weight_outputs.size();
 	for (unsigned int oi = 0; oi < buffers_count; ++oi) {
@@ -200,9 +199,9 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 		const math::Interval &range = state.get_range_const_ref(info.output_buffer_index);
 
 		if (range.is_single_value()) {
-			// The weight is locally constant (or compile-time constant).
-			// We can't use the usual buffer because if we use optimized execution mapping, they won't be filled by any
-			// operation and would contain garbage
+			// 权重是局部常量（或编译期常量）。
+			// 我们不能使用常规缓冲区，因为如果使用优化的执行映射，它们不会被任何
+			// 操作填充，会包含垃圾数据
 			constants[oi] = range.min;
 			buffers.array[oi] = Span<const float>(&constants[oi], 1);
 			// buffers.array[oi] = Span<const float>(&range.min, 1);
@@ -215,7 +214,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 	switch (mode) {
 		case TEXTURE_MODE_MIXEL4: {
 			if (buffers_count <= 4) {
-				// Pick all results and fill with spare indices to keep semantic
+				// 选取所有结果并用备用索引填充以保持语义
 				size_t value_index = 0;
 				for (int rz = rmin.z; rz < rmax.z; ++rz) {
 					for (int rx = rmin.x; rx < rmax.x; ++rx) {
@@ -224,8 +223,8 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 						fill(weights, uint8_t(0));
 						for (unsigned int oi = 0; oi < buffers_count; ++oi) {
 							const float weight = buffers.get_weight(oi, value_index);
-							// TODO Optimization: weight output nodes could already multiply by 255 and clamp afterward
-							// so we would not need to do it here
+							// TODO 优化：权重输出节点可以预先乘以 255 后再钳制，
+							// 这样我们就不需要在这里做了
 							weights[oi] = math::clamp(weight * 255.f, 0.f, 255.f);
 							indices[oi] = weight_outputs[oi].layer_index;
 						}
@@ -235,7 +234,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 						const uint16_t encoded_weights = mixel4::encode_weights_to_packed_u16_lossy(
 								weights[0], weights[1], weights[2], weights[3]
 						);
-						// TODO Flatten this further?
+						// TODO 再进一步扁平化？
 						out_voxel_buffer.set_voxel(encoded_indices, rx, ry, rz, VoxelBuffer::CHANNEL_INDICES);
 						out_voxel_buffer.set_voxel(encoded_weights, rx, ry, rz, VoxelBuffer::CHANNEL_WEIGHTS);
 						++value_index;
@@ -243,7 +242,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 				}
 
 			} else if (buffers_count == 4) {
-				// Pick all results
+				// 选取所有结果
 				size_t value_index = 0;
 				for (int rz = rmin.z; rz < rmax.z; ++rz) {
 					for (int rx = rmin.x; rx < rmax.x; ++rx) {
@@ -259,7 +258,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 						const uint16_t encoded_weights = mixel4::encode_weights_to_packed_u16_lossy(
 								weights[0], weights[1], weights[2], weights[3]
 						);
-						// TODO Flatten this further?
+						// TODO 再进一步扁平化？
 						out_voxel_buffer.set_voxel(encoded_indices, rx, ry, rz, VoxelBuffer::CHANNEL_INDICES);
 						out_voxel_buffer.set_voxel(encoded_weights, rx, ry, rz, VoxelBuffer::CHANNEL_WEIGHTS);
 						++value_index;
@@ -267,7 +266,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 				}
 
 			} else {
-				// More weights than we can have per voxel. Will need to pick most represented weights
+				// 权重数超过每个体素可以拥有的数量。需要选取最具代表性的权重
 				const float pivot = 1.f / 5.f;
 				size_t value_index = 0;
 				FixedArray<uint8_t, 16> skipped_outputs;
@@ -282,7 +281,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 						weights[2] = 0;
 						weights[3] = 0;
 						unsigned int recorded_weights = 0;
-						// Pick up weights above pivot (this is not as correct as a sort but faster)
+						// 选取高于基准的权重（这不如排序准确，但更快）
 						for (unsigned int oi = 0; oi < buffers_count && recorded_weights < indices.size(); ++oi) {
 							const float weight = buffers.get_weight(oi, value_index);
 
@@ -295,9 +294,9 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 								++skipped_outputs_count;
 							}
 						}
-						// If we found less outputs above pivot than expected, fill with some skipped outputs.
-						// We have to do this because if an index appears twice with a different corresponding weight,
-						// then the latest weight will take precedence, which would be unwanted
+						// 如果找到的高于基准的输出比预期的少，用一些被跳过的输出来填充。
+						// 我们必须这样做，因为如果一个索引出现两次但对应不同的权重，
+						// 那么后出现的权重会优先生效，这是不想要的
 						for (unsigned int oi = recorded_weights; oi < indices.size(); ++oi) {
 							indices[oi] = skipped_outputs[oi - recorded_weights];
 						}
@@ -306,7 +305,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 						const uint16_t encoded_weights = mixel4::encode_weights_to_packed_u16_lossy(
 								weights[0], weights[1], weights[2], weights[3]
 						);
-						// TODO Flatten this further?
+						// TODO 再进一步扁平化？
 						out_voxel_buffer.set_voxel(encoded_indices, rx, ry, rz, VoxelBuffer::CHANNEL_INDICES);
 						out_voxel_buffer.set_voxel(encoded_weights, rx, ry, rz, VoxelBuffer::CHANNEL_WEIGHTS);
 						++value_index;
@@ -319,7 +318,7 @@ void VoxelGeneratorGraph::gather_texturing_data_from_weight_outputs(
 			size_t value_index = 0;
 			for (int rz = rmin.z; rz < rmax.z; ++rz) {
 				for (int rx = rmin.x; rx < rmax.x; ++rx) {
-					// Take highest weight as the index
+					// 取权重最高的作为索引
 					float highest_weight = 0.f;
 					uint8_t selected_index = 0;
 					for (unsigned int oi = 0; oi < buffers_count; ++oi) {
@@ -353,8 +352,8 @@ void fill_texturing_data_from_single_texture_index(
 	switch (mode) {
 		case VoxelGeneratorGraph::TEXTURE_MODE_MIXEL4: {
 			const uint8_t cindex = math::clamp(index, 0, 15);
-			// Make sure other indices are different so the weights associated with them don't
-			// override the first index's weight
+			// 确保其它索引不同，这样与它们关联的权重不会
+			// 覆盖第一个索引的权重
 			const uint16_t encoded_indices = mixel4::make_encoded_indices_for_single_texture(cindex);
 			const uint16_t encoded_weights = mixel4::make_encoded_weights_for_single_texture();
 			out_buffer.fill_area(encoded_indices, rmin, rmax, VoxelBuffer::CHANNEL_INDICES);
@@ -380,8 +379,8 @@ void fill_texturing_data_from_single_texture_index(
 	switch (mode) {
 		case VoxelGeneratorGraph::TEXTURE_MODE_MIXEL4: {
 			const uint8_t cindex = math::clamp(index, 0, 15);
-			// Make sure other indices are different so the weights associated with them don't
-			// override the first index's weight
+			// 确保其它索引不同，这样与它们关联的权重不会
+			// 覆盖第一个索引的权重
 			const uint16_t encoded_indices = mixel4::make_encoded_indices_for_single_texture(cindex);
 			const uint16_t encoded_weights = mixel4::make_encoded_weights_for_single_texture();
 			out_buffer.fill(encoded_indices, VoxelBuffer::CHANNEL_INDICES);
@@ -415,7 +414,7 @@ void gather_texturing_data_from_single_texture_output(
 
 	switch (mode) {
 		case VoxelGeneratorGraph::TEXTURE_MODE_MIXEL4: {
-			// TODO Should not really be here, but may work. Left here for now so all code for this is in one place
+			// TODO 并不真正应该在这里，但可能有效。暂时留在这里，以便所有代码集中在一处
 			const uint16_t encoded_weights = mixel4::make_encoded_weights_for_single_texture();
 			out_voxel_buffer.clear_channel(VoxelBuffer::CHANNEL_WEIGHTS, encoded_weights);
 
@@ -693,9 +692,9 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 	const VoxelBuffer::ChannelId sdf_channel = VoxelBuffer::CHANNEL_SDF;
 	const Vector3i origin = input.origin_in_voxels;
 
-	// TODO This may be shared across the module
-	// Storing voxels is lossy on some depth configurations. They use normalized SDF,
-	// so we must scale the values to make better use of the offered resolution
+	// TODO 这可能可以在整个模块间共享
+	// 在某些深度配置下存储体素是有损的。它们使用归一化的 SDF，
+	// 所以我们必须缩放这些值以更好地利用所提供的分辨率
 	const VoxelBuffer::Depth sdf_channel_depth = out_buffer.get_channel_depth(sdf_channel);
 	const float sdf_scale = VoxelBuffer::get_sdf_quantization_scale(sdf_channel_depth);
 
@@ -704,10 +703,10 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 
 	const int stride = 1 << input.lod;
 
-	// Clip threshold must be higher for higher lod indexes because distances for one sampled voxel are also larger
+	// 较高的 LOD 索引需要更高的裁剪阈值，因为单个采样体素的距离也更大
 	const float clip_threshold = _sdf_clip_threshold * stride;
 
-	// Block size must be a multiple of section size, as all sections must have the same size
+	// 块大小必须是区块大小的倍数，因为所有区块的大小必须相同
 	const bool can_use_subdivision =
 			(bs.x % _subdivision_size == 0) && (bs.y % _subdivision_size == 0) && (bs.z % _subdivision_size == 0);
 
@@ -719,7 +718,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 
 	Cache &cache = get_tls_cache();
 
-	// Slice is on the Y axis
+	// 切片在 Y 轴上
 	const unsigned int slice_buffer_size = section_size.x * section_size.z;
 	pg::Runtime &runtime = runtime_ptr->runtime;
 	runtime.prepare_state(cache.state, slice_buffer_size, false);
@@ -754,7 +753,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 		cache.input_sdf_full_cache.resize(volume);
 		input_sdf_full_cache = to_span(cache.input_sdf_full_cache);
 
-		// Note, a copy of the data is notably needed because we are going to write into that same buffer.
+		// 注意，尤其需要一份数据的副本，因为我们要写入同一个缓冲区。
 		get_unscaled_sdf(out_buffer, input_sdf_full_cache);
 
 		sdf_input_range = math::Interval::from_single_value(input_sdf_full_cache[0]);
@@ -763,7 +762,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 		}
 	}
 
-	// For each subdivision of the block
+	// 对块的每个分区
 	for (int sz = 0; sz < bs.z; sz += section_size.z) {
 		for (int sy = 0; sy < bs.y; sy += section_size.y) {
 			for (int sx = 0; sx < bs.x; sx += section_size.x) {
@@ -774,7 +773,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 				const Vector3i gmin = origin + (rmin << input.lod);
 				const Vector3i gmax = origin + (rmax << input.lod);
 
-				// Do a quick analysis of the area. We'll only compute voxels if necessary.
+				// 对该区域进行快速分析。只在必要时才计算体素。
 				{
 					QueryInputs<math::Interval> range_inputs(
 							*runtime_ptr,
@@ -809,7 +808,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 						sdf_is_matter = !sdf_is_air;
 
 					} else {
-						// SDF is not uniform, we'll need to compute it per voxel
+						// SDF 不均匀，我们需要逐体素计算
 						required_outputs.push_back(runtime_ptr->sdf_output_index);
 						sdf_is_air = false;
 						sdf_is_uniform = false;
@@ -826,25 +825,25 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 						out_buffer.fill_area(int(type_range.min), rmin, rmax, type_channel);
 						type_is_uniform = true;
 					} else {
-						// Types are not uniform, we'll need to compute them per voxel
+						// 类型不均匀，需要逐体素计算
 						required_outputs.push_back(runtime_ptr->type_output_index);
 					}
 				}
 
 				if (runtime_ptr->weight_outputs_count > 0 && !sdf_is_air) {
-					// We can skip this when SDF is air because there won't be any matter to give a texture to
-					// TODO Range analysis on that?
-					// Not easy to do that from here, they would have to ALL be locally constant in order to use a
-					// short-circuit...
+					// 当 SDF 为空气时可以跳过，因为没有实体需要赋予纹理
+					// TODO 对此进行范围分析？
+					// 从这里做起来不容易，它们必须全部为局部常量才能使用
+					// 短路……
 					for (unsigned int i = 0; i < runtime_ptr->weight_outputs_count; ++i) {
 						required_outputs.push_back(runtime_ptr->weight_output_indices[i]);
 					}
 				}
 
-				// TODO Instead of filling this ourselves, can we leave this to the graph runtime?
-				// Because currently our logic seems redundant and more complicated, since we also have to not request
-				// those outputs later if any other output isn't uniform. Instead, the graph runtime can figure out
-				// that stuff is constant.
+				// TODO 与其我们自己填充，能否把这个留给图运行时？
+				// 因为目前我们的逻辑显得冗余且更复杂，因为如果任何其它输出不是均匀的，
+				// 我们还必须不请求这些输出。相反，图运行时可以自己判断
+				// 哪些东西是常量。
 				bool single_texture_is_uniform = false;
 				if (runtime_ptr->single_texture_output_index != -1 && !sdf_is_air) {
 					const math::Interval index_range =
@@ -861,11 +860,11 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 				}
 
 				if (required_outputs.size() == 0) {
-					// We found all we need with range analysis, no need to calculate per voxel.
+					// 通过范围分析我们已经找到了所需的一切，无需逐体素计算。
 					continue;
 				}
 
-				// At least one channel needs per-voxel computation.
+				// 至少有一个通道需要逐体素计算。
 
 				if (_use_optimized_execution_map) {
 					runtime.generate_optimized_execution_map(
@@ -890,8 +889,8 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 					y_cache.fill(gy);
 
 					if (input_sdf_full_cache.size() != 0) {
-						// Copy input SDF using expected coordinate convention.
-						// VoxelBuffer is ZXY, but the graph runs in YXZ.
+						// 使用预期的坐标约定复制输入 SDF。
+						// VoxelBuffer 是 ZXY，但图以 YXZ 运行。
 						unsigned int i = 0;
 						for (int rz = rmin.z; rz < rmax.z; ++rz) {
 							for (int rx = rmin.x; rx < rmax.x; ++rx) {
@@ -902,7 +901,7 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 						}
 					}
 
-					// Full query (unless using execution map)
+					// 完整查询（除非使用执行映射）
 					{
 						QueryInputs<Span<const float>> query_inputs(
 								*runtime_ptr, x_cache, y_cache, z_cache, input_sdf_slice_cache
@@ -916,12 +915,12 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 					}
 
 					if (sdf_output_buffer_index != -1
-						// If SDF was found uniform, we already filled the results, and we did not require it in the
-						// query. But if another output exists, a query might still run (so we end up at this
-						// `if`), and we should not gather SDF results. Otherwise it would overwrite the slice with
-						// garbage since SDF was skipped.
-						// The same logic goes for other outputs: if they aren't in the query, we must not fill
-						// them.
+						// 如果发现 SDF 是均匀的，我们已经填充了结果，并且没有在
+						// 查询中要求它。但如果存在其它输出，查询可能仍然会运行（所以我们最终会进入这个
+						// `if`），并且我们不应收集 SDF 结果。否则它会用
+						// 垃圾数据覆盖切片，因为 SDF 被跳过了。
+						// 其它输出同理：如果它们不在查询中，我们就不能填充
+						// 它们。
 						&& !sdf_is_uniform) {
 						const pg::Runtime::Buffer &sdf_buffer = cache.state.get_buffer(sdf_output_buffer_index);
 						fill_zx_sdf_slice(
@@ -967,20 +966,19 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 
 	out_buffer.compress_uniform_channels();
 
-	// This is different from finding out that the buffer is uniform.
-	// This really means we predicted SDF will never cross zero in this area, no matter how precise we get.
-	// Relying on the block's uniform channels would bring up false positives due to LOD aliasing.
+	// 这与发现缓冲区是均匀的不同。
+	// 这真的意味着我们预测 SDF 在此区域内永远不会穿过零，无论我们计算得多精确。
+	// 依赖块的均匀通道会由于 LOD 混叠而产生误报。
 	const bool all_sdf_is_uniform = all_sdf_is_air || all_sdf_is_matter;
 	if (all_sdf_is_uniform) {
-		// TODO If voxel texure weights are used, octree compression might be a bit more complicated.
-		// For now we only look at SDF but if texture weights are used and the player digs a bit inside terrain,
-		// they will find it's all default weights.
-		// Possible workarounds:
-		// - Only do it for air
-		// - Also take indices and weights into account, but may lead to way less compression, or none, for stuff
-		// that
-		//   essentially isnt showing up until dug out
-		// - Invoke generator to produce LOD0 blocks somehow, but main thread could stall
+		// TODO 如果使用了体素纹理权重，八叉树压缩可能会更复杂。
+		// 目前我们只查看 SDF，但如果使用了纹理权重且玩家在地形内部挖了一点，
+		// 他们会发现那里全是默认权重。
+		// 可能的解决方案：
+		// - 只对空气执行
+		// - 也把索引和权重考虑进去，但这可能导致压缩大幅减少，甚至没有压缩，对那种
+		// 基本上在被挖出来之前不会显示的东西
+		// - 以某种方式调用生成器生成 LOD0 块，但主线程可能会阻塞
 		result.max_lod_hint = true;
 	}
 
@@ -988,9 +986,9 @@ VoxelGenerator::Result VoxelGeneratorGraph::generate_block(VoxelGenerator::Voxel
 }
 
 bool VoxelGeneratorGraph::generate_broad_block(VoxelGenerator::VoxelQueryData input) {
-	// This is a reduced version of what `generate_block` does already, so it can be used before scheduling GPU work.
-	// If range analysis and SDF clipping finds that we don't need to generate the full block, we can get away with the
-	// broad result. If any channel cannot be determined this way, we have to perform full generation.
+	// 这是 `generate_block` 已有逻辑的精简版本，因此可在调度 GPU 工作之前使用。
+	// 如果范围分析和 SDF 裁剪发现我们无需生成完整块，就可以采用这种粗略结果。
+	// 如果任何通道无法通过这种方式确定，则必须执行完整生成。
 
 	std::shared_ptr<Runtime> runtime_ptr;
 	{
@@ -1012,12 +1010,12 @@ bool VoxelGeneratorGraph::generate_broad_block(VoxelGenerator::VoxelQueryData in
 
 	const int stride = 1 << input.lod;
 
-	// Clip threshold must be higher for higher lod indexes because distances for one sampled voxel are also larger
+	// 较高的 LOD 索引需要更高的裁剪阈值，因为单个采样体素的距离也更大
 	const float clip_threshold = _sdf_clip_threshold * stride;
 
 	Cache &cache = get_tls_cache();
 
-	// Slice is on the Y axis
+	// 切片在 Y 轴上
 	pg::Runtime &runtime = runtime_ptr->runtime;
 	runtime.prepare_state(cache.state, 1, false);
 
@@ -1058,7 +1056,7 @@ bool VoxelGeneratorGraph::generate_broad_block(VoxelGenerator::VoxelQueryData in
 			sdf_is_air = sdf_range.min > 0.f;
 
 		} else {
-			// SDF is not uniform, we'll need to compute it per voxel
+			// SDF 不均匀，我们需要逐体素计算
 			return false;
 		}
 	}
@@ -1068,21 +1066,21 @@ bool VoxelGeneratorGraph::generate_broad_block(VoxelGenerator::VoxelQueryData in
 		if (type_range.is_single_value()) {
 			out_buffer.fill(int(type_range.min), type_channel);
 		} else {
-			// Types are not uniform, we'll need to compute them per voxel
+			// 类型不均匀，需要逐体素计算
 			return false;
 		}
 	}
 
-	// We can skip this when SDF is air because there won't be any matter to give a texture to
+	// 当 SDF 为空气时可以跳过，因为没有实体需要赋予纹理
 	if (runtime_ptr->weight_outputs_count > 0 && !sdf_is_air) {
 		return false;
-		// TODO Range analysis on that?
+		// TODO 对此进行范围分析？
 	}
 
-	// TODO Instead of filling this ourselves, can we leave this to the graph runtime?
-	// Because currently our logic seems redundant and more complicated, since we also have to not request
-	// those outputs later if any other output isn't uniform. Instead, the graph runtime can figure out
-	// that stuff is constant.
+	// TODO 与其我们自己填充，能否把这个留给图运行时？
+	// 因为目前我们的逻辑显得冗余且更复杂，因为如果任何其它输出不是均匀的，
+	// 我们还必须不请求这些输出。相反，图运行时可以自己判断
+	// 哪些东西是常量。
 	if (runtime_ptr->single_texture_output_index != -1 && !sdf_is_air) {
 		const math::Interval index_range = cache.state.get_range(runtime_ptr->single_texture_output_buffer_index);
 		if (index_range.is_single_value()) {
@@ -1092,7 +1090,7 @@ bool VoxelGeneratorGraph::generate_broad_block(VoxelGenerator::VoxelQueryData in
 		}
 	}
 
-	// We found all we need with range analysis, no need to calculate per voxel.
+	// 通过范围分析我们已经找到了所需的一切，无需逐体素计算。
 	return true;
 }
 
@@ -1116,8 +1114,8 @@ bool has_output_type(
 } // namespace
 
 pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
-	// This is a specialized compilation. We use VoxelGraphFunction for a more precise use case, which is to generate
-	// voxels based on 3D coordinates and some other attributes. So we expect specific inputs and outputs to be used.
+	// 这是一种专门的编译。我们将 VoxelGraphFunction 用于更精确的用例，即基于 3D 坐标
+	// 及其它一些属性生成体素。因此我们期望使用特定的输入和输出。
 
 	ERR_FAIL_COND_V(_main_function.is_null(), pg::CompilationResult::make_error("Main function not defined"));
 
@@ -1125,7 +1123,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 
 	std::shared_ptr<Runtime> r = make_shared_instance<Runtime>();
 
-	// We usually expect X, Y, Z and SDF inputs. Custom inputs are not supported.
+	// 我们通常期望 X、Y、Z 和 SDF 输入。不支持自定义输入。
 	_main_function->auto_pick_inputs_and_outputs();
 	Span<const pg::VoxelGraphFunction::Port> input_defs = _main_function->get_input_definitions();
 	for (unsigned int input_index = 0; input_index < input_defs.size(); ++input_index) {
@@ -1150,8 +1148,8 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 		}
 	}
 
-	// TODO This bypasses VoxelGraphFunction's compiling method, we should probably use it now
-	// Core compilation
+	// TODO 这绕过了 VoxelGraphFunction 的编译方法，我们现在可能应该使用它
+	// 核心编译
 	pg::Runtime &runtime = r->runtime;
 	const pg::CompilationResult result = runtime.compile(**_main_function, debug);
 
@@ -1161,12 +1159,12 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 
 	const ProgramGraph &source_graph = _main_function->get_graph();
 
-	// Extra steps
+	// 额外步骤
 	for (unsigned int output_index = 0; output_index < runtime.get_output_count(); ++output_index) {
 		const pg::Runtime::OutputInfo output = runtime.get_output_info(output_index);
 		const ProgramGraph::Node &node = source_graph.get_node(output.node_id);
 
-		// TODO Allow specifying max count in pg::NodeTypeDB so we can make some of these checks more generic
+		// TODO 允许在 pg::NodeTypeDB 中指定最大数量，以便让其中一些检查更通用
 		switch (node.type_id) {
 			case pg::VoxelGraphFunction::NODE_OUTPUT_SDF:
 				if (r->sdf_output_buffer_index != -1) {
@@ -1193,7 +1191,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 				CRASH_COND(node.params.size() == 0);
 				const int layer_index = node.params[0];
 				if (layer_index < 0) {
-					// Should not be allowed by the UI, but who knows
+					// 正常情况下 UI 不应允许这种情况，但谁知道呢
 					pg::CompilationResult error;
 					error.success = false;
 					error.message = String(VOXEL_TTR("Cannot use negative layer index in weight output"));
@@ -1272,7 +1270,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 		return error;
 	}
 
-	// Sort output weights by layer index, for determinism. Could be exploited for optimization too?
+	// 按图层索引对权重输出排序，以保证确定性。也可能可用于优化？
 	{
 		struct WeightOutputComparer {
 			inline bool operator()(const WeightOutput &a, const WeightOutput &b) const {
@@ -1284,7 +1282,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 		sorter.sort(r->weight_outputs.data(), r->weight_outputs_count);
 	}
 
-	// Calculate spare indices
+	// 计算备用索引
 	{
 		FixedArray<bool, 16> used_indices_map;
 		FixedArray<uint8_t, 4> spare_indices;
@@ -1309,7 +1307,7 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 		r->spare_texture_indices = spare_indices;
 	}
 
-	// Store valid result
+	// 存储有效结果
 	RWLockWrite wlock(_runtime_lock);
 	_runtime = r;
 
@@ -1325,13 +1323,13 @@ pg::CompilationResult VoxelGeneratorGraph::compile(bool debug) {
 	return result;
 }
 
-// This is an external API which involves locking so better not use this internally
+// 这是一个涉及锁定的外部 API，因此最好不要在内部使用
 bool VoxelGeneratorGraph::is_good() const {
 	RWLockRead rlock(_runtime_lock);
 	return _runtime != nullptr;
 }
 
-// TODO Rename `generate_series`
+// TODO 重命名 `generate_series`
 void VoxelGeneratorGraph::generate_set(Span<const float> in_x, Span<const float> in_y, Span<const float> in_z) {
 	RWLockRead rlock(_runtime_lock);
 	ERR_FAIL_COND(_runtime == nullptr);
@@ -1340,7 +1338,7 @@ void VoxelGeneratorGraph::generate_set(Span<const float> in_x, Span<const float>
 
 	Span<float> in_sdf;
 	if (_runtime->sdf_input_index != -1) {
-		// Support graphs having an SDF input, give it default values
+		// 支持带有 SDF 输入的图，为它提供默认值
 		cache.input_sdf_full_cache.resize(in_x.size());
 		in_sdf = to_span(cache.input_sdf_full_cache);
 		in_sdf.fill(0.f);
@@ -1350,8 +1348,8 @@ void VoxelGeneratorGraph::generate_set(Span<const float> in_x, Span<const float>
 
 	runtime.prepare_state(cache.state, in_x.size(), false);
 	runtime.generate_set(cache.state, inputs.get(), false, nullptr);
-	// Note, when generating SDF, we don't scale it because the return values are uncompressed floats. Scale only
-	// matters if we are storing it inside 16-bit or 8-bit VoxelBuffer.
+	// 注意，生成 SDF 时我们不缩放它，因为返回值是未压缩的浮点数。仅当将其存储到
+	// 16 位或 8 位 VoxelBuffer 中时，缩放才有意义。
 }
 
 void VoxelGeneratorGraph::generate_series(
@@ -1369,8 +1367,8 @@ void VoxelGeneratorGraph::generate_series(
 
 	runtime.prepare_state(cache.state, in_x.size(), false);
 	runtime.generate_set(cache.state, inputs.get(), false, nullptr);
-	// Note, when generating SDF, we don't scale it because the return values are uncompressed floats. Scale only
-	// matters if we are storing it inside 16-bit or 8-bit VoxelBuffer.
+	// 注意，生成 SDF 时我们不缩放它，因为返回值是未压缩的浮点数。仅当将其存储到
+	// 16 位或 8 位 VoxelBuffer 中时，缩放才有意义。
 }
 
 void VoxelGeneratorGraph::generate_series(
@@ -1407,13 +1405,13 @@ void VoxelGeneratorGraph::generate_series(
 	}
 
 	if (buffer_index == -1) {
-		// The graph does not define such output
+		// 图未定义此类输出
 		out_values.fill(defval);
 		return;
 	}
 
 	{
-		// The implementation cannot guarantee constness at compile time, but it should not modifiy the data either way
+		// 该实现无法在编译时保证 const 性，但无论如何都不应修改数据
 		float *ptr_x = const_cast<float *>(positions_x.data());
 		float *ptr_y = const_cast<float *>(positions_y.data());
 		float *ptr_z = const_cast<float *>(positions_z.data());
@@ -1469,8 +1467,8 @@ inline Vector3 get_3d_pos_from_panorama_uv(Vector2 uv) {
 	return Vector3(x, y, z);
 }
 
-// Subdivides a rectangle in square chunks and runs a function on each of them.
-// The ref is important to allow re-using functors.
+// 将矩形细分为方形块，并对每个块运行一个函数。
+// 引用很重要，以便允许复用仿函数。
 template <typename F>
 inline void for_chunks_2d(int w, int h, int chunk_size, F &f) {
 	const int chunks_x = w / chunk_size;
@@ -1504,8 +1502,8 @@ void VoxelGeneratorGraph::bake_sphere_bumpmap(Ref<Image> im, float ref_radius, f
 	ERR_FAIL_COND(runtime_ptr == nullptr);
 	ERR_FAIL_COND_MSG(runtime_ptr->sdf_output_buffer_index == -1, "This function only works with an SDF output.");
 
-	// This process would use too much memory if run over the entire image at once,
-	// so we'll subdivide the load in smaller chunks
+	// 如果一次处理整个图像，此过程会占用太多内存，
+	// 因此我们将负载细分为更小的块
 	struct ProcessChunk {
 		StdVector<float> x_coords;
 		StdVector<float> y_coords;
@@ -1562,7 +1560,7 @@ void VoxelGeneratorGraph::bake_sphere_bumpmap(Ref<Image> im, float ref_radius, f
 				}
 			}
 
-			// Support graphs having an SDF input, give it default values
+			// 支持带有 SDF 输入的图，为它提供默认值
 			Span<float> in_sdf;
 			if (runtime_wrapper.sdf_input_index != -1) {
 				in_sdf_cache.resize(x_coords.size());
@@ -1577,8 +1575,8 @@ void VoxelGeneratorGraph::bake_sphere_bumpmap(Ref<Image> im, float ref_radius, f
 			runtime_wrapper.runtime.generate_set(state, inputs.get(), false, nullptr);
 			const pg::Runtime::Buffer &buffer = state.get_buffer(runtime_wrapper.sdf_output_buffer_index);
 
-			// Calculate final pixels
-			// TODO Optimize: could convert to buffer directly?
+			// 计算最终像素
+			// TODO 优化：能否直接转换为缓冲区？
 			i = 0;
 			for (int iy = y0; iy < ymax; ++iy) {
 				for (int ix = x0; ix < xmax; ++ix) {
@@ -1597,9 +1595,9 @@ void VoxelGeneratorGraph::bake_sphere_bumpmap(Ref<Image> im, float ref_radius, f
 	for_chunks_2d(im->get_width(), im->get_height(), 32, pc);
 }
 
-// If this generator is used to produce a planet, specifically using a spherical heightmap approach,
-// then this function can be used to bake a map of the surface.
-// Such maps can be used by shaders to sharpen the details of the planet when seen from far away.
+// 如果此生成器用于生成行星，特别是使用球形高度图的方法，
+// 那么此函数可用于烘焙表面地图。
+// 此类地图可被着色器用于在远处观看行星时锐化其细节。
 void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius, float strength) {
 	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(im.is_null());
@@ -1613,13 +1611,13 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 	ERR_FAIL_COND(runtime_ptr == nullptr);
 	ERR_FAIL_COND_MSG(runtime_ptr->sdf_output_buffer_index == -1, "This function only works with an SDF output.");
 
-	// This process would use too much memory if run over the entire image at once,
-	// so we'll subdivide the load in smaller chunks
+	// 如果一次处理整个图像，此过程会占用太多内存，
+	// 因此我们将负载细分为更小的块
 	struct ProcessChunk {
 		StdVector<float> x_coords;
 		StdVector<float> y_coords;
 		StdVector<float> z_coords;
-		StdVector<float> sdf_values_p; // TODO Could be used at the same time to get bump?
+		StdVector<float> sdf_values_p; // TODO 是否可以同时用于获取凹凸？
 		StdVector<float> sdf_values_px;
 		StdVector<float> sdf_values_py;
 		StdVector<float> in_sdf_cache;
@@ -1668,7 +1666,7 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 
 			const pg::Runtime::Buffer &sdf_output_buffer = state.get_buffer(runtime_wrapper.sdf_output_buffer_index);
 
-			// Support graphs having an SDF input, give it default values
+			// 支持带有 SDF 输入的图，为它提供默认值
 			Span<float> in_sdf;
 			if (runtime_wrapper.sdf_input_index != -1) {
 				in_sdf_cache.resize(x_coords.size());
@@ -1676,9 +1674,9 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 				in_sdf.fill(0.f);
 			}
 
-			// TODO instead of using 3 separate queries, interleave triplets of positions into a single array?
+			// TODO 与其使用 3 次单独的查询，何不把三个一组的位置交错进同一个数组？
 
-			// Get heights
+			// 获取高度
 			unsigned int i = 0;
 			for (int iy = y0; iy < ymax; ++iy) {
 				for (int ix = x0; ix < xmax; ++ix) {
@@ -1695,12 +1693,12 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 					runtime_wrapper, to_span(x_coords), to_span(y_coords), to_span(z_coords), in_sdf
 			);
 
-			// TODO Perform range analysis on the range of coordinates, it might still yield performance benefits
+			// TODO 对坐标范围进行区间分析，可能仍有性能收益
 			runtime_wrapper.runtime.generate_set(state, inputs.get(), false, nullptr);
 			CRASH_COND(sdf_values_p.size() != sdf_output_buffer.size);
 			memcpy(sdf_values_p.data(), sdf_output_buffer.data, sdf_values_p.size() * sizeof(float));
 
-			// Get neighbors along X
+			// 获取沿 X 方向的相邻点
 			i = 0;
 			for (int iy = y0; iy < ymax; ++iy) {
 				for (int ix = x0; ix < xmax; ++ix) {
@@ -1716,7 +1714,7 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 			CRASH_COND(sdf_values_px.size() != sdf_output_buffer.size);
 			memcpy(sdf_values_px.data(), sdf_output_buffer.data, sdf_values_px.size() * sizeof(float));
 
-			// Get neighbors along Y
+			// 沿 Y 方向获取相邻点
 			i = 0;
 			for (int iy = y0; iy < ymax; ++iy) {
 				for (int ix = x0; ix < xmax; ++ix) {
@@ -1732,11 +1730,11 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 			CRASH_COND(sdf_values_py.size() != sdf_output_buffer.size);
 			memcpy(sdf_values_py.data(), sdf_output_buffer.data, sdf_values_py.size() * sizeof(float));
 
-			// TODO This is probably invalid due to the distortion, may need to use another approach.
-			// Compute the 3D normal from gradient, then project it?
+			// TODO 由于畸变，这很可能不成立，可能需要另寻他法。
+			// 从梯度计算 3D 法线，然后将其投影？
 
-			// Calculate final pixels
-			// TODO Optimize: convert into buffer directly?
+			// 计算最终像素
+			// TODO 优化：直接转换进缓冲区？
 			i = 0;
 			for (int iy = y0; iy < ymax; ++iy) {
 				for (int ix = x0; ix < xmax; ++ix) {
@@ -1754,7 +1752,7 @@ void VoxelGeneratorGraph::bake_sphere_normalmap(Ref<Image> im, float ref_radius,
 
 	Cache &cache = get_tls_cache();
 
-	// The default for strength is 1.f
+	// strength 的默认值是 1.f
 	const float e = 0.001f;
 	if (strength > -e && strength < e) {
 		if (strength > 0.f) {
@@ -1800,13 +1798,13 @@ MaybeRayHit raycast_sdf_approx_batch(
 
 	Span<const Span<const float>> inputs_spans = to_span_const(inputs);
 
-	// Generate a group of values
+	// 生成一组值
 	runtime.generate_set(state, inputs_spans, false, nullptr);
 	const pg::Runtime::Buffer &sd_output_buffer = state.get_buffer(sdf_output_buffer_index);
 	VOXEL_ASSERT(x_array.size() == sd_output_buffer.size);
 	Span<const float> out_sd_values(sd_output_buffer.data, sd_output_buffer.size);
 
-	// Analyse values
+	// 分析值
 	unsigned int hit_index = 0;
 	for (const float sd : out_sd_values) {
 		if (sd < 0.f) {
@@ -1816,7 +1814,7 @@ MaybeRayHit raycast_sdf_approx_batch(
 	}
 
 	if (hit_index < out_sd_values.size()) {
-		// Found a hit
+		// 找到命中点
 		MaybeRayHit hit;
 		hit.fraction = static_cast<float>(hit_index) / static_cast<float>(step_count);
 		hit.valid = true;
@@ -1831,17 +1829,17 @@ float VoxelGeneratorGraph::raycast_sdf_approx(
 		const Vector3 ray_end,
 		const float stride
 ) const {
-	// Generates values along a ray to find the first one where SDF < 0.0, and return distance along the ray. If no hit
-	// is found, returns -1.0.
-	// This is an approximation: the error margin of the returned value will be up to the given stride.
-	// The longer the distance, the more expensive it is.
-	// The lower the stride, the more expensive and accurate it is.
+	// 沿射线生成值，找到第一个 SDF < 0.0 的位置，并返回沿射线的距离。若未命中
+	// 则返回 -1.0。
+	// 这是近似计算：返回值的误差最多为给定的步长。
+	// 距离越长，开销越大。
+	// 步长越小，开销越大但精度越高。
 
-	// Possible optimizations if the ray is vertical:
-	// TODO Detect if the graph is purely 2D, and if it is, fast-track to a heightmap single evaluation?
-	// TODO Optimize 2D parts of the graph if possible
-	// TODO Use range analysis? Could be effective on such a restricted XZ range
-	// TODO Allow rational stride, for LOD use cases?
+	// 若射线竖直，可能的优化：
+	// TODO 检测图是否纯 2D，若是，则快速走高度图单次求值？
+	// TODO 尽可能优化图中的 2D 部分
+	// TODO 使用区间分析？在如此受限的 XZ 范围上可能很有效
+	// TODO 允许有理数步长，用于 LOD 场景？
 
 	VOXEL_PROFILE_SCOPE();
 
@@ -1873,8 +1871,8 @@ float VoxelGeneratorGraph::raycast_sdf_approx(
 
 	const unsigned int step_count = Math::ceil(distance / stride);
 
-	// We'll compute batches of values instead of one by one, as the graph runtime prefers it.
-	// It's chosen such that the runtime could use SIMD.
+	// 我们将成批计算值，而不是逐个计算，因为图运行时更喜欢这种方式。
+	// 选择该批次大小是为了让运行时能够使用 SIMD。
 	static const unsigned int BATCH_LENGTH = 16;
 
 	const unsigned int batch_count = math::ceildiv(step_count, BATCH_LENGTH);
@@ -1913,8 +1911,8 @@ float VoxelGeneratorGraph::raycast_sdf_approx(
 
 		if (hit.valid) {
 			return Math::lerp(from_distance, to_distance, static_cast<real_t>(hit.fraction));
-			// TODO Affine search by doing hierarchical search? Or leave it to the caller for now?
-			// Evaluate voxels between hit.y and hit.y+stride
+			// TODO 通过分层搜索进行仿射搜索？还是暂时留给调用方？
+			// 计算 hit.y 和 hit.y+stride 之间的体素
 		}
 	}
 
@@ -1943,7 +1941,7 @@ void VoxelGeneratorGraph::generate_image_from_sdf(Ref<Image> image, const Transf
 	StdVector<float> y_buffer;
 	StdVector<float> z_buffer;
 
-	// TODO Candidate for temp allocator
+	// TODO 临时分配器的候选
 	x_buffer.resize(resolution.x);
 	y_buffer.resize(resolution.x);
 	z_buffer.resize(resolution.x);
@@ -1964,7 +1962,7 @@ void VoxelGeneratorGraph::generate_image_from_sdf(Ref<Image> image, const Transf
 	Span<const Span<const float>> inputs_spans = to_span_const(inputs);
 
 	for (int yi = 0; yi < resolution.y; ++yi) {
-		// We add 0.5 to sample at the center of pixels
+		// 加 0.5 以在像素中心采样
 		const real_t yf = (static_cast<real_t>(resolution.y - yi - 1) + 0.5) / static_cast<real_t>(resolution.y);
 		const real_t ly = Math::lerp(-half_size.y, half_size.y, yf);
 
@@ -2035,7 +2033,7 @@ bool VoxelGeneratorGraph::get_shader_source(ShaderSourceData &out_data) const {
 #endif
 
 VoxelSingleValue VoxelGeneratorGraph::generate_single(Vector3i position, unsigned int channel) {
-	// This is very slow when used multiple times, so if possible prefer using bulk queries
+	// 多次使用时非常慢，因此如果可能，优先使用批量查询
 
 	struct L {
 		static inline float query(const Runtime &runtime_info, const Vector3i pos, const int buffer_index) {
@@ -2098,7 +2096,7 @@ VoxelSingleValue VoxelGeneratorGraph::generate_single(Vector3i position, unsigne
 		} break;
 
 		default:
-			// Fallback to slow default
+			// 回退到慢速的默认实现
 			v = VoxelGenerator::generate_single(position, channel);
 			break;
 	}
@@ -2116,8 +2114,8 @@ math::Interval get_range(const Span<const float> values) {
 	return math::Interval(minv, maxv);
 }
 
-// Note, this wrapper may not be used for main generation tasks.
-// It is mostly used as a debug tool.
+// 注意，此包装器不能用于主要生成任务。
+// 它主要用于调试工具。
 math::Interval VoxelGeneratorGraph::debug_analyze_range(
 		Vector3i min_pos,
 		Vector3i max_pos,
@@ -2144,7 +2142,7 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 			math::Interval()
 	);
 
-	// Note, buffer size is irrelevant here, because range analysis doesn't use buffers
+	// 注意，这里的缓冲区大小无关紧要，因为区间分析不使用缓冲区
 	runtime.prepare_state(cache.state, 1, false);
 	runtime.analyze_range(cache.state, query_inputs.get());
 	if (optimize_execution_map) {
@@ -2154,13 +2152,13 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 #if 0
 	const bool range_validation = true;
 	if (range_validation) {
-		// Actually calculate every value and check if range analysis bounds them.
-		// If it does not, then it's a bug.
-		// This is not 100% accurate. We would have to calculate every value at every point in space in the area which
-		// is not possible, we can only sample a finite number within a grid.
+		// 实际计算每个值，并检查区间分析是否将其包含在内。
+		// 若未包含，那就是一个 bug。
+		// 这并非 100% 精确。我们本应计算区域内每个空间点的每个值，但这
+		// 不可能做到，只能在一个网格内采样有限数量。
 
-		// TODO Make sure the graph is compiled in debug mode, otherwise buffer lookups won't match
-		// TODO Even with debug on, it appears buffers don't really match???
+		// TODO 确保图以调试模式编译，否则缓冲区查找将不匹配
+		// TODO 即使开启调试，缓冲区似乎也并不真正匹配？？？
 
 		const Vector3i cube_size = max_pos - min_pos;
 		if (cube_size.x > 64 || cube_size.y > 64 || cube_size.z > 64) {
@@ -2219,7 +2217,7 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 
 					if (buffer.data == nullptr) {
 						if (buffer.is_binding) {
-							// Not supported
+							// 不支持
 							continue;
 						}
 						VOXEL_PRINT_ERROR("Didn't expect nullptr in buffer data");
@@ -2249,7 +2247,7 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 	}
 #endif
 
-	// TODO Change return value to allow checking other outputs
+	// TODO 更改返回值以允许检查其它输出
 	if (runtime_ptr->sdf_output_buffer_index != -1) {
 		return cache.state.get_range(runtime_ptr->sdf_output_buffer_index);
 	}
@@ -2262,12 +2260,12 @@ math::Interval VoxelGeneratorGraph::debug_analyze_range(
 
 	d->_graph.copy_from(_graph, p_subresources);
 	d->register_subresources();
-	// Program not copied, as it may contain pointers to the resources we are duplicating
+	// 未复制 Program，因为它可能包含指向我们正在复制的资源的指针
 
 	return d;
 }*/
 
-// Debug land
+// 调试相关
 
 float VoxelGeneratorGraph::debug_measure_microseconds_per_voxel(
 		bool singular,
@@ -2354,7 +2352,7 @@ float VoxelGeneratorGraph::debug_measure_microseconds_per_voxel(
 	return us;
 }
 
-// This may be used as template when creating new graphs
+// 创建新图时可用作模板
 void VoxelGeneratorGraph::load_plane_preset() {
 	using namespace pg;
 	clear();
@@ -2385,7 +2383,7 @@ void VoxelGeneratorGraph::load_plane_preset() {
 void VoxelGeneratorGraph::debug_load_waves_preset() {
 	using namespace pg;
 	clear();
-	// This is mostly for testing
+	// 主要用于测试
 
 	ERR_FAIL_COND(_main_function.is_null());
 	VoxelGraphFunction &g = **_main_function;
@@ -2491,8 +2489,8 @@ Dictionary VoxelGeneratorGraph::get_graph_as_variant_data() const {
 void VoxelGeneratorGraph::load_graph_from_variant_data(Dictionary data) {
 	ERR_FAIL_COND(_main_function.is_null());
 	if (_main_function->load_graph_from_variant_data(data)) {
-		// It's possible to auto-compile on load because `graph_data` is the only property set by the loader,
-		// which is enough to have all information we need
+		// 可以在加载时自动编译，因为 `graph_data` 是加载器设置的唯一属性，
+		// 它足以提供我们所需的全部信息
 		compile(Engine::get_singleton()->is_editor_hint());
 	}
 }
@@ -2546,7 +2544,7 @@ void VoxelGeneratorGraph::_bind_methods() {
 			&Self::_b_debug_measure_microseconds_per_voxel
 	);
 
-	// Still present here for compatibility
+	// 保留在这里以保持兼容性
 	ClassDB::bind_method(D_METHOD("_set_graph_data", "data"), &Self::load_graph_from_variant_data);
 	ClassDB::bind_method(D_METHOD("_get_graph_data"), &Self::get_graph_as_variant_data);
 

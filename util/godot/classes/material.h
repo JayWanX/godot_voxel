@@ -7,7 +7,7 @@
 
 namespace voxel::godot {
 
-// Exposing exclusively 3D material types requires a special hint string, because the base class is Material.
+// 只暴露 3D 材质类型需要特殊的提示字符串，因为基类是 Material。
 extern const char *MATERIAL_3D_PROPERTY_HINT_STRING;
 
 } // namespace voxel::godot

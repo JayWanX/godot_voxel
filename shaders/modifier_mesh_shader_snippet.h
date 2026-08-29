@@ -1,4 +1,4 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
 const char *g_modifier_mesh_shader_snippet =

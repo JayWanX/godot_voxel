@@ -33,7 +33,7 @@ using namespace voxel::godot;
 
 VoxelGraphEditorPlugin::VoxelGraphEditorPlugin() {}
 
-// EditorNode isn't ready during plugin construction, so defer work to `init()`.
+// 插件构造期间 EditorNode 尚未就绪，因此将工作推迟到 `init()`。
 void VoxelGraphEditorPlugin::init() {
 	// EditorInterface *ed = get_editor_interface();
 	_graph_editor = memnew(VoxelGraphEditor);
@@ -61,7 +61,7 @@ void VoxelGraphEditorPlugin::init() {
 	_bottom_panel_button = EditorNode::get_bottom_panel()->add_item(VOXEL_TTR("Voxel Graph"), _graph_editor);
 	_bottom_panel_button->hide();
 
-	// TODO Move this to `_enter_tree` and remove it on `_exit_tree`?
+	// TODO 将此移到 `_enter_tree`，并在 `_exit_tree` 中移除？
 	Ref<VoxelGraphEditorInspectorPlugin> vge_inspector_plugin;
 	vge_inspector_plugin.instantiate();
 	add_inspector_plugin(vge_inspector_plugin);
@@ -76,8 +76,8 @@ bool VoxelGraphEditorPlugin::_voxel_handles(const Object *p_object) const {
 	if (p_object == nullptr) {
 		return false;
 	}
-	// We have to handle both resources for now, because we automatically make the generator behave like a graph,
-	// even though the graph is actually an internal property ("main function"). It saves clicks from the user.
+	// 目前我们必须处理这两种资源，因为我们让生成器表现得像一个图形，
+	// 尽管图形实际上是它的内部属性（“主函数”）。这可以为用户省去一些点击。
 	const VoxelGeneratorGraph *generator_ptr = Object::cast_to<VoxelGeneratorGraph>(p_object);
 	if (generator_ptr != nullptr) {
 		return true;
@@ -86,15 +86,15 @@ bool VoxelGraphEditorPlugin::_voxel_handles(const Object *p_object) const {
 	if (graph_ptr != nullptr) {
 		return true;
 	}
-	// In the past we would also handle `VoxelGraphNodeInspectorWrapper` for when we inspect nodes of the graph, but
-	// Godot does not actually allow a plugin to handle multiple resources simultaneously. Instead, we do something
-	// different.
-	// See https://github.com/godotengine/godot/issues/73650
+	// 过去我们也会处理 `VoxelGraphNodeInspectorWrapper`，用于检查图形的节点，但
+	// Godot 实际上不允许一个插件同时处理多个资源。因此我们改用了
+	// 不同的方式。
+	// 参见 https://github.com/godotengine/godot/issues/73650
 	return false;
 }
 
 void VoxelGraphEditorPlugin::_voxel_edit(Object *p_object) {
-	// Workaround for when we inspect nodes of the graph...
+	// 用于检查图形节点时的变通方法...
 	if (p_object == nullptr && _ignore_edit_null) {
 		VOXEL_PRINT_VERBOSE(format("{}: ignored edit(null)", VOXEL_CLASS_NAME_C(VoxelGraphEditorPlugin)));
 		return;
@@ -122,7 +122,7 @@ void VoxelGraphEditorPlugin::_voxel_edit(Object *p_object) {
 		}
 	}
 
-	_graph_editor->set_undo_redo(get_undo_redo()); // UndoRedo isn't available in constructor
+	_graph_editor->set_undo_redo(get_undo_redo()); // UndoRedo 在构造函数中不可用
 
 	if (generator.is_valid()) {
 		const VoxelStringNames &sn = VoxelStringNames::get_singleton();
@@ -152,14 +152,14 @@ void VoxelGraphEditorPlugin::_voxel_edit(Object *p_object) {
 			}
 		}
 		_voxel_node.set(voxel_node);
-		// TODO Sometimes Godot doesn't give me the node anymore, it gets null, despite it still being selected in the
-		//      scene tree. But LOL NO because I selected a resource somehow that throws it off I guess??
-		//      This causes the in-scene preview gizmos (such as range analysis) to disappear for
-		//      no reason, and it drives me crazy when debugging bugs that are already painful to investigate.
-		//      It happens if you select a graph node, and then the graph's background (i.e editing the graph resource).
-		//      The only way to get non-null is to manually select the terrain node again in the scene tree.
-		//      So I workaround this by... never setting it to null. It absolutely sucks.
-		//      It shouldnt have pointer safety problems since we use an ObjectWeakRef.
+		// TODO 有时 Godot 不再给我那个节点，它会变成 null，尽管它仍然在
+		//      场景树中被选中。但哈哈才怪，因为我以某种方式选中了一个资源，导致它跑偏了？？
+		//      这会毫无理由地导致场景内的预览辅助线（例如范围分析）消失，
+		//      在调试本就难以调查的 bug 时快把我逼疯了。
+		//      如果你选中一个图形节点，然后点击图形的背景（即编辑图形资源），就会发生这种情况。
+		//      要获得非 null 值的唯一方法是在场景树中手动再次选中地形节点。
+		//      所以我用这种方式绕过它……永远不把它设为 null。这实在太糟糕了。
+		//      由于我们使用的是 ObjectWeakRef，它不应该有指针安全问题。
 		if (voxel_node != nullptr) {
 			_graph_editor->set_voxel_node(voxel_node);
 		}
@@ -171,7 +171,7 @@ void VoxelGraphEditorPlugin::_voxel_edit(Object *p_object) {
 }
 
 void VoxelGraphEditorPlugin::_voxel_make_visible(bool visible) {
-	// Workaround for when we inspect nodes of the graph...
+	// 用于检查图形节点时的变通方法...
 	if (_ignore_make_visible) {
 		VOXEL_PRINT_VERBOSE(format("{}: ignored make_visible({})", VOXEL_CLASS_NAME_C(VoxelGraphEditorPlugin), visible));
 		return;
@@ -193,7 +193,7 @@ void VoxelGraphEditorPlugin::_voxel_make_visible(bool visible) {
 		if (!pinned) {
 			_bottom_panel_button->hide();
 
-			// TODO Awful hack to handle the nonsense happening in `_on_graph_editor_node_selected`
+			// TODO 处理 `_on_graph_editor_node_selected` 中发生的胡闹的糟糕 hack
 			if (!_deferred_visibility_scheduled) {
 				_deferred_visibility_scheduled = true;
 				call_deferred("_hide_deferred");
@@ -205,11 +205,11 @@ void VoxelGraphEditorPlugin::_voxel_make_visible(bool visible) {
 void VoxelGraphEditorPlugin::_hide_deferred() {
 	_deferred_visibility_scheduled = false;
 	if (_bottom_panel_button->is_visible()) {
-		// Still visible actually? Don't hide then
+		// 实际上仍然可见？那就不要隐藏
 		return;
 	}
-	// The point is when the plugin's UI closed (for real, not closed and re-opened simultaneously!),
-	// it should cleanup its UI to not waste RAM (as it references stuff).
+	// 关键是当插件的 UI 关闭时（真正的关闭，而不是关闭后又同时重新打开！），
+	// 它应该清理自己的 UI，以免浪费内存（因为它引用了很多东西）。
 	_voxel_edit(nullptr);
 
 	if (_graph_editor->is_visible_in_tree()) {
@@ -218,27 +218,27 @@ void VoxelGraphEditorPlugin::_hide_deferred() {
 }
 
 void VoxelGraphEditorPlugin::_on_graph_editor_node_selected(uint32_t node_id) {
-	// Nodes are not Godot objects so we have to create a proxy.
-	// We have to make a new wrapper every time because it has to target the same node for a given time.
+	// 节点不是 Godot 对象，所以我们必须创建一个代理。
+	// 每次都必须创建新的包装器，因为它需要在给定时间内指向同一个节点。
 	Ref<VoxelGraphNodeInspectorWrapper> wrapper;
 	wrapper.instantiate();
 	wrapper->setup(node_id, _graph_editor);
-	// Workaround the new behavior that Godot will call `edit(nullptr)` first when editing another object, even if that
-	// object is also handled by the plugin, and even if `inspector_only` is `true`. `edit(nullptr)` would cause the UI
-	// to be cleaned up when a GraphNode is emitting its `selected` signal, causing destruction of that GraphNode.
+	// 绕过新行为：即使编辑的对象也由本插件处理，甚至即使 `inspector_only` 为 `true`，
+	// Godot 也会在编辑其他对象时先调用 `edit(nullptr)`。`edit(nullptr)` 会导致 UI
+	// 在 GraphNode 正在发出 `selected` 信号时被清理，从而销毁该 GraphNode。
 	_ignore_edit_null = true;
 	_ignore_make_visible = true;
-	// Note: it's neither explicit nor documented, but the reference will stay alive due to EditorHistory::_add_object.
-	// Specifying `inspector_only=true` because that's what other plugins do when they can edit "sub-objects"
+	// 注意：这既不明示也没有文档说明，但由于 EditorHistory::_add_object，引用会保持存活。
+	// 指定 `inspector_only=true`，因为这是其他插件在编辑“子对象”时的做法
 	get_editor_interface()->inspect_object(*wrapper, String(), true);
 	_ignore_edit_null = false;
 	_ignore_make_visible = false;
 	_node_wrappers.push_back(wrapper);
-	// TODO Absurd situation here...
-	// Even though we pass `inspector_only=true`, `inspect_object()` gets to a point where Godot calls
-	// `make_visible(false)` on ALL plugins for some reason... and also calls `edit(null)` on our plugin.
-	// I don't understand what's the point of that parameter then... so we have to ignore these calls, which works for
-	// now luckily, because they are not using `call_deferred`.
+	// TODO 这里的情况太荒谬了……
+	// 尽管我们传入了 `inspector_only=true`，`inspect_object()` 仍然会走到 Godot 出于某种原因
+	// 在所有插件上调用 `make_visible(false)` 的地方……并且还会在我们的插件上调用 `edit(null)`。
+	// 我不明白那个参数的意义是什么……所以我们只能忽略这些调用，好在目前
+	// 这样是可行的，因为它们没有使用 `call_deferred`。
 	// https://github.com/godotengine/godot/issues/40166
 }
 
@@ -260,17 +260,17 @@ void VoxelGraphEditorPlugin::inspect_graph_or_generator(const VoxelGraphEditor &
 }
 
 void VoxelGraphEditorPlugin::_on_graph_editor_nothing_selected() {
-	// The inspector is unfortunately designed like a singleton, so when we select nodes to edit their properties, it
-	// prevents from still having access to the graph resource itself, to save it for example. I'd like to embed
-	// properties inside the nodes themselves, but it's a bit more work (and a waste of space), and Godot doesn't expose
-	// EditorInspector which would have allowed having a secondary inspector in the graph editor. So for now I make it
-	// so deselecting all nodes in the graph (like clicking in the background) selects the graph.
+	// 不幸的是，检查器被设计得像单例一样，所以当我们选中节点来编辑其属性时，
+	// 就无法再访问图形资源本身（例如保存它）。我想把
+	// 属性嵌入到节点自身内部，但这需要更多工作（而且浪费空间），而且 Godot 不暴露
+	// EditorInspector，否则就可以在图形编辑器中拥有一个次级检查器。所以目前我让
+	// 取消选中图形中的所有节点（比如点击背景）时选中图形。
 	inspect_graph_or_generator(*_graph_editor);
 }
 
 void VoxelGraphEditorPlugin::_on_graph_editor_nodes_deleted() {
-	// When deleting nodes, the selected one can be in them, but the inspector wrapper will still point at it.
-	// Clean it up and inspect the graph itself.
+	// 删除节点时，被选中的节点可能在其中，但检查器包装器仍会指向它。
+	// 清理它，并改为检查图形本身。
 	inspect_graph_or_generator(*_graph_editor);
 }
 
@@ -283,14 +283,14 @@ void for_each_node(Node *parent, F action) {
 }
 
 void VoxelGraphEditorPlugin::_on_graph_editor_regenerate_requested() {
-	// We could be editing the graph standalone with no terrain loaded
+	// 我们可能在没有加载地形的情况下独立编辑图形
 	VoxelNode *terrain_node = _voxel_node.get();
 	if (terrain_node != nullptr) {
-		// Re-generate the selected terrain.
+		// 重新生成选中的地形。
 		terrain_node->restart_stream();
 
 	} else {
-		// The node is not selected, but it might be in the tree
+		// 该节点未被选中，但它可能还在场景树中
 		Node *root = get_editor_interface()->get_edited_scene_root();
 
 		if (root != nullptr) {
@@ -316,24 +316,24 @@ void VoxelGraphEditorPlugin::_on_graph_editor_window_close_requested() {
 }
 
 void VoxelGraphEditorPlugin::_on_generator_changed() {
-	// This is to workaround the fact Godot won't save resource A if we edit a built-in resource B inside it from a
-	// custom editor with UndoRedoManager.
+	// 这是为了绕过一个事实：如果在自定义编辑器中通过 UndoRedoManager 编辑某个内嵌在资源 A 里的内置资源 B，
+	// Godot 不会保存资源 A。
 	//
-	// So far from my experience, Godot's main way of detecting if a resource has changed is by having it
-	// appear in UndoRedo actions. But if a resource is built-in (embedded in another), it will not be saved with Ctrl+S
-	// unless the resource that contains it is saved. Sadly, Godot devs I discussed with so far seem to be unaware of
-	// how this situation is supposed to be handled with custom editors. As if it was an edge case that was somehow
-	// luckily avoided in the engine, or dealt with using ad-hoc per-case hacks.
-	// There is `Object::set_edited` and `Resource::owners`, which are used in arbitrary places of the editor, but of
-	// course not exposed to scripts or extensions and no idea how they work with nesting...
-	// Maybe I haven't yet encountered The Dev Who Knows...
+	// 以我的经验，Godot 检测资源是否改变的主要方式就是让它
+	// 出现在 UndoRedo 操作中。但如果资源是内置的（嵌入在另一个资源中），它不会随 Ctrl+S 保存，
+	// 除非包含它的资源被保存。遗憾的是，到目前为止与我讨论过的 Godot 开发者似乎都没有意识到
+	// 在自定义编辑器中这种情况应该如何处理。仿佛这是一个边缘情况，在引擎中要么被某种方式
+	// 幸运地绕开了，要么用临时的按情况 hack 处理。
+	// 有 `Object::set_edited` 和 `Resource::owners`，它们被用在编辑器的各个地方，但当然
+	// 不会暴露给脚本或扩展，而且我也不知道它们如何处理嵌套……
+	// 也许我还没有遇到那个懂行的开发者……
 	//
-	// This workaround might not even be enough if the edited graph is nested deeper. Pushing to the extreme, we would
-	// have to trace back containing resources recursively until we find the one with a file path, and tell Godot that
-	// it needs to be marked for saving, but that's just incredibly tedious to do, as resources don't just have "parent"
-	// properties like nodes do...
+	// 如果被编辑的图形嵌套得更深，这个变通方法甚至可能还不够。极端一点，
+	// 我们可能不得不递归地追溯包含它的资源，直到找到有文件路径的那一个，并告诉 Godot
+	// 它需要被标记为保存，但这做起来极其繁琐，因为资源不像节点那样有“父级”
+	// 属性……
 	//
-	// See https://github.com/godotengine/godot-proposals/discussions/7168
+	// 参见 https://github.com/godotengine/godot-proposals/discussions/7168
 	Ref<VoxelGeneratorGraph> generator = _graph_editor->get_generator();
 	if (generator.is_valid()) {
 		set_object_edited(**generator);
@@ -361,7 +361,7 @@ void VoxelGraphEditorPlugin::undock_graph_editor() {
 
 	_graph_editor->set_popout_button_enabled(false);
 	_graph_editor->set_anchors_preset(Control::PRESET_FULL_RECT);
-	// I don't know what hides it but I needed to make it visible again
+	// 我不知道是什么隐藏了它，但我需要让它再次可见
 	_graph_editor->show();
 
 	_graph_editor_window = memnew(VoxelGraphEditorWindow);

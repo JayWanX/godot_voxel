@@ -17,7 +17,7 @@ namespace voxel {
 class AsyncDependencyTracker;
 class VoxelData;
 
-// Generic task to procedurally generate a block of voxels in a single pass
+// 用于在单次遍历中程序化生成一个体素块的通用任务
 class GenerateBlockTask
 #ifdef VOXEL_ENABLE_GPU
 		: public IGeneratingVoxelsThreadedTask
@@ -50,7 +50,7 @@ private:
 	void run_cpu_generation();
 	void run_stream_saving_and_finish();
 
-	// Not an input, but can be assigned a re-usable instance to avoid allocating one in the task
+	// 不是输入参数，但可以赋给一个可复用的实例，以避免在任务中分配新的
 	std::shared_ptr<VoxelBuffer> _voxels;
 
 	Vector3i _position;
@@ -63,9 +63,9 @@ private:
 	bool _use_gpu = false;
 #endif
 	PriorityDependency _priority_dependency;
-	std::shared_ptr<StreamingDependency> _stream_dependency; // For saving generator output
-	std::shared_ptr<VoxelData> _data; // Just for modifiers
-	std::shared_ptr<AsyncDependencyTracker> _tracker; // For async edits
+	std::shared_ptr<StreamingDependency> _stream_dependency; // 用于保存生成器输出
+	std::shared_ptr<VoxelData> _data; // 仅用于 modifiers
+	std::shared_ptr<AsyncDependencyTracker> _tracker; // 用于异步编辑
 	TaskCancellationToken _cancellation_token;
 
 	bool _has_run = false;

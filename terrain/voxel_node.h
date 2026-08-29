@@ -19,7 +19,7 @@ namespace voxel {
 class VoxelTool;
 class VoxelData;
 
-// Base class for voxel volumes
+// 体素体积的基类
 class VoxelNode : public Node3D {
 	GDCLASS(VoxelNode, Node3D)
 public:

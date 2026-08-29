@@ -4,10 +4,10 @@
 #include <math.h>
 #include <string.h>
 
-// The block below auto-detects SIMD ISA that can be used on the target platform
+// 下面的代码块会自动检测目标平台上可用的 SIMD ISA
 #ifndef MESHOPTIMIZER_NO_SIMD
 
-// The SIMD implementation requires SSE2, which can be enabled unconditionally through compiler settings
+// SIMD 实现需要 SSE2，可通过编译器设置无条件启用
 #if defined(__SSE2__)
 #define SIMD_SSE
 #endif
@@ -17,20 +17,20 @@
 #define SIMD_SSE
 #endif
 
-// GCC/clang define these when NEON support is available
+// 当支持 NEON 时，GCC/clang 会定义这些
 #if defined(__ARM_NEON__) || defined(__ARM_NEON)
 #define SIMD_NEON
 #endif
 
-// On MSVC, we assume that ARM builds always target NEON-capable devices
+// 在 MSVC 上，我们假定 ARM 构建始终面向支持 NEON 的设备
 #if !defined(SIMD_NEON) && defined(_MSC_VER) && (defined(_M_ARM) || defined(_M_ARM64))
 #define SIMD_NEON
 #endif
 
-// When targeting Wasm SIMD we can't use runtime cpuid checks so we unconditionally enable SIMD
+// 当面向 Wasm SIMD 时，我们无法使用运行时 cpuid 检查，因此无条件下启用 SIMD
 #if defined(__wasm_simd128__)
 #define SIMD_WASM
-// Prevent compiling other variant when wasm simd compilation is active
+// 当 wasm simd 编译处于活动状态时，禁止编译其它变体
 #undef SIMD_NEON
 #undef SIMD_SSE
 #endif
@@ -88,17 +88,17 @@ static void decodeFilterOct(T* data, size_t count)
 		float y = float(data[i * 4 + 1]);
 		float z = float(data[i * 4 + 2]) - fabsf(x) - fabsf(y);
 
-		// fixup octahedral coordinates for z<0
+		// 修复 z 为负时的八面体坐标
 		float t = (z >= 0.f) ? 0.f : z;
 
 		x += (x >= 0.f) ? t : -t;
 		y += (y >= 0.f) ? t : -t;
 
-		// compute normal length & scale
+		// 计算法线长度与缩放
 		float l = sqrtf(x * x + y * y + z * z);
 		float s = max / l;
 
-		// rounded signed float->int
+		// 舍入的有符号 float->int
 		int xf = int(x * s + (x >= 0.f ? 0.5f : -0.5f));
 		int yf = int(y * s + (y >= 0.f ? 0.5f : -0.5f));
 		int zf = int(z * s + (z >= 0.f ? 0.5f : -0.5f));
@@ -115,7 +115,7 @@ static void decodeFilterQuat(short* data, size_t count)
 
 	for (size_t i = 0; i < count; ++i)
 	{
-		// recover scale from the high byte of the component
+		// 从 component 的高位字节恢复缩放值
 		int sf = data[i * 4 + 3] | 3;
 		float ss = scale / float(sf);
 
@@ -128,7 +128,7 @@ static void decodeFilterQuat(short* data, size_t count)
 		float ww = 1.f - x * x - y * y - z * z;
 		float w = sqrtf(ww >= 0.f ? ww : 0.f);
 
-		// rounded signed float->int
+		// 舍入的有符号 float->int
 		int xf = int(x * 32767.f + (x >= 0.f ? 0.5f : -0.5f));
 		int yf = int(y * 32767.f + (y >= 0.f ? 0.5f : -0.5f));
 		int zf = int(z * 32767.f + (z >= 0.f ? 0.5f : -0.5f));
@@ -136,7 +136,7 @@ static void decodeFilterQuat(short* data, size_t count)
 
 		int qc = data[i * 4 + 3] & 3;
 
-		// output order is dictated by input index
+		// 输出顺序由输入索引决定
 		data[i * 4 + ((qc + 1) & 3)] = short(xf);
 		data[i * 4 + ((qc + 2) & 3)] = short(yf);
 		data[i * 4 + ((qc + 3) & 3)] = short(zf);
@@ -150,7 +150,7 @@ static void decodeFilterExp(unsigned int* data, size_t count)
 	{
 		unsigned int v = data[i];
 
-		// decode mantissa and exponent
+		// 解码尾数和指数
 		int m = int(v << 8) >> 8;
 		int e = int(v) >> 24;
 
@@ -175,12 +175,12 @@ static void decodeFilterColor(T* data, size_t count)
 
 	for (size_t i = 0; i < count; ++i)
 	{
-		// recover scale from alpha high bit
+		// 从 alpha 高位恢复缩放
 		int as = data[i * 4 + 3];
 		as |= as >> 1;
 		as |= as >> 2;
 		as |= as >> 4;
-		as |= as >> 8; // noop for 8-bit
+		as |= as >> 8; // 对 8 位值无操作
 
 		// convert to RGB in fixed point (co/cg are sign extended)
 		int y = data[i * 4 + 0], co = ST(data[i * 4 + 1]), cg = ST(data[i * 4 + 2]);
@@ -189,14 +189,14 @@ static void decodeFilterColor(T* data, size_t count)
 		int g = y + cg;
 		int b = y - co - cg;
 
-		// expand alpha by one bit to match other components
+		// 将 alpha 扩展一位以匹配其它分量
 		int a = data[i * 4 + 3];
 		a = ((a << 1) & as) | (a & 1);
 
-		// compute scaling factor
+		// 计算缩放因子
 		float ss = max / float(as);
 
-		// rounded float->int
+		// 四舍五入的 float->int
 		int rf = int(float(r) * ss + 0.5f);
 		int gf = int(float(g) * ss + 0.5f);
 		int bf = int(float(b) * ss + 0.5f);
@@ -221,7 +221,7 @@ static void dispatchSimd(void (*process)(T*, size_t), T* data, size_t count, siz
 
 	if (count4 < count)
 	{
-		T tail[4 * 4] = {}; // max stride 4, max count 4
+		T tail[4 * 4] = {}; // 最大跨距 4，最大数量 4
 		size_t tail_size = (count - count4) * stride * sizeof(T);
 		assert(tail_size <= sizeof(tail));
 
@@ -252,7 +252,7 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 	{
 		__m128i n4 = _mm_loadu_si128(reinterpret_cast<__m128i*>(&data[i * 4]));
 
-		// sign-extends each of x,y in [x y ? ?] with arithmetic shifts
+		// 用算术移位分别对 [x y ? ?] 中的 x、y 进行符号扩展
 		__m128i xf = _mm_srai_epi32(_mm_slli_epi32(n4, 24), 24);
 		__m128i yf = _mm_srai_epi32(_mm_slli_epi32(n4, 16), 24);
 
@@ -264,22 +264,22 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 		__m128 y = _mm_cvtepi32_ps(yf);
 		__m128 z = _mm_sub_ps(_mm_cvtepi32_ps(zf), _mm_add_ps(_mm_andnot_ps(sign, x), _mm_andnot_ps(sign, y)));
 
-		// fixup octahedral coordinates for z<0
+		// 修复 z 为负时的八面体坐标
 		__m128 t = _mm_min_ps(z, _mm_setzero_ps());
 
 		x = _mm_add_ps(x, _mm_xor_ps(t, _mm_and_ps(x, sign)));
 		y = _mm_add_ps(y, _mm_xor_ps(t, _mm_and_ps(y, sign)));
 
-		// compute normal length & scale
+		// 计算法线长度与缩放
 		__m128 ll = _mm_add_ps(_mm_mul_ps(x, x), _mm_add_ps(_mm_mul_ps(y, y), _mm_mul_ps(z, z)));
 		__m128 s = _mm_mul_ps(_mm_set1_ps(127.f), _mm_rsqrt_ps(ll));
 
-		// rounded signed float->int
+		// 舍入的有符号 float->int
 		__m128i xr = _mm_cvtps_epi32(_mm_mul_ps(x, s));
 		__m128i yr = _mm_cvtps_epi32(_mm_mul_ps(y, s));
 		__m128i zr = _mm_cvtps_epi32(_mm_mul_ps(z, s));
 
-		// combine xr/yr/zr into final value
+		// 将 xr/yr/zr 合并为最终值
 		__m128i res = _mm_and_si128(n4, _mm_set1_epi32(0xff000000));
 		res = _mm_or_si128(res, _mm_and_si128(xr, _mm_set1_epi32(0xff)));
 		res = _mm_or_si128(res, _mm_slli_epi32(_mm_and_si128(yr, _mm_set1_epi32(0xff)), 8));
@@ -298,10 +298,10 @@ static void decodeFilterOctSimd16(short* data, size_t count)
 		__m128 n4_0 = _mm_loadu_ps(reinterpret_cast<float*>(&data[(i + 0) * 4]));
 		__m128 n4_1 = _mm_loadu_ps(reinterpret_cast<float*>(&data[(i + 2) * 4]));
 
-		// gather both x/y 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 x/y 两组 16 位对
 		__m128i n4 = _mm_castps_si128(_mm_shuffle_ps(n4_0, n4_1, _MM_SHUFFLE(2, 0, 2, 0)));
 
-		// sign-extends each of x,y in [x y] with arithmetic shifts
+		// 用算术移位分别对 [x y] 中的 x、y 进行符号扩展
 		__m128i xf = _mm_srai_epi32(_mm_slli_epi32(n4, 16), 16);
 		__m128i yf = _mm_srai_epi32(n4, 16);
 
@@ -314,22 +314,22 @@ static void decodeFilterOctSimd16(short* data, size_t count)
 		__m128 y = _mm_cvtepi32_ps(yf);
 		__m128 z = _mm_sub_ps(_mm_cvtepi32_ps(zf), _mm_add_ps(_mm_andnot_ps(sign, x), _mm_andnot_ps(sign, y)));
 
-		// fixup octahedral coordinates for z<0
+		// 修复 z 为负时的八面体坐标
 		__m128 t = _mm_min_ps(z, _mm_setzero_ps());
 
 		x = _mm_add_ps(x, _mm_xor_ps(t, _mm_and_ps(x, sign)));
 		y = _mm_add_ps(y, _mm_xor_ps(t, _mm_and_ps(y, sign)));
 
-		// compute normal length & scale
+		// 计算法线长度与缩放
 		__m128 ll = _mm_add_ps(_mm_mul_ps(x, x), _mm_add_ps(_mm_mul_ps(y, y), _mm_mul_ps(z, z)));
 		__m128 s = _mm_div_ps(_mm_set1_ps(32767.f), _mm_sqrt_ps(ll));
 
-		// rounded signed float->int
+		// 舍入的有符号 float->int
 		__m128i xr = _mm_cvtps_epi32(_mm_mul_ps(x, s));
 		__m128i yr = _mm_cvtps_epi32(_mm_mul_ps(y, s));
 		__m128i zr = _mm_cvtps_epi32(_mm_mul_ps(z, s));
 
-		// mix x/z and y/0 to make 16-bit unpack easier
+		// 混合 x/z 与 y/0，使 16 位拆包更容易
 		__m128i xzr = _mm_or_si128(_mm_and_si128(xr, _mm_set1_epi32(0xffff)), _mm_slli_epi32(zr, 16));
 		__m128i y0r = _mm_and_si128(yr, _mm_set1_epi32(0xffff));
 
@@ -356,11 +356,11 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		__m128 q4_0 = _mm_loadu_ps(reinterpret_cast<float*>(&data[(i + 0) * 4]));
 		__m128 q4_1 = _mm_loadu_ps(reinterpret_cast<float*>(&data[(i + 2) * 4]));
 
-		// gather both x/y 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 x/y 两组 16 位对
 		__m128i q4_xy = _mm_castps_si128(_mm_shuffle_ps(q4_0, q4_1, _MM_SHUFFLE(2, 0, 2, 0)));
 		__m128i q4_zc = _mm_castps_si128(_mm_shuffle_ps(q4_0, q4_1, _MM_SHUFFLE(3, 1, 3, 1)));
 
-		// sign-extends each of x,y in [x y] with arithmetic shifts
+		// 用算术移位分别对 [x y] 中的 x、y 进行符号扩展
 		__m128i xf = _mm_srai_epi32(_mm_slli_epi32(q4_xy, 16), 16);
 		__m128i yf = _mm_srai_epi32(q4_xy, 16);
 		__m128i zf = _mm_srai_epi32(_mm_slli_epi32(q4_zc, 16), 16);
@@ -381,13 +381,13 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 
 		__m128 s = _mm_set1_ps(32767.f);
 
-		// rounded signed float->int
+		// 舍入的有符号 float->int
 		__m128i xr = _mm_cvtps_epi32(_mm_mul_ps(x, s));
 		__m128i yr = _mm_cvtps_epi32(_mm_mul_ps(y, s));
 		__m128i zr = _mm_cvtps_epi32(_mm_mul_ps(z, s));
 		__m128i wr = _mm_cvtps_epi32(_mm_mul_ps(w, s));
 
-		// mix x/z and w/y to make 16-bit unpack easier
+		// 混合 x/z 与 w/y，使 16 位拆包更容易
 		__m128i xzr = _mm_or_si128(_mm_and_si128(xr, _mm_set1_epi32(0xffff)), _mm_slli_epi32(zr, 16));
 		__m128i wyr = _mm_or_si128(_mm_and_si128(wr, _mm_set1_epi32(0xffff)), _mm_slli_epi32(yr, 16));
 
@@ -395,12 +395,12 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		__m128i res_0 = _mm_unpacklo_epi16(wyr, xzr);
 		__m128i res_1 = _mm_unpackhi_epi16(wyr, xzr);
 
-		// store results to stack so that we can rotate using scalar instructions
+		// 将结果存储到栈中，以便使用标量指令进行旋转
 		uint64_t res[4];
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&res[0]), res_0);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&res[2]), res_1);
 
-		// rotate and store
+		// 旋转并存储
 		uint64_t* out = reinterpret_cast<uint64_t*>(&data[i * 4]);
 
 		out[0] = rotateleft64(res[0], data[(i + 0) * 4 + 3] << 4);
@@ -416,11 +416,11 @@ static void decodeFilterExpSimd(unsigned int* data, size_t count)
 	{
 		__m128i v = _mm_loadu_si128(reinterpret_cast<__m128i*>(&data[i]));
 
-		// decode exponent into 2^x directly
+		// 将指数直接解码为 2 的 x 次方
 		__m128i ef = _mm_srai_epi32(v, 24);
 		__m128i es = _mm_slli_epi32(_mm_add_epi32(ef, _mm_set1_epi32(127)), 23);
 
-		// decode 24-bit mantissa into floating-point value
+		// 将 24 位尾数解码为浮点值
 		__m128i mf = _mm_srai_epi32(_mm_slli_epi32(v, 8), 8);
 		__m128 m = _mm_cvtepi32_ps(mf);
 
@@ -442,30 +442,30 @@ static void decodeFilterColorSimd8(unsigned char* data, size_t count)
 		__m128i cgf = _mm_srai_epi32(_mm_slli_epi32(c4, 8), 24);
 		__m128i af = _mm_srli_epi32(c4, 24);
 
-		// recover scale from alpha high bit
+		// 从 alpha 高位恢复缩放
 		__m128i as = af;
 		as = _mm_or_si128(as, _mm_srli_epi32(as, 1));
 		as = _mm_or_si128(as, _mm_srli_epi32(as, 2));
 		as = _mm_or_si128(as, _mm_srli_epi32(as, 4));
 
-		// expand alpha by one bit to match other components
+		// 将 alpha 扩展一位以匹配其它分量
 		af = _mm_or_si128(_mm_and_si128(_mm_slli_epi32(af, 1), as), _mm_and_si128(af, _mm_set1_epi32(1)));
 
-		// compute scaling factor
+		// 计算缩放因子
 		__m128 ss = _mm_mul_ps(_mm_set1_ps(255.f), _mm_rcp_ps(_mm_cvtepi32_ps(as)));
 
-		// convert to RGB in fixed point
+		// 转换为定点 RGB
 		__m128i rf = _mm_add_epi32(yf, _mm_sub_epi32(cof, cgf));
 		__m128i gf = _mm_add_epi32(yf, cgf);
 		__m128i bf = _mm_sub_epi32(yf, _mm_add_epi32(cof, cgf));
 
-		// rounded signed float->int
+		// 舍入的有符号 float->int
 		__m128i rr = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(rf), ss));
 		__m128i gr = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(gf), ss));
 		__m128i br = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(bf), ss));
 		__m128i ar = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(af), ss));
 
-		// repack rgba into final value
+		// 将 rgba 重新打包为最终值
 		__m128i res = rr;
 		res = _mm_or_si128(res, _mm_slli_epi32(gr, 8));
 		res = _mm_or_si128(res, _mm_slli_epi32(br, 16));
@@ -482,7 +482,7 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		__m128i c4_0 = _mm_loadu_si128(reinterpret_cast<__m128i*>(&data[(i + 0) * 4]));
 		__m128i c4_1 = _mm_loadu_si128(reinterpret_cast<__m128i*>(&data[(i + 2) * 4]));
 
-		// gather both y/co 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 y/co 两组 16 位对
 		__m128i c4_yco = _mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(c4_0), _mm_castsi128_ps(c4_1), _MM_SHUFFLE(2, 0, 2, 0)));
 		__m128i c4_cga = _mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(c4_0), _mm_castsi128_ps(c4_1), _MM_SHUFFLE(3, 1, 3, 1)));
 
@@ -492,35 +492,35 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		__m128i cgf = _mm_srai_epi32(_mm_slli_epi32(c4_cga, 16), 16);
 		__m128i af = _mm_srli_epi32(c4_cga, 16);
 
-		// recover scale from alpha high bit
+		// 从 alpha 高位恢复缩放
 		__m128i as = af;
 		as = _mm_or_si128(as, _mm_srli_epi32(as, 1));
 		as = _mm_or_si128(as, _mm_srli_epi32(as, 2));
 		as = _mm_or_si128(as, _mm_srli_epi32(as, 4));
 		as = _mm_or_si128(as, _mm_srli_epi32(as, 8));
 
-		// expand alpha by one bit to match other components
+		// 将 alpha 扩展一位以匹配其它分量
 		af = _mm_or_si128(_mm_and_si128(_mm_slli_epi32(af, 1), as), _mm_and_si128(af, _mm_set1_epi32(1)));
 
-		// compute scaling factor
+		// 计算缩放因子
 		__m128 ss = _mm_div_ps(_mm_set1_ps(65535.f), _mm_cvtepi32_ps(as));
 
-		// convert to RGB in fixed point
+		// 转换为定点 RGB
 		__m128i rf = _mm_add_epi32(yf, _mm_sub_epi32(cof, cgf));
 		__m128i gf = _mm_add_epi32(yf, cgf);
 		__m128i bf = _mm_sub_epi32(yf, _mm_add_epi32(cof, cgf));
 
-		// rounded signed float->int
+		// 舍入的有符号 float->int
 		__m128i rr = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(rf), ss));
 		__m128i gr = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(gf), ss));
 		__m128i br = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(bf), ss));
 		__m128i ar = _mm_cvtps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(af), ss));
 
-		// mix r/b and g/a to make 16-bit unpack easier
+		// 混合 r/b 与 g/a，使 16 位拆包更容易
 		__m128i rbr = _mm_or_si128(_mm_and_si128(rr, _mm_set1_epi32(0xffff)), _mm_slli_epi32(br, 16));
 		__m128i gar = _mm_or_si128(_mm_and_si128(gr, _mm_set1_epi32(0xffff)), _mm_slli_epi32(ar, 16));
 
-		// pack r/g/b/a using 16-bit unpacks
+		// 使用 16 位拆包来打包 r/g/b/a
 		__m128i res_0 = _mm_unpacklo_epi16(rbr, gar);
 		__m128i res_1 = _mm_unpackhi_epi16(rbr, gar);
 
@@ -534,14 +534,14 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 inline float32x4_t vsqrtq_f32(float32x4_t x)
 {
 	float32x4_t r = vrsqrteq_f32(x);
-	r = vmulq_f32(r, vrsqrtsq_f32(vmulq_f32(r, x), r)); // refine rsqrt estimate
+	r = vmulq_f32(r, vrsqrtsq_f32(vmulq_f32(r, x), r)); // 精化 rsqrt 估计值
 	return vmulq_f32(r, x);
 }
 
 inline float32x4_t vdivq_f32(float32x4_t x, float32x4_t y)
 {
 	float32x4_t r = vrecpeq_f32(y);
-	r = vmulq_f32(r, vrecpsq_f32(y, r)); // refine rcp estimate
+	r = vmulq_f32(r, vrecpsq_f32(y, r)); // 精化 rcp 估计值
 	return vmulq_f32(x, r);
 }
 #endif
@@ -555,7 +555,7 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 	{
 		int32x4_t n4 = vld1q_s32(reinterpret_cast<int32_t*>(&data[i * 4]));
 
-		// sign-extends each of x,y in [x y ? ?] with arithmetic shifts
+		// 用算术移位分别对 [x y ? ?] 中的 x、y 进行符号扩展
 		int32x4_t xf = vshrq_n_s32(vshlq_n_s32(n4, 24), 24);
 		int32x4_t yf = vshrq_n_s32(vshlq_n_s32(n4, 16), 24);
 
@@ -567,26 +567,26 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 		float32x4_t y = vcvtq_f32_s32(yf);
 		float32x4_t z = vsubq_f32(vcvtq_f32_s32(zf), vaddq_f32(vabsq_f32(x), vabsq_f32(y)));
 
-		// fixup octahedral coordinates for z<0
+		// 修复 z 为负时的八面体坐标
 		float32x4_t t = vminq_f32(z, vdupq_n_f32(0.f));
 
 		x = vaddq_f32(x, vreinterpretq_f32_s32(veorq_s32(vreinterpretq_s32_f32(t), vandq_s32(vreinterpretq_s32_f32(x), sign))));
 		y = vaddq_f32(y, vreinterpretq_f32_s32(veorq_s32(vreinterpretq_s32_f32(t), vandq_s32(vreinterpretq_s32_f32(y), sign))));
 
-		// compute normal length & scale
+		// 计算法线长度与缩放
 		float32x4_t ll = vaddq_f32(vmulq_f32(x, x), vaddq_f32(vmulq_f32(y, y), vmulq_f32(z, z)));
 		float32x4_t rl = vrsqrteq_f32(ll);
 		float32x4_t s = vmulq_f32(vdupq_n_f32(127.f), rl);
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 16 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 16 位，因此可以省略该减法
 		const float32x4_t fsnap = vdupq_n_f32(3 << 22);
 
 		int32x4_t xr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(x, s), fsnap));
 		int32x4_t yr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(y, s), fsnap));
 		int32x4_t zr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(z, s), fsnap));
 
-		// combine xr/yr/zr into final value
+		// 将 xr/yr/zr 合并为最终值
 		int32x4_t res = vandq_s32(n4, vdupq_n_s32(0xff000000));
 		res = vorrq_s32(res, vandq_s32(xr, vdupq_n_s32(0xff)));
 		res = vorrq_s32(res, vshlq_n_s32(vandq_s32(yr, vdupq_n_s32(0xff)), 8));
@@ -605,10 +605,10 @@ static void decodeFilterOctSimd16(short* data, size_t count)
 		int32x4_t n4_0 = vld1q_s32(reinterpret_cast<int32_t*>(&data[(i + 0) * 4]));
 		int32x4_t n4_1 = vld1q_s32(reinterpret_cast<int32_t*>(&data[(i + 2) * 4]));
 
-		// gather both x/y 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 x/y 两组 16 位对
 		int32x4_t n4 = vuzpq_s32(n4_0, n4_1).val[0];
 
-		// sign-extends each of x,y in [x y] with arithmetic shifts
+		// 用算术移位分别对 [x y] 中的 x、y 进行符号扩展
 		int32x4_t xf = vshrq_n_s32(vshlq_n_s32(n4, 16), 16);
 		int32x4_t yf = vshrq_n_s32(n4, 16);
 
@@ -621,27 +621,27 @@ static void decodeFilterOctSimd16(short* data, size_t count)
 		float32x4_t y = vcvtq_f32_s32(yf);
 		float32x4_t z = vsubq_f32(vcvtq_f32_s32(zf), vaddq_f32(vabsq_f32(x), vabsq_f32(y)));
 
-		// fixup octahedral coordinates for z<0
+		// 修复 z 为负时的八面体坐标
 		float32x4_t t = vminq_f32(z, vdupq_n_f32(0.f));
 
 		x = vaddq_f32(x, vreinterpretq_f32_s32(veorq_s32(vreinterpretq_s32_f32(t), vandq_s32(vreinterpretq_s32_f32(x), sign))));
 		y = vaddq_f32(y, vreinterpretq_f32_s32(veorq_s32(vreinterpretq_s32_f32(t), vandq_s32(vreinterpretq_s32_f32(y), sign))));
 
-		// compute normal length & scale
+		// 计算法线长度与缩放
 		float32x4_t ll = vaddq_f32(vmulq_f32(x, x), vaddq_f32(vmulq_f32(y, y), vmulq_f32(z, z)));
 		float32x4_t rl = vrsqrteq_f32(ll);
-		rl = vmulq_f32(rl, vrsqrtsq_f32(vmulq_f32(rl, ll), rl)); // refine rsqrt estimate
+		rl = vmulq_f32(rl, vrsqrtsq_f32(vmulq_f32(rl, ll), rl)); // 精化 rsqrt 估计值
 		float32x4_t s = vmulq_f32(vdupq_n_f32(32767.f), rl);
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 16 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 16 位，因此可以省略该减法
 		const float32x4_t fsnap = vdupq_n_f32(3 << 22);
 
 		int32x4_t xr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(x, s), fsnap));
 		int32x4_t yr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(y, s), fsnap));
 		int32x4_t zr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(z, s), fsnap));
 
-		// mix x/z and y/0 to make 16-bit unpack easier
+		// 混合 x/z 与 y/0，使 16 位拆包更容易
 		int32x4_t xzr = vorrq_s32(vandq_s32(xr, vdupq_n_s32(0xffff)), vshlq_n_s32(zr, 16));
 		int32x4_t y0r = vandq_s32(yr, vdupq_n_s32(0xffff));
 
@@ -667,11 +667,11 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		int32x4_t q4_0 = vld1q_s32(reinterpret_cast<int32_t*>(&data[(i + 0) * 4]));
 		int32x4_t q4_1 = vld1q_s32(reinterpret_cast<int32_t*>(&data[(i + 2) * 4]));
 
-		// gather both x/y 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 x/y 两组 16 位对
 		int32x4_t q4_xy = vuzpq_s32(q4_0, q4_1).val[0];
 		int32x4_t q4_zc = vuzpq_s32(q4_0, q4_1).val[1];
 
-		// sign-extends each of x,y in [x y] with arithmetic shifts
+		// 用算术移位分别对 [x y] 中的 x、y 进行符号扩展
 		int32x4_t xf = vshrq_n_s32(vshlq_n_s32(q4_xy, 16), 16);
 		int32x4_t yf = vshrq_n_s32(q4_xy, 16);
 		int32x4_t zf = vshrq_n_s32(vshlq_n_s32(q4_zc, 16), 16);
@@ -692,8 +692,8 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 
 		float32x4_t s = vdupq_n_f32(32767.f);
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 16 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 16 位，因此可以省略该减法
 		const float32x4_t fsnap = vdupq_n_f32(3 << 22);
 
 		int32x4_t xr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(x, s), fsnap));
@@ -701,7 +701,7 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		int32x4_t zr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(z, s), fsnap));
 		int32x4_t wr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(w, s), fsnap));
 
-		// mix x/z and w/y to make 16-bit unpack easier
+		// 混合 x/z 与 w/y，使 16 位拆包更容易
 		int32x4_t xzr = vorrq_s32(vandq_s32(xr, vdupq_n_s32(0xffff)), vshlq_n_s32(zr, 16));
 		int32x4_t wyr = vorrq_s32(vandq_s32(wr, vdupq_n_s32(0xffff)), vshlq_n_s32(yr, 16));
 
@@ -709,7 +709,7 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		int32x4_t res_0 = vreinterpretq_s32_s16(vzipq_s16(vreinterpretq_s16_s32(wyr), vreinterpretq_s16_s32(xzr)).val[0]);
 		int32x4_t res_1 = vreinterpretq_s32_s16(vzipq_s16(vreinterpretq_s16_s32(wyr), vreinterpretq_s16_s32(xzr)).val[1]);
 
-		// rotate and store
+		// 旋转并存储
 		uint64_t* out = (uint64_t*)&data[i * 4];
 
 		out[0] = rotateleft64(vgetq_lane_u64(vreinterpretq_u64_s32(res_0), 0), vgetq_lane_s32(cf, 0) << 4);
@@ -725,11 +725,11 @@ static void decodeFilterExpSimd(unsigned int* data, size_t count)
 	{
 		int32x4_t v = vld1q_s32(reinterpret_cast<int32_t*>(&data[i]));
 
-		// decode exponent into 2^x directly
+		// 将指数直接解码为 2 的 x 次方
 		int32x4_t ef = vshrq_n_s32(v, 24);
 		int32x4_t es = vshlq_n_s32(vaddq_s32(ef, vdupq_n_s32(127)), 23);
 
-		// decode 24-bit mantissa into floating-point value
+		// 将 24 位尾数解码为浮点值
 		int32x4_t mf = vshrq_n_s32(vshlq_n_s32(v, 8), 8);
 		float32x4_t m = vcvtq_f32_s32(mf);
 
@@ -751,25 +751,25 @@ static void decodeFilterColorSimd8(unsigned char* data, size_t count)
 		int32x4_t cgf = vshrq_n_s32(vshlq_n_s32(c4, 8), 24);
 		int32x4_t af = vreinterpretq_s32_u32(vshrq_n_u32(vreinterpretq_u32_s32(c4), 24));
 
-		// recover scale from alpha high bit
+		// 从 alpha 高位恢复缩放
 		int32x4_t as = af;
 		as = vorrq_s32(as, vshrq_n_s32(as, 1));
 		as = vorrq_s32(as, vshrq_n_s32(as, 2));
 		as = vorrq_s32(as, vshrq_n_s32(as, 4));
 
-		// expand alpha by one bit to match other components
+		// 将 alpha 扩展一位以匹配其它分量
 		af = vorrq_s32(vandq_s32(vshlq_n_s32(af, 1), as), vandq_s32(af, vdupq_n_s32(1)));
 
-		// compute scaling factor
+		// 计算缩放因子
 		float32x4_t ss = vmulq_f32(vdupq_n_f32(255.f), vrecpeq_f32(vcvtq_f32_s32(as)));
 
-		// convert to RGB in fixed point
+		// 转换为定点 RGB
 		int32x4_t rf = vaddq_s32(yf, vsubq_s32(cof, cgf));
 		int32x4_t gf = vaddq_s32(yf, cgf);
 		int32x4_t bf = vsubq_s32(yf, vaddq_s32(cof, cgf));
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 16 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 16 位，因此可以省略该减法
 		const float32x4_t fsnap = vdupq_n_f32(3 << 22);
 
 		int32x4_t rr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(vcvtq_f32_s32(rf), ss), fsnap));
@@ -777,7 +777,7 @@ static void decodeFilterColorSimd8(unsigned char* data, size_t count)
 		int32x4_t br = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(vcvtq_f32_s32(bf), ss), fsnap));
 		int32x4_t ar = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(vcvtq_f32_s32(af), ss), fsnap));
 
-		// repack rgba into final value
+		// 将 rgba 重新打包为最终值
 		int32x4_t res = vandq_s32(rr, vdupq_n_s32(0xff));
 		res = vorrq_s32(res, vshlq_n_s32(vandq_s32(gr, vdupq_n_s32(0xff)), 8));
 		res = vorrq_s32(res, vshlq_n_s32(vandq_s32(br, vdupq_n_s32(0xff)), 16));
@@ -794,7 +794,7 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		int32x4_t c4_0 = vld1q_s32(reinterpret_cast<int32_t*>(&data[(i + 0) * 4]));
 		int32x4_t c4_1 = vld1q_s32(reinterpret_cast<int32_t*>(&data[(i + 2) * 4]));
 
-		// gather both y/co 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 y/co 两组 16 位对
 		int32x4_t c4_yco = vuzpq_s32(c4_0, c4_1).val[0];
 		int32x4_t c4_cga = vuzpq_s32(c4_0, c4_1).val[1];
 
@@ -804,26 +804,26 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		int32x4_t cgf = vshrq_n_s32(vshlq_n_s32(c4_cga, 16), 16);
 		int32x4_t af = vreinterpretq_s32_u32(vshrq_n_u32(vreinterpretq_u32_s32(c4_cga), 16));
 
-		// recover scale from alpha high bit
+		// 从 alpha 高位恢复缩放
 		int32x4_t as = af;
 		as = vorrq_s32(as, vshrq_n_s32(as, 1));
 		as = vorrq_s32(as, vshrq_n_s32(as, 2));
 		as = vorrq_s32(as, vshrq_n_s32(as, 4));
 		as = vorrq_s32(as, vshrq_n_s32(as, 8));
 
-		// expand alpha by one bit to match other components
+		// 将 alpha 扩展一位以匹配其它分量
 		af = vorrq_s32(vandq_s32(vshlq_n_s32(af, 1), as), vandq_s32(af, vdupq_n_s32(1)));
 
-		// compute scaling factor
+		// 计算缩放因子
 		float32x4_t ss = vdivq_f32(vdupq_n_f32(65535.f), vcvtq_f32_s32(as));
 
-		// convert to RGB in fixed point
+		// 转换为定点 RGB
 		int32x4_t rf = vaddq_s32(yf, vsubq_s32(cof, cgf));
 		int32x4_t gf = vaddq_s32(yf, cgf);
 		int32x4_t bf = vsubq_s32(yf, vaddq_s32(cof, cgf));
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 16 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 16 位，因此可以省略该减法
 		const float32x4_t fsnap = vdupq_n_f32(3 << 22);
 
 		int32x4_t rr = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(vcvtq_f32_s32(rf), ss), fsnap));
@@ -831,11 +831,11 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		int32x4_t br = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(vcvtq_f32_s32(bf), ss), fsnap));
 		int32x4_t ar = vreinterpretq_s32_f32(vaddq_f32(vmulq_f32(vcvtq_f32_s32(af), ss), fsnap));
 
-		// mix r/b and g/a to make 16-bit unpack easier
+		// 混合 r/b 与 g/a，使 16 位拆包更容易
 		int32x4_t rbr = vorrq_s32(vandq_s32(rr, vdupq_n_s32(0xffff)), vshlq_n_s32(br, 16));
 		int32x4_t gar = vorrq_s32(vandq_s32(gr, vdupq_n_s32(0xffff)), vshlq_n_s32(ar, 16));
 
-		// pack r/g/b/a using 16-bit unpacks
+		// 使用 16 位拆包来打包 r/g/b/a
 		int32x4_t res_0 = vreinterpretq_s32_s16(vzipq_s16(vreinterpretq_s16_s32(rbr), vreinterpretq_s16_s32(gar)).val[0]);
 		int32x4_t res_1 = vreinterpretq_s32_s16(vzipq_s16(vreinterpretq_s16_s32(rbr), vreinterpretq_s16_s32(gar)).val[1]);
 
@@ -854,7 +854,7 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 	{
 		v128_t n4 = wasm_v128_load(&data[i * 4]);
 
-		// sign-extends each of x,y in [x y ? ?] with arithmetic shifts
+		// 用算术移位分别对 [x y ? ?] 中的 x、y 进行符号扩展
 		v128_t xf = wasm_i32x4_shr(wasm_i32x4_shl(n4, 24), 24);
 		v128_t yf = wasm_i32x4_shr(wasm_i32x4_shl(n4, 16), 24);
 
@@ -866,26 +866,26 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 		v128_t y = wasm_f32x4_convert_i32x4(yf);
 		v128_t z = wasm_f32x4_sub(wasm_f32x4_convert_i32x4(zf), wasm_f32x4_add(wasm_f32x4_abs(x), wasm_f32x4_abs(y)));
 
-		// fixup octahedral coordinates for z<0
-		// note: i32x4_min with 0 is equvalent to f32x4_min
+		// 修复 z 为负时的八面体坐标
+		// 注意：带 0 的 i32x4_min 等价于 f32x4_min
 		v128_t t = wasm_i32x4_min(z, wasm_i32x4_splat(0));
 
 		x = wasm_f32x4_add(x, wasm_v128_xor(t, wasm_v128_and(x, sign)));
 		y = wasm_f32x4_add(y, wasm_v128_xor(t, wasm_v128_and(y, sign)));
 
-		// compute normal length & scale
+		// 计算法线长度与缩放
 		v128_t ll = wasm_f32x4_add(wasm_f32x4_mul(x, x), wasm_f32x4_add(wasm_f32x4_mul(y, y), wasm_f32x4_mul(z, z)));
 		v128_t s = wasm_f32x4_div(wasm_f32x4_splat(127.f), wasm_f32x4_sqrt(ll));
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 8 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 8 位，因此可以省略该减法
 		const v128_t fsnap = wasm_f32x4_splat(3 << 22);
 
 		v128_t xr = wasm_f32x4_add(wasm_f32x4_mul(x, s), fsnap);
 		v128_t yr = wasm_f32x4_add(wasm_f32x4_mul(y, s), fsnap);
 		v128_t zr = wasm_f32x4_add(wasm_f32x4_mul(z, s), fsnap);
 
-		// combine xr/yr/zr into final value
+		// 将 xr/yr/zr 合并为最终值
 		v128_t res = wasm_v128_and(n4, wasm_i32x4_splat(0xff000000));
 		res = wasm_v128_or(res, wasm_v128_and(xr, wasm_i32x4_splat(0xff)));
 		res = wasm_v128_or(res, wasm_i32x4_shl(wasm_v128_and(yr, wasm_i32x4_splat(0xff)), 8));
@@ -906,10 +906,10 @@ static void decodeFilterOctSimd16(short* data, size_t count)
 		v128_t n4_0 = wasm_v128_load(&data[(i + 0) * 4]);
 		v128_t n4_1 = wasm_v128_load(&data[(i + 2) * 4]);
 
-		// gather both x/y 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 x/y 两组 16 位对
 		v128_t n4 = wasmx_unziplo_v32x4(n4_0, n4_1);
 
-		// sign-extends each of x,y in [x y] with arithmetic shifts
+		// 用算术移位分别对 [x y] 中的 x、y 进行符号扩展
 		v128_t xf = wasm_i32x4_shr(wasm_i32x4_shl(n4, 16), 16);
 		v128_t yf = wasm_i32x4_shr(n4, 16);
 
@@ -922,26 +922,26 @@ static void decodeFilterOctSimd16(short* data, size_t count)
 		v128_t y = wasm_f32x4_convert_i32x4(yf);
 		v128_t z = wasm_f32x4_sub(wasm_f32x4_convert_i32x4(zf), wasm_f32x4_add(wasm_f32x4_abs(x), wasm_f32x4_abs(y)));
 
-		// fixup octahedral coordinates for z<0
-		// note: i32x4_min with 0 is equvalent to f32x4_min
+		// 修复 z 为负时的八面体坐标
+		// 注意：带 0 的 i32x4_min 等价于 f32x4_min
 		v128_t t = wasm_i32x4_min(z, wasm_i32x4_splat(0));
 
 		x = wasm_f32x4_add(x, wasm_v128_xor(t, wasm_v128_and(x, sign)));
 		y = wasm_f32x4_add(y, wasm_v128_xor(t, wasm_v128_and(y, sign)));
 
-		// compute normal length & scale
+		// 计算法线长度与缩放
 		v128_t ll = wasm_f32x4_add(wasm_f32x4_mul(x, x), wasm_f32x4_add(wasm_f32x4_mul(y, y), wasm_f32x4_mul(z, z)));
 		v128_t s = wasm_f32x4_div(wasm_f32x4_splat(32767.f), wasm_f32x4_sqrt(ll));
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 16 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 16 位，因此可以省略该减法
 		const v128_t fsnap = wasm_f32x4_splat(3 << 22);
 
 		v128_t xr = wasm_f32x4_add(wasm_f32x4_mul(x, s), fsnap);
 		v128_t yr = wasm_f32x4_add(wasm_f32x4_mul(y, s), fsnap);
 		v128_t zr = wasm_f32x4_add(wasm_f32x4_mul(z, s), fsnap);
 
-		// mix x/z and y/0 to make 16-bit unpack easier
+		// 混合 x/z 与 y/0，使 16 位拆包更容易
 		v128_t xzr = wasm_v128_or(wasm_v128_and(xr, wasm_i32x4_splat(0xffff)), wasm_i32x4_shl(zr, 16));
 		v128_t y0r = wasm_v128_and(yr, wasm_i32x4_splat(0xffff));
 
@@ -967,11 +967,11 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		v128_t q4_0 = wasm_v128_load(&data[(i + 0) * 4]);
 		v128_t q4_1 = wasm_v128_load(&data[(i + 2) * 4]);
 
-		// gather both x/y 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 x/y 两组 16 位对
 		v128_t q4_xy = wasmx_unziplo_v32x4(q4_0, q4_1);
 		v128_t q4_zc = wasmx_unziphi_v32x4(q4_0, q4_1);
 
-		// sign-extends each of x,y in [x y] with arithmetic shifts
+		// 用算术移位分别对 [x y] 中的 x、y 进行符号扩展
 		v128_t xf = wasm_i32x4_shr(wasm_i32x4_shl(q4_xy, 16), 16);
 		v128_t yf = wasm_i32x4_shr(q4_xy, 16);
 		v128_t zf = wasm_i32x4_shr(wasm_i32x4_shl(q4_zc, 16), 16);
@@ -987,14 +987,14 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		v128_t z = wasm_f32x4_mul(wasm_f32x4_convert_i32x4(zf), ss);
 
 		// reconstruct w as a square root; we clamp to 0.f to avoid NaN due to precision errors
-		// note: i32x4_max with 0 is equivalent to f32x4_max
+		// 注意：与 0 进行 i32x4_max 运算等价于 f32x4_max
 		v128_t ww = wasm_f32x4_sub(wasm_f32x4_splat(1.f), wasm_f32x4_add(wasm_f32x4_mul(x, x), wasm_f32x4_add(wasm_f32x4_mul(y, y), wasm_f32x4_mul(z, z))));
 		v128_t w = wasm_f32x4_sqrt(wasm_i32x4_max(ww, wasm_i32x4_splat(0)));
 
 		v128_t s = wasm_f32x4_splat(32767.f);
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 16 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 16 位，因此可以省略该减法
 		const v128_t fsnap = wasm_f32x4_splat(3 << 22);
 
 		v128_t xr = wasm_f32x4_add(wasm_f32x4_mul(x, s), fsnap);
@@ -1002,7 +1002,7 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		v128_t zr = wasm_f32x4_add(wasm_f32x4_mul(z, s), fsnap);
 		v128_t wr = wasm_f32x4_add(wasm_f32x4_mul(w, s), fsnap);
 
-		// mix x/z and w/y to make 16-bit unpack easier
+		// 混合 x/z 与 w/y，使 16 位拆包更容易
 		v128_t xzr = wasm_v128_or(wasm_v128_and(xr, wasm_i32x4_splat(0xffff)), wasm_i32x4_shl(zr, 16));
 		v128_t wyr = wasm_v128_or(wasm_v128_and(wr, wasm_i32x4_splat(0xffff)), wasm_i32x4_shl(yr, 16));
 
@@ -1013,7 +1013,7 @@ static void decodeFilterQuatSimd(short* data, size_t count)
 		// compute component index shifted left by 4 (and moved into i32x4 slot)
 		v128_t cm = wasm_i32x4_shl(cf, 4);
 
-		// rotate and store
+		// 旋转并存储
 		uint64_t* out = reinterpret_cast<uint64_t*>(&data[i * 4]);
 
 		out[0] = rotateleft64(wasm_i64x2_extract_lane(res_0, 0), wasm_i32x4_extract_lane(cm, 0));
@@ -1029,11 +1029,11 @@ static void decodeFilterExpSimd(unsigned int* data, size_t count)
 	{
 		v128_t v = wasm_v128_load(&data[i]);
 
-		// decode exponent into 2^x directly
+		// 将指数直接解码为 2 的 x 次方
 		v128_t ef = wasm_i32x4_shr(v, 24);
 		v128_t es = wasm_i32x4_shl(wasm_i32x4_add(ef, wasm_i32x4_splat(127)), 23);
 
-		// decode 24-bit mantissa into floating-point value
+		// 将 24 位尾数解码为浮点值
 		v128_t mf = wasm_i32x4_shr(wasm_i32x4_shl(v, 8), 8);
 		v128_t m = wasm_f32x4_convert_i32x4(mf);
 
@@ -1058,25 +1058,25 @@ static void decodeFilterColorSimd8(unsigned char* data, size_t count)
 		v128_t cgf = wasm_i32x4_shr(wasm_i32x4_shl(c4, 8), 24);
 		v128_t af = wasm_v128_or(zero, wasm_u32x4_shr(c4, 24));
 
-		// recover scale from alpha high bit
+		// 从 alpha 高位恢复缩放
 		v128_t as = af;
 		as = wasm_v128_or(as, wasm_i32x4_shr(as, 1));
 		as = wasm_v128_or(as, wasm_i32x4_shr(as, 2));
 		as = wasm_v128_or(as, wasm_i32x4_shr(as, 4));
 
-		// expand alpha by one bit to match other components
+		// 将 alpha 扩展一位以匹配其它分量
 		af = wasm_v128_or(wasm_v128_and(wasm_i32x4_shl(af, 1), as), wasm_v128_and(af, wasm_i32x4_splat(1)));
 
-		// compute scaling factor
+		// 计算缩放因子
 		v128_t ss = wasm_f32x4_div(wasm_f32x4_splat(255.f), wasm_f32x4_convert_i32x4(as));
 
-		// convert to RGB in fixed point
+		// 转换为定点 RGB
 		v128_t rf = wasm_i32x4_add(yf, wasm_i32x4_sub(cof, cgf));
 		v128_t gf = wasm_i32x4_add(yf, cgf);
 		v128_t bf = wasm_i32x4_sub(yf, wasm_i32x4_add(cof, cgf));
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 8 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 8 位，因此可以省略该减法
 		const v128_t fsnap = wasm_f32x4_splat(3 << 22);
 
 		v128_t rr = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_convert_i32x4(rf), ss), fsnap);
@@ -1084,7 +1084,7 @@ static void decodeFilterColorSimd8(unsigned char* data, size_t count)
 		v128_t br = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_convert_i32x4(bf), ss), fsnap);
 		v128_t ar = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_convert_i32x4(af), ss), fsnap);
 
-		// repack rgba into final value
+		// 将 rgba 重新打包为最终值
 		v128_t res = wasm_v128_and(rr, wasm_i32x4_splat(0xff));
 		res = wasm_v128_or(res, wasm_i32x4_shl(wasm_v128_and(gr, wasm_i32x4_splat(0xff)), 8));
 		res = wasm_v128_or(res, wasm_i32x4_shl(wasm_v128_and(br, wasm_i32x4_splat(0xff)), 16));
@@ -1104,7 +1104,7 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		v128_t c4_0 = wasm_v128_load(&data[(i + 0) * 4]);
 		v128_t c4_1 = wasm_v128_load(&data[(i + 2) * 4]);
 
-		// gather both y/co 16-bit pairs in each 32-bit lane
+		// 在每个 32 位通道中同时收集 y/co 两组 16 位对
 		v128_t c4_yco = wasmx_unziplo_v32x4(c4_0, c4_1);
 		v128_t c4_cga = wasmx_unziphi_v32x4(c4_0, c4_1);
 
@@ -1114,26 +1114,26 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		v128_t cgf = wasm_i32x4_shr(wasm_i32x4_shl(c4_cga, 16), 16);
 		v128_t af = wasm_v128_or(zero, wasm_u32x4_shr(c4_cga, 16));
 
-		// recover scale from alpha high bit
+		// 从 alpha 高位恢复缩放
 		v128_t as = af;
 		as = wasm_v128_or(as, wasm_i32x4_shr(as, 1));
 		as = wasm_v128_or(as, wasm_i32x4_shr(as, 2));
 		as = wasm_v128_or(as, wasm_i32x4_shr(as, 4));
 		as = wasm_v128_or(as, wasm_i32x4_shr(as, 8));
 
-		// expand alpha by one bit to match other components
+		// 将 alpha 扩展一位以匹配其它分量
 		af = wasm_v128_or(wasm_v128_and(wasm_i32x4_shl(af, 1), as), wasm_v128_and(af, wasm_i32x4_splat(1)));
 
-		// compute scaling factor
+		// 计算缩放因子
 		v128_t ss = wasm_f32x4_div(wasm_f32x4_splat(65535.f), wasm_f32x4_convert_i32x4(as));
 
-		// convert to RGB in fixed point
+		// 转换为定点 RGB
 		v128_t rf = wasm_i32x4_add(yf, wasm_i32x4_sub(cof, cgf));
 		v128_t gf = wasm_i32x4_add(yf, cgf);
 		v128_t bf = wasm_i32x4_sub(yf, wasm_i32x4_add(cof, cgf));
 
-		// fast rounded signed float->int: addition triggers renormalization after which mantissa stores the integer value
-		// note: the result is offset by 0x4B40_0000, but we only need the low 8 bits so we can omit the subtraction
+		// 快速的舍入有符号 float->int：加法会触发重新归一化，此后尾数（mantissa）存储整数值
+		// 注意：结果偏移了 0x4B40_0000，但我们只需低 8 位，因此可以省略该减法
 		const v128_t fsnap = wasm_f32x4_splat(3 << 22);
 
 		v128_t rr = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_convert_i32x4(rf), ss), fsnap);
@@ -1141,11 +1141,11 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 		v128_t br = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_convert_i32x4(bf), ss), fsnap);
 		v128_t ar = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_convert_i32x4(af), ss), fsnap);
 
-		// mix r/b and g/a to make 16-bit unpack easier
+		// 混合 r/b 与 g/a，使 16 位拆包更容易
 		v128_t rbr = wasm_v128_or(wasm_v128_and(rr, wasm_i32x4_splat(0xffff)), wasm_i32x4_shl(br, 16));
 		v128_t gar = wasm_v128_or(wasm_v128_and(gr, wasm_i32x4_splat(0xffff)), wasm_i32x4_shl(ar, 16));
 
-		// pack r/g/b/a using 16-bit unpacks
+		// 使用 16 位拆包来打包 r/g/b/a
 		v128_t res_0 = wasmx_unpacklo_v16x8(rbr, gar);
 		v128_t res_1 = wasmx_unpackhi_v16x8(rbr, gar);
 
@@ -1155,7 +1155,7 @@ static void decodeFilterColorSimd16(unsigned short* data, size_t count)
 }
 #endif
 
-// optimized variant of frexp
+// frexp 的优化变体
 inline int optlog2(float v)
 {
 	union
@@ -1169,7 +1169,7 @@ inline int optlog2(float v)
 	return v == 0 ? 0 : int((u.ui >> 23) & 0xff) - 127 + 1;
 }
 
-// optimized variant of ldexp
+// ldexp 的优化变体
 inline float optexp2(int e)
 {
 	union
@@ -1263,7 +1263,7 @@ void meshopt_encodeFilterOct(void* destination, size_t count, size_t stride, int
 	{
 		const float* n = &data[i * 4];
 
-		// octahedral encoding of a unit vector
+		// 单位向量的八面体编码
 		float nx = n[0], ny = n[1], nz = n[2], nw = n[3];
 		float nl = fabsf(nx) + fabsf(ny) + fabsf(nz);
 		float ns = nl == 0.f ? 0.f : 1.f / nl;
@@ -1311,16 +1311,16 @@ void meshopt_encodeFilterQuat(void* destination_, size_t count, size_t stride, i
 		const float* q = &data[i * 4];
 		short* d = &destination[i * 4];
 
-		// establish maximum quaternion component
+		// 确定最大的四元数分量
 		int qc = 0;
 		qc = fabsf(q[1]) > fabsf(q[qc]) ? 1 : qc;
 		qc = fabsf(q[2]) > fabsf(q[qc]) ? 2 : qc;
 		qc = fabsf(q[3]) > fabsf(q[qc]) ? 3 : qc;
 
-		// we use double-cover properties to discard the sign
+		// 我们利用双覆盖特性来舍弃符号
 		float sign = q[qc] < 0.f ? -1.f : 1.f;
 
-		// note: we always encode a cyclical swizzle to be able to recover the order via rotation
+		// 注意：我们总是编码一个循环 swizzle，以便能通过旋转恢复顺序
 		d[0] = short(meshopt_quantizeSnorm(q[(qc + 1) & 3] * scaler * sign, bits));
 		d[1] = short(meshopt_quantizeSnorm(q[(qc + 2) & 3] * scaler * sign, bits));
 		d[2] = short(meshopt_quantizeSnorm(q[(qc + 3) & 3] * scaler * sign, bits));
@@ -1399,7 +1399,7 @@ void meshopt_encodeFilterExp(void* destination_, size_t count, size_t stride, in
 		}
 		else
 		{
-			// the code below assumes component_exp is initialized outside of the loop
+			// 下面的代码假设 component_exp 在循环外已初始化
 			assert(mode == meshopt_EncodeExpSharedComponent);
 		}
 
@@ -1410,7 +1410,7 @@ void meshopt_encodeFilterExp(void* destination_, size_t count, size_t stride, in
 			// note that we additionally scale the mantissa to make it a K-bit signed integer (K-1 bits for magnitude)
 			exp -= (bits - 1);
 
-			// compute renormalized rounded mantissa for each component
+			// 计算每个 component 的重新归一化并四舍五入后的尾数
 			int mmask = (1 << 24) - 1;
 			int m = int(v[j] * optexp2(-exp) + (v[j] >= 0 ? 0.5f : -0.5f));
 
@@ -1435,16 +1435,16 @@ void meshopt_encodeFilterColor(void* destination, size_t count, size_t stride, i
 		int fg = meshopt_quantizeUnorm(c[1], bits);
 		int fb = meshopt_quantizeUnorm(c[2], bits);
 
-		// YCoCg-R encoding with truncated Co/Cg ensures that decoding can be done using integers
+		// 对 Co/Cg 截断的 YCoCg-R 编码确保可以使用整数进行解码
 		int fco = (fr - fb) / 2;
 		int tmp = fb + fco;
 		int fcg = (fg - tmp) / 2;
 		int fy = tmp + fcg;
 
-		// validate that R/G/B can be reconstructed with K bit integers
+		// 验证 R/G/B 是否可以用 K 位整数重建
 		assert(unsigned((fy + fco - fcg) | (fy + fcg) | (fy - fco - fcg)) < (1u << bits));
 
-		// alpha: K-1-bit encoding with high bit set to 1
+		// alpha：K-1 位编码，高位设置为 1
 		int fa = meshopt_quantizeUnorm(c[3], bits - 1) | (1 << (bits - 1));
 
 		if (stride == 4)

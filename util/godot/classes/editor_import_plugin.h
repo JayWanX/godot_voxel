@@ -19,7 +19,7 @@ struct ImportOptionWrapper {
 			option(p_option), default_value(p_default_value) {}
 };
 
-// Exposes the same interface for different equivalent dictionary types, depending on the compiling target.
+// 根据编译目标，为不同的等价字典类型暴露相同的接口。
 struct KeyValueWrapper {
 #if defined(VOXEL_GODOT)
 
@@ -45,7 +45,7 @@ struct KeyValueWrapper {
 #endif
 };
 
-// Exposes the same interface for different equivalent lists of strings, depending on the compiling target.
+// 根据编译目标，为不同的等价字符串列表暴露相同的接口。
 struct StringListWrapper {
 #if defined(VOXEL_GODOT)
 	List<String> &_list;
@@ -55,7 +55,7 @@ struct StringListWrapper {
 #endif
 };
 
-// Wraps EditorImportPlugin to isolate engine API differences.
+// 封装 EditorImportPlugin，以隔离引擎 API 的差异。
 class Voxel_EditorImportPlugin : public EditorImportPlugin {
 	GDCLASS(Voxel_EditorImportPlugin, EditorImportPlugin)
 public:
@@ -95,7 +95,7 @@ public:
 #endif
 
 protected:
-	// These methods can be implemented once, wrappers above take care of converting.
+	// 这些方法只需实现一次，上面的封装负责转换。
 
 	virtual String _voxel_get_importer_name() const;
 	virtual String _voxel_get_visible_name() const;

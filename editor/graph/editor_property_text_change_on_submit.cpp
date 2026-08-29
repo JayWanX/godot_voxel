@@ -41,7 +41,7 @@ void Voxel_EditorPropertyTextChangeOnSubmit::_on_line_edit_text_submitted(String
 	if (_ignore_changes) {
 		return;
 	}
-	// Same behavior as the default `EditorPropertyText`
+	// 与默认的 `EditorPropertyText` 行为一致
 	if (_line_edit->has_focus()) {
 		_line_edit->release_focus();
 	}

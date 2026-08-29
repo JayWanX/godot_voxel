@@ -1,13 +1,13 @@
 # VoxelSaveCompletionTracker
 
-Inherits: [RefCounted](https://docs.godotengine.org/en/stable/classes/class_refcounted.html)
+继承自：[RefCounted](https://docs.godotengine.org/en/stable/classes/class_refcounted.html)
 
-Object returned by some asynchronous functions to track progress and completion.
+由某些异步函数返回的对象，用于跟踪进度和完成情况。
 
-## Methods: 
+## 方法：
 
 
-Return                                                                  | Signature                                               
+返回值                                                                     | 函数签名                                                    
 ----------------------------------------------------------------------- | --------------------------------------------------------
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)    | [get_remaining_tasks](#i_get_remaining_tasks) ( ) const 
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)    | [get_total_tasks](#i_get_total_tasks) ( ) const         
@@ -15,22 +15,22 @@ Return                                                                  | Signat
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)  | [is_complete](#i_is_complete) ( ) const                 
 <p></p>
 
-## Method Descriptions
+## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_remaining_tasks"></span> **get_remaining_tasks**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_total_tasks"></span> **get_total_tasks**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_aborted"></span> **is_aborted**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_complete"></span> **is_complete**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

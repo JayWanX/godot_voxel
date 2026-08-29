@@ -1,60 +1,60 @@
 # VoxelInstanceLibraryItem
 
-Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
+继承自：[Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
-Inherited by: [VoxelInstanceLibraryMultiMeshItem](VoxelInstanceLibraryMultiMeshItem.md), [VoxelInstanceLibrarySceneItem](VoxelInstanceLibrarySceneItem.md)
+派生：[VoxelInstanceLibraryMultiMeshItem](VoxelInstanceLibraryMultiMeshItem.md), [VoxelInstanceLibrarySceneItem](VoxelInstanceLibrarySceneItem.md)
 
-Settings for a model that can be used by [VoxelInstancer](VoxelInstancer.md)
+供 [VoxelInstancer](VoxelInstancer.md) 使用的模型的设置。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                        | Name                                                                     | Default 
---------------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------
-[float](https://docs.godotengine.org/en/stable/classes/class_float.html)    | [floating_sdf_offset_along_normal](#i_floating_sdf_offset_along_normal)  | -0.1    
-[float](https://docs.godotengine.org/en/stable/classes/class_float.html)    | [floating_sdf_threshold](#i_floating_sdf_threshold)                      | 0.0     
-[VoxelInstanceGenerator](VoxelInstanceGenerator.md)                         | [generator](#i_generator)                                                |         
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)        | [lod_index](#i_lod_index)                                                | 0       
-[String](https://docs.godotengine.org/en/stable/classes/class_string.html)  | [name](#i_name)                                                          | ""      
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)      | [persistent](#i_persistent)                                              | false   
+类型                                                                          | 名称                                                                       | 默认值   
+--------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------
+[float](https://docs.godotengine.org/en/stable/classes/class_float.html)    | [floating_sdf_offset_along_normal](#i_floating_sdf_offset_along_normal)  | -0.1  
+[float](https://docs.godotengine.org/en/stable/classes/class_float.html)    | [floating_sdf_threshold](#i_floating_sdf_threshold)                      | 0.0   
+[VoxelInstanceGenerator](VoxelInstanceGenerator.md)                         | [generator](#i_generator)                                                |       
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)        | [lod_index](#i_lod_index)                                                | 0     
+[String](https://docs.godotengine.org/en/stable/classes/class_string.html)  | [name](#i_name)                                                          | ""    
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)      | [persistent](#i_persistent)                                              | false 
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_floating_sdf_offset_along_normal"></span> **floating_sdf_offset_along_normal** = -0.1
 
-Offset along instances upward axis to apply when the object is tested for being floating or not.
+在检测对象是否漂浮时，沿实例向上轴应用的偏移。
 
-An instance is determined to be floating if the SDF at its origin is greater than 0. However, in practice, SDF can be imprecise, and the way instances spawn on triangles of meshes means SDF at their position will always fluctuate a bit around 0. This can lead instances to be overly removed after digging around them, or not enough. You can attempt to fix this by increasing this offset to very small values, so SDF slightly below instances (usually underground) is tested instead. Negative values will check below, positive will check above. Make sure to test resulting behaviors.
+如果实例原点处的 SDF 大于 0，则该实例会被判定为漂浮。然而在实际中，SDF 可能不精确，而且实例生成在网格三角形上的方式意味着它们位置的 SDF 总会围绕 0 上下小幅波动。这可能导致在周围挖掘后实例被过度移除，或移除不足。你可以尝试将此偏移增大到很小的值来修复，这样会改而检测实例略下方（通常在地下）的 SDF。负值会检测下方，正值会检测上方。请务必测试最终的行为。
 
-WARNING: changing this too high can break automatic removal entirely, but is relatively safer than [floating_sdf_threshold](VoxelInstanceLibraryItem.md#i_floating_sdf_threshold).
+警告：将此值设置得过高会完全破坏自动移除功能，但相比 [floating_sdf_threshold](VoxelInstanceLibraryItem.md#i_floating_sdf_threshold) 相对更安全。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_floating_sdf_threshold"></span> **floating_sdf_threshold** = 0.0
 
-Threshold used to find if SDF is air. If the SDF at the sampled location is greater, the instance is considered floating. See also [floating_sdf_offset_along_normal](VoxelInstanceLibraryItem.md#i_floating_sdf_offset_along_normal) for more info.
+用于判断 SDF 是否为空气的阈值。如果采样位置的 SDF 更大，则该实例被视为漂浮。更多信息请参见 [floating_sdf_offset_along_normal](VoxelInstanceLibraryItem.md#i_floating_sdf_offset_along_normal)。
 
-WARNING: changing this too high can break automatic removal entirely. While this can "turn off" removal after digging ground, it is not recommended to do this when instances have no collider, because then it leaves no way of removing them.
+警告：将此值设置得过高会完全破坏自动移除功能。虽然这可以在挖掘地面后“关闭”移除，但当实例没有碰撞体时不建议这样做，因为那样就完全没有移除它们的方法了。
 
 ### [VoxelInstanceGenerator](VoxelInstanceGenerator.md)<span id="i_generator"></span> **generator**
 
-Generator that will be used to pick points where the item will spawn.
+用于挑选条目生成位置的生成器。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_lod_index"></span> **lod_index** = 0
 
-LOD index of chunks of the terrain where this item will spawn. The higher it is, the broader the range it will spawn at around viewers, however it will have lower precision because it uses meshes of a lower level of detail. Prefer spawning larger objects on higher LOD indexes (large trees, boulders), and small objects on lower LOD indexes (grass, small rocks)
+该条目将生成的地形区块的 LOD 索引。索引越高，在观察者周围生成的区域越广，但由于使用更低细节层级的网格，精度也会更低。建议将较大的对象（大树、巨石）放在较高的 LOD 索引上生成，将较小的对象（草、小石头）放在较低的 LOD 索引上生成。
 
 ### [String](https://docs.godotengine.org/en/stable/classes/class_string.html)<span id="i_name"></span> **name** = ""
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_persistent"></span> **persistent** = false
 
-If not enabled, items will always spawn if generator conditions are met: for example, if you dig a hole, it will remove grass in the surface, but if you leave the area and come back, grass will spawn inside the hole.
+若未启用，只要生成器条件满足，条目就总会生成：例如，如果你挖了一个洞，它会移除地表的草，但如果你离开该区域再回来，草会在洞内重新生成。
 
-If enabled, and if the terrain has a [VoxelStream](VoxelStream.md) supporting instances, this item will be saved in chunks where instances of it got modified (following the same events as voxel modifications), so if you leave and come back, instances of the item will remain in the same state as you left them. Only the transform of items is saved.
+若启用，且地形具有支持实例的 [VoxelStream](VoxelStream.md)，则该条目将保存在其实例被修改的区块中（与体素修改遵循相同的事件），因此如果你离开再回来，该条目的实例将保持你离开时的状态。仅保存条目的变换。
 
-Note: saving relies on identifying the item in save files with the same number given in the [VoxelInstanceLibrary](VoxelInstanceLibrary.md). Removing the item or changing its ID can lead saves to load the item incorrectly.
+注意：保存时依赖于使用 [VoxelInstanceLibrary](VoxelInstanceLibrary.md) 中给出的相同编号来在存档文件中标识该条目。移除条目或更改其 ID 可能导致存档错误地加载该条目。
 
-See also [https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence](https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence)
+另请参见 [https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence](https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence)
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

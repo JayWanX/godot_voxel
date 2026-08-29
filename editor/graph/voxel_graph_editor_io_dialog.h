@@ -15,7 +15,7 @@ VOXEL_GODOT_FORWARD_DECLARE(class Button)
 
 namespace voxel {
 
-// Dialog to edit exposed inputs and outputs of a `VoxelGraphFunction`
+// 用于编辑 `VoxelGraphFunction` 暴露的输入和输出的对话框
 class VoxelGraphEditorIODialog : public ConfirmationDialog {
 	GDCLASS(VoxelGraphEditorIODialog, ConfirmationDialog)
 public:

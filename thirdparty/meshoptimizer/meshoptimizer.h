@@ -37,7 +37,7 @@
 
 #define MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN namespace voxelmeshopt {
 #define MESHOPTIMIZER_VOXEL_NAMESPACE_END }
-// No C interface here, this is exclusively for a C++ source integration
+// 这里没有 C 接口，仅用于 C++ 源码集成
 
 #else
 
@@ -1173,7 +1173,7 @@ inline size_t meshopt_generateProvokingIndexBuffer(T* destination, unsigned int*
 	meshopt_IndexAdapter<T> out(destination, NULL, index_count);
 
 	size_t bound = vertex_count + (index_count / 3);
-	assert(size_t(T(bound - 1)) == bound - 1); // bound - 1 must fit in T
+	assert(size_t(T(bound - 1)) == bound - 1); // bound - 1 必须能容纳进 T
 	(void)bound;
 
 	return meshopt_generateProvokingIndexBuffer(out.data, reorder, in.data, index_count, vertex_count);

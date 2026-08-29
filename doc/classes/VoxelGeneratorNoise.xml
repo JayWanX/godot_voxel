@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGeneratorNoise" inherits="VoxelGenerator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Voxel generator producing overhanging shapes using 3D noise.
+		使用 3D 噪声生成悬垂形状的体素生成器。
 	</brief_description>
 	<description>
 	</description>
@@ -9,17 +9,17 @@
 	</tutorials>
 	<members>
 		<member name="channel" type="int" setter="set_channel" getter="get_channel" enum="VoxelBuffer.ChannelId" default="1">
-			Channel into which the generator will produce voxel data. This depends on the type of meshing you need.
+			生成器将体素数据写入的通道。这取决于你需要的网格化类型。
 		</member>
 		<member name="height_range" type="float" setter="set_height_range" getter="get_height_range" default="200.0">
-			Range of altitudes within which the shape variations will be found. The higher this range, the more overhangs there will be.
-			Shapes will start at maximum density near the base of the shape (low probability to find air), and progressively loose density until it reaches maximum height.
+			形状变化将出现的高度范围。此范围越大，悬垂就越多。
+			形状在靠近底部时密度最大（找到空气的概率低），并逐渐降低密度，直到达到最大高度。
 		</member>
 		<member name="height_start" type="float" setter="set_height_start" getter="get_height_start" default="-100.0">
-			Base of the shape. Everything below it will be filled with ground.
+			形状的底部。其下方的所有内容都将被地面填充。
 		</member>
 		<member name="noise" type="FastNoiseLite" setter="set_noise" getter="get_noise">
-			Noise used as density function. It is required for the generator to work.
+			用作密度函数的噪声。生成器需要它才能工作。
 		</member>
 	</members>
 </class>

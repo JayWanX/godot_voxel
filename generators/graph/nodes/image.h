@@ -22,7 +22,7 @@ inline float get_pixel_repeat_linear(const Image &im, float x, float y, int im_w
 	const float h01 = get_pixel_repeat(im, x0, y0 + 1, im_w, im_h);
 	const float h11 = get_pixel_repeat(im, x0 + 1, y0 + 1, im_w, im_h);
 
-	// Bilinear filter
+	// 双线性滤波
 	const float h = Math::lerp(Math::lerp(h00, h10, xf), Math::lerp(h01, h11, xf), yf);
 
 	return h;
@@ -36,7 +36,7 @@ inline math::Interval skew3(math::Interval x) {
 	return (cubed(x) + x) * 0.5f;
 }
 
-// This is mostly useful for generating planets from an existing heightmap
+// 这主要用于根据已有的高度图生成星球
 inline float sdf_sphere_heightmap(
 		float x,
 		float y,
@@ -51,8 +51,8 @@ inline float sdf_sphere_heightmap(
 ) {
 	const float d = Math::sqrt(x * x + y * y + z * z) + 0.0001f;
 	const float sd = d - r;
-	// Optimize when far enough from heightmap.
-	// This introduces a discontinuity but it should be ok for clamped storage
+	// 当离高度图足够远时进行优化。
+	// 这会引入不连续性，但对于受限存储来说应该没问题
 	const float margin = 1.2f * (max_h - min_h);
 	if (sd > max_h + margin || sd < min_h - margin) {
 		return sd;
@@ -60,15 +60,15 @@ inline float sdf_sphere_heightmap(
 	const float nx = x / d;
 	const float ny = y / d;
 	const float nz = z / d;
-	// TODO Could use fast atan2, it doesn't have to be precise
+	// TODO 可以使用快速的 atan2，它不需要很精确
 	// https://github.com/ducha-aiki/fast_atan2/blob/master/fast_atan.cpp
 	const float uvx = -Math::atan2(nz, nx) * voxel::math::INV_TAU<float> + 0.5f;
-	// This is an approximation of asin(ny)/(PI/2)
-	// TODO It may be desirable to use the real function though,
-	// in cases where we want to combine the same map in shaders
+	// 这是 asin(ny)/(PI/2) 的近似
+	// TODO 不过在某些情况下可能希望使用真正的函数，
+	// 例如当我们想对着色器中的同一地图进行组合时
 	const float ys = skew3(ny);
 	const float uvy = -0.5f * ys + 0.5f;
-	// TODO Could use bicubic interpolation when the image is sampled at lower resolution than voxels
+	// TODO 当图像以低于体素的分辨率采样时，可以使用双三次插值
 	const float h = get_pixel_repeat_linear(im, uvx * norm_x, uvy * norm_y, im.get_width(), im.get_height());
 	return sd - m * h;
 }
@@ -87,9 +87,8 @@ inline math::Interval sdf_sphere_heightmap(
 
 	const Interval d = get_length(x, y, z) + 0.0001f;
 	const Interval sd = d - r;
-	// TODO There is a discontinuity here due to the optimization done in the regular function
-	// Not sure yet how to implement it here. Worst case scenario, we remove it
-
+	// TODO 由于普通函数中的优化，这里存在不连续性
+	// 还不确定如何在这里实现它。最坏的情况下，我们把它去掉
 	const Interval nx = x / d;
 	const Interval ny = y / d;
 	const Interval nz = z / d;
@@ -97,7 +96,7 @@ inline math::Interval sdf_sphere_heightmap(
 	const Interval ys = skew3(ny);
 	const Interval uvy = -0.5f * ys + 0.5f;
 
-	// atan2 returns results between -PI and PI but sometimes the angle can wrap, we have to account for this
+	// atan2 返回 -PI 到 PI 之间的结果，但有时角度会环绕，我们必须考虑这一点
 	OptionalInterval atan_r1;
 	const Interval atan_r0 = atan2(nz, nx, &atan_r1);
 
@@ -168,7 +167,7 @@ void register_image_nodes(Span<NodeType> types) {
 			Runtime::Buffer &out = ctx.get_output(0);
 			const Params p = ctx.get_params<Params>();
 			const Image &im = *p.image;
-			// Cache image size to reduce API calls.
+			// 缓存图像尺寸以减少 API 调用。
 			const int w = im.get_width();
 			const int h = im.get_height();
 #ifdef DEBUG_ENABLED
@@ -177,7 +176,7 @@ void register_image_nodes(Span<NodeType> types) {
 				return;
 			}
 #endif
-			// TODO Optimized path for most used formats, `get_pixel` is kinda slow
+			// TODO 为最常用的格式做优化路径，`get_pixel` 有点慢
 			if (p.filter == FILTER_NEAREST) {
 				for (uint32_t i = 0; i < out.size; ++i) {
 					out.data[i] = get_pixel_repeat(im, x.data[i], y.data[i], w, h);
@@ -256,7 +255,7 @@ void register_image_nodes(Span<NodeType> types) {
 			const Runtime::Buffer &y = ctx.get_input(1);
 			const Runtime::Buffer &z = ctx.get_input(2);
 			Runtime::Buffer &out = ctx.get_output(0);
-			// TODO Allow to use bilinear filtering?
+			// TODO 允许使用双线性滤波？
 			const Params p = ctx.get_params<Params>();
 			const Image &im = *p.image;
 			for (uint32_t i = 0; i < out.size; ++i) {

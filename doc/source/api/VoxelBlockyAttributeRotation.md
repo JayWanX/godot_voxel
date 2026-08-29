@@ -1,22 +1,22 @@
 # VoxelBlockyAttributeRotation
 
-Inherits: [VoxelBlockyAttribute](VoxelBlockyAttribute.md)
+继承自：[VoxelBlockyAttribute](VoxelBlockyAttribute.md)
 
 !!! warning
-    This class is marked as experimental. It is subject to likely change or possible removal in future versions. Use at your own discretion.
+    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                    | Name                                   | Default 
------------------------------------------------------------------------ | -------------------------------------- | --------
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)  | [horizontal_only](#i_horizontal_only)  | false   
+类型                                                                      | 名称                                     | 默认值   
+----------------------------------------------------------------------- | -------------------------------------- | ------
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)  | [horizontal_only](#i_horizontal_only)  | false 
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_horizontal_only"></span> **horizontal_only** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

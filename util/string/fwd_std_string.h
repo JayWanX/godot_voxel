@@ -3,7 +3,7 @@
 
 namespace voxel {
 
-// std::string can't be forward-declared. Using type-tunneling instead.
+// std::string 不能被前置声明。改用类型隧道（type-tunneling）技术。
 // http://jonjagger.blogspot.com/2011/04/forward-declaring-stdstring-in-c.html
 struct FwdConstStdString;
 struct FwdMutableStdString;

@@ -13,8 +13,8 @@ VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
 
 namespace voxel {
 
-// Allows to edit a map of attribute combination and associated models.
-// This cannot be exposed as regular properties, therefore it is a custom comtrol.
+// 允许编辑属性组合与关联模型之间的映射。
+// 这无法作为常规属性暴露，因此它是一个自定义控件。
 class VoxelBlockyTypeVariantListEditor : public VBoxContainer {
 	GDCLASS(VoxelBlockyTypeVariantListEditor, VBoxContainer)
 public:

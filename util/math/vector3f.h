@@ -6,10 +6,10 @@
 
 namespace voxel {
 
-// 32-bit float precision 3D vector.
-// Because Godot's `Vector3` uses `real_t`, so when `real_t` is `double` it forces some things to use double-precision
-// vectors while they dont need that amount of precision. This is also a problem for some third-party libraries
-// that do not support `double` as a result.
+// 32 位浮点精度三维向量。
+// 因为 Godot 的 `Vector3` 使用 `real_t`，所以当 `real_t` 为 `double` 时，会强制某些东西使用双精度
+// 向量，而它们并不需要那么高的精度。这对部分第三方库也是个问题，
+// 因为它们不支持 `double` 作为结果类型。
 typedef Vector3T<float> Vector3f;
 
 namespace math {
@@ -53,7 +53,7 @@ inline Vector3f normalized(Vector3f v, float &out_length) {
 }
 
 inline bool is_normalized(const Vector3f &v) {
-	// use length_squared() instead of length() to avoid sqrt(), makes it more stringent.
+	// 使用 length_squared() 而非 length() 以避免 sqrt()，使判断更严格。
 	return Math::is_equal_approx(length_squared(v), 1, float(UNIT_EPSILON));
 }
 

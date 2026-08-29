@@ -21,11 +21,11 @@
 
 #include <limits>
 
-// I implemented an alternate API to customize instance queries more easily. The approach was to use virtuals and
-// temporary buffers instead of templates, because templates would cause a lot of bloat. But when used on the existing
-// floating removal function, it made it slightly slower (up to 20% longer). So this keeps the old implementation.
-// Note: if we used our own instance cache instead of grabbing it from Godot, the performance difference might be ruled
-// out.
+// 我实现了一个替代 API 以更轻松地自定义实例查询。其方法是使用虚函数和
+// 临时缓冲区而不是模板，因为模板会导致大量膨胀。但当用于现有的
+// 浮动移除函数时，它使其略慢（最多长 20%）。因此保留旧实现。
+// 注意：如果我们使用自己的实例缓存而不是从 Godot 获取，性能差异可能可以
+// 消除。
 #define VOXEL_INSTANCER_USE_SPECIALIZED_FLOATING_INSTANCE_REMOVAL_IMPLEMENTATION
 
 VOXEL_GODOT_FORWARD_DECLARE(class PhysicsBody3D);
@@ -49,27 +49,27 @@ struct InstancerQuickReloadingCache;
 struct InstancerTaskOutputQueue;
 struct InstanceLibraryMultiMeshItemSettings;
 
-// Note: a large part of this node could be made generic to support the sole idea of instancing within octants?
-// Even nodes like gridmaps could be rebuilt on top of this, if its concept of "grid" was decoupled.
-// It is coupled to terrain at the moment because of performance.
+// 注意：此节点的大部分内容可以通用化，以支持仅在卦限内实例化的想法？
+// 如果“网格”的概念被解耦，即使是 gridmap 之类的节点也可以在此之上重建。
+// 由于性能原因，它目前与地形耦合。
 
-// Add-on to voxel nodes, allowing to spawn elements on the surface.
-// These elements are rendered with hardware instancing, can have collisions, and also be persistent.
+// 体素节点的附加组件，允许在表面生成元素。
+// 这些元素使用硬件实例化渲染，可以具有碰撞，也可以持久化。
 class VoxelInstancer : public Node3D, public IInstanceLibraryItemListener {
 	GDCLASS(VoxelInstancer, Node3D)
 public:
 	static const int MAX_LOD = 8;
 
-	// I didn't want this enum to be here on the C++ side, because it prevents forward-declaring the class it is in.
-	// However Godot is forcing me to.
-	// `VARIANT_ENUM_CAST(ns1::ns2::Enum)` assumes the enum is in a class, so it generates its name as being `ns2.Enum`,
-	// which confuses docs. There doesn't seem to be a way to register that enum as global either.
+	// 我不想在 C++ 侧放置此枚举，因为它会阻止前置声明其所在的类。
+	// 但 Godot 迫使我这样做。
+	// `VARIANT_ENUM_CAST(ns1::ns2::Enum)` 假定枚举在类中，因此它生成的名称是 `ns2.Enum`，
+	// 这会让文档混乱。似乎也没有办法将该枚举注册为全局。
 	using UpMode = voxel::UpMode;
 
 	VoxelInstancer();
 	~VoxelInstancer();
 
-	// Properties
+	// 属性
 
 	void set_up_mode(UpMode mode);
 	UpMode get_up_mode() const;
@@ -89,7 +89,7 @@ public:
 	void set_fading_duration(const float fading);
 	float get_fading_duration() const;
 
-	// Actions
+	// 操作
 
 	void save_all_modified_blocks(
 			BufferedTaskScheduler &tasks,
@@ -107,7 +107,7 @@ public:
 
 	Node3D *convert_to_nodes(const uint32_t flags) const;
 
-	// Event handlers
+	// 事件处理程序
 
 	// void on_data_block_loaded(Vector3i grid_position, unsigned int lod_index, UniquePtr<InstanceBlockData>
 	// instances);
@@ -129,7 +129,7 @@ public:
 	void on_scene_instance_modified(Vector3i data_block_position, unsigned int render_block_index);
 	void on_data_block_saved(Vector3i data_grid_position, unsigned int lod_index);
 
-	// Internal properties
+	// 内部属性
 
 	void set_mesh_block_size_po2(unsigned int p_mesh_block_size_po2);
 	void set_data_block_size_po2(unsigned int p_data_block_size_po2);
@@ -137,7 +137,7 @@ public:
 
 	int get_library_item_id_from_render_block_index(unsigned render_block_index) const;
 
-	// Debug
+	// 调试
 
 	int debug_get_block_count() const;
 	void debug_get_instance_counts(StdUnorderedMap<uint32_t, uint32_t> &counts_per_layer) const;
@@ -158,7 +158,7 @@ public:
 
 	Dictionary debug_get_block_infos(const Vector3 world_position, const int item_id);
 
-	// Editor
+	// 编辑器
 
 #ifdef TOOLS_ENABLED
 #if defined(VOXEL_GODOT)
@@ -201,7 +201,7 @@ private:
 			bool cache_while_saving
 	);
 
-	// Get a layer assuming it exists
+	// 获取一个图层，假定它存在
 	Layer &get_layer(int id);
 	const Layer &get_layer_const(int id) const;
 
@@ -235,7 +235,7 @@ private:
 #endif
 
 	struct SceneInstance {
-		// Owned by the scene tree.
+		// 由场景树拥有。
 		VoxelInstanceComponent *component = nullptr;
 		Node3D *root = nullptr;
 	};
@@ -377,71 +377,71 @@ private:
 
 	static void _bind_methods();
 
-	// TODO Rename RenderBlock?
+	// TODO 重命名 RenderBlock？
 	struct Block {
 		uint16_t layer_id = 0;
-		// Distance-based LOD index.
-		// Can be one index higher than max mesh lod count in case it should hide beyond last LOD
+		// 基于距离的 LOD 索引。
+		// 如果应在最后一个 LOD 之外隐藏，则可以比最大网格 LOD 计数高一个索引
 		uint8_t current_mesh_lod = 0;
-		// LOD index corresponding to the terrain's ground chunk system
+		// 与地形的底层数据块系统对应的 LOD 索引
 		uint8_t lod_index = 0;
-		// If true, the block is waiting to be populated asynchronously. We create blocks in this state so when async
-		// generation completes, we can check if the block is still present.
-		// TODO Unused?
+		// 如果为 true，则该数据块正在等待异步填充。我们以此状态创建数据块，
+		// 以便异步生成完成时可以检查该数据块是否仍然存在。
+		// TODO 未使用？
 		bool pending_instances = false;
-		// Used for distance-filtered colliders feature
+		// 用于距离过滤碰撞体功能
 		bool distance_colliders_active = false;
-		// Position in mesh block coordinate system
+		// 网格数据块坐标系中的位置
 		Vector3i grid_position;
 		voxel::godot::DirectMultiMeshInstance multimesh_instance;
-		// For physics we use nodes because it's easier to manage.
-		// Such instances may be less numerous.
-		// If the item associated to this block has no collisions, this will be empty.
-		// Indices in the vector correspond to index of the instance in multimesh.
+		// 物理方面我们使用节点，因为更易于管理。
+		// 此类实例的数量可能较少。
+		// 如果与此数据块关联的项目没有碰撞，则为空。
+		// 向量中的索引对应于 multimesh 中实例的索引。
 		StdVector<VoxelInstancerRigidBody *> bodies;
 		StdVector<SceneInstance> scene_instances;
 	};
 
 	struct Layer {
 		unsigned int lod_index;
-		// Blocks indexed by grid position.
-		// Keys follow the mesh block coordinate system.
+		// 数据块按网格位置索引。
+		// 键遵循网格数据块坐标系。
 		StdUnorderedMap<Vector3i, unsigned int> blocks;
 	};
 
 	struct MeshLodDistances {
-		// Multimesh LOD updates based on the distance between the camera and the center of the block.
-		// Two distances are used to implement hysteresis, which allows to avoid oscillating too fast between lods.
+		// Multimesh LOD 基于相机与数据块中心之间的距离进行更新。
+		// 使用两个距离来实现滞回，从而避免在 LOD 之间过快振荡。
 
-		// TODO Need to investigate if Godot 4 implements LOD for multimeshes
-		// Despite this, due to how Godot 4 implements LOD, it may still be beneficial to have a custom LOD system,
-		// so we can switch to impostors rather than only decimating geometry
+		// TODO 需要调查 Godot 4 是否为 multimesh 实现了 LOD
+		// 尽管如此，由于 Godot 4 实现 LOD 的方式，拥有自定义 LOD 系统可能仍然有益，
+		// 这样我们可以切换到替身（impostor）而不仅仅是简化几何体
 
-		// Distance above which the mesh starts being used, taking precedence over meshes of lower distance.
+		// 超过此距离后网格开始使用，优先于距离较低的网格。
 		float enter_distance_squared;
-		// Distance under which the mesh stops being used
+		// 低于此距离后网格停止使用
 		float exit_distance_squared;
 	};
 
 	struct Lod : public NonCopyable {
-		// Unordered list of layer IDs using this LOD level.
+		// 使用此 LOD 级别的图层 ID 的无序列表。
 		StdVector<int> layers;
 
-		// Blocks that have unsaved changes.
-		// Keys follows the data block coordinate system.
-		// Can contain coordinates where no instance blocks are present (can happen because of support for render blocks
-		// being twice as big; not ideal, but shouldn't cause issues)
+		// 具有未保存更改的数据块。
+		// 键遵循数据块坐标系。
+		// 可以包含不存在实例数据块的坐标（可能因为支持渲染数据块
+		// 大两倍而发生；不理想，但不应导致问题）
 		StdUnorderedSet<Vector3i> modified_blocks;
 
-		// This is a temporary place to store loaded instances data while it's not visible yet.
-		// These instances are user-authored ones. If a block does not have an entry there,
-		// it will get generated instances.
-		// Keys follows the data block coordinate system.
-		// Can't use Godot's `HashMap` because it lacks move semantics.
+		// 这是一个临时位置，用于在实例数据尚不可见时存储已加载的实例数据。
+		// 这些实例是用户创作的实例。如果数据块在此处没有条目，
+		// 它将获得生成的实例。
+		// 键遵循数据块坐标系。
+		// 不能使用 Godot 的 `HashMap`，因为它缺少移动语义。
 		// StdUnorderedMap<Vector3i, UniquePtr<InstanceBlockData>> loaded_instances_data;
 
-		// Blocks that contain edited data (not generated).
-		// Keys follows the data block coordinate system.
+		// 包含已编辑数据（非生成数据）的数据块。
+		// 键遵循数据块坐标系。
 		StdUnorderedSet<Vector3i> edited_data_blocks;
 
 		std::shared_ptr<InstancerQuickReloadingCache> quick_reload_cache;
@@ -453,10 +453,10 @@ private:
 
 	FixedArray<Lod, MAX_LOD> _lods;
 
-	// Does not have nulls. Indices matter.
+	// 不包含空值。索引很重要。
 	StdVector<UniquePtr<Block>> _blocks;
 
-	// Each layer corresponds to a library item. Addresses of values in the map are expected to be stable.
+	// 每个图层对应一个库项目。map 中值的地址应保持稳定。
 	StdUnorderedMap<int, Layer> _layers;
 
 	Ref<VoxelInstanceLibrary> _library;

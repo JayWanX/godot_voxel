@@ -12,7 +12,7 @@
 namespace voxel {
 
 void VoxelStreamScript::load_voxel_block(VoxelStream::VoxelQueryData &query_data) {
-	// Create a temporary wrapper so Godot can pass it to scripts
+	// 创建临时包装器，以便 Godot 将其传给脚本
 	Ref<godot::VoxelBuffer> buffer_wrapper(memnew(
 			godot::VoxelBuffer(static_cast<godot::VoxelBuffer::Allocator>(query_data.voxel_buffer.get_allocator()))
 	));
@@ -25,21 +25,21 @@ void VoxelStreamScript::load_voxel_block(VoxelStream::VoxelQueryData &query_data
 
 	int res;
 	if (GDVIRTUAL_CALL(_load_voxel_block, buffer_wrapper, query_data.position_in_blocks, query_data.lod_index, res)) {
-		// Check if the return enum is valid
+		// 检查返回的枚举是否有效
 		ERR_FAIL_INDEX(res, _RESULT_COUNT);
-		// If the block was found, grab its data from the script-facing object to our internal buffer
+		// 若找到该数据块，则从面向脚本的对象中取出其数据存入内部缓冲区
 		if (res == RESULT_BLOCK_FOUND) {
 			buffer_wrapper->get_buffer().move_to(query_data.voxel_buffer);
 		}
 		query_data.result = ResultCode(res);
 	} else {
-		// The function wasn't found or failed?
+		// 该函数未找到或失败了？
 		WARN_PRINT_ONCE("VoxelStreamScript::_load_voxel_block is unimplemented!");
 	}
 }
 
 void VoxelStreamScript::save_voxel_block(VoxelStream::VoxelQueryData &query_data) {
-	// For now the callee can exceptionally take ownership of this wrapper, because we copy the data to it.
+	// 目前被调用方可例外地取得此包装器的所有权，因为我们会将数据复制到其中。
 	Ref<godot::VoxelBuffer> buffer_wrapper(memnew(
 			godot::VoxelBuffer(static_cast<godot::VoxelBuffer::Allocator>(query_data.voxel_buffer.get_allocator()))
 	));
@@ -69,7 +69,7 @@ bool VoxelStreamScript::is_runnable() const {
 }
 
 void VoxelStreamScript::_bind_methods() {
-	// TODO Test if GDVIRTUAL can print errors properly when GDScript fails inside a different thread.
+	// TODO 测试 GDScript 在其它线程中失败时，GDVIRTUAL 是否能正确打印错误。
 	GDVIRTUAL_BIND(_load_voxel_block, "out_buffer", "position_in_blocks", "lod");
 	GDVIRTUAL_BIND(_save_voxel_block, "buffer", "position_in_blocks", "lod");
 	GDVIRTUAL_BIND(_get_used_channels_mask);

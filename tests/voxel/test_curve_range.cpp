@@ -7,14 +7,14 @@
 namespace voxel::tests {
 
 void test_get_curve_monotonic_sections() {
-	// This one is a bit annoying to test because Curve has float precision issues stemming from the bake() function
+	// 这个测试起来有点麻烦，因为 Curve 存在源自 bake() 函数的浮点精度问题
 	struct L {
 		static bool is_equal_approx(float a, float b) {
 			return Math::is_equal_approx(a, b, 2.f * CURVE_RANGE_MARGIN);
 		}
 	};
 	{
-		// One segment going up
+		// 一个上升的线段
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0));
@@ -45,7 +45,7 @@ void test_get_curve_monotonic_sections() {
 		}
 	}
 	{
-		// One flat segment
+		// 一个平直的线段
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0));
@@ -59,7 +59,7 @@ void test_get_curve_monotonic_sections() {
 		VOXEL_TEST_ASSERT(sections[0].y_max == 0.f);
 	}
 	{
-		// Two segments: going up, then flat
+		// 两个线段：先上升，再平直
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0));
@@ -70,7 +70,7 @@ void test_get_curve_monotonic_sections() {
 		VOXEL_TEST_ASSERT(sections.size() == 1);
 	}
 	{
-		// Two segments: flat, then up
+		// 两个线段：先平直，再上升
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0));
@@ -81,7 +81,7 @@ void test_get_curve_monotonic_sections() {
 		VOXEL_TEST_ASSERT(sections.size() == 1);
 	}
 	{
-		// Three segments: flat, then up, then flat
+		// 三个线段：平直、上升、再平直
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0));
@@ -93,7 +93,7 @@ void test_get_curve_monotonic_sections() {
 		VOXEL_TEST_ASSERT(sections.size() == 1);
 	}
 	{
-		// Three segments: up, down, up
+		// 三个线段：上升、下降、上升
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0));
@@ -107,7 +107,7 @@ void test_get_curve_monotonic_sections() {
 		VOXEL_TEST_ASSERT(sections[2].x_max == 1.f);
 	}
 	{
-		// Two segments: going up, then down
+		// 两个线段：先上升，再下降
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0));
@@ -118,7 +118,7 @@ void test_get_curve_monotonic_sections() {
 		VOXEL_TEST_ASSERT(sections.size() == 2);
 	}
 	{
-		// One segment, curved as a parabola going up then down
+		// 一个线段，形如抛物线，先上升后下降
 		Ref<Curve> curve;
 		curve.instantiate();
 		curve->add_point(Vector2(0, 0), 0.f, 1.f);

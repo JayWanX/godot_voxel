@@ -24,7 +24,7 @@ namespace voxel {
 namespace {
 
 struct CubicAreaInfo {
-	int edge_size; // In data blocks
+	int edge_size; // 以数据块为单位
 	int mesh_block_size_factor;
 	unsigned int anchor_buffer_index;
 
@@ -34,7 +34,7 @@ struct CubicAreaInfo {
 };
 
 CubicAreaInfo get_cubic_area_info_from_size(unsigned int size) {
-	// Determine size of the cube of blocks
+	// 确定数据块立方体的尺寸
 	int edge_size;
 	int mesh_block_size_factor;
 	switch (size) {
@@ -51,15 +51,15 @@ CubicAreaInfo get_cubic_area_info_from_size(unsigned int size) {
 			return CubicAreaInfo{ 0, 0, 0 };
 	}
 
-	// Pick anchor block, usually within the central part of the cube (that block must be valid)
+	// 选择锚点数据块，通常位于立方体的中心部分（该数据块必须是有效的）
 	const unsigned int anchor_buffer_index = edge_size * edge_size + edge_size + 1;
 
 	return { edge_size, mesh_block_size_factor, anchor_buffer_index };
 }
 
-// Takes a list of blocks and interprets it as a cube of blocks centered around the area we want to create a mesh from.
-// Voxels from central blocks are copied, and part of side blocks are also copied so we get a temporary buffer
-// which includes enough neighbors for the mesher to avoid doing bound checks.
+// 接收一组数据块，并将其视为以我们想生成网格的区域为中心的立方体数据块。
+// 中央数据块的体素会被复制，侧面数据块的部分体素也会被复制，
+// 这样我们就能得到一个临时缓冲区，其中包含足够的邻居，使网格生成器无需进行边界检查。
 void copy_block_and_neighbors(
 		Span<std::shared_ptr<VoxelBuffer>> blocks,
 		VoxelBuffer &dst,
@@ -76,10 +76,10 @@ void copy_block_and_neighbors(
 	VOXEL_DSTACK();
 	VOXEL_PROFILE_SCOPE();
 
-	// Extract wanted channels in a list
+	// 提取需要的通道列表
 	const SmallVector<uint8_t, VoxelBuffer::MAX_CHANNELS> channels = VoxelBuffer::mask_to_channels_list(channels_mask);
 
-	// Determine size of the cube of blocks
+	// 确定数据块立方体的尺寸
 	const CubicAreaInfo area_info = get_cubic_area_info_from_size(blocks.size());
 	ERR_FAIL_COND(!area_info.is_valid());
 
@@ -100,8 +100,8 @@ void copy_block_and_neighbors(
 	const Box3i bounds_in_voxels_lod0 = voxel_data.get_bounds();
 	const Box3i bounds_in_voxels(bounds_in_voxels_lod0.position >> lod_index, bounds_in_voxels_lod0.size >> lod_index);
 
-	// TODO In terrains that only work with caches, we should never consider generating voxels from here.
-	// This is the case of VoxelTerrain, which is now doing unnecessary box subtraction calculations...
+	// TODO 在仅依赖缓存的 terrain 中，我们绝不应考虑从这里生成体素。
+	// VoxelTerrain 就是这种情况，它现在正在做不必要的盒体减法计算……
 
 	const Vector3i min_pos = -Vector3iUtil::create(min_padding);
 	const Vector3i max_pos = Vector3iUtil::create(mesh_block_size + max_padding);
@@ -111,21 +111,21 @@ void copy_block_and_neighbors(
 	const Vector3i origin_in_voxels = origin_in_voxels_without_padding - Vector3iUtil::create(min_padding);
 	const Vector3i origin_in_voxels_lod0 = origin_in_voxels << lod_index;
 
-	// These boxes are initially relative to the minimum corner of the minimum chunk.
-	// TODO Candidate for temp allocator (or SmallVector?)
+	// 这些盒体最初相对于最小数据块的最近角落。
+	// TODO 可考虑使用临时分配器（或 SmallVector?）
 	StdVector<Box3i> boxes_to_generate;
 	const Box3i mesh_data_box = Box3i::from_min_max(min_pos, max_pos);
 	if (contains(blocks.to_const(), std::shared_ptr<VoxelBuffer>())) {
 		const Box3i bounds_local(bounds_in_voxels.position - origin_in_voxels_without_padding, bounds_in_voxels.size);
-		const Box3i box = mesh_data_box.clipped(bounds_local); // Prevent generation outside fixed bounds
+		const Box3i box = mesh_data_box.clipped(bounds_local); // 防止在固定边界之外生成
 		if (!box.is_empty()) {
 			boxes_to_generate.push_back(box);
 		}
 	}
 
 	{
-		// TODO The following logic might as well be simplified and moved to VoxelData.
-		// We are just sampling or generating data in a given area.
+		// TODO 以下逻辑也许可以简化并移入 VoxelData。
+		// 我们只是在给定区域内采样或生成数据。
 
 		const Vector3i data_block_pos0 = mesh_block_pos * area_info.mesh_block_size_factor;
 		SpatialLock3D::Read srlock(
@@ -135,7 +135,7 @@ void copy_block_and_neighbors(
 				)
 		);
 
-		// Using ZXY as convention to reconstruct positions with thread locking consistency
+		// 使用 ZXY 约定重建位置，以保持线程加锁的一致性
 		unsigned int block_index = 0;
 		for (int z = -1; z < area_info.edge_size - 1; ++z) {
 			for (int x = -1; x < area_info.edge_size - 1; ++x) {
@@ -156,9 +156,9 @@ void copy_block_and_neighbors(
 					}
 
 					if (boxes_to_generate.size() > 0) {
-						// Subtract edited box from the area to generate
-						// TODO This approach allows to batch boxes if necessary,
-						// but is it just better to do it anyways for every clipped box?
+						// 从待生成区域中减去已编辑的盒体
+						// TODO 这种方法允许在必要时批量处理盒体，
+						// 但直接对每个裁剪后的盒体都这样做是不是更好？
 						VOXEL_PROFILE_SCOPE_NAMED("Box subtract");
 						const unsigned int input_count = boxes_to_generate.size();
 						const Box3i block_box =
@@ -166,15 +166,15 @@ void copy_block_and_neighbors(
 
 						for (unsigned int box_index = 0; box_index < input_count; ++box_index) {
 							const Box3i box = boxes_to_generate[box_index];
-							// Remainder boxes are added to the end of the list
+							// 剩余盒体会追加到列表末尾
 							box.difference_to_vec(block_box, boxes_to_generate);
 #ifdef DEBUG_ENABLED
-							// Difference should add boxes to the vector, not remove any
+							// 差集操作应往向量中添加盒体，而不是移除任何盒体
 							CRASH_COND(box_index >= boxes_to_generate.size());
 #endif
 						}
 
-						// Remove input boxes
+						// 移除输入盒体
 						boxes_to_generate.erase(boxes_to_generate.begin(), boxes_to_generate.begin() + input_count);
 					}
 				}
@@ -182,7 +182,7 @@ void copy_block_and_neighbors(
 		}
 	}
 
-	// Undo padding to go back to proper buffer coordinates
+	// 撤销填充，回到正确的缓冲区坐标
 	for (Box3i &box : boxes_to_generate) {
 		box.position += Vector3iUtil::create(min_padding);
 	}
@@ -192,11 +192,11 @@ void copy_block_and_neighbors(
 	}
 
 	if (out_boxes_to_generate != nullptr) {
-		// Delegate generation to the caller
+		// 将生成工作委托给调用方
 		append_array(*out_boxes_to_generate, boxes_to_generate);
 
 	} else {
-		// Complete data with generated voxels on the CPU
+		// 用 CPU 上生成的体素补全数据
 		VOXEL_PROFILE_SCOPE_NAMED("Generate");
 		VoxelBuffer generated_voxels(VoxelBuffer::ALLOCATOR_POOL);
 
@@ -236,8 +236,8 @@ Ref<ArrayMesh> build_mesh(
 		Span<const VoxelMesher::Output::Surface> surfaces,
 		Mesh::PrimitiveType primitive,
 		int flags,
-		// This vector indexes surfaces to the material they use (if a surface uses a material but is empty, it
-		// won't be added to the mesh)
+		// 此向量将表面索引到它们使用的材质（如果某个表面使用了材质但为空，
+		// 则不会被添加到网格中）
 		StdVector<uint16_t> &mesh_material_indices
 ) {
 	VOXEL_PROFILE_SCOPE();
@@ -262,14 +262,14 @@ Ref<ArrayMesh> build_mesh(
 			mesh.instantiate();
 		}
 
-		// TODO Use `add_surface`, it's about 20% faster after measuring in Tracy (though we may see if Godot 4 expects
-		// the same)
+		// TODO 使用 `add_surface`，在 Tracy 中测量后它大约快 20%（不过我们可以看看 Godot 4 是否
+		// 表现相同）
 		mesh->add_surface_from_arrays(primitive, arrays, Array(), Dictionary(), flags);
 
 		mesh_material_indices.push_back(surface.material_index);
 	}
 
-	// Debug code to highlight vertex sharing
+	// 用于突出显示顶点共享的调试代码
 	/*if (mesh->get_surface_count() > 0) {
 		Array wireframe_surface = generate_debug_seams_wireframe_surface(mesh, 0);
 		if (wireframe_surface.size() > 0) {
@@ -329,15 +329,14 @@ void MeshBlockTask::run(voxel::ThreadedTaskContext &ctx) {
 	);
 #endif
 
-	// TODO When using Transvoxel and fixed-bounds terrain, "boundary cliffs" don't appear on negative sides.
-	// This is due to implementation details: Transvoxel only meshes the inner and positive parts of each 2^3 cell.
-	// If having cliffs is expected, we could force the terrain to request meshes 1 chunk beyond boundary, but that's a
-	// bit wasteful. Instead, we could dynamically alter negative padding to exceptionally include those boundary
-	// voxels. Unfortunately, this might have side-effects when position-sensitive features such as detail rendering are
-	// used.
-	// This also rises another concern: if height gets limited vertically but not horizontally, typical terrain will
-	// end up with a huge surface at the bottom facing down, since the default for chunks outside bounds is air.
-	// We would have to somehow expose a way to set what these areas default to as well...
+	// TODO 使用 Transvoxel 和固定边界 terrain 时，"边界悬崖"不会出现在负方向上。
+	// 这是由于实现细节：Transvoxel 只为每个 2^3 单元的内部和正方向部分生成网格。
+	// 如果期望出现悬崖，我们可以强制 terrain 在边界外多请求 1 个数据块的网格，但这
+	// 有点浪费。相反，我们可以动态调整负方向的填充，以额外包含那些边界体素。
+	// 不幸的是，当使用诸如细节渲染等对位置敏感的特性时，这可能会产生副作用。
+	// 这还引发另一个担忧：如果高度在垂直方向上受限而水平方向上不受限，
+	// 典型的 terrain 最终会在底部产生一个巨大的朝下表面，因为边界外数据块的默认值是空气。
+	// 我们还必须以某种方式提供一种方法来设置这些区域默认是什么……
 
 #ifdef VOXEL_ENABLE_GPU
 	if (_stage == 0)
@@ -431,7 +430,7 @@ void MeshBlockTask::gather_voxels_gpu(voxel::ThreadedTaskContext &ctx) {
 
 	ctx.status = ThreadedTaskContext::STATUS_TAKEN_OUT;
 
-	// Start GPU task, we'll continue meshing after it
+	// 启动 GPU 任务，之后我们会继续网格生成
 	VoxelEngine::get_singleton().push_gpu_task(gpu_task);
 }
 
@@ -464,14 +463,14 @@ void MeshBlockTask::gather_voxels_cpu() {
 			nullptr
 	);
 
-	// Could cache generator data from here if it was safe to write into the map
+	// 如果从这里写入 map 是安全的，本可以把生成器数据缓存起来
 	/*if (data != nullptr && cache_generated_blocks) {
 		const CubicAreaInfo area_info = get_cubic_area_info_from_size(blocks.size());
 		ERR_FAIL_COND(!area_info.is_valid());
 
 		VoxelDataLodMap::Lod &lod = data->lods[lod_index];
 
-		// Note, this box does not include neighbors!
+		// 注意，这个包围盒不包含相邻的块！
 		const Vector3i min_bpos = position * area_info.mesh_block_size_factor;
 		const Vector3i max_bpos = min_bpos + Vector3iUtil::create(area_info.edge_size - 2);
 
@@ -491,7 +490,7 @@ void MeshBlockTask::gather_voxels_cpu() {
 					const Vector3i min_src_pos =
 							(bpos - min_bpos) * data_block_size + Vector3iUtil::create(min_padding);
 					cache_buffer->copy_from(voxels, min_src_pos, min_src_pos + cache_buffer->get_size(), Vector3i());
-					// TODO Where to put voxels? Can't safely write to data at the moment.
+					// TODO 体素该放在哪里？目前无法安全地写入数据。
 				}
 			}
 		}
@@ -512,7 +511,7 @@ void MeshBlockTask::build_mesh() {
 		lod_index,
 		collision_hint,
 		lod_hint,
-		// TODO Gathering detail texture information is not always necessary
+		// TODO 收集细节纹理信息并非总是必要
 		true // detail_texture_hint
 	};
 	mesher->build(_surfaces_output, input);
@@ -520,10 +519,9 @@ void MeshBlockTask::build_mesh() {
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 	const bool mesh_is_empty = VoxelMesher::is_mesh_empty(_surfaces_output.surfaces);
 
-	// Currently, Transvoxel only is supported in combination with detail normalmap texturing, because the algorithm
-	// provides a cheap source for cells subdividing the mesh. It should be possible to obtain cells from any mesh,
-	// but it is more expensive to find them from scratch, and for now Transvoxel is the most viable algorithm for
-	// smooth terrain.
+	// 目前，Transvoxel 仅与细节法线贴图纹理结合使用才受支持，因为该算法
+	// 为细分网格的单元提供了廉价的来源。从任何网格中获取单元应该都是可能的，
+	// 但从头开始查找它们的成本更高，目前 Transvoxel 是平滑地形最可行的算法。
 	Ref<VoxelMesherTransvoxel> transvoxel_mesher;
 
 	if (
@@ -544,13 +542,13 @@ void MeshBlockTask::build_mesh() {
 
 		std::shared_ptr<DetailTextureOutput> detail_textures = make_shared_instance<DetailTextureOutput>();
 		detail_textures->valid = false;
-		// This is stored here in case detail texture rendering completes before the output of the current task gets
-		// dequeued in the main thread, since it runs in a separate asynchronous task
+		// 这里保存一份副本，以防细节纹理渲染在当前任务输出被主线程
+		// 取出之前完成，因为它是在一个独立的异步任务中运行的
 		_detail_textures = detail_textures;
 
 		RenderDetailTextureTask *nm_task = VOXEL_NEW(RenderDetailTextureTask);
 		nm_task->cell_iterator = std::move(cell_iterator);
-		// Copy mesh data
+		// 复制网格数据
 		append_array(nm_task->mesh_vertices, mesh_arrays.vertices);
 		append_array(nm_task->mesh_normals, mesh_arrays.normals);
 		append_array(nm_task->mesh_indices, mesh_arrays.indices);
@@ -579,7 +577,7 @@ void MeshBlockTask::build_mesh() {
 #endif
 
 	if (require_visual && VoxelEngine::get_singleton().is_threaded_graphics_resource_building_enabled()) {
-		// This can only run if the engine supports building meshes from multiple threads
+		// 这只有在引擎支持多线程构建网格时才可运行
 
 		_mesh = voxel::build_mesh(
 				to_span(_surfaces_output.surfaces),
@@ -618,13 +616,12 @@ bool MeshBlockTask::is_cancelled() {
 
 void MeshBlockTask::apply_result() {
 	if (VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
-		// The request response must match the dependency it would have been requested with.
-		// If it doesn't match, we are no longer interested in the result.
-		// It is assumed that if a dependency is changed, a new copy of it is made and the old one is marked
-		// invalid.
+		// 请求响应必须与请求时对应的依赖相匹配。
+		// 如果不匹配，说明我们不再关心该结果。
+		// 可以假定：当依赖发生变化时，会创建一份新副本，旧副本被标记为无效。
 		if (meshing_dependency->valid) {
 			VoxelEngine::BlockMeshOutput o;
-			// TODO Check for invalidation due to property changes
+			// TODO 检查因属性变化导致的失效
 
 			if (_has_run) {
 				o.type = VoxelEngine::BlockMeshOutput::TYPE_MESHED;
@@ -651,7 +648,7 @@ void MeshBlockTask::apply_result() {
 		}
 
 	} else {
-		// This can happen if the user removes the volume while requests are still about to return
+		// 用户可能在请求尚未返回时移除了体积
 		VOXEL_PRINT_VERBOSE("Mesh request response came back but volume wasn't found");
 	}
 }

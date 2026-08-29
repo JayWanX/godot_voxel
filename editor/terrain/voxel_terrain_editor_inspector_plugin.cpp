@@ -24,11 +24,11 @@ bool VoxelTerrainEditorInspectorPlugin::_voxel_parse_property(Object *p_object, 
 	if (p_type != Variant::AABB) {
 		return false;
 	}
-	// TODO Give the same name to these properties
+	// TODO 给这些属性相同的名称
 	if (p_path != "voxel_bounds" && p_path != "bounds") {
 		return false;
 	}
-	// Replace default AABB editor with this one
+	// 用这个编辑器替换默认的 AABB 编辑器
 	Voxel_EditorPropertyAABBMinMax *ed = memnew(Voxel_EditorPropertyAABBMinMax);
 	ed->setup(-constants::MAX_VOLUME_EXTENT, constants::MAX_VOLUME_EXTENT, 1, true);
 	add_property_editor(p_path, ed);

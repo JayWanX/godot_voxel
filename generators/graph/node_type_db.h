@@ -3,7 +3,7 @@
 
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/core/string.h" // For String hash
+#include "../../util/godot/core/string.h" // 供 String 哈希使用
 #include "../../util/string/expression_parser.h"
 #include "../../util/string/std_string.h"
 #include "voxel_graph_compiler.h"
@@ -29,18 +29,16 @@ enum Category {
 const char *get_category_name(Category category);
 
 struct NodeType {
-	// TODO Separate Input and Output port types? Some member values don't make sense.
+	// TODO 将输入和输出端口类型分开？某些成员值没有意义。
 	struct Port {
 		String name;
-		// Only relevant for inputs.
+		// 仅与输入相关。
 		float default_value;
-		// Which connection will be automatically made if the input port is not connected and no fixed value has been
-		// explicitely specified. Only relevant for inputs.
+		// 当输入端口未连接且未显式指定固定值时，将自动建立的连接。仅与输入相关。
 		VoxelGraphFunction::AutoConnect auto_connect = VoxelGraphFunction::AUTO_CONNECT_NONE;
-		// If true, a buffer will be provided as input even if values were determined constant.
-		// If false, no buffer will provided, and instead the value will be available in Buffer::constant_value.
-		// This option exists to avoid having to implement all possible combinations of constant values vs variable
-		// values in input buffers.
+		// 如果为 true，即使值被确定为常量，也会提供缓冲区作为输入。
+		// 如果为 false，则不提供缓冲区，值将改为在 Buffer::constant_value 中可用。
+		// 该选项的存在是为了避免在输入缓冲区中实现常量值与变量值的所有可能组合。
 		bool require_input_buffer_when_constant = true;
 		// PortType port_type;
 
@@ -78,9 +76,9 @@ struct NodeType {
 	};
 
 	String name;
-	// Debug-only nodes are ignored in non-debug compilation.
+	// 仅调试用的节点在非调试编译时被忽略。
 	bool debug_only = false;
-	// Pseudo nodes are replaced during compilation with one or multiple real nodes, they have no logic on their own
+	// 伪节点在编译期间被替换为一个或多个真实节点，它们本身没有逻辑
 	bool is_pseudo_node = false;
 	Category category;
 	StdVector<Port> inputs;
@@ -91,9 +89,9 @@ struct NodeType {
 	CompileFunc compile_func = nullptr;
 	Runtime::ProcessBufferFunc process_buffer_func = nullptr;
 	Runtime::RangeAnalysisFunc range_analysis_func = nullptr;
-	// If available, name of the corresponding function to be used in expression nodes
+	// 如果有的话，用于表达式节点中对应函数的名称
 	const char *expression_func_name = nullptr;
-	// The Expression node can invoke the logic of other nodes, but it then needs a specific implementation
+	// Expression 节点可以调用其它节点的逻辑，但它需要一个特定的实现
 	ExpressionParser::FunctionCallback expression_func = nullptr;
 	ShaderGenFunc shader_gen_func = nullptr;
 

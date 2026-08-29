@@ -35,11 +35,11 @@ void TimeSpreadTaskRunner::process(uint64_t time_budget_usec) {
 
 	const uint64_t time_before = time.get_ticks_usec();
 
-	// Do at least one task
+	// 至少执行一个任务
 	do {
 		ITimeSpreadTask *task = nullptr;
 
-		// Consume from high priority queues first
+		// 优先从高优先级队列取用
 		unsigned int queue_index;
 		for (queue_index = 0; queue_index < _queues.size(); ++queue_index) {
 			Queue &queue = _queues[queue_index];
@@ -61,13 +61,13 @@ void TimeSpreadTaskRunner::process(uint64_t time_budget_usec) {
 		if (ctx.postpone) {
 			tls_postponed_tasks[queue_index].push_back(task);
 		} else {
-			// TODO Call recycling function instead?
+			// TODO 改为调用回收函数？
 			VOXEL_DELETE(task);
 		}
 
 	} while (time.get_ticks_usec() - time_before < time_budget_usec);
 
-	// Push postponed task back into queues
+	// 将被推迟的任务推回队列
 	for (unsigned int queue_index = 0; queue_index < tls_postponed_tasks.size(); ++queue_index) {
 		StdVector<ITimeSpreadTask *> &tasks = tls_postponed_tasks[queue_index];
 		if (tasks.size() > 0) {
@@ -78,8 +78,8 @@ void TimeSpreadTaskRunner::process(uint64_t time_budget_usec) {
 }
 
 void TimeSpreadTaskRunner::flush() {
-	// Note, it is assumed no other threads can push tasks anymore.
-	// It is up to the caller to stop them before flushing.
+	// 注意，这里假设已没有其他线程能再推送任务。
+	// 调用方负责在刷新前停止它们。
 	while (get_pending_count() != 0) {
 		process(100);
 		// Sleep?

@@ -45,16 +45,16 @@ void init_sparse_octree_priority_dependency(
 	const float transformed_block_radius =
 			volume_transform.basis.xform(Vector3(block_radius, block_radius, block_radius)).length();
 
-	// Distance beyond which it is safe to drop a block without risking to block LOD subdivision.
-	// This does not depend on viewer's view distance, but on LOD precision instead.
-	// TODO Should `data_block_size` be used here? Should it be mesh_block_size instead?
+	// 超过此距离即可安全丢弃数据块，而不会有阻塞 LOD 细分的风险。
+	// 该距离不取决于观察者的视距，而取决于 LOD 精度。
+	// TODO 这里是否应使用 `data_block_size`？是否应改为 mesh_block_size？
 	dep.drop_distance_squared = math::squared(
 			2.f * transformed_block_radius *
 			VoxelEngine::get_octree_lod_block_region_extent(octree_lod_distance, data_block_size)
 	);
 }
 
-// This is only if we want to cache voxel data
+// 仅当我们想要缓存体素数据时才使用
 void request_block_generate(
 		const VolumeID volume_id,
 		const unsigned int data_block_size,
@@ -73,7 +73,7 @@ void request_block_generate(
 	CRASH_COND(data_block_size > 255);
 	CRASH_COND(stream_dependency == nullptr);
 
-	// We should not have done this request in the first place if both stream and generator are null
+	// 若流和生成器均为空，则一开始就不应发出此请求
 	ERR_FAIL_COND(stream_dependency->generator.is_null());
 
 	VoxelGenerator::BlockTaskParams params;
@@ -106,7 +106,7 @@ void request_block_generate(
 	task_scheduler.push_main_task(task);
 }
 
-// Used only when streaming block by block
+// 仅在按数据块流式加载时使用
 void request_block_load(
 		const VolumeID volume_id,
 		const unsigned int data_block_size,
@@ -170,7 +170,7 @@ void request_block_load(
 		task_scheduler.push_io_task(task);
 
 	} else if (settings.cache_generated_blocks) {
-		// Directly generate the block without checking the stream.
+		// 直接生成数据块，不检查流。
 		request_block_generate(
 				volume_id,
 				data_block_size,
@@ -223,9 +223,9 @@ void send_block_data_requests(
 	}
 }
 
-// This is used when streaming is enabled, yet the terrain has no stream and no generator (There can only be empty
-// blocks when moving around), or generating is configured to happen on the fly during meshing.
-// So we have to simulate a VoxelStream that returns empty blocks immediately.
+// 当启用了流式加载，但地形既没有流也没有生成器（移动时只能存在空的
+// 数据块），或生成被配置为在网格化期间即时进行时使用。
+// 因此我们必须模拟一个立即返回空数据块的 VoxelStream。
 void apply_block_data_requests_as_empty(
 		const Span<const VoxelLodTerrainUpdateData::BlockToLoad> blocks_to_load,
 		VoxelData &data,
@@ -249,9 +249,9 @@ void apply_block_data_requests_as_empty(
 			}
 		}
 		{
-			// The block is considered "loaded" as we know there is nothing to load from a save file,
-			// and generating can be done on the fly if present, so this is represented by assigning a data block with
-			// no voxels attached.
+			// 该数据块被视为“已加载”，因为我们知道保存文件中没有任何内容可加载，
+			// 且若存在生成器，生成可以即时进行，因此通过分配一个
+			// 不附带体素的数据块来表示。
 			VoxelDataBlock empty_block(btl.loc.lod);
 			empty_block.viewers = viewers;
 			data.try_set_block(btl.loc.position, empty_block);
@@ -259,8 +259,8 @@ void apply_block_data_requests_as_empty(
 	}
 
 	if (settings.streaming_system == VoxelLodTerrainUpdateData::STREAMING_SYSTEM_CLIPBOX) {
-		// Since streaming is enabled, the system must be told this block is now "loaded", because it doesn't use
-		// polling to know when things are loaded
+		// 由于启用了流式加载，必须告知系统此数据块现在“已加载”，因为它不使用
+		// 轮询来了解何时加载完成
 		MutexLock mlock(state.clipbox_streaming.loaded_data_blocks_mutex);
 		for (const VoxelLodTerrainUpdateData::BlockToLoad &btl : blocks_to_load) {
 			state.clipbox_streaming.loaded_data_blocks.push_back(btl.loc);
@@ -284,7 +284,7 @@ void request_voxel_block_save(
 	SaveBlockDataTask *task =
 			VOXEL_NEW(SaveBlockDataTask(volume_id, block_pos, lod_index, voxels, stream_dependency, tracker, with_flush));
 
-	// No priority data, saving doesn't need sorting.
+	// 无优先级数据，保存不需要排序。
 
 	task_scheduler.push_io_task(task);
 }
@@ -318,18 +318,18 @@ void send_mesh_requests(
 			const VoxelLodTerrainUpdateData::MeshToUpdate &mesh_to_update = lod.mesh_blocks_pending_update[bi];
 
 			auto mesh_block_it = lod.mesh_map_state.map.find(mesh_to_update.position);
-			// A block must have been allocated before we ask for a mesh update
+			// 在请求网格更新之前，数据块必须已被分配
 			VOXEL_ASSERT_CONTINUE(mesh_block_it != lod.mesh_map_state.map.end());
 			VoxelLodTerrainUpdateData::MeshBlockState &mesh_block = mesh_block_it->second;
-			// All blocks we get here must be in the scheduled state
+			// 这里获得的所有数据块必须处于已调度状态
 			VOXEL_ASSERT_CONTINUE(mesh_block.state == VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT);
 
-			// Get block and its neighbors
+			// 获取数据块及其相邻数据块
 			// VoxelEngine::BlockMeshInput mesh_request;
 			// mesh_request.render_block_position = mesh_block_pos;
 			// mesh_request.lod = lod_index;
 
-			// We'll allocate this quite often. If it becomes a problem, it should be easy to pool.
+			// 我们会经常分配它。若这成为问题，将其池化应该很容易。
 			MeshBlockTask *task = VOXEL_NEW(MeshBlockTask);
 			task->volume_id = volume_id;
 			task->mesh_block_position = mesh_to_update.position;
@@ -350,7 +350,7 @@ void send_mesh_requests(
 			task->cancellation_token = mesh_to_update.cancellation_token;
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
-			// Don't update a detail texture if one update is already processing
+			// 若已有更新正在处理，则不要更新细节纹理
 			if (settings.detail_texture_settings.enabled &&
 				lod_index >= settings.detail_texture_settings.begin_lod_index &&
 				mesh_block.detail_texture_state != VoxelLodTerrainUpdateData::DETAIL_TEXTURE_PENDING) {
@@ -363,15 +363,15 @@ void send_mesh_requests(
 					Box3i(render_to_data_factor * mesh_to_update.position, Vector3iUtil::create(render_to_data_factor))
 							.padded(1);
 
-			// Iteration order matters for thread access.
-			// The array also implicitly encodes block position due to the convention being used,
-			// so there is no need to also include positions in the request
+			// 迭代顺序对线程访问很重要。
+			// 由于使用的约定，该数组还隐式编码了数据块位置，
+			// 因此无需在请求中再包含位置
 			data.get_blocks_with_voxel_data(data_box, lod_index, to_span(task->blocks));
 			task->blocks_count = Vector3iUtil::get_volume_u64(data_box.size);
 
-			// TODO There is inconsistency with coordinates sent to this function.
-			// Sometimes we send data block coordinates, sometimes we send mesh block coordinates. They aren't always
-			// the same, it might cause issues in priority sorting?
+			// TODO 发送给此函数的坐标存在不一致。
+			// 有时发送数据块坐标，有时发送网格数据块坐标。它们并不总是
+			// 相同，这可能会导致优先级排序出现问题？
 			init_sparse_octree_priority_dependency(
 					task->priority_dependency,
 					task->mesh_block_position,
@@ -392,10 +392,10 @@ void send_mesh_requests(
 	}
 }
 
-// Generates all non-present blocks in preparation for an edit.
-// This function schedules one parallel task for every block.
-// The returned tracker may be polled to detect when it is complete.
-// Only used in full load mode, because in streaming mode blocks must be present already.
+// 为编辑准备而生成所有尚未存在的数据块。
+// 此函数为每个数据块调度一个并行任务。
+// 可轮询返回的跟踪器以检测其是否完成。
+// 仅在完全加载模式下使用，因为在流式加载模式下数据块必须已存在。
 std::shared_ptr<AsyncDependencyTracker> preload_boxes_async(
 		VoxelLodTerrainUpdateData::State &state,
 		const VoxelLodTerrainUpdateData::Settings &settings,
@@ -447,7 +447,7 @@ std::shared_ptr<AsyncDependencyTracker> preload_boxes_async(
 				for (const Vector3i &missing_bpos : tls_missing) {
 					if (!lod.has_loading_block(missing_bpos)) {
 						todo.push_back(TaskArguments{ missing_bpos, lod_index });
-						// We should not need to populate loading_blocks in full load mode
+						// 在完全加载模式下，我们不应需要填充 loading_blocks
 						// lod.loading_blocks.insert(missing_bpos);
 					}
 				}
@@ -459,16 +459,16 @@ std::shared_ptr<AsyncDependencyTracker> preload_boxes_async(
 
 	std::shared_ptr<AsyncDependencyTracker> tracker = nullptr;
 
-	// TODO `next_tasks` is executed in parallel. But since they can be edits, may we do them in sequence?
+	// TODO `next_tasks` 并行执行。但由于它们可能是编辑操作，我们是否可以按顺序执行？
 
 	if (todo.size() > 0) {
 		VOXEL_PROFILE_SCOPE_NAMED("Posting requests");
 
-		// Only create the tracker if we actually are creating tasks. If we still create it,
-		// no task will take ownership of it, so if it is not stored after this function returns,
-		// it would destroy `next_tasks`.
+		// 仅当我们确实在创建任务时才创建跟踪器。若仍创建它，
+		// 则没有任务会接管其所有权，因此若此函数返回后未保存它，
+		// 它就会销毁 `next_tasks`。
 
-		// This may first run the generation tasks, and then the edits
+		// 这可能先运行生成任务，再运行编辑操作
 		tracker = make_shared_instance<AsyncDependencyTracker>(
 				todo.size(),
 				next_tasks,
@@ -497,7 +497,7 @@ std::shared_ptr<AsyncDependencyTracker> preload_boxes_async(
 		}
 
 	} else if (next_tasks.size() > 0) {
-		// Nothing to preload, we may schedule `next_tasks` right now
+		// 无需预加载，现在即可调度 `next_tasks`
 		VoxelEngine::get_singleton().push_async_tasks(next_tasks);
 	}
 
@@ -517,7 +517,7 @@ void process_async_edits(
 	VOXEL_PROFILE_SCOPE();
 
 	if (state.running_async_edits.size() == 0) {
-		// Schedule all next edits when the previous ones are done
+		// 当先前编辑完成时，调度所有后续编辑
 
 		StdVector<Box3i> boxes_to_preload;
 		StdVector<IThreadedTask *> tasks_to_schedule;
@@ -527,7 +527,7 @@ void process_async_edits(
 			VoxelLodTerrainUpdateData::AsyncEdit &edit = state.pending_async_edits[edit_index];
 			CRASH_COND(edit.task_tracker->has_next_tasks());
 
-			// Not sure if worth doing, I don't think tasks can be aborted before even being scheduled.
+			// 不确定是否值得做，我认为任务在调度之前不会被中止。
 			if (edit.task_tracker->is_aborted()) {
 				VOXEL_PRINT_VERBOSE("Aborted async edit");
 				VOXEL_DELETE(edit.task);
@@ -580,7 +580,7 @@ void process_changed_generated_areas(
 			const Box3i &voxel_box = *box_it;
 			const Box3i bbox = voxel_box.padded(1).downscaled(mesh_block_size << lod_index);
 
-			// TODO If there are cached generated blocks, they need to be re-cached or removed
+			// TODO 若存在缓存的已生成数据块，则需要重新缓存或移除
 
 			RWLockRead rlock(lod.mesh_map_state.map_lock);
 
@@ -635,11 +635,11 @@ void VoxelLodTerrainUpdateTask::flush_pending_lod_edits(
 	tls_modified_lod0_blocks.clear();
 	tls_modified_voxel_areas_lod0.clear();
 
-	// Consume inputs
+	// 消耗输入
 	{
 		MutexLock lock(state.edit_notifications.mutex);
 
-		// Not sure if could just use `=`? What would std::vector do with capacity?
+		// 不确定能否直接使用 `=`？std::vector 会如何处理容量？
 		append_array(tls_modified_lod0_blocks, state.edit_notifications.edited_blocks_lod0);
 		append_array(tls_modified_voxel_areas_lod0, state.edit_notifications.edited_voxel_areas_lod0);
 
@@ -647,29 +647,29 @@ void VoxelLodTerrainUpdateTask::flush_pending_lod_edits(
 		state.edit_notifications.edited_voxel_areas_lod0.clear();
 	}
 
-	// Update all data LODs
+	// 更新所有数据 LOD
 	// tls_updated_block_locations.clear();
 	data.update_lods(to_span(tls_modified_lod0_blocks), nullptr);
 
-	// Update affected meshes.
-	// TODO Optimize: trigger mesh updates at LOD0 earlier? There is a bit of latency due to doing all the mipping work
-	// first, and we know the edit happens before mipping anyways
+	// 更新受影响的网格。
+	// TODO 优化：是否更早地在 LOD0 触发网格更新？由于先完成所有 mipmap 生成工作
+	// 会带来一些延迟，而且我们知道编辑无论如何都会在 mipmap 生成之前发生
 	const unsigned int lod_count = data.get_lod_count();
 	for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 		const int mesh_block_size_at_lod = mesh_block_size << lod_index;
 
 		for (const Box3i voxel_box : tls_modified_voxel_areas_lod0) {
-			// Padding is required for edits near chunk borders, which can affect multiple meshes despite only affecting
-			// one data block
+			// 靠近数据块边界的编辑需要填充，因为这类编辑尽管只影响
+			// 一个数据块，却可能影响多个网格
 			const Box3i padded_voxel_box = voxel_box.padded(1);
 			const Box3i mesh_block_box = padded_voxel_box.downscaled(mesh_block_size_at_lod);
 
 			mesh_block_box.for_each_cell([&lod](Vector3i mesh_block_pos) {
 				auto mesh_block_it = lod.mesh_map_state.map.find(mesh_block_pos);
 				if (mesh_block_it != lod.mesh_map_state.map.end()) {
-					// If a mesh block state exists here, it will need an update.
-					// If there is none, it will probably get created later when we come closer to it
+					// 若此处存在网格数据块状态，则它将需要更新。
+					// 若不存在，则它可能在我们靠近时稍后被创建
 					schedule_mesh_update( //
 							mesh_block_it->second, //
 							mesh_block_pos, //
@@ -681,17 +681,17 @@ void VoxelLodTerrainUpdateTask::flush_pending_lod_edits(
 		}
 	}
 
-	// -- Old logic based solely on updated data blocks, however doesn't account for padding (would have to force-edit
-	// around to simulate that, which isn't great).
-	// Schedule mesh updates at every affected LOD
+	// -- 旧逻辑仅基于已更新的数据块，但不考虑填充（需要在周围强制编辑
+	// 来模拟，这并不理想）。
+	// 在每个受影响的 LOD 调度网格更新
 	// for (const VoxelData::BlockLocation loc : tls_updated_block_locations) {
 	// 	const Vector3i mesh_block_pos = math::floordiv(loc.position, data_to_mesh_factor);
 	// 	VoxelLodTerrainUpdateData::Lod &dst_lod = state.lods[loc.lod_index];
 	//
 	// 	auto mesh_block_it = dst_lod.mesh_map_state.map.find(mesh_block_pos);
 	// 	if (mesh_block_it != dst_lod.mesh_map_state.map.end()) {
-	// 		// If a mesh block state exists here, it will need an update.
-	// 		// If there is none, it will probably get created later when we come closer to it
+	// 		// 若此处存在网格数据块状态，则它将需要更新。
+	// 		// 若不存在，则它可能在我们靠近时稍后被创建
 	// 		schedule_mesh_update(mesh_block_it->second, mesh_block_pos, dst_lod.blocks_pending_update);
 	// 	}
 	// }
@@ -706,17 +706,17 @@ uint8_t VoxelLodTerrainUpdateTask::get_transition_mask(
 	uint8_t transition_mask = 0;
 
 	if (lod_index + 1 >= lod_count) {
-		// We do transitions on higher-resolution blocks.
-		// Therefore, lowest-resolution blocks never have transitions.
+		// 我们在更高分辨率的数据块上执行过渡。
+		// 因此，最低分辨率的数据块永远不会有过渡。
 		return transition_mask;
 	}
 
 	const VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
-	// Based on octree rules, and the fact it must have run before, check neighbor blocks of same LOD:
-	// If one is missing or not visible, it means either of the following:
-	// - The neighbor at lod+1 is visible or not loaded (there must be a transition)
-	// - The neighbor at lod-1 is visible (no transition)
+	// 基于八叉树规则以及它必须先于其它步骤运行的约束，检查相同 LOD 的相邻数据块：
+	// 若某个相邻数据块缺失或不可见，则意味着以下情况之一：
+	// - lod+1 处的相邻数据块可见或未加载（必须有过渡）
+	// - lod-1 处的相邻数据块可见（无过渡）
 
 	uint8_t visible_neighbors_of_same_lod = 0;
 	for (unsigned int dir = 0; dir < Cube::SIDE_COUNT; ++dir) {
@@ -730,7 +730,7 @@ uint8_t VoxelLodTerrainUpdateTask::get_transition_mask(
 	}
 
 	if (visible_neighbors_of_same_lod == 0b111111) {
-		// No transitions needed
+		// 无需过渡
 		return transition_mask;
 	}
 
@@ -740,8 +740,8 @@ uint8_t VoxelLodTerrainUpdateTask::get_transition_mask(
 
 		const VoxelLodTerrainUpdateData::Lod &lower_lod = state.lods[lod_index + 1];
 
-		// At least one neighbor isn't visible.
-		// Check for neighbors at different LOD (there can be only one kind on a given side)
+		// 至少有一个相邻数据块不可见。
+		// 检查不同 LOD 的相邻数据块（某一侧只能有一种）
 		for (unsigned int dir = 0; dir < Cube::SIDE_COUNT; ++dir) {
 			const unsigned int dir_mask = (1 << dir);
 
@@ -757,15 +757,15 @@ uint8_t VoxelLodTerrainUpdateTask::get_transition_mask(
 
 				if (lower_neighbor_block_it != lower_lod.mesh_map_state.map.end() &&
 					lower_neighbor_block_it->second.visual_active) {
-					// The block has a visible neighbor of lower LOD
+					// 该数据块有一个可见的较低 LOD 相邻数据块
 					transition_mask |= dir_mask;
 					continue;
 				}
 			}
 
 			if (lod_index > 0) {
-				// Check upper LOD neighbors.
-				// There are always 4 on each side, checking any is enough
+				// 检查较高 LOD 的相邻数据块。
+				// 每侧始终有 4 个，检查任意一个即可
 
 				Vector3i upper_neighbor_pos = upper_pos;
 				for (unsigned int i = 0; i < Vector3iUtil::AXIS_COUNT; ++i) {
@@ -781,7 +781,7 @@ uint8_t VoxelLodTerrainUpdateTask::get_transition_mask(
 
 				if (upper_neighbor_block_it == upper_lod.mesh_map_state.map.end() ||
 					upper_neighbor_block_it->second.visual_active == false) {
-					// The block has no visible neighbor yet. World border? Assume lower LOD.
+					// 该数据块尚无可见的相邻数据块。世界边界？假定为较低 LOD。
 					transition_mask |= dir_mask;
 				}
 			}
@@ -795,21 +795,21 @@ void update_transition_masks(
 		VoxelLodTerrainUpdateData::State &state,
 		uint32_t lods_to_update_transitions,
 		const unsigned int lod_count,
-		// Currently needed to keep supporting the old octree streaming system, which doesn't support multiple viewers
+		// 目前为继续支持旧的八叉树流式加载系统所需，该系统不支持多个观察者
 		const bool use_refcounts
 ) {
-	// TODO Optimize: this works but it's not smart.
-	// It doesn't take too long (100 microseconds when octrees update with lod distance 60).
-	// We used to only update positions based on which blocks were added/removed in the octree update,
-	// which was faster than this. However it missed some spots, which caused annoying cracks to show up.
-	// So instead, when any block changes state in LOD N, we update all transitions in LODs N-1, N, and N+1.
-	// It is unclear yet why the old approach didn't work, maybe because it didn't properly made N-1 and N+1 update.
-	// If you find a better approach, it has to comply with the validation check below.
+	// TODO 优化：这可行但不够智能。
+	// 它不会花费太长时间（当八叉树以 LOD 距离 60 更新时约 100 微秒）。
+	// 我们过去只根据八叉树更新中添加/移除的数据块来更新位置，
+	// 这比现在更快。但它遗漏了一些位置，导致出现恼人的裂缝。
+	// 因此，当 LOD N 中任何数据块状态改变时，我们会更新 LOD N-1、N 和 N+1 中的所有过渡。
+	// 目前尚不清楚旧方法为何不起作用，也许是因为它没有正确更新 N-1 和 N+1。
+	// 若你找到更好的方法，它必须符合下面的验证检查。
 	if (lods_to_update_transitions != 0) {
 		VOXEL_PROFILE_SCOPE_NAMED("Transition masks");
-		// We pass a mask that gets populated with (0b111 << index), because we want to add lod+1, lod+0 and lod-1. But
-		// because the case of -1 would require more code, we instead offset the mask by 1. Then at the end, we
-		// only need to undo that offset once here.
+		// 我们传入一个被填充为 (0b111 << index) 的掩码，因为我们想包含 lod+1、lod+0 和 lod-1。但
+		// 由于 -1 的情况需要更多代码，我们改为将掩码偏移 1。然后在最后，
+		// 只需在此处撤销一次该偏移。
 		lods_to_update_transitions >>= 1;
 
 		for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
@@ -819,8 +819,8 @@ void update_transition_masks(
 
 			VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
-			// TODO Might not be necessary because we run this in the update task. No other thread is allowed to modify
-			// this map while the task is running.
+			// TODO 可能没有必要，因为我们在更新任务中运行此代码。任务运行期间不允许其它线程修改
+			// 此映射。
 			RWLockRead rlock(lod.mesh_map_state.map_lock);
 
 			for (auto it = lod.mesh_map_state.map.begin(); it != lod.mesh_map_state.map.end(); ++it) {
@@ -841,7 +841,7 @@ void update_transition_masks(
 		}
 	}
 #if 0
-	// DEBUG: Validation check for transition mask updates.
+	// DEBUG: 过渡掩码更新的验证检查。
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Transition checks");
 		for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
@@ -900,14 +900,14 @@ void VoxelLodTerrainUpdateTask::run(ThreadedTaskContext &ctx) {
 	ProfilingClock profiling_clock;
 	ProfilingClock profiling_clock_total;
 
-	// TODO This is not a good name, "streaming" has several meanings. Rename "can_load"?
+	// TODO 这不是一个好名字，"streaming" 有多种含义。改名为 "can_load"？
 	const bool stream_enabled =
 			((stream.is_valid() && stream->is_runnable()) || (generator.is_valid() && generator->is_runnable()));
 
 	const unsigned int lod_count = data.get_lod_count();
 
 #ifdef DEV_ENABLED
-	// Make sure the main thread has processed outputs of the last threaded update
+	// 确保主线程已处理上一次线程更新任务的输出
 	for (unsigned int lod_index = 0; lod_index < state.lods.size(); ++lod_index) {
 		const VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 		CRASH_COND(lod.mesh_blocks_to_unload.size() != 0);
@@ -924,13 +924,13 @@ void VoxelLodTerrainUpdateTask::run(ThreadedTaskContext &ctx) {
 	CRASH_COND_MSG(update_data.task_is_complete, "Expected only one update task to run on a given volume");
 	MutexLock mutex_lock(update_data.completion_mutex);
 
-	// Update pending LOD data modifications due to edits.
-	// These are deferred from edits so we can batch them.
-	// It has to happen first because blocks can be unloaded afterwards.
-	// This is also what causes meshes to update after edits.
+	// 更新因编辑产生的挂起 LOD 数据修改。
+	// 这些修改从编辑中延迟处理，以便我们可以批量执行。
+	// 它必须首先发生，因为数据块随后可能被卸载。
+	// 这也是编辑后网格更新的原因。
 	flush_pending_lod_edits(state, data, 1 << settings.mesh_block_size_po2);
 
-	// Other mesh updates
+	// 其它网格更新
 	process_changed_generated_areas(state, settings, lod_count);
 
 	static thread_local StdVector<VoxelData::BlockToSave> tls_data_blocks_to_save;
@@ -977,17 +977,17 @@ void VoxelLodTerrainUpdateTask::run(ThreadedTaskContext &ctx) {
 	profiling_clock.restart();
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("IO requests");
-		// It's possible the user didn't set a stream yet, or it is turned off
+		// 用户可能尚未设置流，或流已被关闭
 		if (stream_enabled) {
 			const unsigned int data_block_size = data.get_block_size();
 
-			// This part would still "work" without that check because `data_blocks_to_load` would be empty,
-			// but I added this for expliciteness
+			// 即使没有该检查，这部分仍会“工作”，因为 `data_blocks_to_load` 会是空的，
+			// 但我添加它是为了明确
 			if (data.is_streaming_enabled()) {
 				if (stream.is_null() && !settings.cache_generated_blocks) {
-					// TODO Optimization: not ideal because a bit delayed. It requires a second update cycle for meshes
-					// to get requested. We could instead set those empty blocks right away instead of putting them in
-					// that list, but it's simpler code for now.
+					// TODO 优化：不太理想，因为有一点延迟。网格请求需要再经过一个更新周期
+					// 才能发出。我们也可以直接设置这些空数据块，而不是将它们放入
+					// 该列表，但目前这样写代码更简单。
 					apply_block_data_requests_as_empty(to_span(data_blocks_to_load), data, state, settings);
 
 				} else {
@@ -1019,8 +1019,8 @@ void VoxelLodTerrainUpdateTask::run(ThreadedTaskContext &ctx) {
 	}
 	state.stats.time_io_requests = profiling_clock.restart();
 
-	// TODO When no mesher is assigned, mesh requests are still accumulated but not being sent. A better way to support
-	// this is by allowing voxels-only/mesh-less viewers, similar to VoxelTerrain
+	// TODO 当未分配网格化器时，网格请求仍会累积但不会发送。更好的支持方式是
+	// 允许仅体素/无网格的观察者，类似于 VoxelTerrain
 	if (_meshing_dependency->mesher.is_valid()) {
 		send_mesh_requests(
 				_volume_id,

@@ -6,13 +6,13 @@
 
 namespace voxel {
 
-// Domain warp is a transformation of coordinates before sampling the actual noise.
-// It can be done with another instance of noise, however it needs a sample for each coordinate,
-// so FastNoiseLite provides specialized versions of this using gradients.
-// This is faster and produces higher-quality results.
+// 域扭曲（Domain warp）是在采样实际噪声之前对坐标进行的一种变换。
+// 可以用另一个噪声实例来做，但它需要对每个坐标各采样一次，
+// 所以 FastNoiseLite 提供了使用梯度的专门版本。
+// 这样更快，且结果质量更高。
 //
-// Note: FastNoiseLite provides this with the same class, but then its unclear which applies to what,
-// so I made two classes, each with a specific purpose.
+// 注意：FastNoiseLite 用同一个类提供这个功能，但那会不清楚哪个作用于什么，
+// 所以我做了两个类，各有特定用途。
 //
 class Voxel_FastNoiseLiteGradient : public Resource {
 	GDCLASS(Voxel_FastNoiseLiteGradient, Resource)
@@ -20,7 +20,7 @@ class Voxel_FastNoiseLiteGradient : public Resource {
 	typedef ::fast_noise_lite::FastNoiseLite _FastNoise;
 
 public:
-	// TODO Had to prefix it because of https://github.com/godotengine/godot/issues/44860
+	// TODO 必须加前缀，因为 https://github.com/godotengine/godot/issues/44860
 	static const int _MAX_OCTAVES = 32;
 
 	enum NoiseType {
@@ -29,8 +29,8 @@ public:
 		TYPE_VALUE = _FastNoise::DomainWarpType_BasicGrid
 	};
 
-	// This one does not map directly to FastNoise unfortunately,
-	// because Godot's UI wants consecutive values starting from 0...
+	// 遗憾的是这个不能直接映射到 FastNoise，
+	// 因为 Godot 的 UI 希望值从 0 开始连续……
 	enum FractalType { //
 		FRACTAL_NONE,
 		FRACTAL_DOMAIN_WARP_PROGRESSIVE,
@@ -73,8 +73,8 @@ public:
 	void set_rotation_type_3d(RotationType3D type);
 	RotationType3D get_rotation_type_3d() const;
 
-	// These are inline to ensure inlining actually happens. If they were bound directly to the script API,
-	// it means they would need to have an address, in which case I'm not sure they would be inlined?
+	// 这些是内联的，以确保内联真正发生。如果它们直接绑定到脚本 API，
+	// 就意味着它们需要有地址，那样我就不确定它们还能不能内联了？
 
 	inline void warp_2d(real_t &x, real_t &y) const {
 		return _fn.DomainWarp(x, y);
@@ -84,13 +84,13 @@ public:
 		return _fn.DomainWarp(x, y, z);
 	}
 
-	// TODO Bounds access
-	// TODO Interval range analysis
+	// TODO 边界访问
+	// TODO 区间范围分析
 
 private:
 	static void _bind_methods();
 
-	// TODO Getting the gradient instead of adding it would be more useful?
+	// TODO 获取梯度而不是叠加梯度会不会更有用？
 
 	Vector2 _b_warp_2d(Vector2 pos) {
 		warp_2d(pos.x, pos.y);
@@ -104,7 +104,7 @@ private:
 
 	::fast_noise_lite::FastNoiseLite _fn;
 
-	// TODO FastNoiseLite should rather have getters
+	// TODO FastNoiseLite 更应该提供 getter
 
 	NoiseType _noise_type = TYPE_VALUE;
 	int _seed = 0;

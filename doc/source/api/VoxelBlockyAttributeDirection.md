@@ -1,29 +1,29 @@
 # VoxelBlockyAttributeDirection
 
-Inherits: [VoxelBlockyAttribute](VoxelBlockyAttribute.md)
+继承自：[VoxelBlockyAttribute](VoxelBlockyAttribute.md)
 
 !!! warning
-    This class is marked as experimental. It is subject to likely change or possible removal in future versions. Use at your own discretion.
+    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                    | Name                                   | Default 
------------------------------------------------------------------------ | -------------------------------------- | --------
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)  | [horizontal_only](#i_horizontal_only)  | false   
+类型                                                                      | 名称                                     | 默认值   
+----------------------------------------------------------------------- | -------------------------------------- | ------
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)  | [horizontal_only](#i_horizontal_only)  | false 
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                | Signature                                                                                                          
+返回值                                                                   | 函数签名                                                                                                               
 --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [from_vec3](#i_from_vec3) ( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) v ) const 
 <p></p>
 
-## Enumerations: 
+## 枚举：<span id="enumerations"></span>
 
-enum **Direction**: 
+枚举 **Direction**：
 
 - <span id="i_DIR_NEGATIVE_X"></span>**DIR_NEGATIVE_X** = **0**
 - <span id="i_DIR_POSITIVE_X"></span>**DIR_POSITIVE_X** = **1**
@@ -34,16 +34,16 @@ enum **Direction**:
 - <span id="i_DIR_COUNT"></span>**DIR_COUNT** = **6**
 
 
-## Property Descriptions
+## 属性描述
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_horizontal_only"></span> **horizontal_only** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-## Method Descriptions
+## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_from_vec3"></span> **from_vec3**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) v ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

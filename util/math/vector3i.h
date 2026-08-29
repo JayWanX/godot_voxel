@@ -8,7 +8,7 @@
 #include "../hash_funcs.h"
 #include "../macros.h"
 #include "funcs.h"
-#include <functional> // For std::hash
+#include <functional> // 用于 std::hash
 
 namespace voxel {
 namespace Vector3iUtil {
@@ -25,8 +25,8 @@ inline void sort_min_max(Vector3i &a, Vector3i &b) {
 	math::sort(a.z, b.z);
 }
 
-// Returning a 64-bit integer because volumes can quickly overflow INT_MAX (like 1300^3),
-// even though dense volumes of that size will rarely be encountered in this module.
+// 返回 64 位整数，因为体积很容易溢出 INT_MAX（例如 1300^3），
+// 尽管本模块中很少会遇到那么大的密集体积。
 inline uint64_t get_volume_u64(const Vector3i &v) {
 #ifdef DEBUG_ENABLED
 	VOXEL_ASSERT_RETURN_V(v.x >= 0 && v.y >= 0 && v.z >= 0, 0);
@@ -115,8 +115,8 @@ inline Vector3i max(const Vector3i a, const Vector3i b) {
 	return Vector3i(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
 }
 
-// Rotations: CW (clockwise) and CCW (counter-clockwise) are such that the rotation axis is pointed at the viewer.
-// Same convention used by Godot Basis. CCW is positive angle, CW is negative angle.
+// 旋转：CW（顺时针）与 CCW（逆时针）均指旋转轴指向观察者。
+// 与 Godot Basis 使用的约定相同。CCW 为正角，CW 为负角。
 
 inline Vector3i rotate_x_90_ccw(Vector3i v) {
 	return Vector3i(v.x, -v.z, v.y);
@@ -150,7 +150,7 @@ inline int manhattan_distance(const Vector3i &a, const Vector3i &b) {
 }
 
 inline int chebyshev_distance(const Vector3i &a, const Vector3i &b) {
-	// In Chebyshev metric, points on the surface of a cube are all equidistant to its center
+	// 在切比雪夫距离下，立方体表面上的点到其中心距离相等
 	return math::max(math::max(Math::abs(a.x - b.x), Math::abs(a.y - b.y)), Math::abs(a.z - b.z));
 }
 
@@ -166,9 +166,9 @@ TextWriter &operator<<(TextWriter &w, const Vector3i &v);
 } // namespace voxel
 
 VOXEL_GODOT_NAMESPACE_BEGIN
-// To prevent unintuitive overload-resolution compiler errors, operators overloads should be
-// defined in the same namespace as the type they are dealing with... in which case, Godot's namespace.
-// The compiler only looks for overrides in the namespace of the arguments (Koenig lookup, is it?).
+// 为避免不直观的重载解析编译错误，运算符重载应
+// 定义在其操作类型所在的同一命名空间内……即 Godot 的命名空间。
+// 编译器只会在参数的命名空间内查找重载（也就是 Koenig 查找，是吗？）。
 // https://stackoverflow.com/questions/5195512/namespaces-and-operator-resolution
 
 inline Vector3i operator<<(const Vector3i &a, int b) {
@@ -196,14 +196,14 @@ inline Vector3i operator%(const Vector3i &a, int b) {
 
 VOXEL_GODOT_NAMESPACE_END
 
-// For Godot
+// 用于 Godot
 struct Vector3iHasher {
 	static inline uint32_t hash(const Vector3i &v) {
 		uint32_t hash = voxel::hash_djb2_one_32(v.x);
 		hash = voxel::hash_djb2_one_32(v.y, hash);
 		return voxel::hash_djb2_one_32(v.z, hash);
 
-		// What Godot uses. Turns out to be slower?
+		// Godot 所用的实现。结果似乎更慢？
 		// uint32_t h = voxel::hash_murmur3_one_32(v.x);
 		// h = voxel::hash_murmur3_one_32(v.y, h);
 		// h = voxel::hash_murmur3_one_32(v.z, h);

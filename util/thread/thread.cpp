@@ -56,7 +56,7 @@ namespace {
 
 uint64_t get_hash(const std::thread::id &p_t) {
 	static std::hash<std::thread::id> hasher;
-	// TODO Maybe not a good idea to use a hash, could have collisions?
+	// TODO 使用哈希或许不是好主意，可能会有冲突？
 	return hasher(p_t);
 }
 

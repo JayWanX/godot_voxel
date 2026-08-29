@@ -10,7 +10,7 @@ VOXEL_GODOT_FORWARD_DECLARE(class Image)
 
 namespace voxel {
 
-// Stores minimum and maximum values over a 2D image at multiple levels of detail
+// 在多个细节层级上存储 2D 图像的最小值和最大值
 class ImageRangeGrid {
 public:
 	~ImageRangeGrid();
@@ -21,22 +21,22 @@ public:
 		return _total_range;
 	}
 
-	// Gets a quick upper bound of the range of values within an area of the image. If the area goes out of bounds of
-	// the image, evaluation will be done as if the image repeats infinitely.
+	// 快速获取图像某个区域内值的范围上界。如果区域超出图像边界，
+	// 将按图像无限重复的方式进行求值。
 	math::Interval get_range_repeat(math::Interval xr, math::Interval yr) const;
 
 private:
 	static const int MAX_LODS = 16;
 
 	struct Lod {
-		// Grid of chunks containing the min and max of all pixels covered by each chunk
+		// 块的网格，包含每个块覆盖的所有像素的最小值和最大值
 		StdVector<math::Interval> data;
-		// In chunks
+		// 以块为单位
 		int size_x = 0;
 		int size_y = 0;
 	};
 
-	// Original size
+	// 原始尺寸
 	int _pixels_x = 0;
 	int _pixels_y = 0;
 	bool _pixels_x_is_power_of_2 = true;

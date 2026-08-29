@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelInstanceLibrarySceneItem" inherits="VoxelInstanceLibraryItem" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Instancer model using scenes.
+		使用场景的实例化器模型。
 	</brief_description>
 	<description>
-		This model will spawn scene instances, which may be suited for sparse and complex elements.
+		该模型将生成场景实例，可能适合稀疏且复杂的元素。
 	</description>
 	<tutorials>
 	</tutorials>

@@ -27,8 +27,8 @@ inline String to_godot(const std::string_view sv) {
 	return String::utf8(sv.data(), sv.size());
 }
 
-// Turns out these functions are only used in editor for now.
-// They are generic, but I have to wrap them, otherwise GCC throws warnings-as-errors for them being unused.
+// 事实证明这些函数目前只在编辑器中使用。
+// 它们是通用的，但我必须包装它们，否则 GCC 会把"未使用"当作错误警告抛出。
 #ifdef TOOLS_ENABLED
 
 PackedStringArray to_godot(const StdVector<std::string_view> &svv);
@@ -74,9 +74,9 @@ inline String ptr2s(const void *p) {
 
 } // namespace voxel::godot
 
-// `TTR` means "tools translate", which is for editor-only localized messages.
-// Godot does not define the TTR macro for translation of messages in release builds. However, there are some non-editor
-// code that can produce errors in this module, and we still want them to compile properly.
+// `TTR` 表示 "tools translate"（工具翻译），用于仅限编辑器的本地化消息。
+// Godot 在发布构建中不定义用于消息翻译的 TTR 宏。不过，本模块中有一些非编辑器
+// 代码会产生错误，而我们仍然希望它们能正常编译。
 #if defined(VOXEL_GODOT) && defined(TOOLS_ENABLED)
 #define VOXEL_TTR(msg) TTR(msg)
 #else
@@ -85,9 +85,9 @@ inline String ptr2s(const void *p) {
 
 VOXEL_GODOT_NAMESPACE_BEGIN
 
-// Needed for `voxel::format()`.
-// I gave up trying to nicely convert Godot's String here... it has non-explicit `const char*` constructor, that makes
-// other overloads ambiguous...
+// `voxel::format()` 需要用到。
+// 我放弃了在这里漂亮地转换 Godot 的 String……它带有非显式的 `const char*` 构造函数，那会让
+// 其他重载产生歧义……
 // StdStringStream &operator<<(StdStringStream &ss, const String &s);
 struct GodotStringWrapper {
 	GodotStringWrapper(const String &p_s) : s(p_s) {}
@@ -99,7 +99,7 @@ VOXEL_GODOT_NAMESPACE_END
 
 namespace std {
 
-// For String keys in std::unordered_map
+// 供 String 作为 std::unordered_map 的键使用
 template <>
 struct hash<String> {
 	inline size_t operator()(const String &v) const {

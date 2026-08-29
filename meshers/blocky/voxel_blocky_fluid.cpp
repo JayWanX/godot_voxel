@@ -48,7 +48,7 @@ void bake_fluid(const VoxelBlockyFluid &fluid, BakedFluid &baked_fluid, Material
 	baked_fluid.material_id = materials.get_or_create_index(material);
 	baked_fluid.dip_when_flowing_down = fluid.get_dip_when_flowing_down();
 
-	// TODO This part shouldn't be necessary? it's the same for every fluid
+	// TODO 这部分应该没必要吧？它对每个流体都一样
 	for (unsigned int side_index = 0; side_index < Cube::SIDE_COUNT; ++side_index) {
 		BakedFluid::Surface &surface = baked_fluid.side_surfaces[side_index];
 		make_cube_side_vertices(surface.positions, side_index, 1.f);

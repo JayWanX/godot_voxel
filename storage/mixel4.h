@@ -5,7 +5,7 @@
 #include "../util/math/funcs.h"
 #include <cstdint>
 
-// Functions to encode, decode and blend voxel materials using 4 indices and 4 weights.
+// 使用 4 个索引和 4 个权重来编码、解码和混合体素材质的函数。
 
 namespace voxel {
 
@@ -15,21 +15,21 @@ namespace mixel4 {
 
 inline FixedArray<uint8_t, 4> decode_weights_from_packed_u16(uint16_t packed_weights) {
 	FixedArray<uint8_t, 4> weights;
-	// SIMDable?
+	// 可 SIMD 化？
 	// weights[0] = ((packed_weights >> 0) & 0x0f) << 4;
 	// weights[1] = ((packed_weights >> 4) & 0x0f) << 4;
 	// weights[2] = ((packed_weights >> 8) & 0x0f) << 4;
 	// weights[3] = ((packed_weights >> 12) & 0x0f) << 4;
 
-	// Reduced but not SIMDable
+	// 已简化但不可 SIMD 化
 	weights[0] = (packed_weights & 0x0f) << 4;
 	weights[1] = packed_weights & 0xf0;
 	weights[2] = (packed_weights >> 4) & 0xf0;
 	weights[3] = (packed_weights >> 8) & 0xf0;
-	// The code above is such that the maximum uint8_t value for a weight is 240, not 255.
-	// We could add extra computations in order to match the range exactly,
-	// but as a compromise I'm not doing them because it would kinda break bijectivity and is slower.
-	// If this is a problem, then it could be an argument to switch to 8bit representation using 3 channels.
+	// 上面的代码使得权重的最大 uint8_t 值为 240，而不是 255。
+	// 我们可以增加额外的计算来完全匹配该范围，
+	// 但作为折衷我没有这样做，因为它会破坏双射性并且更慢。
+	// 如果这是个问题，那么它可能成为改用 3 个通道的 8 位表示的理由。
 	// weights[0] |= weights[0] >> 4;
 	// weights[1] |= weights[1] >> 4;
 	// weights[2] |= weights[2] >> 4;
@@ -39,7 +39,7 @@ inline FixedArray<uint8_t, 4> decode_weights_from_packed_u16(uint16_t packed_wei
 
 inline FixedArray<uint8_t, 4> decode_indices_from_packed_u16(uint16_t packed_indices) {
 	FixedArray<uint8_t, 4> indices;
-	// SIMDable?
+	// 可 SIMD 化？
 	indices[0] = (packed_indices >> 0) & 0x0f;
 	indices[1] = (packed_indices >> 4) & 0x0f;
 	indices[2] = (packed_indices >> 8) & 0x0f;
@@ -51,12 +51,12 @@ inline constexpr uint16_t encode_indices_to_packed_u16(uint8_t a, uint8_t b, uin
 	return (a & 0xf) | ((b & 0xf) << 4) | ((c & 0xf) << 8) | ((d & 0xf) << 12);
 }
 
-// Encodes from 0..255 to 0..15 values packed in 16 bits. Lower 4 bits of input values will not be preserved.
+// 将 0..255 的值编码为打包在 16 位中的 0..15 值。输入值的低 4 位将不会被保留。
 inline constexpr uint16_t encode_weights_to_packed_u16_lossy(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
 	return (a >> 4) | ((b >> 4) << 4) | ((c >> 4) << 8) | ((d >> 4) << 12);
 }
 
-// Checks if there are no duplicate indices in any voxel
+// 检查任意体素中是否没有重复的索引
 inline void debug_check_texture_indices(FixedArray<uint8_t, 4> indices) {
 	FixedArray<bool, 16> checked;
 	fill(checked, false);
@@ -75,7 +75,7 @@ inline void _normalize_weights_preserving(
 		const unsigned int other2
 ) {
 	const float part_sum = weights[other0] + weights[other1] + weights[other2];
-	// It is assumed the preserved channel is already clamped to [0, 1]
+	// 假定保留的通道已经夹取到 [0, 1]
 	const float expected_part_sum = 1.f - weights[preserved_index];
 
 	if (part_sum < 0.0001f) {
@@ -132,7 +132,7 @@ inline void blend_texture_packed_u16(
 	FixedArray<uint8_t, 4> indices = decode_indices_from_packed_u16(encoded_indices);
 	FixedArray<uint8_t, 4> weights = decode_weights_from_packed_u16(encoded_weights);
 
-	// Search if our texture index is already present
+	// 查找我们的纹理索引是否已经存在
 	unsigned int component_index = 4;
 	for (unsigned int i = 0; i < indices.size(); ++i) {
 		if (indices[i] == texture_index) {
@@ -143,9 +143,9 @@ inline void blend_texture_packed_u16(
 
 	bool index_was_changed = false;
 	if (component_index >= indices.size()) {
-		// Our texture index is not present, we'll replace the lowest weight
+		// 我们的纹理索引不存在，将替换权重最低的组件
 		uint8_t lowest_weight = 255;
-		// Default to 0 in the hypothetic case where all weights are maxed
+		// 在所有权重都取最大值这一假设情况下，默认为 0
 		component_index = 0;
 		for (unsigned int i = 0; i < weights.size(); ++i) {
 			if (weights[i] < lowest_weight) {
@@ -157,8 +157,7 @@ inline void blend_texture_packed_u16(
 		index_was_changed = true;
 	}
 
-	// TODO Optimization in case target_weight is 1?
-
+	// TODO 优化：target_weight 为 1 时的情况？
 	FixedArray<float, 4> weights_f;
 	for (unsigned int i = 0; i < weights.size(); ++i) {
 		weights_f[i] = weights[i] / 255.f;
@@ -185,18 +184,17 @@ constexpr inline uint16_t make_encoded_weights_for_single_texture() {
 }
 
 constexpr inline uint16_t make_encoded_indices_for_single_texture(uint8_t index) {
-	// Make sure other indices are different so the weights associated with them don't override the first
-	// index's weight.
+	// 确保其他索引不同，这样与它们关联的权重不会覆盖第一个
+	// 索引的权重。
 	const uint8_t index1 = (index + 1) & 0xf;
 	const uint8_t index2 = (index + 2) & 0xf;
 	const uint8_t index3 = (index + 3) & 0xf;
 	const uint16_t encoded_indices = encode_indices_to_packed_u16(index, index1, index2, index3);
 	return encoded_indices;
-	// Note: an alternative would be to snap indices so that the first one is multiple of 4 and following ones are
-	// consecutive. That would minimize the changes in indices layout while keeping them sorted, which could in turn
-	// reduce the amount of seams the mesher might have to make. However it needs to involve weights too instead of
-	// assuming the relevant slot will be the first one. Haven't done that for now as it's not high priority, and it's
-	// likely for the format to change to become simpler instead
+	// 注意：另一种做法是将索引对齐，使第一个索引是 4 的倍数且后续索引连续。
+	// 这会最小化索引布局的变化，同时保持它们有序，从而可能减少网格器需要制作的接缝数量。
+	// 但它也需要把权重考虑进去，而不是假定相关槽位总是第一个。目前还没有做，
+	// 因为优先级不高，而且格式很可能会变得更简单
 }
 
 } // namespace mixel4

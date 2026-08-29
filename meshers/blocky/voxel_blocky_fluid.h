@@ -17,10 +17,10 @@ namespace blocky {
 struct MaterialIndexer;
 }
 
-// Minecraft-style fluid common configuration.
-// Fluids are a bit special compared to regular models. Rendering them with precalculated models would require way too
-// many of them. So instead, they are procedurally generated during meshing.
-// They only require separate models to represent their level, or other states such as falling.
+// Minecraft 风格的流体通用配置。
+// 与普通模型相比，流体有些特殊。用预计算模型渲染它们需要太多模型。
+// 因此，它们是在网格化过程中程序化生成的。
+// 它们只需要单独的模型来表示液位，或其他状态（如下落）。
 class VoxelBlockyFluid : public Resource {
 	GDCLASS(VoxelBlockyFluid, Resource)
 public:
@@ -28,7 +28,7 @@ public:
 		// o---x
 		// |
 		// z
-		// Values are proportional to an angle, and named after a top-down OpenGL coordinate system.
+		// 这些值正比于角度，并以俯视 OpenGL 坐标系命名。
 		FLOW_STRAIGHT_POSITIVE_X,
 		FLOW_DIAGONAL_POSITIVE_X_NEGATIVE_Z,
 		FLOW_STRAIGHT_NEGATIVE_Z,

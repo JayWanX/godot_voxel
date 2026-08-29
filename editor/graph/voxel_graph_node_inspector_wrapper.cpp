@@ -37,7 +37,7 @@ void VoxelGraphNodeInspectorWrapper::_get_property_list(List<PropertyInfo> *p_li
 	ERR_FAIL_COND(graph.is_null());
 
 	if (!graph->has_node(_node_id)) {
-		// Maybe got erased by the user?
+		// 也许被用户删除了？
 #ifdef DEBUG_ENABLED
 		VOXEL_PRINT_VERBOSE("VoxelGeneratorGraph node was not found, from the graph inspector");
 #endif
@@ -111,16 +111,16 @@ void VoxelGraphNodeInspectorWrapper::_get_property_list(List<PropertyInfo> *p_li
 
 		PropertyInfo pi;
 		pi.name = port_name;
-		// All I/Os are floats at the moment.
+		// 目前所有 I/O 都是 float。
 		pi.type = Variant::FLOAT;
 		if (autoconnect_enabled && autoconnect_hint != VoxelGraphFunction::AUTO_CONNECT_NONE) {
-			// This default value won't be used because the port will automatically connect when compiled
+			// 这个默认值不会使用，因为编译时端口会自动连接
 			pi.usage |= PROPERTY_USAGE_READ_ONLY;
 		}
 		p_list->push_back(pi);
 	}
 
-	// Autoconnect
+	// 自动连接
 
 	if (has_autoconnect_inputs) {
 		p_list->push_back(PropertyInfo(Variant::BOOL, AUTOCONNECT_PROPERTY_NAME));
@@ -129,10 +129,10 @@ void VoxelGraphNodeInspectorWrapper::_get_property_list(List<PropertyInfo> *p_li
 
 namespace {
 
-// Automatically updates the list of inputs from variable names used in the expression.
-// Contrary to VisualScript (for which this has to be done manually to the user), submitting the text field containing
-// the expression's code also changes dynamic inputs of the node and reconnects existing connections, all as one
-// UndoRedo action.
+// 根据表达式代码中使用的变量名自动更新输入列表。
+// 与 VisualScript（需要用户手动操作）不同，提交包含
+// 表达式代码的文本字段也会改变节点的动态输入并重新连接现有连接，所有这些作为一个
+// UndoRedo 操作。
 void update_expression_inputs(
 		VoxelGraphFunction &graph,
 		uint32_t node_id,
@@ -144,7 +144,7 @@ void update_expression_inputs(
 	const CharString code_utf8 = code.utf8();
 	StdVector<std::string_view> new_input_names;
 	if (!VoxelGraphFunction::get_expression_variables(code_utf8.get_data(), new_input_names)) {
-		// Error, the action will not include node input changes
+		// 出错，操作将不会包含节点输入的变化
 		return;
 	}
 	StdVector<StdString> old_input_names;
@@ -154,7 +154,7 @@ void update_expression_inputs(
 		ProgramGraph::PortLocation src;
 		uint32_t dst_port_index;
 	};
-	// Find what we'll disconnect
+	// 找出我们将要断开的连接
 	StdVector<Connection> to_disconnect;
 	for (uint32_t port_index = 0; port_index < old_input_names.size(); ++port_index) {
 		ProgramGraph::PortLocation src;
@@ -162,7 +162,7 @@ void update_expression_inputs(
 			to_disconnect.push_back({ { src.node_id, src.port_index }, port_index });
 		}
 	}
-	// Find what we'll reconnect
+	// 找出我们将要重连的连接
 	StdVector<Connection> to_reconnect;
 	for (uint32_t port_index = 0; port_index < old_input_names.size(); ++port_index) {
 		const std::string_view old_name = old_input_names[port_index];
@@ -216,15 +216,15 @@ bool VoxelGraphNodeInspectorWrapper::_set(const StringName &p_name, const Varian
 	Ref<VoxelGraphFunction> graph = get_graph();
 	ERR_FAIL_COND_V(graph.is_null(), false);
 	ERR_FAIL_COND_V(_graph_editor == nullptr, false);
-	// We cannot keep a reference to UndoRedo in our object because our object can be referenced by UndoRedo, which
-	// would cause a cyclic reference. So we access it from a weak reference to the editor.
+	// 我们不能在对象中保存对 UndoRedo 的引用，因为我们的对象可能被 UndoRedo 引用，那
+	// 会造成循环引用。因此我们通过对编辑器的弱引用来访问它。
 	EditorUndoRedoManager *undo_redo = _graph_editor->get_undo_redo();
 	ERR_FAIL_COND_V(undo_redo == nullptr, false);
 	EditorUndoRedoManager &ur = *undo_redo;
 
 	const String name = p_name;
 
-	// Special case because `name` is neither a parameter nor an output
+	// 特殊情况，因为 `name` 既不是参数也不是输出
 	if (name == "name") {
 		String previous_name = graph->get_node_name(_node_id);
 		ur.create_action("Set VoxelGeneratorGraph node name");
@@ -241,7 +241,7 @@ bool VoxelGraphNodeInspectorWrapper::_set(const StringName &p_name, const Varian
 		ur.create_action(String("Set ") + AUTOCONNECT_PROPERTY_NAME);
 		ur.add_do_method(graph.ptr(), "set_node_default_inputs_autoconnect", _node_id, p_value);
 		ur.add_undo_method(graph.ptr(), "set_node_default_inputs_autoconnect", _node_id, prev_autoconnect);
-		// To update disabled default input values in the inspector
+		// 更新检查器中被禁用的默认输入值
 		ur.add_do_method(this, "notify_property_list_changed");
 		ur.add_undo_method(this, "notify_property_list_changed");
 		ur.commit_action();
@@ -260,10 +260,10 @@ bool VoxelGraphNodeInspectorWrapper::_set(const StringName &p_name, const Varian
 
 		if (node_type_id == VoxelGraphFunction::NODE_EXPRESSION) {
 			update_expression_inputs(**graph, _node_id, p_value, ur, *_graph_editor);
-			// TODO Default inputs cannot be set after adding variables!
-			// It requires calling `notify_property_list_changed`, however that makes the LineEdit in the inspector to
-			// reset its cursor position, making string parameter edition a nightmare. Only workaround is to deselect
-			// and re-select the node...
+			// TODO 添加变量后无法设置默认输入！
+			// 它需要调用 `notify_property_list_changed`，但这会导致检查器中的 LineEdit
+			// 重置光标位置，使字符串参数编辑成为一场噩梦。唯一的变通方法是取消选中
+			// 再重新选中节点...
 		} else if (node_type_id == VoxelGraphFunction::NODE_COMMENT) {
 			ur.add_do_method(_graph_editor, "update_node_comment", _node_id);
 			ur.add_undo_method(_graph_editor, "update_node_comment", _node_id);
@@ -318,16 +318,16 @@ bool VoxelGraphNodeInspectorWrapper::_get(const StringName &p_name, Variant &r_r
 		return true;
 	}
 
-	// Can't error-check like that, Godot sometimes spams properties such as `script` in the editor for unknown
-	// reasons (like every frame, even when not visible in the inspector)
+	// 不能那样做错误检查，Godot 有时会在编辑器中为未知属性刷屏（比如 `script`），
+	// 而且毫无理由（比如每帧都刷，即使检查器中不可见）
 	// ERR_PRINT(String("Invalid param name {0}").format(varray(p_name)));
 
 	return false;
 }
 
-// This method is an undocumented hack used in `EditorInspector::_edit_set` so we can implement UndoRedo ourselves.
-// If we don't do this, then the inspector's UndoRedo will use the wrapper, which won't mark the real resource as
-// modified.
+// 这是 `EditorInspector::_edit_set` 中使用的一个没有文档说明的 hack，让我们能够自己实现 UndoRedo。
+// 如果我们不这样做，检查器的 UndoRedo 就会使用包装器，这样就不会把真正的资源标记为
+// 已修改。
 bool VoxelGraphNodeInspectorWrapper::_dont_undo_redo() const {
 	return true;
 }

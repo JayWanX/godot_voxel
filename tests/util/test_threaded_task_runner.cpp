@@ -48,7 +48,7 @@ void test_threaded_task_runner_misc() {
 
 			++counter->current_count;
 
-			// Update maximum count
+			// 更新最大计数
 			// https://stackoverflow.com/questions/16190078/how-to-atomically-update-a-maximum-value
 			unsigned int current_count = counter->current_count;
 			unsigned int prev_max = counter->max_count;
@@ -93,7 +93,7 @@ void test_threaded_task_runner_misc() {
 	runner.set_thread_count(test_thread_count);
 	runner.set_name("Test");
 
-	// Parallel tasks only
+	// 仅并行任务
 
 	for (unsigned int i = 0; i < 16; ++i) {
 		TestTask *task = VOXEL_NEW(TestTask(parallel_counter));
@@ -106,7 +106,7 @@ void test_threaded_task_runner_misc() {
 	VOXEL_TEST_ASSERT(parallel_counter->max_count <= test_thread_count);
 	VOXEL_TEST_ASSERT(parallel_counter->current_count == 0);
 
-	// Serial tasks only
+	// 仅串行任务
 
 	for (unsigned int i = 0; i < 16; ++i) {
 		TestTask *task = VOXEL_NEW(TestTask(serial_counter));
@@ -119,7 +119,7 @@ void test_threaded_task_runner_misc() {
 	VOXEL_TEST_ASSERT(serial_counter->max_count == 1);
 	VOXEL_TEST_ASSERT(serial_counter->current_count == 0);
 
-	// Interleaved
+	// 交错混合
 
 	parallel_counter->reset();
 	serial_counter->reset();
@@ -210,7 +210,7 @@ void test_threaded_task_runner_debug_names() {
 	while (Time::get_singleton()->get_ticks_msec() - time_before < 5000) {
 		VOXEL_PROFILE_SCOPE();
 
-		// Saturate task queue so a bunch should be running while we query their names
+		// 让任务队列饱和，这样当我们查询任务名称时有多个任务正在运行
 		while (in_flight_count < 5000) {
 			for (unsigned int i = 0; i < 1000; ++i) {
 				if ((i % 3) != 0) {
@@ -224,14 +224,14 @@ void test_threaded_task_runner_debug_names() {
 			}
 		}
 
-		// Get debug task names
+		// 获取调试任务名称
 		FixedArray<const char *, ThreadedTaskRunner::MAX_THREADS> active_task_names;
 		fill(active_task_names, (const char *)nullptr);
 		for (unsigned int i = 0; i < test_thread_count; ++i) {
 			active_task_names[i] = runner.get_thread_debug_task_name(i);
 		}
 
-		// Put task names into an array
+		// 把任务名称放入数组
 		StdVector<StdString> task_names;
 		task_names.resize(test_thread_count);
 		for (unsigned int i = 0; i < active_task_names.size(); ++i) {
@@ -241,7 +241,7 @@ void test_threaded_task_runner_debug_names() {
 			}
 		}
 
-		// Count names
+		// 统计名称数量
 		for (int i = 0; i < task_names.size(); ++i) {
 			const StdString &name = task_names[i];
 			auto it = name_counts.find(name);
@@ -260,8 +260,8 @@ void test_threaded_task_runner_debug_names() {
 	runner.wait_for_all_tasks();
 	L::dequeue_tasks(runner, in_flight_count);
 
-	// Print how many times each name came up.
-	// Doing this to check if the test runs as expected and to prevent compiler optimization on getting the names
+	// 打印每个名称出现的次数。
+	// 这样做是为了检查测试是否按预期运行，并防止编译器对获取名称进行优化
 	StdStringTextWriter ss;
 	for (auto it = name_counts.begin(); it != name_counts.end(); ++it) {
 		ss << it->first << ": " << it->second << "; ";
@@ -276,18 +276,18 @@ void test_task_priority_values() {
 	VOXEL_TEST_ASSERT(TaskPriority(10, 10, 0, 0) < TaskPriority(10, 10, 10, 0));
 }
 
-// Simulates doing work in every chunk of a grid, where each task will want to access neighbors of each block. If any
-// neighbor fails to get locked, the task is postponed.
+// 模拟在网格的每个块中执行工作，其中每个任务都需要访问每个数据块的邻居。如果任何
+// 邻居无法获得锁，该任务就会被延迟。
 void test_threaded_task_postponing() {
-	// There isn't really a test check in this function, for now we run it to detect if it crashes and that all tasks
-	// eventually run once.
+	// 此函数中并没有真正的测试断言，目前我们运行它只是为了检测是否崩溃，以及所有任务是否
+	// 最终都运行一次。
 
 	struct Block {
 		std::atomic_bool is_locked;
 	};
 
 	struct Map {
-		// Doesn't have to be a map but I chose it anyways since that's how the actual voxel map is stored
+		// 不一定要用 map，但我还是选择了它，因为实际的体素图就是这样存储的
 		StdUnorderedMap<Vector3i, Block> blocks;
 	};
 
@@ -298,7 +298,7 @@ void test_threaded_task_postponing() {
 		uint64_t time_us;
 	};
 
-	// To log what actually happened and visualize it
+	// 为了记录实际发生的事件并可视化它们
 	struct EventList {
 		StdVector<Event> events;
 		Mutex mutex;
@@ -333,14 +333,14 @@ void test_threaded_task_postponing() {
 						Block &block = it->second;
 						bool expected = false;
 						if (block.is_locked.compare_exchange_strong(expected, true) == false) {
-							// Could not lock, will have to cancel
+							// 无法获得锁，将不得不取消
 							for (Block *b : locked_blocks) {
 								b->is_locked = false;
 							}
 							locked_blocks.clear();
 							return false;
 						} else {
-							// Successful lock
+							// 加锁成功
 							locked_blocks.push_back(&block);
 						}
 					}
@@ -409,7 +409,7 @@ void test_threaded_task_postponing() {
 
 	unsigned int in_flight_count = 0;
 
-	// Generate map
+	// 生成地图
 	Map map;
 	const int map_size = 16;
 	Vector3i bpos;
@@ -425,7 +425,7 @@ void test_threaded_task_postponing() {
 	EventList events;
 	RandomPCG rng;
 
-	// Schedule tasks that will want to access overlapping blocks
+	// 调度那些将访问重叠数据块的任务
 	for (bpos.z = 0; bpos.z < map_size; ++bpos.z) {
 		for (bpos.x = 0; bpos.x < map_size; ++bpos.x) {
 			for (bpos.y = 0; bpos.y < map_size; ++bpos.y) {
@@ -442,7 +442,7 @@ void test_threaded_task_postponing() {
 	VOXEL_TEST_ASSERT(in_flight_count == 0);
 
 #ifdef VOXEL_TEST_TASK_POSTPONING_DUMP_EVENTS
-	// Dump events
+	// 导出事件
 	std::ofstream ofs("ddd_block_tasks_test.json", std::ios::binary);
 	if (ofs.good()) {
 		ofs << "{\n";

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelBlockyFluid" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Properties of a blocky fluid.
+		方块风流体的属性。
 	</brief_description>
 	<description>
-		Common properties of a specific fluid. It may be shared between multiple blocky models, each representing a level/state of the fluid.
+		某种特定流体的通用属性。它可以在多个方块风模型之间共享，每个模型代表流体的一种液位/状态。
 	</description>
 	<tutorials>
 	</tutorials>
 	<members>
 		<member name="dip_when_flowing_down" type="bool" is_experimental="true" setter="set_dip_when_flowing_down" getter="get_dip_when_flowing_down" default="false">
-			When enabled, if all following conditions are met for a given fluid voxel:
-			- It doesn't have maximum level
-			- It isn't covered by another voxel of the same fluid type 
-			- It can flow downwards (below is air or fluid of the same type)
-			Then the shape of the voxel will change to be "pushed" downwards, creating steeper slopes. Note, this also means the voxel will look as if it has minimum level in some situations. However, in practice these cases don't occur often. You may decide whether to use this option depending on how your fluid simulates.
+			启用后，如果给定流体系体素满足以下所有条件：
+			- 未达到最大液位
+			- 未被同类型流体的其他体素覆盖
+			- 可以向下流动（下方为空气或同类型流体）
+			则该体素的形状将变为“被向下挤压”的形状，从而形成更陡峭的坡度。注意，这也会导致体素在某些情况下看起来像是处于最低液位。不过在实践中，这些情况并不常发生。你可以根据流体的模拟方式来决定是否使用此选项。
 		</member>
 		<member name="material" type="Material" setter="set_material" getter="get_material">
-			Material used by all states of the fluid. Note that UVs of a fluid are different than a regular model, so you may need a [ShaderMaterial] to handle flowing animation. See [url]https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids[/url]
+			流体所有状态所使用的材质。注意，流体的 UV 与普通模型不同，因此你可能需要一个 [ShaderMaterial] 来处理流动动画。参见 [url]https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids[/url]
 		</member>
 	</members>
 </class>

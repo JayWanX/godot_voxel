@@ -6,8 +6,8 @@ namespace voxel::godot {
 
 #ifdef TOOLS_ENABLED
 
-// TODO Cannot use `Shader.has_uniform()` because it is unreliable.
-// See https://github.com/godotengine/godot/issues/64467
+// TODO 不能使用 `Shader.has_uniform()`，因为它不可靠。
+// 参见 https://github.com/godotengine/godot/issues/64467
 bool shader_has_uniform(const Shader &shader, StringName uniform_name) {
 	StdVector<ShaderParameterInfo> params;
 	get_shader_parameter_list(shader.get_rid(), params);
@@ -29,8 +29,8 @@ bool shader_has_uniform(const Shader &shader, StringName uniform_name) {
 String get_missing_uniform_names(Span<const StringName> expected_uniforms, const Shader &shader) {
 	String missing_uniforms;
 
-	// TODO Cannot use `Shader.has_uniform()` because it is unreliable.
-	// See https://github.com/godotengine/godot/issues/64467
+	// TODO 不能使用 `Shader.has_uniform()`，因为它不可靠。
+	// 参见 https://github.com/godotengine/godot/issues/64467
 	// for (unsigned int i = 0; i < expected_uniforms.size(); ++i) {
 	// 	StringName uniform_name = expected_uniforms[i];
 	// 	VOXEL_ASSERT_CONTINUE(uniform_name != StringName());

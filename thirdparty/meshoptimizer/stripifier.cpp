@@ -7,8 +7,8 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Francine Evans, Steven Skiena and Amitabh Varshney. Optimizing Triangle Strips for Fast Rendering. 1996
+// 此作品基于：
+// Francine Evans、Steven Skiena 和 Amitabh Varshney。《优化用于快速渲染的三角形带》，1996
 namespace meshopt
 {
 
@@ -91,7 +91,7 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 	{
 		assert(next < 0 || (size_t(next >> 2) < buffer_size && (next & 3) < 3));
 
-		// fill triangle buffer
+		// 填充三角形缓冲区
 		while (buffer_size < buffer_capacity && index_offset < index_count)
 		{
 			buffer[buffer_size][0] = indices[index_offset + 0];
@@ -110,17 +110,17 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 			unsigned int a = buffer[i][0], b = buffer[i][1], c = buffer[i][2];
 			unsigned int v = buffer[i][next & 3];
 
-			// ordered removal from the buffer
+			// 从 buffer 中有序移除
 			memmove(buffer[i], buffer[i + 1], (buffer_size - i - 1) * sizeof(buffer[0]));
 			buffer_size--;
 
-			// update vertex valences for strip start heuristic
+			// 更新顶点度数（valence），用于条带起始启发式
 			valence[a]--;
 			valence[b]--;
 			valence[c]--;
 
 			// find next triangle (note that edge order flips on every iteration)
-			// in some cases we need to perform a swap to pick a different outgoing triangle edge
+			// 在某些情况下，我们需要执行一次交换以选取不同的出向三角形边
 			// for [a b c], the default strip edge is [b c], but we might want to use [a c]
 			int cont = findStripNext(buffer, buffer_size, parity ? strip[1] : v, parity ? v : strip[1]);
 			int swap = cont < 0 ? findStripNext(buffer, buffer_size, parity ? v : strip[0], parity ? strip[0] : v) : -1;
@@ -131,7 +131,7 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 				destination[strip_size++] = strip[0];
 				destination[strip_size++] = v;
 
-				// next strip has same winding
+				// 下一条 strip 具有相同的绕序
 				// ? a b => b a v
 				strip[1] = v;
 
@@ -139,10 +139,10 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 			}
 			else
 			{
-				// emit the next vertex in the strip
+				// 发出 strip 中的下一个顶点
 				destination[strip_size++] = v;
 
-				// next strip has flipped winding
+				// 下一条 strip 的绕序已翻转
 				strip[0] = strip[1];
 				strip[1] = v;
 				parity ^= 1;
@@ -153,27 +153,27 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 		else
 		{
 			// if we didn't find anything, we need to find the next new triangle
-			// we use a heuristic to maximize the strip length
+			// 我们使用启发式算法以最大化 strip 长度
 			unsigned int i = findStripFirst(buffer, buffer_size, valence);
 			unsigned int a = buffer[i][0], b = buffer[i][1], c = buffer[i][2];
 
-			// ordered removal from the buffer
+			// 从 buffer 中有序移除
 			memmove(buffer[i], buffer[i + 1], (buffer_size - i - 1) * sizeof(buffer[0]));
 			buffer_size--;
 
-			// update vertex valences for strip start heuristic
+			// 更新顶点度数（valence），用于条带起始启发式
 			valence[a]--;
 			valence[b]--;
 			valence[c]--;
 
-			// we need to pre-rotate the triangle so that we will find a match in the existing buffer on the next iteration
+			// 我们需要预先旋转三角形，以便在下一轮迭代中能在现有缓冲区中找到匹配
 			int ea = findStripNext(buffer, buffer_size, c, b);
 			int eb = findStripNext(buffer, buffer_size, a, c);
 			int ec = findStripNext(buffer, buffer_size, b, a);
 
 			// in some cases we can have several matching edges; since we can pick any edge, we pick the one with the smallest
-			// triangle index in the buffer. this reduces the effect of stripification on ACMR and additionally - for unclear
-			// reasons - slightly improves the stripification efficiency
+			// 缓冲区中的三角形索引。这可减少条带化对 ACMR 的影响，另外——出于尚不明确的原因
+			// ——略能提高条带化效率
 			int mine = INT_MAX;
 			mine = (ea >= 0 && mine > ea) ? ea : mine;
 			mine = (eb >= 0 && mine > eb) ? eb : mine;
@@ -181,7 +181,7 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 
 			if (ea == mine)
 			{
-				// keep abc
+				// 保留 abc
 				next = ea;
 			}
 			else if (eb == mine)
@@ -210,7 +210,7 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 				destination[strip_size++] = b;
 				destination[strip_size++] = c;
 
-				// new strip always starts with the same edge winding
+				// 新 strip 始终以相同的边绕序开始
 				strip[0] = b;
 				strip[1] = c;
 				parity = 1;
@@ -219,13 +219,13 @@ size_t meshopt_stripify(unsigned int* destination, const unsigned int* indices, 
 			{
 				if (strip_size)
 				{
-					// connect last strip using degenerate triangles
+					// 使用退化三角形连接上一条 strip
 					destination[strip_size++] = strip[1];
 					destination[strip_size++] = a;
 				}
 
-				// note that we may need to flip the emitted triangle based on parity
-				// we always end up with outgoing edge "cb" in the end
+				// 注意：我们可能需要根据奇偶性翻转已发出的三角形
+				// 我们最终总是以出向边 "cb" 结束
 				unsigned int e0 = parity ? c : b;
 				unsigned int e1 = parity ? b : c;
 
@@ -247,8 +247,8 @@ size_t meshopt_stripifyBound(size_t index_count)
 {
 	assert(index_count % 3 == 0);
 
-	// worst case without restarts is 2 degenerate indices and 3 indices per triangle
-	// worst case with restarts is 1 restart index and 3 indices per triangle
+	// 无重启的最坏情况是每个三角形 2 个退化索引和 3 个索引
+	// 有重启的最坏情况是每个三角形 1 个重启索引和 3 个索引
 	return (index_count / 3) * 5;
 }
 
@@ -269,14 +269,14 @@ size_t meshopt_unstripify(unsigned int* destination, const unsigned int* indices
 		{
 			unsigned int a = indices[i - 2], b = indices[i - 1], c = indices[i];
 
-			// flip winding for odd triangles
+			// 为奇数三角形翻转绕序
 			if ((i - start) & 1)
 			{
 				unsigned int t = a;
 				a = b, b = t;
 			}
 
-			// although we use restart indices, strip swaps still produce degenerate triangles, so skip them
+			// 尽管我们使用重启索引，strip 交换仍会产生退化三角形，因此跳过它们
 			if (a != b && a != c && b != c)
 			{
 				destination[offset + 0] = a;

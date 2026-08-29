@@ -18,10 +18,10 @@ public:
 
 	void set_model(Ref<VoxelBlockyModel> model);
 
-	// `EditorUndoRedoManager` isn't a singleton, so it has to be injected.
+	// `EditorUndoRedoManager` 不是单例，因此必须注入。
 	void set_undo_redo(EditorUndoRedoManager *urm);
 
-	// TODO: `SceneTree::get_process_time` is not exposed, can't get delta time from `_notification`
+	// TODO: `SceneTree::get_process_time` 未暴露，无法从 `_notification` 获取增量时间
 
 private:
 	void update_model();

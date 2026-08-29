@@ -85,8 +85,8 @@ void VoxelMeshSDFViewer::update_view() {
 	Ref<ImageTexture> texture = ImageTexture::create_from_image(image);
 	_texture_rect->set_texture(texture);
 
-	// TODO Implement a raymarched view.
-	// I can't do it at the moment because Godot 4 support for post-processing shaders seems broken.
+	// TODO 实现光线步进视图。
+	// 我目前无法做到，因为 Godot 4 对后期处理着色器的支持似乎有问题。
 }
 
 void VoxelMeshSDFViewer::_on_bake_button_pressed() {

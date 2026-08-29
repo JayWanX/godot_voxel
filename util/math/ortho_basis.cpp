@@ -2,17 +2,17 @@
 
 namespace voxel::math {
 
-// We can obtain a list of all the bases by positionning the origin at 8 corners of a cube. In one corner, the basis
-// axes may align with 3 edges of the cube. We can rotate the corresponding edges 3 times per corner (X->Y, Y->Z, Z->X).
-// So we get 3 * 8 = 24 bases.
-// Another way is to pick an axis, then rotate the basis to point that axis at each of the 6
-// directions (we have to pick a convention for up and down), and then further rotate the basis 4 times around that
-// axis, which gives 4 * 6 = 24 bases.
+// 我们可以把原点放在立方体的 8 个角上得到所有基的列表。在某个角上，基的
+// 各轴可能与立方体的 3 条棱对齐。每个角可将对应棱旋转 3 次（X->Y、Y->Z、Z->X）。
+// 因此共有 3 * 8 = 24 个基。
+// 另一种方法是选一条轴，然后将基旋转使该轴分别指向 6 个
+// 方向（需约定上/下），再绕该轴将基旋转 4 次，
+// 这样得到 4 * 6 = 24 个基。
 
-// Values are taken from Godot's GridMap code. Order is arbitrary, but must remain the same to match enum values.
+// 数值取自 Godot 的 GridMap 代码。顺序任意，但必须保持不变以匹配枚举值。
 // clang-format off
 static const OrthoBasis g_ortho_bases[ORTHOGONAL_BASIS_COUNT] = {
-	OrthoBasis(Vector3i( 1,  0,  0), Vector3i( 0,  1,  0), Vector3i( 0,  0,  1)), // identity
+	OrthoBasis(Vector3i( 1,  0,  0), Vector3i( 0,  1,  0), Vector3i( 0,  0,  1)), // 恒等
 	OrthoBasis(Vector3i( 0, -1,  0), Vector3i( 1,  0,  0), Vector3i( 0,  0,  1)), //
 	OrthoBasis(Vector3i(-1,  0,  0), Vector3i( 0, -1,  0), Vector3i( 0,  0,  1)), //
 	OrthoBasis(Vector3i( 0,  1,  0), Vector3i(-1,  0,  0), Vector3i( 0,  0,  1)), //
@@ -94,12 +94,12 @@ const char *ortho_rotation_to_string(int i) {
 }
 
 OrthoBasis OrthoBasis::from_axis_turns(const Vector3i::Axis axis, const int turns) {
-	// If turns are negative, do the positive equivalent
+	// 若旋转次数为负，则执行等价的正数旋转
 	const int mturns = turns >= 0 ? turns % 4 : 4 - ((-turns) % 4);
 	if (mturns == 0) {
 		return OrthoBasis();
 	}
-	// Clockwise with the rotation axis pointing at us
+	// 旋转轴指向我们时的顺时针方向
 	switch (axis) {
 		case Vector3i::AXIS_X:
 			switch (mturns) {

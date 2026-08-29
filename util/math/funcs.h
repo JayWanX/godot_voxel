@@ -13,13 +13,13 @@
 
 namespace voxel::math {
 
-// Generic math functions, only using scalar types.
+// 通用数学函数，仅使用标量类型。
 
 template <typename T>
 inline constexpr T min(const T a, const T b) {
-	// Godot's vector types have an operator<, which means if the wrong headers are included, this function could be
-	// used instead of the dedicated component-wise one, without causing errors. So we have to guard against that silent
-	// ambiguity issue.
+	// Godot 的向量类型带有 operator<，这意味着如果包含了错误的头文件，本函数可能被
+	// 误当作逐分量的专用版本使用而不会报错。因此我们必须防范这种静默的
+	// 二义性问题。
 	static_assert(std::is_scalar<T>::value);
 	return a < b ? a : b;
 }
@@ -78,9 +78,9 @@ inline T max(const T a, const T b, const T c, const T d, const T e, const T f, c
 	return max(max(a, b, c, d), max(e, f, g, h));
 }
 
-// template versions require explicit types.
-// float versions do not require casting all the time, so optional double-precision support with `real_t` is easier when
-// using arguments of different precision.
+// 模板版本需要显式指定类型。
+// float 版本无需始终强制转换，因此在使用 `real_t` 时，可选的 double 精度支持在
+// 传入不同精度的参数时更方便。
 
 inline float minf(float a, float b) {
 	return a < b ? a : b;
@@ -101,7 +101,7 @@ inline double maxf(double a, double b) {
 template <typename T>
 inline constexpr T clamp(const T x, const T min_value, const T max_value) {
 	static_assert(std::is_scalar<T>::value);
-	// TODO Enforce T as being numeric
+	// TODO 强制 T 为数值类型
 	return min(max(x, min_value), max_value);
 }
 
@@ -131,10 +131,10 @@ inline double lerp(double a, double b, double t) {
 	return Math::lerp(a, b, t);
 }
 
-// Performs euclidean division, aka floored division.
-// This implementation expects a strictly positive divisor.
+// 执行欧几里得除法，即向下取整除法。
+// 本实现要求除数严格为正。
 //
-// Example with division by 3:
+// 以除以 3 为例：
 //
 //    x   | `/` | floordiv | ceildiv
 // ----------------------------------
@@ -186,17 +186,17 @@ inline int ceildiv(unsigned int x, unsigned int d) {
 	return (x + d - 1) / d;
 }
 
-// TODO Rename `wrapi`
-// `Math::wrapi` with zero min
+// TODO 重命名 `wrapi`
+// `Math::wrapi`，最小值为 0
 inline int wrap(int x, int d) {
 #ifdef DEV_ENABLED
 	VOXEL_ASSERT(d > 0);
 #endif
-	// return x % d; // Positive only
+	// return x % d; // 仅正数
 	return ((x % d) + d) % d;
 }
 
-// Math::wrapf with zero min
+// `Math::wrapf`，最小值为 0
 inline float wrapf(float x, float d) {
 	return Math::is_zero_approx(d) ? 0.f : x - (d * Math::floor(x / d));
 }
@@ -205,7 +205,7 @@ inline double wrapf(double x, double d) {
 	return Math::is_zero_approx(d) ? 0.0 : x - (d * Math::floor(x / d));
 }
 
-// Similar to Math::smoothstep but doesn't use macro to clamp
+// 类似于 Math::smoothstep，但不使用宏进行钳制
 inline float smoothstep(float p_from, float p_to, float p_weight) {
 	if (Math::is_equal_approx(p_from, p_to)) {
 		return p_from;
@@ -234,8 +234,8 @@ inline bool is_power_of_two(size_t x) {
 	return x != 0 && (x & (x - 1)) == 0;
 }
 
-// If `x` is a power of two, returns `x`.
-// Otherwise, returns the closest power of two greater than `x`.
+// 若 `x` 是 2 的幂，返回 `x`。
+// 否则返回大于 `x` 且最接近 2 的幂。
 inline unsigned int get_next_power_of_two_32(unsigned int x) {
 	if (x == 0) {
 		return 0;
@@ -249,7 +249,7 @@ inline unsigned int get_next_power_of_two_32(unsigned int x) {
 	return ++x;
 }
 
-// Function to find the previous power of 2 to an integer.
+// 查找小于某整数的前一个 2 的幂的函数。
 inline unsigned int get_previous_power_of_two_32(unsigned int x) {
 	x |= x >> 1;
 	x |= x >> 2;
@@ -259,7 +259,7 @@ inline unsigned int get_previous_power_of_two_32(unsigned int x) {
 	return x - (x >> 1);
 }
 
-// Assuming `pot == (1 << i)`, returns `i`.
+// 假设 `pot == (1 << i)`，返回 `i`。
 inline unsigned int get_shift_from_power_of_two_32(unsigned int pot) {
 #ifdef DEBUG_ENABLED
 	VOXEL_ASSERT(is_power_of_two(pot));
@@ -273,7 +273,7 @@ inline unsigned int get_shift_from_power_of_two_32(unsigned int pot) {
 	return 0;
 }
 
-// If `num` == 2^N, returns N. Otherwise, returns the exponent of the next power of two.
+// 若 `num` == 2^N，返回 N。否则返回下一个 2 的幂的指数。
 // 0 => 0
 // 1 => 0
 // 2 => 1
@@ -290,8 +290,8 @@ inline unsigned int get_next_power_of_two_32_shift(unsigned int num) {
 	return 0;
 }
 
-// If the provided address `a` is not aligned to the number of bytes specified in `align`,
-// returns the next aligned address. `align` must be a power of two.
+// 若提供的地址 `a` 未按 `align` 指定的字节数对齐，
+// 则返回下一个对齐地址。`align` 必须是 2 的幂。
 inline size_t alignup(size_t a, size_t align) {
 #ifdef DEBUG_ENABLED
 	VOXEL_ASSERT(is_power_of_two(align));
@@ -303,7 +303,7 @@ inline size_t alignup(size_t a, size_t align) {
 // 	return i & (i - 1);
 // }
 
-// Float equivalent of Math::snapped, which only comes in `double` variant in Godot.
+// Math::snapped 的浮点版本；Godot 中该函数仅有 `double` 变体。
 inline float snappedf(float p_value, float p_step) {
 	if (p_step != 0) {
 		p_value = Math::floor(p_value / p_step + 0.5f) * p_step;
@@ -373,8 +373,8 @@ inline void sort4_array(TArray &array, TLess less) {
 	}
 }
 
-// Returns -1 if `x` is negative, and 1 otherwise.
-// Contrary to a usual version like GLSL, this one returns 1 when `x` is 0, instead of 0.
+// 若 `x` 为负返回 -1，否则返回 1。
+// 与 GLSL 等常见版本不同，本函数在 `x` 为 0 时返回 1 而非 0。
 template <typename T>
 inline T sign_nonzero(T x) {
 	return x < 0 ? -1 : 1;
@@ -385,9 +385,9 @@ constexpr const T sign(const T v) {
 	return v == 0 ? 0.0f : (v < 0 ? -1.0f : +1.0f);
 }
 
-// Trilinear interpolation between corner values of a unit-sized cube.
-// `v***` arguments are corner values named as `vXYZ`, where a coordinate is 0 or 1 on the cube.
-// Coordinates of `p` are in 0..1, but are not clamped so extrapolation is possible.
+// 对单位立方体角点值进行三线性插值。
+// `v***` 参数为角点值，命名为 `vXYZ`，其中坐标在立方体上为 0 或 1。
+// `p` 的坐标在 0..1 之间，但未被钳制，因此可以进行外推。
 //
 //      6---------------7
 //     /|              /|
@@ -458,8 +458,8 @@ struct LinearFuncParams {
 	float b;
 };
 
-// Given source and destination intervals, returns parameters to use in an `a*x+b` formula to apply such remap.
-// If the source interval is approximatively empty, returns zero values.
+// 给定源区间与目标区间，返回用于 `a*x+b` 公式以执行重映射的参数。
+// 若源区间近似为空，返回零值。
 inline LinearFuncParams remap_intervals_to_linear_params(float min0, float max0, float min1, float max1) {
 	// min1 + (max1 - min1) * (x - min0) / (max0 - min0)
 	// min1 + (max1 - min1) * (x - min0) * (1/(max0 - min0))
@@ -479,14 +479,14 @@ inline LinearFuncParams remap_intervals_to_linear_params(float min0, float max0,
 	return { a, b };
 }
 
-// The result of the right-shift operator `>>` is implementation-defined until C++20, where it performs arithmetic
-// shift. This function makes it explicit to handle eventual issues before C++20.
+// 右移运算符 `>>` 的结果在 C++20 之前由实现定义，C++20 起执行算术
+// 移位。本函数显式处理 C++20 之前可能出现的兼容问题。
 // https://en.cppreference.com/w/cpp/language/operator_arithmetic#Built-in_bitwise_shift_operators
 inline constexpr int32_t arithmetic_rshift(int32_t a, unsigned int b) {
-	// MSVC documents right shift as arithmetic.
+	// MSVC 将右移记录为算术移位。
 	// https://learn.microsoft.com/en-us/cpp/cpp/left-shift-and-right-shift-operators-input-and-output?view=msvc-170#right-shifts
 
-	// GCC documents right shifts as arithmetic.
+	// GCC 将右移记录为算术移位。
 	// https://gcc.gnu.org/onlinedocs/gcc-13.1.0/gcc/Integers-implementation.html
 
 	static_assert(-4 >> 1 == -2, "Signed right-shift is not arithmetic, patch needed to support current compiler.");

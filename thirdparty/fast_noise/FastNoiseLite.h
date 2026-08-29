@@ -1,24 +1,24 @@
-// MIT License
+// MIT 许可证
 //
 // Copyright(c) 2023 Jordan Peck (jordan.me2@gmail.com)
-// Copyright(c) 2023 Contributors
+// 版权(c) 2023 贡献者
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
+// 在此免费授予任何获得本软件及其相关文档副本的人以下权限，
+// （文档统称"本软件"），即可以不受限制地
+// 处理本软件，包括但不限于以下权利：
+// 使用、复制、修改、合并、发布、分发、再许可和/或销售
+// 本软件的副本，并允许将本软件提供给
+// 的人士同样享有上述权利，但须满足以下条件：
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// 上述版权声明和本许可声明应包含在本软件的
+// 所有副本或重要部分中。
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// 本软件按"原样"提供，不附带任何明示或
+// 隐含的担保，包括但不限于对适销性、
+// 特定用途适用性和非侵权性的担保。在任何情况下，
+// 作者或版权所有者不对任何索赔、损害或其它
+// 责任负责，无论基于合同、侵权或其它方式，
+// 无论由本软件或其使用或其它处理方式引起。
 // SOFTWARE.
 //
 // .'',;:cldxkO00KKXXNNWWWNNXKOkxdollcc::::::;:::ccllloooolllllllllooollc:,'...        ...........',;cldxkO000Okxdlc::;;;,,;;;::cclllllll
@@ -47,13 +47,13 @@
 // VERSION: 1.1.1
 // https://github.com/Auburn/FastNoiseLite
 
-// <Voxel> Prefixed `VOXEL_` to avoid conflict with Godot's version
+// <Voxel> 添加 `VOXEL_` 前缀以避免与 Godot 的版本冲突
 #ifndef VOXEL_FASTNOISELITE_H
 #define VOXEL_FASTNOISELITE_H
 
 #include <cmath>
 
-// <Voxel> Added namespace to avoid conflict with Godot class
+// <Voxel> 添加命名空间以避免与 Godot 的类冲突
 namespace fast_noise_lite {
 
 class FastNoiseLite
@@ -113,7 +113,7 @@ public:
     };
 
     /// <summary>
-    /// Create new FastNoise object with optional seed
+    /// 使用可选种子创建新的 FastNoise 对象
     /// </summary>
     FastNoiseLite(int seed = 1337)
     {
@@ -142,7 +142,7 @@ public:
     }
 
     /// <summary>
-    /// Sets seed used for all noise types
+    /// 设置所有噪声类型使用的种子
     /// </summary>
     /// <remarks>
     /// Default: 1337
@@ -150,7 +150,7 @@ public:
     void SetSeed(int seed) { mSeed = seed; }
 
     /// <summary>
-    /// Sets frequency for all noise types
+    /// 设置所有噪声类型的频率
     /// </summary>
     /// <remarks>
     /// Default: 0.01
@@ -161,7 +161,7 @@ public:
     /// Sets noise algorithm used for GetNoise(...)
     /// </summary>
     /// <remarks>
-    /// Default: OpenSimplex2
+    /// 默认值：OpenSimplex2
     /// </remarks>
     void SetNoiseType(NoiseType noiseType)
     {
@@ -170,11 +170,11 @@ public:
     }
 
     /// <summary>
-    /// Sets domain rotation type for 3D Noise and 3D DomainWarp.
-    /// Can aid in reducing directional artifacts when sampling a 2D plane in 3D
+    /// 设置 3D 噪声和 3D DomainWarp 的域旋转类型。
+    /// 有助于减少在 3D 中采样 2D 平面时的方向性伪影
     /// </summary>
     /// <remarks>
-    /// Default: None
+    /// 默认值：None
     /// </remarks>
     void SetRotationType3D(RotationType3D rotationType3D)
     {
@@ -184,16 +184,16 @@ public:
     }
 
     /// <summary>
-    /// Sets method for combining octaves in all fractal noise types
+    /// 设置所有分形噪声类型中组合倍频程的方法
     /// </summary>
     /// <remarks>
-    /// Default: None
+    /// 默认值：None
     /// Note: FractalType_DomainWarp... only affects DomainWarp(...)
     /// </remarks>
     void SetFractalType(FractalType fractalType) { mFractalType = fractalType; }
 
     /// <summary>
-    /// Sets octave count for all fractal noise types 
+    /// 设置所有分形噪声类型的倍频程数
     /// </summary>
     /// <remarks>
     /// Default: 3
@@ -205,7 +205,7 @@ public:
     }
 
     /// <summary>
-    /// Sets octave lacunarity for all fractal noise types
+    /// 设置所有分形噪声类型的倍频程间隙度
     /// </summary>
     /// <remarks>
     /// Default: 2.0
@@ -213,7 +213,7 @@ public:
     void SetFractalLacunarity(float lacunarity) { mLacunarity = lacunarity; }
 
     /// <summary>
-    /// Sets octave gain for all fractal noise types
+    /// 设置所有分形噪声类型的倍频程增益
     /// </summary>
     /// <remarks>
     /// Default: 0.5
@@ -225,16 +225,16 @@ public:
     }
 
     /// <summary>
-    /// Sets octave weighting for all none DomainWarp fratal types
+    /// 设置所有非 DomainWarp 分形类型的倍频程加权
     /// </summary>
     /// <remarks>
     /// Default: 0.0
-    /// Note: Keep between 0...1 to maintain -1...1 output bounding
+    /// 注意：保持在 0...1 之间以维持 -1...1 的输出边界
     /// </remarks>
     void SetFractalWeightedStrength(float weightedStrength) { mWeightedStrength = weightedStrength; }
 
     /// <summary>
-    /// Sets strength of the fractal ping pong effect
+    /// 设置分形 ping pong 效果的强度
     /// </summary>
     /// <remarks>
     /// Default: 2.0
@@ -243,41 +243,41 @@ public:
 
 
     /// <summary>
-    /// Sets distance function used in cellular noise calculations
+    /// 设置元胞噪声计算中使用的距离函数
     /// </summary>
     /// <remarks>
-    /// Default: Distance
+    /// 默认值：Distance
     /// </remarks>
     void SetCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) { mCellularDistanceFunction = cellularDistanceFunction; }
-    // <Voxel> Added
+    // <Voxel> 新增
     CellularDistanceFunction GetCellularDistanceFunction() const { return mCellularDistanceFunction; }
 
     /// <summary>
-    /// Sets return type from cellular noise calculations
+    /// 设置元胞噪声计算的返回类型
     /// </summary>
     /// <remarks>
-    /// Default: EuclideanSq
+    /// 默认值：EuclideanSq
     /// </remarks>
     void SetCellularReturnType(CellularReturnType cellularReturnType) { mCellularReturnType = cellularReturnType; }
-    // <Voxel> Added
+    // <Voxel> 新增
     CellularReturnType GetCellularReturnType() const { return mCellularReturnType; }
 
     /// <summary>
-    /// Sets the maximum distance a cellular point can move from it's grid position
+    /// 设置元胞点可偏离其网格位置的最大距离
     /// </summary>
     /// <remarks>
     /// Default: 1.0
-    /// Note: Setting this higher than 1 will cause artifacts
+    /// 注意：将其设高于 1 会导致伪影
     /// </remarks> 
     void SetCellularJitter(float cellularJitter) { mCellularJitterModifier = cellularJitter; }
-    // <Voxel> Added
+    // <Voxel> 新增
     float GetCellularJitter() const { return mCellularJitterModifier; }
 
     /// <summary>
     /// Sets the warp algorithm when using DomainWarp(...)
     /// </summary>
     /// <remarks>
-    /// Default: OpenSimplex2
+    /// 默认值：OpenSimplex2
     /// </remarks>
     void SetDomainWarpType(DomainWarpType domainWarpType)
     {
@@ -296,10 +296,10 @@ public:
 
 
     /// <summary>
-    /// 2D noise at given position using current settings
+    /// 使用当前设置在给定位置处求 2D 噪声
     /// </summary>
     /// <returns>
-    /// Noise output bounded between -1...1
+    /// 噪声输出被限制在 -1...1 之间
     /// </returns>
     template <typename FNfloat>
     float GetNoise(FNfloat x, FNfloat y) const
@@ -322,10 +322,10 @@ public:
     }
 
     /// <summary>
-    /// 3D noise at given position using current settings
+    /// 使用当前设置在给定位置处求 3D 噪声
     /// </summary>
     /// <returns>
-    /// Noise output bounded between -1...1
+    /// 噪声输出被限制在 -1...1 之间
     /// </returns>
     template <typename FNfloat>
     float GetNoise(FNfloat x, FNfloat y, FNfloat z) const
@@ -349,10 +349,10 @@ public:
 
 
     /// <summary>
-    /// 2D warps the input position using current domain warp settings
+    /// 使用当前域扭曲设置在给定位置处扭曲 2D 输入位置
     /// </summary>
     /// <example>
-    /// Example usage with GetNoise
+    /// 使用 GetNoise 的示例用法
     /// <code>DomainWarp(x, y)
     /// noise = GetNoise(x, y)</code>
     /// </example>
@@ -376,10 +376,10 @@ public:
     }
 
     /// <summary>
-    /// 3D warps the input position using current domain warp settings
+    /// 使用当前域扭曲设置在给定位置处扭曲 3D 输入位置
     /// </summary>
     /// <example>
-    /// Example usage with GetNoise
+    /// 使用 GetNoise 的示例用法
     /// <code>DomainWarp(x, y, z)
     /// noise = GetNoise(x, y, z)</code>
     /// </example>
@@ -402,7 +402,7 @@ public:
         }
     }
 
-// <Voxel> Exposed everything. Need it for extensions without modifying the library too much
+// <Voxel> 暴露出了全部内容。扩展时无需过多修改该库
 // private:
     template <typename T>
     struct Arguments_must_be_floating_point_values;
@@ -621,7 +621,7 @@ public:
     }
 
 
-    // Generic noise gen
+    // 通用噪声生成
 
     template <typename FNfloat>
     float GenNoiseSingle(int seed, FNfloat x, FNfloat y) const
@@ -725,7 +725,7 @@ public:
         case TransformType3D_DefaultOpenSimplex2:
             {
                 const FNfloat R3 = (FNfloat)(2.0 / 3.0);
-                FNfloat r = (x + y + z) * R3; // Rotation, not skew
+                FNfloat r = (x + y + z) * R3; // 旋转，而非斜切（skew）
                 x = r - x;
                 y = r - y;
                 z = r - z;
@@ -762,7 +762,7 @@ public:
     }
 
 
-    // Domain Warp Coordinate Transforms
+    // 域扭曲坐标变换
 
     template <typename FNfloat>
     void TransformDomainWarpCoordinate(FNfloat& x, FNfloat& y) const
@@ -812,7 +812,7 @@ public:
         case TransformType3D_DefaultOpenSimplex2:
             {
                 const FNfloat R3 = (FNfloat)(2.0 / 3.0);
-                FNfloat r = (x + y + z) * R3; // Rotation, not skew
+                FNfloat r = (x + y + z) * R3; // 旋转，而非斜切（skew）
                 x = r - x;
                 y = r - y;
                 z = r - z;
@@ -849,7 +849,7 @@ public:
     }
 
 
-    // Fractal FBm
+    // 分形 FBm
 
     template <typename FNfloat>
     float GenFractalFBm(FNfloat x, FNfloat y) const
@@ -895,7 +895,7 @@ public:
     }
 
 
-    // Fractal Ridged
+    // 分形 Ridged
 
     template <typename FNfloat>
     float GenFractalRidged(FNfloat x, FNfloat y) const
@@ -941,7 +941,7 @@ public:
     }
 
 
-    // Fractal PingPong 
+    // 分形 PingPong
 
     template <typename FNfloat>
     float GenFractalPingPong(FNfloat x, FNfloat y) const
@@ -987,12 +987,12 @@ public:
     }
 
 
-    // Simplex/OpenSimplex2 Noise
+    // Simplex/OpenSimplex2 噪声
 
     template <typename FNfloat>
     float SingleSimplex(int seed, FNfloat x, FNfloat y) const
     {
-        // 2D OpenSimplex2 case uses the same algorithm as ordinary Simplex.
+        // 2D OpenSimplex2 情况使用与普通 Simplex 相同的算法。
 
         const float SQRT3 = 1.7320508075688772935274463415059f;
         const float G2 = (3 - SQRT3) / 6;
@@ -1063,12 +1063,12 @@ public:
     template <typename FNfloat>
     float SingleOpenSimplex2(int seed, FNfloat x, FNfloat y, FNfloat z) const
     {
-        // 3D OpenSimplex2 case uses two offset rotated cube grids.
+        // 3D OpenSimplex2 情况使用两个偏移旋转的立方体网格。
 
         /*
          * --- Rotation moved to TransformNoiseCoordinate method ---
          * const FNfloat R3 = (FNfloat)(2.0 / 3.0);
-         * FNfloat r = (x + y + z) * R3; // Rotation, not skew
+         * FNfloat r = (x + y + z) * R3; // 旋转，而非斜切（skew）
          * x = r - x; y = r - y; z = r - z;
         */
 
@@ -1160,12 +1160,12 @@ public:
     }
 
 
-    // OpenSimplex2S Noise
+    // OpenSimplex2S 噪声
 
     template <typename FNfloat>
     float SingleOpenSimplex2S(int seed, FNfloat x, FNfloat y) const
     {
-        // 2D OpenSimplex2S case is a modified 2D simplex noise.
+        // 2D OpenSimplex2S 情况是经过修改的 2D simplex 噪声。
 
         const FNfloat SQRT3 = (FNfloat)1.7320508075688772935274463415059;
         const FNfloat G2 = (3 - SQRT3) / 6;
@@ -1199,7 +1199,7 @@ public:
         float y1 = y0 - (float)(1 - 2 * G2);
         value += (a1 * a1) * (a1 * a1) * GradCoord(seed, i1, j1, x1, y1);
 
-        // Nested conditionals were faster than compact bit logic/arithmetic.
+        // 嵌套条件语句比紧凑的位逻辑/算术更快。
         float xmyi = xi - yi;
         if (t > G2)
         {
@@ -1296,12 +1296,12 @@ public:
     template <typename FNfloat>
     float SingleOpenSimplex2S(int seed, FNfloat x, FNfloat y, FNfloat z) const
     {
-        // 3D OpenSimplex2S case uses two offset rotated cube grids.
+        // 3D OpenSimplex2S 情况使用两个偏移旋转的立方体网格。
 
         /*
          * --- Rotation moved to TransformNoiseCoordinate method ---
          * const FNfloat R3 = (FNfloat)(2.0 / 3.0);
-         * FNfloat r = (x + y + z) * R3; // Rotation, not skew
+         * FNfloat r = (x + y + z) * R3; // 旋转，而非斜切（skew）
          * x = r - x; y = r - y; z = r - z;
         */
 
@@ -1487,14 +1487,14 @@ public:
     }
 
 
-// <Voxel> GCC raises warnings when integer overflows occur, which are needed for hashing here.
-// Same fix as in Godot e41e2a110373a251cd0664f077ada6f344e5c8fd
+// <Voxel> GCC 在发生整数溢出时会发出警告，而此处哈希运算需要这些溢出。
+// 与 Godot e41e2a110373a251cd0664f077ada6f344e5c8fd 中的修复相同
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggressive-loop-optimizations"
 #endif
 
-    // Cellular Noise
+    // Cellular 噪声
 
     template <typename FNfloat>
     float SingleCellular(int seed, FNfloat x, FNfloat y) const
@@ -1785,7 +1785,7 @@ public:
 #pragma GCC diagnostic pop
 #endif
 
-    // Perlin Noise
+    // Perlin 噪声
 
     template <typename FNfloat>
     float SinglePerlin(int seed, FNfloat x, FNfloat y) const
@@ -1849,7 +1849,7 @@ public:
     }
 
 
-    // Value Cubic Noise
+    // Value Cubic 噪声
 
     template <typename FNfloat>
     float SingleValueCubic(int seed, FNfloat x, FNfloat y) const
@@ -1936,7 +1936,7 @@ public:
     }
 
 
-    // Value Noise
+    // Value 噪声
 
     template <typename FNfloat>
     float SingleValue(int seed, FNfloat x, FNfloat y) const
@@ -2025,7 +2025,7 @@ public:
     }
 
 
-    // Domain Warp Single Wrapper
+    // Domain Warp 单包装器
 
     template <typename FNfloat>
     void DomainWarpSingle(FNfloat& x, FNfloat& y) const
@@ -2057,7 +2057,7 @@ public:
     }
 
 
-    // Domain Warp Fractal Progressive
+    // Domain Warp 分形渐进
 
     template <typename FNfloat>
     void DomainWarpFractalProgressive(FNfloat& x, FNfloat& y) const
@@ -2103,7 +2103,7 @@ public:
     }
 
 
-    // Domain Warp Fractal Independant
+    // Domain Warp 分形独立
 
     template <typename FNfloat>
     void DomainWarpFractalIndependent(FNfloat& x, FNfloat& y) const
@@ -2149,7 +2149,7 @@ public:
     }
 
 
-    // Domain Warp Basic Grid
+    // Domain Warp 基础网格
 
     template <typename FNfloat>
     void SingleDomainWarpBasicGrid(int seed, float warpAmp, float frequency, FNfloat x, FNfloat y, FNfloat& xr, FNfloat& yr) const
@@ -2354,7 +2354,7 @@ public:
         /*
          * --- Rotation moved to TransformDomainWarpCoordinate method ---
          * const FNfloat R3 = (FNfloat)(2.0 / 3.0);
-         * FNfloat r = (x + y + z) * R3; // Rotation, not skew
+         * FNfloat r = (x + y + z) * R3; // 旋转，而非斜切（skew）
          * x = r - x; y = r - y; z = r - z;
         */
 

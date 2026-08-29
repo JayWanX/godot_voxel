@@ -29,10 +29,10 @@ void VoxelGeneratorNoise::set_noise(Ref<FastNoiseLite> noise) {
 		_noise->connect(
 				VoxelStringNames::get_singleton().changed, callable_mp(this, &VoxelGeneratorNoise::_on_noise_changed)
 		);
-		// The OpenSimplexNoise resource is not thread-safe so we make a copy of it for use in threads
+		// OpenSimplexNoise 资源不是线程安全的，因此我们复制一份供线程使用
 		copy = _noise->duplicate();
 	}
-	// The OpenSimplexNoise resource is not thread-safe so we make a copy of it for use in threads
+	// OpenSimplexNoise 资源不是线程安全的，因此我们复制一份供线程使用
 	RWLockWrite wlock(_parameters_lock);
 	_parameters.noise = copy;
 }
@@ -96,10 +96,10 @@ real_t VoxelGeneratorNoise::get_height_range() const {
 }
 
 /*
-// For isosurface use cases, noise can be "shaped" by calculating only the first octave,
-// and discarding the next ones if beyond some distance away from the isosurface,
-// because then we assume next octaves won't change the sign (which crosses the surface).
-// This might reduce accuracy in some areas, but it speeds up the results.
+// 对于等值面用例，可以通过只计算第一个倍频程来"塑形"噪声，
+// 若超出等值面一定距离则丢弃后续倍频程，
+// 因为此时我们假设后续倍频程不会改变符号（即不会跨越表面）。
+// 这在某些区域可能会降低精度，但能加快结果生成。
 static inline float get_shaped_noise(OpenSimplexNoise &noise, float x, float y, float z, float threshold, float bias) {
 	x /= noise.get_period();
 	y /= noise.get_period();
@@ -107,9 +107,9 @@ static inline float get_shaped_noise(OpenSimplexNoise &noise, float x, float y, 
 
 	float sum = noise._get_octave_noise_3d(0, x, y, z);
 
-	// A default value for `threshold` would be `persistence`
+	// `threshold` 的默认值应为 `persistence`
 	if (sum + bias > threshold || sum + bias < -threshold) {
-		// Assume next octaves will not change sign of noise
+		// 假设后续倍频程不会改变噪声的符号
 		return sum;
 	}
 
@@ -144,8 +144,8 @@ VoxelGenerator::Result VoxelGeneratorNoise::generate_block(VoxelGenerator::Voxel
 	Vector3i origin_in_voxels = input.origin_in_voxels;
 	int lod = input.lod;
 
-	// We need the period to properly produce a signed distance. That's why we can't just take any Noise, or we'd need
-	// an extra property the user has to tweak manually.
+	// 我们需要周期来正确产生有符号距离。这就是为什么我们不能随便使用任何噪声，否则就需要
+	// 一个用户必须手动调整的额外属性。
 	const float noise_period = 1.0 / math::max<real_t>(noise.get_frequency(), 0.0001);
 
 	int isosurface_lower_bound = static_cast<int>(Math::floor(params.height_start));
@@ -159,7 +159,7 @@ VoxelGenerator::Result VoxelGeneratorNoise::generate_block(VoxelGenerator::Voxel
 	Result result;
 
 	if (origin_in_voxels.y >= isosurface_upper_bound) {
-		// Fill with air
+		// 用空气填充
 		if (params.channel == VoxelBuffer::CHANNEL_SDF) {
 			buffer.clear_channel_f(params.channel, 100.0);
 		} else if (params.channel == VoxelBuffer::CHANNEL_TYPE) {
@@ -170,7 +170,7 @@ VoxelGenerator::Result VoxelGeneratorNoise::generate_block(VoxelGenerator::Voxel
 		result.max_lod_hint = true;
 
 	} else if (origin_in_voxels.y + (buffer.get_size().y << lod) < isosurface_lower_bound) {
-		// Fill with matter
+		// 用物质填充
 		if (params.channel == VoxelBuffer::CHANNEL_SDF) {
 			buffer.clear_channel_f(params.channel, -100.0);
 		} else if (params.channel == VoxelBuffer::CHANNEL_TYPE) {
@@ -196,9 +196,9 @@ VoxelGenerator::Result VoxelGeneratorNoise::generate_block(VoxelGenerator::Voxel
 					const int ly = origin_in_voxels.y + (y << lod);
 
 					if (ly < isosurface_lower_bound) {
-						// Below is only matter
+						// 下方只有物质
 						if (params.channel == VoxelBuffer::CHANNEL_SDF) {
-							// Not consistent SDF but should work ok
+							// 不是一致的 SDF，但应该可以正常工作
 							buffer.set_voxel_f(constants::SDF_FAR_INSIDE, x, y, z, params.channel);
 						} else if (params.channel == VoxelBuffer::CHANNEL_TYPE) {
 							buffer.set_voxel(matter_type, x, y, z, params.channel);
@@ -208,9 +208,9 @@ VoxelGenerator::Result VoxelGeneratorNoise::generate_block(VoxelGenerator::Voxel
 						continue;
 
 					} else if (ly >= isosurface_upper_bound) {
-						// Above is only air
+						// 上方只有空气
 						if (params.channel == VoxelBuffer::CHANNEL_SDF) {
-							// Not consistent SDF but should work ok
+							// 不是一致的 SDF，但应该可以正常工作
 							buffer.set_voxel_f(constants::SDF_FAR_OUTSIDE, x, y, z, params.channel);
 						} else if (params.channel == VoxelBuffer::CHANNEL_TYPE) {
 							buffer.set_voxel(air_type, x, y, z, params.channel);
@@ -220,16 +220,16 @@ VoxelGenerator::Result VoxelGeneratorNoise::generate_block(VoxelGenerator::Voxel
 						continue;
 					}
 
-					// Bias is what makes noise become "matter" the lower we go, and "air" the higher we go
+					// 偏差（bias）使我们越往下噪声越表现为"物质"，越往上越表现为"空气"
 					const float t = (ly - params.height_start) * height_range_inv;
 					const float bias = 2.0 * t - 1.0;
 
-					// We are near the isosurface, need to calculate noise value
+					// 我们接近等值面，需要计算噪声值
 					// float n = get_shaped_noise(noise, lx, ly, lz, one_minus_persistence, bias);
 					const float n = noise.get_noise_3d(lx, ly, lz);
-					// We have to multiply -1..1 noise by its period in order to obtain a better signed distance. Not
-					// multiplying leads to gradients moving way too slowly, leading to blockyness because 16-bit
-					// encoding is tuned for proper distance fields
+					// 我们必须将 -1..1 的噪声乘以其周期，以获得更好的有符号距离。不
+					// 相乘会导致梯度移动过慢，产生方块感，因为 16 位
+					// 编码是为正确的距离场调优的
 					const float d = ((n + bias) * noise_period); // * iso_scale;
 
 					if (params.channel == VoxelBuffer::CHANNEL_SDF) {

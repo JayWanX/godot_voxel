@@ -353,7 +353,7 @@ namespace FastSIMD
             return _mm_castps_si128( _mm_blendv_ps( _mm_castsi128_ps( b ), _mm_castsi128_ps( a ), _mm_castsi128_ps( m ) ) );
         }
 
-        // Min, Max
+        // Min、Max
 
         FS_INLINE static float32v Min_f32( float32v a, float32v b )
         {
@@ -436,7 +436,7 @@ namespace FastSIMD
             return _mm_abs_epi32( a );
         }
 
-        // Float math
+        // 浮点运算
 
         FS_INLINE static float32v Sqrt_f32( float32v a )
         {
@@ -453,7 +453,7 @@ namespace FastSIMD
             return _mm_rcp_ps( a );
         }
 
-        // Floor, Ceil, Round: http://dss.stephanierct.com/DevBlog/?p=8
+        // Floor、Ceil、Round：http://dss.stephanierct.com/DevBlog/?p=8
 
         template<eLevel L = LEVEL_T, std::enable_if_t<(L < Level_SSE41)>* = nullptr>
         FS_INLINE static float32v Floor_f32( float32v a )
@@ -506,9 +506,9 @@ namespace FastSIMD
             const __m128 nearest2 = _mm_set1_ps( 1.99999988079071044921875f );
 #endif
             __m128 aTrunc = _mm_cvtepi32_ps( _mm_cvttps_epi32( a ) );       // truncate a
-            __m128 rmd = _mm_sub_ps( a, aTrunc );                           // get remainder
-            __m128 rmd2 = _mm_mul_ps( rmd, nearest2 );                   // mul remainder by near 2 will yield the needed offset
-            __m128 rmd2Trunc = _mm_cvtepi32_ps( _mm_cvttps_epi32( rmd2 ) ); // after being truncated of course
+            __m128 rmd = _mm_sub_ps( a, aTrunc );                           // 求余数
+            __m128 rmd2 = _mm_mul_ps( rmd, nearest2 );                   // 将余数乘以接近 2 的值即可得到所需偏移
+            __m128 rmd2Trunc = _mm_cvtepi32_ps( _mm_cvttps_epi32( rmd2 ) ); // 当然是在截断之后
             return _mm_add_ps( aTrunc, rmd2Trunc );
         }
         

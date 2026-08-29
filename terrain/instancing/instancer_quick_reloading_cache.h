@@ -10,10 +10,10 @@ namespace voxel {
 
 struct InstanceBlockData;
 
-// Temporarily stores chunks that just got unloaded and are about to be saved asynchronously.
-// If chunks need to be loaded again before saving has completed or even started, they will be picked from this cache
-// instead. Without this, chunks could be reloaded before getting saved, leading to loss of data. As confusing as it
-// sounds, this can happen because saving and loading is multi-threaded.
+// 临时存储刚刚卸载且即将异步保存的数据块。
+// 如果在保存完成甚至开始之前需要再次加载这些数据块，则会改从该缓存中获取。
+// 没有它，数据块可能在保存前就被重新加载，从而导致数据丢失。
+// 听起来可能令人困惑，但因为保存和加载是多线程的，这种情况确实可能发生。
 struct InstancerQuickReloadingCache {
 	StdUnorderedMap<Vector3i, UniquePtr<InstanceBlockData>> map;
 	Mutex mutex;

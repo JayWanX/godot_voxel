@@ -1,134 +1,132 @@
-Overview
+概述
 ===========
 
-This section explains the main concepts used in this voxel engine and which parts implement them.
+本节介绍本体素引擎使用的主要概念以及实现这些概念的组成部分。
 
 
-What voxels are
+什么是体素
 ------------------
 
-![Cubes and marching cubes](images/cubes_and_marching_cubes.webp)
+![立方体与行进立方体](images/cubes_and_marching_cubes.webp)
 
-"Voxel" is short for "volumetric picture element", similar to "pixel" which means "picture element". They compose volumes, as opposed to simple 2D images, which allows to make 3D terrains or models in 3 dimensions. Instead of representing solely the surface of objects like classic polygon-based models do, they also represent the insides as well, in every point of space.
+“Voxel”是“volumetric picture element”（体积像素元素）的缩写，类似于意为“picture element”（图像元素）的“pixel”（像素）。它们构成体积，与简单的 2D 图像不同，因此可以制作 3 维的 3D 地形或模型。与经典的多边形模型只表示物体表面不同，它们还在空间的每一个点上表示物体内部。
 
-In this engine, a voxel is a specific point in space holding some values. Those values can be:
+在本引擎中，体素是空间中承载某些数值的特定点。这些数值可以是：
 
-- The type of the voxel
-- Its density (or Signed Distance)
-- Its color
-- Its material
-- Etc...
+- 体素的类型
+- 它的密度（或带符号距离）
+- 它的颜色
+- 它的材质
+- 等等……
 
-Voxels can be obtained by either deciding their values manually on a grid, or by defining procedural rules to generate them from anywhere, like fractal noise or Signed-Distance-Field formulas.
+体素可以通过在网格上手动确定其数值来获得，也可以通过定义程序化规则从任意位置生成，例如分形噪声或带符号距离场公式。
 
 !!! note
-    Although this engine started as a way to generate terrains, it is not the only thing you can do with it. Because of this, you will often find the word "volume" instead of "terrain" in this documentation, to designate objects composed of voxels.
+    尽管本引擎最初是用来生成地形的，但它并非唯一的用途。因此，在本文档中你经常会看到用“volume”（体积）而不是“terrain”（地形）来指代由体素构成的对象。
 
 
-Generating voxels
+生成体素
 ------------------
 
-Voxels span 3 dimensions, so contrary to images, storing them can take up way more memory as volumes get bigger. This is why it important to think about procedural sources of voxels, because they don't cost any memory and can be accessed at any resolution.
+体素跨越 3 个维度，因此与图像不同，随着体积变大，存储它们会占用多得多的内存。这就是为什么考虑程序化生成体素很重要，因为它们不消耗任何内存，并且可以以任意分辨率访问。
 
-This task is implemented by resources deriving [VoxelGenerator](api/VoxelGenerator.md). Their goal is to generate voxel data, either at a specific point in space, or in a whole defined volume. There are endless possible recipes to generate models, terrains or planets, which we won't detail in this section. 
+这项任务由继承自 [VoxelGenerator](api/VoxelGenerator.md) 的资源实现。它们的目标是生成体素数据，既可以在空间的特定点上生成，也可以在整个定义的体积内生成。生成模型、地形或行星的方案数不胜数，本节不再赘述。
 
-Types of generators include:
+生成器的类型包括：
 
-- [VoxelGeneratorNoise2D](api/VoxelGeneratorNoise2D.md): generates a heightmap using 2D fractal noise
-- [VoxelGeneratorNoise](api/VoxelGeneratorNoise.md): generates a "spongy" world using 3D noise to form large caves and overhangs, modified so that most of the terrain is downwards and becomes only air above some altitude
-- [VoxelGeneratorFlat](api/VoxelGeneratorFlat.md): generates a simple flat plane.
-- [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md): allows to combine all sorts of operations using a graph (like a 3D VisualShader) to produce the volume with more flexibility than the other simple generators
-- [VoxelGeneratorScript](api/VoxelGeneratorScript.md): allows to implement the generation logic with a script. Will likely be slower than the other options, unless you use C#.
-- And some others
+- [VoxelGeneratorNoise2D](api/VoxelGeneratorNoise2D.md)：使用 2D 分形噪声生成高度图
+- [VoxelGeneratorNoise](api/VoxelGeneratorNoise.md)：使用 3D 噪声生成“海绵状”世界，形成大型洞穴和悬崖，经过调整使大部分地形向下，超过一定高度后就只剩空气
+- [VoxelGeneratorFlat](api/VoxelGeneratorFlat.md)：生成简单的平坦平面。
+- [VoxelGeneratorGraph](api/VoxelGeneratorGraph.md)：允许使用图（类似 3D VisualShader）组合各种操作来生成体积，比其他简单生成器更灵活
+- [VoxelGeneratorScript](api/VoxelGeneratorScript.md)：允许使用脚本实现生成逻辑。除非你使用 C#，否则可能会比其他方案更慢。
+- 以及其他一些
 
 
-Storing voxels
+存储体素
 ---------------
 
-![Block map storage schema](images/block_map_storage.webp)
+![数据块映射存储示意图](images/block_map_storage.webp)
 
-Even if it needs lots of memory, we still have to store voxel data at some point. This is important for passing voxels around, storing player edits which cannot be reproduced with a generator, or saving terrains to disk.
+即使需要大量内存，我们仍然必须在某个时刻存储体素数据。这对于传递体素、存储无法用生成器复现的玩家编辑，或将地形保存到磁盘都很重要。
 
-The core class for doing this is [VoxelBuffer](api/VoxelBuffer.md). This is a simple grid data structure with configurable format. You might not have to use this class often, but its storage concept is useful to know in order to use other APIs like [VoxelTool](api/VoxelTool.md). Voxels can hold various kinds of values, so this object uses multiple channels, each of them being one type of information:
+实现这一功能的核心类是 [VoxelBuffer](api/VoxelBuffer.md)。它是一个格式可配置的简单网格数据结构。你可能不常使用这个类，但要使用 [VoxelTool](api/VoxelTool.md) 等其他 API，了解其存储概念是很有用的。体素可以承载各种类型的数值，因此该对象使用多个通道，每个通道对应一种信息：
 
-- `TYPE`: The type of voxel, mainly used to associate the voxel with a type of model like in Minecraft. This is very similar to tile IDs seen in tilemaps or gridmaps.
-- `SDF`: The Signed Distance Field value, used for smooth voxels. It tells how far from the surface the voxel is. This can be understood like a density of matter, where negative values mean "matter" (distance below surface), and positive values mean "air" (distance above surface).
-- `COLOR`: Color information. It can either be compressed RGBA, or an index into a palette of colors.
-- And others.
+- `TYPE`：体素的类型，主要用于将体素与某种类型的模型关联起来，就像 Minecraft 那样。这与 tilemap 或 gridmap 中的图块 ID 非常相似。
+- `SDF`：带符号距离场数值，用于平滑体素。它表示体素距离表面有多远。这可以理解为物质的密度，负值表示“物质”（表面以下的距离），正值表示“空气”（表面以上的距离）。
+- `COLOR`：颜色信息。它可以是压缩的 RGBA，也可以是颜色调色板的索引。
+- 以及其他。
 
-The engine uses the first channels, while others are unused for now. Each channel can also use a configurable bit depth: 8, 16, 32 or 64 bits. This allows to tune quality and memory usage depending on your needs.
-Finally, a simple optimization is applied so that if a channel is filled with the same value, it won't allocate memory and instead store just that value. This way, areas such as the sky don't take up memory.
+引擎使用前几个通道，其余通道目前未使用。每个通道还可以使用可配置的位深：8、16、32 或 64 位。这样可以根据你的需求调整质量和内存占用。
+最后，还应用了一个简单的优化：如果某个通道填充的是相同的数值，它就不会分配内存，而只存储这一个数值。这样，天空等区域就不会占用内存。
 
 
-Saving voxels to disk
+将体素保存到磁盘
 -----------------------
 
-![Raw region file seen as an image](images/region_file_seen_as_image.png)
+![以图像形式查看的原始区域文件](images/region_file_seen_as_image.png)
 
-When players make edits to the world or when you want to sculpt a terrain in the editor and keep your changes saved, it becomes necessary to save voxels to disk.
+当玩家编辑世界，或你想在编辑器中雕刻地形并保存修改时，就有必要将体素保存到磁盘。
 
-This module implements this functionality with [VoxelStream](api/VoxelStream.md). Similarly to generators, a stream allows to request blocks of voxels so that it's not necessary to load the entire thing at once. But also, it allows to send back blocks of voxels to save them.
-This block-based approach is especially useful if the world is very large. In contrast, smaller volumes might just be loaded all at once. Subclasses may implement it in various ways, often using compressed files.
+本模块通过 [VoxelStream](api/VoxelStream.md) 实现这一功能。与生成器类似，数据流允许按数据块请求体素，这样就不必一次性加载全部内容。同时，它也可以回传体素数据块进行保存。
+这种基于数据块的方式在世界非常大时尤为有用。相比之下，较小的体积可能只需一次性全部加载。子类可以用各种方式实现它，通常使用压缩文件。
 
 
-Turning voxels into meshes
+将体素转换为网格
 ----------------------------
 
-![Cubes and wireframe](images/cubes_and_wireframe.webp)
+![立方体与线框](images/cubes_and_wireframe.webp)
 
-Today's graphics cards are getting more and more powerful, but in average, polygons (meshes) remain the fastest way to render 3D models. So we are not really going to directly draw voxels. Instead, we have to convert them into polygons, which will then be rendered. To do this, this engine uses a resource called [VoxelMesher](api/VoxelMesher.md).
+如今的显卡性能越来越强大，但平均而言，多边形（网格）仍然是渲染 3D 模型最快的方式。因此我们并不会真正直接绘制体素，而是必须将它们转换为多边形，然后再进行渲染。为此，本引擎使用一种名为 [VoxelMesher](api/VoxelMesher.md) 的资源。
 
-There are several ways to produce polygons from voxel data, and the engine provides types of meshers to do it:
+从体素数据生成多边形有多种方式，引擎提供了多种网格生成器类型来实现：
 
-- [VoxelMesherCubes](api/VoxelMesherCubes.md): the color of voxels is used to produce colored cubes. This is the simplest way to polygonize voxels.
-- [VoxelMesherBlocky](api/VoxelMesherBlocky.md): the type of voxels is used to batch together meshes corresponding to that type. This can also use cubes, but any shape will do if custom meshes are provided. This is a similar technique as the one used in Minecraft, and has a wide range of options.
-- [VoxelMesherTransvoxel](api/VoxelMesherTransvoxel.md): instead of making cubes, this one uses the SDF value to produce a smooth surface, based on the [Transvoxel](https://transvoxel.org/) algorithm. It can also produce transition meshes, which is useful to stitch together two meshes of different level of detail.
+- [VoxelMesherCubes](api/VoxelMesherCubes.md)：使用体素的颜色生成彩色立方体。这是将体素多边形化的最简单方式。
+- [VoxelMesherBlocky](api/VoxelMesherBlocky.md)：使用体素的类型将对应类型的网格批量组合在一起。它也可以使用立方体，但如果提供了自定义网格，任何形状都可以。这与 Minecraft 使用的技术类似，并且有大量可选项。
+- [VoxelMesherTransvoxel](api/VoxelMesherTransvoxel.md)：它不是生成立方体，而是基于 [Transvoxel](https://transvoxel.org/) 算法，使用 SDF 数值生成平滑表面。它还可以生成过渡网格，这对于拼接两个不同细节级别的网格很有用。
 
 
-Putting it together with nodes
+用节点将它们整合起来
 -------------------------------
 
-![Game screenshots](images/game_examples.webp)
+![游戏截图](images/game_examples.webp)
 
-So far, we could consider that there are enough tools to use voxels within games. It's a bit more work to take it from there, though.
+到目前为止，我们可以认为已经有足够的工具在游戏中使用体素了。不过，要从这里更进一步还需要更多工作。
 
-Turning a bunch of voxels into a mesh is ok for a model or a small piece of land, however it won't scale well with large editable terrains. It gets more tricky if that terrain needs to have a large view distance. Very often, the proposed solution is to split it into chunks, eventually using variable level of detail, and properly update parts of that terrain when they are modified by players. This is what the `VoxelTerrain*` nodes do, by putting together the tools seen before, and using threads to run heavy operations in the background.
+将一堆体素转换为网格对于模型或一小块地皮来说没问题，但对于大型可编辑地形则难以扩展。如果该地形还需要很大的视距，情况就更棘手了。通常的解决方案是将其分割成区块，最终使用可变的细节级别，并在玩家修改地形时恰当地更新相应部分。这正是 `VoxelTerrain*` 节点所做的：它将前面介绍的工具整合在一起，并使用线程在后台运行繁重的操作。
 
 !!! note
-    In this engine, "Chunks" are actually called "Blocks". They typically represent cubes of 16x16x16 voxels. Some options are specified in blocks, rather than spatial units.
+    在本引擎中，“区块（Chunks）”实际上被称为“数据块（Blocks）”。它们通常代表 16x16x16 体素的立方体。某些选项以数据块为单位指定，而不是以空间单位指定。
 
-### Terrain types
+### 地形类型
 
-There are two main types of terrains supported by the engine. They have a lot in common, but also handle blocks in a very different way.
+引擎支持两种主要的地形类型。它们有很多共同点，但处理数据块的方式截然不同。
 
-- [VoxelTerrain](api/VoxelTerrain.md): this one uses a simple grid of blocks, and takes care of loading and unloading blocks as the viewer moves around. Its view distance is limited in similar ways to Minecraft, so it is better used with blocky voxels or moderate-size smooth volumes.
+- [VoxelTerrain](api/VoxelTerrain.md)：它使用简单的数据块网格，并在观察者移动时负责加载和卸载数据块。它的视距受到与 Minecraft 类似的限制，因此更适合配合方块风体素或中等大小的平滑体积使用。
 
-- [VoxelLodTerrain](api/VoxelLodTerrain.md): this one uses an octree of blocks. Contrary to a simple grid, this allows to store voxels at multiple levels of detail, allowing to render much larger distances. It currently works a bit differently compared to the other.
+- [VoxelLodTerrain](api/VoxelLodTerrain.md)：它使用数据块的八叉树。与简单的网格不同，这允许以多个细节级别存储体素，从而渲染更远的距离。目前它的工作方式与另一种略有不同。
 
-Both kinds of terrains can be edited in real time, and only the edited parts will be re-meshed dynamically. A helper class [VoxelTool](api/VoxelTool.md) is exposed to the script API to simplify the process of editing voxels, which can be obtained by using `get_voxel_tool()` methods. It allows to set single voxels, dig around or blend simple shapes such as spheres or boxes. The same concept of channels seen earlier is available on this API, so depending on the type of mesher you are using, you may want to edit either `TYPE`, `SDF` or `COLOR` channels.
+两种地形都可以实时编辑，并且只有被编辑的部分会被动态地重新生成网格。脚本 API 公开了一个辅助类 [VoxelTool](api/VoxelTool.md)，用于简化编辑体素的过程，可以通过 `get_voxel_tool()` 方法获取。它可以设置单个体素、挖洞或融合球体、立方体等简单形状。前面介绍的通道概念在此 API 上同样可用，因此根据你使用的网格生成器类型，你可能需要编辑 `TYPE`、`SDF` 或 `COLOR` 通道。
 
-Finally, for these terrains to load, it is required to place at least one [VoxelViewer](api/VoxelViewer.md) node in the world. These may be placed typically as child of the player, or the main `Camera3D`. They tell the voxel engine where to load voxels, how far, and give priority to mesh updates happening near them.
-
-
-### Common properties
-
-#### Voxel properties
-
-Each voxel node inherits `VoxelNode`, which defines properties they all have in common.
-
-- `stream`: a `VoxelStream` resource, which allows to load and save voxels. See [Voxel Streams](streams.md)
-- `generator`: a `VoxelGenerator` resource, which allows to populate the volume with generated voxels. See [Generators](generators.md)
-- `mesher`: a `VoxelMesher` resource, which defines how the voxels will look like. It also defines collision meshes if enabled.
+最后，要让这些地形能够加载，需要在世界中放置至少一个 [VoxelViewer](api/VoxelViewer.md) 节点。这些节点通常作为玩家或主 `Camera3D` 的子节点放置。它们告诉体素引擎在何处加载体素、加载多远，并优先处理其附近的网格更新。
 
 
-#### Collisions
+### 通用属性
 
-Physics based collisions are enabled by default, and behave like a static body. It provides both raycasting and collision detection. You can turn it on or off by setting the `generate_collisions` option on any of the terrain nodes. Or you can enable or disable it in code.
+#### 体素属性
 
-The collision is built along with the mesh. So any blocks that have already been built will not be affected by this setting unless they are regenerated.
+每个体素节点都继承自 `VoxelNode`，它定义了所有节点共有的属性。
 
-You can also turn on the collision wire mesh for debugging. In the editor, look under the Debug menu for `Visible Collision Shapes`.
+- `stream`：一个 `VoxelStream` 资源，允许加载和保存体素。参见 [Voxel 数据流](streams.md)
+- `generator`：一个 `VoxelGenerator` 资源，允许用生成的体素填充体积。参见 [生成器](generators.md)
+- `mesher`：一个 `VoxelMesher` 资源，定义体素的外观。如果启用，它还定义碰撞网格。
 
-![Collision shapes](images/debug-collision-shapes.gif)
 
+#### 碰撞
 
+基于物理的碰撞默认启用，行为类似静态刚体。它同时提供射线检测和碰撞检测。你可以在任意地形节点上设置 `generate_collisions` 选项来开启或关闭它，也可以在代码中启用或禁用。
+
+碰撞与网格一起构建。因此，任何已经构建完成的数据块都不会受此设置影响，除非它们被重新生成。
+
+你还可以开启碰撞线框网格用于调试。在编辑器的 Debug 菜单下找到 `Visible Collision Shapes`。
+
+![碰撞形状](images/debug-collision-shapes.gif)

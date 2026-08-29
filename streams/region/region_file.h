@@ -18,12 +18,12 @@ struct RegionFormat {
 
 	static_assert(CHANNEL_COUNT == VoxelBuffer::MAX_CHANNELS, "This format doesn't support variable channel count");
 
-	// How many voxels in a cubic block, as power of two
+	// 一个立方体区块中包含多少个体素，以 2 的幂表示
 	uint8_t block_size_po2 = 0;
-	// How many blocks across all dimensions (stored as 3 bytes)
+	// 各维度上区块的数量（以 3 个字节存储）
 	Vector3i region_size;
 	FixedArray<VoxelBuffer::Depth, CHANNEL_COUNT> channel_depths;
-	// Blocks are stored at offsets multiple of that size
+	// 区块以该大小的整数倍偏移量存储
 	uint32_t sector_size = 0;
 	FixedArray<Color8, 256> palette;
 	bool has_palette = false;
@@ -37,8 +37,8 @@ struct RegionBlockInfo {
 	static const unsigned int MAX_SECTOR_COUNT = 0xff;
 
 	// AAAB
-	// A: 3 bytes for sector index
-	// B: 1 byte for size of the block, in sectors
+	// A: 3 字节为扇区索引
+	// B: 1 字节为区块大小，以扇区为单位
 	uint32_t data = 0;
 
 	inline uint32_t get_sector_index() const {
@@ -62,14 +62,13 @@ struct RegionBlockInfo {
 
 static_assert(sizeof(RegionBlockInfo) == 4, "Data in this struct must have a consistent size on all target platforms.");
 
-// Archive file storing voxels in a fixed sparse grid data structure.
-// The format is designed to be easily writable in chunks so it can be used for partial in-game loading and saving.
-// Inspired by https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game
-// (if that link doesn't work, it can be found on Wayback Machine)
+// 以固定稀疏网格数据结构存储体素的归档文件。
+// 该格式被设计为易于分块写入，因此可用于游戏内的局部加载与保存。
+// 灵感来自 https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game
+// （若该链接无法访问，可在 Wayback Machine 上找到）
 //
-// This is a stream implementation, where the file handle remains in use for read and write and only keeps a fraction
-// of data in memory.
-// It isn't thread-safe.
+// 这是一种流式的实现，文件句柄在读写的整个过程中保持打开，并且只在内存中保留一小部分数据。
+// 它不是线程安全的。
 //
 class RegionFile {
 public:
@@ -116,9 +115,9 @@ private:
 	struct Header {
 		uint8_t version = -1;
 		RegionFormat format;
-		// Location and size of blocks, indexed by flat position.
-		// This table always has the same size,
-		// and the same index always corresponds to the same 3D position.
+		// 各区块的位置与大小，以扁平化位置作为索引。
+		// 该表的大小始终相同，
+		// 且同一个索引始终对应于同一个 3D 位置。
 		StdVector<RegionBlockInfo> blocks;
 	};
 
@@ -135,10 +134,10 @@ private:
 		Vector3u16(Vector3i p) : x(p.x), y(p.y), z(p.z) {}
 	};
 
-	// TODO Is it ever read?
-	// List of sectors in the order they appear in the file,
-	// and which position their block is. The same block can span multiple sectors.
-	// This is essentially a reverse table of `Header::blocks`.
+	// TODO 它是否曾经被读取过？
+	// 扇区按其在文件中出现的顺序排列的列表，
+	// 以及这些扇区所属区块的位置。同一个区块可以跨越多个扇区。
+	// 它本质上就是 `Header::blocks` 的反向表。
 	StdVector<Vector3u16> _sectors;
 	uint32_t _blocks_begin_offset;
 	String _file_path;

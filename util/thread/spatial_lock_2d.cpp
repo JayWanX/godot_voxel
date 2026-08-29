@@ -26,7 +26,7 @@ void SpatialLock2D::remove_box(const BoxBounds2i &box, Mode mode) {
 			return;
 		}
 	}
-	// Could be a bug
+	// 可能是个 bug
 	VOXEL_PRINT_ERROR(format("Could not find box to remove {} with mode {}", box, mode));
 }
 

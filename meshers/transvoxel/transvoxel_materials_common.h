@@ -26,9 +26,9 @@ inline void add_4i8_4w8_texture_data(
 	iuv.y = pack_bytes(weights);
 }
 
-// Transition cells contain 2x2 values on one side, and 3x3 values on the other side.
-// The side with 2x2 values only repeats the values at the corner of the 3x3 side.
-// This function fills in an array of all values from the 3x3 "partial" side and fills in the redundant 2x2 ones.
+// 过渡单元在一侧包含 2x2 个值，在另一侧包含 3x3 个值。
+// 2x2 值的那一侧只是重复 3x3 一侧角上的值。
+// 此函数从 3x3 “部分”一侧填充所有值的数组，并补齐冗余的 2x2 值。
 template <typename TPartialArray9, typename TFullArray13>
 void fill_redundant_transition_cell_values(const TPartialArray9 &src, TFullArray13 &dst) {
 	for (unsigned int i = 0; i < src.size(); ++i) {

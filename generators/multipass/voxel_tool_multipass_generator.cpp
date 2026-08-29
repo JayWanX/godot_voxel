@@ -44,7 +44,7 @@ void VoxelToolMultipassGenerator::set_pass_input(PassInput &pass_input) {
 
 	_pass_input = pass_input;
 
-	// TODO Perhaps we should always pass block size as a power of two index
+	// TODO 也许我们应该总是以 2 的幂索引的形式传递数据块大小
 	VOXEL_ASSERT(math::is_power_of_two(pass_input.block_size));
 	_block_size_po2 = math::get_shift_from_power_of_two_32(pass_input.block_size);
 	_block_size_mask = pass_input.block_size - 1;
@@ -72,7 +72,7 @@ VoxelBuffer *get_pass_input_block_w(void *ctx, Vector3i bpos) {
 	PassInput *pi = static_cast<PassInput *>(ctx);
 	return get_pass_input_block(*pi, bpos);
 }
-// Just wrapping up for const...
+// 只是为了 const 而包装一下……
 const VoxelBuffer *get_pass_input_block_r(void *ctx, Vector3i bpos) {
 	return get_pass_input_block_w(ctx, bpos);
 }
@@ -174,8 +174,8 @@ Block *VoxelToolMultipassGenerator::get_block_and_relative_position(
 	return block;
 }
 
-// These methods never go alone, but may be used in others.
-// They don't represent an edit, they only abstract the lower-level API
+// 这些方法从不单独使用，但可能被其它方法使用。
+// 它们不代表一次编辑，它们只是抽象了底层 API
 uint64_t VoxelToolMultipassGenerator::_get_voxel(Vector3i pos) const {
 	Vector3i rpos;
 	Block *block = get_block_and_relative_position(pos, rpos);
@@ -213,7 +213,7 @@ void VoxelToolMultipassGenerator::_set_voxel_f(Vector3i pos, float v) {
 }
 
 void VoxelToolMultipassGenerator::_post_edit(const Box3i &box) {
-	// Nothing to do
+	// 无事可做
 }
 
 Vector3i VoxelToolMultipassGenerator::get_editable_area_min() const {
@@ -248,20 +248,20 @@ void VoxelToolMultipassGenerator::do_path(Span<const Vector3> positions, Span<co
 	VOXEL_ASSERT_RETURN(positions.size() >= 2);
 	VOXEL_ASSERT_RETURN(positions.size() == radii.size());
 
-	// TODO Increase margin a bit with smooth voxels?
+	// TODO 使用平滑体素时稍微增大边距？
 	const int margin = 1;
 
-	// Compute total bounding box
+	// 计算总包围盒
 
 	const AABB total_aabb = get_path_aabb(positions, radii).grow(margin);
 	const Box3i total_voxel_box(to_vec3i(math::floor(total_aabb.position)), to_vec3i(math::ceil(total_aabb.size)));
 	const Box3i clipped_voxel_box = total_voxel_box.clipped(_editable_voxel_box);
 
-	// Rasterize
+	// 光栅化
 
 	for (unsigned int point_index = 1; point_index < positions.size(); ++point_index) {
-		// TODO Could run this in local space so we dont need doubles
-		// TODO Apply terrain scale
+		// TODO 可以在局部空间中运行，这样就不需要 double
+		// TODO 应用地形缩放
 		const Vector3 p0 = positions[point_index - 1];
 		const Vector3 p1 = positions[point_index];
 

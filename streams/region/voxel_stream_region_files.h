@@ -10,14 +10,14 @@
 
 namespace voxel {
 
-// TODO Rename VoxelStreamRegionForest
+// TODO 重命名 VoxelStreamRegionForest
 
-// Loads and saves blocks to the filesystem, in multiple region files indexed by world position, under a directory.
-// Loading and saving blocks in batches of similar regions makes a lot more sense here,
-// because it allows to keep using the same file handles and avoid switching.
-// Inspired by https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game
+// 将数据块加载并保存到文件系统，存储在按世界位置索引的多个区域文件中，位于某个目录下。
+// 在这里按相似区域的批次加载和保存数据块更有意义，
+// 因为这样可以持续使用相同的文件句柄并避免切换。
+// 灵感来自 https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game
 //
-// Region files are not thread-safe. Because of this, internal mutexing may often constrain the use by one thread only.
+// 区域文件不是线程安全的。正因为如此，内部互斥锁往往会把使用限制为仅一个线程。
 //
 class VoxelStreamRegionFiles : public VoxelStream {
 	GDCLASS(VoxelStreamRegionFiles, VoxelStream)
@@ -59,7 +59,7 @@ protected:
 private:
 	struct CachedRegion;
 
-	// TODO Redundant with VoxelStream::Result. May be replaced
+	// TODO 与 VoxelStream::Result 冗余，可能会被替换
 	enum EmergeResult { //
 		EMERGE_OK,
 		EMERGE_OK_FALLBACK,
@@ -83,16 +83,16 @@ private:
 	struct Meta {
 		uint8_t version = -1;
 		// uint8_t lod_count = 0;
-		uint8_t block_size_po2 = 0; // How many voxels in a cubic block
-		uint8_t region_size_po2 = 0; // How many blocks in one cubic region
+		uint8_t block_size_po2 = 0; // 一个立方体数据块中有多少个体素
+		uint8_t region_size_po2 = 0; // 一个立方体区域中有多少个数据块
 		FixedArray<VoxelBuffer::Depth, VoxelBuffer::MAX_CHANNELS> channel_depths;
-		uint32_t sector_size = 0; // Blocks are stored at offsets multiple of that size
+		uint32_t sector_size = 0; // 数据块存储在该尺寸的整数倍偏移处
 	};
 
 	static bool check_meta(const Meta &meta);
 	void _convert_files(Meta new_meta);
 
-	// Orders block requests so those querying the same regions get grouped together
+	// 对数据块请求排序，使查询相同区域的请求被分组在一起
 	struct BlockQueryComparator {
 		VoxelStreamRegionFiles *self = nullptr;
 
@@ -114,9 +114,9 @@ private:
 		}
 	};
 
-	// TODO This is not thread-friendly.
-	// `VoxelRegionFile` is not thread-safe so we have to limit the usage to one thread at once, blocking the others.
-	// A refactoring should be done to allow better threading.
+	// TODO 这并不利于多线程。
+	// `VoxelRegionFile` 不是线程安全的，因此我们必须将使用限制为同一时间仅一个线程，阻塞其他线程。
+	// 应该进行重构以实现更好的多线程。
 
 	struct CachedRegion {
 		Vector3i position;
@@ -132,7 +132,7 @@ private:
 	bool _meta_loaded = false;
 	bool _meta_saved = false;
 	StdVector<CachedRegion *> _region_cache;
-	// TODO Add memory caches to increase capacity.
+	// TODO 添加内存缓存以提高容量。
 	unsigned int _max_open_regions = MIN(8, FOPEN_MAX);
 
 	Mutex _mutex;

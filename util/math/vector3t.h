@@ -7,9 +7,9 @@
 
 namespace voxel {
 
-// Template 3-dimensional vector. Only fields and standard operators.
-// Math functions are separate to allow more unified overloading, and similarity with other math libraries such as
-// shaders.
+// 模板三维向量。仅包含字段与标准运算符。
+// 数学函数独立出来，以便实现更统一的重载，并与其他数学库（如
+// 着色器）保持一致。
 template <typename T>
 struct Vector3T {
 	static const unsigned int AXIS_COUNT = 3;
@@ -25,8 +25,8 @@ struct Vector3T {
 
 	inline Vector3T() : x(0), y(0), z(0) {}
 
-	// It is recommended to use `explicit` because otherwise it would open the door to plenty of implicit conversions
-	// which would make many cases ambiguous.
+	// 建议使用 `explicit`，否则会引入大量隐式转换，
+	// 导致许多情况产生二义性。
 	inline explicit Vector3T(T p_v) : x(p_v), y(p_v), z(p_v) {}
 
 	inline Vector3T(T p_x, T p_y, T p_z) : x(p_x), y(p_y), z(p_z) {}
@@ -133,10 +133,10 @@ struct Vector3T {
 		return x < p_v.x;
 	}
 
-	// Swizzling
+	// 重排（swizzling）
 
-	// This one only exists for cosmetic reasons so we can write code that lines up. It should be simplified by the
-	// compiler.
+	// 这个仅出于排版美观的考虑，以便我们写出对齐的代码。编译器应能将其
+	// 简化掉。
 	inline Vector3T<T> xyz() const {
 		return Vector3T<T>(x, y, z);
 	}
@@ -231,8 +231,8 @@ inline Axis get_longest_axis(Vector3T<T> v) {
 	return AXIS_Z;
 }
 
-// Rotations: CW (clockwise) and CCW (counter-clockwise) are such that the rotation axis is pointed at the viewer.
-// Same convention used by Godot Basis. CCW is positive angle, CW is negative angle.
+// 旋转：CW（顺时针）与 CCW（逆时针）均指旋转轴指向观察者。
+// 与 Godot Basis 使用的约定相同。CCW 为正角，CW 为负角。
 
 template <typename T>
 Vector3T<T> rotate_x_90_ccw(Vector3T<T> v) {

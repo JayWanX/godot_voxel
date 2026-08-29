@@ -8,7 +8,7 @@ void get_property_list(const Object &obj, StdVector<PropertyInfoWrapper> &out_pr
 #if defined(VOXEL_GODOT)
 	List<PropertyInfo> properties;
 	obj.get_property_list(&properties, false);
-	// I'd like to use ConstIterator since I only read that list but that isn't possible :shrug:
+	// 我本想使用 ConstIterator，因为我只读取该列表，但那是不可能的 :shrug:
 	for (List<PropertyInfo>::Iterator it = properties.begin(); it != properties.end(); ++it) {
 		const PropertyInfo property = *it;
 		PropertyInfoWrapper pi;
@@ -28,7 +28,7 @@ uint64_t get_deep_hash(const Object &obj, uint32_t property_usage, uint64_t hash
 	StdVector<PropertyInfoWrapper> properties;
 	get_property_list(obj, properties);
 
-	// I'd like to use ConstIterator since I only read that list but that isn't possible :shrug:
+	// 我本想使用 ConstIterator，因为我只读取该列表，但那是不可能的 :shrug:
 	for (const PropertyInfoWrapper &property : properties) {
 		if ((property.usage & property_usage) != 0) {
 			const Variant value = obj.get(property.name);

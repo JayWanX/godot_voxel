@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Provides collision to VoxelInstancer multimesh instances
+// 为 VoxelInstancer multimesh 实例提供碰撞
 class VoxelInstancerRigidBody : public RigidBody3D {
 	GDCLASS(VoxelInstancerRigidBody, RigidBody3D);
 
@@ -36,7 +36,7 @@ public:
 
 	int get_library_item_id() const;
 
-	// Note, for this the body must switch to convex shapes
+	// 注意，为此刚体必须切换到凸形
 	// void detach_and_become_rigidbody() {
 	// 	//...
 	// }

@@ -1,39 +1,39 @@
-Voxel block format v3
+体素数据块格式 v3
 ====================
 
 !!! warning
-    This document is about an old version of the format. You may check the most recent version.
+    本文档描述的是该格式的旧版本。你可以查看最新版本。
 
-Version: 3
+版本：3
 
-This page describes the binary format used by default in this module to serialize voxel blocks to files, network or databases.
+本页描述此模块默认用于将体素数据块序列化到文件、网络或数据库的二进制格式。
 
-### Changes from version 2
+### 相对版本 2 的变化
 
-- The second channel (at index 1) was used for SDF data but the format didn't dictate anything particular about it. It is now expected to be for SDF. It used to have an arbitrary format for fixed-point encoding. It is now using inorm16.
-- Compression format `1` is deprecated.
-- Moved compression wrapper to its own specification.
+- 第二个通道（索引 1）曾用于 SDF 数据，但格式对此没有作出任何特别规定。现在明确期望它用于 SDF。它过去使用任意的定点编码格式，现在改用 inorm16。
+- 压缩格式 `1` 已被弃用。
+- 压缩包装已移至其独立的规范中。
 
 
-Specification
+规范
 ----------------
 
-### Endianness
+### 字节序
 
-By default, little-endian.
+默认为小端字节序。
 
-### Compressed container
+### 压缩容器<span id="compressed-container"></span>
 
-A block is usually serialized within a compressed data container.
-This is the format provided by the `VoxelBlockSerializer` utility class. If you don't use compression, the layout will correspond to `BlockData` described in the next listing, and won't have this wrapper.
-See [Compressed container format](#compressed-container) for specification.
+数据块通常序列化在压缩数据容器中。
+这是由 `VoxelBlockSerializer` 工具类提供的格式。如果你不使用压缩，其布局将对应于下一节中描述的 `BlockData`，并且不会有此包装。
+规范请参见[压缩容器格式](#compressed-container)。
 
-### Block format
+### 数据块格式
 
-It starts with version number `3` in one byte, then some metadata and the actual voxels.
+它以单字节版本号 `3` 开始，然后是元数据和实际的体素数据。
 
 !!! note
-    The size and formats are present to make the format standalone. When used within a chunked container like region files, it is recommended to check if they match the format expected for the volume as a whole.
+    尺寸和格式信息的存在是为了使格式独立自足。当在类似区域文件的分块容器中使用时，建议检查它们是否与整个体量所期望的格式一致。
 
 ```
 BlockData
@@ -46,9 +46,9 @@ BlockData
 - epilogue
 ```
 
-### Channels
+### 通道
 
-Block data starts with exactly 8 channels one after the other, each with the following structure:
+数据块数据以恰好 8 个依次排列的通道开始，每个通道的结构如下：
 
 ```
 Channel
@@ -56,30 +56,30 @@ Channel
 - data
 ```
 
-`format` contains both compression and bit depth, respectively known as `VoxelBuffer::Compression` and `VoxelBuffer::Depth` enums. The low nibble contains compression, and the high nibble contains depth. Depending on those values, `data` will be different.
+`format` 同时包含压缩方式和位深度，分别对应 `VoxelBuffer::Compression` 和 `VoxelBuffer::Depth` 枚举。低半字节包含压缩方式，高半字节包含位深度。根据这些值，`data` 会有所不同。
 
-Depth can be 0 (8-bit), 1 (16-bit), 2 (32-bit) or 3 (64-bit).
+位深度可以是 0（8 位）、1（16 位）、2（32 位）或 3（64 位）。
 
-If compression is `COMPRESSION_NONE` (0), `data` will be an array of N*S bytes, where N is the number of voxels inside a block, multiplied by the number of bytes corresponding to the bit depth. For example, a block of size 16x16x16 and a channel of 32-bit depth will have `16*16*16*4` bytes to load from the file into this channel.
-The 3D indexing of that data is in order `ZXY`.
+如果压缩方式是 `COMPRESSION_NONE`（0），`data` 将是 N*S 字节的数组，其中 N 是数据块内的体素数量，乘以位深度对应的字节数 S。例如，尺寸为 16x16x16 的数据块与 32 位位深度的通道将有 `16*16*16*4` 字节需要从文件加载到此通道中。
+该数据的 3D 索引按 `ZXY` 顺序排列。
 
-If compression is `COMPRESSION_UNIFORM` (1), the data will be a single voxel value, which means all voxels in the block have that same value. Unused channels will always use this mode. The value spans the same number of bytes defined by the depth.
+如果压缩方式是 `COMPRESSION_UNIFORM`（1），数据将是单个体素值，这意味着数据块中的所有体素都具有相同的值。未使用的通道始终使用此模式。该值占用与位深度对应的相同字节数。
 
-Other compression values are invalid.
+其它压缩值无效。
 
-#### SDF channel
+#### SDF 通道
 
-The second channel (at index 1) is used for SDF data. If depth is 8 or 16 bits, it may contain fixed-point values encoded as `inorm8` or `inorm16`. This is numbers in the range [-1..1].
+第二个通道（索引 1）用于 SDF 数据。如果位深度为 8 或 16 位，它可能包含以 `inorm8` 或 `inorm16` 编码的定点值。这些是 [-1..1] 范围内的数值。
 
-To obtain a `float` from an `int8`, use `max(i / 127, -1.f)`.
-To obtain a `float` from an `int16`, use `max(i / 32767, -1.f)`.
+要从 `int8` 得到 `float`，请使用 `max(i / 127, -1.f)`。
+要从 `int16` 得到 `float`，请使用 `max(i / 32767, -1.f)`。
 
-For 32-bit depth, regular `float` are used.
-For 64-bit depth, regular `double` are used.
+对于 32 位位深度，使用常规 `float`。
+对于 64 位位深度，使用常规 `double`。
 
-### Metadata
+### 元数据
 
-After all channels information, block data can contain metadata information. Blocks that don't contain any will only have a fixed amount of bytes left (from the epilogue) before reaching the size of the total data to read. If there is more, the block contains metadata.
+在所有通道信息之后，数据块数据可以包含元数据信息。不含任何元数据的数据块，在达到总数据读取大小之前，只会剩下固定数量的字节（来自尾部）。如果还有更多内容，则该数据块包含元数据。
 
 ```
 Metadata
@@ -88,11 +88,11 @@ Metadata
 - voxel_metadata[*]
 ```
 
-It starts with one 32-bit unsigned integer representing the total size of all metadata there is to read. That data comes in two groups: one for the whole block, and one per voxel.
+它以单个 32 位无符号整数开始，表示需要读取的所有元数据的总大小。该数据分为两组：一组用于整个数据块，一组用于每个体素。
 
-Block metadata is one Godot `Variant`, encoded using the `encode_variant` method of the engine.
+数据块元数据是单个 Godot `Variant`，使用引擎的 `encode_variant` 方法编码。
 
-Voxel metadata immediately follows. It is a sequence of the following data structures, which must be read until a total of `metadata_size` bytes have been read from the beginning:
+体素元数据紧随其后。它是以下数据结构的序列，必须一直读取，直到从开头读取的字节总数达到 `metadata_size`：
 
 ```
 VoxelMetadata
@@ -102,24 +102,24 @@ VoxelMetadata
 - data
 ```
 
-`x`, `y` and `z` indicate which voxel the data corresponds. `data` is also a `Variant` encoded the same way as described earlier. This results in an associative collection between voxel positions relative to the block and their corresponding metadata.
+`x`、`y` 和 `z` 指示数据对应的体素。`data` 也是一个按前面所述方式编码的 `Variant`。这样就形成了数据块内相对体素位置与其对应元数据之间的关联集合。
 
-### Epilogue
+### 尾部
 
-At the very end, block data finishes with a sequence of 4 bytes, which once read into a `uint32_t` integer must match the value `0x900df00d`. If that condition isn't fulfilled, the block must be assumed corrupted.
+在最后，数据块数据以 4 字节序列结尾，将其读入 `uint32_t` 整数后必须等于值 `0x900df00d`。如果不满足该条件，则该数据块必须视为已损坏。
 
 !!! note
-    On little-endian architectures (like desktop), binary editors will not show the epilogue as `0x900df00d`, but as `0x0df00d90` instead.
+    在小端字节序架构（如桌面端）上，二进制编辑器不会将尾部显示为 `0x900df00d`，而是显示为 `0x0df00d90`。
 
 
-Current Issues
+当前问题
 ----------------
 
-### Endianness
+### 字节序
 
-The format is intented to use little-endian, however the implementation of the engine does not fully guarantee this.
+该格式打算使用小端字节序，然而引擎的实现并不能完全保证这一点。
 
-Godot's `encode_variant` doesn't seem to care about endianness across architectures, so it's possible it becomes a problem in the future and gets changed to a custom format.
-The implementation of block channels with depth greater than 8-bit currently doesn't consider this either. This might be refined in a later iteration.
+Godot 的 `encode_variant` 似乎不关心不同架构间的字节序，因此将来可能会成为问题并改为自定义格式。
+当前位深度大于 8 位的数据块通道实现同样没有考虑这一点。这可能会在后续迭代中改进。
 
-This will become important to address if voxel games require communication between mobile and desktop.
+如果体素游戏需要在移动端和桌面端之间通信，解决这一点将变得重要。

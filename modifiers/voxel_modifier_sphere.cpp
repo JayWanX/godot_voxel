@@ -37,7 +37,7 @@ void VoxelModifierSphere::apply(VoxelModifierContext ctx) const {
 	const Vector3f center = to_vec3f(get_transform().origin);
 	const float sdf_scale = 1.0f;
 
-	// TODO Support transform scale
+	// TODO 支持变换缩放
 
 	switch (get_operation()) {
 		case OP_ADD:

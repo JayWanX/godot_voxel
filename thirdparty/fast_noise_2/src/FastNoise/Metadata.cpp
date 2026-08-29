@@ -1,4 +1,4 @@
-#define FASTNOISE_METADATA // Should only be defined here
+#define FASTNOISE_METADATA // 只应在此处定义
 
 #include <unordered_set>
 #include <unordered_map>
@@ -50,7 +50,7 @@ void AddToDataStream( std::vector<uint8_t>& dataStream, T value )
 
 bool SerialiseNodeDataInternal( NodeData* nodeData, bool fixUp, std::vector<uint8_t>& dataStream, std::unordered_map<const NodeData*, uint16_t>& referenceIds, std::unordered_set<const NodeData*> dependencies = {} )
 {
-    // dependencies passed by value to avoid false positives from other branches in the node tree
+    // 依赖通过值传递，以避免节点树中其他分支造成的误报
 
     const Metadata* metadata = nodeData->metadata;
 
@@ -59,7 +59,7 @@ bool SerialiseNodeDataInternal( NodeData* nodeData, bool fixUp, std::vector<uint
         nodeData->nodeLookups.size()     != metadata->memberNodeLookups.size() ||
         nodeData->hybrids.size()   != metadata->memberHybrids.size()     )
     {
-        assert( 0 ); // Member size mismatch with metadata
+        assert( 0 ); // 成员大小与元数据不匹配
         return false;
     }
 
@@ -67,7 +67,7 @@ bool SerialiseNodeDataInternal( NodeData* nodeData, bool fixUp, std::vector<uint
     {
         dependencies.insert( nodeData );
 
-        // Null any dependency loops 
+        // 将任何依赖环置空(Null)
         for( auto& node : nodeData->nodeLookups )
         {
             if( dependencies.find( node ) != dependencies.end() )
@@ -84,14 +84,14 @@ bool SerialiseNodeDataInternal( NodeData* nodeData, bool fixUp, std::vector<uint
         }
     }
 
-    // Reference previously encoded nodes to reduce encoded string length
-    // Relevant if a node has multiple links from it's output
+    // 引用先前编码的节点以缩短编码字符串的长度
+    // 当节点的输出有多个链接时相关
     auto reference = referenceIds.find( nodeData );
 
     if( reference != referenceIds.end() )
     {
-        // UINT16_MAX where node ID should be
-        // Referenced by index in reference array, array ordering will match on decode
+        // 节点 ID 处应填 UINT16_MAX
+        // 通过引用数组中的索引引用，数组顺序会在解码时匹配
         AddToDataStream( dataStream, std::numeric_limits<uint16_t>::max() );
         AddToDataStream( dataStream, reference->second );
         return true;
@@ -100,18 +100,18 @@ bool SerialiseNodeDataInternal( NodeData* nodeData, bool fixUp, std::vector<uint
     // Node ID
     AddToDataStream( dataStream, metadata->id );
 
-    // Member variables
+    // 成员变量
     for( size_t i = 0; i < metadata->memberVariables.size(); i++ )
     {
         AddToDataStream( dataStream, nodeData->variables[i].i );
     }
 
-    // Member nodes
+    // 成员节点
     for( size_t i = 0; i < metadata->memberNodeLookups.size(); i++ )
     {
         if( fixUp && nodeData->nodeLookups[i] )
         {
-            // Create test node to see if source is a valid node type
+            // 创建测试节点以判断 source 是否是有效的节点类型
             SmartNode<> test = metadata->CreateNode();
             SmartNode<> node = nodeData->nodeLookups[i]->metadata->CreateNode();
 
@@ -128,12 +128,12 @@ bool SerialiseNodeDataInternal( NodeData* nodeData, bool fixUp, std::vector<uint
         }
     }
 
-    // Member hybrids
+    // 成员 hybrids
     for( size_t i = 0; i < metadata->memberHybrids.size(); i++ )
     {
-        // 1 byte to indicate:
-        // 0 = constant float value
-        // 1 = node lookup
+        // 1 字节用于指示：
+        // 0 = 常量 float 值
+        // 1 = 节点查找
 
         if( !nodeData->hybrids[i].first )
         {
@@ -147,7 +147,7 @@ bool SerialiseNodeDataInternal( NodeData* nodeData, bool fixUp, std::vector<uint
         {
             if( fixUp )
             {
-                // Create test node to see if source is a valid node type
+                // 创建测试节点以判断 source 是否是有效的节点类型
                 SmartNode<> test = metadata->CreateNode();
                 SmartNode<> node = nodeData->hybrids[i].first->metadata->CreateNode();
 
@@ -205,7 +205,7 @@ SmartNode<> DeserialiseSmartNodeInternal( const std::vector<uint8_t>& serialised
         return nullptr;
     }
 
-    // UINT16_MAX indicates a reference node
+    // UINT16_MAX 表示引用节点
     if( nodeId == std::numeric_limits<uint16_t>::max() )
     {
         uint16_t referenceId;
@@ -222,7 +222,7 @@ SmartNode<> DeserialiseSmartNodeInternal( const std::vector<uint8_t>& serialised
         return referenceNodes[referenceId];
     }
 
-    // Create node from nodeId
+    // 从 nodeId 创建节点
     const Metadata* metadata = Metadata::GetFromId( nodeId );
 
     if( !metadata )
@@ -237,7 +237,7 @@ SmartNode<> DeserialiseSmartNodeInternal( const std::vector<uint8_t>& serialised
         return nullptr;
     }
 
-    // Member variables
+    // 成员变量
     for( const auto& var : metadata->memberVariables )
     {
         Metadata::MemberVariable::ValueUnion v;
@@ -250,7 +250,7 @@ SmartNode<> DeserialiseSmartNodeInternal( const std::vector<uint8_t>& serialised
         var.setFunc( generator.get(), v );
     }
 
-    // Member nodes
+    // 成员节点
     for( const auto& node : metadata->memberNodeLookups )
     {
         SmartNode<> nodeGen = DeserialiseSmartNodeInternal( serialisedNodeData, serialIdx, referenceNodes, level );
@@ -261,13 +261,13 @@ SmartNode<> DeserialiseSmartNodeInternal( const std::vector<uint8_t>& serialised
         }
     }
 
-    // Member variables
+    // 成员变量
     for( const auto& hybrid : metadata->memberHybrids )
     {
         uint8_t isGenerator;
-        // 1 byte to indicate:
-        // 0 = constant float value
-        // 1 = node lookup
+        // 1 字节用于指示：
+        // 0 = 常量 float 值
+        // 1 = 节点查找
 
         if( !GetFromDataStream( serialisedNodeData, serialIdx, isGenerator ) || isGenerator > 1 )
         {
@@ -319,7 +319,7 @@ NodeData* DeserialiseNodeDataInternal( const std::vector<uint8_t>& serialisedNod
         return nullptr;
     }
 
-    // UINT16_MAX indicates a reference node
+    // UINT16_MAX 表示引用节点
     if( nodeId == std::numeric_limits<uint16_t>::max() )
     {
         uint16_t referenceId;
@@ -336,7 +336,7 @@ NodeData* DeserialiseNodeDataInternal( const std::vector<uint8_t>& serialisedNod
         return nodeDataOut[referenceId].get();
     }
 
-    // Create node from nodeId
+    // 从 nodeId 创建节点
     const Metadata* metadata = Metadata::GetFromId( nodeId );
 
     if( !metadata )
@@ -346,7 +346,7 @@ NodeData* DeserialiseNodeDataInternal( const std::vector<uint8_t>& serialisedNod
 
     std::unique_ptr<NodeData> nodeData( new NodeData( metadata ) );
 
-    // Member variables
+    // 成员变量
     for( auto& var : nodeData->variables )
     {
         if( !GetFromDataStream( serialisedNodeData, serialIdx, var ) )
@@ -355,7 +355,7 @@ NodeData* DeserialiseNodeDataInternal( const std::vector<uint8_t>& serialisedNod
         }
     }
 
-    // Member nodes
+    // 成员节点
     for( auto& node : nodeData->nodeLookups )
     {
         node = DeserialiseNodeDataInternal( serialisedNodeData, nodeDataOut, serialIdx );
@@ -366,13 +366,13 @@ NodeData* DeserialiseNodeDataInternal( const std::vector<uint8_t>& serialisedNod
         }
     }
 
-    // Member hybrids
+    // 成员 hybrids
     for( auto& hybrid : nodeData->hybrids )
     {
         uint8_t isGenerator;
-        // 1 byte to indicate:
-        // 0 = constant float value
-        // 1 = node lookup
+        // 1 字节用于指示：
+        // 0 = 常量 float 值
+        // 1 = 节点查找
 
         if( !GetFromDataStream( serialisedNodeData, serialIdx, isGenerator ) || isGenerator > 1 )
         {

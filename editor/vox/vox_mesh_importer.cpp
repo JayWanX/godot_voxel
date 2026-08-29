@@ -50,7 +50,7 @@ String VoxelVoxMeshImporter::_voxel_get_resource_type() const {
 }
 
 float VoxelVoxMeshImporter::_voxel_get_priority() const {
-	// Higher import priority means the importer is preferred over another.
+	// 导入优先级越高，说明该导入器优先于另一个被选用。
 	return 0.0;
 }
 
@@ -77,7 +77,7 @@ bool VoxelVoxMeshImporter::_voxel_get_option_visibility(
 
 struct ForEachModelInstanceArgs {
 	const Model *model;
-	// Pivot position, which turns out to be at the center in MagicaVoxel
+	// 枢轴位置，在 MagicaVoxel 中恰好位于中心
 	Vector3i position;
 	Basis basis;
 };
@@ -91,7 +91,7 @@ Error for_each_model_instance_in_scene_graph(const Data &data, int node_id, Tran
 	switch (vox_node->type) {
 		case Node::TYPE_TRANSFORM: {
 			const TransformNode *vox_transform_node = reinterpret_cast<const TransformNode *>(vox_node);
-			// Calculate global transform of the child
+			// 计算子节点的全局变换
 			const Transform3D child_trans(
 					transform.basis * vox_transform_node->rotation.basis, transform.xform(vox_transform_node->position)
 			);
@@ -129,10 +129,10 @@ void for_each_model_instance(const Data &vox_data, F f) {
 		return;
 	}
 	if (vox_data.get_root_node_id() == -1) {
-		// No scene graph
+		// 没有场景图
 		ForEachModelInstanceArgs args;
 		args.model = &vox_data.get_model(0);
-		// Put at center to match what MagicaVoxel would do
+		// 放到中心以匹配 MagicaVoxel 的做法
 		args.position = args.model->size / 2;
 		args.basis = Basis();
 		f(args);
@@ -141,18 +141,18 @@ void for_each_model_instance(const Data &vox_data, F f) {
 	for_each_model_instance_in_scene_graph(vox_data, vox_data.get_root_node_id(), Transform3D(), 0, f);
 }
 
-// Find intersecting or touching models, merge their voxels into the same grid, mesh the result, then combine meshes.
+// 找到相交或接触的模型，将它们的体素合并到同一个网格中，对结果做网格化，然后合并网格。
 
 struct ModelInstance {
-	// Model with baked rotation
+	// 已烘焙旋转的模型
 	UniquePtr<voxel::VoxelBuffer> voxels;
-	// Lowest corner position
+	// 最低角位置
 	Vector3i position;
 };
 
 void extract_model_instances(const Data &vox_data, StdVector<ModelInstance> &out_instances) {
 	VOXEL_DSTACK();
-	// Gather all models and bake their rotations
+	// 收集所有模型并烘焙它们的旋转
 	for_each_model_instance(vox_data, [&out_instances](ForEachModelInstanceArgs args) {
 		ERR_FAIL_COND(args.model == nullptr);
 		const Model &model = *args.model;
@@ -160,11 +160,11 @@ void extract_model_instances(const Data &vox_data, StdVector<ModelInstance> &out
 		Span<const uint8_t> src_color_indices;
 		Vector3i dst_size = model.size;
 
-		// Using temporary copy to rotate the data
+		// 使用临时副本旋转数据
 		StdVector<uint8_t> temp_voxels;
 
 		if (args.basis == Basis()) {
-			// No transformation
+			// 没有变换
 			src_color_indices = to_span_const(model.color_indexes);
 		} else {
 			math::OrthoBasis basis;
@@ -177,9 +177,9 @@ void extract_model_instances(const Data &vox_data, StdVector<ModelInstance> &out
 			src_color_indices = to_span_const(temp_voxels);
 		}
 
-		// TODO Optimization: implement transformation for VoxelBuffers so we can avoid using a temporary copy.
-		// Didn't do it yet because VoxelBuffers also have metadata and the `transform_3d_array_zxy` function only works
-		// on arrays.
+		// TODO 优化：为 VoxelBuffer 实现变换，这样就能避免使用临时副本。
+		// 还没这么做，因为 VoxelBuffer 也有元数据，而且 `transform_3d_array_zxy` 函数只对
+		// 数组有效。
 		UniquePtr<voxel::VoxelBuffer> voxels = make_unique_instance<voxel::VoxelBuffer>(voxel::VoxelBuffer::ALLOCATOR_DEFAULT);
 		voxels->create(dst_size);
 		voxels->decompress_channel(voxel::VoxelBuffer::CHANNEL_COLOR);
@@ -198,7 +198,7 @@ void extract_model_instances(const Data &vox_data, StdVector<ModelInstance> &out
 }
 
 bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_origin, voxel::VoxelBuffer &out_voxels) {
-	// Determine total size
+	// 确定总大小
 	const ModelInstance &first_instance = instances[0];
 	Box3i bounding_box(first_instance.position, first_instance.voxels->get_size());
 	for (unsigned int instance_index = 1; instance_index < instances.size(); ++instance_index) {
@@ -206,8 +206,8 @@ bool make_single_voxel_grid(Span<const ModelInstance> instances, Vector3i &out_o
 		bounding_box.merge_with(Box3i(mi.position, mi.voxels->get_size()));
 	}
 
-	// Extra sanity check
-	// 3 gigabytes
+	// 额外的健全性检查
+	// 3 GB
 	const size_t limit = 3'000'000'000ull;
 	const size_t volume = Vector3iUtil::get_volume_u64(bounding_box.size);
 	ERR_FAIL_COND_V_MSG(
@@ -255,7 +255,7 @@ Error VoxelVoxMeshImporter::_voxel_import(
 	const Error load_err = vox_data.load_from_file(p_source_file);
 	ERR_FAIL_COND_V(load_err != OK, load_err);
 
-	// Get color palette
+	// 获取颜色调色板
 	Ref<VoxelColorPalette> palette;
 	palette.instantiate();
 	for (unsigned int i = 0; i < vox_data.get_palette().size(); ++i) {
@@ -275,18 +275,18 @@ Error VoxelVoxMeshImporter::_voxel_import(
 		StdVector<ModelInstance> model_instances;
 		extract_model_instances(vox_data, model_instances);
 
-		// From this point we no longer need vox data so we can free some memory
+		// 从这里开始我们不再需要 vox 数据，因此可以释放一些内存
 		vox_data.clear();
 
-		// TODO Optimization: this approach uses a lot of memory, might fail on scenes with a large bounding box.
-		// One workaround would be to mesh the scene incrementally in chunks, giving up greedy meshing beyond 256 or so.
+		// TODO 优化：这种方法占用大量内存，在边界框较大的场景上可能会失败。
+		// 一个变通方法是以块为单位增量地对场景进行网格化，超过 256 左右就放弃贪心网格化。
 		Vector3i bounding_box_origin;
 		voxel::VoxelBuffer voxels(voxel::VoxelBuffer::ALLOCATOR_DEFAULT);
 		const bool single_grid_succeeded =
 				make_single_voxel_grid(to_span_const(model_instances), bounding_box_origin, voxels);
 		ERR_FAIL_COND_V(!single_grid_succeeded, ERR_CANT_CREATE);
 
-		// We no longer need these
+		// 我们不再需要这些
 		model_instances.clear();
 
 		Ref<VoxelMesherCubes> mesher;
@@ -312,9 +312,9 @@ Error VoxelVoxMeshImporter::_voxel_import(
 		};
 
 		mesh = build_mesh(voxels, **mesher, surface_index_to_material, atlas, p_scale, offset);
-		// Deallocate large temporary memory to free space.
-		// This is a workaround because VoxelBuffer uses this by default, however it doesn't fit the present use case.
-		// Eventually we should avoid using this pool here.
+		// 释放大型临时内存以腾出空间。
+		// 这是一个变通方法，因为 VoxelBuffer 默认使用这个池，但它不适合当前的用例。
+		// 最终我们应该避免在这里使用这个池。
 		VoxelMemoryPool::get_singleton().clear_unused_blocks();
 	}
 
@@ -323,9 +323,9 @@ Error VoxelVoxMeshImporter::_voxel_import(
 		return ERR_CANT_CREATE;
 	}
 
-	// Save atlas
-	// TODO Saving atlases separately is impossible because of https://github.com/godotengine/godot/issues/51163
-	// Instead, I do like ResourceImporterScene: I leave them UNCOMPRESSED inside the materials...
+	// 保存图集
+	// TODO 由于 https://github.com/godotengine/godot/issues/51163，无法单独保存图集
+	// 相反，我像 ResourceImporterScene 那样做：我把它们以未压缩的形式放在材质内部……
 	/*String atlas_path;
 		if (atlas.is_valid()) {
 			atlas_path = String("{0}.atlas{1}.stex").format(varray(p_save_path, model_index));
@@ -345,24 +345,24 @@ Error VoxelVoxMeshImporter::_voxel_import(
 		mat.instantiate();
 		mat->set_roughness(1.f);
 		if (!p_store_colors_in_textures) {
-			// In this case we store colors in vertices
+			// 这种情况下我们把颜色存储在顶点中
 			mat->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
 		}
 	}
 	materials[1]->set_transparency(StandardMaterial3D::TRANSPARENCY_ALPHA);
 
-	// Assign materials
+	// 分配材质
 	if (p_store_colors_in_textures) {
-		// Can't share materials at the moment, because each atlas is specific to its mesh
+		// 目前无法共享材质，因为每个图集都专属于其网格
 		for (unsigned int surface_index = 0; surface_index < surface_index_to_material.size(); ++surface_index) {
 			const unsigned int material_index = surface_index_to_material[surface_index];
 			CRASH_COND(material_index >= materials.size());
 			Ref<StandardMaterial3D> material = materials[material_index]->duplicate();
 			if (atlas.is_valid()) {
-				// TODO Do I absolutely HAVE to load this texture back to memory AND renderer just so import works??
+				// TODO 我真的必须为了导入而把这个纹理重新加载回内存和渲染器吗？？
 				// Ref<Texture> texture = ResourceLoader::load(atlas_path);
-				// TODO THIS IS A WORKAROUND, it is not supposed to be an ImageTexture...
-				// See earlier code, I could not find any way to reference a separate StreamTexture.
+				// TODO 这是一个变通方法，它不应该是 ImageTexture……
+				// 参见前面的代码，我找不到任何方法引用单独的 StreamTexture。
 				Ref<ImageTexture> texture = ImageTexture::create_from_image(atlas);
 				material->set_texture(StandardMaterial3D::TEXTURE_ALBEDO, texture);
 				material->set_texture_filter(StandardMaterial3D::TEXTURE_FILTER_NEAREST);
@@ -377,7 +377,7 @@ Error VoxelVoxMeshImporter::_voxel_import(
 		}
 	}
 
-	// Save mesh
+	// 保存网格
 	{
 		VOXEL_PROFILE_SCOPE();
 		String mesh_save_path = String("{0}.mesh").format(varray(p_save_path));

@@ -61,7 +61,7 @@ public:
 	void do_mesh(const VoxelMeshSDF &mesh_sdf, const Transform3D &transform, const float isolevel) override;
 #endif
 
-	// Specialized API
+	// 专用 API
 
 	void do_hemisphere(Vector3 center, float radius, Vector3 flat_direction, float smoothness);
 

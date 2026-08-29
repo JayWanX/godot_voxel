@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelMesherBlocky" inherits="VoxelMesher" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Produces a mesh by batching models corresponding to each voxel value, similar to games like Minecraft or StarMade.
+		通过批量合并与每个体素值对应的模型来生成网格，类似于 Minecraft 或 StarMade 等游戏。
 	</brief_description>
 	<description>
-		Occluded faces are removed from the result, and some degree of ambient occlusion can be baked on the edges. Values are expected to be in the [constant VoxelBuffer.CHANNEL_TYPE] channel. Models are defined with a [VoxelBlockyLibrary], in which model indices correspond to the voxel values. Models don't have to be cubes.
+		被遮挡的面会从结果中移除，并且可以在边缘烘焙一定程度的环境光遮蔽。体素值应存储在 [constant VoxelBuffer.CHANNEL_TYPE] 通道中。模型通过 [VoxelBlockyLibrary] 定义，其中模型索引与体素值对应。模型不一定是立方体。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -25,33 +25,33 @@
 	</methods>
 	<members>
 		<member name="library" type="VoxelBlockyLibraryBase" setter="set_library" getter="get_library">
-			Library of models that will be used by this mesher. If you are using a mesher without a terrain, make sure you call [method VoxelBlockyLibraryBase.bake] before building meshes, otherwise results will be empty or out-of-date.
+			此网格生成器将使用的模型库。如果你在没有地形的情况下使用网格生成器，请确保在构建网格之前调用 [method VoxelBlockyLibraryBase.bake]，否则结果将为空或已过时。
 		</member>
 		<member name="occlusion_darkness" type="float" setter="set_occlusion_darkness" getter="get_occlusion_darkness" default="0.8">
 		</member>
 		<member name="occlusion_enabled" type="bool" setter="set_occlusion_enabled" getter="get_occlusion_enabled" default="true">
-			Enables baked ambient occlusion. To render it, you need a material that applies vertex colors.
+			启用烘焙的环境光遮蔽。要渲染它，你需要一个应用顶点颜色的材质。
 		</member>
 		<member name="shadow_occluder_negative_x" type="bool" setter="set_shadow_occluder_side" getter="get_shadow_occluder_side" default="false" experimental="">
-			When enabled, generates a quad covering the negative X side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+			启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块负 X 侧的四边形，以强制方向光投射阴影。
 		</member>
 		<member name="shadow_occluder_negative_y" type="bool" setter="set_shadow_occluder_side" getter="get_shadow_occluder_side" default="false" experimental="">
-			When enabled, generates a quad covering the negative Y side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+			启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块负 Y 侧的四边形，以强制方向光投射阴影。
 		</member>
 		<member name="shadow_occluder_negative_z" type="bool" setter="set_shadow_occluder_side" getter="get_shadow_occluder_side" default="false" experimental="">
-			When enabled, generates a quad covering the negative Z side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+			启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块负 Z 侧的四边形，以强制方向光投射阴影。
 		</member>
 		<member name="shadow_occluder_positive_x" type="bool" setter="set_shadow_occluder_side" getter="get_shadow_occluder_side" default="false" experimental="">
-			When enabled, generates a quad covering the positive X side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+			启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块正 X 侧的四边形，以强制方向光投射阴影。
 		</member>
 		<member name="shadow_occluder_positive_y" type="bool" setter="set_shadow_occluder_side" getter="get_shadow_occluder_side" default="false" experimental="">
-			When enabled, generates a quad covering the positive Y side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+			启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块正 Y 侧的四边形，以强制方向光投射阴影。
 		</member>
 		<member name="shadow_occluder_positive_z" type="bool" setter="set_shadow_occluder_side" getter="get_shadow_occluder_side" default="false" experimental="">
-			When enabled, generates a quad covering the positive Z side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+			启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块正 Z 侧的四边形，以强制方向光投射阴影。
 		</member>
 		<member name="tint_mode" type="int" setter="set_tint_mode" getter="get_tint_mode" enum="VoxelMesherBlocky.TintMode" default="0">
-			Configures a way to apply color from voxel data.
+			配置从体素数据应用颜色的方式。
 		</member>
 	</members>
 	<constants>
@@ -68,10 +68,10 @@
 		<constant name="SIDE_POSITIVE_Z" value="5" enum="Side">
 		</constant>
 		<constant name="TINT_NONE" value="0" enum="TintMode">
-			Only use colors from library models.
+			仅使用库模型中的颜色。
 		</constant>
 		<constant name="TINT_RAW_COLOR" value="1" enum="TintMode">
-			Modulate voxel colors based on the [constant VoxelBuffer.CHANNEL_COLOR] channel. Values are interpreted as being raw RGBA color. If the channel is 16-bit, colors are packed with 4 bits per component. If 32-bits, colors are packed with 8 bits per component. Other depths are not supported. See [method VoxelTool.color_to_u32] for encoding. You may also change the format of the color channel to use this, see [member VoxelNode.format]. Alpha will only have an effect if the material supports transparency, but will not affect how faces are culled by the mesher.
+			根据 [constant VoxelBuffer.CHANNEL_COLOR] 通道调整体素颜色。值被解释为原始 RGBA 颜色。如果通道是 16 位，则颜色按每个分量 4 位打包。如果是 32 位，则颜色按每个分量 8 位打包。不支持其他位深。编码请参见 [method VoxelTool.color_to_u32]。你也可以更改颜色通道的格式来使用此模式，参见 [member VoxelNode.format]。Alpha 仅在材质支持透明度时才会生效，但不会影响网格生成器对面进行剔除的方式。
 		</constant>
 	</constants>
 </class>

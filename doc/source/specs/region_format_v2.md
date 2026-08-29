@@ -1,41 +1,41 @@
-Region format v2
+区域文件格式 v2
 ==================
 
 !!! warning
-    This document is about an old version of the format. You may check the most recent version.
+    本文档描述的是该格式的旧版本。你可以查看最新版本。
 
-Version: 2
+版本：2
 
-Regions allows to save large 3D voxel volumes in a format suitable for frequent streaming in all directions.  
-This format is inspired by https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game  
-It is implemented by `VoxelStreamRegionFiles`, which can be found in https://github.com/Voxel/godot_voxel/blob/master/streams/voxel_stream_region_files.cpp
+区域文件允许以适合在各个方向频繁流式加载的格式保存大型 3D 体素体量。  
+此格式的灵感来自 https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game  
+它由 `VoxelStreamRegionFiles` 实现，可在 https://github.com/Voxel/godot_voxel/blob/master/streams/voxel_stream_region_files.cpp 找到
 
 
-Coordinate spaces
+坐标空间
 -------------------
 
-This format uses 3 different coordinate spaces. Each one can be converted to another by using a multiplier.
+此格式使用 3 种不同的坐标空间。每种坐标空间都可以通过使用乘数转换为另一种。
 
-- Voxel coordinates: actual position of voxels in space
-- Block coordinates: position of a block of voxels with a defined size B. For example, common block size is 16x16x16 voxels. Block coordinates can be converted into voxel coordinates by multiplying it by B, giving the origin voxel within that block.
-- Region coordinates: position of a region of blocks with a defined size R. A region coordinate can be converted into block coordinates by multiplying it by R, giving the origin block within that region.
+- 体素坐标：体素在空间中的实际位置
+- 数据块坐标：具有定义尺寸 B 的体素数据块的位置。例如，常见的数据块尺寸是 16x16x16 个体素。将数据块坐标乘以 B 即可转换为体素坐标，得到该数据块内的原点体素。
+- 区域坐标：具有定义尺寸 R 的区域（由数据块组成）的位置。将区域坐标乘以 R 即可转换为数据块坐标，得到该区域内的原点数据块。
 
-Powers of two may be used as multipliers.
+可以使用 2 的幂作为乘数。
 
 
-File structure
+文件结构
 ----------------
 
-A region save is organized in multiple files, and is contained within a root directory containing them.
-Under that directory, is located two things:
+区域存档由多个文件组成，并包含在一个存放这些文件的根目录中。
+该目录下包含两样东西：
 
-- A `meta.vxrm` file
-- A `regions` directory
+- 一个 `meta.vxrm` 文件
+- 一个 `regions` 目录
 
-Under the region directory, there must be a sub-directory, for each layer of level of detail (LOD). Those folders must be named `lodX`, where `X` is the LOD index, starting from `0`.
+在区域目录下，必须为每个细节层级（LOD）都有一个子目录。这些文件夹必须命名为 `lodX`，其中 `X` 是 LOD 索引，从 `0` 开始。
 
-LOD folders then contain region files for that LOD.
-Each region file is named using the following convention: `r.X.Y.Z.vxr`, where X, Y and Z are coordinates of the region, in the region coordinate space.
+然后 LOD 文件夹包含该 LOD 的区域文件。
+每个区域文件按照以下约定命名：`r.X.Y.Z.vxr`，其中 X、Y 和 Z 是该区域在区域坐标空间中的坐标。
 
 - `world/`
 	- `meta.vxrm`
@@ -52,30 +52,30 @@ Each region file is named using the following convention: `r.X.Y.Z.vxr`, where X
 		- ...
 
 
-Meta file
+元文件
 ------------
 
-The meta file under the root directory contains global information about all voxel data. It is currently using JSON, but may not be edited by hand.
+根目录下的元文件包含关于所有体素数据的全局信息。它目前使用 JSON 格式，但可能不宜手工编辑。
 
-It must contain the following fields:
+它必须包含以下字段：
 
-- `version`: integer telling the version of that format. It must be `2`. Older versions may be migrated.
-- `block_size_po2`: size of blocks in voxels, as an integer power of two (4 for 16, 5 for 32 etc). Blocks are always cubic.
-- `lod_count`: how many LOD levels there are. There will be as many LOD folders. It must be greater than 0.
-- `region_size_po2`: size of regions in blocks, as an integer power of two (4 for 16, 5 for 32 etc). Regions are always cubic.
-- `sector_size`: size of a sector within a region file, as a strictly positive integer. See region format for more information.
-- `channel_depths`: array of 8 integers, representing the bit depth of each voxel channel:
-	- `0`: 8 bits
-	- `1`: 16 bits
-	- `2`: 32 bits
-	- `3`: 64 bits
-	- See block format for more information.
+- `version`：整数，指明该格式的版本。它必须是 `2`。旧版本可能被迁移。
+- `block_size_po2`：数据块以体素计量的尺寸，为 2 的整数次幂（16 对应 4，32 对应 5 等）。数据块始终是立方的。
+- `lod_count`：LOD 层级的数量。将会有同样数量的 LOD 文件夹。它必须大于 0。
+- `region_size_po2`：区域以数据块计量的尺寸，为 2 的整数次幂（16 对应 4，32 对应 5 等）。区域始终是立方的。
+- `sector_size`：区域文件内扇区的大小，为严格正整数。更多信息请参见区域格式。
+- `channel_depths`：包含 8 个整数的数组，表示每个体素通道的位深度：
+	- `0`：8 位
+	- `1`：16 位
+	- `2`：32 位
+	- `3`：64 位
+	- 更多信息请参见数据块格式。
 
 
-Region file
+区域文件
 -------------
 
-Region files are binary, little-endian. They are composed of a prologue, header, and sector data.
+区域文件是二进制格式，使用小端字节序。它们由前导、头部和扇区数据组成。
 
 ```
 Prologue:
@@ -87,33 +87,33 @@ SectorData:
 - ...
 ```
 
-### Prologue
+### 前导
 
-It starts with four 8-bit characters: `VXR_`, followed by one byte representing the version of the format in binary form. The version must be `2`. Version `1` has the same data layout so it can be read the same. Other versions cannot be read.
+它以四个 8 位字符开始：`VXR_`，后跟一个以二进制形式表示格式版本的字节。版本必须是 `2`。版本 `1` 具有相同的数据布局，因此可以以相同方式读取。其它版本无法读取。
 
-### Header
+### 头部
 
-The header is a sequence of 32-bit integers. Each integer represents information about where a block is in the file, and how big it is. The count of that sequence is the number of blocks a region can contain, and is the same in all regions. The index of elements in that sequence is calculated from 3D block positions, in ZXY order. The index for a block can be obtained with the formula `y + block_size * (x + block_size * z)`.
-Each integer contains two informations:
-- The first byte is the number of sectors the block is spanning. Obtained as `n & 0xff`.
-- The 3 other bytes are the index to the first sector. Obtained as `n >> 8`.
+头部是一系列 32 位整数。每个整数表示关于数据块在文件中的位置及其大小的信息。该序列的数量是一个区域能包含的数据块数量，在所有区域中相同。该序列中元素的索引根据 3D 数据块位置按 ZXY 顺序计算。数据块的索引可以通过公式 `y + block_size * (x + block_size * z)` 获得。
+每个整数包含两条信息：
+- 第一个字节是数据块跨越的扇区数。通过 `n & 0xff` 获得。
+- 其余 3 个字节是第一个扇区的索引。通过 `n >> 8` 获得。
 
-### Sectors
+### 扇区
 
-The rest of the file is occupied by sectors.
-Sectors are fixed-size chunks of data. Their size is determined from the meta file described earlier.
-Blocks are stored in those sectors. A block can span one or more sectors.
-The file is partitionned in this way to allow frequently writing blocks of variable size without having to often shift consecutive contents.
+文件的其余部分由扇区占据。
+扇区是固定大小的数据块。它们的大小由前面描述的元文件决定。
+数据块存储在这些扇区中。一个数据块可以跨越一个或多个扇区。
+文件以这种方式分区，以便频繁写入可变大小的数据块时不必经常移动连续的内容。
 
-When we need to load a block, the address where block information starts will be the following:
+当需要加载数据块时，数据块信息起始的地址如下：
 ```
 header_size + first_sector_index * sector_size
 ```
 
-Once we have the address of the block, the first 4 bytes at this address will contain the size of the written data.
+一旦得到数据块的地址，该地址处的前 4 个字节将包含所写入数据的大小。
 
 !!! note
-	those 4 bytes are included in the total block size when the number of occupied sectors is determined.
+	在确定占用扇区数量时，这 4 个字节计入数据块总大小。
 
 ```
 RegionBlockData
@@ -121,27 +121,27 @@ RegionBlockData
 - buffer
 ```
 
-The obtained buffer can be read using the block format.
+得到的缓冲区可以使用数据块格式读取。
 
 
-Block format
+数据块格式
 --------------
 
-See [Block format](block_format_v1.md)
+请参见[数据块格式](block_format_v1.md)
 
 
-Current Issues
+当前问题
 ----------------
 
-Although this format is currently implemented and usable, it has known issues.
+尽管此格式目前已实现且可用，但它存在已知问题。
 
-### Endianness
+### 字节序
 
-Godot's `encode_variant` doesn't seem to care about endianness across architectures, so it's possible it becomes a problem in the future and gets changed to a custom format.
-The rest of this spec is not affected by this and assumes we use little-endian, however the implementation of block channels currently doesn't consider this either. This may be refined in a later iteration.
+Godot 的 `encode_variant` 似乎不关心不同架构间的字节序，因此将来可能会成为问题并改为自定义格式。
+本规范的其余部分不受此影响，并假定我们使用小端字节序，然而当前数据块通道的实现同样没有考虑这一点。这可能会在后续迭代中改进。
 
-### Versioning
+### 版本管理
 
-The region format should be thought of a container for instances of the block format. The former has a version number, but the latter doesn't, which is hard to manage. We may introduce separate versionning, which will cause older saves to become incompatible.
+区域格式应被视为数据块格式实例的容器。前者有版本号，而后者没有，这很难管理。我们可能会引入独立的版本管理，这将导致旧存档变得不兼容。
 
-User versionning may also be added as a third layer: if the game needs to replace some metadata with new ones, or swap voxel IDs around due to a change in the game, it is desirable to expose a hook to migrate old versions.
+用户版本管理也可以作为第三层加入：如果游戏需要用新元数据替换某些元数据，或由于游戏变更而交换体素 ID，最好提供一个钩子来迁移旧版本。

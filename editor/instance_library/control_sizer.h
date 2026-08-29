@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Implements similar logic as the middle resizing handle of SplitContainer, but works on a target control instead
+// 实现与 SplitContainer 中间调整大小的手柄类似的逻辑，但作用于目标控件上
 class Voxel_ControlSizer : public Control {
 	GDCLASS(Voxel_ControlSizer, Control)
 public:

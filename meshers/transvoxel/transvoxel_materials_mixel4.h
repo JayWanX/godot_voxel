@@ -9,9 +9,9 @@
 
 namespace voxel::transvoxel::materials::mixel4 {
 
-// How many textures can be referred to in total
+// 总共可以引用的纹理数量
 static const unsigned int MAX_TEXTURES = 16;
-// How many textures can blend at once
+// 一次可以混合的纹理数量
 static const unsigned int MAX_TEXTURE_BLENDS = 4;
 
 template <unsigned int NVoxels>
@@ -28,8 +28,8 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 		const WeightSampler_T &weights_sampler,
 		const unsigned int case_code
 ) {
-	// TODO Optimization: this function takes almost half of the time when polygonizing non-empty cells.
-	// I wonder how it can be optimized further?
+	// TODO 优化：此函数在多边形化非空单元时几乎占用一半的时间。
+	// 我想知道还能如何进一步优化？
 
 	struct IndexAndWeight {
 		unsigned int index;
@@ -39,7 +39,7 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 	FixedArray<FixedArray<uint8_t, MAX_TEXTURES>, NVoxels> cell_texture_weights_temp;
 	FixedArray<IndexAndWeight, MAX_TEXTURES> indexed_weight_sums;
 
-	// Find 4 most-used indices in voxels
+	// 找出体素中使用最多的 4 个索引
 	for (unsigned int i = 0; i < indexed_weight_sums.size(); ++i) {
 		indexed_weight_sums[i] = IndexAndWeight{ i, 0 };
 	}
@@ -49,7 +49,7 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 		FixedArray<uint8_t, MAX_TEXTURES> &weights_temp = cell_texture_weights_temp[ci];
 		fill(weights_temp, uint8_t(0));
 
-		// Air voxels should not contribute
+		// 空气体素不应参与贡献
 		if ((case_code & (1 << ci)) != 0) {
 			continue;
 		}
@@ -76,25 +76,25 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 
 	CellTextureDatas<NVoxels> cell_textures;
 
-	// Assign indices
+	// 分配索引
 	for (unsigned int i = 0; i < cell_textures.indices.size(); ++i) {
 		cell_textures.indices[i] = indexed_weight_sums[i].index;
 	}
 
-	// Sort indices to avoid cases that are ambiguous for blending, like 1,2,3,4 and 2,1,3,4
-	// TODO maybe we could require this sorting to be done up front?
-	// Or maybe could be done after meshing so we do it less times?
+	// 对索引排序以避免混合时出现歧义的情况，如 1,2,3,4 和 2,1,3,4
+	// TODO 也许我们可以要求预先完成这种排序？
+	// 或者也可以在网格化之后进行，这样次数更少？
 	math::sort(cell_textures.indices[0], cell_textures.indices[1], cell_textures.indices[2], cell_textures.indices[3]);
 
 	cell_textures.packed_indices = pack_bytes(cell_textures.indices);
 
-	// Remap weights to follow the indices we selected
+	// 重新映射权重以匹配我们选择的索引
 	for (unsigned int ci = 0; ci < cell_texture_weights_temp.size(); ++ci) {
 		// VOXEL_PROFILE_SCOPE();
 
 		FixedArray<uint8_t, 4> &dst_weights = cell_textures.weights[ci];
 
-		// Skip air voxels
+		// 跳过空气体素
 		if ((case_code & (1 << ci)) != 0) {
 			fill(dst_weights, uint8_t(0));
 			continue;
@@ -112,9 +112,9 @@ CellTextureDatas<NVoxels> select_textures_4_per_voxel(
 }
 
 struct TextureIndicesData {
-	// Texture indices for each voxel
+	// 每个体素的纹理索引
 	Span<const uint16_t> buffer;
-	// Used if the buffer is empty
+	// 当缓冲区为空时使用
 	FixedArray<uint8_t, 4> default_indices;
 	uint32_t packed_default_indices;
 };
@@ -125,19 +125,19 @@ inline void get_cell_texture_data(
 		const TextureIndicesData &texture_indices_data,
 		const FixedArray<unsigned int, NVoxels> &voxel_indices,
 		const WeightSampler_T &weights_data,
-		// Used for rejecting air voxels. Can be set to 0 so all corners are always used.
+		// 用于剔除空气体素。可设为 0 以始终使用所有角。
 		const unsigned int case_code
 ) {
 	if (texture_indices_data.buffer.size() == 0) {
-		// Indices are known for the whole block, just read weights directly
+		// 整个数据块的索引已知，直接读取权重即可
 		cell_textures.indices = texture_indices_data.default_indices;
 		cell_textures.packed_indices = texture_indices_data.packed_default_indices;
 		for (unsigned int ci = 0; ci < voxel_indices.size(); ++ci) {
 			if ((case_code & (1 << ci)) != 0) {
-				// Force air voxels to not contribute
-				// TODO This is not great, because every Transvoxel vertex interpolates between a matter and air corner.
-				// This approach means we would always interpolate towards 0 as a result.
-				// Maybe we'll have to use a different approach and remove this option in the future.
+				// 强制空气体素不参与贡献
+				// TODO 这不太好，因为每个 Transvoxel 顶点都在实体与空气角之间插值。
+				// 这意味着结果总是会向 0 插值。
+				// 也许将来我们得采用不同的方法并移除该选项。
 				fill(cell_textures.weights[ci], uint8_t(0));
 			} else {
 				const unsigned int wi = voxel_indices[ci];
@@ -146,7 +146,7 @@ inline void get_cell_texture_data(
 		}
 
 	} else {
-		// There can be more than 4 indices or they are not known, so we have to select them
+		// 索引可能多于 4 个或未知，因此我们必须自行选择
 		cell_textures =
 				select_textures_4_per_voxel(voxel_indices, texture_indices_data.buffer, weights_data, case_code);
 	}
@@ -160,12 +160,12 @@ struct WeightSamplerPackedU16 {
 };
 
 inline uint16_t reorder_transition_case_code(const uint16_t case_code) {
-	// Reorders the case code from a transition cell so bits corresponds to an XYZ iteration order through cell corners.
+	// 重新排列过渡单元的 case code，使位与遍历单元角的 XYZ 迭代顺序对应。
 	//
-	// The order of cell corners chosen in transition cells are dependent on how the Transvoxel tables are laid out (see
-	// figures 4.16 and 4.17 of the paper), which unfortunately is different from the order in which we sample voxels.
-	// That prevents from re-using it in texture selection. The reason for that choice seems to stem from convenience
-	// when creating the lookup tables.
+	// 过渡单元中选择的角顺序取决于 Transvoxel 表的布局（参见
+	// 论文中的图 4.16 和 4.17），遗憾的是这与我们采样体素的顺序不同。
+	// 这导致无法在纹理选择中复用它。选择该顺序的原因似乎是为了方便
+	// 创建查找表。
 	//                       |436785210|
 	const uint16_t alt_case_code = 0 //
 			| ((case_code & 0b000000111)) // 210
@@ -222,7 +222,7 @@ struct Processor {
 	inline uint32_t on_transition_cell(const FixedArray<uint32_t, 9> &corner_voxel_indices, const uint8_t case_code) {
 		const uint16_t alt_case_code = textures_skip_air_voxels ? reorder_transition_case_code(case_code) : 0;
 
-		// Get values from 9 significant corners
+		// 从 9 个关键角获取值
 		CellTextureDatas<9> cell_textures_partial;
 		get_cell_texture_data(
 				cell_textures_partial,
@@ -232,7 +232,7 @@ struct Processor {
 				alt_case_code
 		);
 
-		// Fill in slots that are just repeating others
+		// 填充只是重复其它槽位的值
 
 		cell_textures.indices = cell_textures_partial.indices;
 		cell_textures.packed_indices = cell_textures_partial.packed_indices;

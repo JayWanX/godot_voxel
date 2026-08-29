@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Copied from Godot core.
+// 从 Godot 核心代码复制而来。
 // TODO Godot 核心已提供类似函数，考虑替换或保留自定义实现
 
 inline uint32_t hash_djb2_one_32(uint32_t p_in, uint32_t p_prev = 5381) {
@@ -18,8 +18,8 @@ inline uint64_t hash_djb2_one_64(uint64_t p_in, uint64_t p_prev = 5381) {
 }
 
 #define HASH_MURMUR3_SEED 0x7F07C65
-// Murmurhash3 32-bit version.
-// All MurmurHash versions are public domain software, and the author disclaims all copyright to their code.
+// Murmurhash3 的 32 位版本。
+// 所有 MurmurHash 版本均为公有领域软件，作者放弃其代码的所有版权。
 
 inline uint32_t hash_murmur3_one_32(uint32_t p_in, uint32_t p_seed = HASH_MURMUR3_SEED) {
 	p_in *= 0xcc9e2d51;

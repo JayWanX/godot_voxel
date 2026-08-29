@@ -24,17 +24,17 @@ namespace voxel {
 
 class VoxelBuffer;
 
-// Uses an internal VoxelGraphFunction to generate voxel data.
+// 使用内部的 VoxelGraphFunction 生成体素数据。
 class VoxelGeneratorGraph : public VoxelGenerator {
 	GDCLASS(VoxelGeneratorGraph, VoxelGenerator)
 public:
 	static const char *SIGNAL_NODE_NAME_CHANGED;
 
-	// Selects the format produced by texture outputs
+	// 选择纹理输出产生的格式
 	enum TextureMode {
-		// Voxels contain 4 indices and 4 weights encoded in 16-bit channels INDICES and WEIGHTS
+		// 体素包含 4 个索引和 4 个权重，编码在 16 位通道 INDICES 和 WEIGHTS 中
 		TEXTURE_MODE_MIXEL4,
-		// Voxels contain 1 index in 8-bit channel INDICES
+		// 体素包含 1 个索引，位于 8 位通道 INDICES 中
 		TEXTURE_MODE_SINGLE,
 		TEXTURE_MODE_COUNT
 	};
@@ -47,7 +47,7 @@ public:
 
 	Ref<pg::VoxelGraphFunction> get_main_function() const;
 
-	// Performance tuning (advanced)
+	// 性能调优（高级）
 
 	bool is_using_optimized_execution_map() const;
 	void set_use_optimized_execution_map(bool use);
@@ -70,7 +70,7 @@ public:
 	void set_texture_mode(const TextureMode mode);
 	TextureMode get_texture_mode() const;
 
-	// VoxelGenerator implementation
+	// VoxelGenerator 实现
 
 	int get_used_channels_mask() const override;
 
@@ -97,7 +97,7 @@ public:
 
 	// Ref<Resource> duplicate(bool p_subresources) const VOXEL_OVERRIDE_UNLESS_GODOT_EXTENSION;
 
-	// Utility
+	// 工具
 
 	void bake_sphere_bumpmap(Ref<Image> im, float ref_radius, float min_height, float max_height);
 	void bake_sphere_normalmap(Ref<Image> im, float ref_radius, float strength);
@@ -106,7 +106,7 @@ public:
 
 	void generate_image_from_sdf(Ref<Image> image, const Transform3D transform, const Vector2 size);
 
-	// Internal
+	// 内部
 
 	pg::CompilationResult compile(bool debug);
 	bool is_good() const;
@@ -119,7 +119,7 @@ public:
 			Span<const float> in_sdf
 	);
 
-	// Returns state from the last generator used in the current thread
+	// 返回当前线程中最后一次使用的生成器的状态
 	static const pg::Runtime::State &get_last_state_from_current_thread();
 	static Span<const uint32_t> get_last_execution_map_debug_from_current_thread();
 
@@ -129,17 +129,17 @@ public:
 	bool has_texture_output() const;
 
 #ifdef VOXEL_ENABLE_GPU
-	// GPU support
+	// GPU 支持
 
 	bool supports_shaders() const override {
-		// To some extent. It might fail if the graph contains nodes that are not compatible.
+		// 在某种程度上支持。如果图中包含不兼容的节点，可能会失败。
 		return true;
 	}
 
 	bool get_shader_source(ShaderSourceData &out_data) const override;
 #endif
 
-	// Debug
+	// 调试
 
 	math::Interval debug_analyze_range(Vector3i min_pos, Vector3i max_pos, bool optimize_execution_map) const;
 
@@ -152,7 +152,7 @@ public:
 
 	void debug_load_waves_preset();
 
-	// Editor
+	// 编辑器
 
 #ifdef TOOLS_ENABLED
 	void get_configuration_warnings(PackedStringArray &out_warnings) const override;
@@ -165,10 +165,9 @@ private:
 	Dictionary _b_compile();
 	float _b_debug_measure_microseconds_per_voxel(bool singular);
 #ifdef TOOLS_ENABLED
-	// This exists because some custom editors will edit an internal object instead of the resource itself
-	// (here the "main function" object). And because Godot determines wether or not a resource should be saved based on
-	// UndoRedo, if the containing resource doesn't appear in UndoRedo actions, it will consider the resource hasn't
-	// changed and won't save it... so we call a dummy function first, just to make Godot understand that...
+	// 这存在是因为某些自定义编辑器会编辑内部对象而不是资源本身（这里是“主函数”对象）。
+	// 并且由于 Godot 根据 UndoRedo 判断资源是否应保存，如果包含该资源的资源没有出现在 UndoRedo 操作中，
+	// 它就会认为资源没有改变而不保存…… 所以我们先调用一个空函数，只是为了让 Godot 明白这一点……
 	void _b_dummy_function() {}
 #endif
 	Dictionary get_graph_as_variant_data() const;
@@ -194,37 +193,37 @@ private:
 
 	Ref<pg::VoxelGraphFunction> _main_function;
 
-	// This generator performs range analysis using nodes of the graph. Terrain surface can only appear when SDF
-	// crosses zero within a block. For each generated block, an estimated range of the output is calculated.
-	// If that range is beyond this threshold (either negatively or positively), then blocks will be given a uniform
-	// value, either air or matter, skipping generation of all voxels.
-	// Setting a high threshold turns it off, providing consistent SDF, but it may severely impact performance.
+	// 该生成器使用图的节点执行范围分析。地形表面只会在 SDF 在块内穿过零时出现。
+	// 对于每个生成的块，都会计算输出的估计范围。
+	// 如果该范围超出此阈值（无论是负向还是正向），那么块将被赋予统一的值，要么是空气要么是实体，
+	// 从而跳过所有体素的生成。
+	// 设置较高的阈值会关闭该功能，提供一致的 SDF，但可能会严重影响性能。
 	float _sdf_clip_threshold = 1.5f;
-	// Sometimes block size can be larger, but it makes range analysis less precise. So it is possible to subdivide
-	// generation within areas of the block instead of doing it whole.
-	// Blocks size must be a multiple of the subdivision size.
+	// 有时块尺寸可能较大，但这会降低范围分析的精度。因此可以将块内区域的生成进行细分，
+	// 而不是整体生成。
+	// 块尺寸必须是细分尺寸的倍数。
 	bool _use_subdivision = true;
 	int _subdivision_size = 16;
-	// When enabled, the generator will attempt to optimize out nodes that don't need to run in specific areas,
-	// if their output range is considered to not affect the final result.
+	// 启用后，如果某些节点的输出范围被认为不影响最终结果，
+	// 生成器将尝试优化掉在特定区域不需要运行的节点。
 	bool _use_optimized_execution_map = true;
-	// When enabled, nodes using only the X and Z coordinates will be cached when generating blocks in slices along Y.
-	// This prevents recalculating values that would otherwise be the same on each slice.
-	// It helps a lot when part of the graph is generating a heightmap for example.
+	// 启用后，当沿 Y 方向分片生成块时，仅使用 X 和 Z 坐标的节点将被缓存。
+	// 这可以防止重新计算那些在每个分片上本应相同的值。
+	// 例如，当图的某部分正在生成高度图时，这会带来很大帮助。
 	bool _use_xz_caching = true;
-	// If true, inverts clipped blocks so they create visual artifacts making the clipped area visible.
+	// 如果为 true，则反转被裁剪的块，使其产生视觉伪影，让被裁剪的区域可见。
 	bool _debug_clipped_blocks = false;
 	TextureMode _texture_mode = TEXTURE_MODE_MIXEL4;
 
-	// Only compiling and generation methods are thread-safe.
+	// 只有编译和生成方法是线程安全的。
 
-	// Wrapper around the runtime with extra information specialized for the use case
+	// 运行时封装，包含针对该用例特化的额外信息
 	struct Runtime {
-		// TODO Use the runtime and state from `VoxelGraphFunction`
+		// TODO 使用来自 `VoxelGraphFunction` 的运行时和状态
 		pg::Runtime runtime;
 
-		// Indices that are not used in the graph.
-		// This is used when there are less than 4 texture weight outputs.
+		// 图中未使用的索引。
+		// 当纹理权重输出少于 4 个时使用。
 		FixedArray<uint8_t, 4> spare_texture_indices;
 
 		int x_input_index = -1;
@@ -242,12 +241,12 @@ private:
 		int single_texture_output_buffer_index = -1;
 
 		FixedArray<WeightOutput, 16> weight_outputs;
-		// List of indices to feed queries. The order doesn't matter, can be different from `weight_outputs`.
+		// 用于提供查询的索引列表。顺序无关紧要，可以与 `weight_outputs` 不同。
 		FixedArray<unsigned int, 16> weight_output_indices;
 		unsigned int weight_outputs_count = 0;
 	};
 
-	// Helper to setup inputs for runtime queries
+	// 用于为运行时查询设置输入的辅助
 	template <typename T>
 	struct QueryInputs {
 		FixedArray<T, 4> query_inputs;
@@ -283,7 +282,7 @@ private:
 		StdVector<float> z_cache;
 		StdVector<float> input_sdf_slice_cache;
 		StdVector<float> input_sdf_full_cache;
-		// TODO Use the runtime and state from `VoxelGraphFunction`
+		// TODO 使用来自 `VoxelGraphFunction` 的运行时和状态
 		pg::Runtime::State state;
 		pg::Runtime::ExecutionMap optimized_execution_map;
 	};

@@ -9,45 +9,45 @@ namespace voxel {
 
 class IThreadedTask;
 
-// Tracks the status of one or more tasks.
-// This should be referenced by tasks using a shared pointer.
+// 追踪一个或多个任务的状态。
+// 任务应通过共享指针引用它。
 class AsyncDependencyTracker {
 public:
-	// Creates a tracker with no known tasks to track yet. You must use `set_count` before scheduling tasks.
+	// 创建一个尚未追踪任何已知任务的追踪器。你必须在调度任务前使用 `set_count`。
 	AsyncDependencyTracker();
 
-	// Creates a tracker which will track `initial_count` tasks.
+	// 创建一个将追踪 `initial_count` 个任务的追踪器。
 	AsyncDependencyTracker(int initial_count);
 
 	typedef void (*ScheduleNextTasksCallback)(Span<IThreadedTask *> tasks);
 
-	// Alternate constructor where a collection of tasks will be scheduled on completion.
-	// All the next tasks will be run in parallel.
-	// If a dependency is aborted, these tasks will be destroyed instead.
+	// 备用构造函数，其中一组任务会在完成时一并被调度。
+	// 所有后续任务将并行运行。
+	// 若某个依赖被中止，这些任务将被销毁。
 	AsyncDependencyTracker(int initial_count, Span<IThreadedTask *> next_tasks, ScheduleNextTasksCallback scheduler_cb);
 
 	~AsyncDependencyTracker();
 
-	// Sets dependency count. This may only be used if you don't know easily the amount of tasks to create up-front, but
-	// has to be called BEFORE those tasks are scheduled.
+	// 设置依赖数量。仅当你难以预先知道要创建的任务数量时才使用它，但
+	// 必须在这些任务被调度之前调用。
 	void set_count(int count);
 
-	// Call this when one of the tracked dependencies is complete
+	// 当某个被追踪的依赖完成时调用
 	void post_complete();
 
-	// Call this when one of the tracked dependencies is aborted
+	// 当某个被追踪的依赖中止时调用
 	void abort() {
 		_aborted = true;
 		_tasks_have_started = true;
 	}
 
-	// Returns `true` if any of the tracked tasks was aborted.
-	// It usually means tasks depending on this tracker may be aborted as well.
+	// 若任何被追踪的任务被中止，返回 `true`。
+	// 这通常意味着依赖于该追踪器的任务也可能被中止。
 	bool is_aborted() const {
 		return _aborted;
 	}
 
-	// Returns `true` when all the tracked tasks have completed
+	// 当所有被追踪的任务都已完成时返回 `true`
 	bool is_complete() const {
 		return _count == 0;
 	}

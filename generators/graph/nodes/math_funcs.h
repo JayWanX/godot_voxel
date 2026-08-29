@@ -311,7 +311,7 @@ void register_math_func_nodes(Span<NodeType> types) {
 		t.inputs.push_back(NodeType::Port("b"));
 		t.inputs.push_back(NodeType::Port("ratio"));
 		t.outputs.push_back(NodeType::Port("out"));
-		// TODO Add a `clamp` parameter? It helps optimization
+		// TODO 添加一个 `clamp` 参数？它有助于优化
 		t.process_buffer_func = [](ProcessBufferContext &ctx) {
 			bool a_ignored;
 			bool b_ignored;
@@ -368,15 +368,15 @@ void register_math_func_nodes(Span<NodeType> types) {
 		t.range_analysis_func = [](RangeAnalysisContext &ctx) {
 			const Interval a = ctx.get_input(0);
 			const Interval b = ctx.get_input(1);
-			// Note: if I call this `t` like I use to do with `lerp`, GCC complains it shadows `t` from the outer scope.
-			// Even though this lambda does not capture anything from the outer scope :shrug:
+			// 注意：如果我像使用 `lerp` 时那样把它命名为 `t`，GCC 会抱怨它遮蔽了外层作用域的 `t`。
+			// 尽管这个 lambda 并没有从外层作用域捕获任何东西 :shrug:
 			const Interval r = ctx.get_input(2);
 			if (r.is_single_value()) {
 				if (r.min == 1.f) {
-					// a will be ignored
+					// a 将被忽略
 					ctx.ignore_input(0);
 				} else if (r.min == 0.f) {
-					// b will be ignored
+					// b 将被忽略
 					ctx.ignore_input(1);
 				}
 			}
@@ -398,7 +398,7 @@ void register_math_func_nodes(Span<NodeType> types) {
 	}
 	{
 		struct Params {
-			// Remap can be reduced to a linear function
+			// Remap 可以化简为一个线性函数
 			// a * x + b
 			float a;
 			float b;

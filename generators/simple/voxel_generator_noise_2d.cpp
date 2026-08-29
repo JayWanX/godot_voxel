@@ -30,7 +30,7 @@ void VoxelGeneratorNoise2D::set_noise(Ref<Noise> noise) {
 		_noise->connect(
 				VoxelStringNames::get_singleton().changed, callable_mp(this, &VoxelGeneratorNoise2D::_on_noise_changed)
 		);
-		// The OpenSimplexNoise resource is not thread-safe so we make a copy of it for use in threads
+		// OpenSimplexNoise 资源不是线程安全的，因此我们复制一份供线程使用
 		copy = _noise->duplicate();
 	}
 	RWLockWrite wlock(_parameters_lock);
@@ -56,7 +56,7 @@ void VoxelGeneratorNoise2D::set_curve(Ref<Curve> curve) {
 		_curve->connect(
 				VoxelStringNames::get_singleton().changed, callable_mp(this, &VoxelGeneratorNoise2D::_on_curve_changed)
 		);
-		// The Curve resource is not thread-safe so we make a copy of it for use in threads
+		// Curve 资源不是线程安全的，因此我们复制一份供线程使用
 		_parameters.curve = _curve->duplicate();
 		_parameters.curve->bake();
 	} else {
@@ -171,7 +171,7 @@ void VoxelGeneratorNoise2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_curve", "curve"), &VoxelGeneratorNoise2D::set_curve);
 	ClassDB::bind_method(D_METHOD("get_curve"), &VoxelGeneratorNoise2D::get_curve);
 
-	// TODO Accept `Noise` instead of `FastNoiseLite`?
+	// TODO 接受 `Noise` 而不是 `FastNoiseLite`？
 	ADD_PROPERTY(
 			PropertyInfo(
 					Variant::OBJECT,

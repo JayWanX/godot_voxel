@@ -11,12 +11,12 @@ void ShaderMaterialPoolVLT::recycle(Ref<ShaderMaterial> material) {
 
 	const VoxelStringNames &sn = VoxelStringNames::get_singleton();
 
-	// Reset textures to avoid hoarding them in the pool
+	// 重置纹理，避免它们在池中被囤积
 	material->set_shader_parameter(sn.u_voxel_normalmap_atlas, Ref<Texture2D>());
 	material->set_shader_parameter(sn.u_voxel_cell_lookup, Ref<Texture2D>());
 	material->set_shader_parameter(sn.u_voxel_virtual_texture_offset_scale, Vector4(0, 0, 0, 1));
-	// TODO Would be nice if we repurposed `u_transition_mask` to store extra flags.
-	// Here we exploit cell_size==0 as "there is no virtual normalmaps on this block"
+	// TODO 若能重新利用 `u_transition_mask` 存储额外标志就好了。
+	// 这里我们利用 cell_size==0 表示“该数据块上没有虚拟法线贴图”
 	material->set_shader_parameter(sn.u_voxel_cell_size, 0.f);
 	material->set_shader_parameter(sn.u_voxel_virtual_texture_fade, 0.f);
 

@@ -16,7 +16,7 @@ public:
 
 	inline void wait() const {
 		std::unique_lock<decltype(_mutex)> lock(_mutex);
-		while (_count == 0) { // Handle spurious wake-ups.
+		while (_count == 0) { // 处理虚假唤醒。
 			_condition.wait(lock);
 		}
 		--_count;
@@ -34,7 +34,7 @@ public:
 private:
 	mutable std::mutex _mutex;
 	mutable std::condition_variable _condition;
-	mutable unsigned long _count = 0; // Initialized as locked.
+	mutable unsigned long _count = 0; // 初始化为已锁定。
 };
 
 } // namespace voxel

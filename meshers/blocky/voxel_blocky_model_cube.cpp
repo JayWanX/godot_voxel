@@ -36,7 +36,7 @@ Cube::Side VoxelBlockyModelCube::name_to_side(const String &s) {
 	if (s == "back") {
 		return Cube::SIDE_BACK;
 	}
-	return Cube::SIDE_COUNT; // Invalid
+	return Cube::SIDE_COUNT; // 无效
 }
 
 void VoxelBlockyModelCube::set_tile(VoxelBlockyModel::Side side, Vector2i pos) {
@@ -94,14 +94,14 @@ void VoxelBlockyModelCube::set_height(float h) {
 	_height = math::clamp(h, 0.01f, 1.f);
 
 	if (get_collision_aabb_count() > 0) {
-		// Make collision box match
+		// 让碰撞盒匹配
 		set_collision_aabb(0, AABB(Vector3(0, 0, 0), Vector3(1, _height, 1)));
 	}
 
 	emit_changed();
 }
 
-// Allow to specify AtlasTextures?
+// 允许指定 AtlasTextures？
 
 void VoxelBlockyModelCube::set_atlas_size_in_tiles(Vector2i s) {
 	VOXEL_ASSERT_RETURN(s.x > 0);
@@ -199,7 +199,7 @@ void rotate_ortho(
 
 		unsigned int surface_index = 0;
 		for (BakedModel::SideSurface &surface : surfaces) {
-			// Move mesh to origin for easier rotation, since the baked mesh spans 0..1 instead of -0.5..0.5
+			// 将网格移到原点以便更容易旋转，因为烘焙的网格范围是 0..1 而非 -0.5..0.5
 			add(to_span(surface.positions), Vector3f(-0.5));
 			rotate_mesh_arrays(to_span(surface.positions), to_span(normals), to_span(surface.tangents), basis);
 			add(to_span(surface.positions), Vector3f(0.5));
@@ -225,17 +225,17 @@ void bake_cube_geometry(
 	baked_data.model.surface_count = 1;
 
 	BakedModel::Surface &surface = baked_data.model.surfaces[0];
-	// The only way to specify materials in this model is via "material overrides", since there is no base mesh.
-	// Even if none are specified, we should at least index the "empty" material.
+	// 该模型指定材质的唯一方式是"材质覆盖"，因为没有基础网格。
+	// 即使没有指定任何材质，我们也至少应该索引"空"材质。
 	surface.material_id = material_indexer.get_or_create_index(config.get_material_override(0));
 
 	make_cube_sides_vertices_tangents(to_span(baked_data.model.sides_surfaces), config.get_height(), bake_tangents);
 
 	const float e = 0.001;
-	// Winding is the same as the one chosen in Cube:: vertices
-	// I am confused. I read in at least 3 OpenGL tutorials that texture coordinates start at bottom-left (0,0).
-	// But even though Godot is said to follow OpenGL's convention, the engine starts at top-left!
-	// And now in Godot 4 it's flipped again?
+	// 绕序与 Cube:: vertices 中选择的一致
+	// 我很困惑。我至少在 3 个 OpenGL 教程中读到纹理坐标从左下角 (0,0) 开始。
+	// 但尽管据说 Godot 遵循 OpenGL 的约定，引擎却从左上角开始！
+	// 而现在在 Godot 4 中又被翻转了？
 	const Vector2f uv_norm_top_bottom[4] = {
 		Vector2f(e, 1.f - e),
 		Vector2f(1.f - e, 1.f - e),
@@ -319,11 +319,10 @@ void VoxelBlockyModelCube::rotate_tiles_90(const math::Axis axis, const bool clo
 
 	_tiles = rotated_tiles;
 
-	// Collision boxes don't change with this kind of model. Height is always vertical.
+	// 碰撞盒不会因这种模型而改变。高度始终是垂直的。
 	// VoxelBlockyModel::rotate_90(axis, clockwise);
 
-	// Can't do that, it causes the sub-inspector to be entirely rebuilt, which fucks up the state of custom editors in
-	// it...
+	// 不能那样做，它会导致子检视器完全重建，从而搞乱其中自定义编辑器的状态...
 	// notify_property_list_changed();
 
 	emit_changed();
@@ -339,11 +338,10 @@ void VoxelBlockyModelCube::rotate_tiles_ortho(const math::OrthoBasis ortho_basis
 
 	_tiles = rotated_tiles;
 
-	// Collision boxes don't change with this kind of model. Height is always vertical.
+	// 碰撞盒不会因这种模型而改变。高度始终是垂直的。
 	// VoxelBlockyModel::rotate_90(axis, clockwise);
 
-	// Can't do that, it causes the sub-inspector to be entirely rebuilt, which fucks up the state of custom editors in
-	// it...
+	// 不能那样做，它会导致子检视器完全重建，从而搞乱其中自定义编辑器的状态...
 	// notify_property_list_changed();
 
 	emit_changed();

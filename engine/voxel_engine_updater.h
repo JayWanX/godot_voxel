@@ -5,7 +5,7 @@
 
 namespace voxel {
 
-// TODO Hack to make VoxelEngine update... need ways to integrate callbacks from main loop!
+// TODO 为让 VoxelEngine 更新而采用的临时手段……需要找到从主循环集成回调的方法！
 class VoxelEngineUpdater : public Node {
 	GDCLASS(VoxelEngineUpdater, Node)
 public:

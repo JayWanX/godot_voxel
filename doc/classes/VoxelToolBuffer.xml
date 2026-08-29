@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelToolBuffer" inherits="VoxelTool" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Implementation of the [VoxelTool] API for [VoxelBuffer].
+		为 [VoxelBuffer] 实现的 [VoxelTool] API。
 	</brief_description>
 	<description>
-		There are no functions specific to [VoxelBuffer]. You may check generic ones in [VoxelTool].
-		Note: contrary to other implementations, this one allows editing even if the area is partially out of bounds.
+		没有特定于 [VoxelBuffer] 的函数。你可以查看 [VoxelTool] 中的通用函数。
+		注意：与其他实现相反，此实现即使区域部分超出边界也允许编辑。
 	</description>
 	<tutorials>
 	</tutorials>

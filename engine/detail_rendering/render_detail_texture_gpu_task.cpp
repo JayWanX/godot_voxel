@@ -39,7 +39,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	RenderingDevice &rd = ctx.rendering_device;
 	GPUStorageBufferPool &storage_buffer_pool = ctx.storage_buffer_pool;
 
-	// Size can vary each time so we have to recreate the format...
+	// 尺寸每次都可能变化，因此必须重新创建格式……
 	Ref<RDTextureFormat> texture_format;
 	texture_format.instantiate();
 	texture_format->set_width(texture_width);
@@ -47,34 +47,31 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	texture_format->set_format(RenderingDevice::DATA_FORMAT_R8G8B8A8_UINT);
 	texture_format->set_usage_bits(
 			RenderingDevice::TEXTURE_USAGE_STORAGE_BIT |
-			// TODO Not sure if `TEXTURE_USAGE_CAN_UPDATE_BIT` is necessary, we only generate the texture
+			// TODO 不确定是否真的需要 `TEXTURE_USAGE_CAN_UPDATE_BIT`，我们只是生成纹理
 			RenderingDevice::TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice::TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	);
 	texture_format->set_texture_type(RenderingDevice::TEXTURE_TYPE_2D);
 
-	// TODO Which optimizations can I do?
-	// - Some storage buffers could be uniform buffers instead, maybe that's faster for small structs? They could be
-	// pooled as well
-	// - Creating/Updating buffers prior to running the shaders maybe doesn't require all barriers? This is the default
-	// argument
-	// - Creating a texture (image...) also requires a pool, but perhaps a more specialized one? I can't create a
-	// max-sized texture to fit all cases, since it has to be downloaded after, and download speed directly depends on
-	// the size of the data. Also, why should I use an image anyways?
-	// - Do I really have to create a new uniform set every time I modify just one of the passed values?
-	// - One task will use multiple shaders sequentially (and pipelines, even though compute pipelines appear devoid of
-	// options compared to a rendering pipeline). But I guess switching shaders has a cost, and likely more than
-	// one task of the same kind will be executed. Is there a strong reason I should reorganize the way things are
-	// scheduled to reduce shader switches?
+	// TODO 可以做哪些优化？
+	// - 某些存储缓冲区可以改用统一缓冲区，对于小型结构体也许更快？它们也可以池化
+	// - 在运行着色器之前创建/更新缓冲区，也许并不需要所有屏障？这是默认参数
+	// - 创建纹理（图像……）也需要一个池，但也许需要一个更专门的池？我无法创建
+	// 一个能容纳所有情况的超大纹理，因为它之后必须被下载回来，且下载速度直接取决于
+	// 数据大小。另外，我到底为什么要用图像？
+	// - 每次我只修改其中一个传入的值时，真的都要新建一个 uniform 集合吗？
+	// - 一个任务会顺序使用多个着色器（以及管线，尽管计算管线相比渲染管线似乎没什么
+	// 可配置项）。但我猜切换着色器是有成本的，而且同类的任务很可能不止一个会执行。
+	// 是否有充分理由让我重新组织调度方式以减少着色器切换？
 
-	// We can't create resources while making the compute list, so we'll spaghetti a bit and have to create them first
-	// for all shaders, and only then we'll create the list.
+	// 我们无法在构建计算列表的同时创建资源，所以这里会有点绕，必须先为所有着色器创建资源，
+	// 然后才能创建列表。
 
-	// First output image
+	// 第一张输出图像
 
 	Ref<RDTextureView> texture0_view;
 	texture0_view.instantiate();
 
-	// TODO Do I have to use a texture? Is it better than a storage buffer?
+	// TODO 我是否必须使用纹理？它比存储缓冲区更好吗？
 	_normalmap_texture0_rid = texture_create(rd, **texture_format, **texture0_view, TypedArray<PackedByteArray>());
 	ERR_FAIL_COND(!_normalmap_texture0_rid.is_valid());
 
@@ -83,7 +80,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	image0_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_IMAGE);
 	image0_uniform->add_id(_normalmap_texture0_rid);
 
-	// Second temporary image
+	// 第二张临时图像
 
 	Ref<RDTextureView> texture1_view;
 	texture1_view.instantiate();
@@ -96,7 +93,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	image1_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_IMAGE);
 	image1_uniform->add_id(_normalmap_texture1_rid);
 
-	// Mesh vertices
+	// 网格顶点
 
 	PackedByteArray mesh_vertices_pba;
 	copy_bytes_to<Vector4f>(mesh_vertices_pba, to_span(mesh_vertices));
@@ -109,7 +106,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	mesh_vertices_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	mesh_vertices_uniform->add_id(_mesh_vertices_sb.rid);
 
-	// Mesh indices
+	// 网格索引
 
 	PackedByteArray mesh_indices_pba;
 	copy_bytes_to<int32_t>(mesh_indices_pba, to_span(mesh_indices));
@@ -122,7 +119,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	mesh_indices_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	mesh_indices_uniform->add_id(_mesh_indices_sb.rid);
 
-	// Cell tris
+	// 单元格三角形
 
 	PackedByteArray cell_triangles_pba;
 	copy_bytes_to<int32_t>(cell_triangles_pba, to_span(cell_triangles));
@@ -135,7 +132,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	cell_triangles_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	cell_triangles_uniform->add_id(_cell_triangles_sb.rid);
 
-	// Tiles data
+	// 瓦片数据
 
 	PackedByteArray tile_data_pba;
 	copy_bytes_to<TileData>(tile_data_pba, to_span(tile_data));
@@ -148,7 +145,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	tile_data_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	tile_data_uniform->add_id(_tile_data_sb.rid);
 
-	// Gather hits params
+	// 命中收集参数
 
 	struct GatherHitsParams {
 		Vector3f block_origin_world;
@@ -162,8 +159,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 			GatherHitsParams{ params.block_origin_world, params.pixel_world_step, params.tile_size_pixels }
 	);
 
-	// TODO Might be better to use a Uniform Buffer for this. They might be faster for small amounts of data, but need
-	// to care more about alignment
+	// TODO 这里改用统一缓冲区可能更好。对于少量数据它们可能更快，但需要更注意对齐
 	_gather_hits_params_sb = storage_buffer_pool.allocate(gather_hits_params_pba);
 	ERR_FAIL_COND(_gather_hits_params_sb.is_null());
 
@@ -172,7 +168,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	gather_hits_params_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	gather_hits_params_uniform->add_id(_gather_hits_params_sb.rid);
 
-	// Hit buffer
+	// 命中缓冲区
 
 	const unsigned int hit_positions_buffer_size_bytes =
 			tile_data.size() * math::squared(params.tile_size_pixels) * sizeof(float) * 4;
@@ -183,7 +179,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	hit_positions_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	hit_positions_uniform->add_id(_hit_positions_buffer_sb.rid);
 
-	// Generator params
+	// 生成器参数
 
 	struct GeneratorParams {
 		int32_t tile_size_pixels;
@@ -200,9 +196,9 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	generator_params_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	generator_params_uniform->add_id(_generator_params_sb.rid);
 
-	// SD buffers
+	// 有符号距离缓冲区
 
-	// TODO Maybe using half-precision would work well enough?
+	// TODO 也许使用半精度就足够好了？
 	const unsigned int sd_buffer_size_bytes =
 			tile_data.size() * math::squared(params.tile_size_pixels) * 4 * sizeof(float);
 
@@ -224,7 +220,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	}
 #endif
 
-	// Normalmap params
+	// 法线贴图参数
 
 	struct NormalmapParams {
 		int32_t tile_size_pixels;
@@ -247,10 +243,10 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	normalmap_params_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_STORAGE_BUFFER);
 	normalmap_params_uniform->add_id(_normalmap_params_sb.rid);
 
-	// Dilation params
+	// 膨胀参数
 
 	PackedByteArray dilation_params_pba;
-	// I need only 4 but apparently the minimum size for UBO is 16 bytes
+	// 我只需要 4 字节，但显然 UBO 的最小大小是 16 字节
 	dilation_params_pba.resize(16);
 	*reinterpret_cast<int32_t *>(dilation_params_pba.ptrw()) = params.tile_size_pixels;
 
@@ -262,12 +258,12 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	dilation_params_uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_UNIFORM_BUFFER);
 	dilation_params_uniform->add_id(_dilation_params_rid);
 
-	// Pipelines
-	// Not sure what a pipeline is required for in compute shaders, it seems to be required "just because"
+	// 管线
+	// 不确定计算着色器中的管线是做什么用的，看起来只是"因为需要所以需要"
 
 	const RID gather_hits_shader_rid = ctx.base_resources.detail_gather_hits_shader.rid;
 	ERR_FAIL_COND(!gather_hits_shader_rid.is_valid());
-	// TODO Perhaps we could cache this pipeline?
+	// TODO 也许可以缓存这个管线？
 	_gather_hits_pipeline_rid = rd.compute_pipeline_create(gather_hits_shader_rid);
 	ERR_FAIL_COND(!_gather_hits_pipeline_rid.is_valid());
 
@@ -287,17 +283,17 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 
 	const RID detail_normalmap_shader_rid = ctx.base_resources.detail_normalmap_shader.rid;
 	ERR_FAIL_COND(!detail_normalmap_shader_rid.is_valid());
-	// TODO Perhaps we could cache this pipeline?
+	// TODO 也许可以缓存这个管线？
 	_detail_normalmap_pipeline_rid = rd.compute_pipeline_create(detail_normalmap_shader_rid);
 	ERR_FAIL_COND(!_detail_normalmap_pipeline_rid.is_valid());
 
 	const RID dilation_shader_rid = ctx.base_resources.dilate_normalmap_shader.rid;
 	ERR_FAIL_COND(!dilation_shader_rid.is_valid());
-	// TODO Perhaps we could cache this pipeline?
+	// TODO 也许可以缓存这个管线？
 	_normalmap_dilation_pipeline_rid = rd.compute_pipeline_create(dilation_shader_rid);
 	ERR_FAIL_COND(!_normalmap_dilation_pipeline_rid.is_valid());
 
-	// Make compute list
+	// 构建计算列表
 
 #ifdef VOXEL_ENABLE_MODIFIERS
 	const unsigned int modifier_count = modifiers.size();
@@ -308,7 +304,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 
 	const int compute_list_id = rd.compute_list_begin();
 
-	// Gather hits
+	// 收集命中
 	{
 		mesh_vertices_uniform->set_binding(0);
 		mesh_indices_uniform->set_binding(1);
@@ -343,11 +339,11 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 		);
 	}
 
-	// Ensure dependencies are ready before running dilation on the result (I though this was automatically handled?
-	// Why is barrier necessary anyways? Is dependency resolution actually not automatic?)
+	// 确保在结果上运行膨胀之前依赖已就绪（我以为这是自动处理的？
+	// 为什么还是需要屏障？依赖解析实际上不是自动的吗？）
 	rd.compute_list_add_barrier(compute_list_id);
 
-	// Generate signed distances
+	// 生成有符号距离
 	{
 		hit_positions_uniform->set_binding(0);
 		generator_params_uniform->set_binding(1);
@@ -360,7 +356,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 		detail_generator_uniforms[1] = generator_params_uniform;
 		detail_generator_uniforms[2] = sd_buffer0_uniform;
 
-		// Extra params
+		// 额外参数
 		if (shader_params != nullptr && shader_params->params.size() > 0) {
 			add_uniform_params(
 					shader_params->params, detail_generator_uniforms, ctx.base_resources.filtering_sampler_rid
@@ -386,7 +382,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 
 	rd.compute_list_add_barrier(compute_list_id);
 
-	// Apply modifiers
+	// 应用修改器
 
 #ifdef VOXEL_ENABLE_MODIFIERS
 	for (unsigned int modifier_index = 0; modifier_index < modifiers.size(); ++modifier_index) {
@@ -407,13 +403,13 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 		detail_modifier_uniforms[2] = sd_buffer0_uniform;
 		detail_modifier_uniforms[3] = sd_buffer1_uniform;
 
-		// Swap buffers
-		// TODO Would it be possible to read and write to the same buffer so we would not need to ping-pong?
+		// 交换缓冲区
+		// TODO 是否可以读写同一个缓冲区，这样就不需要乒乓（ping-pong）了？
 		Ref<RDUniform> temp = sd_buffer1_uniform;
 		sd_buffer1_uniform = sd_buffer0_uniform;
 		sd_buffer0_uniform = temp;
 
-		// Extra params
+		// 额外参数
 		if (modifier_data.params != nullptr) {
 			add_uniform_params(
 					modifier_data.params->params, detail_modifier_uniforms, ctx.base_resources.filtering_sampler_rid
@@ -442,7 +438,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 	}
 #endif
 
-	// Normalmap rendering
+	// 法线贴图渲染
 	{
 		sd_buffer0_uniform->set_binding(0);
 		mesh_vertices_uniform->set_binding(1);
@@ -483,7 +479,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 
 	rd.compute_list_add_barrier(compute_list_id);
 
-	// Dilation step 1
+	// 膨胀步骤 1
 	{
 		image0_uniform->set_binding(0);
 		image1_uniform->set_binding(1);
@@ -491,7 +487,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 
 		Array dilation_uniforms;
 		dilation_uniforms.resize(3);
-		// Bindings should be respectively 0 and 1 at this point
+		// 此时绑定应分别为 0 和 1
 		dilation_uniforms[0] = image0_uniform;
 		dilation_uniforms[1] = image1_uniform;
 		dilation_uniforms[2] = dilation_params_uniform;
@@ -509,9 +505,9 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 		const unsigned int local_group_size_z = 1;
 		rd.compute_list_dispatch(
 				compute_list_id,
-				// Had to cast explicitely because even though both arguments are unsigned, MSVC is too dumb to
-				// realize it can just use the unsigned version of this function. Also, if both are uint16_t, it
-				// somehow decides to use the SIGNED version.
+				// 不得不显式转换，因为即使两个参数都是无符号的，MSVC 也笨到无法
+				// 意识到可以直接使用该函数的无符号版本。另外，如果两者都是 uint16_t，它
+				// 居然会选择有符号版本。
 				math::ceildiv(static_cast<unsigned int>(texture_width), local_group_size_x),
 				math::ceildiv(static_cast<unsigned int>(texture_height), local_group_size_y),
 				local_group_size_z
@@ -520,21 +516,21 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 
 	rd.compute_list_add_barrier(compute_list_id);
 
-	// Dilation step 2
+	// 膨胀步骤 2
 	{
-		// Swap images
+		// 交换图像
 
 		image1_uniform->set_binding(0);
 		image0_uniform->set_binding(1);
 
-		// Uniform set
+		// Uniform 集合
 
 		Array dilation_uniforms;
 		dilation_uniforms.resize(3);
 		dilation_uniforms[0] = image1_uniform;
 		dilation_uniforms[1] = image0_uniform;
 		dilation_uniforms[2] = dilation_params_uniform;
-		// TODO Do I really have to create a new uniform set every time I modify just one of the passed values?
+		// TODO 每次只修改其中一个传入的值时，真的都要新建一个 uniform 集合吗？
 		const RID dilation_uniform_set_rid = uniform_set_create(rd, dilation_uniforms, dilation_shader_rid, 0);
 		_uniform_sets_to_free.push_back(dilation_uniform_set_rid);
 		// #ifdef DEV_ENABLED
@@ -554,7 +550,7 @@ void RenderDetailTextureGPUTask::prepare(GPUTaskContext &ctx) {
 		);
 	}
 
-	// Final result should be in image0.
+	// 最终结果应在 image0 中。
 
 	rd.compute_list_end();
 }
@@ -565,20 +561,20 @@ PackedByteArray RenderDetailTextureGPUTask::collect_texture_and_cleanup(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// TODO This is incredibly slow and should not happen in the first place.
-	// But due to how Godot is designed right now, it is not possible to create a texture from the output of a compute
-	// shader without first downloading it back to RAM...
+	// TODO 这极其缓慢，本就不该发生。
+	// 但由于 Godot 当前的设计，无法直接从计算着色器的输出创建纹理，
+	// 只能先把它下载回内存……
 	PackedByteArray texture_data = rd.texture_get_data(_normalmap_texture0_rid, 0);
 
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Cleanup");
 
-		// Godot "auto-frees" uniform sets when their dependencies get freed.
-		// But sometimes it doesn't, and can't guess that it should (like when re-using resources).
-		// So we have to manually check what we should or should not free.
-		// See https://github.com/godotengine/godot/issues/103073
-		// Instead of adding more debug checks, we can actually free uniform sets first,
-		// before Godot gets to auto-free them afterwards, which is simpler.
+		// Godot 会在其依赖被释放时"自动释放" uniform 集合。
+		// 但有时它不会，也无法猜到应该释放（例如复用资源时）。
+		// 因此我们必须手动检查哪些该释放、哪些不该释放。
+		// 参见 https://github.com/godotengine/godot/issues/103073
+		// 与其添加更多调试检查，不如先手动释放 uniform 集合，
+		// 这样比之后等 Godot 自动释放更简单。
 		for (RID rid : _uniform_sets_to_free) {
 			free_rendering_device_rid(rd, rid);
 		}
@@ -622,7 +618,7 @@ PackedByteArray RenderDetailTextureGPUTask::collect_texture_and_cleanup(
 		storage_buffer_pool.recycle(_normalmap_params_sb);
 	}
 
-	// Uniform sets auto-free themselves once their contents are freed.
+	// Uniform 集合会在其内容被释放后自动释放。
 	// rd.free(_uniform_set_rid);
 	return texture_data;
 }

@@ -4,14 +4,14 @@
 #include "io/log.h"
 #include "macros.h"
 
-// Abnormally terminate the program
+// 异常终止程序
 #ifdef _MSC_VER
 #define VOXEL_GENERATE_TRAP() __debugbreak()
 #else
 #define VOXEL_GENERATE_TRAP() __builtin_trap()
 #endif
 
-// The following macros print a message and crash the program.
+// 以下宏会打印一条消息并使程序崩溃。
 
 #define VOXEL_CRASH_MSG(msg)                                                                                              \
 	voxel::print_error("FATAL: Method/function failed.", msg, __FUNCTION__, __FILE__, __LINE__);                      \
@@ -20,7 +20,7 @@
 
 #define VOXEL_CRASH() VOXEL_CRASH_MSG("")
 
-// The following macros check a condition. If it fails, they print a message and crash the program.
+// 以下宏会检查一个条件。若失败，则打印消息并使程序崩溃。
 
 #define VOXEL_ASSERT_MSG(cond, msg)                                                                                       \
 	if (VOXEL_UNLIKELY(!(cond))) {                                                                                        \
@@ -34,7 +34,7 @@
 
 #define VOXEL_ASSERT(cond) VOXEL_ASSERT_MSG(cond, "")
 
-// The following macros check a condition. If it fails, they print a message, then return or continue.
+// 以下宏会检查一个条件。若失败，则打印消息，然后 return 或 continue。
 
 #define VOXEL_INTERNAL_ASSERT_ACT(cond, act, msg)                                                                         \
 	if (VOXEL_UNLIKELY(!(cond))) {                                                                                        \

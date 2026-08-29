@@ -1,20 +1,20 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
-const char *g_detail_modifier_shader_template_0 = 
+const char *g_detail_modifier_shader_template_0 =
 "#version 450\n"
 "\n"
-"// Takes a list of positions and evaluates a signed distance field in 4 locations around them.\n"
-"// The 4 locations are picked such that the result can be used to compute a gradient.\n"
-"// The result is then applied on top of previous values using a specified operation.\n"
+"// 接收一组位置，并在其周围 4 个位置求值有符号距离场。\n"
+"// 选择这 4 个位置，使结果可用于计算梯度。\n"
+"// 随后使用指定的操作将结果叠加到先前的值上。\n"
 "\n"
-"// This shader may be dispatched multiple times for each source of voxel data that we may combine for a given chunk.\n"
+"// 对于给定区块，此着色器可能针对我们可能组合的每个体素数据源被多次派发。\n"
 "\n"
 "layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;\n"
 "\n"
 "layout (set = 0, binding = 0, std430) restrict readonly buffer PositionBuffer {\n"
-"	// X, Y, Z is hit position\n"
-"	// W is integer triangle index\n"
+"	// X、Y、Z 为命中位置\n"
+"	// W 为整数三角形索引\n"
 "	vec4 values[];\n"
 "} u_positions;\n"
 "\n"
@@ -24,16 +24,16 @@ const char *g_detail_modifier_shader_template_0 =
 "} u_detail_params;\n"
 "\n"
 "layout (set = 0, binding = 2, std430) restrict readonly buffer InSDBuffer {\n"
-"	// 4 values per index\n"
+"	// 每个索引 4 个值\n"
 "	float values[];\n"
 "} u_in_sd;\n"
 "\n"
 "layout (set = 0, binding = 3, std430) restrict writeonly buffer OutSDBuffer {\n"
-"	// 4 values per index\n"
+"	// 每个索引 4 个值\n"
 "	float values[];\n"
 "} u_out_sd;\n"
 "\n"
-"// Parameters common to all modifiers\n"
+"// 所有修改器共用的参数\n"
 "layout (set = 0, binding = 4, std430) restrict readonly buffer BaseModifierParams {\n"
 "	mat4 world_to_model;\n"
 "	int operation;\n"
@@ -44,14 +44,14 @@ const char *g_detail_modifier_shader_template_0 =
 // clang-format on
 
 // clang-format off
-const char *g_detail_modifier_shader_template_1 = 
+const char *g_detail_modifier_shader_template_1 =
 "\n"
 "float sd_smooth_union(float a, float b, float s) {\n"
 "	const float h = clamp(0.5 + 0.5 * (b - a) / s, 0.0, 1.0);\n"
 "	return mix(b, a, h) - s * h * (1.0 - h);\n"
 "}\n"
 "\n"
-"// Inverted a and b because it subtracts SDF a from SDF b\n"
+"// 交换 a 和 b，因为它是从 SDF b 中减去 SDF a\n"
 "float sd_smooth_subtract(float b, float a, float s) {\n"
 "	const float h = clamp(0.5 - 0.5 * (b + a) / s, 0.0, 1.0);\n"
 "	return mix(b, -a, h) + s * h * (1.0 - h);\n"
@@ -113,6 +113,5 @@ const char *g_detail_modifier_shader_template_1 =
 "	u_out_sd.values[sdi + 1] = sd1;\n"
 "	u_out_sd.values[sdi + 2] = sd2;\n"
 "	u_out_sd.values[sdi + 3] = sd3;\n"
-"}\n"
-"\n";
+"}\n";
 // clang-format on

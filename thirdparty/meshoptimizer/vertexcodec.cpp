@@ -4,10 +4,10 @@
 #include <assert.h>
 #include <string.h>
 
-// The block below auto-detects SIMD ISA that can be used on the target platform
+// 下面的代码块会自动检测目标平台上可用的 SIMD ISA
 #ifndef MESHOPTIMIZER_NO_SIMD
 
-// The SIMD implementation requires SSSE3, which can be enabled unconditionally through compiler settings
+// SIMD 实现需要 SSSE3，可通过编译器设置无条件启用
 #if defined(__AVX__) || defined(__SSSE3__)
 #define SIMD_SSE
 #endif
@@ -31,20 +31,20 @@
 #define SIMD_TARGET __attribute__((target("ssse3")))
 #endif
 
-// GCC/clang define these when NEON support is available
+// 当支持 NEON 时，GCC/clang 会定义这些
 #if defined(__ARM_NEON__) || defined(__ARM_NEON)
 #define SIMD_NEON
 #endif
 
-// On MSVC, we assume that ARM builds always target NEON-capable devices
+// 在 MSVC 上，我们假定 ARM 构建始终面向支持 NEON 的设备
 #if !defined(SIMD_NEON) && defined(_MSC_VER) && (defined(_M_ARM) || defined(_M_ARM64))
 #define SIMD_NEON
 #endif
 
-// When targeting Wasm SIMD we can't use runtime cpuid checks so we unconditionally enable SIMD
+// 当面向 Wasm SIMD 时，我们无法使用运行时 cpuid 检查，因此无条件下启用 SIMD
 #if defined(__wasm_simd128__)
 #define SIMD_WASM
-// Prevent compiling other variant when wasm simd compilation is active
+// 当 wasm simd 编译处于活动状态时，禁止编译其它变体
 #undef SIMD_NEON
 #undef SIMD_SSE
 #undef SIMD_AVX
@@ -54,13 +54,13 @@
 #define SIMD_TARGET
 #endif
 
-// When targeting AArch64/x64, optimize for latency to allow decoding of individual 16-byte groups to overlap
-// We don't do this for 32-bit systems because we need 64-bit math for this and this will hurt in-order CPUs
+// 面向 AArch64/x64 时，优化延迟以允许各个 16 字节组的解码重叠
+// 我们不对 32 位系统这样做，因为此处需要 64 位运算，且这会损害顺序 CPU 的性能
 #if defined(__x86_64__) || defined(_M_X64) || defined(__aarch64__) || defined(_M_ARM64)
 #define SIMD_LATENCYOPT
 #endif
 
-// In switch dispatch, marking default case as unreachable allows to remove redundant bounds checks
+// 在 switch 分发中，将 default 分支标记为不可达可移除冗余的边界检查
 #if defined(__GNUC__)
 #define SIMD_UNREACHABLE() __builtin_unreachable()
 #elif defined(_MSC_VER)
@@ -141,8 +141,8 @@ const int kEncodeDefaultLevel = 2;
 
 static size_t getVertexBlockSize(size_t vertex_size)
 {
-	// make sure the entire block fits into the scratch buffer and is aligned to byte group size
-	// note: the block size is implicitly part of the format, so we can't change it without breaking compatibility
+	// 确保整个数据块适合放入临时缓冲区，并与字节组大小对齐
+	// 注意：数据块大小隐式属于格式的一部分，因此在不破坏兼容性的前提下我们无法更改它
 	size_t result = (kVertexBlockSizeBytes / vertex_size) & ~(kByteGroupSize - 1);
 
 	return (result < kVertexBlockMaxSize) ? result : kVertexBlockMaxSize;
@@ -169,10 +169,10 @@ inline T unzigzag(T v)
 struct Stats
 {
 	size_t size;
-	size_t header;  // bytes for header
-	size_t bitg[9]; // bytes for bit groups
-	size_t bitc[8]; // bit consistency: how many bits are shared between all bytes in a group
-	size_t ctrl[4]; // number of control groups
+	size_t header;  // 头部字节数
+	size_t bitg[9]; // 位组字节数
+	size_t bitc[8]; // 位一致性：一个组内所有字节之间共享的位数
+	size_t ctrl[4]; // 控制组数量
 };
 
 static Stats* bytestats = NULL;
@@ -226,7 +226,7 @@ static unsigned char* encodeBytesGroup(unsigned char* data, const unsigned char*
 	size_t byte_size = 8 / bits;
 	assert(kByteGroupSize % byte_size == 0);
 
-	// fixed portion: bits bits for each value
+	// 固定部分：每个值 bits 位
 	// variable portion: full byte for each out-of-range value (using 1...1 as sentinel)
 	unsigned char sentinel = (1 << bits) - 1;
 
@@ -242,8 +242,8 @@ static unsigned char* encodeBytesGroup(unsigned char* data, const unsigned char*
 			byte |= enc;
 		}
 
-		// encode 1-bit groups in reverse bit order
-		// this makes them faster to decode alongside other groups
+		// 以反向位顺序编码 1 位组
+		// 这使得它们与其它组一起解码时更快
 		if (bits == 1)
 			byte = (unsigned char)(((byte * 0x80200802ull) & 0x0884422110ull) * 0x0101010101ull >> 32);
 
@@ -254,7 +254,7 @@ static unsigned char* encodeBytesGroup(unsigned char* data, const unsigned char*
 	{
 		unsigned char v = buffer[i];
 
-		// branchless append of out-of-range values
+		// 无分支地追加超出范围的值
 		*data = v;
 		data += v >= sentinel;
 	}
@@ -268,7 +268,7 @@ static unsigned char* encodeBytes(unsigned char* data, unsigned char* data_end, 
 
 	unsigned char* header = data;
 
-	// round number of groups to 4 to get number of header bytes
+	// 将组数取整到 4 以得到头部字节数
 	size_t header_size = (buffer_size / kByteGroupSize + 3) / 4;
 
 	if (size_t(data_end - data) < header_size)
@@ -292,7 +292,7 @@ static unsigned char* encodeBytes(unsigned char* data, unsigned char* data_end, 
 		{
 			size_t size = encodeBytesGroupMeasure(buffer + i, bits[bitk]);
 
-			// favor consistent bit selection across groups, but never replace literals
+			// 优先在各组间保持一致的位选择，但绝不替换字面量
 			if (size < best_size || (size == best_size && bits[bitk] == last_bits && bits[best_bitk] != 8))
 			{
 				best_bitk = bitk;
@@ -379,7 +379,7 @@ static int estimateRotate(const unsigned char* vertex_data, size_t vertex_count,
 	{
 		unsigned int bitg = 0;
 
-		// calculate bit consistency mask for the group
+		// 计算该组的位一致性掩码
 		for (size_t j = 0; j < group_size && i + j < vertex_count; ++j)
 		{
 			unsigned int v = vertex[0] | (vertex[1] << 8) | (vertex[2] << 16) | (vertex[3] << 24);
@@ -428,7 +428,7 @@ static int estimateChannel(const unsigned char* vertex_data, size_t vertex_count
 
 		memcpy(last_vertex, vertex_data + (i == 0 ? 0 : i - 1) * vertex_size, vertex_size);
 
-		// we sometimes encode elements we didn't fill when rounding to kByteGroupSize
+		// 当按 kByteGroupSize 取整时，我们有时会对未填充的元素进行编码
 		if (block_size < block_size_aligned)
 			memset(block + block_size, 0, block_size_aligned - block_size);
 
@@ -439,7 +439,7 @@ static int estimateChannel(const unsigned char* vertex_data, size_t vertex_count
 
 				for (size_t ig = 0; ig < block_size; ig += kByteGroupSize)
 				{
-					// to maximize encoding performance we only evaluate 1/2/4/8 bit groups
+					// 为最大化编码性能，我们仅评估 1/2/4/8 位组
 					size_t size1 = encodeBytesGroupMeasure(block + ig, 1);
 					size_t size2 = encodeBytesGroupMeasure(block + ig, 2);
 					size_t size4 = encodeBytesGroupMeasure(block + ig, 4);
@@ -473,39 +473,39 @@ static bool estimateControlZero(const unsigned char* buffer, size_t vertex_count
 static int estimateControl(const unsigned char* buffer, size_t vertex_count, size_t vertex_count_aligned, int level)
 {
 	if (estimateControlZero(buffer, vertex_count_aligned))
-		return 2; // zero encoding
+		return 2; // 零编码
 
 	if (level == 0)
-		return 1; // 1248 encoding in level 0 for encoding speed
+		return 1; // 在 level 0 中使用 1248 编码以提高编码速度
 
-	// round number of groups to 4 to get number of header bytes
+	// 将组数取整到 4 以得到头部字节数
 	size_t header_size = (vertex_count_aligned / kByteGroupSize + 3) / 4;
 
 	size_t est_bytes0 = header_size, est_bytes1 = header_size;
 
 	for (size_t i = 0; i < vertex_count_aligned; i += kByteGroupSize)
 	{
-		// assumes kBitsV1[] = {0, 1, 2, 4, 8} for performance
+		// 为性能假设 kBitsV1[] = {0, 1, 2, 4, 8}
 		size_t size0 = encodeBytesGroupMeasure(buffer + i, 0);
 		size_t size1 = encodeBytesGroupMeasure(buffer + i, 1);
 		size_t size2 = encodeBytesGroupMeasure(buffer + i, 2);
 		size_t size4 = encodeBytesGroupMeasure(buffer + i, 4);
 		size_t size8 = encodeBytesGroupMeasure(buffer + i, 8);
 
-		// both control modes have access to 1/2/4 bit encoding
+		// 两种控制模式都可以使用 1/2/4 位编码
 		size_t size12 = size1 < size2 ? size1 : size2;
 		size_t size124 = size12 < size4 ? size12 : size4;
 
-		// each control mode has access to 0/8 bit encoding respectively
+		// 每种控制模式分别可以使用 0/8 位编码
 		est_bytes0 += size124 < size0 ? size124 : size0;
 		est_bytes1 += size124 < size8 ? size124 : size8;
 	}
 
-	// pick shortest control entry but prefer literal encoding
+	// 选择最短的控制条目，但优先采用字面量编码
 	if (est_bytes0 < vertex_count || est_bytes1 < vertex_count)
 		return est_bytes0 < est_bytes1 ? 0 : 1;
 	else
-		return 3; // literal encoding
+		return 3; // 字面量编码
 }
 
 static unsigned char* encodeVertexBlock(unsigned char* data, unsigned char* data_end, const unsigned char* vertex_data, size_t vertex_count, size_t vertex_size, unsigned char last_vertex[256], const unsigned char* channels, int version, int level)
@@ -518,7 +518,7 @@ static unsigned char* encodeVertexBlock(unsigned char* data, unsigned char* data
 
 	size_t vertex_count_aligned = (vertex_count + kByteGroupSize - 1) & ~(kByteGroupSize - 1);
 
-	// we sometimes encode elements we didn't fill when rounding to kByteGroupSize
+	// 当按 kByteGroupSize 取整时，我们有时会对未填充的元素进行编码
 	memset(buffer, 0, sizeof(buffer));
 
 	size_t control_size = version == 0 ? 0 : vertex_size / 4;
@@ -555,14 +555,14 @@ static unsigned char* encodeVertexBlock(unsigned char* data, unsigned char* data
 
 		if (ctrl == 3)
 		{
-			// literal encoding
+			// 字面量编码
 			if (size_t(data_end - data) < vertex_count)
 				return NULL;
 
 			memcpy(data, buffer, vertex_count);
 			data += vertex_count;
 		}
-		else if (ctrl != 2) // non-zero encoding
+		else if (ctrl != 2) // 非零编码
 		{
 			data = encodeBytes(data, data_end, buffer, vertex_count_aligned, version == 0 ? kBitsV0 : kBitsV1 + ctrl);
 			if (!data)
@@ -609,7 +609,7 @@ static const unsigned char* decodeBytesGroup(const unsigned char* data, unsigned
 	case 2:
 		data_var = data + 4;
 
-		// 4 groups with 4 2-bit values in each byte
+		// 每个字节包含 4 组、每组 4 个 2 位值
 		READ(), NEXT(2), NEXT(2), NEXT(2), NEXT(2);
 		READ(), NEXT(2), NEXT(2), NEXT(2), NEXT(2);
 		READ(), NEXT(2), NEXT(2), NEXT(2), NEXT(2);
@@ -619,7 +619,7 @@ static const unsigned char* decodeBytesGroup(const unsigned char* data, unsigned
 	case 4:
 		data_var = data + 8;
 
-		// 8 groups with 2 4-bit values in each byte
+		// 每个字节包含 8 组、每组 2 个 4 位值
 		READ(), NEXT(4), NEXT(4);
 		READ(), NEXT(4), NEXT(4);
 		READ(), NEXT(4), NEXT(4);
@@ -646,7 +646,7 @@ static const unsigned char* decodeBytes(const unsigned char* data, const unsigne
 {
 	assert(buffer_size % kByteGroupSize == 0);
 
-	// round number of groups to 4 to get number of header bytes
+	// 将组数取整到 4 以得到头部字节数
 	size_t header_size = (buffer_size / kByteGroupSize + 3) / 4;
 	if (size_t(data_end - data) < header_size)
 		return NULL;
@@ -727,7 +727,7 @@ static const unsigned char* decodeVertexBlock(const unsigned char* data, const u
 
 			if (ctrl == 3)
 			{
-				// literal encoding
+				// 字面量编码
 				if (size_t(data_end - data) < vertex_count)
 					return NULL;
 
@@ -736,7 +736,7 @@ static const unsigned char* decodeVertexBlock(const unsigned char* data, const u
 			}
 			else if (ctrl == 2)
 			{
-				// zero encoding
+				// 零编码
 				memset(buffer + j * vertex_count, 0, vertex_count);
 			}
 			else
@@ -761,7 +761,7 @@ static const unsigned char* decodeVertexBlock(const unsigned char* data, const u
 			decodeDeltas1<unsigned int, true>(buffer, transposed + k, vertex_count, vertex_size, last_vertex + k, (32 - (channel >> 4)) & 31);
 			break;
 		default:
-			return NULL; // invalid channel type
+			return NULL; // 无效的通道类型
 		}
 	}
 
@@ -778,7 +778,7 @@ static unsigned char kDecodeBytesGroupShuffle[256][8];
 static unsigned char kDecodeBytesGroupCount[256];
 
 #ifdef __wasm__
-__attribute__((cold)) // this saves 500 bytes in the output binary - we don't need to vectorize this loop!
+__attribute__((cold)) // 这可在输出二进制中节省 500 字节——我们无需向量化此循环！
 #endif
 static bool
 decodeBytesGroupBuildTables()
@@ -847,7 +847,7 @@ inline const unsigned char* decodeBytesGroupSimd(const unsigned char* data, unsi
 		memcpy(&data32, data, 4);
 		data32 &= data32 >> 1;
 
-		// arrange bits such that low bits of nibbles of data64 contain all 2-bit elements of data32
+		// 排列数据位，使 data64 的各位元（nibble）低位包含 data32 的全部 2 位元素
 		unsigned long long data64 = ((unsigned long long)data32 << 30) | (data32 & 0x3fffffff);
 
 		// adds all 1-bit nibbles together; the sum fits in 4 bits because datacnt=16 would have used mode 3
@@ -1029,7 +1029,7 @@ inline uint8x16_t shuffleBytes(unsigned char mask0, unsigned char mask1, uint8x8
 SIMD_TARGET
 inline void neonMoveMask(uint8x16_t mask, unsigned char& mask0, unsigned char& mask1)
 {
-	// magic constant found using z3 SMT assuming mask has 8 groups of 0xff or 0x00
+	// 使用 z3 SMT 找到的魔法常量，假定掩码有 8 组 0xff 或 0x00
 	const uint64_t magic = 0x000103070f1f3f80ull;
 
 	uint64x2_t mask2 = vreinterpretq_u64_u8(mask);
@@ -1061,7 +1061,7 @@ inline const unsigned char* decodeBytesGroupSimd(const unsigned char* data, unsi
 		memcpy(&data32, data, 4);
 		data32 &= data32 >> 1;
 
-		// arrange bits such that low bits of nibbles of data64 contain all 2-bit elements of data32
+		// 排列数据位，使 data64 的各位元（nibble）低位包含 data32 的全部 2 位元素
 		unsigned long long data64 = ((unsigned long long)data32 << 30) | (data32 & 0x3fffffff);
 
 		// adds all 1-bit nibbles together; the sum fits in 4 bits because datacnt=16 would have used mode 3
@@ -1173,7 +1173,7 @@ inline v128_t decodeShuffleMask(unsigned char mask0, unsigned char mask1)
 SIMD_TARGET
 inline void wasmMoveMask(v128_t mask, unsigned char& mask0, unsigned char& mask1)
 {
-	// magic constant found using z3 SMT assuming mask has 8 groups of 0xff or 0x00
+	// 使用 z3 SMT 找到的魔法常量，假定掩码有 8 组 0xff 或 0x00
 	const uint64_t magic = 0x000103070f1f3f80ull;
 
 	mask0 = uint8_t((wasm_i64x2_extract_lane(mask, 0) * magic) >> 56);
@@ -1429,7 +1429,7 @@ static const unsigned char* decodeBytesSimd(const unsigned char* data, const uns
 	assert(buffer_size % kByteGroupSize == 0);
 	assert(kByteGroupSize == 16);
 
-	// round number of groups to 4 to get number of header bytes
+	// 将组数取整到 4 以得到头部字节数
 	size_t header_size = (buffer_size / kByteGroupSize + 3) / 4;
 	if (size_t(data_end - data) < header_size)
 		return NULL;
@@ -1439,7 +1439,7 @@ static const unsigned char* decodeBytesSimd(const unsigned char* data, const uns
 
 	size_t i = 0;
 
-	// fast-path: process 4 groups at a time, do a shared bounds check
+	// 快速路径：一次处理 4 组，执行一次共享的边界检查
 	for (; i + kByteGroupSize * 4 <= buffer_size && size_t(data_end - data) >= kByteGroupDecodeLimit * 4; i += kByteGroupSize * 4)
 	{
 		size_t header_offset = i / kByteGroupSize;
@@ -1451,7 +1451,7 @@ static const unsigned char* decodeBytesSimd(const unsigned char* data, const uns
 		data = decodeBytesGroupSimd(data, buffer + i + kByteGroupSize * 3, hshift + ((header_byte >> 6) & 3));
 	}
 
-	// slow-path: process remaining groups
+	// 慢速路径：处理剩余的组
 	for (; i < buffer_size; i += kByteGroupSize)
 	{
 		if (size_t(data_end - data) < kByteGroupDecodeLimit)
@@ -1588,7 +1588,7 @@ static const unsigned char* decodeVertexBlockSimd(const unsigned char* data, con
 			}
 			else if (ctrl == 2)
 			{
-				// zero encoding
+				// 零编码
 				memset(buffer + j * vertex_count_aligned, 0, vertex_count_aligned);
 			}
 			else
@@ -1616,7 +1616,7 @@ static const unsigned char* decodeVertexBlockSimd(const unsigned char* data, con
 			decodeDeltas4Simd<2>(buffer, transposed + k, vertex_count_aligned, vertex_size, last_vertex + k, (32 - (channel >> 4)) & 31);
 			break;
 		default:
-			return NULL; // invalid channel type
+			return NULL; // 无效的通道类型
 		}
 	}
 
@@ -1651,7 +1651,7 @@ size_t meshopt_encodeVertexBufferLevel(unsigned char* buffer, size_t buffer_size
 
 	assert(vertex_size > 0 && vertex_size <= 256);
 	assert(vertex_size % 4 == 0);
-	assert(level >= 0 && level <= 9); // only a subset of this range is used right now
+	assert(level >= 0 && level <= 9); // 目前只使用了此范围的一部分
 	assert(version < 0 || unsigned(version) <= kDecodeVertexVersion);
 
 	version = version < 0 ? gEncodeVertexVersion : version;

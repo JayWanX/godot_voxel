@@ -7,7 +7,7 @@
 
 namespace voxel {
 
-// Associates small numbers to colors, so colored voxels can be specified using less memory.
+// 将小数字与颜色关联起来，这样彩色体素可以用更少的内存来表示。
 class VoxelColorPalette : public Resource {
 	GDCLASS(VoxelColorPalette, Resource)
 public:
@@ -23,7 +23,7 @@ public:
 
 	void clear();
 
-	// Internal
+	// 内部
 
 	inline void set_color8(uint8_t i, Color8 c) {
 		_colors[i] = c;

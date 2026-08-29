@@ -6,13 +6,13 @@
 
 namespace voxel {
 
-// Used as child of scene items instanced with VoxelInstancer.
+// 用作使用 VoxelInstancer 实例化的场景项的子节点。
 //
-// It is needed because such instances are tied with some of the logic in VoxelInstancer.
-// The root of a scene could be anything derived from Node3D,
-// so offering an API using inheritance on the root node is impractical.
-// So instead the component approach is taken.
-// If a huge amount of instances is needed, prefer using fast/multimesh instances.
+// 之所以需要它，是因为此类实例与 VoxelInstancer 中的一些逻辑绑定在一起。
+// 场景的根节点可以是任意 Node3D 派生类，
+// 因此在根节点上使用继承来提供 API 不切实际。
+// 因此改为采用组件方式。
+// 如果需要大量实例，请优先使用 fast/multimesh 实例。
 class VoxelInstanceComponent : public Node {
 	GDCLASS(VoxelInstanceComponent, Node)
 public:
@@ -31,13 +31,13 @@ public:
 		_instancer = instancer;
 	}
 
-	// TODO Need to investigate if we need this
+	// TODO 需要调查我们是否真的需要它
 	//
-	// This must be called by the user from a script if they want the instancer to remember a removal.
-	// It may be common to call `queue_free()` on the root (which could be a body or an area) but there doesn't seem to
-	// be a reliable way to detect this scenario happens from a child node.
-	// `_exit_tree` could happen for different reasons.
-	// `unparented` won't happen because the parent is unparented, not the child.
+	// 如果用户希望实例化器记住一次移除，则必须从脚本中调用此方法。
+	// 在根节点（可能是刚体或区域）上调用 `queue_free()` 可能很常见，但从子节点似乎
+	// 没有可靠的方法来检测这种情况是否发生。
+	// `_exit_tree` 可能因不同原因而触发。
+	// `unparented` 不会发生，因为被解除父节点的是父节点而不是子节点。
 	void detach_as_removed() {
 		ERR_FAIL_COND_MSG(_instancer == nullptr, "Already detached");
 		_instancer->on_scene_instance_removed(_data_block_position, _render_block_index, _instance_index);
@@ -45,12 +45,12 @@ public:
 	}
 
 	Variant serialize_state() {
-		// TODO Scripting
+		// TODO 脚本
 		return Variant();
 	}
 
 	Variant deserialize_state() {
-		// TODO Scripting
+		// TODO 脚本
 		return Variant();
 	}
 
@@ -88,11 +88,11 @@ protected:
 				// 	}
 				// 	break;
 
-			// TODO Optimization: this is also called when we quit the game or destroy the world
-			// which can make things a bit slow, but I don't know if it can easily be avoided
+			// TODO 优化：当我们退出游戏或销毁世界时也会调用它，
+			// 这可能会让操作稍慢，但我不确定能否轻松避免
 			case NOTIFICATION_UNPARENTED:
-				// The user could queue_free() that node or its parent in game for some reason,
-				// so we have to notify the instancer to remove the instance
+				// 用户可能会出于某种原因在游戏中 queue_free() 该节点或其父节点，
+				// 因此我们必须通知实例化器移除该实例
 				if (_instancer != nullptr) {
 					detach_as_removed();
 				}
@@ -102,7 +102,7 @@ protected:
 
 private:
 	static void _bind_methods() {
-		// TODO Scripting
+		// TODO 脚本
 	}
 
 	VoxelInstancer *_instancer = nullptr;

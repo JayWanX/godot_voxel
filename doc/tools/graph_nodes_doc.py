@@ -144,11 +144,21 @@ def strip_leading_and_trailing_empty_lines(text, newline = '\n'):
     return text
 
 
+# Categories in business logical order (data flow: input -> processing -> output)
+CATEGORY_ORDER = ["输入", "SDF", "向量", "噪声", "映射", "数学", "运算", "输出", "杂项"]
+
+
+def get_ordered_category_names(nodes_per_category):
+    ordered_names = [name for name in CATEGORY_ORDER if name in nodes_per_category]
+    remaining = [name for name in nodes_per_category if name not in CATEGORY_ORDER]
+    return ordered_names + remaining
+
+
 # More classic representation, can show more things
 def write_markdown_listing_from_nodes(nodes, formatter):
     out = ""
     nodes_per_category = get_nodes_by_category_dict(nodes)
-    category_names = sorted(nodes_per_category.keys())
+    category_names = get_ordered_category_names(nodes_per_category)
 
     for category_name in category_names:
         out += "## " + category_name + "\n\n"
@@ -157,11 +167,11 @@ def write_markdown_listing_from_nodes(nodes, formatter):
             out += "### " + node.name + "\n\n"
 
             if len(node.inputs) > 0:
-                out += "Inputs: " + ", ".join(['`' + port.name + '`' for port in node.inputs]) + "\n"
+                out += "输入: " + ", ".join(['`' + port.name + '`' for port in node.inputs]) + "\n"
             if len(node.outputs) > 0:
-                out += "Outputs: " + ", ".join(['`' + port.name + '`' for port in node.outputs]) + "\n"
+                out += "输出: " + ", ".join(['`' + port.name + '`' for port in node.outputs]) + "\n"
             if len(node.parameters) > 0:
-                out += "Parameters: " + ", ".join(['`' + param.name + '`' for param in node.parameters]) + "\n"
+                out += "参数: " + ", ".join(['`' + param.name + '`' for param in node.parameters]) + "\n"
             
             out += "\n"
             desc = strip_leading_and_trailing_empty_lines(node.description)
@@ -269,12 +279,13 @@ if __name__ == "__main__":
         f.write(cpp)
     
     # Generate Markdown
-    formatter = xml_to_markdown.ClassFormatter('', module_class_names, {}, 'api/')
     module_class_names = get_module_class_names(Path(xml_classes_dirpath))
+    formatter = xml_to_markdown.ClassFormatter('', module_class_names, {}, 'api/')
     md = write_markdown_listing_from_nodes(nodes, formatter)
     with open(md_fpath, "w") as f:
-        f.write("# VoxelGeneratorGraph nodes\n\n")
+        f.write("# VoxelGeneratorGraph 节点\n\n")
         f.write(formatter.make_text(
-            "This page lists all nodes that can be used in [VoxelGeneratorGraph] and [VoxelGraphFunction].\n\n"))
+            "本页面列出了所有可以在 [VoxelGeneratorGraph] 和 [VoxelGraphFunction] 中使用的节点。"))
+        f.write("\n\n")
         f.write(md)
 

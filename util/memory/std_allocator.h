@@ -20,7 +20,7 @@ extern std::atomic_uint64_t g_deallocated;
 } // namespace StdDefaultAllocatorCounters
 #endif
 
-// Default allocator matching standard library requirements, backed by Godot's allocator.
+// 满足标准库要求、由 Godot 分配器支撑的默认分配器。
 template <class T>
 struct StdDefaultAllocator {
 	typedef T value_type;
@@ -55,9 +55,9 @@ struct StdDefaultAllocator {
 		VOXEL_FREE(p);
 	}
 
-	// Note: defining a `rebind` struct is optional as long as the allocator is a template class. It is therefore
-	// provided by `allocator_traits`. `rebind` is used by containers to obtain the same allocator with a different T,
-	// in order to allocate internal data structures (nodes of linked list, buckets of unordered_map...)
+	// 注意：只要分配器是模板类，定义 `rebind` 结构体就是可选的。它由
+	// `allocator_traits` 提供。容器使用 `rebind` 获取带不同 T 的同一分配器，
+	// 以便分配内部数据结构（链表的节点、unordered_map 的桶……）
 };
 
 template <class T, class U>

@@ -11,7 +11,7 @@ VOXEL_GODOT_FORWARD_DECLARE(class World3D);
 
 namespace voxel::godot {
 
-// Thin wrapper around VisualServer mesh instance API
+// VisualServer 网格实例 API 的薄封装
 class DirectMeshInstance : public NonCopyable {
 public:
 	DirectMeshInstance();

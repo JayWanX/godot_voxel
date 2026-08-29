@@ -11,11 +11,11 @@
 
 namespace voxel {
 
-// TODO Deprecate in favor of resource name?
+// TODO 弃用，改用资源名称？
 void VoxelInstanceLibraryItem::set_item_name(String p_name) {
 	_name = p_name;
 
-	// Also set resource name, so Godot will use it in array inspector
+	// 同时设置资源名称，这样 Godot 会在数组检视面板中使用它
 	set_name(p_name);
 	emit_changed();
 }
@@ -128,7 +128,7 @@ void VoxelInstanceLibraryItem::_on_generator_changed() {
 }
 
 void VoxelInstanceLibraryItem::_bind_methods() {
-	// Can't be just "set_name" because Resource already defines that, despite being for a `resource_name` property
+	// 不能只是 "set_name"，因为 Resource 已经定义了该方法，尽管它用于 `resource_name` 属性
 	ClassDB::bind_method(D_METHOD("set_item_name", "name"), &VoxelInstanceLibraryItem::set_item_name);
 	ClassDB::bind_method(D_METHOD("get_item_name"), &VoxelInstanceLibraryItem::get_item_name);
 

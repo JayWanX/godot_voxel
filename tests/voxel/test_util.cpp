@@ -11,7 +11,7 @@ bool sd_equals_approx(const VoxelBuffer &vb1, const VoxelBuffer &vb2) {
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
 	const VoxelBuffer::Depth depth = vb1.get_channel_depth(channel);
 	// const float error_margin = 1.1f * VoxelBuffer::get_sdf_quantization_scale(depth);
-	// There can be a small difference due to scaling operations, so instead of an exact equality, we check approximate
+	// 由于缩放操作可能存在微小差异，因此我们不检查完全相等，而是检查近似
 	// equality.
 	Vector3i pos;
 	for (pos.y = 0; pos.y < vb1.get_size().y; ++pos.y) {

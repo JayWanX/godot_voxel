@@ -16,7 +16,7 @@
 #include "../../util/godot/core/class_db.h"
 #endif
 
-// TODO Only required because of MAX_MATERIALS... could be enough inverting that dependency
+// TODO 只是因为 MAX_MATERIALS 才需要……也许反转该依赖就够了
 #include "voxel_mesher_blocky.h"
 
 #include "voxel_blocky_model_cube.h"
@@ -39,7 +39,7 @@ bool VoxelBlockyModel::_set(const StringName &p_name, const Variant &p_value) {
 		return true;
 	}
 
-	// LEGACY
+	// 旧版
 
 	if (property_name.begins_with("cube_tiles_")) {
 		String s = property_name.substr(string_literal_length("cube_tiles_"), property_name.length());
@@ -85,7 +85,7 @@ bool VoxelBlockyModel::_get(const StringName &p_name, Variant &r_ret) const {
 		return true;
 	}
 
-	// LEGACY
+	// 旧版
 
 	if (property_name.begins_with("cube_tiles_")) {
 		String s = property_name.substr(string_literal_length("cube_tiles_"), property_name.length());
@@ -143,7 +143,7 @@ void VoxelBlockyModel::_get_property_list(List<PropertyInfo> *p_list) const {
 
 // void VoxelBlockyModel::set_id(int id) {
 // 	ERR_FAIL_COND(id < 0 || (unsigned int)id >= VoxelBlockyLibrary::MAX_VOXEL_TYPES);
-// 	// Cannot modify ID after creation
+// 	// 创建后无法修改 ID
 // 	ERR_FAIL_COND_MSG(_id != -1, "ID cannot be modified after being added to a library");
 // 	_id = id;
 // }
@@ -156,16 +156,16 @@ void VoxelBlockyModel::set_color(Color color) {
 }
 
 void VoxelBlockyModel::set_material_override(int index, Ref<Material> material) {
-	// TODO Can't check for `_surface_count` instead, because there is no guarantee about the order in which Godot will
-	// set properties when loading the resource. The mesh could be set later, so we can't know the number of surfaces.
+	// TODO 不能改用它检查 `_surface_count`，因为加载资源时无法保证 Godot 设置属性的顺序。
+	// 网格可能稍后才被设置，因此无法知道表面的数量。
 	ERR_FAIL_INDEX(index, int(_surface_params.size()));
 	_surface_params[index].material_override = material;
 	emit_changed();
 }
 
 Ref<Material> VoxelBlockyModel::get_material_override(int index) const {
-	// TODO Can't check for `_surface_count` instead, because there is no guarantee about the order in which Godot will
-	// set properties when loading the resource. The mesh could be set later, so we can't know the number of surfaces.
+	// TODO 不能改用它检查 `_surface_count`，因为加载资源时无法保证 Godot 设置属性的顺序。
+	// 网格可能稍后才被设置，因此无法知道表面的数量。
 	ERR_FAIL_INDEX_V(index, int(_surface_params.size()), Ref<Material>());
 	return _surface_params[index].material_override;
 }
@@ -180,15 +180,15 @@ bool VoxelBlockyModel::has_material_override() const {
 }
 
 void VoxelBlockyModel::set_mesh_collision_enabled(int surface_index, bool enabled) {
-	// TODO Can't check for `_surface_count` instead, because there is no guarantee about the order in which Godot will
-	// set properties when loading the resource. The mesh could be set later, so we can't know the number of surfaces.
+	// TODO 不能改用它检查 `_surface_count`，因为加载资源时无法保证 Godot 设置属性的顺序。
+	// 网格可能稍后才被设置，因此无法知道表面的数量。
 	ERR_FAIL_INDEX(surface_index, int(_surface_params.size()));
 	_surface_params[surface_index].collision_enabled = enabled;
 }
 
 bool VoxelBlockyModel::is_mesh_collision_enabled(int surface_index) const {
-	// TODO Can't check for `_surface_count` instead, because there is no guarantee about the order in which Godot will
-	// set properties when loading the resource. The mesh could be set later, so we can't know the number of surfaces.
+	// TODO 不能改用它检查 `_surface_count`，因为加载资源时无法保证 Godot 设置属性的顺序。
+	// 网格可能稍后才被设置，因此无法知道表面的数量。
 	ERR_FAIL_INDEX_V(surface_index, int(_surface_params.size()), false);
 	return _surface_params[surface_index].collision_enabled;
 }
@@ -223,13 +223,13 @@ void VoxelBlockyModel::set_collision_mask(uint32_t mask) {
 }
 
 void VoxelBlockyModel::bake(blocky::ModelBakingContext &ctx) const {
-	// TODO That's a bit iffy, design something better?
-	// The following logic must run after derived classes, should not be called directly
+	// TODO 这有点不确定，能否设计得更好？
+	// 以下逻辑必须在派生类之后运行，不应直接调用
 
 	blocky::BakedModel &baked_data = ctx.model;
 	blocky::MaterialIndexer &materials = ctx.material_indexer;
 
-	// baked_data.contributes_to_ao is set by the side culling phase
+	// baked_data.contributes_to_ao 由侧面剔除阶段设置
 	baked_data.transparency_index = _transparency_index;
 	baked_data.culls_neighbors = _culls_neighbors;
 	baked_data.color = _color;
@@ -241,9 +241,9 @@ void VoxelBlockyModel::bake(blocky::ModelBakingContext &ctx) const {
 
 	blocky::BakedModel::Model &model = baked_data.model;
 
-	// Note: mesh rotation is not implemented here, it is done in derived classes.
+	// 注意：网格旋转不在这里实现，它是在派生类中完成的。
 
-	// Set empty sides mask
+	// 设置空侧面掩码
 	model.empty_sides_mask = 0;
 	for (unsigned int side = 0; side < Cube::SIDE_COUNT; ++side) {
 		if (!voxel::is_empty(model.sides_surfaces[side])) {
@@ -252,7 +252,7 @@ void VoxelBlockyModel::bake(blocky::ModelBakingContext &ctx) const {
 		model.empty_sides_mask |= (1 << side);
 	}
 
-	// Assign material overrides if any
+	// 如果存在，分配材质覆盖
 	for (unsigned int surface_index = 0; surface_index < model.surface_count; ++surface_index) {
 		if (surface_index < _surface_count) {
 			const SurfaceParams &surface_params = _surface_params[surface_index];
@@ -282,7 +282,7 @@ void VoxelBlockyModel::_b_set_collision_aabbs(TypedArray<AABB> array) {
 	for (int i = 0; i < array.size(); ++i) {
 		const Variant v = array[i];
 		// ERR_FAIL_COND(v.get_type() != Variant::AABB);
-		// TODO "Add Element" in the Godot Array inspector always adds a null element even if the array is typed!
+		// TODO 即使在类型化数组中，Godot 数组检视器中的"添加元素"也总会添加一个 null 元素！
 		if (v.get_type() != Variant::AABB) {
 			VOXEL_PRINT_WARNING(
 					format("Item {} of the array is not an AABB (found {}). It will be replaced.",
@@ -335,14 +335,14 @@ uint32_t VoxelBlockyModel::get_tags_mask() const {
 #ifdef TOOLS_ENABLED
 
 void VoxelBlockyModel::get_configuration_warnings(PackedStringArray &out_warnings) const {
-	// May have implementations in subclasses
+	// 子类中可能有实现
 }
 
 #endif
 
 bool VoxelBlockyModel::is_empty() const {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in child classes
+	// 在子类中实现
 	return true;
 }
 
@@ -359,7 +359,7 @@ void VoxelBlockyModel::copy_base_properties_from(const VoxelBlockyModel &src) {
 
 Ref<Mesh> VoxelBlockyModel::get_preview_mesh() const {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in child classes
+	// 在子类中实现
 	return Ref<Mesh>();
 }
 
@@ -387,7 +387,7 @@ Ref<Mesh> VoxelBlockyModel::make_mesh_from_baked_data(
 	for (unsigned int surface_index = 0; surface_index < inner_surfaces.size(); ++surface_index) {
 		const blocky::BakedModel::Surface &surface = inner_surfaces[surface_index];
 
-		// Get vertex and index count in the surface
+		// 获取表面中的顶点和索引数量
 		unsigned int vertex_count = surface.positions.size();
 		unsigned int index_count = surface.indices.size();
 		for (const FixedArray<blocky::BakedModel::SideSurface, blocky::MAX_SURFACES> &side_surfaces : sides_surfaces) {
@@ -396,12 +396,12 @@ Ref<Mesh> VoxelBlockyModel::make_mesh_from_baked_data(
 			index_count += side_surface.indices.size();
 		}
 
-		// Godot doesn't like being given empty arrays when adding a surface to a mesh
+		// Godot 不喜欢在向网格添加表面时传入空数组
 		if (index_count == 0) {
 			continue;
 		}
 
-		// Allocate surface arrays
+		// 分配表面数组
 
 		PackedVector3Array vertices;
 		PackedVector3Array normals;
@@ -430,7 +430,7 @@ Ref<Mesh> VoxelBlockyModel::make_mesh_from_baked_data(
 		Span<Vector2> uvs_w(uvs.ptrw(), uvs.size());
 		Span<int> indices_w(indices.ptrw(), indices.size());
 
-		// Populate arrays
+		// 填充数组
 
 		unsigned int vi = 0;
 		unsigned int ti = 0;
@@ -502,13 +502,13 @@ Ref<Mesh> VoxelBlockyModel::make_mesh_from_baked_data(
 
 void VoxelBlockyModel::rotate_collision_boxes_90(math::Axis axis, bool clockwise) {
 	for (AABB &aabb : _collision_aabbs) {
-		// Make it centered, rotation axis is the center of the voxel
+		// 使其居中，旋转轴是体素的中心
 		aabb.position -= Vector3(0.5, 0.5, 0.5);
 
 		FixedArray<Vector3f, 2> points;
 		points[0] = to_vec3f(aabb.position);
 		points[1] = to_vec3f(aabb.position + aabb.size);
-		// TODO Move Axis enum outside of vectors?
+		// TODO 是否将 Axis 枚举移到 vectors 之外？
 		math::rotate_90(to_span(points), math::Axis(axis), clockwise);
 		const Vector3f min_pos = math::min(points[0], points[1]);
 		const Vector3f max_pos = math::max(points[0], points[1]);
@@ -522,7 +522,7 @@ void VoxelBlockyModel::rotate_collision_boxes_ortho(math::OrthoBasis ortho_basis
 	Basis basis(to_vec3(ortho_basis.x), to_vec3(ortho_basis.y), to_vec3(ortho_basis.z));
 
 	for (AABB &aabb : _collision_aabbs) {
-		// Make it centered, rotation axis is the center of the voxel
+		// 使其居中，旋转轴是体素的中心
 		aabb.position -= Vector3(0.5, 0.5, 0.5);
 
 		const Vector3 p0 = basis.xform(aabb.position);
@@ -573,8 +573,8 @@ void VoxelBlockyModel::_b_rotate_90(Vector3i::Axis axis, bool clockwise) {
 }
 
 // void ortho_simplify(Span<const Vector3f> vertices, Span<const int> indices, StdVector<int> &output) {
-// TODO Optimization: implement mesh simplification based on axis-aligned triangles.
-// It could be very effective on mesh collisions with the blocky mesher.
+// TODO 优化：基于轴对齐的三角形实现网格简化。
+// 它可能对 blocky 网格生成器的网格碰撞非常有效。
 // }
 
 void VoxelBlockyModel::_bind_methods() {
@@ -619,21 +619,21 @@ void VoxelBlockyModel::_bind_methods() {
 	);
 	ClassDB::bind_method(D_METHOD("get_mesh_ortho_rotation_index"), &VoxelBlockyModel::get_mesh_ortho_rotation_index);
 
-	// Bound for editor purposes
+	// 仅为编辑器目的绑定
 	ClassDB::bind_method(D_METHOD("rotate_90", "axis", "clockwise"), &VoxelBlockyModel::_b_rotate_90);
 
 	ClassDB::bind_method(D_METHOD("set_lod_skirts_enabled", "enabled"), &VoxelBlockyModel::set_lod_skirts_enabled);
 	ClassDB::bind_method(D_METHOD("get_lod_skirts_enabled"), &VoxelBlockyModel::get_lod_skirts_enabled);
 
-	// TODO Update to StringName in Godot 4
+	// TODO 在 Godot 4 中更新为 StringName
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color"), "set_color", "get_color");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "transparency_index"), "set_transparency_index", "get_transparency_index");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "culls_neighbors"), "set_culls_neighbors", "get_culls_neighbors");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "random_tickable"), "set_random_tickable", "is_random_tickable");
 
-	// TODO This is not supposed to be 3D layers.
-	// But I used it anyways because `PROPERTY_HINT_FLAGS` is inadequate and Godot exposes no way to make custom layers.
-	// We could make our own but that is a lot of work.
+	// TODO 这本来不应该是 3D 图层。
+	// 但无论如何我还是用了它，因为 `PROPERTY_HINT_FLAGS` 不适用，而 Godot 没有提供自定义图层的方式。
+	// 我们可以自己做一个，但那工作量很大。
 	ADD_PROPERTY(
 			PropertyInfo(Variant::INT, "tags_mask", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_tags_mask", "get_tags_mask"
 	);
@@ -642,8 +642,8 @@ void VoxelBlockyModel::_bind_methods() {
 
 	ADD_GROUP("Box collision", "");
 
-	// TODO What is the syntax `number:` in `hint_string` with `ARRAY`? It's old, hard to search usages in Godot's
-	// codebase, and I can't find it anywhere in the documentation
+	// TODO `hint_string` 搭配 `ARRAY` 时 `number:` 语法是什么意思？它很旧，在 Godot 的
+	// 代码库中很难搜索，而且我在文档的任何地方都找不到它
 	ADD_PROPERTY(
 			PropertyInfo(
 					Variant::ARRAY, "collision_aabbs", PROPERTY_HINT_TYPE_STRING, String::num_int64(Variant::AABB) + ":"
@@ -652,15 +652,15 @@ void VoxelBlockyModel::_bind_methods() {
 			"get_collision_aabbs"
 	);
 	ADD_PROPERTY(
-			// TODO This collision mask might not actually be related to Godot standard physics.
-			// It is mostly used in voxel raycasts, box collision and maybe other things
+			// TODO 这个碰撞掩码可能实际上与 Godot 标准物理无关。
+			// 它主要用于体素射线投射、盒体碰撞以及可能其它用途
 			PropertyInfo(Variant::INT, "collision_mask", PROPERTY_HINT_LAYERS_3D_PHYSICS),
 			"set_collision_mask",
 			"get_collision_mask"
 	);
 
-	// Note: rotation property is currently exposed only in derived classes.
-	// It will not necessarily be supported by all derived classes.
+	// 注意：旋转属性目前只在派生类中暴露。
+	// 并非所有派生类都一定支持它。
 
 	BIND_ENUM_CONSTANT(SIDE_NEGATIVE_X);
 	BIND_ENUM_CONSTANT(SIDE_POSITIVE_X);

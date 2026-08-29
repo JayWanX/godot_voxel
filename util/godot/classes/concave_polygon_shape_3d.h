@@ -18,7 +18,7 @@
 
 namespace voxel::godot {
 
-// Combines all mesh surface arrays into one collider.
+// 将所有网格表面数组合并为一个碰撞体。
 Ref<ConcavePolygonShape3D> create_concave_polygon_shape(const Span<const Array> surfaces);
 
 Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
@@ -26,7 +26,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 		const Span<const int> indices
 );
 
-// Create shape from a sub-region of a mesh surface (starting at 0).
+// 从网格表面的一个子区域（从 0 开始）创建形状。
 Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 		const Array &surface_arrays,
 		const unsigned int vertex_count,

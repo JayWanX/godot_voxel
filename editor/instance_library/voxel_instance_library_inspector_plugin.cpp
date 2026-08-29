@@ -11,13 +11,13 @@ bool VoxelInstanceLibraryInspectorPlugin::_voxel_can_handle(const Object *p_obje
 }
 
 void VoxelInstanceLibraryInspectorPlugin::_voxel_parse_begin(Object *p_object) {
-	// TODO How can I make sure the buttons will be at the beginning of the "VoxelInstanceLibrary" category?
-	// This is a better place than the Spatial editor toolbar (which would get hidden if you are not in the 3D tab
-	// of the editor), but it will appear at the very top of the inspector, even above the "VoxelInstanceLibrary"
-	// catgeory of properties. That looks a bit off, and if the class were to be inherited, it would start to be
-	// confusing because these buttons are about the property list of "VoxelInstanceLibrary" specifically.
-	// I could neither use `parse_property` nor `parse_category`, because when the list is empty,
-	// the class returns no properties AND no category.
+	// TODO 我怎样才能确保这些按钮位于 "VoxelInstanceLibrary" 分类的开头？
+	// 比起 Spatial 编辑器工具栏（如果你不在 3D 标签页，它会被隐藏），这里是个更好的位置，
+	// 但它会出现在检查器的最顶部，甚至在 "VoxelInstanceLibrary" 属性分类
+	// 之上。这看起来有点别扭，而且如果该类被继承，就会开始变得
+	// 混乱，因为这些按钮针对的是 "VoxelInstanceLibrary" 特有的属性列表。
+	// 我不能使用 `parse_property` 或 `parse_category`，因为当列表为空时，
+	// 该类既不返回属性，也不返回分类。
 }
 
 bool VoxelInstanceLibraryInspectorPlugin::_voxel_parse_property(
@@ -29,7 +29,7 @@ bool VoxelInstanceLibraryInspectorPlugin::_voxel_parse_property(
 		const BitField<PropertyUsageFlags> p_usage,
 		const bool p_wide
 ) {
-	// We use this property as anchor to put our list on top of it
+	// 我们用这个属性作为锚点，把我们的列表放在它上面
 	if (p_path == "_selected_item") {
 		Ref<VoxelInstanceLibrary> library(Object::cast_to<VoxelInstanceLibrary>(p_object));
 

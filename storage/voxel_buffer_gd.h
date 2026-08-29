@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <memory>
 
-// Can't forward-declare because we use Image::Format
+// 无法前向声明，因为我们会使用 Image::Format
 // VOXEL_GODOT_FORWARD_DECLARE(class Image)
 VOXEL_GODOT_FORWARD_DECLARE(class ImageTexture3D)
 
@@ -21,9 +21,9 @@ class VoxelTool;
 
 namespace godot {
 
-// Scripts-facing wrapper around VoxelBuffer.
-// It is separate because being a Godot object requires to carry more baggage, and because this data type can
-// be instanced many times while being rarely accessed directly from scripts, it is a bit better to take this part out
+// 面向脚本的 VoxelBuffer 包装器。
+// 单独拆出来是因为作为 Godot 对象需要携带更多包袱，而且这种数据类型
+// 会被实例化很多次却很少被脚本直接访问，所以把这一部分单独拿出来会更好
 class VoxelBuffer : public RefCounted {
 	GDCLASS(VoxelBuffer, RefCounted)
 
@@ -52,7 +52,7 @@ public:
 		ALL_CHANNELS_MASK = (1 << MAX_CHANNELS) - 1,
 	};
 
-	// TODO use C++17 inline to initialize right here...
+	// TODO 使用 C++17 inline 直接在这里初始化...
 	static const char *CHANNEL_ID_HINT_STRING;
 
 	enum Compression {
@@ -76,18 +76,18 @@ public:
 		ALLOCATOR_COUNT
 	};
 
-	// Limit was made explicit for serialization reasons, and also because there must be a reasonable one
+	// 设置显式上限是出于序列化原因，也因为必须有一个合理的限制
 	static const uint32_t MAX_SIZE = 65535;
 
-	// Constructs a new buffer
+	// 构造一个新的缓冲区
 	VoxelBuffer();
 	VoxelBuffer(VoxelBuffer::Allocator allocator);
-	// Reference an existing buffer
+	// 引用现有的缓冲区
 	VoxelBuffer(std::shared_ptr<voxel::VoxelBuffer> &other);
 
 	~VoxelBuffer();
 
-	// Workaround because the constructor with arguments cannot always be used due to Godot limitations
+	// 由于 Godot 的限制，带参数的构造函数并不总能使用，因此采用变通方法
 	static Ref<VoxelBuffer> create_shared(std::shared_ptr<voxel::VoxelBuffer> &other);
 
 	inline const voxel::VoxelBuffer &get_buffer() const {
@@ -174,9 +174,9 @@ public:
 
 	void remap_values(unsigned int channel_index, PackedInt32Array map);
 
-	// When using lower than 32-bit resolution for terrain signed distance fields,
-	// it should be scaled to better fit the range of represented values since the storage is normalized to -1..1.
-	// This returns that scale for a given depth configuration.
+	// 当使用低于 32 位的分辨率表示地形有符号距离场时，
+	// 应对其进行缩放以更好地适配所表示值的范围，因为存储被归一化到 -1..1。
+	// 该函数返回给定位深配置下的缩放比例。
 	static float get_sdf_quantization_scale(Depth d);
 
 	Allocator get_allocator() const;
@@ -187,7 +187,7 @@ public:
 	Ref<ImageTexture3D> create_3d_texture_from_sdf_zxy(const Image::Format output_format) const;
 	void update_3d_texture_from_sdf_zxy(Ref<ImageTexture3D> texture) const;
 
-	// Operations
+	// 操作
 
 	void op_add_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel);
 	void op_sub_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel);
@@ -196,8 +196,8 @@ public:
 	void op_min_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel);
 	void op_max_buffer_f(Ref<VoxelBuffer> other, VoxelBuffer::ChannelId channel);
 
-	// Checks if float/SDF values from a channel of the source buffer are lower than a threshold, and sets an integer
-	// value into the destination buffer depending on the result of that comparison.
+	// 检查源缓冲区某通道的 float/SDF 值是否低于阈值，并根据该比较的结果
+	// 将整数值写入目标缓冲区。
 	void op_select_less_src_f_dst_i_values(
 			Ref<VoxelBuffer> src_ref,
 			const VoxelBuffer::ChannelId src_channel,
@@ -207,7 +207,7 @@ public:
 			const VoxelBuffer::ChannelId dst_channel
 	);
 
-	// Metadata
+	// 元数据
 
 	Variant get_block_metadata() const;
 	void set_block_metadata(Variant meta);
@@ -227,7 +227,7 @@ public:
 	void clear_voxel_metadata();
 	void clear_voxel_metadata_in_area(Vector3i min_pos, Vector3i max_pos);
 
-	// Debugging
+	// 调试
 
 	Ref<Image> debug_print_sdf_to_image_top_down();
 	static Ref<Image> debug_print_sdf_to_image_top_down(const voxel::VoxelBuffer &vb);
@@ -237,7 +237,7 @@ public:
 	static Ref<Image> debug_print_sdf_z_slice(const voxel::VoxelBuffer &buffer, float scale, int z);
 
 private:
-	// `create` is defined by `GDCLASS`, preventing direct binding of a `create` function
+	// `create` 由 `GDCLASS` 定义，从而阻止直接绑定名为 `create` 的函数
 	void _b_create(int x, int y, int z) {
 		create(x, y, z);
 	}

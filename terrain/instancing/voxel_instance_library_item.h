@@ -29,7 +29,7 @@ public:
 	float get_floating_sdf_offset_along_normal() const;
 	void set_floating_sdf_offset_along_normal(const float new_offset);
 
-	// Internal
+	// 内部
 
 	void add_listener(IInstanceLibraryItemListener *listener, int id);
 	void remove_listener(IInstanceLibraryItemListener *listener, int id);
@@ -46,17 +46,16 @@ private:
 
 	static void _bind_methods();
 
-	// For the user, not used by the engine
+	// 供用户使用，引擎不使用
 	String _name;
 
-	// If a layer is persistent, any change to its instances will be saved if the volume has a stream
-	// supporting instances. It will also not generate on top of modified surfaces.
-	// If a layer is not persistent, changes won't get saved, and it will keep generating on all compliant
-	// surfaces.
+	// 如果图层是持久的，则只要体积有支持实例的流，对其实例的任何更改都会被保存。
+	// 它也不会在已修改的表面之上生成。
+	// 如果图层不是持久的，更改不会被保存，并且它会在所有符合要求的表面上持续生成。
 	bool _persistent = false;
 
-	// Which LOD of the octree this model will spawn into.
-	// Higher means larger distances, but lower precision and density
+	// 该模型将生成到八叉树的哪个 LOD 中。
+	// 数值越大表示距离越远，但精度和密度越低
 	int _lod_index = 0;
 
 	Ref<VoxelInstanceGenerator> _generator;

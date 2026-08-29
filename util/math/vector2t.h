@@ -19,8 +19,8 @@ struct Vector2T {
 
 	Vector2T() : x(0), y(0) {}
 
-	// It is recommended to use `explicit` because otherwise it would open the door to plenty of implicit conversions
-	// which would make many cases ambiguous.
+	// 建议使用 `explicit`，否则会引入大量隐式转换，
+	// 导致许多情况产生二义性。
 	explicit Vector2T(T p_v) : x(p_v), y(p_v) {}
 
 	Vector2T(T p_x, T p_y) : x(p_x), y(p_y) {}

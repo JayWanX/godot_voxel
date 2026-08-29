@@ -6,16 +6,16 @@
 
 namespace voxel {
 
-// Accessor provided to scripts in the context of generating columns of blocks in multipass generators.
-// It is not supposed to be used by more than one thread at a time.
-// Scripts are not allowed to keep a reference to it outside of the method it is passed in (unfortunately Godot doesn't
-// provide something to guard against it)
+// 在多 pass 生成器生成数据块列的上下文中，提供给脚本的访问器。
+// 它不应同时被多个线程使用。
+// 脚本不允许在传入它的方法之外持有对它的引用（遗憾的是 Godot 不提供
+// 防止此行为的机制）
 class VoxelToolMultipassGenerator : public VoxelTool {
 	GDCLASS(VoxelToolMultipassGenerator, VoxelTool)
 public:
 	void set_pass_input(VoxelGeneratorMultipassCBStructs::PassInput &pass_input);
 
-	// VoxelTool methods
+	// VoxelTool 方法
 
 	void copy(
 			const Vector3i pos,
@@ -51,9 +51,9 @@ public:
 	void set_voxel_metadata(const Vector3i pos, const Variant &meta) override;
 	Variant get_voxel_metadata(const Vector3i pos) const override;
 
-	// TODO Implement more methods
+	// TODO 实现更多方法
 
-	// Specific methods
+	// 特有方法
 
 	Vector3i get_editable_area_min() const;
 	Vector3i get_editable_area_max() const;
@@ -61,9 +61,9 @@ public:
 	Vector3i get_main_area_min() const;
 	Vector3i get_main_area_max() const;
 
-	// Debug
+	// 调试
 
-	// Create a standalone instance for testing purposes.
+	// 创建一个用于测试的独立实例。
 	// static Ref<VoxelToolMultipassGenerator> create_offline(
 	// 		Vector3i grid_origin_blocks, Vector3i grid_size_blocks, Vector3i main_block_position, int block_size_po2);
 
@@ -87,7 +87,7 @@ private:
 	int _block_size_mask = 0;
 	Box3i _editable_voxel_box;
 
-	// "offline" means the class uses its own storage for testing purposes.
+	// "offline" 意味着该类使用自己的存储，用于测试目的。
 	// bool _is_offline = false;
 	// StdVector<VoxelGeneratorMultipassCBStructs::Block> _offline_blocks;
 	// StdVector<VoxelGeneratorMultipassCBStructs::Block *> _offline_block_pointers;

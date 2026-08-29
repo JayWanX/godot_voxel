@@ -21,7 +21,7 @@ void VoxelMeshBlock::set_world(Ref<World3D> p_world) {
 	if (_world != p_world) {
 		_world = p_world;
 
-		// To update world. I replaced visibility by presence in world because Godot 3 culling performance is horrible
+		// 用于更新 world。我通过是否存在于 world 中来代替可见性，因为 Godot 3 的剔除性能很差
 		_set_visible(_visible && _parent_visible);
 
 		if (_static_body.is_valid()) {
@@ -54,14 +54,14 @@ void VoxelMeshBlock::set_mesh(
 		RenderingServerEnums::ShadowCastingSetting shadow_setting,
 		int render_layers_mask
 ) {
-	// TODO Don't add mesh instance to the world if it's not visible.
-	// I suspect Godot is trying to include invisible mesh instances into the culling process,
-	// which is killing performance when LOD is used (i.e many meshes are in pool but hidden)
-	// This needs investigation.
+	// TODO 如果网格不可见，就不要将网格实例添加到 world 中。
+	// 我怀疑 Godot 试图将不可见的网格实例纳入剔除流程，
+	// 这在使用 LOD 时会严重影响性能（即池中有很多网格但处于隐藏状态）。
+	// 这需要进一步调查。
 
 	if (mesh.is_valid()) {
 		if (!_mesh_instance.is_valid()) {
-			// Create instance if it doesn't exist
+			// 如果实例不存在则创建它
 			_mesh_instance.create();
 			_mesh_instance.set_interpolated(false);
 			_mesh_instance.set_gi_mode(gi_mode);
@@ -78,7 +78,7 @@ void VoxelMeshBlock::set_mesh(
 
 	} else {
 		if (_mesh_instance.is_valid()) {
-			// Delete instance if it exists
+			// 如果实例存在则删除它
 			_mesh_instance.destroy();
 		}
 	}
@@ -156,7 +156,7 @@ void VoxelMeshBlock::set_collision_shape(Ref<Shape3D> shape, bool debug_collisio
 	if (!_static_body.is_valid()) {
 		_static_body.create();
 		_static_body.set_world(*_world);
-		// This allows collision signals to provide the terrain node in the `collider` field
+		// 这允许碰撞信号在 `collider` 字段中提供地形节点
 		_static_body.set_attached_object(node);
 
 	} else {
@@ -225,7 +225,7 @@ Ref<ConcavePolygonShape3D> make_collision_shape_from_mesher_output(
 
 	if (mesher.is_generating_collision_surface()) {
 		if (mesher_output.collision_surface.submesh_vertex_end != -1) {
-			// Use a sub-region of the render mesh
+			// 使用渲染网格的子区域
 			if (mesher_output.surfaces.size() > 0) {
 				shape = create_concave_polygon_shape(
 						mesher_output.surfaces[0].arrays,
@@ -235,18 +235,18 @@ Ref<ConcavePolygonShape3D> make_collision_shape_from_mesher_output(
 			}
 
 		} else {
-			// Use specialized collision mesh
+			// 使用专门的碰撞网格
 			shape = create_concave_polygon_shape(
 					to_span(mesher_output.collision_surface.positions), to_span(mesher_output.collision_surface.indices)
 			);
 		}
 
 	} else {
-		// Use render mesh
+		// 使用渲染网格
 		static const unsigned int MAX_STACK_SURFACES = 8;
 
 		if (mesher_output.surfaces.size() <= MAX_STACK_SURFACES) {
-			// Use stack
+			// 使用栈
 			std::array<Array, MAX_STACK_SURFACES> render_surfaces_s;
 			for (unsigned int i = 0; i < mesher_output.surfaces.size(); ++i) {
 				render_surfaces_s[i] = mesher_output.surfaces[i].arrays;
@@ -255,7 +255,7 @@ Ref<ConcavePolygonShape3D> make_collision_shape_from_mesher_output(
 			shape = create_concave_polygon_shape(render_surfaces);
 
 		} else {
-			// Use heap
+			// 使用堆
 			StdVector<Array> render_surfaces_h;
 			render_surfaces_h.reserve(mesher_output.surfaces.size());
 			for (const VoxelMesher::Output::Surface &surface : mesher_output.surfaces) {

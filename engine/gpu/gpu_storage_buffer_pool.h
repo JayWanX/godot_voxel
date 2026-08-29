@@ -21,8 +21,8 @@ struct GPUStorageBuffer {
 	}
 };
 
-// Pools storage buffers of specific sizes so they can be re-used.
-// Not thread-safe.
+// 池化特定大小的存储缓冲区，以便它们可以被重复使用。
+// 非线程安全。
 class GPUStorageBufferPool {
 public:
 	GPUStorageBufferPool();
@@ -45,7 +45,7 @@ private:
 		unsigned int used_buffers = 0;
 	};
 
-	// Up to roughly 800 Mb with the current size formula
+	// 按当前尺寸公式计算，最多约 800 Mb
 	static const unsigned int POOL_COUNT = 48;
 
 	std::array<uint32_t, POOL_COUNT> _pool_sizes;

@@ -66,7 +66,7 @@ Ref<Mesh> make_axes_mesh() {
 	return mesh;
 }
 
-// TODO Re-use this function in VoxelDebug?
+// TODO 在 VoxelDebug 中复用此函数？
 Ref<Mesh> make_wireboxes_mesh(Span<const AABB> p_aabbs, Color p_color) {
 	if (p_aabbs.size() == 0) {
 		return Ref<Mesh>();
@@ -243,7 +243,7 @@ void VoxelBlockyModelViewer::set_undo_redo(EditorUndoRedoManager *urm) {
 
 void VoxelBlockyModelViewer::update_model() {
 	VOXEL_ASSERT_RETURN(_model.is_valid());
-	// Can be null
+	// 可能为 null
 	Ref<Mesh> mesh = _model->get_preview_mesh();
 	_mesh_instance->set_mesh(mesh);
 
@@ -287,8 +287,8 @@ void VoxelBlockyModelViewer::process(float delta) {
 	if (_rotation_anim_basis.is_equal_approx(Basis())) {
 		return;
 	}
-	// Fake counter-rotation to show the feedback of rotating by 90 degrees, because rotating cubes without animation
-	// isn't easy to distinguish
+	// 模拟反向旋转，以展示旋转 90 度的反馈效果，因为立方体在无动画的情况下旋转
+	// 不容易分辨
 	_rotation_anim_basis = _rotation_anim_basis.slerp(Basis(), 0.25);
 	if (_rotation_anim_basis.is_equal_approx(Basis())) {
 		_mesh_instance->set_transform(Transform3D());

@@ -1,13 +1,13 @@
 # VoxelBlockyModelCube
 
-Inherits: [VoxelBlockyModel](VoxelBlockyModel.md)
+继承自：[VoxelBlockyModel](VoxelBlockyModel.md)
 
-Generates a cube model with specific tiles on its sides.
+生成一个在各面上具有特定贴图的立方体模型。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                            | Name                                                       | Default                  
+类型                                                                              | 名称                                                         | 默认值                      
 ------------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------
 [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html)  | [atlas_size_in_tiles](#i_atlas_size_in_tiles)              | Vector2i(16, 16)         
 [AABB[]](https://docs.godotengine.org/en/stable/classes/class_aabb[].html)      | [collision_aabbs](#i_collision_aabbs)                      | [AABB(0, 0, 0, 1, 1, 1)] 
@@ -15,42 +15,42 @@ Type                                                                            
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)            | [mesh_ortho_rotation_index](#i_mesh_ortho_rotation_index)  | 0                        
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                          | Signature                                                                                                                                                           
+返回值                                                                             | 函数签名                                                                                                                                                                
 ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html)  | [get_tile](#i_get_tile) ( [Side](VoxelBlockyModel.md#enumerations) side ) const                                                                                     
 [void](#)                                                                       | [set_tile](#i_set_tile) ( [Side](VoxelBlockyModel.md#enumerations) side, [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html) position )  
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html)<span id="i_atlas_size_in_tiles"></span> **atlas_size_in_tiles** = Vector2i(16, 16)
 
-Sets a reference size of texture atlas, in tiles. It must be set so the model generates correct texture coordinates from specified tile positions.
+设置纹理图集的参考尺寸（以贴图数量为单位）。必须设置它，模型才能根据指定的贴图位置生成正确的纹理坐标。
 
-If you are not using an atlas and every side uses the same full texture, use (1,1).
+如果你不使用图集，且每个面都使用相同的完整纹理，请使用 (1,1)。
 
 ### [AABB[]](https://docs.godotengine.org/en/stable/classes/class_aabb[].html)<span id="i_collision_aabbs"></span> **collision_aabbs** = [AABB(0, 0, 0, 1, 1, 1)]
 
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_height"></span> **height** = 1.0
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_mesh_ortho_rotation_index"></span> **mesh_ortho_rotation_index** = 0
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-## Method Descriptions
+## 方法描述
 
 ### [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html)<span id="i_get_tile"></span> **get_tile**( [Side](VoxelBlockyModel.md#enumerations) side ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_set_tile"></span> **set_tile**( [Side](VoxelBlockyModel.md#enumerations) side, [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html) position ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

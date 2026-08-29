@@ -73,7 +73,7 @@ void VoxelGeneratorMultipassCacheViewer::update_image() {
 	}
 
 	Rect2i view_rect_tiles(Vector2i(), get_size() / TILE_SIZE);
-	// TODO Usability: maybe have a way to control where we look at
+	// TODO 可用性：也许可以有一种方式控制我们查看的位置
 	view_rect_tiles.position -= view_rect_tiles.size / 2;
 
 	const Color bg_color(0.3, 0.3, 0.3);
@@ -85,7 +85,7 @@ void VoxelGeneratorMultipassCacheViewer::update_image() {
 				view_rect_tiles.size.x,
 				view_rect_tiles.size.y,
 				false,
-				// We don't use alpha, but otherwise Godot complains that RGB8 isn't supported by GPU
+				// 我们不使用 alpha，但否则 Godot 会抱怨 GPU 不支持 RGB8
 				Image::FORMAT_RGBA8
 		);
 		_image->fill(bg_color);
@@ -110,7 +110,7 @@ void VoxelGeneratorMultipassCacheViewer::update_image() {
 				color = err_color;
 			}
 
-			// Debug refcounts
+			// 调试引用计数
 			// if (column.viewer_count == 0) {
 			// 	color = Color(0, 0, 0);
 			// } else if (column.viewer_count == 1) {
@@ -126,10 +126,10 @@ void VoxelGeneratorMultipassCacheViewer::update_image() {
 			// }
 
 			const Vector2i pixel_pos = column.position - view_rect_tiles.position;
-			// TODO Optimize: access pixels directly so we can use exact 8-bit color components.
-			// `set_pixel` has unnecessary overhead. On top of that, it would more conveniently allow us to diff the
-			// previous image, therefore knowing if anything changed, and then preventing from redrawing the control,
-			// which in turns prevents redrawing the entire Godot Editor
+			// TODO 优化：直接访问像素，这样我们就能使用精确的 8 位颜色分量。
+			// `set_pixel` 有额外的开销。除此之外，直接访问还能更方便地将当前
+			// 图像与之前的进行比较，从而知道是否有任何变化，进而避免重绘控件，
+			// 也就避免了重绘整个 Godot 编辑器
 			_image->set_pixelv(pixel_pos, color);
 		}
 	}

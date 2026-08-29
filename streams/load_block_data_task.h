@@ -46,7 +46,7 @@ private:
 #ifdef VOXEL_ENABLE_INSTANCER
 	UniquePtr<InstanceBlockData> _instances;
 #endif
-	Vector3i _position; // In data blocks of the specified lod
+	Vector3i _position; // 以指定 lod 的数据块为单位
 	VolumeID _volume_id;
 	uint8_t _lod_index;
 	uint8_t _block_size;

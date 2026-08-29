@@ -16,7 +16,7 @@ public:
 	int get_priority();
 	bool is_cancelled();
 
-	// Internal
+	// 内部
 	bool is_scheduled() const;
 	void mark_completed();
 	IThreadedTask *create_task();
@@ -28,7 +28,7 @@ private:
 
 	static void _bind_methods();
 
-	// Created upon scheduling, owned by the task runner
+	// 在调度时创建，由任务运行器拥有
 	Voxel_ThreadedTaskInternal *_scheduled_task = nullptr;
 	bool _completed = false;
 };

@@ -18,16 +18,16 @@ namespace blocky {
 struct ModelBakingContext;
 }
 
-// TODO Add preview in inspector showing collision boxes
+// TODO 在检视器中添加显示碰撞盒的预览
 
-// Visuals and collisions corresponding to a specific voxel value/state, for use with `VoxelMesherBlocky`.
-// A voxel can be a simple coloured cube, or a more complex model.
+// 与特定体素值/状态对应的视觉效果和碰撞，供 `VoxelMesherBlocky` 使用。
+// 体素可以是简单的彩色立方体，也可以是更复杂的模型。
 class VoxelBlockyModel : public Resource {
 	GDCLASS(VoxelBlockyModel, Resource)
 
 public:
-	// Convention to mean "nothing".
-	// Don't assign a non-empty model at this index.
+	// 约定为"无"。
+	// 不要在该索引处分配非空模型。
 	static const uint16_t AIR_ID = 0;
 	static const uint8_t NULL_FLUID_INDEX = 255;
 	static constexpr uint32_t MAX_SURFACES = 2;
@@ -44,7 +44,7 @@ public:
 		SIDE_COUNT = Cube::SIDE_COUNT
 	};
 
-	// Properties
+	// 属性
 
 	void set_color(Color color);
 	_FORCE_INLINE_ Color get_color() const {
@@ -94,7 +94,7 @@ public:
 	bool get_lod_skirts_enabled() const;
 
 	//------------------------------------------
-	// Properties for internal usage only
+	// 仅供内部使用的属性
 
 	virtual bool is_empty() const;
 
@@ -155,12 +155,12 @@ private:
 	void _b_set_collision_aabbs(TypedArray<AABB> array);
 	void _b_rotate_90(Vector3i::Axis axis, bool clockwise);
 
-	// Properties
+	// 属性
 
 	struct SurfaceParams {
-		// If assigned, these materials override those present on the mesh itself.
+		// 如果已赋值，这些材质会覆盖网格本身自带的材质。
 		Ref<Material> material_override;
-		// If true and classic mesh physics are enabled, the surface will be present in the collider.
+		// 如果为 true 且启用了经典网格物理，该表面将出现在碰撞器中。
 		bool collision_enabled = true;
 	};
 
@@ -169,16 +169,16 @@ private:
 protected:
 	unsigned int _surface_count = 0;
 
-	// Used for AABB physics only, not classic physics
+	// 仅用于 AABB 物理，不用于经典物理
 	StdVector<AABB> _collision_aabbs;
 	uint32_t _collision_mask = 1;
 
 private:
-	// If two neighboring voxels are supposed to occlude their shared face,
-	// this index decides wether or not it should happen. Equal indexes culls the face, different indexes doesn't.
+	// 如果两个相邻体素本应遮挡它们共享的面，
+	// 该索引决定是否遮挡。索引相同则剔除该面，不同则不剔除。
 	uint8_t _transparency_index = 0;
-	// If enabled, this voxel culls the faces of its neighbors. Disabling
-	// can be useful for denser transparent voxels, such as foliage.
+	// 若启用，该体素会剔除其邻居的面。禁用该选项
+	// 对较密集的透明体素（如树叶）很有用。
 	bool _culls_neighbors = true;
 	bool _random_tickable = false;
 	uint32_t _tags_mask = 1;

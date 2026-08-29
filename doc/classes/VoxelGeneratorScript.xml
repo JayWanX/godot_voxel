@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGeneratorScript" inherits="VoxelGenerator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Base class for custom generators defined with a script.
+		使用脚本定义的自定义生成器的基类。
 	</brief_description>
 	<description>
-		Important: this engine makes heavy use of threads. Generators will run in one of them, so make sure you don't access the scene tree or other unsafe APIs from within a generator.
+		重要：此引擎大量使用线程。生成器将在其中一个线程中运行，因此请确保不要在生成器内部访问场景树或其他不安全的 API。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -15,15 +15,15 @@
 			<param index="1" name="origin_in_voxels" type="Vector3i" />
 			<param index="2" name="lod" type="int" />
 			<description>
-				[code]out_buffer[/code]: Buffer in which to populate voxel data. It will never be [code]null[/code] and will have the requested size. It is only valid for this function, do not store it anywhere after the end. Note: this buffer can have any non-empty size, but some assumptions can be made depending on which terrain node you're using. [VoxelTerrain] will always request blocks of size 16x16x16, but [VoxelLodTerrain] can request blocks of different sizes.
-				[code]origin_in_voxels[/code]: Coordinates of the lower corner of the box to generate, relative to LOD0. The size of the box is known from [code]out_buffer[/code].
-				[code]lod[/code]: Level of detail index to use for this block. It can be ignored if you don't use LOD. This may be used as a power of two, telling how big is one voxel. For example, if you use a loop to fill the buffer using noise, you should sample that noise at steps of 2^lod, starting from [code]origin_in_voxels[/code] (in code you can use [code]1 &lt;&lt; lod[/code] for fast computation, instead of [code]pow(2, lod)[/code]). You may want to separate variables that iterate the coordinates in [code]out_buffer[/code] and variables used to generate voxel values in space.
+				[code]out_buffer[/code]：用于填充体素数据的缓冲区。它永远不会是 [code]null[/code]，并且具有请求的大小。它仅在此函数内有效，切勿在函数结束后将其存储在任何地方。注意：此缓冲区可以具有任何非空尺寸，但根据你使用的地形节点，可以做一些假设。[VoxelTerrain] 总是请求 16x16x16 大小的区块，但 [VoxelLodTerrain] 可以请求不同大小的区块。
+			[code]origin_in_voxels[/code]：要生成的盒体下角坐标，相对于 LOD0。盒体的大小可从 [code]out_buffer[/code] 得知。
+			[code]lod[/code]：用于此区块的细节级别索引。如果不使用 LOD 可以忽略它。它可以用作 2 的幂，表示一个体素有多大。例如，如果你使用循环配合噪声填充缓冲区，应从 [code]origin_in_voxels[/code] 开始以 2^lod 的步长采样噪声（在代码中你可以使用 [code]1 &lt;&lt; lod[/code] 进行快速计算，而不是 [code]pow(2, lod)[/code]）。你可能希望将迭代 [code]out_buffer[/code] 中坐标的变量与用于在空间中生成体素值的变量分开。
 			</description>
 		</method>
 		<method name="_get_used_channels_mask" qualifiers="virtual const">
 			<return type="int" />
 			<description>
-				Use this to indicate which channels your generator will use. It returns a bitmask, so for example you may provide information like this: [code](1 &lt;&lt; channel1) | (1 &lt;&lt; channel2)[/code]
+				使用此方法指示你的生成器将使用哪些通道。它返回一个位掩码，例如你可以提供这样的信息：[code](1 &lt;&lt; channel1) | (1 &lt;&lt; channel2)[/code]
 			</description>
 		</method>
 	</methods>

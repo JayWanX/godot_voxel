@@ -48,9 +48,9 @@ void generate_mesh(
 		const float baked_occlusion_darkness,
 		const TintSampler tint_sampler
 ) {
-	// TODO Optimization: not sure if this mandates a template function. There is so much more happening in this
-	// function other than reading voxels, although reading is on the hottest path. It needs to be profiled. If
-	// changing makes no difference, we could use a function pointer or switch inside instead to reduce executable size.
+	// TODO 优化：不确定这是否需要模板函数。这个函数中除了读取体素之外还发生了很多事情，
+	// 尽管读取在最热门的路径上。它需要被分析。如果改变后没有区别，
+	// 我们可以改用函数指针或在内部使用 switch 来减小可执行文件的大小。
 
 	ERR_FAIL_COND(
 			block_size.x < static_cast<int>(2 * VoxelMesherBlocky::PADDING) ||
@@ -58,13 +58,13 @@ void generate_mesh(
 			block_size.z < static_cast<int>(2 * VoxelMesherBlocky::PADDING)
 	);
 
-	// Build lookup tables so to speed up voxel access.
-	// These are values to add to an address in order to get given neighbor.
+	// 构建查找表以加速体素访问。
+	// 这些值会加到一个地址上以获取给定的邻居。
 
 	const int row_size = block_size.y;
 	const int deck_size = block_size.x * row_size;
 
-	// Data must be padded, hence the off-by-one
+	// 数据必须经过填充，因此存在差一（off-by-one）
 	const Vector3i min = Vector3iUtil::create(VoxelMesherBlocky::PADDING);
 	const Vector3i max = block_size - Vector3iUtil::create(VoxelMesherBlocky::PADDING);
 
@@ -133,13 +133,12 @@ void generate_mesh(
 	for (unsigned int z = min.z; z < (unsigned int)max.z; ++z) {
 		for (unsigned int x = min.x; x < (unsigned int)max.x; ++x) {
 			for (unsigned int y = min.y; y < (unsigned int)max.y; ++y) {
-				// min and max are chosen such that you can visit 1 neighbor away from the current voxel without size
-				// check
+				// 选择 min 和 max 使得可以在不做大小检查的情况下访问当前体素的 1 个邻居
 
 				const unsigned int voxel_index = y + x * row_size + z * deck_size;
 				const unsigned int voxel_id = type_buffer[voxel_index];
 
-				// TODO Don't assume air is 0?
+				// TODO 不假设 air 是 0？
 				if (voxel_id == AIR_ID || !library.has_model(voxel_id)) {
 					continue;
 				}
@@ -147,23 +146,23 @@ void generate_mesh(
 				const BakedModel &voxel = library.models[voxel_id];
 				const BakedModel::Model &model = voxel.model;
 
-				// Calculate visibility of sides
+				// 计算各侧面的可见性
 				uint32_t visible_sides_mask = 0;
 				for (unsigned int side = 0; side < Cube::SIDE_COUNT; ++side) {
 					if ((model.empty_sides_mask & (1 << side)) != 0) {
-						// This side is empty
+						// 该侧面是空的
 						continue;
 					}
 
 					const uint32_t neighbor_voxel_id = type_buffer[voxel_index + side_neighbor_lut[side]];
 
-					// Invalid voxels are treated like air
+					// 无效体素被视为空气
 					if (neighbor_voxel_id < library.models.size()) {
 						const BakedModel &other_vt = library.models[neighbor_voxel_id];
 						if (!is_face_visible_regardless_of_shape(voxel, other_vt)) {
-							// Visibility depends on the shape
+							// 可见性取决于形状
 							if (!is_face_visible_according_to_shape(library, voxel, other_vt, side)) {
-								// Completely occluded
+								// 完全被遮挡
 								continue;
 							}
 						}
@@ -179,8 +178,8 @@ void generate_mesh(
 				const FixedArray<FixedArray<BakedModel::SideSurface, MAX_SURFACES>, Cube::SIDE_COUNT>
 						*model_sides_surfaces = &model.sides_surfaces;
 
-				// Hybrid approach: extract cube faces and decimate those that aren't visible,
-				// and still allow voxels to have geometry that is not a cube.
+				// 混合方案：提取立方体面并剔除那些不可见的面，
+				// 同时仍允许体素拥有非立方体的几何体。
 
 				if (voxel.fluid_index != NULL_FLUID_INDEX) {
 					if (!generate_fluid_model(
@@ -202,22 +201,22 @@ void generate_mesh(
 
 				const Color modulate_color = voxel.color * tint_sampler.evaluate(Vector3i(x, y, z));
 
-				// Sides
+				// 侧面
 				for (unsigned int side = 0; side < Cube::SIDE_COUNT; ++side) {
 					if ((visible_sides_mask & (1 << side)) == 0) {
-						// This side is culled
+						// 该侧面被剔除
 						continue;
 					}
 
-					// By default we render the whole side if we consider it visible
+					// 默认情况下，如果认为可见，就渲染整个侧面
 					const FixedArray<BakedModel::SideSurface, MAX_SURFACES> *side_surfaces =
 							&((*model_sides_surfaces)[side]);
 
-					// Might be only partially visible
+					// 可能只是部分可见
 					if (voxel.cutout_sides_enabled) {
 						const uint32_t neighbor_voxel_id = type_buffer[voxel_index + side_neighbor_lut[side]];
 
-						// Invalid voxels are treated like air
+						// 无效体素被视为空气
 						if (neighbor_voxel_id < library.models.size()) {
 							const BakedModel &other_vt = library.models[neighbor_voxel_id];
 
@@ -227,26 +226,25 @@ void generate_mesh(
 							const unsigned int neighbor_shape_id =
 									other_vt.model.side_pattern_indices[Cube::g_opposite_side[side]];
 
-							// That's a hashmap lookup on a hot path. Cutting out sides like this should be used
-							// sparsely if possible.
-							// Unfortunately, use cases include certain water styles, which means oceans...
-							// Eventually we should provide another approach for these
+							// 这是热路径上的哈希表查找。像这样镂空侧面应尽可能少用。
+							// 遗憾的是，某些水样式用到了它，这意味着海洋……
+							// 最终我们应该为这些情况提供另一种方案
 							auto it = cutout_side_surfaces_by_neighbor_shape.find(neighbor_shape_id);
 
 							if (it != cutout_side_surfaces_by_neighbor_shape.end()) {
-								// Use pre-cut side instead
+								// 改用预先镂空好的侧面
 								side_surfaces = &it->second;
 							}
 						}
 					}
 
-					// The face is visible
+					// 该面可见
 
 					int8_t shaded_corner[8] = { 0 };
 
 					if (bake_occlusion) {
-						// Combinatory solution for
-						// https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/ (inverted)
+						// 以下问题的组合解
+						// https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/（已反转）
 						//	function vertexAO(side1, side2, corner) {
 						//	  if(side1 && side2) {
 						//		return 0
@@ -275,10 +273,10 @@ void generate_mesh(
 						}
 					}
 
-					// Subtracting 1 because the data is padded
+					// 减去 1，因为数据经过填充
 					const Vector3f pos(x - 1, y - 1, z - 1);
 
-					// TODO Move this into a function
+					// TODO 将此移入一个函数
 					for (unsigned int surface_index = 0; surface_index < model_surface_count; ++surface_index) {
 						const BakedModel::Surface &surface = model_surfaces[surface_index];
 
@@ -295,7 +293,7 @@ void generate_mesh(
 						const StdVector<Vector2f> &side_uvs = side_surface.uvs;
 						const StdVector<float> &side_tangents = side_surface.tangents;
 
-						// Append vertices of the faces in one go, don't use push_back
+						// 一次性追加面的顶点，不要用 push_back
 
 						{
 							const int append_index = arrays.positions.size();
@@ -338,10 +336,10 @@ void generate_mesh(
 								for (unsigned int i = 0; i < vertex_count; ++i) {
 									const Vector3f vertex_pos = side_positions[i];
 
-									// General purpose occlusion colouring.
-									// TODO Optimize for cubes
-									// TODO Fix occlusion inconsistency caused by triangles orientation? Not sure if
-									// worth it
+									// 通用环境光遮蔽着色。
+									// TODO 针对立方体优化
+									// TODO 修复由三角形朝向引起的光照不一致？不确定是否
+									// 值得
 									float shade = 0;
 									for (unsigned int j = 0; j < 4; ++j) {
 										unsigned int corner = Cube::g_side_corners[side][j];
@@ -412,13 +410,13 @@ void generate_mesh(
 					}
 				}
 
-				// Inside
+				// 内部
 				for (unsigned int surface_index = 0; surface_index < model_surface_count; ++surface_index) {
 					const BakedModel::Surface &surface = model_surfaces[surface_index];
 					if (surface.positions.size() == 0) {
 						continue;
 					}
-					// TODO Get rid of push_backs
+					// TODO 去掉 push_back
 
 					VoxelMesherBlocky::Arrays &arrays = out_arrays_per_material[surface.material_id];
 
@@ -446,7 +444,7 @@ void generate_mesh(
 						arrays.normals.push_back(normals[i]);
 						arrays.uvs.push_back(uvs[i]);
 						arrays.positions.push_back(positions[i] + pos);
-						// TODO handle ambient occlusion on inner parts
+						// TODO 处理内部部分的环境光遮蔽
 						arrays.colors.push_back(modulate_color);
 					}
 
@@ -571,8 +569,8 @@ void VoxelMesherBlocky::build(VoxelMesher::Output &output, const VoxelMesher::In
 	}
 
 	if (params.library.is_null()) {
-		// This may be a configuration warning, the mesh will be left empty.
-		// If it was an error it would spam unnecessarily in the editor as users set things up.
+		// 这可能是一个配置警告，网格将保持为空。
+		// 如果它是错误，在用户进行设置时会在编辑器中不必要地刷屏。
 		return;
 	}
 	// ERR_FAIL_COND(params.library.is_null());
@@ -590,40 +588,40 @@ void VoxelMesherBlocky::build(VoxelMesher::Output &output, const VoxelMesher::In
 		baked_occlusion_darkness = params.baked_occlusion_darkness / 3.0f;
 	}
 
-	// The technique is Culled faces.
-	// Could be improved with greedy meshing: https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/
-	// However I don't feel it's worth it yet:
-	// - Not so much gain for organic worlds with lots of texture variations
-	// - Works well with cubes but not with any shape
-	// - Slower
-	// => Could be implemented in a separate class?
+	// 该技术是剔除（Culled faces）面。
+	// 可以用贪婪网格化（greedy meshing）改进：https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/
+	// 但我认为目前还不值得：
+	// - 对拥有大量贴图变化的有机世界来说收益不大
+	// - 对立方体效果良好，但对任意形状则不行
+	// - 更慢
+	// => 也许可以放到一个单独的类中实现？
 
 	const VoxelBuffer &voxels = input.voxels;
 
-	// Iterate 3D padded data to extract voxel faces.
-	// This is the most intensive job in this class, so all required data should be as fit as possible.
+	// 遍历 3D 填充数据以提取体素面。
+	// 这是本类中计算量最大的工作，因此所有所需数据应尽可能紧凑。
 
-	// The buffer we receive MUST be dense (i.e not compressed, and channels allocated).
-	// That means we can use raw pointers to voxel data inside instead of using the higher-level getters,
-	// and then save a lot of time.
+	// 我们收到的缓冲区必须是无损的（即未压缩，且通道已分配）。
+	// 这意味着我们可以使用内部体素数据的原始指针，而不是使用高层 getter，
+	// 从而节省大量时间。
 
 	if (voxels.get_channel_compression(channel) == VoxelBuffer::COMPRESSION_UNIFORM) {
-		// All voxels have the same type.
-		// If it's all air, nothing to do. If it's all cubes, nothing to do either.
-		// TODO Handle edge case of uniform block with non-cubic voxels!
-		// If the type of voxel still produces geometry in this situation (which is an absurd use case but not an
-		// error), decompress into a backing array to still allow the use of the same algorithm.
+		// 所有体素类型相同。
+		// 如果全是空气，则无事可做。如果全是立方体，同样无事可做。
+		// TODO 处理非立方体体素的均匀数据块边缘情况！
+		// 如果体素类型在这种情况下仍能生成几何（这是一种荒谬的用法，但不是
+		// 错误），则解压到后备数组，以便仍能使用相同的算法。
 		return;
 
 	} else if (voxels.get_channel_compression(channel) != VoxelBuffer::COMPRESSION_NONE) {
-		// No other form of compression is allowed
+		// 不允许其它形式的压缩
 		ERR_PRINT("VoxelMesherBlocky received unsupported voxel compression");
 		return;
 	}
 
 	Span<const uint8_t> raw_channel;
 	if (!voxels.get_channel_as_bytes_read_only(channel, raw_channel)) {
-		// Case supposedly handled before...
+		// 这种情况据说之前已经处理过……
 		ERR_PRINT("Something wrong happened");
 		return;
 	}
@@ -638,7 +636,7 @@ void VoxelMesherBlocky::build(VoxelMesher::Output &output, const VoxelMesher::In
 
 	unsigned int material_count = 0;
 	{
-		// We can only access baked data. Only this data is made for multithreaded access.
+		// 我们只能访问烘焙数据。只有这些数据是为多线程访问而设计的。
 		RWLockRead lock(params.library->get_baked_data_rw_lock());
 		const blocky::BakedLibrary &library_baked_data = params.library->get_baked_data();
 
@@ -694,7 +692,7 @@ void VoxelMesherBlocky::build(VoxelMesher::Output &output, const VoxelMesher::In
 	}
 
 	if (input.lod_index > 0) {
-		// Might not look good, but at least it's something
+		// 可能看起来不好看，但至少有点东西
 		const float lod_scale = 1 << input.lod_index;
 		for (Arrays &arrays : arrays_per_material) {
 			for (Vector3f &p : arrays.positions) {
@@ -708,8 +706,8 @@ void VoxelMesherBlocky::build(VoxelMesher::Output &output, const VoxelMesher::In
 		}
 	}
 
-	// TODO Optimization: we could return a single byte array and use Mesh::add_surface down the line?
-	// That API does not seem to exist yet though.
+	// TODO 优化：我们可以返回单个字节数组，之后使用 Mesh::add_surface？
+	// 不过该 API 目前似乎还不存在。
 
 	for (unsigned int material_index = 0; material_index < material_count; ++material_index) {
 		const Arrays &arrays = arrays_per_material[material_index];
@@ -756,7 +754,7 @@ void VoxelMesherBlocky::build(VoxelMesher::Output &output, const VoxelMesher::In
 	}
 
 	if (params.shadow_occluders_mask != 0 && !blocky::is_empty(arrays_per_material)) {
-		// TODO Candidate for temp allocator (maybe even stack allocator in this case?)
+		// TODO 适合使用临时分配器（这种情况下甚至可以用栈分配器？）
 		blocky::OccluderArrays occluder_arrays;
 
 		RWLockRead lock(params.library->get_baked_data_rw_lock());
@@ -905,8 +903,8 @@ void VoxelMesherBlocky::_bind_methods() {
 					PROPERTY_HINT_RESOURCE_TYPE,
 					VoxelBlockyLibraryBase::get_class_static(),
 					PROPERTY_USAGE_DEFAULT
-					// Sadly we can't use this hint because the property type is abstract... can't just choose a
-					// default child class. This hint becomes less and less useful everytime I come across it...
+					// 很遗憾我们不能使用这个提示，因为属性类型是抽象的……不能只选择一个
+					// 默认子类。每次遇到这个提示，它都变得越来越没用……
 					//| PROPERTY_USAGE_EDITOR_INSTANTIATE_OBJECT
 			),
 			"set_library",

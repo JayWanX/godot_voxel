@@ -102,14 +102,14 @@ namespace FastNoise
 
             auto slot = GetUsedSlotItr( ptr );
 
-            // Check pos pointing at garbage data
+            // 检查 pos 是否指向垃圾数据
             if( slot == usedSlots.end() )
             {
                 assert( 0 );
                 return false;
             }
 
-            // Check pos is correct
+            // 检查 pos 是否正确
             if( slot->pos != pos )
             {
                 assert( 0 );
@@ -158,7 +158,7 @@ namespace FastNoise
                 {                   
                     uint8_t* endSlot = (uint8_t*)ptr + size;
 
-                    // Align next slot correctly for SlotHeader
+                    // 为 SlotHeader 正确对齐下一个槽
                     size_t alignmentOffset = (size_t)endSlot % alignof( SlotHeader );
 
                     if( alignmentOffset )
@@ -173,7 +173,7 @@ namespace FastNoise
                     new( startSlot ) SlotHeader { 0u };
                     usedSlots.emplace_back( Slot{ freeSlots[idx].pos, slotSize } );
 
-                    // Check if remaining free slot is empty
+                    // 检查剩余的可用槽是否为空
                     if( freeSlots[idx].size <= slotSize )
                     {
                         assert( freeSlots[idx].size == slotSize );
@@ -188,7 +188,7 @@ namespace FastNoise
                 }
             }
 
-            assert( freeSlots.empty() || freeSlots[0].size != poolSize ); // Empty pool not large enough to fit alloc, increase the pool size
+            assert( freeSlots.empty() || freeSlots[0].size != poolSize ); // 空池不足以容纳该分配，请增大池的大小
             return nullptr;
         }
 
@@ -201,7 +201,7 @@ namespace FastNoise
             assert( slotHeader->references == 0 );
             assert( slot->size < poolSize );
 
-            // Merge free slots as necessary
+            // 按需合并可用槽
             Slot* expandedBefore = nullptr;
             uint32_t idx = 0;
 
@@ -212,7 +212,7 @@ namespace FastNoise
                     break;
                 }
 
-                // Found slot before, expand
+                // 前面找到槽，展开
                 if( freeSlots[idx].pos + freeSlots[idx].size == pos )
                 {
                     freeSlots[idx].size += slot->size;
@@ -224,19 +224,19 @@ namespace FastNoise
 
             if( idx < freeSlots.size() && freeSlots[idx].pos == pos + slot->size )
             {
-                // Found slot before and after, expand before again, delete after
+                // 前、后都找到槽，再次展开前面，删除后面
                 if( expandedBefore )
                 {
                     expandedBefore->size += freeSlots[idx].size;
                     freeSlots.erase( freeSlots.begin() + idx );
                 }
-                else // Found slot after, expand
+                else // 后面找到槽，展开
                 {
                     freeSlots[idx].pos = pos;
                     freeSlots[idx].size += slot->size;
                 }
             }
-            else if( !expandedBefore ) // No slots before or after, create new
+            else if( !expandedBefore ) // 前后都没有槽，新建一个
             {
                 freeSlots.emplace( freeSlots.begin() + idx, Slot { pos, slot->size } );
             }
@@ -295,7 +295,7 @@ namespace FastNoise
                 ref.u32.pool++;
             }
 
-            // Could not find ptr in pools, probably not allocated using this class
+            // 在池中找不到 ptr，可能不是由该类分配的
             assert( 0 );
             return { SmartNodeManager::kInvalidReferenceId };
         }
@@ -338,8 +338,8 @@ namespace FastNoise
             return nullptr;
         }
 
-        // std::list is used to allow lock free reads to pools
-        // In most use cases there should only be 1 pool so performance is not a concern
+        // 使用 std::list 以允许对池进行无锁读取
+        // 大多数情况下应只有一个池，因此无需担心性能
         std::list<SmartNodeManagerPool> mPools;
         mutable std::mutex mMutex;
     };

@@ -67,11 +67,11 @@ real_t calculate_i_offset(const AABB &box, AABB other, real_t motion, int i, int
 	return motion;
 }
 
-// Gets the transformed vector for moving a box and slide.
-// This algorithm is free from tunnelling for axis-aligned movement,
-// except in some high-speed diagonal cases or huge size differences:
-// For example, if a box is fast enough to have a diagonal motion jumping from A to B,
-// it will pass through C if that other box is the only other one:
+// 获取移动盒子并滑动时的变换后向量。
+// 该算法对于轴对齐移动不会发生隧穿（tunnelling），
+// 但在某些高速对角移动或尺寸差异巨大的情况下除外：
+// 例如，如果一个盒子移动足够快，其对角运动从 A 跳到 B，
+// 那么当 C 是唯一的其它盒子时，它会穿过 C：
 //
 //  o---o
 //  | A |
@@ -83,14 +83,14 @@ real_t calculate_i_offset(const AABB &box, AABB other, real_t motion, int i, int
 //                  | B |
 //                  o---o
 //
-// TODO one way to fix this would be to try a "hot side" projection instead
+// TODO 修复这个问题的一种方式是尝试"热侧"投影
 //
 Vector3 get_motion(AABB box, Vector3 motion, Span<const AABB> environment_boxes, const real_t margin) {
-	// The bounding box is expanded to include it's estimated version at next update.
-	// This also makes the algorithm tunnelling-free
+	// 包围盒被扩展以包含它在下次更新时的预估版本。
+	// 这也使得算法免于隧穿（tunnelling）
 	const AABB expanded_box = expand_with_vector(box, motion);
 
-	// TODO Candidate for temp allocator
+	// TODO 可作为临时分配器（temp allocator）的候选
 	StdVector<AABB> colliding_boxes;
 	for (size_t i = 0; i < environment_boxes.size(); ++i) {
 		const AABB &other = environment_boxes[i];
@@ -129,7 +129,7 @@ inline Vector2 get_xz(Vector3 v) {
 	return Vector2(v.x, v.z);
 }
 
-// Finds the first obstacle to a rectangle moving down through axis-aligned boxes
+// 查找矩形向下穿过轴对齐盒子时遇到的第一个障碍物
 real_t rect_cast_down(
 		Span<const AABB> boxes,
 		const Rect2 rect,
@@ -140,16 +140,16 @@ real_t rect_cast_down(
 	real_t hit_y = min_y;
 	for (const AABB box : boxes) {
 		if (box.position.y > from_y) {
-			// Box is above starting position
+			// 盒子位于起始位置上方
 			continue;
 		}
 		const real_t box_top = box.position.y + box.size.y;
 		if (box_top > from_y) {
-			// Ignore overlap
+			// 忽略重叠
 			continue;
 		}
 		if (box_top + margin < min_y) {
-			// Too far
+			// 距离太远
 			continue;
 		}
 		if (!rect.intersects(Rect2(get_xz(box.position), get_xz(box.size)))) {
@@ -160,7 +160,7 @@ real_t rect_cast_down(
 	return hit_y;
 }
 
-// Finds the first obstacle to a rectangle moving up through axis-aligned boxes
+// 查找矩形向上穿过轴对齐盒子时遇到的第一个障碍物
 real_t rect_cast_up(
 		Span<const AABB> boxes,
 		const Rect2 rect,
@@ -171,15 +171,15 @@ real_t rect_cast_up(
 	real_t hit_y = max_y;
 	for (const AABB box : boxes) {
 		if (box.position.y + box.size.y < from_y) {
-			// Box is below starting position
+			// 盒子位于起始位置下方
 			continue;
 		}
 		if (box.position.y < from_y) {
-			// Ignore overlap
+			// 忽略重叠
 			continue;
 		}
 		if (box.position.y - margin > max_y) {
-			// Too far
+			// 距离太远
 			continue;
 		}
 		if (!rect.intersects(Rect2(get_xz(box.position), get_xz(box.size)))) {
@@ -217,7 +217,7 @@ void collect_boxes_blocky(
 
 	Vector3i i = minp;
 
-	// TODO Optimization: read the whole box of voxels at once, querying individually is slower
+	// TODO 优化：一次性读取整个体素盒子，逐个查询较慢
 	for (i.z = minp.z; i.z < maxp.z; ++i.z) {
 		for (i.y = minp.y; i.y < maxp.y; ++i.y) {
 			for (i.x = minp.x; i.x < maxp.x; ++i.x) {
@@ -253,7 +253,7 @@ void collect_boxes_cubes(
 
 	Vector3i i = minp;
 
-	// TODO Optimization: read the whole box of voxels at once, querying individually is slower
+	// TODO 优化：一次性读取整个体素盒子，逐个查询较慢
 	for (i.z = minp.z; i.z < maxp.z; ++i.z) {
 		for (i.y = minp.y; i.y < maxp.y; ++i.y) {
 			for (i.x = minp.x; i.x < maxp.x; ++i.x) {
@@ -303,7 +303,7 @@ Vector3 VoxelBoxMover::get_motion(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Transform to local in case the volume is transformed
+	// 变换到本地坐标，以防体积体被变换
 	const Transform3D to_world = terrain_transform;
 	const Transform3D to_local = to_world.affine_inverse();
 
@@ -315,17 +315,17 @@ Vector3 VoxelBoxMover::get_motion(
 
 	AABB expanded_box = expand_with_vector(box, input_motion);
 	if (_step_climbing_enabled) {
-		// We'll have to gather a bit higher for ceilings in case we have to climb up steps
+		// 为了在需要爬上台阶时能检测到天花板，我们需要向更高处收集
 		expanded_box.size.y += _max_step_height;
 	}
 
-	// TODO Candidate for temp allocator
+	// TODO 可作为临时分配器（temp allocator）的候选
 	static thread_local StdVector<AABB> s_colliding_boxes;
 	StdVector<AABB> &potential_boxes = s_colliding_boxes;
 	potential_boxes.clear();
 
-	// Collect potential collisions with the terrain (broad phase)
-	// TODO If motion is really big, we may want something more optimal or reject it
+	// 收集与地形之间可能发生的碰撞（粗阶段 broad phase）
+	// TODO 如果运动量非常大，我们可能需要更优的方案或直接拒绝
 	collect_boxes(terrain_data, mesher, expanded_box, _collision_mask, potential_boxes);
 
 	const real_t margin = 0.001;
@@ -337,14 +337,14 @@ Vector3 VoxelBoxMover::get_motion(
 	const real_t motion_diff_epsilon = 0.005;
 
 	if (_step_climbing_enabled &&
-		// Movement is horizontal?
+		// 移动是水平的？
 		Math::abs(slided_motion1.y) < 0.001 && get_xz(input_motion).length_squared() > 0.0001 &&
-		// Horizontal direction of input motion isn't the same as resulting slided motion?
+		// 输入运动的水平方向与滑动后的结果运动方向不同？
 		get_xz(input_motion).distance_squared_to(get_xz(slided_motion1)) > motion_diff_epsilon * motion_diff_epsilon) {
 		//
 		AABB mobox = box;
 
-		// Raise the box as high as max step height and ceilings allow
+		// 将盒子升高到最大台阶高度和天花板允许的高度
 		{
 			const real_t me_top = box.position.y + box.size.y;
 			const real_t hit_h = rect_cast_up(
@@ -358,16 +358,15 @@ Vector3 VoxelBoxMover::get_motion(
 			mobox.position.y += step_h;
 		}
 
-		// Account for gravity that got cancelled by the first attempt,
-		// which would bias our step height. We're supposed to be on ground anyways
+		// 考虑第一次尝试中因重力被抵消的影响，这会使台阶高度产生偏差。无论如何我们本应已在地面上
 		const Vector3 momotion(input_motion.x, slided_motion1.y, input_motion.z);
 
-		// Do a second attempt at moving
+		// 进行第二次移动尝试
 		Vector3 slided_motion2 = voxel::get_motion(mobox, momotion, to_span(potential_boxes), margin);
 
 		const real_t epsilon = 0.0001;
 		{
-			// Move the box back down as far as we raised it or until we touch ground
+			// 将盒子向下移回我们抬升的高度，或直到接触地面
 			const real_t step_h = mobox.position.y - box.position.y;
 			const Vector3 slided_pos = mobox.position + slided_motion2;
 			const real_t hit_y = rect_cast_down(
@@ -394,7 +393,7 @@ Vector3 VoxelBoxMover::get_motion(
 		}
 	}
 
-	// Switch back to world
+	// 切换回世界坐标
 	const Vector3 world_slided_motion = to_world.basis.xform(final_motion);
 
 	return world_slided_motion;
@@ -430,17 +429,17 @@ bool VoxelBoxMover::intersects(
 		const Transform3D &terrain_transform,
 		const VoxelMesher &mesher
 ) const {
-	// Transform to local in case the volume is transformed
+	// 变换到本地坐标，以防体积体被变换
 	const Transform3D to_world = terrain_transform;
 	const Transform3D to_local = to_world.affine_inverse();
 	const AABB aabb = to_local.xform(aabb_world);
 
-	// TODO Candidate for temp allocator
+	// TODO 可作为临时分配器（temp allocator）的候选
 	static thread_local StdVector<AABB> s_colliding_boxes;
 	StdVector<AABB> &potential_boxes = s_colliding_boxes;
 	potential_boxes.clear();
 
-	// Collect potential collisions with the terrain (broad phase)
+	// 收集与地形之间可能发生的碰撞（粗阶段 broad phase）
 	collect_boxes(terrain_data, mesher, aabb, _collision_mask, potential_boxes);
 
 	return voxel::intersects(to_span(potential_boxes), aabb);
@@ -453,7 +452,7 @@ Vector3 VoxelBoxMover::_b_get_motion(Vector3 pos, Vector3 motion, AABB aabb, Nod
 	VoxelNode *terrain = Object::cast_to<VoxelNode>(terrain_node);
 	ERR_FAIL_COND_V(terrain == nullptr, Vector3());
 
-	// The mesher is required to know how collisions should be processed
+	// 需要网格器（mesher）来了解碰撞应如何处理
 	Ref<VoxelMesher> mesher = terrain->get_mesher();
 	ERR_FAIL_COND_V(mesher.is_null(), Vector3());
 
@@ -465,7 +464,7 @@ bool VoxelBoxMover::_b_intersects(AABB p_aabb, Object *p_terrain_node) const {
 	VoxelNode *terrain = Object::cast_to<VoxelNode>(p_terrain_node);
 	ERR_FAIL_COND_V(terrain == nullptr, false);
 
-	// The mesher is required to know how collisions should be processed
+	// 需要网格器（mesher）来了解碰撞应如何处理
 	Ref<VoxelMesher> mesher = terrain->get_mesher();
 	ERR_FAIL_COND_V(mesher.is_null(), false);
 

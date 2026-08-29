@@ -3,7 +3,7 @@ shader_type canvas_item;
 #include "fast_noise_lite.gdshaderinc"
 
 void fragment() {
-	// Some test
+	// 一些测试
 	fnl_state state = fnlCreateState(1337);
 	state.noise_type = FNL_NOISE_OPENSIMPLEX2;
 	state.fractal_type = FNL_FRACTAL_RIDGED;

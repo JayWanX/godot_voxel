@@ -14,18 +14,18 @@
 
 namespace voxel {
 
-// TODO Use template? This is a litteral copy paste from the 3D version with 2 instead of 3.
+// TODO 用模板？这是 3D 版本的字面复制粘贴，只是把 3 换成了 2。
 
-// Locking on a large 2D data structure can be done with this, instead of putting RWLocks on every chunk or
-// every node. This also reduces the amount of required mutexes considerably (that matters on some platforms with
-// low limits).
+// 对大型二维数据结构加锁可以用这个，而无需在每个区块或
+// 每个节点上都放读写锁。这也显著减少了所需互斥量的数量（在某些具有
+// 较低限制的平台上是重要的）。
 //
-// Some methods allow to `try` locking areas. They should be used in contextes where blocking is worse than
-// delaying operations. Such contextes may then postpone their work, or cancel it. If that's not possible, then it
-// has to wait, or run outside of the main thread to maintain app responsivity.
+// 某些方法允许 `try` 锁定区域。它们应被用于阻塞比
+// 延迟操作更糟的场景。这类场景随后可推迟或取消其工作。若做不到，则它
+// 必须等待，或在主线程之外运行以维持应用的响应性。
 //
-// Do not try to lock more than one box at the same time before doing your task. If another thread does so,
-// it could end up in a deadlock depending in the order it happens.
+// 在执行任务前，不要尝试同时锁定多个包围盒。如果另一个线程这样做，
+// 则根据发生的顺序不同，可能导致死锁。
 class SpatialLock2D {
 public:
 	enum Mode { //
@@ -104,7 +104,7 @@ public:
 		return _boxes.size();
 	}
 
-	// Scoped helpers
+	// 作用域辅助类
 
 	struct Read {
 		Read(SpatialLock2D &p_locker, const BoxBounds2i p_box) : locker(p_locker), box(p_box) {
@@ -155,15 +155,15 @@ private:
 		for (unsigned int i = 0; i < _boxes.size(); ++i) {
 			const Box &existing_box = _boxes[i];
 #ifdef VOXEL_SPATIAL_LOCK_2D_CHECKS
-			// Each thread can lock only one box at a time, otherwise there can be deadlocks depending on the order of
-			// locks. For example:
-			// - Thread 1 locks A
-			// - Thread 2 locks B
-			// - Thread 1 locks B, but blocks because it is already locked
-			// - Thread 2 locks A, but blocks because it is already locked:
-			//   This is a deadlock.
-			// Note: this is not true if threads only lock for reading, but if we didn't ever write we'd not use locks.
-			// Note: this is also not true if threads use `try_lock` instead!
+			// 每个线程一次只能锁定一个包围盒，否则根据
+			// 加锁的顺序不同可能发生死锁。例如：
+			// - 线程 1 锁定 A
+			// - 线程 2 锁定 B
+			// - 线程 1 锁定 B，但因已被锁定而阻塞
+			// - 线程 2 锁定 A，但因已被锁定而阻塞：
+			// 这就是死锁。
+			// 注意：若线程只加读锁则不成立，但如果我们从不写入，也就不会用锁了。
+			// 注意：若线程改用 `try_lock` 也不成立！
 			VOXEL_ASSERT_RETURN_V_MSG(existing_box.thread_id != thread_id, false,
 					"Locking two areas from the same thread is not allowed");
 #endif
@@ -201,20 +201,20 @@ private:
 		_boxes_mutex.lock();
 		remove_box(box, mode);
 		_boxes_mutex.unlock();
-		// Tell eventual waiting threads that they might be able to lock their box now.
+		// 通知可能正在等待的线程，它们现在或许可以锁定自己的包围盒了。
 		_semaphore.post();
 	}
 
-	// List of boxes currently locked.
-	// In practice, each thread can lock up to 1 box at once (maybe a few more in rare cases that would allow it), so
-	// there won't be many boxes to store.
+	// 当前已锁定包围盒的列表。
+	// 实际上，每个线程一次最多锁定 1 个包围盒（极少数允许的情况下可能稍多），因此
+	// 需要存储的包围盒不会很多。
 	StdVector<Box> _boxes;
-	// This mutex is supposed to be locked for very small periods of time, just to lookup, add or remove boxes.
-	// So we lock it even in `try_*` methods. The long-period locking states are the boxes themselves.
-	// Also it is not a recursive mutex for performance. Do not lock it again once you successfully locked it.
+	// 该互斥量预期只被锁定极短时间，仅用于查找、添加或移除包围盒。
+	// 因此我们即使在 `try_*` 方法中也会锁定它。长时间锁定的状态是包围盒本身。
+	// 另外出于性能它并非可重入互斥量。一旦成功锁定，不要再重复锁定。
 	mutable ShortLock _boxes_mutex;
-	// This semaphore is waited for when a lock fails. It is posted everytime a box is unlocked, so any thread
-	// waiting for it may retry locking their box.
+	// 锁失败时线程会等待该信号量。每次有包围盒解锁时它都会被 post，因此任何线程
+	// 等待它时都可重试锁定自己的包围盒。
 	Semaphore _semaphore;
 };
 

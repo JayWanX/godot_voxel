@@ -2,7 +2,7 @@
 #include "../../constants/voxel_string_names.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/godot/classes/object.h"
-#include "../../util/godot/core/array.h" // for `varray`
+#include "../../util/godot/core/array.h" // 供 `varray` 使用
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
@@ -71,7 +71,7 @@ namespace AutoPickUtility {
 bool try_add_port(const VoxelGraphFunction::Port &port, StdVector<VoxelGraphFunction::Port> &added_ports) {
 	for (VoxelGraphFunction::Port &p : added_ports) {
 		if (p.equals(port)) {
-			// Already added
+			// 已添加
 			return false;
 		}
 	}
@@ -88,7 +88,7 @@ bool try_add_port(
 }
 
 struct Comparator {
-	// If special input, move to top. Otherwise, use alphanumeric sorting.
+	// 如果是特殊输入则置顶，否则按字母数字顺序排序。
 	bool operator()(const VoxelGraphFunction::Port &a, const VoxelGraphFunction::Port &b) const {
 		if (a.is_custom()) {
 			if (b.is_custom()) {
@@ -110,7 +110,7 @@ struct Comparator {
 
 } // namespace AutoPickUtility
 
-// Automatically chooses inputs and outputs based on a graph.
+// 根据图自动选择输入和输出。
 void auto_pick_inputs_and_outputs(
 		const ProgramGraph &graph,
 		StdVector<VoxelGraphFunction::Port> &inputs,
@@ -131,10 +131,10 @@ void auto_pick_inputs_and_outputs(
 			AutoPickUtility::try_add_port(node, type, outputs);
 
 		} else if (node.autoconnect_default_inputs) {
-			// The input node is implicit
+			// 输入节点是隐式的
 			for (const ProgramGraph::Port &input : node.inputs) {
 				VoxelGraphFunction::NodeTypeID input_type_id;
-				// If the input isn't connected and has an autoconnect hint
+				// 如果输入未连接且具有自动连接提示
 				if (input.connections.size() == 0 &&
 					VoxelGraphFunction::try_get_node_type_id_from_auto_connect(
 							VoxelGraphFunction::AutoConnect(input.autoconnect_hint), input_type_id
@@ -212,7 +212,7 @@ void setup_function(ProgramGraph::Node &node, Ref<VoxelGraphFunction> func) {
 
 	node.autoconnect_default_inputs = true;
 
-	// TODO Function parameters
+	// TODO 函数参数
 }
 
 void update_function(ProgramGraph &graph, uint32_t node_id, StdVector<ProgramGraph::Connection> *removed_connections) {
@@ -227,7 +227,7 @@ void update_function(ProgramGraph &graph, uint32_t node_id, StdVector<ProgramGra
 
 	VOXEL_ASSERT(node.default_inputs.size() == node.inputs.size());
 
-	// Update inputs
+	// 更新输入
 	for (unsigned int input_index = 0; input_index < input_defs.size(); ++input_index) {
 		const VoxelGraphFunction::Port &port_def = input_defs[input_index];
 
@@ -242,7 +242,7 @@ void update_function(ProgramGraph &graph, uint32_t node_id, StdVector<ProgramGra
 			node.default_inputs.push_back(0.f);
 		}
 	}
-	// Remove excess inputs
+	// 移除多余的输入
 	if (node.inputs.size() > input_defs.size()) {
 		for (unsigned int i = input_defs.size(); i < node.inputs.size(); ++i) {
 			const ProgramGraph::Port &port = node.inputs[i];
@@ -262,12 +262,12 @@ void update_function(ProgramGraph &graph, uint32_t node_id, StdVector<ProgramGra
 		node.default_inputs.resize(input_defs.size());
 	}
 
-	// Add new outputs
+	// 添加新输出
 	for (unsigned int output_index = node.outputs.size(); output_index < output_defs.size(); ++output_index) {
 		ProgramGraph::Port port;
 		node.outputs.push_back(port);
 	}
-	// Remove excess outputs
+	// 移除多余的输出
 	if (node.outputs.size() > output_defs.size()) {
 		for (unsigned int i = output_defs.size(); i < node.outputs.size(); ++i) {
 			const ProgramGraph::Port &port = node.outputs[i];
@@ -315,7 +315,7 @@ ProgramGraph::Node *duplicate_node(
 		for (Variant &param_value : dst_node->params) {
 			Ref<Resource> res = param_value;
 			if (res.is_valid()) {
-				// If the resource has a path, keep it shared
+				// 如果资源有路径，则保持共享
 				if (!godot::is_resource_file(res->get_path())) {
 					param_value = res->duplicate();
 				}
@@ -330,7 +330,7 @@ uint32_t VoxelGraphFunction::create_node(NodeTypeID type_id, Vector2 position, u
 	ERR_FAIL_COND_V(!NodeTypeDB::get_singleton().is_valid_type_id(type_id), ProgramGraph::NULL_ID);
 	ProgramGraph::Node *node = create_node_internal(_graph, type_id, position, id, true);
 	ERR_FAIL_COND_V(node == nullptr, ProgramGraph::NULL_ID);
-	// Register resources if any were created by default
+	// 注册任何默认创建的资源
 	for (const Variant &v : node->params) {
 		if (v.get_type() == Variant::OBJECT) {
 			Ref<Resource> res = v;
@@ -406,7 +406,7 @@ bool VoxelGraphFunction::can_connect(
 	ERR_FAIL_COND_V(!_graph.is_output_port_valid(src_port), false);
 	ERR_FAIL_COND_V(!_graph.is_input_port_valid(dst_port), false);
 	const ProgramGraph::Node &node = _graph.get_node(src_node_id);
-	// Output nodes have output ports, for internal reasons. They should not be connected.
+	// 输出节点因内部原因具有输出端口，它们不应被连接。
 	const NodeType &type = NodeTypeDB::get_singleton().get_type(node.type_id);
 	if (type.category == CATEGORY_OUTPUT) {
 		return false;
@@ -477,7 +477,7 @@ bool VoxelGraphFunction::try_get_connection_to(
 	if (port.connections.size() == 0) {
 		return false;
 	}
-	// There can be at most one inbound connection
+	// 最多只能有一个入站连接
 	out_src = port.connections[0];
 	return true;
 }
@@ -544,7 +544,7 @@ void VoxelGraphFunction::set_node_param_unchecked(
 	}
 
 	if (node.type_id == VoxelGraphFunction::NODE_FUNCTION && param_index == 0) {
-		// The function param is special, it conditions the presence of other parameters and node ports
+		// 函数参数很特殊，它决定了其它参数和节点端口是否存在
 
 		Ref<VoxelGraphFunction> func = value;
 		ERR_FAIL_COND_MSG(
@@ -553,7 +553,7 @@ void VoxelGraphFunction::set_node_param_unchecked(
 						.format(varray(VoxelGraphFunction::get_class_static()))
 		);
 
-		// Unregister potential resource params, since the previous function could have had different ones
+		// 注销潜在的资源参数，因为之前的函数可能具有不同的参数
 		for (unsigned int i = 0; i < node.params.size(); ++i) {
 			Ref<Resource> res = node.params[i];
 			if (res.is_valid()) {
@@ -612,7 +612,7 @@ inline bool has_duplicate(const PackedStringArray &sa) {
 void VoxelGraphFunction::set_expression_node_inputs(uint32_t node_id, PackedStringArray input_names) {
 	ProgramGraph::Node *node = _graph.try_get_node(node_id);
 
-	// Validate
+	// 校验
 	ERR_FAIL_COND(node == nullptr);
 	ERR_FAIL_COND(node->type_id != NODE_EXPRESSION);
 	for (int i = 0; i < input_names.size(); ++i) {
@@ -622,7 +622,7 @@ void VoxelGraphFunction::set_expression_node_inputs(uint32_t node_id, PackedStri
 	ERR_FAIL_COND(has_duplicate(input_names));
 	for (unsigned int i = 0; i < node->inputs.size(); ++i) {
 		const ProgramGraph::Port &port = node->inputs[i];
-		// Sounds annoying if you call this from a script, but this is supposed to be editor functionality for now
+		// 如果从脚本中调用可能会很烦人，但这是编辑器的功能
 		ERR_FAIL_COND_MSG(
 				port.connections.size() > 0,
 				VOXEL_TTR("Cannot change input ports if connections exist, disconnect them first.")
@@ -797,8 +797,7 @@ void VoxelGraphFunction::set_node_gui_position(uint32_t node_id, Vector2 pos) {
 	ERR_FAIL_COND(node == nullptr);
 	if (node->gui_position != pos) {
 		node->gui_position = pos;
-		// Note that this is not a meaningful change, but emitting anyways, because it might be used to know if the
-		// graph needs to be saved...
+		// 注意：这不是有意义的更改，但还是照常发出信号，因为它可能被用来判断是否需要保存图...
 		emit_changed();
 	}
 }
@@ -814,8 +813,7 @@ void VoxelGraphFunction::set_node_gui_size(uint32_t node_id, Vector2 size) {
 	ERR_FAIL_COND(node == nullptr);
 	if (node->gui_size != size) {
 		node->gui_size = size;
-		// Note that this is not a meaningful change, but emitting anyways, because it might be used to know if the
-		// graph needs to be saved...
+		// 注意：这不是有意义的更改，但还是照常发出信号，因为它可能被用来判断是否需要保存图...
 		emit_changed();
 	}
 }
@@ -831,7 +829,7 @@ PackedInt32Array VoxelGraphFunction::get_node_ids() const {
 	PackedInt32Array ids;
 	{
 		_graph.for_each_node_id([&ids](int id) {
-			// Not resizing up-front.
+			// 不预先调整大小。
 			ids.append(id);
 		});
 	}
@@ -858,7 +856,7 @@ uint64_t VoxelGraphFunction::get_output_graph_hash() const {
 	const NodeTypeDB &type_db = NodeTypeDB::get_singleton();
 	StdVector<uint32_t> terminal_nodes;
 
-	// Not using the generic `get_terminal_nodes` function because our terminal nodes do have outputs
+	// 不使用通用的 `get_terminal_nodes` 函数，因为我们的终端节点确实有输出
 	_graph.for_each_node_const([&terminal_nodes, &type_db](const ProgramGraph::Node &node) {
 		const NodeType &type = type_db.get_type(node.type_id);
 		if (type.category == CATEGORY_OUTPUT) {
@@ -866,7 +864,7 @@ uint64_t VoxelGraphFunction::get_output_graph_hash() const {
 		}
 	});
 
-	// Sort for determinism
+	// 为确定性而排序
 	std::sort(terminal_nodes.begin(), terminal_nodes.end());
 
 	StdVector<uint32_t> order;
@@ -883,8 +881,7 @@ uint64_t VoxelGraphFunction::get_output_graph_hash() const {
 			if (v.get_type() == Variant::OBJECT) {
 				const Object *obj = v.operator Object *();
 				if (obj != nullptr) {
-					// Note, the obtained hash can change here even if the result is identical, because it's hard to
-					// tell which properties contribute to the result. This should be rare though.
+					// 注意：即使结果相同，此处获得的哈希也可能变化，因为很难判断哪些属性对结果有贡献。不过这种情况应该很少见。
 					hash = hash_djb2_one_64(godot::get_deep_hash(*obj), hash);
 				}
 			} else {
@@ -921,7 +918,7 @@ void VoxelGraphFunction::register_subresource(Resource &resource) {
 
 	const ObjectID res_id(resource.get_instance_id());
 
-	// The same resource can be registered more than once, so we have to account for it
+	// 同一资源可能被注册多次，所以我们必须考虑这种情况
 	if (!contains(_subresources, res_id)) {
 		resource.connect(
 				VoxelStringNames::get_singleton().changed,
@@ -977,7 +974,7 @@ void VoxelGraphFunction::_on_subresource_changed() {
 namespace {
 
 enum VoxelGraphVariantFormatVersion {
-	// Introduced auto-connect
+	// 引入自动连接
 	VOXEL_GRAPH_VARIANT_FORMAT_VERSION_2 = 2
 };
 
@@ -1037,7 +1034,7 @@ Dictionary get_graph_as_variant_data(const ProgramGraph &graph) {
 			node_data["name"] = node->name;
 		}
 
-		// Parameters
+		// 参数
 		for (size_t j = 0; j < type.params.size(); ++j) {
 			const NodeType::Param &param = type.params[j];
 			node_data[param.name] = node->params[j];
@@ -1045,7 +1042,7 @@ Dictionary get_graph_as_variant_data(const ProgramGraph &graph) {
 
 		node_data["auto_connect"] = node->autoconnect_default_inputs;
 
-		// Static default inputs
+		// 静态默认输入
 		for (size_t j = 0; j < type.inputs.size(); ++j) {
 			if (node->inputs[j].connections.size() == 0) {
 				const NodeType::Port &port = type.inputs[j];
@@ -1053,7 +1050,7 @@ Dictionary get_graph_as_variant_data(const ProgramGraph &graph) {
 			}
 		}
 
-		// Function default inputs
+		// 函数默认输入
 		if (node->type_id == VoxelGraphFunction::NODE_FUNCTION) {
 			VOXEL_ASSERT(node->params.size() >= 1);
 			Ref<VoxelGraphFunction> function = node->params[0];
@@ -1067,7 +1064,7 @@ Dictionary get_graph_as_variant_data(const ProgramGraph &graph) {
 			}
 		}
 
-		// Dynamic inputs. Order matters.
+		// 动态输入。顺序很重要。
 		Array dynamic_inputs_data;
 		for (size_t j = 0; j < node->inputs.size(); ++j) {
 			const ProgramGraph::Port &port = node->inputs[j];
@@ -1148,10 +1145,10 @@ bool load_graph_from_variant_data(ProgramGraph &graph, Dictionary data, String r
 		const Vector2 gui_position = node_data["gui_position"];
 		VoxelGraphFunction::NodeTypeID type_id;
 		ERR_FAIL_COND_V(!type_db.try_get_type_id_from_name(type_name, type_id), false);
-		// Don't create default param values, they will be assigned from serialized data
+		// 不要创建默认参数值，它们将由序列化数据赋值
 		ProgramGraph::Node *node = create_node_internal(graph, type_id, gui_position, id, false);
 		ERR_FAIL_COND_V(node == nullptr, false);
-		// TODO Graphs made in older versions must have autoconnect always off
+		// TODO 旧版本创建的图必须始终关闭 autoconnect
 
 		const Variant vname = node_data.get("name", Variant());
 		if (vname != Variant()) {
@@ -1164,24 +1161,24 @@ bool load_graph_from_variant_data(ProgramGraph &graph, Dictionary data, String r
 		if (type_id == VoxelGraphFunction::NODE_FUNCTION) {
 			const NodeType &ntype = type_db.get_type(type_id);
 			VOXEL_ASSERT(ntype.params.size() >= 1);
-			// The function reference is always the first parameter
+			// 函数引用始终是第一个参数
 			const String func_key = ntype.params[0].name;
 			function = node_data[func_key];
 			if (function.is_null()) {
 				ERR_PRINT(String("Unable to load external function referenced in {0} {}")
 								  .format(varray(VoxelGraphFunction::get_class_static(), resource_path)));
 				// continue;
-				// Cancel, connections to that node cause crashes if we carry on loading. Perhaps we could try using a
-				// placeholder in the future so the graph can still be opened?
-				// We should also report the missing dependencies in the editor somehow, because Godot doesn't do it for
-				// us if the resource is opened in some cases
+				// 取消：如果继续加载，连接到该节点的连接会导致崩溃。或许将来我们可以尝试使用
+				// 占位符，这样图仍然可以打开？
+				// 我们还应该以某种方式在编辑器中报告缺失的依赖，因为某些情况下资源被打开时
+				// Godot 不会替我们处理
 				return false;
 			}
 			setup_function(*node, function);
-			// TODO Create a placeholder node in case a function isn't found to avoid loss of data?
-			// For now it's probably ok as long as the user doesn't save over
+			// TODO 若找不到函数，创建一个占位符节点以避免数据丢失？
+			// 目前只要用户不覆盖保存，应该就没问题
 
-			// TODO Function inputs are user-named, but they could conflict with other keys in this save format
+			// TODO 函数输入由用户命名，但它们可能与此保存格式中的其它键冲突
 		}
 
 		Variant auto_connect_v = node_data.get("auto_connect", Variant());
@@ -1255,8 +1252,7 @@ bool load_graph_from_variant_data(ProgramGraph &graph, Dictionary data, String r
 		ERR_FAIL_COND_V(!var_to_id(con_data[1], src.port_index), false);
 		ERR_FAIL_COND_V(!var_to_id(con_data[2], dst.node_id, ProgramGraph::NULL_ID), false);
 		ERR_FAIL_COND_V(!var_to_id(con_data[3], dst.port_index), false);
-		// TODO Create temporary invalid connections if the node has different inputs than before (to handle the case
-		// where an external function has changed)
+		// TODO 如果节点输入与之前不同，创建临时的无效连接（以处理外部函数已更改的情况）
 		graph.connect(src, dst);
 	}
 
@@ -1268,8 +1264,8 @@ bool load_graph_from_variant_data(ProgramGraph &graph, Dictionary data, String r
 bool VoxelGraphFunction::load_graph_from_variant_data(Dictionary data) {
 	clear();
 
-	// Unfortunately we can't compile on load, because input/output information are separate properties and they can be
-	// set by Godot in any order... we would need a post-load callback for when all properties have been assigned.
+	// 遗憾的是，我们无法在加载时编译，因为输入/输出信息是独立的属性，Godot 可能以任意顺序设置它们……
+	// 我们需要一个在所有属性都赋值后调用的后加载回调。
 
 	if (voxel::pg::load_graph_from_variant_data(_graph, data, get_path())) {
 		register_subresources();
@@ -1425,7 +1421,7 @@ bool validate_io_definitions(Span<const VoxelGraphFunction::Port> ports, const C
 		}
 		for (unsigned int j = i + 1; j < ports.size(); ++j) {
 			const VoxelGraphFunction::Port &other_port = ports[j];
-			// There must not be two ports of the same category with equivalent matching
+			// 同一类别下不得存在两个匹配等价（相等）的端口
 			if (port.equals(other_port)) {
 				return false;
 			}
@@ -1564,9 +1560,9 @@ pg::CompilationResult VoxelGraphFunction::compile(bool debug) {
 	_last_compiling_result = result;
 
 	if (!result.success) {
-		// This is only to propagate the update of configuration warnings...
-		// We should not use `changed` for this, because it causes infinite compilation cycles in the editor (the editor
-		// thinks the graph was changed [by the user] and tries to auto-recompile)
+		// 这仅仅是为了传播配置警告的更新……
+		// 我们不应为此使用 `changed`，因为它会导致编辑器中出现无限编译循环（编辑器
+		// 认为图已被[用户]修改并尝试自动重新编译）
 		emit_signal(VoxelStringNames::get_singleton().compiled);
 
 		return result;
@@ -1675,7 +1671,7 @@ void VoxelGraphFunction::debug_analyze_range(
 
 	const pg::Runtime &runtime = compiled_graph->runtime;
 
-	// Note, buffer size is irrelevant here, because range analysis doesn't use buffers
+	// 注意：此处缓冲区大小无关紧要，因为范围分析不使用缓冲区
 	runtime.prepare_state(cache.state, 1, false);
 	runtime.analyze_range(cache.state, input_ranges);
 	if (optimize_execution_map) {
@@ -1718,13 +1714,13 @@ void VoxelGraphFunction::execute(
 		return;
 	}
 
-	// Note, we may not use I/O definitions, but ONLY the CompiledGraph, because the graph and I/O definitions can be
-	// modified by another thread while this function runs.
+	// 注意：我们不能使用 I/O 定义，而只能使用 CompiledGraph，因为此函数运行时，图和 I/O 定义可能
+	// 被其它线程修改。
 
-	// TODO If some outputs are not provided, optimize with an execution map
+	// TODO 如果未提供某些输出，请使用执行映射进行优化
 
-	// If the input length is too big, run multiple passes so we don't allocate too much memory, which might help
-	// reducing space occupied in CPU cache
+	// 如果输入长度过大，则分多次运行，以免分配过多内存，这可能有助于
+	// 减少 CPU 缓存占用的空间
 	const unsigned int chunk_count = math::ceildiv(total_buffer_size, max_processing_chunk_size);
 	const unsigned int chunk_size = math::min(total_buffer_size, max_processing_chunk_size);
 
@@ -1735,7 +1731,7 @@ void VoxelGraphFunction::execute(
 	_compiled_graph->runtime.prepare_state(
 			cache.state,
 			chunk_size,
-			// since we generate arbitrary series, outer group optimization cannot apply.
+			// 由于我们生成任意序列，外层分组优化不适用。
 			false
 	);
 
@@ -1744,8 +1740,8 @@ void VoxelGraphFunction::execute(
 		const unsigned buffer_chunk_size = math::min(chunk_size, total_buffer_size - buffer_begin);
 
 		if (buffer_chunk_size != chunk_size) {
-			// When there is more than one chunk, the last chunk may need to be smaller to get to the right count.
-			// All chunks before have the same size.
+			// 当有多个数据块时，最后一个数据块可能需要更小才能得到正确的数量。
+			// 之前的所有数据块大小相同。
 			_compiled_graph->runtime.prepare_state(cache.state, buffer_chunk_size, false);
 		}
 
@@ -1756,7 +1752,7 @@ void VoxelGraphFunction::execute(
 		_compiled_graph->runtime.generate_set(cache.state, to_span_const(cache.input_chunks), false, nullptr);
 
 		if (!dummy_output) {
-			// Copy outputs
+			// 复制输出
 			for (unsigned int output_index = 0; output_index < outputs.size(); ++output_index) {
 				Span<float> output = outputs[output_index].sub(buffer_begin, buffer_chunk_size);
 				const pg::Runtime::OutputInfo &oi = _compiled_graph->runtime.get_output_info(output_index);
@@ -1774,7 +1770,7 @@ void VoxelGraphFunction::execute(
 	}
 }
 
-// Binding land
+// 绑定区
 
 int VoxelGraphFunction::_b_get_node_type_count() const {
 	return NodeTypeDB::get_singleton().get_type_count();
@@ -1829,11 +1825,11 @@ void VoxelGraphFunction::duplicate_subgraph(
 		}
 	}
 
-	// index of original node in `node_ids` => copied node ID
+	// `node_ids` 中原始节点的索引 => 复制的节点 ID
 	StdVector<uint32_t> original_to_copied_node_ids;
 	original_to_copied_node_ids.reserve(original_node_ids.size());
 
-	// Copy nodes
+	// 复制节点
 	for (unsigned int original_node_index = 0; original_node_index < original_node_ids.size(); ++original_node_index) {
 		const uint32_t original_node_id = original_node_ids[original_node_index];
 		const ProgramGraph::Node *original_node = _graph.try_get_node(original_node_id);
@@ -1854,7 +1850,7 @@ void VoxelGraphFunction::duplicate_subgraph(
 		}
 	}
 
-	// Copy connections
+	// 复制连接
 	unsigned int original_node_index = 0;
 	for (const uint32_t node_id : original_node_ids) {
 		const ProgramGraph::Node *original_src_node = _graph.try_get_node(node_id);
@@ -1865,7 +1861,7 @@ void VoxelGraphFunction::duplicate_subgraph(
 			for (const ProgramGraph::PortLocation loc : port.connections) {
 				size_t copied_src_node_index;
 
-				// Only copy connections between nodes that are in the copied subset
+				// 仅复制复制的子集内节点之间的连接
 				if (find(original_node_ids, loc.node_id, copied_src_node_index)) {
 					const uint32_t copied_src_node_id = original_to_copied_node_ids[copied_src_node_index];
 					const uint32_t copied_dst_node_id = original_to_copied_node_ids[original_node_index];
@@ -1877,8 +1873,8 @@ void VoxelGraphFunction::duplicate_subgraph(
 			}
 		}
 
-		// We don't need to iterate output ports, since we only care about connections between nodes
-		// of the copied sub-graph, so connections we found from input ports would be found too from output ports.
+		// 我们无需遍历输出端口，因为我们只关心复制的子图内节点之间的连接，
+		// 因此从输入端口找到的连接同样可以从输出端口找到。
 
 		++original_node_index;
 	}
@@ -1919,14 +1915,14 @@ Array serialize_io_definitions(Span<const VoxelGraphFunction::Port> ports) {
 		Array port_data;
 		port_data.resize(3);
 
-		// Name
+		// 名称
 		port_data[0] = port.name;
 
-		// Type as a string
+		// 类型（字符串形式）
 		const NodeType &ntype = type_db.get_type(port.type);
 		port_data[1] = ntype.name;
 
-		// Sub-index
+		// 子索引
 		port_data[2] = port.sub_index;
 
 		data[i] = port_data;
@@ -1960,8 +1956,7 @@ void deserialize_io_definitions(StdVector<VoxelGraphFunction::Port> &ports, Arra
 		ports.push_back(port);
 
 		/*PackedInt32Array a = data[2];
-		// Can't check if node IDs are valid, because there is no garantee Godot will deserialize graph data before IO
-		// definitions.
+		// 无法检查节点 ID 是否有效，因为无法保证 Godot 会在 IO 定义之前反序列化图数据。
 		for (unsigned int i = 0; i < a.size(); ++i) {
 			const int node_id_v = a[i];
 			ERR_FAIL_COND(node_id_v < 0);

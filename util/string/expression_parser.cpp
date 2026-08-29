@@ -5,7 +5,7 @@
 #include <cmath>
 
 #if defined(_MSC_VER)
-#pragma warning(disable : 4701) // Potentially uninitialized local variable used.
+#pragma warning(disable : 4701) // 使用了可能未初始化的局部变量。
 #endif
 
 namespace voxel {
@@ -34,7 +34,7 @@ struct Token {
 
 	Type type = INVALID;
 	union Data {
-		// Can't put a std::string_view inside a union, not sure why
+		// 不知道为什么不能把 std::string_view 放进 union
 		StringView str;
 		float number;
 	} data;
@@ -73,9 +73,9 @@ std::string_view get_name(const std::string_view text, unsigned int &pos) {
 }
 
 bool get_number_token(const std::string_view text, unsigned int &pos, Token &out_token, bool negative) {
-	// TODO Handle overflow errors, use common code
+	// TODO 处理溢出错误，使用通用代码
 
-	// Integer part
+	// 整数部分
 	int64_t n = 0;
 	char c = 0;
 	while (pos < text.size()) {
@@ -90,7 +90,7 @@ bool get_number_token(const std::string_view text, unsigned int &pos, Token &out
 		n = -n;
 	}
 
-	// Decimal part
+	// 小数部分
 	double f;
 	bool is_float = false;
 	if (c == '.') {
@@ -179,7 +179,7 @@ public:
 				return true;
 			}
 
-			// TODO Unary operator `-`
+			// TODO 一元运算符 `-`
 			/*if (c == '-') {
 				++_position;
 				if (_position >= _text.size()) {
@@ -311,7 +311,7 @@ ErrorID pop_expression_operator(StdVector<OpEntry> &operations_stack, StdVector<
 		last_node->n1 = std::move(right);
 	}
 
-	// Push result back to stack
+	// 把结果压回栈
 	operand_stack.push_back(std::move(last_node));
 
 	return ERROR_NONE;
@@ -355,7 +355,7 @@ Result parse_expression(
 Error parse_function(Tokenizer &tokenizer, StdVector<UniquePtr<Node>> &operand_stack, Span<const Function> functions) {
 	std::string_view fname;
 	{
-		// We'll replace the variable with a function call node
+		// 我们将用函数调用节点替换这个变量
 		UniquePtr<Node> top = pop(operand_stack);
 		VOXEL_ASSERT(top->type == Node::VARIABLE);
 		const VariableNode *node = static_cast<VariableNode *>(top.get());
@@ -443,12 +443,12 @@ Result parse_expression(
 		if (as_operator(token.type, op_type)) {
 			OpEntry op;
 			op.precedence = precedence_base + get_operator_precedence(op_type);
-			// Operands will be assigned when we pop operations from the stack
+			// 操作数将在我们从栈中弹出运算时被赋值
 			op.node = make_unique_instance<OperatorNode>(op_type, nullptr, nullptr);
 
 			while (operations_stack.size() > 0) {
 				const OpEntry &last_op = operations_stack.back();
-				// While the current operator has lower precedence, pop last operand
+				// 当当前运算符优先级更低时，弹出上一个操作数
 				if (op.precedence <= last_op.precedence) {
 					const ErrorID err = pop_expression_operator(operations_stack, operand_stack);
 					if (err != ERROR_NONE) {
@@ -484,7 +484,7 @@ Result parse_expression(
 				}
 
 			} else {
-				// Increase precedence for what will go inside parenthesis
+				// 提高括号内内容的优先级
 				precedence_base += MAX_PRECEDENCE;
 			}
 
@@ -529,9 +529,9 @@ Result parse_expression(
 		*out_last_token = token;
 	}
 
-	// All remaining operations should end up with ascending precedence,
-	// so popping them should be correct
-	// Note: will not work correctly if precedences are equal
+	// 所有剩余的运算最终都应具有递增的优先级，
+	// 所以按顺序弹出它们应该是正确的
+	// 注意：如果优先级相等，则无法正确工作
 	while (operations_stack.size() > 0) {
 		const ErrorID err = pop_expression_operator(operations_stack, operand_stack);
 		if (err != ERROR_NONE) {
@@ -545,7 +545,7 @@ Result parse_expression(
 	Result result;
 
 	VOXEL_ASSERT(operand_stack.size() <= 1);
-	// The stack can be empty if the expression was empty
+	// 如果表达式为空，栈可能是空的
 	if (operand_stack.size() > 0) {
 		result.root = std::move(operand_stack.back());
 	}
@@ -560,7 +560,7 @@ void find_variables(const Node &node, StdVector<std::string_view> &variables) {
 
 		case Node::VARIABLE: {
 			const VariableNode &vnode = static_cast<const VariableNode &>(node);
-			// A variable can appear multiple times, only get it once
+			// 一个变量可能出现多次，只获取它一次
 			if (std::find(variables.begin(), variables.end(), vnode.name) == variables.end()) {
 				variables.push_back(vnode.name);
 			}
@@ -590,8 +590,8 @@ void find_variables(const Node &node, StdVector<std::string_view> &variables) {
 	}
 }
 
-// Returns true if the passed node is constant (or gets changed into a constant).
-// `out_number` is the value of the node if it is constant.
+// 如果传入的节点是常量（或被改变为常量），则返回 true。
+// 如果节点是常量，`out_number` 就是它的值。
 bool precompute_constants(UniquePtr<Node> &node, float &out_number, Span<const Function> functions) {
 	VOXEL_ASSERT(node != nullptr);
 	switch (node->type) {
@@ -635,7 +635,7 @@ bool precompute_constants(UniquePtr<Node> &node, float &out_number, Span<const F
 					node = make_unique_instance<NumberNode>(out_number);
 					return true;
 				}
-				// TODO Unary operators
+				// TODO 一元运算符
 			}
 			return false;
 		} break;

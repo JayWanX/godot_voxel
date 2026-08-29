@@ -67,10 +67,10 @@ const char *get_category_name(Category category) {
 NodeTypeDB::NodeTypeDB() {
 	Span<NodeType> types = to_span(_types);
 
-	// TODO Most operations need SIMD support
+	// TODO 大多数运算需要 SIMD 支持
 
-	// SUGG the program could be a list of pointers to polymorphic heap-allocated classes...
-	// but I find that the data struct approach is kinda convenient too?
+	// SUGG 程序可以是一组指向多态堆分配类的指针列表……
+	// 但我认为数据结构的方式也有点方便？
 
 	register_curve_node(types);
 	register_image_nodes(types);

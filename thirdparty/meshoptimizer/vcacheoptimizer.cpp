@@ -6,9 +6,9 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Tom Forsyth. Linear-Speed Vertex Cache Optimisation. 2006
-// Pedro Sander, Diego Nehab and Joshua Barczak. Fast Triangle Reordering for Vertex Locality and Reduced Overdraw. 2007
+// 此作品基于：
+// Tom Forsyth。《线性速度顶点缓存优化》，2006
+// Pedro Sander、Diego Nehab 和 Joshua Barczak。用于顶点局部性与减少过度绘制的高速三角形重排。2007
 namespace meshopt
 {
 
@@ -21,13 +21,13 @@ struct VertexScoreTable
 	float live[1 + kValenceMax];
 };
 
-// Tuned to minimize the ACMR of a GPU that has a cache profile similar to NVidia and AMD
+// 经过调优，以最小化具有与 NVidia 和 AMD 相似缓存特性的 GPU 的 ACMR
 static const VertexScoreTable kVertexScoreTable = {
     {0.f, 0.779f, 0.791f, 0.789f, 0.981f, 0.843f, 0.726f, 0.847f, 0.882f, 0.867f, 0.799f, 0.642f, 0.613f, 0.600f, 0.568f, 0.372f, 0.234f},
     {0.f, 0.995f, 0.713f, 0.450f, 0.404f, 0.059f, 0.005f, 0.147f, 0.006f},
 };
 
-// Tuned to minimize the encoded index buffer size
+// 经过调优，以最小化编码后的索引缓冲区大小
 static const VertexScoreTable kVertexScoreTableStrip = {
     {0.f, 1.000f, 1.000f, 1.000f, 0.453f, 0.561f, 0.490f, 0.459f, 0.179f, 0.526f, 0.000f, 0.227f, 0.184f, 0.490f, 0.112f, 0.050f, 0.131f},
     {0.f, 0.956f, 0.786f, 0.577f, 0.558f, 0.618f, 0.549f, 0.499f, 0.489f},
@@ -44,12 +44,12 @@ static void buildTriangleAdjacency(TriangleAdjacency& adjacency, const unsigned 
 {
 	size_t face_count = index_count / 3;
 
-	// allocate arrays
+	// 分配数组
 	adjacency.counts = allocator.allocate<unsigned int>(vertex_count);
 	adjacency.offsets = allocator.allocate<unsigned int>(vertex_count);
 	adjacency.data = allocator.allocate<unsigned int>(index_count);
 
-	// fill triangle counts
+	// 填充三角形计数
 	memset(adjacency.counts, 0, vertex_count * sizeof(unsigned int));
 
 	for (size_t i = 0; i < index_count; ++i)
@@ -59,7 +59,7 @@ static void buildTriangleAdjacency(TriangleAdjacency& adjacency, const unsigned 
 		adjacency.counts[indices[i]]++;
 	}
 
-	// fill offset table
+	// 填充偏移表
 	unsigned int offset = 0;
 
 	for (size_t i = 0; i < vertex_count; ++i)
@@ -70,7 +70,7 @@ static void buildTriangleAdjacency(TriangleAdjacency& adjacency, const unsigned 
 
 	assert(offset == index_count);
 
-	// fill triangle data
+	// 填充三角形数据
 	for (size_t i = 0; i < face_count; ++i)
 	{
 		unsigned int a = indices[i * 3 + 0], b = indices[i * 3 + 1], c = indices[i * 3 + 2];
@@ -80,7 +80,7 @@ static void buildTriangleAdjacency(TriangleAdjacency& adjacency, const unsigned 
 		adjacency.data[adjacency.offsets[c]++] = unsigned(i);
 	}
 
-	// fix offsets that have been disturbed by the previous pass
+	// 修复被上一轮处理扰乱的偏移
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
 		assert(adjacency.offsets[i] >= adjacency.counts[i]);
@@ -91,7 +91,7 @@ static void buildTriangleAdjacency(TriangleAdjacency& adjacency, const unsigned 
 
 static unsigned int getNextVertexDeadEnd(const unsigned int* dead_end, unsigned int& dead_end_top, unsigned int& input_cursor, const unsigned int* live_triangles, size_t vertex_count)
 {
-	// check dead-end stack
+	// 检查死胡同栈
 	while (dead_end_top)
 	{
 		unsigned int vertex = dead_end[--dead_end_top];
@@ -100,7 +100,7 @@ static unsigned int getNextVertexDeadEnd(const unsigned int* dead_end, unsigned 
 			return vertex;
 	}
 
-	// input order
+	// 输入顺序
 	while (input_cursor < vertex_count)
 	{
 		if (live_triangles[input_cursor] > 0)
@@ -121,15 +121,15 @@ static unsigned int getNextVertexNeighbor(const unsigned int* next_candidates_be
 	{
 		unsigned int vertex = *next_candidate;
 
-		// otherwise we don't need to process it
+		// 否则我们无需处理它
 		if (live_triangles[vertex] > 0)
 		{
 			int priority = 0;
 
-			// will it be in cache after fanning?
+			// 扇出后它是否仍在缓存中？
 			if (2 * live_triangles[vertex] + timestamp - cache_timestamps[vertex] <= cache_size)
 			{
-				priority = timestamp - cache_timestamps[vertex]; // position in cache
+				priority = timestamp - cache_timestamps[vertex]; // 在缓存中的位置
 			}
 
 			if (priority > best_priority)
@@ -154,7 +154,7 @@ static float vertexScore(const VertexScoreTable* table, int cache_position, unsi
 
 static unsigned int getNextTriangleDeadEnd(unsigned int& input_cursor, const unsigned char* emitted_flags, size_t face_count)
 {
-	// input order
+	// 输入顺序
 	while (input_cursor < face_count)
 	{
 		if (!emitted_flags[input_cursor])
@@ -176,11 +176,11 @@ void meshopt_optimizeVertexCacheTable(unsigned int* destination, const unsigned 
 
 	meshopt_Allocator allocator;
 
-	// guard for empty meshes
+	// 对空网格的防护
 	if (index_count == 0 || vertex_count == 0)
 		return;
 
-	// support in-place optimization
+	// 支持就地（in-place）优化
 	if (destination == indices)
 	{
 		unsigned int* indices_copy = allocator.allocate<unsigned int>(index_count);
@@ -193,24 +193,24 @@ void meshopt_optimizeVertexCacheTable(unsigned int* destination, const unsigned 
 
 	size_t face_count = index_count / 3;
 
-	// build adjacency information
+	// 构建邻接信息
 	TriangleAdjacency adjacency = {};
 	buildTriangleAdjacency(adjacency, indices, index_count, vertex_count, allocator);
 
 	// live triangle counts; note, we alias adjacency.counts as we remove triangles after emitting them so the counts always match
 	unsigned int* live_triangles = adjacency.counts;
 
-	// emitted flags
+	// 已发射标志
 	unsigned char* emitted_flags = allocator.allocate<unsigned char>(face_count);
 	memset(emitted_flags, 0, face_count);
 
-	// compute initial vertex scores
+	// 计算初始顶点得分
 	float* vertex_scores = allocator.allocate<float>(vertex_count);
 
 	for (size_t i = 0; i < vertex_count; ++i)
 		vertex_scores[i] = vertexScore(table, -1, live_triangles[i]);
 
-	// compute triangle scores
+	// 计算三角形得分
 	float* triangle_scores = allocator.allocate<float>(face_count);
 
 	for (size_t i = 0; i < face_count; ++i)
@@ -240,23 +240,23 @@ void meshopt_optimizeVertexCacheTable(unsigned int* destination, const unsigned 
 		unsigned int b = indices[current_triangle * 3 + 1];
 		unsigned int c = indices[current_triangle * 3 + 2];
 
-		// output indices
+		// 输出索引
 		destination[output_triangle * 3 + 0] = a;
 		destination[output_triangle * 3 + 1] = b;
 		destination[output_triangle * 3 + 2] = c;
 		output_triangle++;
 
-		// update emitted flags
+		// 更新已发射标志
 		emitted_flags[current_triangle] = true;
 		triangle_scores[current_triangle] = 0;
 
-		// new triangle
+		// 新三角形
 		size_t cache_write = 0;
 		cache_new[cache_write++] = a;
 		cache_new[cache_write++] = b;
 		cache_new[cache_write++] = c;
 
-		// old triangles
+		// 旧三角形
 		for (size_t i = 0; i < cache_count; ++i)
 		{
 			unsigned int index = cache[i];
@@ -269,9 +269,9 @@ void meshopt_optimizeVertexCacheTable(unsigned int* destination, const unsigned 
 		cache = cache_new, cache_new = cache_temp;
 		cache_count = cache_write > cache_size ? cache_size : cache_write;
 
-		// remove emitted triangle from adjacency data
-		// this makes sure that we spend less time traversing these lists on subsequent iterations
-		// live triangle counts are updated as a byproduct of these adjustments
+		// 从邻接数据中移除已发射的三角形
+		// 这能确保我们在后续迭代中花费更少时间遍历这些列表
+		// 活跃三角形计数会作为这些调整的副产品被更新
 		for (size_t k = 0; k < 3; ++k)
 		{
 			unsigned int index = indices[current_triangle * 3 + k];
@@ -295,24 +295,24 @@ void meshopt_optimizeVertexCacheTable(unsigned int* destination, const unsigned 
 		unsigned int best_triangle = ~0u;
 		float best_score = 0;
 
-		// update cache positions, vertex scores and triangle scores, and find next best triangle
+		// 更新缓存位置、顶点得分和三角形得分，并寻找下一个最佳三角形
 		for (size_t i = 0; i < cache_write; ++i)
 		{
 			unsigned int index = cache[i];
 
-			// no need to update scores if we are never going to use this vertex
+			// 若我们永远不会使用该顶点，则无需更新得分
 			if (adjacency.counts[index] == 0)
 				continue;
 
 			int cache_position = i >= cache_size ? -1 : int(i);
 
-			// update vertex score
+			// 更新顶点得分
 			float score = vertexScore(table, cache_position, live_triangles[index]);
 			float score_diff = score - vertex_scores[index];
 
 			vertex_scores[index] = score;
 
-			// update scores of vertex triangles
+			// 更新顶点所关联三角形的得分
 			const unsigned int* neighbors_begin = &adjacency.data[0] + adjacency.offsets[index];
 			const unsigned int* neighbors_end = neighbors_begin + adjacency.counts[index];
 
@@ -331,7 +331,7 @@ void meshopt_optimizeVertexCacheTable(unsigned int* destination, const unsigned 
 			}
 		}
 
-		// step through input triangles in order if we hit a dead-end
+		// 若遇到死胡同，则按顺序遍历输入三角形
 		current_triangle = best_triangle;
 
 		if (current_triangle == ~0u)
@@ -363,11 +363,11 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 
 	meshopt_Allocator allocator;
 
-	// guard for empty meshes
+	// 对空网格的防护
 	if (index_count == 0 || vertex_count == 0)
 		return;
 
-	// support in-place optimization
+	// 支持就地（in-place）优化
 	if (destination == indices)
 	{
 		unsigned int* indices_copy = allocator.allocate<unsigned int>(index_count);
@@ -377,30 +377,30 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 
 	size_t face_count = index_count / 3;
 
-	// build adjacency information
+	// 构建邻接信息
 	TriangleAdjacency adjacency = {};
 	buildTriangleAdjacency(adjacency, indices, index_count, vertex_count, allocator);
 
-	// live triangle counts
+	// 活跃三角形计数
 	unsigned int* live_triangles = allocator.allocate<unsigned int>(vertex_count);
 	memcpy(live_triangles, adjacency.counts, vertex_count * sizeof(unsigned int));
 
-	// cache time stamps
+	// 缓存时间戳
 	unsigned int* cache_timestamps = allocator.allocate<unsigned int>(vertex_count);
 	memset(cache_timestamps, 0, vertex_count * sizeof(unsigned int));
 
-	// dead-end stack
+	// 死胡同栈
 	unsigned int* dead_end = allocator.allocate<unsigned int>(index_count);
 	unsigned int dead_end_top = 0;
 
-	// emitted flags
+	// 已发射标志
 	unsigned char* emitted_flags = allocator.allocate<unsigned char>(face_count);
 	memset(emitted_flags, 0, face_count);
 
 	unsigned int current_vertex = 0;
 
 	unsigned int timestamp = cache_size + 1;
-	unsigned int input_cursor = 1; // vertex to restart from in case of dead-end
+	unsigned int input_cursor = 1; // 遇死胡同时从中重新开始的顶点
 
 	unsigned int output_triangle = 0;
 
@@ -408,7 +408,7 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 	{
 		const unsigned int* next_candidates_begin = &dead_end[0] + dead_end_top;
 
-		// emit all vertex neighbors
+		// 发出所有顶点邻接
 		const unsigned int* neighbors_begin = &adjacency.data[0] + adjacency.offsets[current_vertex];
 		const unsigned int* neighbors_end = neighbors_begin + adjacency.counts[current_vertex];
 
@@ -420,24 +420,24 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 			{
 				unsigned int a = indices[triangle * 3 + 0], b = indices[triangle * 3 + 1], c = indices[triangle * 3 + 2];
 
-				// output indices
+				// 输出索引
 				destination[output_triangle * 3 + 0] = a;
 				destination[output_triangle * 3 + 1] = b;
 				destination[output_triangle * 3 + 2] = c;
 				output_triangle++;
 
-				// update dead-end stack
+				// 更新死胡同栈
 				dead_end[dead_end_top + 0] = a;
 				dead_end[dead_end_top + 1] = b;
 				dead_end[dead_end_top + 2] = c;
 				dead_end_top += 3;
 
-				// update live triangle counts
+				// 更新活跃三角形计数
 				live_triangles[a]--;
 				live_triangles[b]--;
 				live_triangles[c]--;
 
-				// update cache info
+				// 更新缓存信息
 				// if vertex is not in cache, put it in cache
 				if (timestamp - cache_timestamps[a] > cache_size)
 					cache_timestamps[a] = timestamp++;
@@ -448,15 +448,15 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 				if (timestamp - cache_timestamps[c] > cache_size)
 					cache_timestamps[c] = timestamp++;
 
-				// update emitted flags
+				// 更新已发射标志
 				emitted_flags[triangle] = true;
 			}
 		}
 
-		// next candidates are the ones we pushed to dead-end stack just now
+		// 下一个候选就是刚刚推入死胡同栈的那些
 		const unsigned int* next_candidates_end = &dead_end[0] + dead_end_top;
 
-		// get next vertex
+		// 获取下一个顶点
 		current_vertex = getNextVertexNeighbor(next_candidates_begin, next_candidates_end, &live_triangles[0], &cache_timestamps[0], timestamp, cache_size);
 
 		if (current_vertex == ~0u)

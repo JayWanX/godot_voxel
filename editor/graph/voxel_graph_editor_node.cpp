@@ -24,7 +24,7 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 	node_view->set_position_offset(graph.get_node_gui_position(node_id) * EDSCALE);
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 2
-	// Don't translate title, it shows the node's name
+	// 不要翻译标题，它显示的是节点的名称
 	{
 		Node *titlebar = node_view->get_titlebar_hbox();
 		if (titlebar != nullptr) {
@@ -45,8 +45,8 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 
 	node_view->_is_relay = node_type_id == VoxelGraphFunction::NODE_RELAY;
 
-	// Some nodes can have variable size title and layout. The node can get larger automatically, but doesn't shrink.
-	// So for now we make them resizable so users can adjust them.
+	// 某些节点可以具有可变大小的标题和布局。节点可以自动变大，但不会缩小。
+	// 因此目前我们让它们可调整大小，以便用户自行调整。
 	if (is_resizable) {
 		node_view->set_resizable(is_resizable);
 
@@ -62,7 +62,7 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 		node_view->set_comment(true);
 	}
 #else
-	// TODO GraphEdit is under refactoring in Godot 4.2, comments are not available anymore
+	// TODO GraphEdit 在 Godot 4.2 中正在重构，注释已不可用
 #endif
 
 	node_view->update_layout(graph);
@@ -78,8 +78,8 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 	const uint32_t node_type_id = graph.get_node_type_id(_node_id);
 	const NodeType &node_type = NodeTypeDB::get_singleton().get_type(node_type_id);
-	// We artificially hide output ports if the node is an output.
-	// These nodes have an output for implementation reasons, some outputs can process the data like any other node.
+	// 如果节点是输出节点，我们人为地隐藏输出端口。
+	// 这些节点出于实现原因拥有输出，某些输出可以像任何其他节点一样处理数据。
 	const bool hide_outputs = node_type.category == CATEGORY_OUTPUT;
 
 	struct Input {
@@ -111,7 +111,7 @@ void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 
 	// const int middle_min_width = EDSCALE * 32.0;
 
-	// Temporarily remove preview if any
+	// 临时移除预览（如果有）
 	if (_preview != nullptr) {
 		remove_child(_preview);
 	}
@@ -121,7 +121,7 @@ void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 		_comment_label = nullptr;
 	}
 
-	// Clear previous inputs and outputs
+	// 清除先前的输入和输出
 	for (Node *row : _rows) {
 		remove_child(row);
 		row->queue_free();
@@ -134,7 +134,7 @@ void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 	_input_hints.clear();
 
 	const bool is_relay = (node_type_id == VoxelGraphFunction::NODE_RELAY);
-	// Can't remove the frame style, it breaks interaction with the node...
+	// 无法移除帧样式，它会破坏与节点的交互...
 	// if (is_relay) {
 	// 	Ref<StyleBoxEmpty> sb;
 	// 	sb.instantiate();
@@ -143,7 +143,7 @@ void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 	// 	remove_theme_style_override("frame");
 	// }
 
-	// Add inputs and outputs
+	// 添加输入和输出
 	for (unsigned int slot_index = 0; slot_index < row_count; ++slot_index) {
 		const bool has_left = slot_index < inputs.size();
 		const bool has_right = (slot_index < outputs.size()) && !hide_outputs;
@@ -160,7 +160,7 @@ void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 			Label *hint_label = memnew(Label);
 			hint_label->set_h_size_flags(Control::SIZE_EXPAND_FILL);
 			hint_label->set_modulate(hint_label_modulate);
-			// Pass filter is required to allow tooltips to work
+			// 需要通过过滤器（pass）才能让工具提示工作
 			hint_label->set_mouse_filter(Control::MOUSE_FILTER_PASS);
 			// hint_label->set_clip_text(true);
 			// hint_label->set_custom_minimum_size(Vector2(middle_min_width, 0));
@@ -180,7 +180,7 @@ void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 
 			Label *label = memnew(Label);
 			label->set_text(outputs[slot_index].name);
-			// Pass filter is required to allow tooltips to work
+			// 需要通过过滤器（pass）才能让工具提示工作
 			label->set_mouse_filter(Control::MOUSE_FILTER_PASS);
 			property_control->add_child(label);
 
@@ -192,7 +192,7 @@ void VoxelGraphEditorNode::update_layout(const VoxelGraphFunction &graph) {
 		_rows.push_back(property_control);
 	}
 
-	// Re-add preview if any
+	// 重新添加预览（如果有）
 	if (_preview != nullptr) {
 		add_child(_preview);
 	}
@@ -219,7 +219,7 @@ void VoxelGraphEditorNode::update_title(const VoxelGraphFunction &graph) {
 void VoxelGraphEditorNode::update_title(const VoxelGraphFunction &graph, uint32_t node_id) {
 	const VoxelGraphFunction::NodeTypeID type_id = graph.get_node_type_id(node_id);
 	if (type_id == VoxelGraphFunction::NODE_RELAY) {
-		// Relays don't have title bars
+		// 中继节点没有标题栏
 		return;
 	}
 	const NodeType &type = NodeTypeDB::get_singleton().get_type(type_id);
@@ -252,8 +252,8 @@ void VoxelGraphEditorNode::poll(const VoxelGraphFunction &graph) {
 	poll_params(graph);
 }
 
-// When an input is left unconnected, it picks a default value. Input hints show this value.
-// It is otherwise shown in the inspector when the node is selected, but seeing them at a glance helps.
+// 当输入未连接时，它会采用默认值。输入提示会显示这个值。
+// 在节点被选中时它也会显示在检查器中，但一眼看到它们会更有帮助。
 void VoxelGraphEditorNode::poll_default_inputs(const VoxelGraphFunction &graph) {
 	ProgramGraph::PortLocation src_loc_unused;
 	const String prefix = ": ";
@@ -263,7 +263,7 @@ void VoxelGraphEditorNode::poll_default_inputs(const VoxelGraphFunction &graph) 
 		const ProgramGraph::PortLocation loc{ _node_id, input_index };
 
 		if (graph.try_get_connection_to(loc, src_loc_unused)) {
-			// There is an inbound connection, don't show the default value
+			// 存在入站连接，不显示默认值
 			if (input_hint.last_value != Variant()) {
 				input_hint.label->set_text("");
 				input_hint.last_value = Variant();
@@ -302,18 +302,17 @@ void VoxelGraphEditorNode::poll_default_inputs(const VoxelGraphFunction &graph) 
 					continue;
 				}
 			}
-			// There is no inbound connection nor autoconnect, show the default value
+			// 既没有入站连接也没有自动连接，显示默认值
 			const Variant current_value = graph.get_node_default_input(loc.node_id, loc.port_index);
-			// Only update when it changes so we don't spam editor redraws
+			// 只在值变化时更新，以免刷爆编辑器重绘
 			if (input_hint.last_value != current_value) {
 				String s;
 				String tooltip;
 				if (current_value.get_type() == Variant::FLOAT) {
-					// Cast to float because that's what the graph actually uses under the hood, even in
-					// double-precision builds
+					// 转换为 float，因为即使在双精度构建中，图形底层实际使用的也是 float
 					const float fv = current_value;
-					// Round decimals, because otherwise setting values like `0.2` ends up being formatted as
-					// `0.19999999999709`, it widens nodes and it's very annoying.
+					// 四舍五入小数，否则像 `0.2` 这样的值会被格式化为
+					// `0.19999999999709`，这会使节点变宽，非常烦人。
 					String fs = String(Variant(fv));
 					s = String::num(fv, 7);
 					if (fs != s) {
@@ -403,11 +402,11 @@ void VoxelGraphEditorNode::_notification(int p_what) {
 
 	if (p_what == NOTIFICATION_DRAW) {
 		if (_is_relay) {
-			// Draw line to show that the data is directly relayed
-			// TODO Thickness and antialiasing should come from GraphEdit
+			// 绘制线条以表示数据被直接中继
+			// TODO 线宽和抗锯齿应该来自 GraphEdit
 			const float width = Math::floor(2.f * get_theme_default_base_scale());
-			// Can't directly use inputs and output positions... Godot pre-scales them, which makes them unusable
-			// for drawing because the node is already scaled
+			// 不能直接使用输入和输出的位置……Godot 会预先缩放它们，导致它们无法
+			// 用于绘制，因为节点本身已经缩放
 			const Vector2 input_pos = get_graph_node_input_port_position(*this, 0);
 			const Vector2 output_pos = get_graph_node_output_port_position(*this, 0);
 			draw_line(input_pos, output_pos, get_graph_node_input_port_color(*this, 0), width, true);

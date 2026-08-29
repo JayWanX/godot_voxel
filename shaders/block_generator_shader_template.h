@@ -1,4 +1,4 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
 const char *g_block_generator_shader_template_0 =
@@ -13,8 +13,8 @@ const char *g_block_generator_shader_template_0 =
 "	int buffer_offset;\n"
 "} u_params;\n"
 "\n"
-"// Contains all outputs, each laid out in contiguous chunks of the same size.\n"
-"// It must be indexed starting from `u_params.buffer_offset`.\n"
+"// 包含所有输出，每个输出以相同大小的连续块排列。\n"
+"// 必须从 `u_params.buffer_offset` 开始索引。\n"
 "layout (set = 0, binding = 1, std430) restrict writeonly buffer OutBuffer {\n"
 "	float values[];\n"
 "} u_out;\n"
@@ -34,15 +34,15 @@ const char *g_block_generator_shader_template_1 =
 "\n"
 "void main() {\n"
 "	const ivec3 rpos = ivec3(gl_GlobalInvocationID.xyz);\n"
-"	// The output buffer might not have a 3D size multiple of our group size.\n"
-"	// Some of the parallel executions will not do anything.\n"
+"	// 输出缓冲区可能没有与工作组大小成倍数的 3D 尺寸。\n"
+"	// 一些并行执行将不会做任何事。\n"
 "	if (rpos.x >= u_params.block_size.x || rpos.y >= u_params.block_size.y || rpos.z >= u_params.block_size.z) {\n"
 "		return;\n"
 "	}\n"
 "\n"
 "	const int out_index = get_zxy_index(rpos, u_params.block_size) + u_params.buffer_offset;\n"
 "\n"
-"	// May be used by generated code for generators that have more than one output\n"
+"	// 可能被生成代码用于有多个输出的生成器\n"
 "	const int volume = get_volume(u_params.block_size);\n"
 "\n"
 "	const vec3 wpos = u_params.origin_in_voxels + vec3(rpos) * u_params.voxel_size;\n"

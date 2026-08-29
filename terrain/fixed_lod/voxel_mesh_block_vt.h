@@ -6,29 +6,29 @@
 
 namespace voxel {
 
-// Stores mesh and collider for one chunk of `VoxelLodTerrain`.
-// It doesn't store voxel data, because it may be using different block size, or different data structure.
+// 为 `VoxelLodTerrain` 的单个数据块（chunk）存储网格和碰撞体。
+// 它不存储体素数据，因为可能使用不同的数据块大小或不同的数据结构。
 //
-// Note that such a block can also not contain a mesh, in case voxels in this area do not produce geometry. For example,
-// it can be used to check if an area has been loaded (so we *know* that it should or should not have a mesh, as opposed
-// to not knowing while threads are still computing the mesh).
+// 注意：当该区域的体素不产生几何体时，这样的数据块也可以不包含网格。例如，
+// 它可以用来检查某个区域是否已加载（从而*知道*它应该有或不应该有网格，而不会
+// 在线程仍在计算网格时处于未知状态）。
 class VoxelMeshBlockVT : public VoxelMeshBlock {
 public:
-	// See VoxelMesherBlocky.
-	// This unfortunately has to be a whole separate mesh instance because Godot doesn't support setting
-	// `cast_shadow` mode per mesh surface. This might have an impact on performance.
+	// 参见 VoxelMesherBlocky。
+	// 不幸的是，这必须是一个完全独立的网格实例，因为 Godot 不支持为每个网格表面
+	// 设置 `cast_shadow` 模式。这可能对性能产生影响。
 	voxel::godot::DirectMeshInstance shadow_occluder;
 
 	RefCount mesh_viewers;
 	RefCount collision_viewers;
 
-	// True if this block is in the update list of `VoxelTerrain`, so multiple edits done before it processes will not
-	// add it multiple times
+	// 如果该数据块在 `VoxelTerrain` 的更新列表中则为 true，这样在它被处理之前进行多次编辑
+	// 不会将其重复添加
 	bool is_in_update_list = false;
 
-	// Will be true if the block has ever been processed by meshing (regardless of there being a mesh or not).
-	// This is needed to know if the area is loaded, in terms of collisions. If the game uses voxels directly for
-	// collision, it may be a better idea to use `is_area_editable` and not use mesh blocks
+	// 如果该数据块曾经被网格化处理过（无论是否有网格），则为 true。
+	// 需要它来判断区域在碰撞层面是否已加载。如果游戏直接使用体素进行
+	// 碰撞，可能更适合使用 `is_area_editable` 而不使用网格数据块
 	bool is_loaded = false;
 
 	VoxelMeshBlockVT(const Vector3i bpos, unsigned int size) : VoxelMeshBlock(bpos) {
@@ -39,8 +39,8 @@ public:
 		if (_world != p_world) {
 			_world = p_world;
 
-			// To update world. I replaced visibility by presence in world because Godot 3 culling performance is
-			// horrible
+			// 用于更新世界。我把"可见性"替换为"是否存在于世界中"，因为 Godot 3 的剔除性能
+			// 很糟糕
 			_set_visible(_visible && _parent_visible);
 
 			if (_static_body.is_valid()) {
@@ -50,7 +50,7 @@ public:
 	}
 
 	void set_material_override(Ref<Material> material) {
-		// Can be invalid if the mesh is empty, we don't create instances for empty meshes
+		// 如果网格为空则该值可能无效，我们不会为空网格创建实例
 		if (_mesh_instance.is_valid()) {
 			_mesh_instance.set_material_override(material);
 		}
@@ -73,7 +73,7 @@ public:
 			}
 		} else {
 			if (!shadow_occluder.is_valid()) {
-				// Create instance if it doesn't exist
+				// 如果实例不存在则创建
 				shadow_occluder.create();
 				shadow_occluder.set_interpolated(false);
 				shadow_occluder.set_render_layers_mask(render_layers_mask);

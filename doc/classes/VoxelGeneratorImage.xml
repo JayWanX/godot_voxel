@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGeneratorImage" inherits="VoxelGeneratorHeightmap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Voxel generator producing a heightmap-based shape using an image.
+		使用图像生成基于高度图形状的体素生成器。
 	</brief_description>
 	<description>
-		Uses the red channel of an image to generate a heightmap, such that the top left corner is centered on the world origin. The image will repeat if terrain generates beyond its size.
-		Note: values in the image are read using `get_pixel` and are assumed to be between 0 and 1 (normalized). These values will be transformed by [member VoxelGeneratorHeightmap.height_start] and [member VoxelGeneratorHeightmap.height_range].
+		使用图像的红色通道生成高度图，使左上角以世界原点为中心。如果地形生成范围超出图像尺寸，图像将重复。
+		注意：图像中的值通过 `get_pixel` 读取，并假定介于 0 和 1 之间（已归一化）。这些值将由 [member VoxelGeneratorHeightmap.height_start] 和 [member VoxelGeneratorHeightmap.height_range] 变换。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -14,7 +14,7 @@
 		</member>
 		<member name="height_range" type="float" setter="set_height_range" getter="get_height_range" overrides="VoxelGeneratorHeightmap" default="200.0" />
 		<member name="image" type="Image" setter="set_image" getter="get_image">
-			Sets the image that will be used as a heightmap. Only the red channel will be used. It is preferable to use an image using the `RF` or `RH` format, which contain higher resolution heights. Common images only have 8-bit depth and will appear blocky.
+			设置将用作高度图的图像。只会使用红色通道。最好使用采用 `RF` 或 `RH` 格式的图像，这些格式包含更高分辨率的高度。普通图像通常只有 8 位深度，会显得有方块感。
 		</member>
 	</members>
 </class>

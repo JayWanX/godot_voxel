@@ -10,7 +10,7 @@ inline void do_monop(pg::Runtime::ProcessBufferContext &ctx, F f) {
 	const Runtime::Buffer &a = ctx.get_input(0);
 	Runtime::Buffer &out = ctx.get_output(0);
 	if (a.is_constant) {
-		// Normally this case should have been optimized out at compile-time
+		// 正常情况下这种情况应在编译时就被优化掉
 		const float v = f(a.constant_value);
 		for (uint32_t i = 0; i < a.size; ++i) {
 			out.data[i] = v;
@@ -45,7 +45,7 @@ inline void do_binop(pg::Runtime::ProcessBufferContext &ctx, F f) {
 			}
 
 		} else {
-			// Normally this case should have been optimized out at compile-time
+			// 正常情况下这种情况应在编译时就被优化掉
 			const float c = f(a.constant_value, b.constant_value);
 			for (uint32_t i = 0; i < buffer_size; ++i) {
 				out.data[i] = c;

@@ -1,17 +1,17 @@
 # VoxelLodTerrain
 
-Inherits: [VoxelNode](VoxelNode.md)
+继承自：[VoxelNode](VoxelNode.md)
 
-Voxel volume using variable level of detail.
+使用可变细节层级的体素体积。
 
-## Description: 
+## 描述：
 
-Renders large terrain using variable level of details. This is preferably used with smooth meshing such as [VoxelMesherTransvoxel](VoxelMesherTransvoxel.md). Blocky meshers can be used, but currently don't have as much support for LOD.
+使用可变细节层级渲染大型地形。这最好与 [VoxelMesherTransvoxel](VoxelMesherTransvoxel.md) 等平滑网格化一起使用。可以使用方块风网格化器，但目前它们对 LOD 的支持没有那么好。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                            | Name                                                                                               | Default                                                                      
+类型                                                                              | 名称                                                                                                 | 默认值                                                                          
 ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -----------------------------------------------------------------------------
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [cache_generated_blocks](#i_cache_generated_blocks)                                                | false                                                                        
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)            | [collision_layer](#i_collision_layer)                                                              | 1                                                                            
@@ -55,10 +55,10 @@ Type                                                                            
 [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)          | [voxel_bounds](#i_voxel_bounds)                                                                    | AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800) 
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                              | Signature                                                                                                                                                                                                                                             
+返回值                                                                                 | 函数签名                                                                                                                                                                                                                                                  
 ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [debug_dump_as_scene](#i_debug_dump_as_scene) ( [String](https://docs.godotengine.org/en/stable/classes/class_string.html) path, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) include_instancer ) const                     
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [debug_get_data_block_count](#i_debug_get_data_block_count) ( ) const                                                                                                                                                                                 
@@ -85,15 +85,15 @@ Return                                                                          
 [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)      | [voxel_to_mesh_block_position](#i_voxel_to_mesh_block_position) ( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) voxel_position, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod_index ) const 
 <p></p>
 
-## Enumerations: 
+## 枚举：<span id="enumerations"></span>
 
-enum **ProcessCallback**: 
+枚举 **ProcessCallback**：
 
-- <span id="i_PROCESS_CALLBACK_IDLE"></span>**PROCESS_CALLBACK_IDLE** = **0** --- The node will use `_process` for the part of its logic running on the main thread.
-- <span id="i_PROCESS_CALLBACK_PHYSICS"></span>**PROCESS_CALLBACK_PHYSICS** = **1** --- The node will use `_physics_process` for the part of its logic running on the main thread.
-- <span id="i_PROCESS_CALLBACK_DISABLED"></span>**PROCESS_CALLBACK_DISABLED** = **2** --- The node will not update. Use with caution!
+- <span id="i_PROCESS_CALLBACK_IDLE"></span>**PROCESS_CALLBACK_IDLE** = **0** --- 节点将使用 `_process` 运行其在主线程上执行的那部分逻辑。
+- <span id="i_PROCESS_CALLBACK_PHYSICS"></span>**PROCESS_CALLBACK_PHYSICS** = **1** --- 节点将使用 `_physics_process` 运行其在主线程上执行的那部分逻辑。
+- <span id="i_PROCESS_CALLBACK_DISABLED"></span>**PROCESS_CALLBACK_DISABLED** = **2** --- 节点将不会更新。请谨慎使用！
 
-enum **DebugDrawFlag**: 
+枚举 **DebugDrawFlag**：
 
 - <span id="i_DEBUG_DRAW_OCTREE_NODES"></span>**DEBUG_DRAW_OCTREE_NODES** = **0**
 - <span id="i_DEBUG_DRAW_OCTREE_BOUNDS"></span>**DEBUG_DRAW_OCTREE_BOUNDS** = **1**
@@ -108,215 +108,215 @@ enum **DebugDrawFlag**:
 - <span id="i_DEBUG_DRAW_ACTIVE_VISUAL_AND_COLLISION_BLOCKS"></span>**DEBUG_DRAW_ACTIVE_VISUAL_AND_COLLISION_BLOCKS** = **10**
 - <span id="i_DEBUG_DRAW_FLAGS_COUNT"></span>**DEBUG_DRAW_FLAGS_COUNT** = **12**
 
-enum **StreamingSystem**: 
+枚举 **StreamingSystem**：
 
-- <span id="i_STREAMING_SYSTEM_LEGACY_OCTREE"></span>**STREAMING_SYSTEM_LEGACY_OCTREE** = **0** --- Loads chunks around the viewer in a spherical pattern. Does not support multiple viewers. Does not support collision-only viewers. Does not support "no viewers" (will assume origin instead). Does not support per-viewer view distance, only [view_distance](VoxelLodTerrain.md#i_view_distance) is used. This was the first system to be implemented, therefore it remains available as default for compatibility.
-- <span id="i_STREAMING_SYSTEM_CLIPBOX"></span>**STREAMING_SYSTEM_CLIPBOX** = **1** --- Loads chunks around the viewer in concentric boxes. Supports multiple viewers and collision-only viewers. This is a better system for multiplayer streaming. Due to simplifications, chunk locations at each LOD might be less optimal than [STREAMING_SYSTEM_LEGACY_OCTREE](VoxelLodTerrain.md#i_STREAMING_SYSTEM_LEGACY_OCTREE).
+- <span id="i_STREAMING_SYSTEM_LEGACY_OCTREE"></span>**STREAMING_SYSTEM_LEGACY_OCTREE** = **0** --- 以球形图案加载观察者周围的区块。 不支持多个观察者。不支持仅碰撞的观察者。不支持"无观察者"（将假定原点）。不支持按观察者设置视距，仅使用 [view_distance](VoxelLodTerrain.md#i_view_distance)。 这是第一个实现的系统，因此出于兼容性考虑，它仍然作为默认系统可用。
+- <span id="i_STREAMING_SYSTEM_CLIPBOX"></span>**STREAMING_SYSTEM_CLIPBOX** = **1** --- 以同心盒的形式加载观察者周围的区块。支持多个观察者和仅碰撞的观察者。这是更适合多人流式加载的系统。 由于简化，每个 LOD 的区块位置可能不如 [STREAMING_SYSTEM_LEGACY_OCTREE](VoxelLodTerrain.md#i_STREAMING_SYSTEM_LEGACY_OCTREE) 优化。
 
 
-## Property Descriptions
+## 属性描述
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_cache_generated_blocks"></span> **cache_generated_blocks** = false
 
-If enabled, streaming the terrain will keep generated voxel data in memory around viewers, even if it wasn't edited. This can speedup voxel queries on non-edited areas and allows [VoxelStream.save_generator_output](VoxelStream.md#i_save_generator_output) to work, but increases memory usage significantly.
+如果启用，流式加载地形时将在观察者周围的内存中保留生成的体素数据，即使它未被编辑。这可以加快对未编辑区域的体素查询，并允许 [VoxelStream.save_generator_output](VoxelStream.md#i_save_generator_output) 工作，但会显著增加内存使用。
 
-This option is not supported when [full_load_mode_enabled](VoxelLodTerrain.md#i_full_load_mode_enabled) is enabled.
+当启用 [full_load_mode_enabled](VoxelLodTerrain.md#i_full_load_mode_enabled) 时，不支持此选项。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_layer"></span> **collision_layer** = 1
 
-Collision layer used by generated colliders. Check Godot documentation for more information.
+生成的碰撞体使用的碰撞层。有关更多信息，请查阅 Godot 文档。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_lod_count"></span> **collision_lod_count** = 0
 
-How many LOD levels are set to generate colliders, starting from LOD 0. Setting this property to 0 means all LODs have collision.
+从 LOD 0 开始，有多少个 LOD 层级设置为生成碰撞体。将此属性设置为 0 意味着所有 LOD 都有碰撞。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_collision_margin"></span> **collision_margin** = 0.04
 
-Collision margin used by generated colliders. Note that it may depend on which physics engine is used under the hood, as some don't use margins.
+生成的碰撞体使用的碰撞边距。注意，它可能取决于底层使用的物理引擎，因为有些引擎不使用边距。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_mask"></span> **collision_mask** = 1
 
-Collision mask used by generated colliders. Check Godot documentation for more information.
+生成的碰撞体使用的碰撞掩码。有关更多信息，请查阅 Godot 文档。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_update_delay"></span> **collision_update_delay** = 0
 
-How long to wait before updating colliders after an edit, in milliseconds. Collider generation is expensive, so the intent is to smooth it out.
+编辑后更新碰撞体之前要等待多长时间，单位为毫秒。碰撞体生成开销较大，因此目的是使其平滑化。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_active_mesh_blocks"></span> **debug_draw_active_mesh_blocks** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_active_visual_and_collision_blocks"></span> **debug_draw_active_visual_and_collision_blocks** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_edit_boxes"></span> **debug_draw_edit_boxes** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_edited_blocks"></span> **debug_draw_edited_blocks** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_enabled"></span> **debug_draw_enabled** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_loaded_visual_and_collision_blocks"></span> **debug_draw_loaded_visual_and_collision_blocks** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_mesh_updates"></span> **debug_draw_mesh_updates** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_modifier_bounds"></span> **debug_draw_modifier_bounds** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_octree_bounds"></span> **debug_draw_octree_bounds** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_octree_nodes"></span> **debug_draw_octree_nodes** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_shadow_occluders"></span> **debug_draw_shadow_occluders** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_viewer_clipboxes"></span> **debug_draw_viewer_clipboxes** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_volume_bounds"></span> **debug_draw_volume_bounds** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_voxel_metadata"></span> **debug_draw_voxel_metadata** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_full_load_mode_enabled"></span> **full_load_mode_enabled** = false
 
-If enabled, data streaming will be turned off, and all voxel data will be loaded from the [stream](VoxelLodTerrain.md#i_stream) into memory.
+如果启用，数据流式加载将被关闭，所有体素数据将从 [VoxelNode.stream](VoxelNode.md#i_stream) 加载到内存中。
 
-This removes several constraints, such as being able to edit anywhere and allowing distant normalmaps to include edited regions. This comes at the expense of more memory usage. However, only edited regions use memory, so in practice it can be good enough.
+这消除了若干限制，例如能够编辑任意位置，并允许远处法线贴图包含已编辑区域。代价是增加内存使用。然而，只有已编辑区域会占用内存，因此实际上可能足够好。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_generate_collisions"></span> **generate_collisions** = true
 
-If enabled, chunked colliders will be generated from meshes.
+如果启用，将从网格生成区块化碰撞体。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_lod_count"></span> **lod_count** = 4
 
-How many LOD levels to use. This should be tuned alongside [lod_distance](VoxelLodTerrain.md#i_lod_distance): if you want to see very far, you need more LOD levels. This allows blocks to become larger the further away they are, to keep their numbers to an acceptable amount. In contrast, too few LOD levels means regions far away will have to use too many small blocks, which can affect performance.
+要使用的 LOD 层级数量。这应与 [lod_distance](VoxelLodTerrain.md#i_lod_distance) 一起调整：如果你想看得非常远，就需要更多 LOD 层级。这允许区块在距离越远时变得越大，以将其数量保持在可接受范围内。相反，LOD 层级太少意味着远处的区域将不得不使用太多的小区块，这会影响性能。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_lod_distance"></span> **lod_distance** = 48.0
 
-How far LOD 0 extends from the viewer. Each parent LOD will extend twice as far as their children LOD levels. When [full_load_mode_enabled](VoxelLodTerrain.md#i_full_load_mode_enabled) is disabled, this also defines how far edits are allowed.
+LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子级 LOD 层级的两倍。当 [full_load_mode_enabled](VoxelLodTerrain.md#i_full_load_mode_enabled) 被禁用时，这也定义了允许编辑多远。
 
-For further control of LODs beyond 0, see [secondary_lod_distance](VoxelLodTerrain.md#i_secondary_lod_distance).
+要进一步控制 0 以上的 LOD，请参见 [secondary_lod_distance](VoxelLodTerrain.md#i_secondary_lod_distance)。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_lod_fade_duration"></span> **lod_fade_duration** = 0.0
 
-When set greater than 0, enables LOD fading. When mesh blocks get split/merged as level of detail changes, they will fade to make the transition less noticeable (or at least more pleasant). This feature requires to use a specific shader, check the online documentation or examples for more information.
+当设置为大于 0 时，启用 LOD 淡入淡出。当网格区块因细节层级变化而被拆分/合并时，它们将淡入淡出，使过渡不那么明显（或至少更舒适）。此功能需要使用特定的着色器，请查阅在线文档或示例获取更多信息。
 
 ### [Material](https://docs.godotengine.org/en/stable/classes/class_material.html)<span id="i_material"></span> **material**
 
-Material used for the surface of the volume. The main usage of this node is with smooth voxels, which means if you want more than one "material" on the ground, you need to use splatmapping techniques with a shader. In addition, many features require shaders to work properly. Check the online documentation or examples for more information.
+用于体积表面的材质。此节点的主要用途是平滑体素，这意味着如果你想在地面上拥有多个"材质"，需要使用着色器技术进行分层贴图。此外，许多功能需要着色器才能正常工作。请查阅在线文档或示例获取更多信息。
 
-Note: if you use a [ShaderMaterial](https://docs.godotengine.org/en/stable/classes/class_shadermaterial.html), it will be instanced on every chunk in order to support per-chunk/LOD features, so dynamic changes done to parameters will not apply. You can use [global uniforms](https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/shading_language.html#global-uniforms) to workaround this limitation.
+注意：如果你使用 [ShaderMaterial](https://docs.godotengine.org/en/stable/classes/class_shadermaterial.html)，它将在每个区块上实例化，以支持每区块/LOD 的功能，因此对参数的动态更改将不会生效。你可以使用 [全局 uniform](https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/shading_language.html#global-uniforms) 来绕开此限制。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_mesh_block_size"></span> **mesh_block_size** = 16
 
-Sets how many voxels across meshes of the terrain span.
+设置地形网格跨越多少个体素。
 
-Voxel chunks are stored in cubic chunks of 16x16x16 voxels, and by default meshes of the terrain match that size. But you can set this to 32 so meshes will span 2x2x2 voxel chunks. This is a performance tradeoff. Higher mesh size may speed up rendering, at the cost of slower mesh updates.
+体素区块以 16x16x16 体素的立方区块存储，默认情况下地形网格与该尺寸匹配。但你可以将其设置为 32，使网格跨越 2x2x2 个体素区块。这是一种性能权衡。更大的网格尺寸可能加快渲染，但会减慢网格更新。
 
-Values other than 16 and 32 are not supported.
+不支持 16 和 32 之外的值。
 
-Note: this setting also affects [VoxelInstancer](VoxelInstancer.md) chunks.
+注意：此设置也会影响 [VoxelInstancer](VoxelInstancer.md) 区块。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_normalmap_begin_lod_index"></span> **normalmap_begin_lod_index** = 2
 
-From which LOD index normalmaps will be generated. There won't be normalmaps below this index.
+从哪个 LOD 索引开始生成法线贴图。此索引以下的层级不会有法线贴图。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_normalmap_enabled"></span> **normalmap_enabled** = false
 
-Enables generation of distant normalmaps. This is a feature used with smooth terrain only (SDF). It is an expensive feature but allows to bring a lot more detail to distant ground.
+启用远处法线贴图的生成。这是仅用于平滑地形（SDF）的功能。它是一项开销较大的功能，但能为远处地面带来更多细节。
 
-This feature requires to use a specific shader, check the online documentation or examples for more information.
+此功能需要使用特定的着色器，请查阅在线文档或示例获取更多信息。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_normalmap_max_deviation_degrees"></span> **normalmap_max_deviation_degrees** = 60
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_normalmap_octahedral_encoding_enabled"></span> **normalmap_octahedral_encoding_enabled** = false
 
-Enables octahedral compression of normalmaps, which reduces memory usage caused by distant normalmaps by about 33%, with some impact on visual quality. Your shader may be modified accordingly to decode them.
+启用法线贴图的八面体压缩，可将远处法线贴图造成的内存使用减少约 33%，但对视觉质量有一定影响。你的着色器可能需要相应修改以解码它们。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_normalmap_tile_resolution_max"></span> **normalmap_tile_resolution_max** = 8
 
-Maximum resolution of tiles in distant normalmaps.
+远处法线贴图中瓦片的最大分辨率。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_normalmap_tile_resolution_min"></span> **normalmap_tile_resolution_min** = 4
 
-Minimum resolution of tiles in distant normalmaps.
+远处法线贴图中瓦片的最小分辨率。
 
-This is the resolution at which normalmaps will begin with, at the LOD level defined in [normalmap_begin_lod_index](VoxelLodTerrain.md#i_normalmap_begin_lod_index). Resolutions will double at each LOD level, until they reach [normalmap_tile_resolution_max](VoxelLodTerrain.md#i_normalmap_tile_resolution_max).
+这是在 [normalmap_begin_lod_index](VoxelLodTerrain.md#i_normalmap_begin_lod_index) 定义的 LOD 层级上法线贴图开始时的分辨率。分辨率将在每个 LOD 层级翻倍，直到达到 [normalmap_tile_resolution_max](VoxelLodTerrain.md#i_normalmap_tile_resolution_max)。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_normalmap_use_gpu"></span> **normalmap_use_gpu** = false
 
-Enables GPU detail normalmaps generation, which can speed it up. This is only valid for generators that support it. Vulkan is required.
+启用 GPU 细节法线贴图生成，可加快生成速度。仅对支持它的生成器有效。需要 Vulkan。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_secondary_lod_distance"></span> **secondary_lod_distance** = 48.0
 
-Controls the size of each LOD above LOD 0, in voxels relative to those LODs (voxels of LOD N are twice as big than LOD N-1). Higher values allow to see further away before detail are decimated, but is more expensive.
+控制 LOD 0 之上每个 LOD 的大小，单位是相对于这些 LOD 的体素（LOD N 的体素是 LOD N-1 的两倍大）。较大的值允许在细节被削减之前看得更远，但开销更大。
 
-Note that it will not necessarily be respected accurately, and will rather be used as a target minimum distance.
+注意，它不一定会被精确遵守，而是作为目标最小距离使用。
 
-This is only used when [streaming_system](VoxelLodTerrain.md#i_streaming_system) is set to [STREAMING_SYSTEM_CLIPBOX](VoxelLodTerrain.md#i_STREAMING_SYSTEM_CLIPBOX). In other cases, [lod_distance](VoxelLodTerrain.md#i_lod_distance) is used.
+仅当 [streaming_system](VoxelLodTerrain.md#i_streaming_system) 设置为 [STREAMING_SYSTEM_CLIPBOX](VoxelLodTerrain.md#i_STREAMING_SYSTEM_CLIPBOX) 时使用。在其他情况下，使用 [lod_distance](VoxelLodTerrain.md#i_lod_distance)。
 
-To control LOD 0, see [lod_distance](VoxelLodTerrain.md#i_lod_distance).
+要控制 LOD 0，请参见 [lod_distance](VoxelLodTerrain.md#i_lod_distance)。
 
 ### [StreamingSystem](VoxelLodTerrain.md#enumerations)<span id="i_streaming_system"></span> **streaming_system** = STREAMING_SYSTEM_LEGACY_OCTREE (0)
 
-Selects the underlying algorithm used to determine when to load and unload chunks around viewers as they move around.
+选择用于确定观察者移动时何时在周围加载和卸载区块的底层算法。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_threaded_update_enabled"></span> **threaded_update_enabled** = false
 
-When enabled, this node will run a large part of its update cycle in a separate thread. Otherwise, it will run on the main thread.
+启用后，此节点将在单独的线程中运行其更新周期的大部分。否则，它将在主线程上运行。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_use_gpu_generation"></span> **use_gpu_generation** = false
 
-Enables GPU block generation, which can speed it up. This is only valid for generators that support it. Vulkan is required.
+启用 GPU 数据块生成，可加快生成速度。仅对支持它的生成器有效。需要 Vulkan。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_view_distance"></span> **view_distance** = 512
 
-Maximum distance viewers can have. If a viewer has a larger distance, it will be clamped. Note that this is only a hint and not an exact boundary. Terrain may load within that distance, but can continue beyond it, rounding up to block size of the biggest LOD.
+观察者可以拥有的最大距离。如果观察者的距离更大，它将被钳制。注意，这只是一个提示，不是精确的边界。地形可能在该距离内加载，但可以继续超出它，向上取整到最大 LOD 的数据块大小。
 
-If your terrain size is finite (like an island or planet) and you want to keep it in view, you may want to set this value to a very large number. This is mainly useful for infinite terrains where a cap is desired.
+如果你的地形尺寸有限（如岛屿或星球），并希望将其保持在视野内，你可能希望将此值设置为非常大的数字。这主要用于需要限制的无限地形。
 
 ### [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)<span id="i_voxel_bounds"></span> **voxel_bounds** = AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)
 
-Bounds within which volume data can exist (loaded or not), in voxels. By default, it is pseudo-infinite. If you make a planet, island or some sort of arena, you may want to choose a finite size.
+体积数据可以存在的边界（无论是否已加载），单位为体素。默认情况下，它是伪无限的。如果你制作星球、岛屿或某种竞技场，你可能希望选择有限尺寸。
 
-Note, because this volume uses chunks with LOD, these bounds will snap to the closest chunk boundary.
+注意，因为此体积使用带 LOD 的区块，这些边界将对齐到最近的区块边界。
 
-## Method Descriptions
+## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_debug_dump_as_scene"></span> **debug_dump_as_scene**( [String](https://docs.godotengine.org/en/stable/classes/class_string.html) path, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) include_instancer ) 
 
-Saves the current state of the terrain as a Godot scene file. Can be used to inspect meshes and instances in more detail in the editor.
+将地形的当前状态保存为 Godot 场景文件。可用于在编辑器中更详细地检查网格和实例。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_debug_get_data_block_count"></span> **debug_get_data_block_count**( ) 
 
-Get how many voxel data chunks are currently loaded
+获取当前加载了多少个体素数据区块。
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_debug_get_data_block_info"></span> **debug_get_data_block_info**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) block_pos, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod ) 
 
-Gets some debug information about a specific voxel data chunk.
+获取关于特定体素数据区块的一些调试信息。
 
 ```
 {
@@ -326,17 +326,17 @@ Gets some debug information about a specific voxel data chunk.
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_get_draw_flag"></span> **debug_get_draw_flag**( [DebugDrawFlag](VoxelLodTerrain.md#enumerations) flag_index ) 
 
-Gets whether a specific debug drawing flag is enabled.
+获取特定调试绘制标志是否已启用。
 
-This method always returns false in exported games.
+此方法在导出的游戏中始终返回 false。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_debug_get_mesh_block_count"></span> **debug_get_mesh_block_count**( ) 
 
-Gets how many meshes the terrain currently has.
+获取地形当前拥有多少个网格。
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_debug_get_mesh_block_info"></span> **debug_get_mesh_block_info**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) block_pos, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod ) 
 
-Gets some debug information about a specific mesh.
+获取关于特定网格的一些调试信息。
 
 ```
 {
@@ -353,9 +353,9 @@ Gets some debug information about a specific mesh.
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_debug_get_octrees_detailed"></span> **debug_get_octrees_detailed**( ) 
 
-Gets debug information about the grid of octrees used to stream the terrain at multiple levels of detail.
+获取用于在多个细节层级上流式加载地形的八叉树网格的调试信息。
 
-The returned array contains alternating [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) and [Array](https://docs.godotengine.org/en/stable/classes/class_array.html) values, where each pair corresponds to one octree at a specific position:
+返回的数组包含交替的 [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) 和 [Array](https://docs.godotengine.org/en/stable/classes/class_array.html) 值，其中每一对对应特定位置的一个八叉树：
 
 ```
 [
@@ -367,25 +367,25 @@ The returned array contains alternating [Vector3i](https://docs.godotengine.org/
 ]
 ```
 
-The array after positions contains info about one octree:
+位置后的数组包含一个八叉树的信息：
 
 ```
 [
 	int (node state),
-	null or Array (children info)
+	null 或 Array（子节点信息）
 ]
 ```
-When children info is not null, it contains 8 arrays structured the same way, and may be recursively traversed to obtain the state of every node of the octree.
+当子节点信息不为 null 时，它包含 8 个以相同方式结构的数组，可以递归遍历以获得八叉树中每个节点的状态。
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_debug_print_sdf_top_down"></span> **debug_print_sdf_top_down**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) center, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) extents ) 
 
-Captures a top-down representation of the signed distance field (SDF) at multiple LOD levels within a specific area. The returned array contains an image for each LOD.
+捕获特定区域内多个 LOD 层级上有符号距离场（SDF）的俯视表示。返回的数组包含每个 LOD 的一张图像。
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_debug_raycast_mesh_block"></span> **debug_raycast_mesh_block**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) origin, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) dir ) 
 
-Gets the non-empty mesh chunk positions from a rough world-space ray, up to a distance of 256 units. All LODs are checked.
+从一条粗略的世界空间射线获取非空网格区块位置，距离最多 256 个单位。会检查所有 LOD。
 
-The returned array contains:
+返回的数组包含：
 
 ```
 [
@@ -399,35 +399,35 @@ The returned array contains:
 
 ### [void](#)<span id="i_debug_set_draw_flag"></span> **debug_set_draw_flag**( [DebugDrawFlag](VoxelLodTerrain.md#enumerations) flag_index, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-Sets a specific debug drawing flag. Note that debug drawing must also be enabled for it to be visible.
+设置特定调试绘制标志。注意，还必须启用调试绘制才能使其可见。
 
-This method does nothing in exported games.
+此方法在导出的游戏中不起作用。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_data_block_region_extent"></span> **get_data_block_region_extent**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_data_block_size"></span> **get_data_block_size**( ) 
 
-Gets the size of one cunic data block in voxels.
+获取一个数据区块在体素中的大小。
 
 ### [VoxelGenerator](VoxelGenerator.md)<span id="i_get_normalmap_generator_override"></span> **get_normalmap_generator_override**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_normalmap_generator_override_begin_lod_index"></span> **get_normalmap_generator_override_begin_lod_index**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [ProcessCallback](VoxelLodTerrain.md#enumerations)<span id="i_get_process_callback"></span> **get_process_callback**( ) 
 
-Gets which callback is used to run the main thread update of this node.
+获取用于运行此节点主线程更新的回调。
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_get_statistics"></span> **get_statistics**( ) 
 
-Gets debug information about how much time is spent processing the terrain.
+获取关于处理地形所花费时间的调试信息。
 
-The returned dictionary has the following structure:
+返回的字典具有以下结构：
 
 ```
 {
@@ -443,42 +443,42 @@ The returned dictionary has the following structure:
 	"blocked_lods": int
 }
 ```
-Times are in microseconds.
+时间以微秒为单位。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_area_meshed"></span> **is_area_meshed**( [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) area_in_voxels, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod_index ) 
 
-Returns true if the area has been processed by meshing. It does not mean the area actually contains a mesh.
+如果该区域已被网格化处理，则返回 true。这并不意味着该区域实际包含网格。
 
-Returns false if the area has not been processed by meshing (therefore it is unknown whethere there should be a mesh here or not).
+如果该区域尚未经过网格化处理（因此此处是否存在网格未知），则返回 false。
 
-When streaming terrain, this can be used to determine if an area has fully "loaded", in case the game relies meshes or mesh colliders.
+对于流式加载的地形，可用于确定某个区域是否已完全"加载"，以防游戏依赖网格或网格碰撞体。
 
 ### [VoxelSaveCompletionTracker](VoxelSaveCompletionTracker.md)<span id="i_save_modified_blocks"></span> **save_modified_blocks**( ) 
 
-Requests saving of all modified voxels. Saving is asynchronous and will complete some time in the future. If the game quits, the engine will ensure saving tasks get completed before the application shuts down.
+请求保存所有已修改的体素。保存是异步的，将在未来某个时间完成。如果游戏退出，引擎将确保保存任务在应用程序关闭前完成。
 
-Use the returned tracker object to know when saving has completed. However, saves occurring after calling this method won't be tracked by this object.
+使用返回的跟踪器对象来了解保存何时完成。但是，在调用此方法之后发生的保存将不会被此对象跟踪。
 
-Note that blocks getting unloaded as the viewer moves around can also trigger saving tasks, independently from this function.
+注意，当观察者移动时被卸载的数据块也会触发保存任务，这与本函数无关。
 
 ### [void](#)<span id="i_set_normalmap_generator_override"></span> **set_normalmap_generator_override**( [VoxelGenerator](VoxelGenerator.md) generator_override ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_set_normalmap_generator_override_begin_lod_index"></span> **set_normalmap_generator_override_begin_lod_index**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod_index ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_set_process_callback"></span> **set_process_callback**( [ProcessCallback](VoxelLodTerrain.md#enumerations) mode ) 
 
-Sets which process callback is used to run the main thread update of this node. By default, it uses `_process`.
+设置用于运行此节点主线程更新的处理回调。默认使用 `_process`。
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_voxel_to_data_block_position"></span> **voxel_to_data_block_position**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) voxel_position, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod_index ) 
 
-Converts a voxel position into a data block position for a specific LOD index.
+将体素位置转换为特定 LOD 索引的数据块位置。
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_voxel_to_mesh_block_position"></span> **voxel_to_mesh_block_position**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) voxel_position, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod_index ) 
 
-Converts a voxel position into a mesh block position for a specific LOD index.
+将体素位置转换为特定 LOD 索引的网格块位置。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

@@ -6,19 +6,19 @@
 namespace voxel::transvoxel::materials {
 
 struct NullProcessor {
-	// Called for every 2x2x2 cell containing triangles.
-	// The returned value is used to determine if the next cell can re-use vertices from previous cells, when equal.
+	// 对每个包含三角形的 2x2x2 单元调用。
+	// 返回的值用于确定下一个单元是否可以在相等时复用前面单元的顶点。
 	inline uint32_t on_cell(const FixedArray<uint32_t, 8> &corner_voxel_indices, const uint8_t case_code) const {
 		return 0;
 	}
-	// Called for every 2x3x3 transition cell containing triangles.
-	// Such cells are actually in 2D data-wise, so corners are the same value, so only 9 are passed in.
-	// The returned value is used to determine if the next cell can re-use vertices from previous cells, when equal.
+	// 对每个包含三角形的 2x3x3 过渡单元调用。
+	// 此类单元在数据上实际上是二维的，因此角点值相同，所以只传入 9 个。
+	// 返回的值用于确定下一个单元是否可以在相等时复用前面单元的顶点。
 	inline uint32_t on_transition_cell(const FixedArray<uint32_t, 9> &corner_voxel_indices, const uint8_t case_code)
 			const {
 		return 0;
 	}
-	// Called one or more times after each `on_cell` for every new vertex, to interpolate and add material data
+	// 在每个 `on_cell` 之后为每个新顶点调用一次或多次，用于插值并添加材质数据
 	inline void on_vertex(const unsigned int v0, const unsigned int v1, const float alpha) const {
 		return;
 	}

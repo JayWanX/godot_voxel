@@ -25,8 +25,8 @@ void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_parse_group(Object
 	if (p_group == VoxelInstanceLibraryMultiMeshItem::MANUAL_SETTINGS_GROUP_NAME) {
 		if (item->get_scene().is_null()) {
 			ERR_FAIL_COND(listener == nullptr);
-			// TODO I preferred  this at the end of the group, but Godot doesn't expose anything to do it.
-			// This is a legacy workflow, we'll see if it can be removed later.
+			// TODO 我更希望这个按钮在分组末尾，但 Godot 没有暴露任何方法来做这件事。
+			// 这是一个遗留工作流，我们看看以后能否移除它。
 			Button *button = memnew(Button);
 			button->set_tooltip_text(
 					VOXEL_TTR("Set properties based on an existing scene. This might copy mesh and material data if "
@@ -34,8 +34,8 @@ void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_parse_group(Object
 			);
 			button->set_text(VOXEL_TTR("Update from scene..."));
 
-			// Using a bind() instead of relying on "currently edited" item in the editor plugin allows to support
-			// multiple sub-inspectors. Plugins are not instanced per-inspected-object, but custom controls are.
+			// 使用 bind() 而不是依赖编辑器插件中“当前编辑的”条目，这样可以支持
+			// 多个子检查器。插件不会按被检查对象实例化，但自定义控件会。
 			button->connect(
 					"pressed",
 					callable_mp(
@@ -53,8 +53,8 @@ void VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_parse_group(Object
 			add_custom_control(label);
 		}
 	}
-	// TODO Button to open scene in editor, since Godot doesn't have that in its resource picker menu?
-	// Perhaps it should rather be a feature request to Godot.
+	// TODO 在编辑器中打开场景的按钮，因为 Godot 的资源选择器菜单里没有这个？
+	// 也许这更应该作为对 Godot 的功能请求。
 	// else if (p_group == VoxelInstanceLibraryMultiMeshItem::SCENE_SETTINGS_GROUP_NAME) {
 	// 	ERR_FAIL_COND(listener == nullptr);
 	// 	Button *button = memnew(Button);
@@ -71,13 +71,13 @@ bool VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_parse_property(
 		const BitField<PropertyUsageFlags> p_usage,
 		const bool p_wide
 ) {
-	// TODO Godot invokes `parse_property` on ALL editor plugins when inspecting items of an Array!
-	// See https://github.com/godotengine/godot/issues/71236
+	// TODO 在检查一个 Array 的条目时，Godot 会在所有编辑器插件上调用 `parse_property`！
+	// 参见 https://github.com/godotengine/godot/issues/71236
 	if (p_object == nullptr) {
-		// We don't care about non-object properties
+		// 我们不关心非对象属性
 		return false;
 	}
-	// Hide manual properties if a scene is assigned, because it will override them
+	// 如果指定了场景，则隐藏手动属性，因为场景会覆盖它们
 	const VoxelInstanceLibraryMultiMeshItem *item = Object::cast_to<VoxelInstanceLibraryMultiMeshItem>(p_object);
 	ERR_FAIL_COND_V_MSG(
 			item == nullptr,
@@ -88,8 +88,8 @@ bool VoxelInstanceLibraryMultiMeshItemInspectorPlugin::_voxel_parse_property(
 	if (item->get_scene().is_null()) {
 		return false;
 	}
-	// TODO I only want to make all properties read-only if they are in the "Manual properties" category...
-	// But Godot doesn't seem to expose a way to do either, so all I can do is hide them one by one
+	// TODO 我只想让 "Manual properties" 分类中的所有属性变为只读……
+	// 但 Godot 似乎没有暴露任何实现它的方法，所以我只能一个一个地隐藏它们
 	static const char *s_manual_properties[] = {
 		"cast_shadow", //
 		"collision_layer", //

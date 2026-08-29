@@ -57,10 +57,10 @@ void test_spot_noise() {
 	noise->set_cell_size(cell_size);
 	noise->set_jitter(0.6f);
 	const Rect2 rect(200.f, -20.f, 100.f, 150.f);
-	// This wasn't working outside of the (0,0) cell, reported on Discord by Phoenix
+	// 这在 (0,0) 单元格之外不起作用，由 Phoenix 在 Discord 上报告
 	const PackedVector2Array positions = noise->get_spot_positions_in_area_2d(rect);
 
-	// Get cells that we know will generate in the rectangle
+	// 获取我们已知会在该矩形内生成的单元格
 	const Vector2i cmin = Vector2i((rect.position / cell_size).ceil());
 	const Vector2i cmax = Vector2i(((rect.position + rect.size) / cell_size).floor());
 	const Vector2i csize = cmax - cmin;

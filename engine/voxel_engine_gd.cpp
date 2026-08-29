@@ -46,7 +46,7 @@ VoxelEngine::Config VoxelEngine::get_config_from_godot() {
 
 	Config config;
 
-	// Compute thread count for general pool.
+	// 计算通用线程池的线程数。
 
 	add_custom_project_setting(Variant::INT, "voxel/threads/count/minimum", PROPERTY_HINT_RANGE, "1,64", 1, true);
 	add_custom_project_setting(
@@ -67,10 +67,10 @@ VoxelEngine::Config VoxelEngine::get_config_from_godot() {
 
 	config.inner.thread_count_minimum = math::max(1, int(ps.get("voxel/threads/count/minimum")));
 
-	// How many threads below available count on the CPU should we set as limit
+	// 我们希望线程数比 CPU 可用线程数少多少（作为上限）
 	config.inner.thread_count_margin_below_max = math::max(1, int(ps.get("voxel/threads/count/margin_below_max")));
 
-	// Portion of available CPU threads to attempt using
+	// 尝试使用的可用 CPU 线程比例
 	config.inner.thread_count_ratio_over_max =
 			math::clamp(float(ps.get("voxel/threads/count/ratio_over_max")), 0.f, 1.f);
 
@@ -102,7 +102,7 @@ int VoxelEngine::get_version_patch() const {
 }
 
 Vector3i VoxelEngine::get_version_v() const {
-	// Handy to compare versions quickly, as Vector3i::operator< compares x first, then y, then z
+	// 方便快速比较版本，因为 Vector3i::operator< 先比较 x，再比较 y，最后比较 z
 	return Vector3i(get_version_major(), get_version_minor(), get_version_patch());
 }
 
@@ -154,7 +154,7 @@ Dictionary to_dict(const voxel::VoxelEngine::Stats &stats) {
 	tasks["gpu"] = stats.gpu_tasks;
 #endif
 
-	// This part is additional for scripts because VoxelMemoryPool is not exposed
+	// 这部分是为脚本额外提供的，因为 VoxelMemoryPool 未暴露给脚本
 	Dictionary mem;
 	mem["voxel_total"] = VOXEL_SIZE_T_TO_VARIANT(VoxelMemoryPool::get_singleton().debug_get_total_memory());
 	mem["voxel_used"] = VOXEL_SIZE_T_TO_VARIANT(VoxelMemoryPool::get_singleton().debug_get_used_memory());
@@ -238,7 +238,7 @@ bool VoxelEngine::_b_get_threaded_graphics_resource_building_enabled() const {
 	return ve.is_threaded_graphics_resource_building_enabled();
 }
 
-// This is normally automatic. This method is mainly to allow overriding it just in case.
+// 这通常是自动完成的。此方法主要用于在特殊情况下允许覆盖。
 // void VoxelEngine::_b_set_threaded_graphics_resource_building_enabled(bool enabled) {
 // 	voxel::VoxelEngine &ve = voxel::VoxelEngine::get_singleton();
 // 	ve.set_threaded_graphics_resource_building_enabled(enabled);

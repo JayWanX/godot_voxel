@@ -56,7 +56,7 @@ void get_graph_node_documentation_category_names(StdVector<String> &out_category
 	}
 }
 
-// This is a dumbed down re-implementation of `Tree::_up` because this stuff is not exposed...
+// 这是 `Tree::_up` 的简化版重新实现，因为这些功能没有暴露...
 void select_up(Tree &tree) {
 	TreeItem *selected_item = tree.get_selected();
 
@@ -81,7 +81,7 @@ void select_up(Tree &tree) {
 	// tree.accept_event();
 }
 
-// This is a dumbed down re-implementation of `Tree::_down` because this stuff is not exposed...
+// 这是 `Tree::_down` 的简化版重新实现，因为这些功能没有暴露...
 void select_down(Tree &tree) {
 	TreeItem *selected_item = tree.get_selected();
 
@@ -166,8 +166,8 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 	_function_file_dialog = memnew(EditorFileDialog);
 	_function_file_dialog->set_access(EditorFileDialog::ACCESS_RESOURCES);
 	_function_file_dialog->set_file_mode(EditorFileDialog::FILE_MODE_OPEN_FILE);
-	// TODO Usability: there is no way to limit a file dialog to a specific TYPE of resource, only file extensions. So
-	// it's not useful because text resources are almost all using `.tres`...
+	// TODO 可用性：没有办法将文件对话框限制为特定 TYPE 的资源，只能限制文件扩展名。所以
+	// 这没什么用，因为文本资源几乎都使用 `.tres`...
 	_function_file_dialog->add_filter("*.tres", VOXEL_TTR("Text Resource"));
 	_function_file_dialog->add_filter("*.res", VOXEL_TTR("Binary Resource"));
 	_function_file_dialog->connect(
@@ -175,7 +175,7 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 	);
 	add_child(_function_file_dialog);
 
-	// TODO Replace QuickOpen with listing of project functions directly in the dialog
+	// TODO 用直接在对话框中列出项目函数来取代 QuickOpen
 #ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
 	_function_quick_open_dialog = memnew(EditorQuickOpen);
@@ -186,16 +186,16 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 #endif
 #endif
 
-	// In this editor, categories come from the documentation and may be unrelated to internal node categories.
-	// They serve different purposes.
+	// 在这个编辑器中，分类来自文档，可能与内部节点分类无关。
+	// 它们服务于不同的目的。
 	get_graph_node_documentation_category_names(_category_names);
 	{
 		SortArray<String> sorter;
 		sorter.sort(_category_names.data(), _category_names.size());
 	}
 
-	// TODO Usability: have CustomInput and CustomOutput subcategories based on I/O definitions, + a "new" option for
-	// unbound
+	// TODO 可用性：基于 I/O 定义将 CustomInput 和 CustomOutput 作为子分类，并为
+	// 未绑定的提供“新建”选项
 	const pg::NodeTypeDB &type_db = pg::NodeTypeDB::get_singleton();
 	for (int type_index = 0; type_index < type_db.get_type_count(); ++type_index) {
 		const pg::NodeType &type = type_db.get_type(type_index);
@@ -250,7 +250,7 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 }
 
 void VoxelGraphNodeDialog::popup_at_screen_position(Vector2 screen_pos) {
-	// Similar popup as in VisualShaderEditor::_show_members_dialog
+	// 与 VisualShaderEditor::_show_members_dialog 中的弹窗类似
 
 	VoxelGraphNodeDialog &dialog = *this;
 
@@ -258,13 +258,13 @@ void VoxelGraphNodeDialog::popup_at_screen_position(Vector2 screen_pos) {
 
 	dialog.popup();
 
-	_filter_line_edit->call_deferred(VoxelStringNames::get_singleton().grab_focus); // Still not visible.
+	_filter_line_edit->call_deferred(VoxelStringNames::get_singleton().grab_focus); // 此时还不可见
 	_filter_line_edit->select_all();
 
-	// Keep within screen bounds.
-	// Seems we also have to do this after showing the window because Godot is unable to update its size
-	// without making it visible first...
-	// TODO Shouldn't we check for screen size instead of window?
+	// 保持在屏幕边界内。
+	// 看来我们必须在显示窗口后做这件事，因为 Godot 无法在不先使其可见的情况下
+	// 更新窗口大小……
+	// TODO 我们不是应该检查屏幕大小而不是窗口大小吗？
 	const Rect2 window_rect =
 			Rect2(DisplayServer::get_singleton()->window_get_position(),
 				  DisplayServer::get_singleton()->window_get_size());
@@ -277,7 +277,7 @@ void VoxelGraphNodeDialog::update_tree(bool autoselect) {
 	_tree->clear();
 	TreeItem *root = _tree->create_item();
 
-	// Filter items
+	// 过滤条目
 
 	const String filter = _filter_line_edit->get_text().strip_edges();
 	const bool use_filter = !filter.is_empty();
@@ -291,7 +291,7 @@ void VoxelGraphNodeDialog::update_tree(bool autoselect) {
 		}
 	}
 
-	// Populate tree
+	// 填充树
 
 	StdVector<TreeItem *> category_tree_items;
 	category_tree_items.resize(_category_names.size(), nullptr);
@@ -340,8 +340,8 @@ void VoxelGraphNodeDialog::on_filter_text_changed(String new_text) {
 void VoxelGraphNodeDialog::on_filter_gui_input(Ref<InputEvent> event) {
 	Ref<InputEventKey> key_event = event;
 	if (key_event.is_valid()) {
-		// Can't call `gui_input()` directly to forward events, so handle keys manually
-		// (as `VisualShaderEditor::_sbox_input` does).
+		// 不能直接调用 `gui_input()` 来转发事件，所以手动处理按键
+		// （就像 `VisualShaderEditor::_sbox_input` 那样）。
 		//
 		// _tree->gui_input(key_event);
 
@@ -377,18 +377,18 @@ void VoxelGraphNodeDialog::on_tree_item_activated() {
 	VOXEL_ASSERT_RETURN(id >= 0);
 
 	if (id < pg::VoxelGraphFunction::NODE_TYPE_COUNT) {
-		// Node selected
+		// 节点被选中
 		emit_signal(SIGNAL_NODE_SELECTED, id);
 		hide();
 
 	} else if (id == ID_FUNCTION_BROWSE) {
-		// Browse function nodes
+		// 浏览函数节点
 		voxel::godot::popup_file_dialog(*_function_file_dialog);
 
 	} else if (id == ID_FUNCTION_QUICK_OPEN) {
 #ifdef VOXEL_GODOT
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-		// Quick open function nodes
+		// 快速打开函数节点
 		_function_quick_open_dialog->popup_dialog(pg::VoxelGraphFunction::get_class_static());
 #else
 		Vector<StringName> base_types;
@@ -466,7 +466,7 @@ void VoxelGraphNodeDialog::on_function_quick_open_dialog_item_selected(String fp
 }
 
 void VoxelGraphNodeDialog::on_description_label_meta_clicked(Variant meta) {
-	// TODO Open docs if a class name is clicked
+	// TODO 点击类名时打开文档
 }
 
 void VoxelGraphNodeDialog::_notification(int p_what) {

@@ -18,17 +18,17 @@ namespace voxel {
 
 void VoxelBlockyLibraryBase::load_default() {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in child classes
+	// 在子类中实现
 }
 
 void VoxelBlockyLibraryBase::clear() {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in child classes
+	// 在子类中实现
 }
 
 void VoxelBlockyLibraryBase::bake() {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in child classes
+	// 在子类中实现
 }
 
 void VoxelBlockyLibraryBase::set_bake_tangents(bool bt) {
@@ -37,8 +37,8 @@ void VoxelBlockyLibraryBase::set_bake_tangents(bool bt) {
 }
 
 TypedArray<Material> VoxelBlockyLibraryBase::_b_get_materials() const {
-	// Note, if at least one non-empty voxel has no material, there will be one null entry in this list to represent
-	// "The default material".
+	// 注意，如果至少有一个非空体素没有材质，此列表中会有一个 null 条目来表示
+	// "默认材质"。
 	TypedArray<Material> materials;
 	materials.resize(_indexed_materials.size());
 	for (size_t i = 0; i < _indexed_materials.size(); ++i) {
@@ -63,7 +63,7 @@ unsigned int VoxelBlockyLibraryBase::get_material_index_count() const {
 #ifdef TOOLS_ENABLED
 
 void VoxelBlockyLibraryBase::get_configuration_warnings(PackedStringArray &out_warnings) const {
-	// Implemented in child classes
+	// 在子类中实现
 }
 
 #endif
@@ -166,7 +166,7 @@ void to_2d(Span<const Vector3f> src, Span<Vector2f> dst, unsigned int src_x_axis
 }
 
 void to_2d(Span<const Vector3f> src, Span<Vector2f> dst, unsigned int side) {
-	// TODO Flip winding?
+	// TODO 是否翻转绕序？
 	switch (side) {
 		case Cube::SIDE_NEGATIVE_X:
 			to_2d(src, dst, math::AXIS_Z, math::AXIS_Y);
@@ -345,7 +345,7 @@ bool find_triangle(Span<const Vector2f> vertices, Span<const int32_t> indices, V
 		Vector2f p1 = vertices[i1];
 		Vector2f p2 = vertices[i2];
 
-		// Grow triangle a little to workaround float precision hell...
+		// 稍微放大三角形以规避浮点精度带来的麻烦...
 		grow_triangle(p0, p1, p2, 0.0001f);
 
 		if (math::is_point_in_triangle(pos, p0, p1, p2)) {
@@ -373,16 +373,16 @@ void interpolate_attributes_assume_no_seams(
 ) {
 	VOXEL_ASSERT((src_indices.size() % 3) == 0);
 
-	// This method only works if the whole mesh we are interpolating has consistent UVs. The mesh could have seams
-	// with different UVs, and vertices we are interpolating could be located exactly on those seams, leading to
-	// ambiguous results. We would need a proper function or library to do proper 2D mesh subtraction preserving
-	// attributes, so that we would not need this in the first place.
+	// 此方法仅在插值整个网格具有一致 UV 时才有效。网格可能带有不同 UV 的接缝，
+	// 而我们插值的顶点可能恰好位于这些接缝上，导致结果有歧义。
+	// 我们需要一个合适的函数或库来做保留属性的正确 2D 网格减法，
+	// 那样就不需要这个方法了。
 
 	const bool has_tangents = src_tangents.size() > 0;
 	Span<const Vector4f> src_tangents2;
 	Span<Vector4f> interp_tangents2;
 	if (has_tangents) {
-		// Alias tangents to be nicer to work with
+		// 将切线取别名以便更好处理
 		src_tangents2 = src_tangents.reinterpret_cast_to<const Vector4f>();
 		interp_tangents2 = interp_tangents.reinterpret_cast_to<Vector4f>();
 	}
@@ -392,7 +392,7 @@ void interpolate_attributes_assume_no_seams(
 
 		Vector3i triangle_indices;
 		if (!find_triangle(src_vertices, src_indices, interp_pos, triangle_indices)) {
-			// TODO Might happen on edges due to floats being annoying?
+			// TODO 由于浮点数带来的麻烦，这种情况可能发生在边缘？
 			VOXEL_PRINT_ERROR("Triangle not found");
 			interp_uvs[i] = Vector2f();
 			continue;
@@ -428,11 +428,11 @@ void generate_cutout_side_surface(
 		Box2f other_quad,
 		BakedModel::SideSurface &cut_side_surface
 ) {
-	// Arguably, some of this could be done once up front.
-	// Not done currently because what we really want here is a full-blown mesh boolean operation. The quad stuff is
-	// only here as an early shortcut because I couldn't find how to do the former.
+	// 可以说，其中部分工作可以预先一次性完成。
+	// 目前没有这样做，因为这里真正想要的是完整的网格布尔运算。四边形处理只是作为早期捷径，
+	// 因为我找不到实现前者（网格布尔运算）的方法。
 
-	// TODO Candidate for temp allocator
+	// TODO 可考虑使用临时分配器
 	StdVector<Vector2f> vertices_2d;
 	vertices_2d.resize(side_surface.positions.size());
 	to_2d(to_span(side_surface.positions), to_span(vertices_2d), side);
@@ -444,15 +444,15 @@ void generate_cutout_side_surface(
 			quad_indices //
 	);
 	if (!is_quad) {
-		// TODO Need a generic cutting algorith using boolean mesh operation
-		// Could not find any easy way to do this
+		// TODO 需要一个使用布尔网格运算的通用裁剪算法
+		// 找不到任何简单的方法来实现这一点
 		return;
 	}
 	const Box2f quad = quad_indices.to_box(to_span(vertices_2d));
 
 	SmallVector<Box2f, 6> quads;
 	quad.difference_to_vec(other_quad, quads);
-	// TODO Remove degenerate triangles just in case of float precision errors?
+	// TODO 移除退化三角形以防浮点精度错误？
 
 	StdVector<Vector2f> cut_vertices_2d_non_indexed;
 	quads_to_triangles(to_span(quads), cut_vertices_2d_non_indexed);
@@ -468,7 +468,7 @@ void generate_cutout_side_surface(
 	if (has_tangents) {
 		cut_tangents.resize(cut_vertices_2d.size() * 4);
 	}
-	// Recover vertex attributes by interpolating over the original geometry
+	// 通过在原始几何体上插值来恢复顶点属性
 	interpolate_attributes_assume_no_seams( //
 			to_span(vertices_2d), //
 			to_span(side_surface.indices), //
@@ -494,8 +494,8 @@ void generate_cutout_side_surface(
 }
 
 void generate_model_cutout_sides(BakedModel &model_data, const uint16_t model_id, BakedLibrary &lib) {
-	// Iterating other models instead of the shape matrix because there is often a limited subset of models we have
-	// to compute cutouts with. Typically, this is used with transparent neighbors that cull our own faces
+	// 遍历其他模型而不是形状矩阵，因为通常需要计算镂空的模型只是一小部分。
+	// 典型情况是用于会剔除我们自己面的透明相邻块
 	for (uint16_t other_model_id = 0; other_model_id < lib.models.size(); ++other_model_id) {
 		if (other_model_id == model_id) {
 			continue;
@@ -508,7 +508,7 @@ void generate_model_cutout_sides(BakedModel &model_data, const uint16_t model_id
 		}
 
 		for (uint16_t side = 0; side < Cube::SIDE_COUNT; ++side) {
-			// Test if the face is totally occluded first
+			// 首先测试面是否被完全遮挡
 			if (!is_face_visible(lib, model_data, other_model_id, side)) {
 				continue;
 			}
@@ -516,14 +516,14 @@ void generate_model_cutout_sides(BakedModel &model_data, const uint16_t model_id
 				continue;
 			}
 
-			// The face is partially or totally visible, depending on the neighbor's shape. Compute its cutout?
+			// 该面部分或全部可见，取决于相邻块的形状。计算它的镂空？
 
 			BakedModel::Model &model = model_data.model;
 			const BakedModel::Model &other_model = other_model_data.model;
 
 			const uint16_t other_side = Cube::g_opposite_side[side];
 
-			// TODO Candidate for temp allocator
+			// TODO 可考虑使用临时分配器
 			StdVector<Vector2f> other_all_vertices_2d;
 			StdVector<int32_t> other_all_indices;
 			get_side_geometry_2d_all_surfaces(other_model, other_side, other_all_vertices_2d, other_all_indices);
@@ -535,7 +535,7 @@ void generate_model_cutout_sides(BakedModel &model_data, const uint16_t model_id
 					other_quad_indices //
 			);
 			if (!other_is_quad) {
-				// Cutting not supported, we'll fallback on rendering the full side
+				// 不支持裁剪，我们将回退为渲染完整侧面
 				continue;
 			}
 			const Box2f other_quad = other_quad_indices.to_box(to_span(other_all_vertices_2d));
@@ -551,10 +551,10 @@ void generate_model_cutout_sides(BakedModel &model_data, const uint16_t model_id
 				generate_cutout_side_surface(side_surface, side, other_quad, cut_surfaces[surface_index]);
 			}
 
-			// Currently, the cutout can be empty in case of failure, in which case we must fallback to full side.
-			// But if we implement proper boolean operation later, that may have to change
+			// 目前，镂空在失败的情况下可能为空，此时我们必须回退到完整侧面。
+			// 但如果以后实现真正的布尔运算，这种情况可能不得不改变
 			if (!is_empty(cut_surfaces)) {
-				// Insert surfaces
+				// 插入表面
 				model.cutout_side_surfaces[side][other_side_shape_id] = std::move(cut_surfaces);
 			}
 		}
@@ -579,9 +579,9 @@ void generate_library_cutout_sides(BakedLibrary &lib) {
 
 template <typename F>
 void rasterize_triangle_barycentric(Vector2f a, Vector2f b, Vector2f c, F output_func) {
-	// Slower than scanline method, but looks better
+	// 比扫描线方法慢，但效果更好
 
-	// Grow the triangle a tiny bit, to help against floating point error
+	// 稍微放大三角形，以抵御浮点误差
 	grow_triangle(a, b, c, 0.001f);
 
 	using namespace math;
@@ -591,7 +591,7 @@ void rasterize_triangle_barycentric(Vector2f a, Vector2f b, Vector2f c, F output
 	const int max_x = (int)Math::ceil(max(max(a.x, b.x), c.x));
 	const int max_y = (int)Math::ceil(max(max(a.y, b.y), c.y));
 
-	// We test against points centered on grid cells
+	// 我们针对网格单元中心的点进行测试
 	const Vector2f offset(0.5, 0.5);
 
 	for (int y = min_y; y < max_y; ++y) {
@@ -615,13 +615,13 @@ void rasterize_side(
 ) {
 	VOXEL_ASSERT_RETURN((indices.size() % 3) == 0);
 
-	// For each triangle
+	// 对于每个三角形
 	for (unsigned int j = 0; j < indices.size(); j += 3) {
 		const Vector3f va = vertices[indices[j]];
 		const Vector3f vb = vertices[indices[j + 1]];
 		const Vector3f vc = vertices[indices[j + 2]];
 
-		// Convert 3D vertices into 2D
+		// 将 3D 顶点转换为 2D
 		Vector2f a, b, c;
 		switch (side) {
 			case Cube::SIDE_NEGATIVE_X:
@@ -653,7 +653,7 @@ void rasterize_side(
 		b *= RASTER_SIZE;
 		c *= RASTER_SIZE;
 
-		// Rasterize pattern
+		// 光栅化图案
 		rasterize_triangle_barycentric(a, b, c, [&bitmap](unsigned int x, unsigned int y) {
 			if (x >= RASTER_SIZE || y >= RASTER_SIZE) {
 				return;
@@ -673,7 +673,7 @@ void rasterize_side_all_surfaces(
 ) {
 	const FixedArray<BakedModel::SideSurface, MAX_SURFACES> &side_surfaces =
 			model_data.model.sides_surfaces[side_index];
-	// For each surface (they are all combined for simplicity, though it is also a limitation)
+	// 对于每个表面（为简单起见将它们合并，不过这也是一个局限）
 	for (unsigned int surface_index = 0; surface_index < model_data.model.surface_count; ++surface_index) {
 		const BakedModel::SideSurface &side = side_surfaces[surface_index];
 		rasterize_side(to_span(side.positions), to_span(side.indices), side_index, bitmap);
@@ -682,13 +682,13 @@ void rasterize_side_all_surfaces(
 
 void generate_side_culling_matrix(BakedLibrary &baked_data) {
 	VOXEL_PROFILE_SCOPE();
-	// When two blocky voxels are next to each other, they share a side.
-	// Geometry of either side can be culled away if covered by the other,
-	// but it's very expensive to do a full polygon check when we build the mesh.
-	// So instead, we compute which sides occlude which for every voxel type,
-	// and generate culling masks ahead of time, using an approximation.
-	// It may have a limitation of the number of different side types,
-	// so it's a tradeoff to take when designing the models.
+	// 当两个 blocky 体素相邻时，它们共享一个侧面。
+	// 任一侧面的几何体如果被对方覆盖就可以被剔除，
+	// 但在构建网格时做完整的多边形检查非常昂贵。
+	// 因此，我们改为为每种体素类型计算哪些侧面遮挡哪些侧面，
+	// 并提前使用近似方法生成剔除掩码。
+	// 它可能受不同侧面类型数量的限制，
+	// 所以在设计模型时需要权衡取舍。
 
 	//	struct TypeAndSide {
 	//		uint16_t type;
@@ -703,24 +703,24 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 	StdVector<Pattern> patterns;
 	uint32_t full_side_pattern_index = VoxelBlockyLibraryBase::NULL_INDEX;
 
-	// Gather patterns for each model
+	// 为每个模型收集图案
 	for (uint16_t type_id = 0; type_id < baked_data.models.size(); ++type_id) {
 		BakedModel &model_data = baked_data.models[type_id];
 		model_data.contributes_to_ao = true;
 
-		// For each side
+		// 对于每个侧面
 		for (uint16_t side = 0; side < Cube::SIDE_COUNT; ++side) {
 			std::bitset<RASTER_SIZE * RASTER_SIZE> bitmap;
 
 			if (model_data.fluid_index != VoxelBlockyModel::NULL_FLUID_INDEX) {
-				// Fluids don't have per-model static geometry, but their culling rules are still similar to a cube.
-				// There is never a side on the top, it's either slightly lower (not on the side) or culled by
-				// neighboring water. But we still need to fill bits as if there was one, otherwise the bottom of water
-				// voxels would not get culled when stacked with other water voxels
+				// 流体没有逐模型的静态几何，但它们的剔除规则仍然类似于立方体。
+				// 顶部从来不会有侧面，要么略低（不在侧面上），要么被
+				// 邻近的水剔除。但我们仍需要像有侧面那样填充位，否则水
+				// 体素与其他水体素堆叠时，底部不会被剔除
 				// if (side != Cube::SIDE_POSITIVE_Y) {
 				bitmap.set();
 				// }
-				// Fluids don't contribute to AO for now
+				// 流体目前不参与 AO
 				model_data.contributes_to_ao = false;
 			} else {
 				rasterize_side_all_surfaces(model_data, side, bitmap);
@@ -735,7 +735,7 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 				}
 			}
 
-			// Find if the same pattern already exists
+			// 查找是否已存在相同的图案
 			uint32_t pattern_index = VoxelBlockyLibraryBase::NULL_INDEX;
 			for (unsigned int i = 0; i < patterns.size(); ++i) {
 				if (patterns[i].bitmap == bitmap) {
@@ -744,7 +744,7 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 				}
 			}
 
-			// Get or create pattern
+			// 获取或创建图案
 			Pattern *pattern = nullptr;
 			if (pattern_index != VoxelBlockyLibraryBase::NULL_INDEX) {
 				pattern = &patterns[pattern_index];
@@ -761,7 +761,7 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 				full_side_pattern_index = pattern_index;
 			}
 			if (pattern_index != full_side_pattern_index) {
-				// Non-cube voxels don't contribute to AO at the moment
+				// 非立方体素目前不参与 AO
 				model_data.contributes_to_ao = false;
 			}
 
@@ -771,7 +771,7 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 		} // side
 	} // type
 
-	// Find which pattern occludes which
+	// 查找哪个图案遮挡哪个图案
 
 	baked_data.side_pattern_count = patterns.size();
 	baked_data.side_pattern_culling.resize_no_init(baked_data.side_pattern_count * baked_data.side_pattern_count);
@@ -781,7 +781,7 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 		const Pattern &pattern_a = patterns[ai];
 
 		if (pattern_a.bitmap.any()) {
-			// Pattern always occludes itself
+			// 图案总是遮挡自身
 			baked_data.side_pattern_culling.set(ai + ai * baked_data.side_pattern_count);
 		}
 
@@ -791,14 +791,14 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 			std::bitset<RASTER_SIZE * RASTER_SIZE> res = pattern_a.bitmap & pattern_b.bitmap;
 
 			if (!res.any()) {
-				// Patterns have nothing in common, there is no occlusion
+				// 图案之间没有共同之处，不存在遮挡
 				continue;
 			}
 
 			bool b_occludes_a = (res == pattern_a.bitmap);
 			bool a_occludes_b = (res == pattern_b.bitmap);
 
-			// Same patterns? That can't be, they must be unique
+			// 相同图案？不可能，它们必须是唯一的
 			CRASH_COND(b_occludes_a && a_occludes_b);
 
 			if (a_occludes_b) {
@@ -812,7 +812,7 @@ void generate_side_culling_matrix(BakedLibrary &baked_data) {
 
 	generate_library_cutout_sides(baked_data);
 
-	// DEBUG
+	// 调试
 	/*print_line("");
 	print_line("Side culling matrix");
 	print_line("-------------------------");

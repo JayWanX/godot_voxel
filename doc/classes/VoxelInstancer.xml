@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelInstancer" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Spawns items on top of voxel surfaces.
+		在体素表面之上生成条目。
 	</brief_description>
 	<description>
-		Add-on to voxel nodes, allowing to spawn static elements on the surface. These elements are rendered with hardware instancing, can have collisions, and also be persistent. It must be child of a voxel node.
+		体素节点的附加组件，允许在表面生成静态元素。这些元素使用硬件实例化渲染，可以拥有碰撞，并且可以是持久化的。它必须是体素节点的子节点。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -61,39 +61,39 @@
 			<param index="0" name="center" type="Vector3" />
 			<param index="1" name="radius" type="float" />
 			<description>
-				Removes all instances having their origin inside the given sphere. Coordinates are local to the instancer.
+				移除所有原点位于给定球体内的实例。坐标为相对于实例化器的局部坐标。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="collision_update_budget_microseconds" type="int" setter="set_collision_update_budget_microseconds" getter="get_collision_update_budget_microseconds" default="500">
-			Hints the maximum time that should be spent updating collisions that are based on distance (see [member VoxelInstanceLibraryMultiMeshItem.collision_distance]). This time can still be exceeded if an operation takes longer, but then no further processing will occur until next frame.
+			提示应花费在更新基于距离的碰撞（参见 [member VoxelInstanceLibraryMultiMeshItem.collision_distance]）上的最大时间。如果某项操作耗时更长，该时间仍可能被超出，但在下一帧之前将不再进行进一步处理。
 		</member>
 		<member name="fading_duration" type="float" setter="set_fading_duration" getter="get_fading_duration" default="0.3">
-			How long it takes for fading to complete, in seconds (same for fading in and out). Used when [member fading_enabled] is active.
+			淡入淡出完成所需的时间（以秒为单位，淡入和淡出相同）。当 [member fading_enabled] 生效时使用。
 		</member>
 		<member name="fading_enabled" type="bool" setter="set_fading_enabled" getter="get_fading_enabled" default="false">
-			When enabled, a per-instance shader parameter will be updated when instances load in and out, so it can be used to apply a fading effect.
-			The material used by instances must have a shader that has a [code]instance uniform vec2 u_lod_fade;[/code] property. X will animate from 0 to 1 during fade in and fade out. Y will be 1 when fading in, and 0 when fading out.
+			启用后，当实例加载和卸载时，将更新每个实例的着色器参数，以便用于应用淡入淡出效果。
+			实例使用的材质必须具有包含 [code]instance uniform vec2 u_lod_fade;[/code] 属性的着色器。X 将在淡入和淡出期间从 0 动画到 1。淡入时 Y 为 1，淡出时 Y 为 0。
 		</member>
 		<member name="library" type="VoxelInstanceLibrary" setter="set_library" getter="get_library">
-			Library from which instances to spawn will be taken from.
+			要生成的实例将取自的库。
 		</member>
 		<member name="mesh_lod_update_budget_microseconds" type="int" setter="set_mesh_lod_update_budget_microseconds" getter="get_mesh_lod_update_budget_microseconds" default="500">
-			Hints the maximum time that should be spent updating mesh LODs (see "mesh LOD" properties on [VoxelInstanceLibraryMultiMeshItem]). This time can still be exceeded if an operation takes longer, but then no further processing will occur until next frame.
+			提示应花费在更新网格 LOD（参见 [VoxelInstanceLibraryMultiMeshItem] 上的“网格 LOD”属性）上的最大时间。如果某项操作耗时更长，该时间仍可能被超出，但在下一帧之前将不再进行进一步处理。
 		</member>
 		<member name="up_mode" type="int" setter="set_up_mode" getter="get_up_mode" enum="VoxelInstancer.UpMode" default="0">
-			Where to consider the "up" direction is on the terrain when generating instances. See also [VoxelInstanceGenerator].
+			生成实例时，认为地形上的“上方”方向位于何处。另请参见 [VoxelInstanceGenerator]。
 		</member>
 	</members>
 	<constants>
 		<constant name="MAX_LOD" value="8">
 		</constant>
 		<constant name="UP_MODE_POSITIVE_Y" value="0" enum="UpMode">
-			Up is towards the positive Y axis. This is the default assumption in Godot.
+			上方朝向正 Y 轴。这是 Godot 中的默认假设。
 		</constant>
 		<constant name="UP_MODE_SPHERE" value="1" enum="UpMode">
-			Up is opposite from the direction where the terrain's origin is. May be used if your terrain is a planet for example.
+			上方与地形原点所在方向相反。例如，如果你的地形是一个星球，可以使用此模式。
 		</constant>
 		<constant name="DEBUG_DRAW_ALL_BLOCKS" value="0" enum="DebugDrawFlag">
 		</constant>

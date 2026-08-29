@@ -9,8 +9,8 @@
 
 namespace voxel {
 
-// Performs software locking on paths,
-// so that multiple threads (controlled by this module) wanting to access the same file will lock a shared mutex.
+// 对路径执行软件层面的加锁，
+// 这样（由本模块控制的）多个线程想要访问同一个文件时会锁定一个共享互斥量。
 class FileLocker {
 public:
 	void lock_read(const StdString &fpath) {
@@ -35,19 +35,19 @@ private:
 		File *fp = nullptr;
 		{
 			MutexLock lock(_files_mutex);
-			// Get or create.
-			// Note, we never remove entries from the map
+			// 获取或创建。
+			// 注意，我们永远不会从 map 中移除条目
 			fp = &_files[fpath];
 		}
 
 		if (read_only) {
 			fp->lock.read_lock();
-			// The read lock was acquired. It means nobody is writing.
+			// 已获取读锁。意味着没有人在写入。
 			fp->read_only = true;
 
 		} else {
 			fp->lock.write_lock();
-			// The write lock was acquired. It means only one thread is writing.
+			// 已获取写锁。意味着只有一个线程在写入。
 			fp->read_only = false;
 		}
 	}
@@ -62,8 +62,8 @@ private:
 			}
 		}
 		VOXEL_ASSERT_RETURN(fp != nullptr);
-		// TODO FileAccess::reopen can have been called, nullifying my efforts to enforce thread sync :|
-		// So for now please don't do that
+		// TODO 可能已经调用过 FileAccess::reopen，这会使我强制执行线程同步的努力白费 :|
+		// 所以目前请不要那样做
 
 		if (fp->read_only) {
 			fp->lock.read_unlock();

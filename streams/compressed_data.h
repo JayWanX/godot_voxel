@@ -7,21 +7,21 @@
 
 namespace voxel::CompressedData {
 
-// Compressed data starts with a single byte telling which compression format is used.
-// What follows depends on it.
+// 压缩数据的开头是一个字节，用于指明所使用的压缩格式。
+// 其后的内容取决于该格式。
 
 enum Compression {
-	// No compression. All following bytes can be read as-is.
-	// Could be used for debugging.
+	// 不压缩。其后所有字节均按原样读取。
+	// 可用于调试。
 	COMPRESSION_NONE = 0,
-	// [deprecated]
-	// The next uint32_t will be the size of decompressed data in big endian format.
-	// All following bytes are compressed data using LZ4 defaults.
-	// This is the fastest compression format.
+	// [已弃用]
+	// 紧随其后的 uint32_t 为以大端格式存储的解压后数据大小。
+	// 其后所有字节均为使用 LZ4 默认参数的压缩数据。
+	// 这是速度最快的压缩格式。
 	COMPRESSION_LZ4_BE = 1,
-	// The next uint32_t will be the size of decompressed data (little endian).
-	// All following bytes are compressed data using LZ4 defaults.
-	// This is the fastest compression format.
+	// 紧随其后的 uint32_t 为以小端格式存储的解压后数据大小。
+	// 其后所有字节均为使用 LZ4 默认参数的压缩数据。
+	// 这是速度最快的压缩格式。
 	COMPRESSION_LZ4 = 2,
 	COMPRESSION_ZSTD = 3,
 	COMPRESSION_COUNT = 4

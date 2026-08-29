@@ -1,22 +1,22 @@
 # VoxelInstanceLibrary
 
-Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
+继承自：[Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
-Contains a list of models that can be used by [VoxelInstancer](VoxelInstancer.md), associated with a unique ID.
+包含一份模型列表，这些模型可与唯一 ID 关联并由 [VoxelInstancer](VoxelInstancer.md) 使用。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                      | Name                                 | Default 
-------------------------------------------------------------------------- | ------------------------------------ | --------
-[Array](https://docs.godotengine.org/en/stable/classes/class_array.html)  | [_data](#i__data)                    | [0]     
-[VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md)                   | [_selected_item](#i__selected_item)  |         
+类型                                                                        | 名称                                   | 默认值 
+------------------------------------------------------------------------- | ------------------------------------ | ----
+[Array](https://docs.godotengine.org/en/stable/classes/class_array.html)  | [_data](#i__data)                    | [0] 
+[VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md)                   | [_selected_item](#i__selected_item)  |     
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                                          | Signature                                                                                                                                                          
+返回值                                                                                             | 函数签名                                                                                                                                                               
 ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [void](#)                                                                                       | [add_item](#i_add_item) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id, [VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md) item )  
 [void](#)                                                                                       | [clear](#i_clear) ( )                                                                                                                                              
@@ -26,44 +26,44 @@ Return                                                                          
 [void](#)                                                                                       | [remove_item](#i_remove_item) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id )                                                          
 <p></p>
 
-## Constants: 
+## 常量：
 
 - <span id="i_MAX_ID"></span>**MAX_ID** = **65535**
 
-## Property Descriptions
+## 属性描述
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i__data"></span> **_data** = [0]
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md)<span id="i__selected_item"></span> **_selected_item**
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-## Method Descriptions
+## 方法描述
 
 ### [void](#)<span id="i_add_item"></span> **add_item**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id, [VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md) item ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_clear"></span> **clear**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_find_item_by_name"></span> **find_item_by_name**( [String](https://docs.godotengine.org/en/stable/classes/class_string.html) name ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [PackedInt32Array](https://docs.godotengine.org/en/stable/classes/class_packedint32array.html)<span id="i_get_all_item_ids"></span> **get_all_item_ids**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md)<span id="i_get_item"></span> **get_item**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_remove_item"></span> **remove_item**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

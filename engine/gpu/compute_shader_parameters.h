@@ -12,7 +12,7 @@ struct ComputeShaderParameter {
 	std::shared_ptr<ComputeShaderResource> resource;
 };
 
-// Equivalent of "materials" for compute shaders we use in the voxel engine
+// 相当于我们在体素引擎中使用的计算着色器的"材质"
 struct ComputeShaderParameters {
 	StdVector<ComputeShaderParameter> params;
 };

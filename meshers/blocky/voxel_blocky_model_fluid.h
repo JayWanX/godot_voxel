@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Minecraft-style fluid model for a specific level.
+// 针对特定液位的类 Minecraft 风格流体模型。
 class VoxelBlockyModelFluid : public VoxelBlockyModel {
 	GDCLASS(VoxelBlockyModelFluid, VoxelBlockyModel)
 public:

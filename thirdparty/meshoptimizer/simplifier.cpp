@@ -22,14 +22,14 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Michael Garland and Paul S. Heckbert. Surface simplification using quadric error metrics. 1997
-// Michael Garland. Quadric-based polygonal surface simplification. 1999
-// Peter Lindstrom. Out-of-Core Simplification of Large Polygonal Models. 2000
-// Matthias Teschner, Bruno Heidelberger, Matthias Mueller, Danat Pomeranets, Markus Gross. Optimized Spatial Hashing for Collision Detection of Deformable Objects. 2003
-// Peter Van Sandt, Yannis Chronis, Jignesh M. Patel. Efficiently Searching In-Memory Sorted Arrays: Revenge of the Interpolation Search? 2019
-// Hugues Hoppe. New Quadric Metric for Simplifying Meshes with Appearance Attributes. 1999
-// Hugues Hoppe, Steve Marschner. Efficient Minimization of New Quadric Metric for Simplifying Meshes with Appearance Attributes. 2000
+// 此作品基于：
+// Michael Garland 和 Paul S. Heckbert. 使用二次误差度量简化曲面. 1997
+// Michael Garland. 基于二次的多边形曲面简化. 1999
+// Peter Lindstrom. 大型多边形模型的外存（Out-of-Core）简化. 2000
+// Matthias Teschner、Bruno Heidelberger、Matthias Mueller、Danat Pomeranets、Markus Gross。用于可变形物体碰撞检测的优化空间哈希。2003
+// Peter Van Sandt, Yannis Chronis, Jignesh M. Patel. 高效搜索内存中的有序数组：插值搜索的反击？2019
+// Hugues Hoppe. 带外观属性的网格简化的新二次度量. 1999
+// Hugues Hoppe, Steve Marschner. 带外观属性的网格简化的新二次度量的高效最小化. 2000
 namespace meshopt
 {
 
@@ -57,7 +57,7 @@ static void updateEdgeAdjacency(EdgeAdjacency& adjacency, const unsigned int* in
 	unsigned int* offsets = adjacency.offsets + 1;
 	EdgeAdjacency::Edge* data = adjacency.data;
 
-	// fill edge counts
+	// 填充边计数
 	memset(offsets, 0, vertex_count * sizeof(unsigned int));
 
 	for (size_t i = 0; i < index_count; ++i)
@@ -68,7 +68,7 @@ static void updateEdgeAdjacency(EdgeAdjacency& adjacency, const unsigned int* in
 		offsets[v]++;
 	}
 
-	// fill offset table
+	// 填充偏移表
 	unsigned int offset = 0;
 
 	for (size_t i = 0; i < vertex_count; ++i)
@@ -80,7 +80,7 @@ static void updateEdgeAdjacency(EdgeAdjacency& adjacency, const unsigned int* in
 
 	assert(offset == index_count);
 
-	// fill edge data
+	// 填充边数据
 	for (size_t i = 0; i < face_count; ++i)
 	{
 		unsigned int a = indices[i * 3 + 0], b = indices[i * 3 + 1], c = indices[i * 3 + 2];
@@ -105,7 +105,7 @@ static void updateEdgeAdjacency(EdgeAdjacency& adjacency, const unsigned int* in
 		offsets[c]++;
 	}
 
-	// finalize offsets
+	// 确定最终偏移量
 	adjacency.offsets[0] = 0;
 	assert(adjacency.offsets[vertex_count] == index_count);
 }
@@ -123,17 +123,17 @@ struct PositionHasher
 
 		unsigned int x = key[0], y = key[1], z = key[2];
 
-		// replace negative zero with zero
+		// 用零替换负零
 		x = (x == 0x80000000) ? 0 : x;
 		y = (y == 0x80000000) ? 0 : y;
 		z = (z == 0x80000000) ? 0 : z;
 
-		// scramble bits to make sure that integer coordinates have entropy in lower bits
+		// 打乱位，以确保整数坐标在低位中具有熵
 		x ^= x >> 17;
 		y ^= y >> 17;
 		z ^= z >> 17;
 
-		// Optimized Spatial Hashing for Collision Detection of Deformable Objects
+		// 用于可变形物体碰撞检测的优化空间哈希（Spatial Hashing）
 		return (x * 73856093) ^ (y * 19349663) ^ (z * 83492791);
 	}
 
@@ -192,7 +192,7 @@ static T* hashLookup2(T* table, size_t buckets, const Hash& hash, const T& key, 
 		if (hash.equal(item, key))
 			return &item;
 
-		// hash collision, quadratic probing
+		// 哈希冲突，使用二次探测（quadratic probing）
 		bucket = (bucket + probe + 1) & hashmod;
 	}
 
@@ -208,8 +208,8 @@ static void buildPositionRemap(unsigned int* remap, unsigned int* wedge, const f
 	unsigned int* table = allocator.allocate<unsigned int>(table_size);
 	memset(table, -1, table_size * sizeof(unsigned int));
 
-	// build forward remap: for each vertex, which other (canonical) vertex does it map to?
-	// we use position equivalence for this, and remap vertices to other existing vertices
+	// 构建前向重映射：每个顶点映射到哪个其他（规范）顶点？
+	// 我们为此使用位置等价，并将顶点重映射到其他已存在的顶点
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
 		unsigned int index = unsigned(i);
@@ -226,7 +226,7 @@ static void buildPositionRemap(unsigned int* remap, unsigned int* wedge, const f
 	if (!wedge)
 		return;
 
-	// build wedge table: for each vertex, which other vertex is the next wedge that also maps to the same vertex?
+	// 构建楔（wedge）表：对每个顶点，哪个其他顶点是同时映射到同一顶点的下一个楔？
 	// entries in table form a (cyclic) wedge loop per vertex; for manifold vertices, wedge[i] == remap[i] == i
 	for (size_t i = 0; i < vertex_count; ++i)
 		wedge[i] = unsigned(i);
@@ -243,7 +243,7 @@ static void buildPositionRemap(unsigned int* remap, unsigned int* wedge, const f
 
 static unsigned int* buildSparseRemap(unsigned int* indices, size_t index_count, size_t vertex_count, size_t* out_vertex_count, meshopt_Allocator& allocator)
 {
-	// use a bit set to compute the precise number of unique vertices
+	// 使用位集计算唯一顶点的精确数量
 	unsigned char* filter = allocator.allocate<unsigned char>((vertex_count + 7) / 8);
 	memset(filter, 0, (vertex_count + 7) / 8);
 
@@ -265,7 +265,7 @@ static unsigned int* buildSparseRemap(unsigned int* indices, size_t index_count,
 	unsigned int* revremap = allocator.allocate<unsigned int>(revremap_size);
 	memset(revremap, -1, revremap_size * sizeof(unsigned int));
 
-	// fill remap, using revremap as a helper, and rewrite indices in the same pass
+	// 以 revremap 为辅助填充 remap，并在同一趟中重写索引
 	RemapHasher hasher = {remap};
 
 	for (size_t i = 0; i < index_count; ++i)
@@ -294,20 +294,20 @@ static unsigned int* buildSparseRemap(unsigned int* indices, size_t index_count,
 
 enum VertexKind
 {
-	Kind_Manifold, // not on an attribute seam, not on any boundary
-	Kind_Border,   // not on an attribute seam, has exactly two open edges
-	Kind_Seam,     // on an attribute seam with exactly two attribute seam edges
+	Kind_Manifold, // 不在属性接缝上，也不在任意边界上
+	Kind_Border,   // 不在属性接缝上，恰好有两条开边
+	Kind_Seam,     // 在恰好有两条属性接缝边的属性接缝上
 	Kind_Complex,  // none of the above; these vertices can move as long as all wedges move to the target vertex
 	Kind_Locked,   // none of the above; these vertices can't move
 
 	Kind_Count
 };
 
-// manifold vertices can collapse onto anything
-// border/seam vertices can collapse onto border/seam respectively, or locked
-// complex vertices can collapse onto complex/locked
-// a rule of thumb is that collapsing kind A into kind B preserves the kind B in the target vertex
-// for example, while we could collapse Complex into Manifold, this would mean the target vertex isn't Manifold anymore
+// 流形顶点可塌缩到任意顶点
+// 边界/接缝顶点可分别塌缩到边界/接缝顶点，或被锁定
+// 复杂顶点可塌缩到复杂/锁定顶点
+// 经验法则是：将类型 A 塌缩进类型 B 会在目标顶点中保留类型 B
+// 例如，虽然我们可以将 Complex 塌缩进 Manifold，但这意味着目标顶点不再是无歧义流形
 const unsigned char kCanCollapse[Kind_Count][Kind_Count] = {
     {1, 1, 1, 1, 1},
     {0, 1, 0, 0, 1},
@@ -317,10 +317,10 @@ const unsigned char kCanCollapse[Kind_Count][Kind_Count] = {
 };
 
 // if a vertex is manifold or seam, adjoining edges are guaranteed to have an opposite edge
-// note that for seam edges, the opposite edge isn't present in the attribute-based topology
-// but is present if you consider a position-only mesh variant
-// while many complex collapses have the opposite edge, since complex vertices collapse to the
-// same wedge, keeping opposite edges separate improves the quality by considering both targets
+// 注意：对接缝边而言，基于属性的拓扑中不存在对边
+// 但若考虑仅位置网格变体，则存在对边
+// 虽然许多复杂塌缩都有对边，但由于复杂顶点会塌缩到
+// 同一楔，通过考虑两个目标来保持对边分开可提升质量
 const unsigned char kHasOpposite[Kind_Count][Kind_Count] = {
     {1, 1, 1, 1, 1},
     {1, 0, 1, 0, 0},
@@ -365,9 +365,9 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, unsigned
 	memset(loop, -1, vertex_count * sizeof(unsigned int));
 	memset(loopback, -1, vertex_count * sizeof(unsigned int));
 
-	// incoming & outgoing open edges: ~0u if no open edges, i if there are more than 1
+	// 出入开边：若无开边则为 ~0u，若有多个则为 i
 	// note that this is the same data as required in loop[] arrays; loop[] data is only valid for border/seam
-	// but here it's okay to fill the data out for other types of vertices as well
+	// 但此处也可为其他类型的顶点填充数据
 	unsigned int* openinc = loopback;
 	unsigned int* openout = loop;
 
@@ -384,10 +384,10 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, unsigned
 
 			if (target == vertex)
 			{
-				// degenerate triangles have two distinct edges instead of three, and the self edge
+				// 退化三角形有两条不同的边（而非三条），以及自边
 				// is bi-directional by definition; this can break border/seam classification by "closing"
-				// the open edge from another triangle and falsely marking the vertex as manifold
-				// instead we mark the vertex as having >1 open edges which turns it into locked/complex
+				// 来自另一三角形的开边会被错误地标记为流形顶点
+				// 我们改为将该顶点标记为具有 >1 条开边，使其变为锁定/复杂
 				openinc[vertex] = openout[vertex] = vertex;
 			}
 			else if (!hasEdge(adjacency, target, vertex))
@@ -408,12 +408,12 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, unsigned
 		{
 			if (wedge[i] == i)
 			{
-				// no attribute seam, need to check if it's manifold
+				// 无属性接缝，需检查是否为流形
 				unsigned int openi = openinc[i], openo = openout[i];
 
-				// note: we classify any vertices with no open edges as manifold
-				// this is technically incorrect - if 4 triangles share an edge, we'll classify vertices as manifold
-				// it's unclear if this is a problem in practice
+				// 注意：我们将任何无开边的顶点分类为流形
+				// 这在技术上不正确 - 若 4 个三角形共享一条边，我们会把顶点分类为流形
+				// 这在实践中是否为问题尚不清楚
 				if (openi == ~0u && openo == ~0u)
 				{
 					result[i] = Kind_Manifold;
@@ -421,8 +421,8 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, unsigned
 				else if (openi != ~0u && openo != ~0u && remap[openi] == remap[openo] && openi != i)
 				{
 					// classify half-seams as seams (the branch below would mis-classify them as borders)
-					// half-seam is a single vertex that connects to both vertices of a potential seam
-					// treating these as seams allows collapsing the "full" seam vertex onto them
+					// 半接缝是同时连接到潜在接缝两个顶点的一个顶点
+					// 将这些视为接缝，可将"完整"接缝顶点塌缩到它们上面
 					result[i] = Kind_Seam;
 				}
 				else if (openi != i && openo != i)
@@ -442,7 +442,7 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, unsigned
 				unsigned int openiv = openinc[i], openov = openout[i];
 				unsigned int openiw = openinc[w], openow = openout[w];
 
-				// seam should have one open half-edge for each vertex, and the edges need to "connect" - point to the same vertex post-remap
+				// 接缝的每个顶点应有一条开半边，且这些边需要"连接" - 重映射后指向同一顶点
 				if (openiv != ~0u && openiv != i && openov != ~0u && openov != i &&
 				    openiw != ~0u && openiw != w && openow != ~0u && openow != w)
 				{
@@ -490,7 +490,7 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, unsigned
 
 				bool protect = false;
 
-				// vertex_lock may protect any wedge, not just the primary vertex, so we switch to complex only if no wedges are protected
+				// vertex_lock 可能保护任何楔，而不只是主顶点，因此仅当所有楔都不受保护时才切换到复杂
 				unsigned int v = unsigned(i);
 				do
 				{
@@ -515,7 +515,7 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, unsigned
 
 	if (vertex_lock)
 	{
-		// vertex_lock may lock any wedge, not just the primary vertex, so we need to lock the primary vertex and relock any wedges
+		// vertex_lock 可能锁定任何楔，而不只是主顶点，因此需锁定主顶点并重新锁定所有楔
 		for (size_t i = 0; i < vertex_count; ++i)
 		{
 			unsigned int ri = sparse_remap ? sparse_remap[i] : unsigned(i);
@@ -785,7 +785,7 @@ static float quadricError(const Quadric& Q, const QuadricGrad* G, size_t attribu
 		r += a * (a * Q.w - 2 * g);
 	}
 
-	// note: unlike position error, we do not normalize by Q.w to retain edge scaling as described in quadricFromAttributes
+	// 注意：与位置误差不同，我们不按 Q.w 归一化，以保留 quadricFromAttributes 中描述的边缩放
 	return fabsf(r);
 }
 
@@ -847,7 +847,7 @@ static void quadricFromTriangleEdge(Quadric& Q, const Vector3& p0, const Vector3
 	Vector3 p20 = {p2.x - p0.x, p2.y - p0.y, p2.z - p0.z};
 	float p20p = p20.x * p10.x + p20.y * p10.y + p20.z * p10.z;
 
-	// perp = perpendicular vector from p2 to line segment p1-p0
+	// perp = 从 p2 到线段 p1-p0 的垂直向量
 	// note: since p10 is unnormalized we need to correct the projection; we scale p20 instead to take advantage of normalize below
 	Vector3 perp = {p20.x * lengthsq - p10.x * p20p, p20.y * lengthsq - p10.y * p20p, p20.z * lengthsq - p10.z * p20p};
 	normalize(perp);
@@ -860,11 +860,11 @@ static void quadricFromTriangleEdge(Quadric& Q, const Vector3& p0, const Vector3
 
 static void quadricFromAttributes(Quadric& Q, QuadricGrad* G, const Vector3& p0, const Vector3& p1, const Vector3& p2, const float* va0, const float* va1, const float* va2, size_t attribute_count)
 {
-	// for each attribute we want to encode the following function into the quadric:
+	// 对每个属性，我们要把以下函数编码进二次（quadric）：
 	// (eval(pos) - attr)^2
-	// where eval(pos) interpolates attribute across the triangle like so:
+	// 其中 eval(pos) 在三角形上以如下方式插值属性：
 	// eval(pos) = pos.x * gx + pos.y * gy + pos.z * gz + gw
-	// where gx/gy/gz/gw are gradients
+	// 其中 gx/gy/gz/gw 是梯度
 	Vector3 p10 = {p1.x - p0.x, p1.y - p0.y, p1.z - p0.z};
 	Vector3 p20 = {p2.x - p0.x, p2.y - p0.y, p2.z - p0.z};
 
@@ -874,7 +874,7 @@ static void quadricFromAttributes(Quadric& Q, QuadricGrad* G, const Vector3& p0,
 
 	// quadric is weighted with the square of edge length (= area)
 	// this equalizes the units with the positional error (which, after normalization, is a square of distance)
-	// as a result, a change in weighted attribute of 1 along distance d is approximately equivalent to a change in position of d
+	// 因此，加权属性沿距离 d 变化 1，约等价于位置变化 d
 	float w = area;
 
 	// we compute gradients using barycentric coordinates; barycentric coordinates can be computed as follows:
@@ -891,8 +891,8 @@ static void quadricFromAttributes(Quadric& Q, QuadricGrad* G, const Vector3& p0,
 	float denom = d00 * d11 - d01 * d01;
 	float denomr = denom == 0 ? 0.f : 1.f / denom;
 
-	// precompute gradient factors
-	// these are derived by directly computing derivative of eval(pos) = a0 * u + a1 * v + a2 * w and factoring out expressions that are shared between attributes
+	// 预计算梯度因子
+	// 这些通过直接对 eval(pos) = a0 * u + a1 * v + a2 * w 求导，并提取各属性间共享的表达式得到
 	float gx1 = (d11 * v0.x - d01 * v1.x) * denomr;
 	float gx2 = (d00 * v1.x - d01 * v0.x) * denomr;
 	float gy1 = (d11 * v0.y - d01 * v1.y) * denomr;
@@ -908,16 +908,16 @@ static void quadricFromAttributes(Quadric& Q, QuadricGrad* G, const Vector3& p0,
 	{
 		float a0 = va0[k], a1 = va1[k], a2 = va2[k];
 
-		// compute gradient of eval(pos) for x/y/z/w
-		// the formulas below are obtained by directly computing derivative of eval(pos) = a0 * u + a1 * v + a2 * w
+		// 对 x/y/z/w 计算 eval(pos) 的梯度
+		// 下面的公式通过对 eval(pos) = a0 * u + a1 * v + a2 * w 直接求导得到
 		float gx = gx1 * (a1 - a0) + gx2 * (a2 - a0);
 		float gy = gy1 * (a1 - a0) + gy2 * (a2 - a0);
 		float gz = gz1 * (a1 - a0) + gz2 * (a2 - a0);
 		float gw = a0 - p0.x * gx - p0.y * gy - p0.z * gz;
 
 		// quadric encodes (eval(pos)-attr)^2; this means that the resulting expansion needs to compute, for example, pos.x * pos.y * K
-		// since quadrics already encode factors for pos.x * pos.y, we can accumulate almost everything in basic quadric fields
-		// note: for simplicity we scale all factors by weight here instead of outside the loop
+		// 由于 quadric 已编码 pos.x * pos.y 的因子，几乎所有内容都可在基础 quadric 字段中累积
+		// 注意：为简单起见，我们在此将所有因子乘以权重，而非在循环外
 		Q.a00 += w * (gx * gx);
 		Q.a11 += w * (gy * gy);
 		Q.a22 += w * (gz * gz);
@@ -957,14 +957,14 @@ static void quadricVolumeGradient(QuadricGrad& G, const Vector3& p0, const Vecto
 
 static bool quadricSolve(Vector3& p, const Quadric& Q, const QuadricGrad& GV)
 {
-	// solve A*p = -b where A is the quadric matrix and b is the linear term
+	// 求解 A*p = -b，其中 A 是 quadric 矩阵，b 是线性项
 	float a00 = Q.a00, a11 = Q.a11, a22 = Q.a22;
 	float a10 = Q.a10, a20 = Q.a20, a21 = Q.a21;
 	float x0 = -Q.b0, x1 = -Q.b1, x2 = -Q.b2;
 
 	float eps = 1e-6f * Q.w;
 
-	// LDL decomposition: A = LDL^T
+	// LDL 分解：A = LDL^T
 	float d0 = a00;
 	float l10 = a10 / d0;
 	float l20 = a20 / d0;
@@ -985,7 +985,7 @@ static bool quadricSolve(Vector3& p, const Quadric& Q, const QuadricGrad& GV)
 	float z1 = y1 / d1;
 	float z2 = y2 / d2;
 
-	// augment system with linear constraint GV using Lagrange multiplier
+	// 使用拉格朗日乘子，以线性约束 GV 扩充方程组
 	float a30 = GV.gx, a31 = GV.gy, a32 = GV.gz;
 	float x3 = -GV.gw;
 
@@ -1074,7 +1074,7 @@ static void fillFaceQuadrics(Quadric* vertex_quadrics, QuadricGrad* volume_gradi
 
 static void fillVertexQuadrics(Quadric* vertex_quadrics, const Vector3* vertex_positions, size_t vertex_count, const unsigned int* remap, unsigned int options)
 {
-	// by default, we use a very small weight to improve triangulation and numerical stability without affecting the shape or error
+	// 默认情况下，我们使用一个非常小的权重来改善三角剖分和数值稳定性，而不影响形状或误差
 	float factor = (options & meshopt_SimplifyRegularize) ? 1e-1f : 1e-7f;
 
 	for (size_t i = 0; i < vertex_count; ++i)
@@ -1106,8 +1106,8 @@ static void fillEdgeQuadrics(Quadric* vertex_quadrics, const unsigned int* indic
 			unsigned char k0 = vertex_kind[i0];
 			unsigned char k1 = vertex_kind[i1];
 
-			// check that either i0 or i1 are border/seam and are on the same edge loop
-			// note that we need to add the error even for edged that connect e.g. border & locked
+			// 检查 i0 或 i1 是否为 border/seam，并且位于同一边缘环上
+			// 注意：即使对于连接 border 与 locked 等类型的边，我们也需要累加误差
 			// if we don't do that, the adjacent border->border edge won't have correct errors for corners
 			if (k0 != Kind_Border && k0 != Kind_Seam && k1 != Kind_Border && k1 != Kind_Seam)
 				continue;
@@ -1121,8 +1121,8 @@ static void fillEdgeQuadrics(Quadric* vertex_quadrics, const unsigned int* indic
 			unsigned int i2 = indices[i + next[e + 1]];
 
 			// we try hard to maintain border edge geometry; seam edges can move more freely
-			// due to topological restrictions on collapses, seam quadrics slightly improves collapse structure but aren't critical
-			const float kEdgeWeightSeam = 0.5f; // applied twice due to opposite edges
+			// 由于折叠受到拓扑限制，seam 二次型略能改善折叠结构，但并非关键
+			const float kEdgeWeightSeam = 0.5f; // 由于相对的边，需应用两次
 			const float kEdgeWeightBorder = 10.f;
 
 			float edgeWeight = (k0 == Kind_Border || k1 == Kind_Border) ? kEdgeWeightBorder : kEdgeWeightSeam;
@@ -1165,7 +1165,7 @@ static void fillAttributeQuadrics(Quadric* attribute_quadrics, QuadricGrad* attr
 	}
 }
 
-// does triangle ABC flip when C is replaced with D?
+// 当 C 被替换为 D 时，三角形 ABC 是否会发生翻转？
 static bool hasTriangleFlip(const Vector3& a, const Vector3& b, const Vector3& c, const Vector3& d)
 {
 	Vector3 eb = {b.x - a.x, b.y - a.y, b.z - a.z};
@@ -1180,7 +1180,7 @@ static bool hasTriangleFlip(const Vector3& a, const Vector3& b, const Vector3& c
 	float abd = nbd.x * nbd.x + nbd.y * nbd.y + nbd.z * nbd.z;
 
 	// scale is cos(angle); somewhat arbitrarily set to ~75 degrees
-	// note that the "pure" check is ndp <= 0 (90 degree cutoff) but that allows flipping through a series of close-to-90 collapses
+	// 注意："纯"检查是 ndp <= 0（90 度截止），但这允许通过一系列接近 90 度的折叠发生翻转
 	return ndp <= 0.25f * sqrtf(abc * abd);
 }
 
@@ -1200,11 +1200,11 @@ static bool hasTriangleFlips(const EdgeAdjacency& adjacency, const Vector3* vert
 		unsigned int a = collapse_remap[edges[i].next];
 		unsigned int b = collapse_remap[edges[i].prev];
 
-		// skip triangles that will get collapsed by i0->i1 collapse or already got collapsed previously
+		// 跳过那些会因 i0->i1 折叠而被折叠或先前已折叠的三角形
 		if (a == i1 || b == i1 || a == b)
 			continue;
 
-		// early-out when at least one triangle flips due to a collapse
+		// 当因折叠而导致至少一个三角形翻转时提前退出
 		if (hasTriangleFlip(vertex_positions[a], vertex_positions[b], v0, v1))
 		{
 #if TRACE >= 2
@@ -1276,7 +1276,7 @@ static size_t boundEdgeCollapses(const EdgeAdjacency& adjacency, size_t vertex_c
 
 	assert(dual_count <= index_count);
 
-	// pad capacity by 3 so that we can check for overflow once per triangle instead of once per edge
+	// 将容量填充 3，以便可以每三角形一次进行溢出检查，而不是每边一次
 	return (index_count - dual_count / 2) + 3;
 }
 
@@ -1288,7 +1288,7 @@ static size_t pickEdgeCollapses(Collapse* collapses, size_t collapse_capacity, c
 	{
 		static const int next[3] = {1, 2, 0};
 
-		// this should never happen as boundEdgeCollapses should give an upper bound for the collapse count, but in an unlikely event it does we can just drop extra collapses
+		// 这不应发生，因为 boundEdgeCollapses 应给出折叠次数的上界，但在极少数情况下，我们只需丢弃多余的折叠
 		if (collapse_count + 3 > collapse_capacity)
 			break;
 
@@ -1297,33 +1297,33 @@ static size_t pickEdgeCollapses(Collapse* collapses, size_t collapse_capacity, c
 			unsigned int i0 = indices[i + e];
 			unsigned int i1 = indices[i + next[e]];
 
-			// this can happen either when input has a zero-length edge, or when we perform collapses for complex
-			// topology w/seams and collapse a manifold vertex that connects to both wedges onto one of them
-			// we leave edges like this alone since they may be important for preserving mesh integrity
+			// 这可能发生在输入具有零长度边时，或当我们为 complex 拓扑执行折叠时
+			// 连同 seams，将连接两个 wedge 的 manifold 顶点折叠到其中一个上
+			// 我们会保留此类边，因为它们对保持网格完整性可能很重要
 			if (remap[i0] == remap[i1])
 				continue;
 
 			unsigned char k0 = vertex_kind[i0];
 			unsigned char k1 = vertex_kind[i1];
 
-			// the edge has to be collapsible in at least one direction
+			// 该边必须至少在某个方向上可折叠
 			if (!(kCanCollapse[k0][k1] | kCanCollapse[k1][k0]))
 				continue;
 
-			// manifold and seam edges should occur twice (i0->i1 and i1->i0) - skip redundant edges
+			// manifold 和 seam 边应出现两次（i0->i1 和 i1->i0）——跳过多余的边
 			if (kHasOpposite[k0][k1] && remap[i1] > remap[i0])
 				continue;
 
-			// two vertices are on a border or a seam, but there's no direct edge between them
-			// this indicates that they belong to two different edge loops and we should not collapse this edge
-			// loop[] and loopback[] track half edges so we only need to check one of them
+			// 两个顶点位于 border 或 seam 上，但两者之间没有直接的边
+			// 这表明它们属于两个不同的边环，我们不应折叠这条边
+			// loop[] 和 loopback[] 跟踪半边，因此我们只需检查其中一个
 			if ((k0 == Kind_Border || k0 == Kind_Seam) && k1 != Kind_Manifold && loop[i0] != i1)
 				continue;
 			if ((k1 == Kind_Border || k1 == Kind_Seam) && k0 != Kind_Manifold && loopback[i1] != i0)
 				continue;
 
-			// edge can be collapsed in either direction - we will pick the one with minimum error
-			// note: we evaluate error later during collapse ranking, here we just tag the edge as bidirectional
+			// 边可以在任一方向上折叠——我们将选择误差最小的那一个
+			// 注意：我们稍后在折叠排序阶段评估误差，这里仅将边标记为双向
 			if (kCanCollapse[k0][k1] & kCanCollapse[k1][k0])
 			{
 				Collapse c = {i0, i1, {/* bidi= */ 1}};
@@ -1331,7 +1331,7 @@ static size_t pickEdgeCollapses(Collapse* collapses, size_t collapse_capacity, c
 			}
 			else
 			{
-				// edge can only be collapsed in one direction
+				// 边只能在一个方向上折叠
 				unsigned int e0 = kCanCollapse[k0][k1] ? i0 : i1;
 				unsigned int e1 = kCanCollapse[k0][k1] ? i1 : i0;
 
@@ -1366,14 +1366,14 @@ static void rankEdgeCollapses(Collapse* collapses, size_t collapse_count, const 
 			ei += quadricError(attribute_quadrics[i0], &attribute_gradients[i0 * attribute_count], attribute_count, vertex_positions[i1], &vertex_attributes[i1 * attribute_count]);
 			ej += bidi ? quadricError(attribute_quadrics[i1], &attribute_gradients[i1 * attribute_count], attribute_count, vertex_positions[i0], &vertex_attributes[i0 * attribute_count]) : 0;
 
-			// seam edges need to aggregate attribute errors between primary and secondary edges, as attribute quadrics are separate
+			// seam 边需要聚合 primary 与 secondary 边之间的属性误差，因为属性二次型是分开的
 			if (vertex_kind[i0] == Kind_Seam)
 			{
 				// for seam collapses we need to find the seam pair; this is a bit tricky since we need to rely on edge loops as target vertex may be locked (and thus have more than two wedges)
 				unsigned int s0 = wedge[i0];
 				unsigned int s1 = loop[i0] == i1 ? loopback[s0] : loop[s0];
 
-				assert(wedge[s0] == i0); // s0 may be equal to i0 for half-seams
+				assert(wedge[s0] == i0); // 对于半个接缝（half-seam），s0 可能等于 i0
 				assert(s1 != ~0u && remap[s1] == remap[i1]);
 
 				// note: this should never happen due to the assertion above, but when disabled if we ever hit this case we'll get a memory safety issue; for now play it safe
@@ -1384,8 +1384,8 @@ static void rankEdgeCollapses(Collapse* collapses, size_t collapse_count, const 
 			}
 			else
 			{
-				// complex edges can have multiple wedges, so we need to aggregate errors for all wedges
-				// this is different from seams (where we aggregate pairwise) because all wedges collapse onto the same target
+				// complex 边可以有多个 wedge，因此我们需要聚合所有 wedge 的误差
+				// 这与 seams（按两两聚合）不同，因为所有 wedge 都折叠到同一目标上
 				if (vertex_kind[i0] == Kind_Complex)
 					for (unsigned int v = wedge[i0]; v != i0; v = wedge[v])
 						ei += quadricError(attribute_quadrics[v], &attribute_gradients[v * attribute_count], attribute_count, vertex_positions[i1], &vertex_attributes[i1 * attribute_count]);
@@ -1418,18 +1418,18 @@ static void rankEdgeCollapses(Collapse* collapses, size_t collapse_count, const 
 static void sortEdgeCollapses(unsigned int* sort_order, const Collapse* collapses, size_t collapse_count)
 {
 	// we use counting sort to order collapses by error; since the exact sort order is not as critical,
-	// only top 12 bits of exponent+mantissa (8 bits of exponent and 4 bits of mantissa) are used.
-	// to avoid excessive stack usage, we clamp the exponent range as collapses with errors much higher than 1 are not useful.
+	// 仅使用 exponent+mantissa 的高 12 位（8 位指数和 4 位尾数）。
+	// 为避免过多的栈开销，我们限制指数范围，因为误差远高于 1 的折叠没有意义。
 	const unsigned int sort_bits = 12;
 	const unsigned int sort_bins = 2048 + 512; // exponent range [-127, 32)
 
-	// fill histogram for counting sort
+	// 为计数排序填充直方图
 	unsigned int histogram[sort_bins];
 	memset(histogram, 0, sizeof(histogram));
 
 	for (size_t i = 0; i < collapse_count; ++i)
 	{
-		// skip sign bit since error is non-negative
+		// 由于误差非负，跳过符号位
 		unsigned int error = collapses[i].errorui;
 		unsigned int key = (error << 1) >> (32 - sort_bits);
 		key = key < sort_bins ? key : sort_bins - 1;
@@ -1437,7 +1437,7 @@ static void sortEdgeCollapses(unsigned int* sort_order, const Collapse* collapse
 		histogram[key]++;
 	}
 
-	// compute offsets based on histogram data
+	// 基于直方图数据计算偏移
 	size_t histogram_sum = 0;
 
 	for (size_t i = 0; i < sort_bins; ++i)
@@ -1449,10 +1449,10 @@ static void sortEdgeCollapses(unsigned int* sort_order, const Collapse* collapse
 
 	assert(histogram_sum == collapse_count);
 
-	// compute sort order based on offsets
+	// 基于偏移计算排序顺序
 	for (size_t i = 0; i < collapse_count; ++i)
 	{
-		// skip sign bit since error is non-negative
+		// 由于误差非负，跳过符号位
 		unsigned int error = collapses[i].errorui;
 		unsigned int key = (error << 1) >> (32 - sort_bits);
 		key = key < sort_bins ? key : sort_bins - 1;
@@ -1493,11 +1493,11 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 		}
 
 		// we limit the error in each pass based on the error of optimal last collapse; since many collapses will be locked
-		// as they will share vertices with other successfull collapses, we need to increase the acceptable error by some factor
+		// 由于它们会与其它成功的折叠共享顶点，我们需要将可接受的误差增大一定倍数
 		float error_goal = edge_collapse_goal < collapse_count ? 1.5f * collapses[collapse_order[edge_collapse_goal]].error : FLT_MAX;
 
 		// on average, each collapse is expected to lock 6 other collapses; to avoid degenerate passes on meshes with odd
-		// topology, we only abort if we got over 1/6 collapses accordingly.
+		// 拓扑，我们仅在折叠数量超过 1/6 时才相应中止。
 		if (c.error > error_goal && c.error > result_error && triangle_collapses > triangle_collapse_goal / 6)
 		{
 			TRACESTATS(6);
@@ -1512,9 +1512,9 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 
 		unsigned char kind = vertex_kind[i0];
 
-		// we don't collapse vertices that had source or target vertex involved in a collapse
-		// it's important to not move the vertices twice since it complicates the tracking/remapping logic
-		// it's important to not move other vertices towards a moved vertex to preserve error since we don't re-rank collapses mid-pass
+		// 我们不折叠其源顶点或目标顶点已参与折叠的边
+		// 重要的是不要移动顶点两次，因为这会复杂化跟踪/重映射逻辑
+		// 重要的是不要将其它顶点向已移动的顶点靠近以保持误差，因为我们在遍历过程中不会重新排序折叠
 		if (collapse_locked[r0] | collapse_locked[r1])
 		{
 			TRACESTATS(1);
@@ -1523,7 +1523,7 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 
 		if (hasTriangleFlips(adjacency, vertex_positions, collapse_remap, r0, r1))
 		{
-			// adjust collapse goal since this collapse is invalid and shouldn't factor into error goal
+			// 调整折叠目标，因为此次折叠无效，不应计入误差目标
 			edge_collapse_goal++;
 
 			TRACESTATS(2);
@@ -1539,7 +1539,7 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 
 		if (kind == Kind_Complex)
 		{
-			// remap all vertices in the complex to the target vertex
+			// 将 complex 中的所有顶点重映射到目标顶点
 			unsigned int v = i0;
 
 			do
@@ -1553,10 +1553,10 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 			// for seam collapses we need to move the seam pair together; this is a bit tricky since we need to rely on edge loops as target vertex may be locked (and thus have more than two wedges)
 			unsigned int s0 = wedge[i0];
 			unsigned int s1 = loop[i0] == i1 ? loopback[s0] : loop[s0];
-			assert(wedge[s0] == i0); // s0 may be equal to i0 for half-seams
+			assert(wedge[s0] == i0); // 对于半个接缝（half-seam），s0 可能等于 i0
 			assert(s1 != ~0u && remap[s1] == r1);
 
-			// additional asserts to verify that the seam pair is consistent
+			// 额外的断言，用于验证 seam 对是否一致
 			assert(kind != vertex_kind[i1] || s1 == wedge[i1]);
 			assert(loop[i0] == i1 || loopback[i0] == i1);
 			assert(loop[s0] == s1 || loopback[s0] == s1);
@@ -1574,12 +1574,12 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 			collapse_remap[i0] = i1;
 		}
 
-		// note: we technically don't need to lock r1 if it's a locked vertex, as it can't move and its quadric won't be used
-		// however, this results in slightly worse error on some meshes because the locked collapses get an unfair advantage wrt scheduling
+		// 注意：从技术上讲，若 r1 是 locked 顶点，我们无需锁定它，因为它无法移动且其二次型不会被使用
+		// 然而，这会使得某些网格上的误差略差，因为 locked 折叠在调度上获得了不公平的优势
 		collapse_locked[r0] = 1;
 		collapse_locked[r1] = 1;
 
-		// border edges collapse 1 triangle, other edges collapse 2 or more
+		// border 边折叠 1 个三角形，其它边折叠 2 个或更多
 		triangle_collapses += (kind == Kind_Border) ? 1 : 2;
 		edge_collapses++;
 
@@ -1612,7 +1612,7 @@ static void updateQuadrics(const unsigned int* collapse_remap, size_t vertex_cou
 		unsigned int r0 = remap[i0];
 		unsigned int r1 = remap[i1];
 
-		// ensure we only update vertex_quadrics once: primary vertex must be moved if any wedge is moved
+		// 确保我们仅更新 vertex_quadrics 一次：若任一 wedge 被移动，则 primary 顶点必须被移动
 		if (i0 == r0)
 		{
 			quadricAdd(vertex_quadrics[r1], vertex_quadrics[r0]);
@@ -1647,9 +1647,9 @@ static void solveQuadrics(Vector3* vertex_positions, float* vertex_attributes, s
 		if (!vertex_update[i])
 			continue;
 
-		// moving externally locked vertices is prohibited
-		// moving vertices on an attribute discontinuity may result in extrapolating UV outside of the chart bounds
-		// moving vertices on a border requires a stronger edge quadric to preserve the border geometry
+		// 禁止移动外部锁定的顶点
+		// 在属性不连续处移动顶点可能导致将 UV 外推到 chart 边界之外
+		// 移动 border 上的顶点需要更强的边二次型，以保持 border 的几何结构
 		if (vertex_kind[i] == Kind_Locked || vertex_kind[i] == Kind_Seam || vertex_kind[i] == Kind_Border)
 			continue;
 
@@ -1666,14 +1666,14 @@ static void solveQuadrics(Vector3* vertex_positions, float* vertex_attributes, s
 		Quadric Q = vertex_quadrics[i];
 		QuadricGrad GV = {};
 
-		// add a point quadric for regularization to stabilize the solution
+		// 添加一个点二次型用于正则化，以稳定求解
 		Quadric R;
 		quadricFromPoint(R, vp.x, vp.y, vp.z, Q.w * 1e-4f);
 		quadricAdd(Q, R);
 
 		if (attribute_count)
 		{
-			// optimal point simultaneously minimizes attribute quadrics for all wedges
+			// 最优点同时最小化所有 wedge 的属性二次型
 			unsigned int v = unsigned(i);
 			do
 			{
@@ -1681,7 +1681,7 @@ static void solveQuadrics(Vector3* vertex_positions, float* vertex_attributes, s
 				v = wedge[v];
 			} while (v != i);
 
-			// minimizing attribute quadrics results in volume loss so we incorporate volume gradient as a constraint
+			// 最小化属性二次型会导致体积损失，因此我们将体积梯度作为约束纳入
 			if (volume_gradients)
 				GV = volume_gradients[i];
 		}
@@ -1693,8 +1693,8 @@ static void solveQuadrics(Vector3* vertex_positions, float* vertex_attributes, s
 			continue;
 		}
 
-		// reject updates that move the vertex too far from its neighborhood
-		// this detects and fixes most cases when the quadric is not well-defined
+		// 拒绝使顶点过度偏离其邻域的更新
+		// 这可在二次型未正确定义的多数情况下检测并修复问题
 		float nr = getNeighborhoodRadius(adjacency, vertex_positions, unsigned(i));
 		float dp = (p.x - vp.x) * (p.x - vp.x) + (p.y - vp.y) * (p.y - vp.y) + (p.z - vp.z) * (p.z - vp.z);
 
@@ -1704,7 +1704,7 @@ static void solveQuadrics(Vector3* vertex_positions, float* vertex_attributes, s
 			continue;
 		}
 
-		// reject updates that would flip a neighboring triangle, as we do for edge collapse
+		// 拒绝会使相邻三角形翻转的更新，正如边折叠时所做的
 		if (hasTriangleFlips(adjacency, vertex_positions, unsigned(i), p))
 		{
 			TRACESTATS(4);
@@ -1727,7 +1727,7 @@ static void solveQuadrics(Vector3* vertex_positions, float* vertex_attributes, s
 		if (!vertex_update[i])
 			continue;
 
-		// updating externally locked vertices is prohibited
+		// 禁止更新外部锁定的顶点
 		if (vertex_kind[i] == Kind_Locked)
 			continue;
 
@@ -1755,14 +1755,14 @@ static size_t remapIndexBuffer(unsigned int* indices, size_t index_count, const 
 		unsigned int v1 = collapse_remap[indices[i + 1]];
 		unsigned int v2 = collapse_remap[indices[i + 2]];
 
-		// we never move the vertex twice during a single pass
+		// 在单次遍历中我们从不移动顶点两次
 		assert(collapse_remap[v0] == v0);
 		assert(collapse_remap[v1] == v1);
 		assert(collapse_remap[v2] == v2);
 
-		// collapse zero area triangles even if they are not topologically degenerate
-		// this is required to cleanup manifold->seam collapses when a vertex is collapsed onto a seam pair
-		// as well as complex collapses and some other cases where cross wedge collapses are performed
+		// 即使三角形并非拓扑退化，也应折叠零面积三角形
+		// 当顶点被折叠到 seam 对上时，需要此步骤来清理 manifold->seam 折叠
+		// 同样适用于 complex 折叠以及执行跨 wedge 折叠的其它一些情况
 		unsigned int r0 = remap[v0];
 		unsigned int r1 = remap[v1];
 		unsigned int r2 = remap[v2];
@@ -1783,15 +1783,15 @@ static void remapEdgeLoops(unsigned int* loop, size_t vertex_count, const unsign
 {
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
-		// note: this is a no-op for vertices that were remapped
-		// ideally we would clear the loop entries for those for consistency, even though they aren't going to be used
-		// however, the remapping process needs loop information for remapped vertices, so this would require a separate pass
+		// 注意：对于已被重映射的顶点，这是一次空操作
+		// 理想情况下我们会清除这些顶点的 loop 条目以保持一致，尽管它们不会被使用
+		// 然而，重映射过程需要已重映射顶点的 loop 信息，因此这需要一次单独的遍历
 		if (loop[i] != ~0u)
 		{
 			unsigned int l = loop[i];
 			unsigned int r = collapse_remap[l];
 
-			// i == r is a special case when the seam edge is collapsed in a direction opposite to where loop goes
+			// 当 seam 边沿与 loop 方向相反的方向折叠时，i == r 是一个特例
 			if (i == r)
 				loop[i] = (loop[l] != ~0u) ? collapse_remap[loop[l]] : ~0u;
 			else
@@ -1817,7 +1817,7 @@ static size_t buildComponents(unsigned int* components, size_t vertex_count, con
 	for (size_t i = 0; i < vertex_count; ++i)
 		components[i] = unsigned(i);
 
-	// compute a unique (but not sequential!) index for each component via union-find
+	// 通过 union-find 为每个 component 计算唯一（但非连续！）索引
 	for (size_t i = 0; i < index_count; i += 3)
 	{
 		static const int next[4] = {1, 2, 0, 1};
@@ -1833,34 +1833,34 @@ static size_t buildComponents(unsigned int* components, size_t vertex_count, con
 			r0 = follow(components, r0);
 			r1 = follow(components, r1);
 
-			// merge components with larger indices into components with smaller indices
-			// this guarantees that the root of the component is always the one with the smallest index
+			// 将具有较大索引的 components 合并到具有较小索引的 components 中
+			// 这保证了 component 的根始终是具有最小索引的那个
 			if (r0 != r1)
 				components[r0 < r1 ? r1 : r0] = r0 < r1 ? r0 : r1;
 		}
 	}
 
-	// make sure each element points to the component root *before* we renumber the components
+	// 确保每个元素在重编号 components *之前* 指向 component 根
 	for (size_t i = 0; i < vertex_count; ++i)
 		if (remap[i] == i)
 			components[i] = follow(components, unsigned(i));
 
 	unsigned int next_component = 0;
 
-	// renumber components using sequential indices
-	// a sequential pass is sufficient because component root always has the smallest index
-	// note: it is unsafe to use follow() in this pass because we're replacing component links with sequential indices inplace
+	// 使用连续索引对 components 重新编号
+	// 一次连续遍历即可，因为 component 根总是具有最小索引
+	// 注意：此遍历中使用 follow() 是不安全的，因为我们就地用连续索引替换了 component 链接
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
 		if (remap[i] == i)
 		{
 			unsigned int root = components[i];
-			assert(root <= i); // make sure we already computed the component for non-roots
+			assert(root <= i); // 确保我们已为非根元素计算了 component
 			components[i] = (root == i) ? next_component++ : components[root];
 		}
 		else
 		{
-			assert(remap[i] < i); // make sure we already computed the component
+			assert(remap[i] < i); // 确保我们已计算了 component
 			components[i] = components[remap[i]];
 		}
 	}
@@ -1872,13 +1872,13 @@ static void measureComponents(float* component_errors, size_t component_count, c
 {
 	memset(component_errors, 0, component_count * 4 * sizeof(float));
 
-	// compute approximate sphere center for each component as an average
+	// 计算每个 component 的近似球心（取其平均值）
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
 		unsigned int c = components[i];
 		assert(components[i] < component_count);
 
-		Vector3 v = vertex_positions[i]; // copy avoids aliasing issues
+		Vector3 v = vertex_positions[i]; // 复制可避免别名问题
 
 		component_errors[c * 4 + 0] += v.x;
 		component_errors[c * 4 + 1] += v.y;
@@ -1886,7 +1886,7 @@ static void measureComponents(float* component_errors, size_t component_count, c
 		component_errors[c * 4 + 3] += 1; // weight
 	}
 
-	// complete the center computation, and reinitialize [3] as a radius
+	// 完成中心计算，并将 [3] 重新初始化为半径
 	for (size_t i = 0; i < component_count; ++i)
 	{
 		float w = component_errors[i * 4 + 3];
@@ -1898,7 +1898,7 @@ static void measureComponents(float* component_errors, size_t component_count, c
 		component_errors[i * 4 + 3] = 0; // radius
 	}
 
-	// compute squared radius for each component
+	// 计算每个 component 的半径平方
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
 		unsigned int c = components[i];
@@ -1911,14 +1911,14 @@ static void measureComponents(float* component_errors, size_t component_count, c
 		component_errors[c * 4 + 3] = component_errors[c * 4 + 3] < r ? r : component_errors[c * 4 + 3];
 	}
 
-	// we've used the output buffer as scratch space, so we need to move the results to proper indices
+	// 我们已将输出缓冲区用作临时空间，因此需要将结果移动到正确的索引处
 	for (size_t i = 0; i < component_count; ++i)
 	{
 #if TRACE >= 2
 		printf("component %d: center %f %f %f, error %e\n", int(i),
 		    component_errors[i * 4 + 0], component_errors[i * 4 + 1], component_errors[i * 4 + 2], sqrtf(component_errors[i * 4 + 3]));
 #endif
-		// note: we keep the squared error to make it match quadric error metric
+		// 注意：我们保留平方误差，以使其与 quadric error metric 匹配
 		component_errors[i] = component_errors[i * 4 + 3];
 	}
 }
@@ -1955,7 +1955,7 @@ static size_t pruneComponents(unsigned int* indices, size_t index_count, const u
 	printf("pruned %d triangles in %d components (goal %e); next %e\n", int((index_count - write) / 3), int(pruned_components), sqrtf(error_cutoff), min_error < FLT_MAX ? sqrtf(min_error) : min_error * 2);
 #endif
 
-	// update next error with the smallest error of the remaining components
+	// 用剩余 components 中的最小误差更新下一个误差
 	nexterror = min_error;
 	return write;
 }
@@ -1968,7 +1968,7 @@ struct CellHasher
 	{
 		unsigned int h = vertex_ids[i];
 
-		// MurmurHash2 finalizer
+		// MurmurHash2 终结器
 		h ^= h >> 13;
 		h *= 0x5bd1e995;
 		h ^= h >> 15;
@@ -1987,7 +1987,7 @@ struct IdHasher
 	{
 		unsigned int h = id;
 
-		// MurmurHash2 finalizer
+		// MurmurHash2 终结器
 		h ^= h >> 13;
 		h *= 0x5bd1e995;
 		h ^= h >> 15;
@@ -2008,7 +2008,7 @@ struct TriangleHasher
 	{
 		const unsigned int* tri = indices + i * 3;
 
-		// Optimized Spatial Hashing for Collision Detection of Deformable Objects
+		// 用于可变形物体碰撞检测的优化空间哈希（Spatial Hashing）
 		return (tri[0] * 73856093) ^ (tri[1] * 19349663) ^ (tri[2] * 83492791);
 	}
 
@@ -2263,7 +2263,7 @@ static size_t filterTriangles(unsigned int* destination, unsigned int* tritable,
 
 static float interpolate(float y, float x0, float y0, float x1, float y1, float x2, float y2)
 {
-	// three point interpolation from "revenge of interpolation search" paper
+	// 来自《interpolation search 的复仇》论文的三点插值
 	float num = (y1 - y) * (x1 - x2) * (x1 - x0) * (y2 - y0);
 	float den = (y2 - y) * (x1 - x2) * (y0 - y1) + (y0 - y) * (x1 - x0) * (y1 - y2);
 	return x1 + num / den;
@@ -2300,19 +2300,19 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 	if (result != indices)
 		memcpy(result, indices, index_count * sizeof(unsigned int));
 
-	// build an index remap and update indices/vertex_count to minimize the subsequent work
-	// note: as a consequence, errors will be computed relative to the subset extent
+	// 构建索引重映射并更新 indices/vertex_count，以尽量减少后续工作
+	// 注意：因此，误差将相对于子集的范围来计算
 	unsigned int* sparse_remap = NULL;
 	if (options & meshopt_SimplifySparse)
 		sparse_remap = buildSparseRemap(result, index_count, vertex_count, &vertex_count, allocator);
 
-	// build adjacency information
+	// 构建邻接信息
 	EdgeAdjacency adjacency = {};
 	prepareEdgeAdjacency(adjacency, index_count, vertex_count, allocator);
 	updateEdgeAdjacency(adjacency, result, index_count, vertex_count, NULL);
 
-	// build position remap that maps each vertex to the one with identical position
-	// wedge table stores next vertex with identical position for each vertex
+	// 构建位置重映射，将每个顶点映射到具有相同位置的顶点
+	// wedge 表为每个顶点存储具有相同位置的下一个顶点
 	unsigned int* remap = allocator.allocate<unsigned int>(vertex_count);
 	unsigned int* wedge = allocator.allocate<unsigned int>(vertex_count);
 	buildPositionRemap(remap, wedge, vertex_positions_data, vertex_count, vertex_positions_stride, sparse_remap, allocator);
@@ -2347,7 +2347,7 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 
 	if (attribute_count)
 	{
-		// remap attributes to only include ones with weight > 0 to minimize memory/compute overhead for quadrics
+		// 重映射属性，仅包含 weight > 0 的属性，以尽量减少 quadrics 的内存/计算开销
 		size_t attributes_used = 0;
 		for (size_t i = 0; i < attribute_count; ++i)
 			if (attribute_weights[i] > 0)
@@ -2397,7 +2397,7 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 		components = allocator.allocate<unsigned int>(vertex_count);
 		component_count = buildComponents(components, vertex_count, result, index_count, remap);
 
-		component_errors = allocator.allocate<float>(component_count * 4); // overallocate for temporary use inside measureComponents
+		component_errors = allocator.allocate<float>(component_count * 4); // 预留多余空间，供 measureComponents 内部临时使用
 		measureComponents(component_errors, component_count, components, vertex_positions, vertex_count);
 
 		component_nexterror = FLT_MAX;
@@ -2430,13 +2430,13 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 
 	while (result_count > target_index_count)
 	{
-		// note: throughout the simplification process adjacency structure reflects welded topology for result-in-progress
+		// 注意：在整个简化过程中，邻接结构反映正在进行的结果的 welded 拓扑
 		updateEdgeAdjacency(adjacency, result, result_count, vertex_count, remap);
 
 		size_t edge_collapse_count = pickEdgeCollapses(edge_collapses, collapse_capacity, result, result_count, remap, vertex_kind, loop, loopback);
 		assert(edge_collapse_count <= collapse_capacity);
 
-		// no edges can be collapsed any more due to topology restrictions
+		// 由于拓扑限制，不再有任何边可以折叠
 		if (edge_collapse_count == 0)
 			break;
 
@@ -2457,18 +2457,18 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 
 		size_t collapses = performEdgeCollapses(collapse_remap, collapse_locked, edge_collapses, edge_collapse_count, collapse_order, remap, wedge, vertex_kind, loop, loopback, vertex_positions, adjacency, triangle_collapse_goal, error_limit, result_error);
 
-		// no edges can be collapsed any more due to hitting the error limit or triangle collapse limit
+		// 由于达到误差上限或三角形折叠上限，不再有任何边可以折叠
 		if (collapses == 0)
 			break;
 
 		updateQuadrics(collapse_remap, vertex_count, vertex_quadrics, volume_gradients, attribute_quadrics, attribute_gradients, attribute_count, vertex_positions, remap, vertex_error);
 
-		// updateQuadrics will update vertex error if we use attributes, but if we don't then result_error and vertex_error are equivalent
+		// 若使用属性，updateQuadrics 将更新顶点误差；若不使用，则 result_error 与 vertex_error 等价
 		vertex_error = attribute_count == 0 ? result_error : vertex_error;
 
-		// note: we update loops following edge collapses, but after this we might still have stale loop data
-		// this can happen when a triangle with a loop edge gets collapsed along a non-loop edge
-		// that works since a loop that points to a vertex that is no longer connected is not affecting collapse logic
+		// 注意：我们在边折叠后更新 loops，但此后仍可能存在陈旧的 loop 数据
+		// 当具有 loop 边的三角形沿非 loop 边被折叠时，就可能发生这种情况
+		// 这可行，因为指向不再连接的顶点的 loop 不会影响折叠逻辑
 		remapEdgeLoops(loop, vertex_count, collapse_remap);
 		remapEdgeLoops(loopback, vertex_count, collapse_remap);
 
@@ -2478,7 +2478,7 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 			result_count = pruneComponents(result, result_count, components, component_errors, component_count, vertex_error, component_nexterror);
 	}
 
-	// at this point, component_nexterror might be stale: component it references may have been removed through a series of edge collapses
+	// 此时，component_nexterror 可能是陈旧的：它所引用的 component 可能已通过一系列边折叠被移除
 	bool component_nextstale = true;
 
 	// we're done with the regular simplification but we're still short of the target; try pruning more aggressively towards error_limit
@@ -2490,7 +2490,7 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 
 		float component_cutoff = component_nexterror * 1.5f < error_limit ? component_nexterror * 1.5f : error_limit;
 
-		// track maximum error in eligible components as we are increasing resulting error
+		// 在增加结果误差的同时，跟踪合格 components 中的最大误差
 		float component_maxerror = 0;
 		for (size_t i = 0; i < component_count; ++i)
 			if (component_errors[i] > component_maxerror && component_errors[i] <= component_cutoff)
@@ -2500,7 +2500,7 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 		if (new_count == result_count && !component_nextstale)
 			break;
 
-		component_nextstale = false; // pruneComponents guarantees next error is up to date
+		component_nextstale = false; // pruneComponents 保证下一个误差是最新的
 		result_count = new_count;
 		result_error = result_error < component_maxerror ? component_maxerror : result_error;
 		vertex_error = vertex_error < component_maxerror ? component_maxerror : vertex_error;
@@ -2513,19 +2513,19 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 	// if solve is requested, update input buffers destructively from internal data
 	if (options & meshopt_SimplifyInternalSolve)
 	{
-		unsigned char* vertex_update = collapse_locked; // reuse as scratch space
+		unsigned char* vertex_update = collapse_locked; // 复用为临时空间
 		memset(vertex_update, 0, vertex_count);
 
-		// limit quadric solve to vertices that are still used in the result
+		// 将 quadric 求解限制在结果中仍被使用的顶点
 		for (size_t i = 0; i < result_count; ++i)
 		{
 			unsigned int v = result[i];
 
-			// recomputing externally locked vertices may result in floating point drift
+			// 重新计算外部锁定的顶点可能导致浮点漂移
 			vertex_update[v] = vertex_kind[v] != Kind_Locked;
 		}
 
-		// edge adjacency may be stale as we haven't updated it after last series of edge collapses
+		// 边邻接数据可能已陈旧，因为我们在最后一轮边折叠后未更新它
 		updateEdgeAdjacency(adjacency, result, result_count, vertex_count, remap);
 
 		solveQuadrics(vertex_positions, vertex_attributes, vertex_count, vertex_quadrics, volume_gradients, attribute_quadrics, attribute_gradients, attribute_count, remap, wedge, adjacency, vertex_kind, vertex_update);
@@ -2536,7 +2536,7 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 	// if debug visualization data is requested, fill it instead of index data; for simplicity, this doesn't work with sparsity
 	if ((options & meshopt_SimplifyInternalDebug) && !sparse_remap)
 	{
-		assert(Kind_Count <= 8 && vertex_count < (1 << 28)); // 3 bit kind, 1 bit loop
+		assert(Kind_Count <= 8 && vertex_count < (1 << 28)); // 3 位类型，1 位 loop 标记
 
 		for (size_t i = 0; i < result_count; i += 3)
 		{
@@ -2548,7 +2548,7 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 		}
 	}
 
-	// convert resulting indices back into the dense space of the larger mesh
+	// 将结果索引转换回较大网格的稠密空间
 	if (sparse_remap)
 		for (size_t i = 0; i < result_count; ++i)
 			result[i] = sparse_remap[result[i]];
@@ -2562,14 +2562,14 @@ size_t meshopt_simplifyEdge(unsigned int* destination, const unsigned int* indic
 
 size_t meshopt_simplify(unsigned int* destination, const unsigned int* indices, size_t index_count, const float* vertex_positions_data, size_t vertex_count, size_t vertex_positions_stride, size_t target_index_count, float target_error, unsigned int options, float* out_result_error)
 {
-	assert((options & meshopt_SimplifyInternalSolve) == 0); // use meshopt_simplifyWithUpdate instead
+	assert((options & meshopt_SimplifyInternalSolve) == 0); // 改用 meshopt_simplifyWithUpdate
 
 	return meshopt_simplifyEdge(destination, indices, index_count, vertex_positions_data, vertex_count, vertex_positions_stride, NULL, 0, NULL, 0, NULL, target_index_count, target_error, options, out_result_error);
 }
 
 size_t meshopt_simplifyWithAttributes(unsigned int* destination, const unsigned int* indices, size_t index_count, const float* vertex_positions_data, size_t vertex_count, size_t vertex_positions_stride, const float* vertex_attributes_data, size_t vertex_attributes_stride, const float* attribute_weights, size_t attribute_count, const unsigned char* vertex_lock, size_t target_index_count, float target_error, unsigned int options, float* out_result_error)
 {
-	assert((options & meshopt_SimplifyInternalSolve) == 0); // use meshopt_simplifyWithUpdate instead
+	assert((options & meshopt_SimplifyInternalSolve) == 0); // 改用 meshopt_simplifyWithUpdate
 
 	return meshopt_simplifyEdge(destination, indices, index_count, vertex_positions_data, vertex_count, vertex_positions_stride, vertex_attributes_data, vertex_attributes_stride, attribute_weights, attribute_count, vertex_lock, target_index_count, target_error, options, out_result_error);
 }
@@ -2588,7 +2588,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 	assert(vertex_positions_stride % sizeof(float) == 0);
 	assert(target_index_count <= index_count);
 
-	// we expect to get ~2 triangles/vertex in the output
+	// 我们期望输出中约每顶点 2 个三角形
 	size_t target_cell_count = target_index_count / 6;
 
 	meshopt_Allocator allocator;
@@ -2596,7 +2596,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 	Vector3* vertex_positions = allocator.allocate<Vector3>(vertex_count);
 	rescalePositions(vertex_positions, vertex_positions_data, vertex_count, vertex_positions_stride);
 
-	// find the optimal grid size using guided binary search
+	// 使用引导式二分搜索找到最佳网格大小
 #if TRACE
 	printf("source: %d vertices, %d triangles\n", int(vertex_count), int(index_count / 3));
 	printf("target: %d cells, %d triangles\n", int(target_cell_count), int(target_index_count / 3));
@@ -2606,7 +2606,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 
 	const int kInterpolationPasses = 5;
 
-	// invariant: # of triangles in min_grid <= target_count
+	// 不变量：min_grid 中三角形数 <= target_count
 	int min_grid = int(1.f / (target_error < 1e-3f ? 1e-3f : (target_error < 1.f ? target_error : 1.f)));
 	int max_grid = 1025;
 	size_t min_triangles = 0;
@@ -2619,7 +2619,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 		min_triangles = countTriangles(vertex_ids, indices, index_count);
 	}
 
-	// instead of starting in the middle, let's guess as to what the answer might be! triangle count usually grows as a square of grid size...
+	// 与其从中间开始，不如猜测一下答案可能是什么！三角形数量通常随网格大小的平方增长……
 	int next_grid_size = int(sqrtf(float(target_cell_count)) + 0.5f);
 
 	for (int pass = 0; pass < 10 + kInterpolationPasses; ++pass)
@@ -2627,7 +2627,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 		if (min_triangles >= target_index_count / 3 || max_grid - min_grid <= 1)
 			break;
 
-		// we clamp the prediction of the grid size to make sure that the search converges
+		// 我们限制网格大小的预测范围，以确保搜索收敛
 		int grid_size = next_grid_size;
 		grid_size = (grid_size <= min_grid) ? min_grid + 1 : (grid_size >= max_grid ? max_grid - 1 : grid_size);
 
@@ -2654,7 +2654,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 			max_triangles = triangles;
 		}
 
-		// we start by using interpolation search - it usually converges faster
+		// 我们先用插值搜索开始——它通常收敛得更快
 		// however, interpolation search has a worst case of O(N) so we switch to binary search after a few iterations which converges in O(logN)
 		next_grid_size = (pass < kInterpolationPasses) ? int(tip + 0.5f) : (min_grid + max_grid) / 2;
 	}
@@ -2667,7 +2667,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 		return 0;
 	}
 
-	// build vertex->cell association by mapping all vertices with the same quantized position to the same cell
+	// 通过将所有具有相同量化位置的顶点映射到同一单元，构建顶点->单元关联
 	size_t table_size = hashBuckets2(vertex_count);
 	unsigned int* table = allocator.allocate<unsigned int>(table_size);
 
@@ -2676,19 +2676,19 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 	computeVertexIds(vertex_ids, vertex_positions, vertex_lock, vertex_count, min_grid);
 	size_t cell_count = fillVertexCells(table, table_size, vertex_cells, vertex_ids, vertex_count);
 
-	// build a quadric for each target cell
+	// 为每个目标 cell 构建一个 quadric
 	Quadric* cell_quadrics = allocator.allocate<Quadric>(cell_count);
 	memset(cell_quadrics, 0, cell_count * sizeof(Quadric));
 
 	fillCellQuadrics(cell_quadrics, indices, index_count, vertex_positions, vertex_cells);
 
-	// for each target cell, find the vertex with the minimal error
+	// 对每个目标单元，找到误差最小的顶点
 	unsigned int* cell_remap = allocator.allocate<unsigned int>(cell_count);
 	float* cell_errors = allocator.allocate<float>(cell_count);
 
 	fillCellRemap(cell_remap, cell_errors, cell_count, vertex_cells, cell_quadrics, vertex_positions, vertex_count);
 
-	// compute error
+	// 计算误差
 	float result_error = 0.f;
 
 	for (size_t i = 0; i < cell_count; ++i)
@@ -2698,7 +2698,7 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 	size_t tritable_size = hashBuckets2(min_triangles);
 	unsigned int* tritable = allocator.allocate<unsigned int>(tritable_size);
 
-	// note: this is the first and last write to destination, which allows aliasing destination with indices
+	// 注意：这是对 destination 的第一次也是最后一次写入，从而允许 destination 与 indices 别名共存
 	size_t write = filterTriangles(destination, tritable, tritable_size, indices, index_count, vertex_cells, cell_remap);
 
 #if TRACE
@@ -2726,7 +2726,7 @@ size_t meshopt_simplifyPrune(unsigned int* destination, const unsigned int* indi
 	if (result != indices)
 		memcpy(result, indices, index_count * sizeof(unsigned int));
 
-	// build position remap that maps each vertex to the one with identical position
+	// 构建位置重映射，将每个顶点映射到具有相同位置的顶点
 	unsigned int* remap = allocator.allocate<unsigned int>(vertex_count);
 	buildPositionRemap(remap, NULL, vertex_positions_data, vertex_count, vertex_positions_stride, NULL, allocator);
 
@@ -2736,7 +2736,7 @@ size_t meshopt_simplifyPrune(unsigned int* destination, const unsigned int* indi
 	unsigned int* components = allocator.allocate<unsigned int>(vertex_count);
 	size_t component_count = buildComponents(components, vertex_count, indices, index_count, remap);
 
-	float* component_errors = allocator.allocate<float>(component_count * 4); // overallocate for temporary use inside measureComponents
+	float* component_errors = allocator.allocate<float>(component_count * 4); // 预留多余空间，供 measureComponents 内部临时使用
 	measureComponents(component_errors, component_count, components, vertex_positions, vertex_count);
 
 	float component_nexterror = 0;
@@ -2766,7 +2766,7 @@ size_t meshopt_simplifyPoints(unsigned int* destination, const float* vertex_pos
 	Vector3* vertex_positions = allocator.allocate<Vector3>(vertex_count);
 	rescalePositions(vertex_positions, vertex_positions_data, vertex_count, vertex_positions_stride);
 
-	// find the optimal grid size using guided binary search
+	// 使用引导式二分搜索找到最佳网格大小
 #if TRACE
 	printf("source: %d vertices\n", int(vertex_count));
 	printf("target: %d cells\n", int(target_cell_count));
@@ -2779,13 +2779,13 @@ size_t meshopt_simplifyPoints(unsigned int* destination, const float* vertex_pos
 
 	const int kInterpolationPasses = 5;
 
-	// invariant: # of vertices in min_grid <= target_count
+	// 不变量：min_grid 中顶点数 <= target_count
 	int min_grid = 0;
 	int max_grid = 1025;
 	size_t min_vertices = 0;
 	size_t max_vertices = vertex_count;
 
-	// instead of starting in the middle, let's guess as to what the answer might be! triangle count usually grows as a square of grid size...
+	// 与其从中间开始，不如猜测一下答案可能是什么！三角形数量通常随网格大小的平方增长……
 	int next_grid_size = int(sqrtf(float(target_cell_count)) + 0.5f);
 
 	for (int pass = 0; pass < 10 + kInterpolationPasses; ++pass)
@@ -2793,7 +2793,7 @@ size_t meshopt_simplifyPoints(unsigned int* destination, const float* vertex_pos
 		assert(min_vertices < target_vertex_count);
 		assert(max_grid - min_grid > 1);
 
-		// we clamp the prediction of the grid size to make sure that the search converges
+		// 我们限制网格大小的预测范围，以确保搜索收敛
 		int grid_size = next_grid_size;
 		grid_size = (grid_size <= min_grid) ? min_grid + 1 : (grid_size >= max_grid ? max_grid - 1 : grid_size);
 
@@ -2823,7 +2823,7 @@ size_t meshopt_simplifyPoints(unsigned int* destination, const float* vertex_pos
 		if (vertices == target_vertex_count || max_grid - min_grid <= 1)
 			break;
 
-		// we start by using interpolation search - it usually converges faster
+		// 我们先用插值搜索开始——它通常收敛得更快
 		// however, interpolation search has a worst case of O(N) so we switch to binary search after a few iterations which converges in O(logN)
 		next_grid_size = (pass < kInterpolationPasses) ? int(tip + 0.5f) : (min_grid + max_grid) / 2;
 	}
@@ -2831,33 +2831,33 @@ size_t meshopt_simplifyPoints(unsigned int* destination, const float* vertex_pos
 	if (min_vertices == 0)
 		return 0;
 
-	// build vertex->cell association by mapping all vertices with the same quantized position to the same cell
+	// 通过将所有具有相同量化位置的顶点映射到同一单元，构建顶点->单元关联
 	unsigned int* vertex_cells = allocator.allocate<unsigned int>(vertex_count);
 
 	computeVertexIds(vertex_ids, vertex_positions, NULL, vertex_count, min_grid);
 	size_t cell_count = fillVertexCells(table, table_size, vertex_cells, vertex_ids, vertex_count);
 
-	// accumulate points into a reservoir for each target cell
+	// 将点累积到每个目标 cell 的 reservoir 中
 	Reservoir* cell_reservoirs = allocator.allocate<Reservoir>(cell_count);
 	memset(cell_reservoirs, 0, cell_count * sizeof(Reservoir));
 
 	fillCellReservoirs(cell_reservoirs, cell_count, vertex_positions, vertex_colors, vertex_colors_stride, vertex_count, vertex_cells);
 
-	// for each target cell, find the vertex with the minimal error
+	// 对每个目标单元，找到误差最小的顶点
 	unsigned int* cell_remap = allocator.allocate<unsigned int>(cell_count);
 	float* cell_errors = allocator.allocate<float>(cell_count);
 
-	// we scale the color weight to bring it to the same scale as position so that error addition makes sense
+	// 我们缩放颜色权重，使其与位置处于同一量级，这样误差相加才有意义
 	float color_weight_scaled = color_weight * (min_grid == 1 ? 1.f : 1.f / (min_grid - 1));
 
 	fillCellRemap(cell_remap, cell_errors, cell_count, vertex_cells, cell_reservoirs, vertex_positions, vertex_colors, vertex_colors_stride, color_weight_scaled * color_weight_scaled, vertex_count);
 
-	// copy results to the output
+	// 将结果复制到输出
 	assert(cell_count <= target_vertex_count);
 	memcpy(destination, cell_remap, sizeof(unsigned int) * cell_count);
 
 #if TRACE
-	// compute error
+	// 计算误差
 	float result_error = 0.f;
 
 	for (size_t i = 0; i < cell_count; ++i)

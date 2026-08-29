@@ -1,7 +1,7 @@
 #ifndef VOXEL_GODOT_PRINT_STRING_H
 #define VOXEL_GODOT_PRINT_STRING_H
 
-// Access to `print_line` the same as defined in core
+// 与 core 中定义的 `print_line` 相同的访问方式
 
 #if defined(VOXEL_GODOT)
 #include <core/string/print_string.h>

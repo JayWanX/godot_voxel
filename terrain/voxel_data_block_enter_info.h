@@ -10,16 +10,16 @@ namespace godot {
 class VoxelBuffer;
 }
 
-// Information sent with data block entering notifications.
-// It is a class for script API convenience.
-// You may neither create this object on your own, nor keep a reference to it.
+// 随数据块进入通知发送的信息。
+// 它是一个类，以方便脚本 API 的使用。
+// 你既不能自己创建这个对象，也不能持有它的引用。
 class VoxelDataBlockEnterInfo : public Object {
 	GDCLASS(VoxelDataBlockEnterInfo, Object)
 public:
 	int network_peer_id = -1;
 	Vector3i block_position;
-	// Shallow copy of the block. We don't use a pointer due to thread-safety, so this information represents only the
-	// moment where the block was inserted into the map.
+	// 数据块的浅拷贝。我们不使用指针，因为线程安全，所以该信息仅代表
+	// 数据块被插入映射时的那个时刻。
 	VoxelDataBlock voxel_block;
 
 private:

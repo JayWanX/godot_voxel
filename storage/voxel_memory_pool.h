@@ -15,11 +15,11 @@
 
 namespace voxel {
 
-// Pool based on a scenario where allocated blocks are often the same size.
-// A pool of blocks is assigned for each power of two.
-// The majority of VoxelBuffers use powers of two so most of the time
-// we won't waste memory. Sometimes non-power-of-two buffers are created,
-// but they are often temporary and less numerous.
+// 基于"分配的块通常大小相同"这一场景的池。
+// 为每个 2 的幂分配一个块池。
+// 大多数 VoxelBuffer 使用 2 的幂，因此大多数时候
+// 我们不会浪费内存。有时会创建非 2 的幂的缓冲区，
+// 但它们往往是临时且数量较少的。
 class VoxelMemoryPool {
 private:
 #ifdef DEBUG_ENABLED
@@ -30,7 +30,7 @@ private:
 		void add(void *mem) {
 			MutexLock lock(mutex);
 			auto it = blocks.find(mem);
-			// Must not add twice
+			// 不能重复添加
 			VOXEL_ASSERT(it == blocks.end());
 			blocks.insert({ mem, dstack::Info() });
 		}
@@ -38,7 +38,7 @@ private:
 		void remove(void *block) {
 			MutexLock lock(mutex);
 			auto it = blocks.find(block);
-			// Must exist
+			// 必须存在
 			VOXEL_ASSERT(it != blocks.end());
 			blocks.erase(it);
 		}
@@ -47,7 +47,7 @@ private:
 
 	struct Pool {
 		Mutex mutex;
-		// Would a linked list be better?
+		// 链表会不会更好？
 		StdVector<uint8_t *> blocks;
 #ifdef DEBUG_ENABLED
 		DebugUsedBlocks debug_used_blocks;
@@ -81,7 +81,7 @@ private:
 
 	inline unsigned int get_pool_index_from_size(size_t size) const {
 #ifdef DEBUG_ENABLED
-		// `get_next_power_of_two_32` takes unsigned int
+		// `get_next_power_of_two_32` 接受 unsigned int
 		VOXEL_ASSERT(size <= std::numeric_limits<unsigned int>::max());
 #endif
 		return math::get_shift_from_power_of_two_32(math::get_next_power_of_two_32(size));
@@ -95,10 +95,9 @@ private:
 	void debug_print_used_blocks(unsigned int max_amount);
 #endif
 
-	// We handle allocations with up to 2^20 = 1,048,576 bytes.
-	// This is chosen based on practical needs.
-	// Each slot in this array corresponds to allocations
-	// that contain 2^index bytes in them.
+	// 我们处理的分配上限为 2^20 = 1,048,576 字节。
+	// 这是根据实际需求选择的。
+	// 该数组中的每个槽位对应包含 2^index 字节的分配。
 	FixedArray<Pool, 21> _pot_pools;
 #ifdef DEBUG_ENABLED
 	DebugUsedBlocks _debug_nonpooled_used_blocks;

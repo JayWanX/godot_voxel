@@ -3,7 +3,7 @@
 
 namespace voxel::math {
 
-// TODO In C++20 we can use <numbers>? (except for TAU unfortunately)
+// TODO 在 C++20 中我们可以使用 <numbers>？（可惜 TAU 不在其中）
 
 template <typename TFloat>
 inline constexpr TFloat TAU = 6.2831853071795864769252867666;

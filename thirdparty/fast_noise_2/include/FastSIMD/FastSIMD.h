@@ -15,9 +15,9 @@ namespace FastSIMD
         Level_SSSE3  = 1 <<  4, // Supplementary SSE3 (SSSE3)
         Level_SSE41  = 1 <<  5, // SSE4.1
         Level_SSE42  = 1 <<  6, // SSE4.2
-        Level_AVX    = 1 <<  7, // AVX supported by CPU and operating system
+        Level_AVX    = 1 <<  7, // CPU 和操作系统支持 AVX
         Level_AVX2   = 1 <<  8, // AVX2
-        Level_AVX512 = 1 <<  9, // AVX512, AVX512DQ supported by CPU and operating system
+        Level_AVX512 = 1 <<  9, // CPU 和操作系统支持 AVX512、AVX512DQ
 
         Level_NEON   = 1 << 16, // ARM NEON
     };

@@ -30,9 +30,9 @@ union MarshallDouble {
 	uint64_t l;
 };
 
-// Dense voxels data storage.
-// Organized in channels of configurable bit depth.
-// Values can be interpreted either as unsigned integers or normalized floats.
+// 稠密体素数据存储。
+// 按可配置位深的通道组织。
+// 值既可以解释为无符号整数，也可以解释为归一化浮点数。
 class VoxelBuffer {
 public:
 	enum ChannelId {
@@ -44,7 +44,7 @@ public:
 		CHANNEL_DATA5,
 		CHANNEL_DATA6,
 		CHANNEL_DATA7,
-		// Arbitrary value, 8 should be enough. Tweak for your needs.
+		// 任意值，8 应该足够。可根据需要调整。
 		MAX_CHANNELS
 	};
 
@@ -54,7 +54,7 @@ public:
 
 	enum Compression : uint8_t {
 		COMPRESSION_NONE = 0,
-		COMPRESSION_UNIFORM, // aka "no voxels allocated"
+		COMPRESSION_UNIFORM, // 即"未分配任何体素"
 		COMPRESSION_COUNT
 	};
 
@@ -67,10 +67,10 @@ public:
 	};
 
 	enum Allocator : uint8_t { //
-		// General-purpose allocator. malloc, Godot's default allocator. Deallocated when the buffer is destroyed.
+		// 通用分配器。malloc，Godot 的默认分配器。缓冲销毁时释放。
 		ALLOCATOR_DEFAULT,
-		// VoxelMemoryPool. Should be faster but remains allocated. Preferred if buffers of similar size are frequently
-		// created at runtime. Don't use for large, infrequent allocations or in-editor, to avoid hoarding memory.
+		// VoxelMemoryPool。应当更快但会一直占用内存。若运行时频繁创建大小相近的缓冲，优先选用。
+		// 不要用于大型、低频的分配，也不要在编辑器中用，以免囤积内存。
 		ALLOCATOR_POOL,
 		ALLOCATOR_COUNT
 	};
@@ -128,7 +128,7 @@ public:
 	}
 
 	static inline real_t raw_voxel_to_real(const uint64_t value, const Depth depth) {
-		// Depths below 32 are normalized between -1 and 1
+		// 低于 32 的位深在 -1 到 1 之间归一化
 		switch (depth) {
 			case DEPTH_8_BIT:
 				return s8_to_snorm(value) * constants::QUANTIZED_SDF_8_BITS_SCALE_INV;
@@ -162,25 +162,25 @@ public:
 	static const Depth DEFAULT_INDICES_CHANNEL_DEPTH = DEPTH_16_BIT;
 	static const Depth DEFAULT_WEIGHTS_CHANNEL_DEPTH = DEPTH_16_BIT;
 
-	// Limit was made explicit for serialization reasons, and also because there must be a reasonable one
+	// 设置显式上限是出于序列化原因，也因为必须有一个合理的限制
 	static const uint32_t MAX_SIZE = 65535;
 
 	struct Channel {
 		union {
-			// Allocated when the channel is populated.
-			// Flat array, in order [z][x][y] because it allows faster vertical-wise access (the engine is Y-up).
+			// 当通道被填充数据时分配。
+			// 一维数组，顺序为 [z][x][y]，因为它允许更快的竖直方向访问（引擎为 Y 轴朝上）。
 			uint8_t *data;
 
-			// Default value when the channel is not populated ().
-			// This is an encoded value, so non-integer values may be obtained by converting it.
+			// 当通道未填充数据时的默认值。
+			// 这是一个编码后的值，因此可以通过转换获得非整数值。
 			uint64_t defval;
 		};
 
 		Depth depth = DEFAULT_CHANNEL_DEPTH;
 		Compression compression = COMPRESSION_UNIFORM;
-		// [...] 2 unused bytes
+		// [...] 2 个未使用字节
 
-		// Storing gigabytes in a single buffer is neither supported nor practical.
+		// 在单个缓冲区中存储数 GB 数据既不受支持也不切实际。
 		uint32_t size_in_bytes = 0;
 
 		static const size_t MAX_SIZE_IN_BYTES = std::numeric_limits<uint32_t>::max();
@@ -250,9 +250,9 @@ public:
 
 	void copy_format(const VoxelBuffer &other);
 
-	// Specialized copy functions.
-	// Note: these functions don't include metadata on purpose.
-	// If you also want to copy metadata, use the specialized functions.
+	// 专用复制函数。
+	// 注意：这些函数刻意不包含元数据。
+	// 如果你还想复制元数据，请使用专门的处理函数。
 	void copy_channels_from(const VoxelBuffer &other);
 	void copy_channel_from(const VoxelBuffer &other, unsigned int channel_index);
 	void copy_channel_from(
@@ -263,10 +263,10 @@ public:
 			unsigned int channel_index
 	);
 
-	// Copy a region from a box of values, passed as a raw array.
-	// `src_size` is the total 3D size of the source box.
-	// `src_min` and `src_max` are the sub-region of that box we want to copy.
-	// `dst_min` is the lower corner where we want the data to be copied into the destination.
+	// 从以原始数组形式传入的值盒中复制一个区域。
+	// `src_size` 是源盒的完整三维尺寸。
+	// `src_min` 和 `src_max` 是该盒中我们要复制的子区域。
+	// `dst_min` 是我们要将数据复制到目标中的较低角。
 	template <typename T>
 	void copy_channel_from(
 			Span<const T> src,
@@ -280,25 +280,25 @@ public:
 
 		Channel &channel = _channels[channel_index];
 #ifdef DEBUG_ENABLED
-		// Size of source and destination values must match
+		// 源和目标值的大小必须匹配
 		VOXEL_ASSERT_RETURN(channel.depth == get_depth_from_size(sizeof(T)));
 #endif
 
-		// This function always decompresses the destination.
-		// To keep it compressed, either check what you are about to copy,
-		// or schedule a recompression for later.
+		// 此函数总是对目标进行解压。
+		// 若要保持压缩状态，要么先检查你要复制的数据，
+		// 要么计划之后重新压缩。
 		decompress_channel(channel_index);
 
 		Span<T> dst = Span<uint8_t>(channel.data, channel.size_in_bytes).reinterpret_cast_to<T>();
 		copy_3d_region_zxy<T>(dst, _size, dst_min, src, src_size, src_min, src_max);
 	}
 
-	// Copy a region of the data into a dense buffer.
-	// If the source is compressed, it is decompressed.
-	// `dst` is a raw array storing grid values in a box.
-	// `dst_size` is the total size of the box.
-	// `dst_min` is the lower corner of where we want the source data to be stored.
-	// `src_min` and `src_max` is the sub-region of the source we want to copy.
+	// 将数据的某个区域复制到稠密缓冲区。
+	// 若源已压缩，则先解压。
+	// `dst` 是存储盒中网格值的原始数组。
+	// `dst_size` 是盒的总尺寸。
+	// `dst_min` 是我们希望存储源数据的较低角。
+	// `src_min` 和 `src_max` 是我们要复制的源子区域。
 	template <typename T>
 	void copy_channel_to(
 			Span<T> dst,
@@ -312,7 +312,7 @@ public:
 
 		const Channel &channel = _channels[channel_index];
 #ifdef DEBUG_ENABLED
-		// Size of source and destination values must match
+		// 源和目标值的大小必须匹配
 		VOXEL_ASSERT_RETURN(channel.depth == get_depth_from_size(sizeof(T)));
 #endif
 
@@ -324,11 +324,11 @@ public:
 		}
 	}
 
-	// TODO Deprecate?
-	// Executes a read-write action on all cells of the provided box that intersect with this buffer.
-	// `action_func` receives a voxel value from the channel, and returns a modified value.
-	// if the returned value is different, it will be applied to the buffer.
-	// Can be used to blend voxels together.
+	// TODO 已弃用？
+	// 对与缓冲区相交的给定盒中的所有单元格执行读写操作。
+	// `action_func` 从通道接收体素值，并返回修改后的值。
+	// 如果返回的值不同，它将被应用到缓冲区。
+	// 可用于混合体素。
 	template <typename F>
 	inline void read_write_action(Box3i box, unsigned int channel_index, F action_func) {
 		VOXEL_ASSERT_RETURN(channel_index < MAX_CHANNELS);
@@ -340,7 +340,7 @@ public:
 		for (pos.z = min_pos.z; pos.z < max_pos.z; ++pos.z) {
 			for (pos.x = min_pos.x; pos.x < max_pos.x; ++pos.x) {
 				for (pos.y = min_pos.y; pos.y < max_pos.y; ++pos.y) {
-					// TODO Optimization: a bunch of checks and branching could be skipped
+					// TODO 优化：可以跳过一堆检查和分支
 					const uint64_t v0 = get_voxel(pos, channel_index);
 					const uint64_t v1 = action_func(pos, v0);
 					if (v0 != v1) {
@@ -356,7 +356,7 @@ public:
 	}
 
 	inline size_t get_index(unsigned int x, unsigned int y, unsigned int z) const {
-		return y + _size.y * (x + _size.x * z); // ZXY index
+		return y + _size.y * (x + _size.x * z); // ZXY 索引
 	}
 
 	template <typename F>
@@ -386,9 +386,9 @@ public:
 		VOXEL_ASSERT_RETURN(get_depth_byte_count(channel.depth) == sizeof(Data_T));
 #endif
 		Span<Data_T> data = Span<uint8_t>(channel.data, channel.size_in_bytes).reinterpret_cast_to<Data_T>();
-		// `&` is required because lambda captures are `const` by default and `mutable` can be used only from C++23
+		// 需要 `&` 是因为 lambda 捕获默认为 `const`，而 `mutable` 只能从 C++23 开始使用
 		for_each_index_and_pos(box, [&data, action_func, offset](size_t i, Vector3i pos) {
-			// This does not require the action to use the exact type, conversion can occur here.
+			// 这不需要操作使用完全相同的类型，此处可以发生转换。
 			data.set(i, action_func(pos + offset, data[i]));
 		});
 		compress_if_uniform(channel);
@@ -415,7 +415,7 @@ public:
 		Span<Data0_T> data0 = Span<uint8_t>(channel0.data, channel0.size_in_bytes).reinterpret_cast_to<Data0_T>();
 		Span<Data1_T> data1 = Span<uint8_t>(channel1.data, channel1.size_in_bytes).reinterpret_cast_to<Data1_T>();
 		for_each_index_and_pos(box, [action_func, offset, &data0, &data1](size_t i, Vector3i pos) {
-			// TODO The caller must still specify exactly the correct type, maybe some conversion could be used
+			// TODO 调用方仍必须指定完全正确的类型，也许可以使用某种转换
 			action_func(pos + offset, data0[i], data1[i]);
 		});
 		compress_if_uniform(channel0);
@@ -457,7 +457,7 @@ public:
 		const Channel &channel0 = _channels[channel_index0];
 		const Channel &channel1 = _channels[channel_index1];
 #ifdef DEBUG_ENABLED
-		// TODO Find a better way to handle combination explosion. For now I allow only what's really used.
+		// TODO 想办法更好地处理组合爆炸。目前只允许实际用到的组合。
 		ERR_FAIL_COND_MSG(channel1.depth != DEPTH_16_BIT, "Second channel depth is hardcoded to 16 for now");
 #endif
 		switch (channel.depth) {
@@ -508,13 +508,13 @@ public:
 		return Vector3iUtil::get_volume_u64(_size);
 	}
 
-	// Gets a slice aliasing the channel's data
+	// 获取一个别名到通道数据的切片
 	bool get_channel_as_bytes(unsigned int channel_index, Span<uint8_t> &slice);
 
-	// Gets a read-only slice aliasing the channel's data
+	// 获取一个只读别名到通道数据的切片
 	bool get_channel_as_bytes_read_only(unsigned int channel_index, Span<const uint8_t> &slice) const;
 
-	// Gets a slice aliasing the channel's data, reinterpreted to a specific type
+	// 获取一个别名到通道数据的切片，并将其重新解释为特定类型
 	template <typename T>
 	bool get_channel_data(unsigned int channel_index, Span<T> &dst) {
 		Span<uint8_t> dst8;
@@ -523,7 +523,7 @@ public:
 		return true;
 	}
 
-	// Gets a read-only slice aliasing the channel's data, reinterpreted to a specific type
+	// 获取一个只读别名到通道数据的切片，并将其重新解释为特定类型
 	template <typename T>
 	bool get_channel_data_read_only(unsigned int channel_index, Span<const T> &dst) const {
 		Span<const uint8_t> dst8;
@@ -532,8 +532,8 @@ public:
 		return true;
 	}
 
-	// Overwrites contents of a channel with raw data. This skips default initialization of the channel, so it
-	// can be a little bit faster than using `decompress_channel`. The input data must have the right size.
+	// 用原始数据覆盖通道内容。这会跳过通道的默认初始化，因此
+	// 可能比使用 `decompress_channel` 稍快一些。输入数据必须具有正确的大小。
 	void set_channel_from_bytes(const unsigned int channel_index, Span<const uint8_t> src);
 
 	void downscale_to(VoxelBuffer &dst, Vector3i src_min, Vector3i src_max, Vector3i dst_min) const;
@@ -543,16 +543,16 @@ public:
 	void set_channel_depth(unsigned int channel_index, Depth new_depth);
 	Depth get_channel_depth(unsigned int channel_index) const;
 
-	// When using lower than 32-bit resolution for terrain signed distance fields,
-	// it should be scaled to better fit the range of represented values since the storage is normalized to -1..1.
-	// This returns that scale for a given depth configuration.
+	// 当使用低于 32 位的分辨率表示地形有符号距离场时，
+	// 应对其进行缩放以更好地适配所表示值的范围，因为存储被归一化到 -1..1。
+	// 该函数返回给定位深配置下的缩放比例。
 	static float get_sdf_quantization_scale(Depth d);
 
 	void get_range_f(float &out_min, float &out_max, ChannelId channel_index) const;
 
 	void transform(const math::OrthoBasis &basis);
 
-	// Metadata
+	// 元数据
 
 	VoxelMetadata &get_block_metadata() {
 		return _block_metadata;
@@ -570,8 +570,7 @@ public:
 
 	template <typename F>
 	void for_each_voxel_metadata_in_area(Box3i box, F callback) const {
-		// TODO For `find`s and this kind of iteration, we may want to separate keys and values in FlatMap's internal
-		// storage, to reduce cache misses
+		// TODO 对于 `find` 和这类迭代，我们可能想把 FlatMap 内部存储中的键和值分开，以减少缓存未命中
 		for (FlatMapMoveOnly<Vector3i, VoxelMetadata>::ConstIterator it = _voxel_metadata.begin();
 			 it != _voxel_metadata.end();
 			 ++it) {
@@ -587,7 +586,7 @@ public:
 	}
 
 	// #ifdef VOXEL_GODOT
-	// 	// TODO Move out of here
+	// 	// TODO 移到别处
 	// 	void for_each_voxel_metadata(const Callable &callback) const;
 	// 	void for_each_voxel_metadata_in_area(const Callable &callback, Box3i box) const;
 	// #endif
@@ -616,20 +615,20 @@ private:
 	static bool is_uniform(const Channel &channel);
 
 private:
-	// Each channel can store arbitrary data.
-	// For example, you can decide to store colors (R, G, B, A), gameplay types (type, state, light) or both.
+	// 每个通道都可以存储任意数据。
+	// 例如，你可以决定存储颜色（R、G、B、A）、玩法类型（类型、状态、光照）或两者兼有。
 	FixedArray<Channel, MAX_CHANNELS> _channels;
 
-	// How many voxels are there in the three directions. All populated channels have the same size.
+	// 三个方向上各有多少体素。所有已填充的通道大小相同。
 	Vector3i _size;
 
-	// Which allocator will be used when storing individual voxels is needed.
-	// The default is the least likely to be misused, though not necessarily the fastest.
+	// 需要存储单个体素时使用哪个分配器。
+	// 默认分配器最不容易被误用，但不一定是最快的。
 	Allocator _allocator = ALLOCATOR_DEFAULT;
 
-	// TODO Could we separate metadata from VoxelBuffer?
+	// TODO 能否将元数据从 VoxelBuffer 中分离出来？
 	VoxelMetadata _block_metadata;
-	// This metadata is expected to be sparse, with low amount of items.
+	// 该元数据预期是稀疏的，条目数量很少。
 	FlatMapMoveOnly<Vector3i, VoxelMetadata> _voxel_metadata;
 };
 
@@ -645,7 +644,7 @@ void paste(
 		bool with_metadata
 );
 
-// Paste if the source is not a certain value
+// 当源不为某个特定值时才粘贴
 void paste_src_masked(
 		Span<const uint8_t> channels,
 		const VoxelBuffer &src_buffer,
@@ -656,7 +655,7 @@ void paste_src_masked(
 		bool with_metadata
 );
 
-// Paste if the source is not a certain value, and the destination is a certain value
+// 当源不为某个特定值、且目标为某个特定值时才粘贴
 void paste_src_masked_dst_writable_value(
 		Span<const uint8_t> channels,
 		const VoxelBuffer &src_buffer,
@@ -669,7 +668,7 @@ void paste_src_masked_dst_writable_value(
 		bool with_metadata
 );
 
-// Paste if the source is not a certain value, and the specified bitset contains the destination value
+// 当源不为某个特定值、且指定的位集包含目标值时才粘贴
 void paste_src_masked_dst_writable_bitarray(
 		Span<const uint8_t> channels,
 		const VoxelBuffer &src_buffer,

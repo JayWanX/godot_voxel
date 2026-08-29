@@ -23,7 +23,7 @@ namespace voxel {
 
 class VoxelData;
 
-// Asynchronous task generating a mesh from voxel blocks and their neighbors, in a particular volume
+// 在特定体积内，从体素数据块及其邻居生成网格的异步任务
 class MeshBlockTask
 #ifdef VOXEL_ENABLE_GPU
 		: public IGeneratingVoxelsThreadedTask
@@ -50,23 +50,22 @@ public:
 
 	static int debug_get_running_count();
 
-	// 3x3x3 or 4x4x4 grid of voxel blocks.
+	// 3x3x3 或 4x4x4 的体素数据块网格。
 	FixedArray<std::shared_ptr<VoxelBuffer>, constants::MAX_BLOCK_COUNT_PER_REQUEST> blocks;
-	// TODO Need to provide format
+	// TODO 需要提供格式
 	// FixedArray<uint8_t, VoxelBuffer::MAX_CHANNELS> channel_depths;
-	Vector3i mesh_block_position; // In mesh blocks of the specified lod
+	Vector3i mesh_block_position; // 以指定 LOD 的网格数据块为单位
 	VolumeID volume_id;
 	uint8_t lod_index = 0;
 	uint8_t blocks_count = 0;
-	// If true, a rendering mesh resource will be created if possible.
+	// 如果为 true，则在可能的情况下创建渲染网格资源。
 	bool require_visual = true;
-	// If true, a collision mesh is required if possible
+	// 如果为 true，则需要碰撞网格（如果可能）
 	bool collision_hint = false;
-	// If true, the mesh will be used in a context with LOD, which might require a few extra things in the way it is
-	// built
+	// 如果为 true，网格将用于带 LOD 的上下文，这可能会在其构建方式上要求一些额外的处理
 	bool lod_hint = false;
-	// Detail textures might be enabled, but we don't always want to update them in every mesh update.
-	// So this boolean is also checked to know if they should be computed.
+	// 细节纹理可能已启用，但我们并不想在每次网格更新时都更新它们。
+	// 因此也会检查此布尔值以决定是否需要计算它们。
 	bool require_detail_texture = false;
 	uint8_t detail_texture_generator_override_begin_lod_index = 0;
 	bool detail_texture_use_gpu = false;
@@ -97,7 +96,7 @@ private:
 	VoxelMesher::Output _surfaces_output;
 	Ref<Mesh> _mesh;
 	Ref<Mesh> _shadow_occluder_mesh;
-	StdVector<uint16_t> _mesh_material_indices; // Indexed by mesh surface
+	StdVector<uint16_t> _mesh_material_indices; // 按网格表面索引
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 	std::shared_ptr<DetailTextureOutput> _detail_textures;
 #endif
@@ -106,9 +105,8 @@ private:
 #endif
 };
 
-// Builds a mesh resource from multiple surfaces data, and returns a mapping of where materials specified in the input
-// will be in the returned mesh. Empty surfaces won't be added to the mesh. If the mesh is totally empty, null will be
-// returned.
+// 根据多组表面数据构建网格资源，并返回输入中指定的材质在返回网格中的映射。
+// 空表面不会被加入网格。如果网格完全为空，将返回 null。
 Ref<ArrayMesh> build_mesh( //
 		Span<const VoxelMesher::Output::Surface> surfaces, //
 		Mesh::PrimitiveType primitive, //
@@ -116,7 +114,7 @@ Ref<ArrayMesh> build_mesh( //
 		StdVector<uint16_t> &mesh_material_indices //
 );
 
-// Builds a triangles mesh resource from a single surface. If the surface is empty, returns null.
+// 根据单一表面构建三角形网格资源。如果表面为空，则返回 null。
 Ref<ArrayMesh> build_mesh(Array surface);
 
 } // namespace voxel

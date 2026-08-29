@@ -1,116 +1,116 @@
-Streams
+数据流
 ========
 
-`VoxelStream` allows to save and load voxel data to a file or a directory structure, using various kinds of implementations. They don't hold voxel data in memory, they are just an access point to different file formats.
+`VoxelStream` 允许使用各种不同的实现，将体素数据保存到文件或目录结构中。它们不在内存中保存体素数据，它们只是不同文件格式的访问点。
 
 
-Stream types
+数据流类型
 ----------------
 
-A few different types are available, each with slightly different features.
+有几种不同类型的可用，每种都有略微不同的特性。
 
-- [VoxelStreamSQLite](api/VoxelStreamSQLite.md) is the most featured one, and uses a single SQLite database file. It can save both voxel data and [instancing](instancing.md) data.
-- [VoxelStreamRegionFiles](api/VoxelStreamRegionFiles.md) is an older one, which works similarly to Minecraft's region system. It saves under multiple files in a folder. It only supports voxel data.
-- [VoxelStreamScript](api/VoxelStreamScript.md) is a custom stream that may be implemented using a script. See [Scripting](scripting.md#custom-stream).
+- [VoxelStreamSQLite](api/VoxelStreamSQLite.md) 功能最全，使用单个 SQLite 数据库文件。它可以同时保存体素数据和[实例化](instancing.md)数据。
+- [VoxelStreamRegionFiles](api/VoxelStreamRegionFiles.md) 是较旧的一种，工作原理类似 Minecraft 的区域系统。它保存到文件夹下的多个文件中。仅支持体素数据。
+- [VoxelStreamScript](api/VoxelStreamScript.md) 是可以通过脚本实现的自定义数据流。参见[脚本编写](scripting.md#custom-stream)。
 
-There is currently no stream implementation using an existing file format (like `.vox` for example), mainly because the current API expects the ability to load data in chunks compatible with the engine's format.
+目前没有使用现有文件格式（例如 `.vox`）的数据流实现，主要是因为当前的 API 期望能够以与引擎格式兼容的数据块形式加载数据。
 
 
-Using streams for savegames
+将数据流用于存档
 ----------------------------
 
-Streams were created initially to serve as a database for saves. Games using voxel technology for terrain are often persistent, so there has to be a place on disk where to save the changes, and reload them back.
+数据流最初是为了作为存档的数据库而创建的。使用体素技术制作地形的游戏通常是持久化的，因此必须在磁盘上有一个地方保存更改，并重新加载它们。
 
-The engine can handle near-unlimited terrain size, so there are often situations where loading the entire world in memory is not possible. For that reason, streams are built in such a way they provide data block by block (or "chunks").
-Only blocks within the player's view distance will be loaded in memory. When the player moves, blocks far away will get unloaded/saved, while blocks getting closer will be loaded.
+引擎可以处理近乎无限大小的地形，所以经常会出现无法将整个世界加载到内存中的情况。因此，数据流被设计成逐块（或"区块"）提供数据。
+只有玩家视野范围内的数据块会被加载到内存中。当玩家移动时，远处的数据块会被卸载/保存，而靠近的数据块会被加载。
 
-By default, only modified blocks are saved. However, if the generator you use is too expensive to re-run on demand, or if your world is primarily edited, it can be configured such that every new block will always get saved. This is the case in Minecraft.
+默认情况下，只保存被修改过的数据块。然而，如果你使用的生成器重新运行的代价太高，或者你的世界主要是编辑出来的，可以配置为让每个新数据块都被保存。Minecraft 就是这样做的。
 
-When voxels are edited, modified blocks are not saved immediately. This is because many edits could keep happening, and trying to save too often could be wasteful.
+当体素被编辑时，被修改的数据块不会立即保存。这是因为可能持续发生许多编辑，而过于频繁地尝试保存可能会造成浪费。
 
-Saving only occurs under the following conditions:
+保存仅在以下条件下发生：
 
-- The block gets unloaded when too far away
-- [save_modified_blocks()](api/VoxelTerrain.md#i_save_modified_blocks) is called on the terrain node (you may want to call this when the player saves, on a timer, or when quitting the game)
+- 数据块因距离太远而被卸载
+- 在地形节点上调用 [save_modified_blocks()](api/VoxelTerrain.md#i_save_modified_blocks)（你可能希望在玩家保存、按定时器或退出游戏时调用它）
 
-You can add minimal saving with this script:
+你可以用这个脚本实现最小的保存：
 
 ```
 extends VoxelTerrain
 
 func _ready():
     stream = VoxelStreamSQLite.new()
-    stream.database_path = "path/to/save.file" # Note, the directory must exist
+    stream.database_path = "path/to/save.file" # 注意，该目录必须存在
 
 func _on_tree_exited():
     save_modified_blocks()
 ```
 
-It can get more complex as development progresses. See following sections for details.
+随着开发的进行，它可能会变得更复杂。详见以下各节。
 
-See also this demo game, which includes one save: [https://github.com/Voxel/voxelgame/tree/master/project/blocky_game](https://github.com/Voxel/voxelgame/tree/master/project/blocky_game)
+另请参见这个包含一个存档的演示游戏：[https://github.com/Voxel/voxelgame/tree/master/project/blocky_game](https://github.com/Voxel/voxelgame/tree/master/project/blocky_game)
 
-TODO: Demo handling multiple saves
+TODO: 演示处理多个存档
 
 
-Asynchronous saving
+异步保存
 ---------------------
 
-While streams have synchronous save/load methods and don't actually depend on terrains, terrains use them *asynchronously*. Loading is performed on different threads, similarly to how procedural generation works in chunks. Saving is also asynchronous, and doesn't block the main thread so the game will not stutter.
+虽然数据流有同步的保存/加载方法，并且实际上不依赖地形，但地形是*异步地*使用它们的。加载在不同线程上执行，与程序化生成区块的方式类似。保存也是异步的，不会阻塞主线程，所以游戏不会卡顿。
 
-However, this approach has consequences you usually don't encounter in more "classic" scene loading/saving, and need to be accounted for.
+然而，这种方法会带来一些你在更"经典"的场景加载/保存中通常不会遇到、需要加以考虑的后果。
 
-### Knowing when saving is complete
+### 了解保存何时完成
 
-If you save and quit a "world" for example, saving will remain happening in the background for a little while, even after you destroy the terrain node. The file won't contain the changes for a moment. To handle this, you may wait for all tasks to finish, maybe displaying a waiting screen in the meantime.
+例如，如果你保存并退出一个"世界"，保存仍会在后台持续一小段时间，即使你已经销毁了地形节点。文件在一段时间内不会包含更改。要处理这种情况，你可以等待所有任务完成，也许在此期间显示一个等待画面。
 
-Check the documentation of [save_modified_blocks()](api/VoxelTerrain.md#i_save_modified_blocks) for more details.
+有关更多详细信息，请查看 [save_modified_blocks()](api/VoxelTerrain.md#i_save_modified_blocks) 的文档。
 
-### Switching saves
+### 切换存档
 
-Another caveat is that changes you do to a stream resource at runtime can be potentially mistaken. For example, let's say you play on a terrain, you save, and want to load another terrain. You could change the path property of your stream to point to another save file/directory, and start a new session. But because saving is asynchronous, saving/loading tasks could still be pending in different threads while you do this. That can cause saves meant for the previous file to end up in the next one.
+另一个注意事项是，在运行时对数据流资源所做的更改可能会被错误处理。例如，假设你在一个地形上玩，保存后想加载另一个地形。你可以更改数据流的路径属性以指向另一个存档文件/目录，然后开始新会话。但是因为保存是异步的，当你这样做时，保存/加载任务可能仍会在不同线程中挂起。这可能导致原本用于上一个文件的保存最终被写入下一个文件。
 
-A simple solution to avoid this, is to create a different stream instance, and let the old one finish off as all its asynchronous tasks complete. This guarantees that a new session can't possibly be bothered by asynchronous tasks of the previous.
+避免这种情况的一个简单解决方案是创建不同的数据流实例，让旧实例在其所有异步任务完成后自行结束。这可以保证新会话不可能被上一会话的异步任务干扰。
 
-You should also consider *NOT embedding a stream resource inside your scene (like `world.tscn`)*. If saves are dynamically created in game, this is not a good approach, because even if you destroy the nodes from that scene and then re-instantiate it for another session, Godot keeps the resources cached, including the stream, which means you'll end up modifying the same stream as the previous session. So creating and assigning a new stream at runtime is a better option.
+你还应该考虑*不要在场景（如 `world.tscn`）中嵌入数据流资源*。如果存档是在游戏中动态创建的，这不是好方法，因为即使你销毁了该场景中的节点，然后再为另一个会话重新实例化它，Godot 也会缓存这些资源，包括数据流，这意味着你最终会修改与上一个会话相同的数据流。因此在运行时创建并分配一个新的数据流是更好的选择。
 
-### File locking
+### 文件锁定
 
-Streams remain open, in order to continuously save and load blocks of terrain. Closing and re-opening to save each block would be much slower due to system API calls, and some platforms have to do a lot of filesystem work under the hood.
+数据流会保持打开状态，以便持续保存和加载地形数据块。由于系统 API 调用，为保存每个数据块而关闭再重新打开会慢得多，而且有些平台在底层需要做大量的文件系统工作。
 
-The consequence is that save files will often be locked while they are in use. Notably, they can't be deleted.
+结果是存档文件在使用期间经常会被锁定。特别是，它们不能被删除。
 
-First, you could wait when saves complete before taking action, or just expect that your file(s) will be locked for a little while after leaving a "world".
+首先，你可以在保存完成后再采取行动，或者可以预期你的文件在离开一个"世界"后会短暂地被锁定一段时间。
 
-Second, make sure your stream actually closes. Some approaches are:
+其次，确保你的数据流真正关闭。一些方法如下：
 
-- 1) Ideally, just let Godot's resource system destroy the stream *once nothing in the game references it*. This is another reason why you should preferably not embed a stream resource in your scenes, because even if there are no instances of that scene in the tree, a variable containing the [PackedScene](https://docs.godotengine.org/en/latest/classes/class_packedscene.html) still references that resource, preventing it from being unloaded. Once all references are gone from your side, the only ones left will be eventual background tasks, that should complete soon after.
-- 2) Manually modify properties of the stream to make it "close". For example, with [VoxelStreamSQLite](api/VoxelStreamSQLite.md), you can set `database_path` to an empty string (`""`), which will force it to close. However, this will cause pending saves and loads to fail, so you should make sure to do that when saving has completed first (TODO: at the moment, [loads will cause errors too](https://github.com/Voxel/godot_voxel/issues/620#issuecomment-2040255061) but there is no way to "wait" for them. This might be addressed in the future if you want to use method 2, but for now try using method 1)
+- 1) 理想情况下，只需让 Godot 的资源系统在*游戏中没有任何东西引用该数据流*时销毁它。这是另一个你应该尽量不要在场景中嵌入数据流资源的原因，因为即使树中没有该场景的实例，包含 [PackedScene](https://docs.godotengine.org/en/latest/classes/class_packedscene.html) 的变量仍然引用该资源，使其无法被卸载。一旦你这边所有引用都消失，剩下的就只是最终的后台任务，它们应该很快就会完成。
+- 2) 手动修改数据流的属性使其"关闭"。例如，使用 [VoxelStreamSQLite](api/VoxelStreamSQLite.md) 时，你可以将 `database_path` 设置为空字符串（`""`），这会强制它关闭。然而，这会导致挂起的保存和加载失败，所以你应该确保在保存完成后才这样做（TODO: 目前，[加载也会导致错误](https://github.com/Voxel/godot_voxel/issues/620#issuecomment-2040255061)，但没有办法"等待"它们。如果你想使用方法 2，这可能会在未来解决，但现在请尝试使用方法 1）
 
 
-Using streams in the Godot Editor
+在 Godot 编辑器中使用的数据流
 ----------------------------------
 
-### Overlap between editor and game
+### 编辑器与游戏的重叠
 
-At the moment, streams can run in the editor, but they behave the same as if the game was running. If you modify anything, blocks will eventually get saved under the same conditions as seen earlier. If you want to preserve your game saves, either leave the `stream` property unassigned, or you can assign a "development save" on the stream in the editor. Then, assign a different path from within your game to the real save (using script).
+目前，数据流可以在编辑器中运行，但它们的行为与游戏运行时相同。如果你修改任何内容，数据块最终会在与前面相同的条件下被保存。如果你想保留游戏存档，要么让 `stream` 属性保持未赋值，要么可以在编辑器中为数据流分配一个"开发存档"。然后，从你的游戏中通过脚本将不同的路径分配给真实存档。
 
-If you use the same save files between game and editor, there is a risk of conflict when you run the game: it will try to open files which are already opened and locked by the editor. To workaround this, either use different files, or close the scene before running the game. See [issue 283](https://github.com/Voxel/godot_voxel/issues/283).
-
-
-### Closing the game
-
-When you test your game and expect proper saving, prefer closing it normally, instead of using Godot's `Stop` button:
-
-![Screenshot of the Stop button in the Godot Editor](images/godot_editor_stop_button.webp)
-
-This button will [kill the game's process](https://github.com/godotengine/godot/blob/b4e2a24c1f62088b3f7ce0197afc90832fc25009/editor/editor_run.cpp#L358), without leaving a chance for cleanup (SIGKILL on Linux). That means any pending save tasks will be lost, and caches won't be flushed. If files are in the middle of being written, it can also cause them to get corrupted.
+如果你在游戏和编辑器之间使用相同的存档文件，运行游戏时存在冲突风险：它会尝试打开已被编辑器打开并锁定的文件。要解决这个问题，要么使用不同的文件，要么在运行游戏前关闭场景。参见[问题 283](https://github.com/Voxel/godot_voxel/issues/283)。
 
 
-Save format specifications
+### 关闭游戏
+
+当你测试游戏并期望正常保存时，最好正常关闭它，而不是使用 Godot 的 `Stop` 按钮：
+
+![Godot 编辑器中 Stop 按钮的截图](images/godot_editor_stop_button.webp)
+
+这个按钮会[杀死游戏进程](https://github.com/godotengine/godot/blob/b4e2a24c1f62088b3f7ce0197afc90832fc25009/editor/editor_run.cpp#L358)，不会留下清理的机会（Linux 上的 SIGKILL）。这意味着任何挂起的保存任务都会丢失，缓存不会被刷新。如果文件正在写入过程中，也可能导致它们损坏。
+
+
+存档格式规范
 ----------------------------
 
-- [Region format](specs/region_format_v3.md)
-- [Block format](specs/block_format_v4.md)
-- [Instance format](specs/instances_format_v1.md)
-- [SQLite format](specs/sqlite_format_v1.md)
+- [区域格式](specs/region_format_v3.md)
+- [数据块格式](specs/block_format_v4.md)
+- [实例格式](specs/instances_format_v1.md)
+- [SQLite 格式](specs/sqlite_format_v1.md)

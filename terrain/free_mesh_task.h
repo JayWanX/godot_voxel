@@ -8,17 +8,17 @@
 
 namespace voxel {
 
-// Had to resort to this in Godot4 because deleting meshes is particularly expensive,
-// because of the Vulkan allocator used by the renderer.
-// It is a deferred cost (it is not spent at the exact time the Mesh object is destroyed, it happens later), so had to
-// use a different type of task to load-balance it. What this task actually does is just to hold a reference on a mesh a
-// bit longer, assuming that mesh is no longer used. Then the execution of the task releases that reference.
+// 在 Godot4 中不得不这样做，因为删除网格尤其昂贵，
+// 这归因于渲染器使用的 Vulkan 分配器。
+// 这是一个延迟成本（它不是在 Mesh 对象被销毁的确切时刻消耗的，而是稍后发生），所以必须
+// 使用不同类型的任务来进行负载均衡。该任务实际上只是将网格的引用多保留
+// 一小段时间，假定该网格不再被使用。然后执行该任务会释放该引用。
 class FreeMeshTask : public IProgressiveTask {
 public:
 	static inline void try_add_and_destroy(voxel::godot::DirectMeshInstance &mi) {
 		const Mesh *mesh = mi.get_mesh_ptr();
 		if (mesh != nullptr && mesh->get_reference_count() == 1) {
-			// That instances holds the last reference to this mesh
+			// 该实例持有此网格的最后一个引用
 			add(mi.get_mesh());
 		}
 		mi.destroy();

@@ -11,7 +11,7 @@ namespace voxel {
 class VoxelBlockyModelEditorInspectorPlugin : public voxel::godot::Voxel_EditorInspectorPlugin {
 	GDCLASS(VoxelBlockyModelEditorInspectorPlugin, voxel::godot::Voxel_EditorInspectorPlugin)
 public:
-	// `EditorUndoRedoManager` isn't a singleton, so it has to be injected.
+	// `EditorUndoRedoManager` 不是单例，因此必须注入。
 	void set_undo_redo(EditorUndoRedoManager *urm);
 
 protected:

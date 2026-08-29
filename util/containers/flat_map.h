@@ -15,11 +15,11 @@ struct FlatMapDefaultComparator {
 	}
 };
 
-// Associative container based on a sorted internal vector.
-// Should be a good tradeoff for small amount of unique items with key lookup while keeping fast iteration.
-// Two elements with the same key is not allowed.
-// The address of keys and values is not guaranteed to be stable.
-// See https://riptutorial.com/cplusplus/example/7270/using-a-sorted-vector-for-fast-element-lookup
+// 基于有序内部向量的关联容器。
+// 在少量唯一元素、需要按键查找又希望保持快速迭代时，是一个不错的折中。
+// 不允许出现两个相同键的元素。
+// 键和值的地址不保证稳定。
+// 参见 https://riptutorial.com/cplusplus/example/7270/using-a-sorted-vector-for-fast-element-lookup
 template <typename K, typename T, typename KComp = FlatMapDefaultComparator<K>>
 class FlatMap {
 public:
@@ -27,44 +27,44 @@ public:
 		K key;
 		T value;
 
-		// For std::sort
+		// 用于 std::sort
 		inline bool operator<(const Pair &other) const {
 			return KComp::less_than(key, other.key);
 		}
 
-		// For std::lower_bound
+		// 用于 std::lower_bound
 		inline bool operator<(const K &other_key) const {
 			return KComp::less_than(key, other_key);
 		}
 	};
 
-	// If the key already exists, the item is not inserted and returns false.
-	// If insertion was successful, returns true.
+	// 若键已存在，则不插入该项并返回 false。
+	// 若插入成功，返回 true。
 	bool insert(K key, T value) {
 		typename StdVector<Pair>::const_iterator it = std::lower_bound(_items.begin(), _items.end(), key);
 		if (it != _items.end() && it->key == key) {
-			// Item already exists
+			// 项已存在
 			return false;
 		}
 		_items.insert(it, Pair{ key, value });
 		return true;
 	}
 
-	// If the key already exists, the item will replace the previous value.
+	// 若键已存在，该项会替换之前的值。
 	T &insert_or_assign(K key, T value) {
 		typename StdVector<Pair>::iterator it = std::lower_bound(_items.begin(), _items.end(), key);
 		if (it != _items.end() && it->key == key) {
-			// Item already exists, assign it
+			// 项已存在，直接赋值
 			it->value = value;
 		} else {
-			// Item doesnt exist, insert it
+			// 项不存在，插入它
 			it = _items.insert(it, Pair{ key, value });
 		}
 		return it->value;
 	}
 
-	// Initialize from a collection if items.
-	// Faster than doing individual insertion of each item.
+	// 从元素集合初始化。
+	// 比逐项插入更快。
 	void clear_and_insert(Span<Pair> pairs) {
 		clear();
 		_items.resize(pairs.size());
@@ -91,12 +91,12 @@ public:
 	}
 
 	bool has(K key) const {
-		// Using std::binary_search is very annoying.
-		// First, we don't want to pass a Pair because it would require constructing a T.
-		// Using just the key as the "value" to search doesn't compile because Pair only has comparison with K as second
-		// argument.
-		// Specifying a comparison lambda is also not viable because both arguments need to be convertible to K.
-		// Making it work would require passing a struct with two operators() with arguments in both orders...
+		// 使用 std::binary_search 非常麻烦。
+		// 首先，我们不想传入 Pair，因为那需要构造一个 T。
+		// "仅用键作为待搜索的"value"无法编译，因为 Pair 只提供了与 K 作为第二
+		// 参数的比较。
+		// 指定比较 lambda 也不可行，因为两个参数都需能转换为 K。
+		// 要让它工作，需要传入一个带两个 operators()、参数顺序相反的结构体……
 		// return std::binary_search(_items.cbegin(), _items.cend(), key);
 
 		typename StdVector<Pair>::const_iterator it = std::lower_bound(_items.begin(), _items.end(), key);
@@ -123,7 +123,7 @@ public:
 	// template <typename F>
 	// inline void for_each(F f) {
 	// 	for (auto it = _items.begin(); it != _items.end(); ++it) {
-	// 		// Do not expose the possibility of modifying keys
+	// 		// 不暴露修改键（key）的可能性
 	// 		const K key = it->key;
 	// 		f(key, it->value);
 	// 	}
@@ -132,7 +132,7 @@ public:
 	// template <typename F>
 	// inline void for_each_const(F f) const {
 	// 	for (auto it = _items.begin(); it != _items.end(); ++it) {
-	// 		// Do not expose the possibility of modifying keys
+	// 		// 不暴露修改键（key）的可能性
 	// 		const K key = it->key;
 	// 		f(key, it->value);
 	// 	}
@@ -196,7 +196,7 @@ public:
 	}
 
 private:
-	// Sorted by key
+	// 按键排序
 	StdVector<Pair> _items;
 };
 
@@ -212,7 +212,7 @@ private:
 // 	}
 // }
 
-// Specialization of FlatMap where `T` is not copyable, only movable
+// FlatMap 的特化版本，其中 `T` 不可拷贝，仅可移动
 template <typename K, typename T, typename KComp = FlatMapDefaultComparator<K>>
 class FlatMapMoveOnly {
 public:
@@ -220,12 +220,12 @@ public:
 		K key;
 		T value;
 
-		// For std::sort
+		// 用于 std::sort
 		inline bool operator<(const Pair &other) const {
 			return KComp::less_than(key, other.key);
 		}
 
-		// For std::lower_bound
+		// 用于 std::lower_bound
 		inline bool operator<(const K &other_key) const {
 			return KComp::less_than(key, other_key);
 		}
@@ -256,33 +256,33 @@ public:
 		return _items[i].value;
 	}
 
-	// If the key already exists, the item is not inserted and returns false.
-	// If insertion was successful, returns true.
+	// 若键已存在，则不插入该项并返回 false。
+	// 若插入成功，返回 true。
 	bool insert(K key, T &&value) {
 		typename StdVector<Pair>::const_iterator it = std::lower_bound(_items.begin(), _items.end(), key);
 		if (it != _items.end() && it->key == key) {
-			// Item already exists
+			// 项已存在
 			return false;
 		}
 		_items.insert(it, std::move(Pair(key, std::move(value))));
 		return true;
 	}
 
-	// If the key already exists, the item will replace the previous value.
+	// 若键已存在，该项会替换之前的值。
 	T &insert_or_assign(K key, T &&value) {
 		typename StdVector<Pair>::iterator it = std::lower_bound(_items.begin(), _items.end(), key);
 		if (it != _items.end() && it->key == key) {
-			// Item already exists, assign it
+			// 项已存在，直接赋值
 			it->value = std::move(value);
 		} else {
-			// Item doesnt exist, insert it
+			// 项不存在，插入它
 			it = _items.insert(it, std::move(Pair(key, std::move(value))));
 		}
 		return it->value;
 	}
 
-	// Initialize from a collection if items.
-	// Faster than doing individual insertion of each item.
+	// 从元素集合初始化。
+	// 比逐项插入更快。
 	void clear_and_insert(Span<Pair> pairs) {
 		clear();
 		_items.resize(pairs.size());
@@ -309,12 +309,12 @@ public:
 	}
 
 	bool has(K key) const {
-		// Using std::binary_search is very annoying.
-		// First, we don't want to pass a Pair because it would require constructing a T.
-		// Using just the key as the "value" to search doesn't compile because Pair only has comparison with K as second
-		// argument.
-		// Specifying a comparison lambda is also not viable because both arguments need to be convertible to K.
-		// Making it work would require passing a struct with two operators() with arguments in both orders...
+		// 使用 std::binary_search 非常麻烦。
+		// 首先，我们不想传入 Pair，因为那需要构造一个 T。
+		// "仅用键作为待搜索的"value"无法编译，因为 Pair 只提供了与 K 作为第二
+		// 参数的比较。
+		// 指定比较 lambda 也不可行，因为两个参数都需能转换为 K。
+		// 要让它工作，需要传入一个带两个 operators()、参数顺序相反的结构体……
 		// return std::binary_search(_items.cbegin(), _items.cend(), key);
 
 		typename StdVector<Pair>::const_iterator it = std::lower_bound(_items.begin(), _items.end(), key);
@@ -407,7 +407,7 @@ public:
 	}
 
 private:
-	// Sorted by key
+	// 按键排序
 	StdVector<Pair> _items;
 };
 

@@ -10,8 +10,8 @@ namespace voxel::godot {
 
 class VoxelBuffer;
 
-// Godot-facing API for BlockSerializer
-// TODO Could be a singleton? Or methods on VoxelBuffer? This object has no state.
+// 面向 Godot 的 BlockSerializer API
+// TODO 可以是单例吗？或做成 VoxelBuffer 的方法？该对象没有状态。
 class VoxelBlockSerializer : public RefCounted {
 	GDCLASS(VoxelBlockSerializer, RefCounted)
 public:
@@ -21,8 +21,8 @@ public:
 		COMPRESSION_ZSTD,
 	};
 
-	// Must use this because the internal enum does not have consecutive IDs (can't change because of saves),
-	// and Godot wants consecutive IDs...
+	// 必须使用它，因为内部枚举没有连续的 ID（因保存数据而无法更改），
+	// 而 Godot 需要连续的 ID……
 	static Compression compression_to_gd(const CompressedData::Compression src);
 	static CompressedData::Compression compression_from_gd(const Compression src);
 

@@ -5,7 +5,7 @@
 
 namespace voxel::godot {
 
-// StringNames used by VOXEL_* classes
+// VOXEL_* 类使用的 StringName
 class StringNames {
 private:
 	static StringNames *g_singleton;

@@ -6,9 +6,9 @@
 
 namespace voxel {
 
-// Template 4-dimensional vector. Only fields and standard operators.
-// Math functions are separate to allow more unified overloading, and similarity with other math libraries such as
-// shaders.
+// 模板四维向量。仅包含字段与标准运算符。
+// 数学函数独立出来，以便实现更统一的重载，并与其他数学库（如
+// 着色器）保持一致。
 template <typename T>
 struct Vector4T {
 	static const unsigned int AXIS_COUNT = 4;
@@ -25,8 +25,8 @@ struct Vector4T {
 
 	Vector4T() : x(0), y(0), z(0), w(0) {}
 
-	// It is recommended to use `explicit` because otherwise it would open the door to plenty of implicit conversions
-	// which would make many cases ambiguous.
+	// 建议使用 `explicit`，否则会引入大量隐式转换，
+	// 导致许多情况产生二义性。
 	explicit Vector4T(T p_v) : x(p_v), y(p_v), z(p_v), w(p_v) {}
 
 	Vector4T(T p_x, T p_y, T p_z, T p_w) : x(p_x), y(p_y), z(p_z), w(p_w) {}

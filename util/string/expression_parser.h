@@ -107,14 +107,14 @@ struct Function {
 	FunctionCallback func = nullptr;
 };
 
-// TODO `text` should be `const`
+// TODO `text` 应该是 `const`
 Result parse(std::string_view text, Span<const Function> functions);
 bool is_tree_equal(const Node &root_a, const Node &root_b, Span<const Function> functions);
 StdString tree_to_string(const Node &node, Span<const Function> functions);
 StdString to_string(const Error error);
 void find_variables(const Node &node, StdVector<std::string_view> &variables);
 
-// TODO Just use indices in the span? Or pointers?
+// TODO 在 span 中直接使用索引？还是用指针？
 inline const Function *find_function_by_id(unsigned int id, Span<const Function> functions) {
 	for (unsigned int i = 0; i < functions.size(); ++i) {
 		const Function &f = functions[i];

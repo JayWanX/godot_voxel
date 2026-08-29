@@ -79,14 +79,14 @@ namespace FastSIMD
         FS_INLINE NEON_i32x4& operator>>=( const int32_t rhs )
         {
             int32x4_t rhs2 = vdupq_n_s32( -rhs );
-            *this = vshlq_s32(*this, rhs2);//use shift right by constant for faster execution
+            *this = vshlq_s32(*this, rhs2);//使用向右侧移常量以获得更快的执行速度
             return *this;
         }
 
         FS_INLINE NEON_i32x4& operator<<=( const int32_t rhs )
         {
             int32x4_t rhs2 = vdupq_n_s32( rhs );
-            *this = vshlq_s32(*this, rhs2);//use shift left by constant for faster execution
+            *this = vshlq_s32(*this, rhs2);//使用向左侧移常量以获得更快的执行速度
             return *this;
         }
 
@@ -179,9 +179,9 @@ namespace FastSIMD
             {
                 
                 float32x4_t reciprocal = vrecpeq_f32( rhs );
-                // use a couple Newton-Raphson steps to refine the estimate.  Depending on your
-                // application's accuracy requirements, you may be able to get away with only
-                // one refinement (instead of the two used here).  Be sure to test!
+                // 使用几次牛顿-拉弗森（Newton-Raphson）步骤来优化估算。根据你的
+                // 应用的精度要求，你可能只需要
+                // 一次优化（而非此处使用的两次）。务必测试！
                 reciprocal = vmulq_f32( vrecpsq_f32( rhs, reciprocal ), reciprocal );
                 reciprocal = vmulq_f32( vrecpsq_f32( rhs, reciprocal ), reciprocal );
 
@@ -379,7 +379,7 @@ namespace FastSIMD
             return vbslq_s32( vreinterpretq_u32_s32( m ), a, b );
         }
 
-        // Min, Max
+        // Min、Max
 
         FS_INLINE static float32v Min_f32( float32v a, float32v b )
         {
@@ -450,7 +450,7 @@ namespace FastSIMD
             return vrsqrteq_f32( a );
         }        
         
-        // Floor, Ceil, Round:
+        // Floor、Ceil、Round：
 
 #ifdef FASTSIMD_USE_ARMV7    
         FS_INLINE static float32v IntFloor_f32(float32v a)

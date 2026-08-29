@@ -11,7 +11,7 @@ void get_shader_parameter_list(const RID &shader_rid, StdVector<ShaderParameterI
 #if defined(VOXEL_GODOT)
 	List<PropertyInfo> params;
 	RenderingServer::get_singleton()->get_shader_parameter_list(shader_rid, &params);
-	// I'd like to use ConstIterator since I only read that list but that isn't possible :shrug:
+	// 我本想使用 ConstIterator，因为我只读取该列表，但那是不可能的 :shrug:
 	for (List<PropertyInfo>::Iterator it = params.begin(); it != params.end(); ++it) {
 		const PropertyInfo property = *it;
 		ShaderParameterInfo pi;
@@ -26,14 +26,14 @@ void get_shader_parameter_list(const RID &shader_rid, StdVector<ShaderParameterI
 String get_current_rendering_method_name() {
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 	RenderingServer *rs = RenderingServer::get_singleton();
-	// RenderingServer can be null with `tests=yes`.
+	// `tests=yes` 时 RenderingServer 可能为 null。
 	VOXEL_ASSERT_RETURN_V(rs != nullptr, "");
 
 	const String method_name = rs->get_current_rendering_method();
 	return method_name;
 
 #else
-	// See https://github.com/godotengine/godot/pull/85430
+	// 参见 https://github.com/godotengine/godot/pull/85430
 
 #if defined(VOXEL_GODOT)
 	OS *os = OS::get_singleton();
@@ -65,14 +65,14 @@ RenderMethod get_current_rendering_method() {
 String get_current_rendering_driver_name() {
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 	RenderingServer *rs = RenderingServer::get_singleton();
-	// RenderingServer can be null with `tests=yes`.
+	// `tests=yes` 时 RenderingServer 可能为 null。
 	VOXEL_ASSERT_RETURN_V(rs != nullptr, "");
 
 	const String driver_name = rs->get_current_rendering_driver_name();
 	return driver_name;
 
 #else
-	// See https://github.com/godotengine/godot/pull/85430
+	// 参见 https://github.com/godotengine/godot/pull/85430
 
 #if defined(VOXEL_GODOT)
 	OS *os = OS::get_singleton();

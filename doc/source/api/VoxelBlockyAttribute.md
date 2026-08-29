@@ -1,16 +1,16 @@
 # VoxelBlockyAttribute
 
-Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
+继承自：[Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
-Inherited by: [VoxelBlockyAttributeAxis](VoxelBlockyAttributeAxis.md), [VoxelBlockyAttributeCustom](VoxelBlockyAttributeCustom.md), [VoxelBlockyAttributeDirection](VoxelBlockyAttributeDirection.md), [VoxelBlockyAttributeRotation](VoxelBlockyAttributeRotation.md)
+派生：[VoxelBlockyAttributeAxis](VoxelBlockyAttributeAxis.md), [VoxelBlockyAttributeCustom](VoxelBlockyAttributeCustom.md), [VoxelBlockyAttributeDirection](VoxelBlockyAttributeDirection.md), [VoxelBlockyAttributeRotation](VoxelBlockyAttributeRotation.md)
 
 !!! warning
-    This class is marked as experimental. It is subject to likely change or possible removal in future versions. Use at your own discretion.
+    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
 
-## Methods: 
+## 方法：
 
 
-Return                                                                              | Signature                                             
+返回值                                                                                 | 函数签名                                                  
 ----------------------------------------------------------------------------------- | ------------------------------------------------------
 [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)  | [get_attribute_name](#i_get_attribute_name) ( ) const 
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_default_value](#i_get_default_value) ( ) const   
@@ -18,26 +18,26 @@ Return                                                                          
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)              | [is_rotation](#i_is_rotation) ( ) const               
 <p></p>
 
-## Constants: 
+## 常量：
 
 - <span id="i_MAX_VALUES"></span>**MAX_VALUES** = **256**
 
-## Method Descriptions
+## 方法描述
 
 ### [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)<span id="i_get_attribute_name"></span> **get_attribute_name**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_default_value"></span> **get_default_value**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_value_count"></span> **get_value_count**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_rotation"></span> **is_rotation**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

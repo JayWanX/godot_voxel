@@ -16,13 +16,13 @@ class VoxelBuffer;
 
 namespace BlockSerializer {
 
-// Latest version, used when serializing
+// 序列化时使用的最新版本
 static const uint8_t BLOCK_FORMAT_VERSION = 4;
 
 struct SerializeResult {
-	// The lifetime of the pointed object is only valid in the calling thread,
-	// until another serialization or deserialization call is made.
-	// TODO Eventually figure out allocators so the caller can decide
+	// 所指向对象的生命周期仅在调用线程内有效，
+	// 直到进行下一次序列化或反序列化调用为止。
+	// TODO 最终要整理分配器，以便调用方决定
 	const StdVector<uint8_t> &data;
 	bool success;
 
@@ -39,7 +39,7 @@ SerializeResult serialize_and_compress(
 bool decompress_and_deserialize(Span<const uint8_t> p_data, VoxelBuffer &out_voxel_buffer);
 bool decompress_and_deserialize(FileAccess &f, unsigned int size_to_read, VoxelBuffer &out_voxel_buffer);
 
-// Temporary thread-local buffers for internal use
+// 供内部使用的临时线程本地缓冲区
 StdVector<uint8_t> &get_tls_data();
 StdVector<uint8_t> &get_tls_compressed_data();
 

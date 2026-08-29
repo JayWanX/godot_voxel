@@ -4,8 +4,8 @@
 #include "../godot/core/vector3.h"
 #include "funcs.h"
 
-// 3-dimensional vector which components are either 32-bit float or 64-bit float depending on how Godot was compiled.
-// This is the type to use for interoperating with Godot.
+// 三维向量，其分量为 32 位或 64 位浮点数，取决于 Godot 的编译方式。
+// 这是与 Godot 互操作时使用的类型。
 
 namespace voxel::godot::Vector3Utility {
 

@@ -35,7 +35,7 @@ bool VoxelMetadataVariant::equals(const ICustomVoxelMetadata &other) const {
 	VOXEL_ASSERT(dynamic_cast<const VoxelMetadataVariant *>(&other) != nullptr);
 #endif
 	const VoxelMetadataVariant &other_v = static_cast<const VoxelMetadataVariant &>(other);
-	// TODO Implement deep comparison?
+	// TODO 实现深度比较？
 	return data == other_v.data;
 }
 

@@ -1,16 +1,16 @@
-SQLite format v1
+SQLite 格式 v1
 ================
 
-This page describes the database schema used by `VoxelStreamSQLite`.
+本页描述 `VoxelStreamSQLite` 使用的数据库模式。
 
 
-Changes from version 0
+相对版本 0 的变化
 -------------------------
 
-Added a `coordinate_format` column to the `meta` table, and several ways to represent coordinates in the `blocks` table.
+向 `meta` 表添加了 `coordinate_format` 列，并为 `blocks` 表提供了多种表示坐标的方式。
 
 
-Schema
+模式
 --------
 
 ### `meta`
@@ -23,13 +23,13 @@ meta {
 }
 ```
 
-Contains general info about the volume. There is only one row inside it.
+包含关于体量的通用信息。其中只有一行记录。
 
-- `version` is the version of the schema. Currently `1`.
-- `block_size_po2` is the size of blocks as a power of two. They are expected to be always the same. By default it is `4` (for blocks of 16x16x16).
-- `coordinate_format` specifies how block coordinates are stored.
+- `version` 是模式的版本。当前为 `1`。
+- `block_size_po2` 是数据块以 2 的幂表示的尺寸。它们预期始终保持一致。默认值为 `4`（用于 16x16x16 的数据块）。
+- `coordinate_format` 指定数据块坐标的存储方式。
 
-Usually, this row should never be modified once the database is setup. If for some reason changes are necessary, they must be done such that the database remains consistent (and may require to re-process all the blocks). Creating a new database and converting over may be preferable than modifying in-place.
+通常，一旦数据库建立，这一行记录就不应再被修改。如果由于某些原因必须更改，更改方式必须保证数据库保持一致（可能需要重新处理所有数据块）。新建一个数据库并转换过去可能比就地修改更可取。
 
 
 ### `blocks`
@@ -47,29 +47,29 @@ blocks {
 }
 ```
 
-Contains every block of the volume. There can be thousands of them.
+包含体量中的每一个数据块。可能有成千上万个。
 
-- `loc` is a key identifying the block, usually made from its coordinates. Its encoding depends on `meta.coordinate_format`.
-- `vb` contains compressed voxel data using the [Block format](block_format_v4.md).
-- `instances` contains compressed instance data using the [Instance format](instances_format_v1.md).
+- `loc` 是标识数据块的键，通常由其坐标构成。其编码取决于 `meta.coordinate_format`。
+- `vb` 包含使用[数据块格式](block_format_v4.md)压缩的体素数据。
+- `instances` 包含使用[实例格式](instances_format_v1.md)压缩的实例数据。
 
-#### Coordinate format
+#### 坐标格式
 
-In all cases, coordinates are equal to the origin of the block in voxels, divided by the size of the block + lod index using euclidean division (`coord >> (block_size_po2 + lod_index)`).
-Depending on `meta.coordinate_format`, that column is interpreted differently:
+在所有情况下，坐标等于数据块在体素中的原点，按欧几里得除法除以数据块尺寸 + LOD 索引（`coord >> (block_size_po2 + lod_index)`）。
+根据 `meta.coordinate_format`，该列的解释方式不同：
 
-- `0`: 64-bit little-endian integer packing the coordinates and LOD index of the block. XYZ are 16-bit signed integers, and LOD is a 8-bit unsigned integer: `0LXXYYZZ`. This was the default format in v0.
-- `1`: 64-bit little-endian integer packing the coordinates and LOD index of the block. XYZ are 19-bit signed integers, and LOD is a 7-bit unsigned integer: `lllllllx xxxxxxxx xxxxxxxx xxyyyyyy yyyyyyyy yyyyyzzz zzzzzzzz zzzzzzzz` (where the most significant bits are on the left).
-- `2`: Comma-separated coordinates in base 10, stored in plain text, without spaces.
-- `3`: 80-bit blob packing the coordinates and LOD index. XYZ are 25-bit signed integers, and LOD is a 5-bit unsigned integer. 
+- `0`：64 位小端整数，打包数据块的坐标和 LOD 索引。XYZ 是 16 位有符号整数，LOD 是 8 位无符号整数：`0LXXYYZZ`。这是 v0 中的默认格式。
+- `1`：64 位小端整数，打包数据块的坐标和 LOD 索引。XYZ 是 19 位有符号整数，LOD 是 7 位无符号整数：`lllllllx xxxxxxxx xxxxxxxx xxyyyyyy yyyyyyyy yyyyyzzz zzzzzzzz zzzzzzzz`（最高有效位在左侧）。
+- `2`：以逗号分隔、基数为 10 的坐标，以纯文本形式存储，不含空格。
+- `3`：80 位 blob，打包坐标和 LOD 索引。XYZ 是 25 位有符号整数，LOD 是 5 位无符号整数。
 
-Format `3` can be represented this way:
+格式 `3` 可以这样表示：
 ```
 Byte |   9        8        7        6        5        4        3        2        1        0
 -----|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------
 Bits |lllllzzz zzzzzzzz zzzzzzzz zzzzzzyy yyyyyyyy yyyyyyyy yyyyyyyx xxxxxxxx xxxxxxxx xxxxxxxx
 ```
-Where each cluster of bits (for each coordinate) may be read with most significant bit to the left, as when printed out. Note the reverse byte order.
+其中每个位簇（对应每个坐标）在读取时最高有效位在左侧，与打印出来时一致。注意字节顺序是反的。
 
 
 
@@ -82,8 +82,7 @@ channels {
 }
 ```
 
-Contains general info about which channel formats should be expected in the volume. There is one row per used channel.
+包含关于体量中应期望哪些通道格式的通用信息。每个使用的通道有一行记录。
 
 !!! warning
-    Currently this table is actually not used, because the engine still needs work to manage formats in general. For now the database accepts blocks of any formats since they are standalone since version 3, but ideally they must be consistent.
-
+    目前这张表实际上未被使用，因为引擎在整体上仍需要完善格式管理。目前数据库接受任何格式的数据块，因为自版本 3 起它们就是独立自足的，但理想情况下它们必须保持一致。

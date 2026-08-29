@@ -17,8 +17,8 @@
 			<param index="0" name="key" type="Array" />
 			<param index="1" name="model" type="VoxelBlockyModel" />
 			<description>
-				Explicitely sets which model to use for a given combination of attributes (key).
-				If you have attributes that automatically generate variants (such as rotations), you are expected to only set models for the default value of such attributes. Other models will not be preserved. This is because the default value will be used as a reference to generate the other models.
+				明确设置对于给定的属性组合（键）使用哪个模型。
+				如果你有自动生成变体的属性（如旋转），你应仅为这些属性的默认值设置模型。其他模型将不会被保留。这是因为默认值将被用作参考来生成其他模型。
 			</description>
 		</method>
 	</methods>

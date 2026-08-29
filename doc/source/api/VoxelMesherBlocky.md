@@ -1,17 +1,17 @@
 # VoxelMesherBlocky
 
-Inherits: [VoxelMesher](VoxelMesher.md)
+继承自：[VoxelMesher](VoxelMesher.md)
 
-Produces a mesh by batching models corresponding to each voxel value, similar to games like Minecraft or StarMade.
+通过批量合并与每个体素值对应的模型来生成网格，类似于 Minecraft 或 StarMade 等游戏。
 
-## Description: 
+## 描述：
 
-Occluded faces are removed from the result, and some degree of ambient occlusion can be baked on the edges. Values are expected to be in the [VoxelBuffer.CHANNEL_TYPE](VoxelBuffer.md#i_CHANNEL_TYPE) channel. Models are defined with a [VoxelBlockyLibrary](VoxelBlockyLibrary.md), in which model indices correspond to the voxel values. Models don't have to be cubes.
+被遮挡的面会从结果中移除，并且可以在边缘烘焙一定程度的环境光遮蔽。体素值应存储在 [VoxelBuffer.CHANNEL_TYPE](VoxelBuffer.md#i_CHANNEL_TYPE) 通道中。模型通过 [VoxelBlockyLibrary](VoxelBlockyLibrary.md) 定义，其中模型索引与体素值对应。模型不一定是立方体。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                      | Name                                                         | Default       
+类型                                                                        | 名称                                                           | 默认值           
 ------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------
 [VoxelBlockyLibraryBase](VoxelBlockyLibraryBase.md)                       | [library](#i_library)                                        |               
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [occlusion_darkness](#i_occlusion_darkness)                  | 0.8           
@@ -25,18 +25,18 @@ Type                                                                      | Name
 [TintMode](VoxelMesherBlocky.md#enumerations)                             | [tint_mode](#i_tint_mode)                                    | TINT_NONE (0) 
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                  | Signature                                                                                                                                                                                   
+返回值                                                                     | 函数签名                                                                                                                                                                                        
 ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)  | [get_shadow_occluder_side](#i_get_shadow_occluder_side) ( [Side](VoxelMesherBlocky.md#enumerations) side ) const                                                                            
 [void](#)                                                               | [set_shadow_occluder_side](#i_set_shadow_occluder_side) ( [Side](VoxelMesherBlocky.md#enumerations) side, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled )  
 <p></p>
 
-## Enumerations: 
+## 枚举：<span id="enumerations"></span>
 
-enum **Side**: 
+枚举 **Side**：
 
 - <span id="i_SIDE_NEGATIVE_X"></span>**SIDE_NEGATIVE_X** = **0**
 - <span id="i_SIDE_POSITIVE_X"></span>**SIDE_POSITIVE_X** = **1**
@@ -45,62 +45,62 @@ enum **Side**:
 - <span id="i_SIDE_NEGATIVE_Z"></span>**SIDE_NEGATIVE_Z** = **4**
 - <span id="i_SIDE_POSITIVE_Z"></span>**SIDE_POSITIVE_Z** = **5**
 
-enum **TintMode**: 
+枚举 **TintMode**：
 
-- <span id="i_TINT_NONE"></span>**TINT_NONE** = **0** --- Only use colors from library models.
-- <span id="i_TINT_RAW_COLOR"></span>**TINT_RAW_COLOR** = **1** --- Modulate voxel colors based on the [VoxelBuffer.CHANNEL_COLOR](VoxelBuffer.md#i_CHANNEL_COLOR) channel. Values are interpreted as being raw RGBA color. If the channel is 16-bit, colors are packed with 4 bits per component. If 32-bits, colors are packed with 8 bits per component. Other depths are not supported. See [VoxelTool.color_to_u32](VoxelTool.md#i_color_to_u32) for encoding. You may also change the format of the color channel to use this, see [VoxelNode.format](VoxelNode.md#i_format). Alpha will only have an effect if the material supports transparency, but will not affect how faces are culled by the mesher.
+- <span id="i_TINT_NONE"></span>**TINT_NONE** = **0** --- 仅使用库模型中的颜色。
+- <span id="i_TINT_RAW_COLOR"></span>**TINT_RAW_COLOR** = **1** --- 根据 [VoxelBuffer.CHANNEL_COLOR](VoxelBuffer.md#i_CHANNEL_COLOR) 通道调整体素颜色。值被解释为原始 RGBA 颜色。如果通道是 16 位，则颜色按每个分量 4 位打包。如果是 32 位，则颜色按每个分量 8 位打包。不支持其他位深。编码请参见 [VoxelTool.color_to_u32](VoxelTool.md#i_color_to_u32)。你也可以更改颜色通道的格式来使用此模式，参见 [VoxelNode.format](VoxelNode.md#i_format)。Alpha 仅在材质支持透明度时才会生效，但不会影响网格生成器对面进行剔除的方式。
 
 
-## Property Descriptions
+## 属性描述
 
 ### [VoxelBlockyLibraryBase](VoxelBlockyLibraryBase.md)<span id="i_library"></span> **library**
 
-Library of models that will be used by this mesher. If you are using a mesher without a terrain, make sure you call [VoxelBlockyLibraryBase.bake](VoxelBlockyLibraryBase.md#i_bake) before building meshes, otherwise results will be empty or out-of-date.
+此网格生成器将使用的模型库。如果你在没有地形的情况下使用网格生成器，请确保在构建网格之前调用 [VoxelBlockyLibraryBase.bake](VoxelBlockyLibraryBase.md#i_bake)，否则结果将为空或已过时。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_occlusion_darkness"></span> **occlusion_darkness** = 0.8
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_occlusion_enabled"></span> **occlusion_enabled** = true
 
-Enables baked ambient occlusion. To render it, you need a material that applies vertex colors.
+启用烘焙的环境光遮蔽。要渲染它，你需要一个应用顶点颜色的材质。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_shadow_occluder_negative_x"></span> **shadow_occluder_negative_x** = false
 
-When enabled, generates a quad covering the negative X side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块负 X 侧的四边形，以强制方向光投射阴影。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_shadow_occluder_negative_y"></span> **shadow_occluder_negative_y** = false
 
-When enabled, generates a quad covering the negative Y side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块负 Y 侧的四边形，以强制方向光投射阴影。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_shadow_occluder_negative_z"></span> **shadow_occluder_negative_z** = false
 
-When enabled, generates a quad covering the negative Z side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块负 Z 侧的四边形，以强制方向光投射阴影。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_shadow_occluder_positive_x"></span> **shadow_occluder_positive_x** = false
 
-When enabled, generates a quad covering the positive X side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块正 X 侧的四边形，以强制方向光投射阴影。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_shadow_occluder_positive_y"></span> **shadow_occluder_positive_y** = false
 
-When enabled, generates a quad covering the positive Y side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块正 Y 侧的四边形，以强制方向光投射阴影。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_shadow_occluder_positive_z"></span> **shadow_occluder_positive_z** = false
 
-When enabled, generates a quad covering the positive Z side of the chunk if it is fully covered by opaque voxels, in order to force directional lights to project a shadow.
+启用后，如果数据块完全被不透明体素覆盖，则生成一个覆盖数据块正 Z 侧的四边形，以强制方向光投射阴影。
 
 ### [TintMode](VoxelMesherBlocky.md#enumerations)<span id="i_tint_mode"></span> **tint_mode** = TINT_NONE (0)
 
-Configures a way to apply color from voxel data.
+配置从体素数据应用颜色的方式。
 
-## Method Descriptions
+## 方法描述
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_get_shadow_occluder_side"></span> **get_shadow_occluder_side**( [Side](VoxelMesherBlocky.md#enumerations) side ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_set_shadow_occluder_side"></span> **set_shadow_occluder_side**( [Side](VoxelMesherBlocky.md#enumerations) side, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

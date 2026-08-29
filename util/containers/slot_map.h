@@ -8,7 +8,7 @@
 
 namespace voxel {
 
-// Version part of a SlotMap key. The last bit is used to represent the version of an unused slot.
+// SlotMap 键的版本部分。最后一位用于表示未使用槽位的版本。
 template <typename TVersion>
 struct SlotMapVersion {
 	static const uint32_t UNUSED_BIT = 1 << (8 * sizeof(TVersion) - 1);
@@ -48,12 +48,12 @@ struct SlotMapVersion {
 	}
 };
 
-// Combination of an index and a version, identifying a specific occupancy of a slot.
+// 索引与版本的组合，用于标识槽位的一次具体占用。
 template <typename TIndex, typename TVersion>
 struct SlotMapKey {
-	// Index in the array of slots
+	// 槽位数组中的索引
 	TIndex index = 0;
-	// Version the slot must have in order to match the key
+	// 槽位必须拥有的版本，以与键匹配
 	SlotMapVersion<TVersion> version;
 
 	inline bool operator==(const SlotMapKey &other) const {
@@ -65,10 +65,10 @@ struct SlotMapKey {
 	}
 };
 
-// Stores uniquely-identified values in an O(1) access container.
-// Always use the IDs if you want to store a reference somewhere. The address of values aren't stable.
-// IDs are made unique with a generation system, they are never re-used.
-// The concept is similar to https://docs.rs/slotmap/latest/slotmap/
+// 在 O(1) 访问的容器中存储具有唯一标识的值。
+// 若要在某处存储引用，务必使用 ID。值的地址并不稳定。
+// ID 通过代际（generation）系统保证唯一，且永远不会被复用。
+// 该概念与 https://docs.rs/slotmap/latest/slotmap/ 类似
 template <typename T, typename TIndex = uint32_t, typename TVersion = uint32_t>
 class SlotMap {
 private:
@@ -91,7 +91,7 @@ public:
 			return Key{ i, slot.version };
 		} else {
 			const TIndex i = _slots.size();
-			// Start versions at 1, so we can represent 0 as invalid
+			// 版本从 1 开始，这样可以用 0 表示无效
 			const uint32_t v = 1;
 			_slots.push_back(Slot{ value, { v } });
 			++_count;
@@ -220,9 +220,9 @@ public:
 
 private:
 	StdVector<Slot> _slots;
-	// TODO The free list could be implemented more efficiently without a vector, but would create some complexity.
-	// If each value in slots is a union of a TIndex and a T, invalid slots could interpret the value as a TIndex to the
-	// next free slot. However putting T in a union isn't possible when T has a non-trivial constructor/destructor.
+	// TODO 空闲链表可以不借助 vector 更高效地实现，但会带来一些复杂度。
+	// 如果每个槽位中的值是 TIndex 与 T 的联合体，无效槽位可将该值解释为指向下
+	// 一个空闲槽位的 TIndex。但当 T 具有非平凡构造/析构函数时，无法将其放入联合体。
 	StdVector<TIndex> _free_list;
 	uint32_t _count = 0;
 };

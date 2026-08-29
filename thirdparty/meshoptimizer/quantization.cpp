@@ -50,7 +50,7 @@ float meshopt_quantizeFloat(float v, int N)
 	// round all numbers except inf/nan; this is important to make sure nan doesn't overflow into -0
 	ui = e == 0x7f800000 ? ui : rui;
 
-	// flush denormals to zero
+	// 将非规格化数（denormal）冲刷为零
 	ui = e == 0 ? 0 : ui;
 
 	u.ui = ui;
@@ -65,7 +65,7 @@ float meshopt_dequantizeHalf(unsigned short h)
 	// bias exponent and pad mantissa with 0; 112 is relative exponent bias (127-15)
 	int r = (em + (112 << 10)) << 13;
 
-	// denormal: flush to zero
+	// 非规格化数：冲刷为零
 	r = (em < (1 << 10)) ? 0 : r;
 
 	// infinity/NaN; note that we preserve NaN payload as a byproduct of unifying inf/nan cases

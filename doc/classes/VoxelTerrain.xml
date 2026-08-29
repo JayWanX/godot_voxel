@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelTerrain" inherits="VoxelNode" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Voxel volume using constant level of detail.
+		使用恒定细节层级的体素体积。
 	</brief_description>
 	<description>
 	</description>
@@ -25,7 +25,7 @@
 			<return type="Vector3i" />
 			<param index="0" name="block_pos" type="Vector3i" />
 			<description>
-				Converts data block coordinates into voxel coordinates. Voxel coordinates of a block correspond to its lowest corner.
+				将数据块坐标转换为体素坐标。数据块的体素坐标对应于其最低角。
 			</description>
 		</method>
 		<method name="debug_get_draw_flag" qualifiers="const">
@@ -49,8 +49,8 @@
 		<method name="get_statistics" qualifiers="const">
 			<return type="Dictionary" />
 			<description>
-				Gets debug information about how much time is spent processing the terrain.
-				The returned dictionary has the following structure:
+				获取关于处理地形所花费时间的调试信息。
+				返回的字典具有以下结构：
 				[codeblock]
 				{
 					"time_detect_required_blocks": int,
@@ -83,28 +83,28 @@
 			<return type="bool" />
 			<param index="0" name="area_in_voxels" type="AABB" />
 			<description>
-				Returns true if the area has been processed by meshing. It does not mean the area actually contains a mesh.
-				Returns false if the area has not been processed by meshing (therefore it is unknown whethere there should be a mesh here or not).
-				When streaming terrain, this can be used to determine if an area has fully "loaded", in case the game relies meshes or mesh colliders.
+				如果该区域已被网格化处理，则返回 true。这并不意味着该区域实际包含网格。
+				如果该区域尚未经过网格化处理（因此此处是否存在网格未知），则返回 false。
+				对于流式加载的地形，可用于确定某个区域是否已完全"加载"，以防游戏依赖网格或网格碰撞体。
 			</description>
 		</method>
 		<method name="save_block">
 			<return type="void" />
 			<param index="0" name="position" type="Vector3i" />
 			<description>
-				Forces a specific block to be saved.
-				Note 1: this will only have an effect if the stream setup on this terrain supports saving.
-				Note 2: saving is asynchronous and won't block the game. the save may complete only a short time after you call this method.
+				强制保存特定数据块。
+				注意 1：只有当地形上设置的数据流支持保存时，这才有效。
+				注意 2：保存是异步的，不会阻塞游戏。保存可能只在你调用此方法后很短的时间内完成。
 			</description>
 		</method>
 		<method name="save_modified_blocks">
 			<return type="VoxelSaveCompletionTracker" />
 			<description>
-				Forces all modified blocks to be saved.
-				Note 1: this will only have an effect if the stream setup on this terrain supports saving.
-				Note 2: saving is asynchronous and won't block the game. the save may complete only a short time after you call this method.
-				Use the returned tracker object to know when saving has completed. However, saves occurring after calling this method won't be tracked by this object.
-				Note that blocks getting unloaded as the viewer moves around can also trigger saving tasks, independently from this function.
+				强制保存所有已修改的数据块。
+				注意 1：只有当地形上设置的数据流支持保存时，这才有效。
+				注意 2：保存是异步的，不会阻塞游戏。保存可能只在你调用此方法后很短的时间内完成。
+				使用返回的跟踪器对象来了解保存何时完成。但是，在调用此方法之后发生的保存将不会被此对象跟踪。
+				注意，当观察者移动时被卸载的数据块也会触发保存任务，这与本函数无关。
 			</description>
 		</method>
 		<method name="try_set_block_data">
@@ -125,13 +125,13 @@
 		<member name="area_edit_notification_enabled" type="bool" setter="set_area_edit_notification_enabled" getter="is_area_edit_notification_enabled" default="false">
 		</member>
 		<member name="automatic_loading_enabled" type="bool" setter="set_automatic_loading_enabled" getter="is_automatic_loading_enabled" default="true">
-			If turned off, the terrain will no longer automatically load blocks around viewers locally. This may be used in multiplayer scenarios, when the terrain is client-side, because blocks will be sent by the server instead.
+			如果关闭，地形将不再在本地自动加载观察者周围的数据块。这可用于多人游戏场景中地形位于客户端的情况，因为数据块将由服务器发送。
 		</member>
 		<member name="block_enter_notification_enabled" type="bool" setter="set_block_enter_notification_enabled" getter="is_block_enter_notification_enabled" default="false">
 		</member>
 		<member name="bounds" type="AABB" setter="set_bounds" getter="get_bounds" default="AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)">
-			Defines the bounds within which the terrain is allowed to have voxels. If an infinite world generator is used, blocks will only generate within this region. Everything outside will be left empty.
-			If any dimension of the new bounds is larger than 512 and [member max_view_distance] is larger than 512, then [member max_view_distance] will be clamped to 512. This measure is to avoid crashing due to a potential huge amount of chunks that would load.
+			定义地形允许存在体素的边界。如果使用无限世界生成器，数据块将仅在此区域内生成。区域外的所有内容都将保持为空。
+			如果新边界的任何维度大于 512 且 [member max_view_distance] 大于 512，则 [member max_view_distance] 将被钳制到 512。此措施是为了避免因可能加载的大量区块而导致崩溃。
 		</member>
 		<member name="collision_layer" type="int" setter="set_collision_layer" getter="get_collision_layer" default="1">
 		</member>
@@ -150,48 +150,48 @@
 		<member name="debug_draw_voxel_metadata" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
 		</member>
 		<member name="generate_collisions" type="bool" setter="set_generate_collisions" getter="get_generate_collisions" default="true">
-			Enables the generation of collision shapes using the classic physics engine. Use this feature if you need realistic or non-trivial collisions or physics.
-			Note 1: you also need [VoxelViewer] to request collisions, otherwise they won't generate.
-			Note 2: If you need simple Minecraft/AABB physics, you can use [VoxelBoxMover] which may perform better in blocky worlds.
+			启用使用经典物理引擎生成碰撞形状。如果你需要真实或非平凡的碰撞或物理，请使用此功能。
+			注意 1：你还需要 [VoxelViewer] 请求碰撞，否则不会生成。
+			注意 2：如果你需要简单的 Minecraft/AABB 物理，可以使用 [VoxelBoxMover]，它在方块风世界中可能表现更好。
 		</member>
 		<member name="material_override" type="Material" setter="set_material_override" getter="get_material_override">
 		</member>
 		<member name="max_view_distance" type="int" setter="set_max_view_distance" getter="get_max_view_distance" default="128">
-			Sets the maximum distance this terrain can support. If a [VoxelViewer] requests more, it will be clamped.
+			设置此地形可以支持的最大距离。如果 [VoxelViewer] 请求更大距离，它将被钳制。
 		</member>
 		<member name="mesh_block_size" type="int" setter="set_mesh_block_size" getter="get_mesh_block_size" default="16">
-			Sets how many voxels across meshes of the terrain span.
-			Voxel chunks are stored in cubic chunks of 16x16x16 voxels, and by default meshes of the terrain match that size. But you can set this to 32 so meshes will span 2x2x2 voxel chunks. This is a performance tradeoff. Higher mesh size may speed up rendering, at the cost of slower mesh updates.
-			Values other than 16 and 32 are not supported.
-			Note: this setting also affects [VoxelInstancer] chunks.
+			设置地形网格跨越多少个体素。
+			体素区块以 16x16x16 体素的立方区块存储，默认情况下地形网格与该尺寸匹配。但你可以将其设置为 32，使网格跨越 2x2x2 个体素区块。这是一种性能权衡。更大的网格尺寸可能加快渲染，但会减慢网格更新。
+			不支持 16 和 32 之外的值。
+			注意：此设置也会影响 [VoxelInstancer] 区块。
 		</member>
 		<member name="use_gpu_generation" type="bool" setter="set_generator_use_gpu" getter="get_generator_use_gpu" default="false">
-			Enables GPU block generation, which can speed it up. This is only valid for generators that support it. Vulkan is required.
+			启用 GPU 数据块生成，可加快生成速度。仅对支持它的生成器有效。需要 Vulkan。
 		</member>
 	</members>
 	<signals>
 		<signal name="block_loaded">
 			<param index="0" name="position" type="Vector3i" />
 			<description>
-				Emitted when a new data block is loaded from stream. This can happen before the mesh or collider becomes available.
+				当从数据流加载新数据块时发出。这可能在网格或碰撞体可用之前发生。
 			</description>
 		</signal>
 		<signal name="block_unloaded">
 			<param index="0" name="position" type="Vector3i" />
 			<description>
-				Emitted when a data block is unloaded due to being outside view distance.
+				当数据块因超出视距而被卸载时发出。
 			</description>
 		</signal>
 		<signal name="mesh_block_entered">
 			<param index="0" name="position" type="Vector3i" />
 			<description>
-				Emitted when a mesh block receives its first update since it was added in the range of viewers. This is regardless of the mesh being empty or not. It tracks changes of the same state obtained with [method is_area_meshed].
+				当网格区块自加入观察者范围以来首次收到更新时发出。这与网格是否为空无关。它跟踪与 [method is_area_meshed] 获得的相同状态的变化。
 			</description>
 		</signal>
 		<signal name="mesh_block_exited">
 			<param index="0" name="position" type="Vector3i" />
 			<description>
-				Emitted when a mesh block gets unloaded. It is the counterpart of [signal mesh_block_entered].
+				当网格区块被卸载时发出。它是 [signal mesh_block_entered] 的对应信号。
 			</description>
 		</signal>
 	</signals>

@@ -43,7 +43,7 @@ void CodeGenHelper::add(const StdString &s) {
 
 void CodeGenHelper::add(float x) {
 	FixedArray<char, 32> buffer;
-	// Godot shaders want float constants to be explicit
+	// Godot 着色器要求 float 常量是显式的
 	const unsigned int decimals = float(int(x)) == x ? 1 : 10;
 	const unsigned int len = snprintf(buffer.data(), buffer.size(), "%.*f", decimals, x);
 	add(buffer.data(), len);
@@ -51,7 +51,7 @@ void CodeGenHelper::add(float x) {
 
 void CodeGenHelper::add(double x) {
 	FixedArray<char, 32> buffer;
-	// Godot shaders want float constants to be explicit
+	// Godot 着色器要求 float 常量是显式的
 	const unsigned int decimals = double(int(x)) == x ? 1 : 16;
 	const unsigned int len = snprintf(buffer.data(), buffer.size(), "%.*lf", decimals, x);
 	add(buffer.data(), len);
@@ -72,8 +72,8 @@ void CodeGenHelper::require_lib_code(const char *lib_name, const char *code) {
 	}
 }
 
-// Some code can be too big to fit in a single literal depending on the compiler,
-// so an option is to provide it as a zero-terminated array of string literals
+// 有些代码可能太大，无法根据编译器的不同放进单个字符串字面量中，
+// 所以一种选择是把它作为以零结尾的字符串字面量数组来提供
 void CodeGenHelper::require_lib_code(const char *lib_name, const char **code) {
 	auto p = _included_libs.insert(lib_name);
 	if (p.second) {

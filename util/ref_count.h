@@ -5,8 +5,8 @@
 
 namespace voxel {
 
-// Simple reference counter.
-// This one is not thread-safe.
+// 简单的引用计数器。
+// 该实现不是线程安全的。
 class RefCount {
 public:
 	RefCount() {}

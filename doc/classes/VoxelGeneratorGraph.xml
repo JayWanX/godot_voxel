@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGeneratorGraph" inherits="VoxelGenerator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Graph-based voxel generator.
+		基于图形的体素生成器。
 	</brief_description>
 	<description>
-		Generates voxel data from a graph of per-voxel operations.
-		The graph must be created, compiled, and only then blocks can be generated.
-		It can be used with SDF-based smooth terrain, and also blocky terrains.
-		Warning: methods to modify the graph should only be called from the main thread.
+		通过逐体素运算的图形生成体素数据。
+		必须先创建并编译图形，之后才能生成数据块。
+		它可用于基于 SDF 的平滑地形，也可用于方块风地形。
+		警告：修改图形的方法只能在主线程中调用。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -19,9 +19,9 @@
 			<param index="2" name="sdf_min" type="float" />
 			<param index="3" name="sdf_max" type="float" />
 			<description>
-				Bakes a spherical bumpmap (or heightmap) using SDF output produced by the generator, if any. The bumpmap uses a panorama projection.
-				[code]ref_radius[/code]: radius of the sphere on which heights will be sampled.
-				[code]strength[/code]: strength of produced normals, may default to 1.0.
+				使用生成器产生的 SDF 输出（如果有）烘焙球形凹凸贴图（或高度图）。凹凸贴图使用全景投影。
+			[code]ref_radius[/code]：采样高度的球体半径。
+			[code]strength[/code]：生成法线的强度，默认为 1.0。
 			</description>
 		</method>
 		<method name="bake_sphere_normalmap">
@@ -30,37 +30,37 @@
 			<param index="1" name="ref_radius" type="float" />
 			<param index="2" name="strength" type="float" />
 			<description>
-				Bakes a spherical normalmap using SDF output produced by the generator, if any. The normalmap uses a panorama projection. It is assumed the generator produces a spherical shape (like a planet). Such normalmap can be used to add more detail to distant views of a terrain using this generator.
-				[code]ref_radius[/code]: radius of the sphere on which normals will be sampled.
-				[code]strength[/code]: strength of produced normals, may default to 1.0.
-				Note: an alternative is to use distance normals feature with [VoxelLodTerrain].
+				使用生成器产生的 SDF 输出（如果有）烘焙球形法线贴图。法线贴图使用全景投影。假定生成器产生球形形状（如行星）。此类法线贴图可用于为使用此生成器的地形远距离视图添加更多细节。
+			[code]ref_radius[/code]：采样法线的球体半径。
+			[code]strength[/code]：生成法线的强度，默认为 1.0。
+			注意：另一种替代方案是与 [VoxelLodTerrain] 一起使用距离法线功能。
 			</description>
 		</method>
 		<method name="clear">
 			<return type="void" />
 			<description>
-				Erases all nodes and connections from the graph.
+				从图形中删除所有节点和连接。
 			</description>
 		</method>
 		<method name="compile">
 			<return type="Dictionary" />
 			<description>
-				Compiles the graph so it can be used to generate blocks.
-				If it succeeds, the returned result is a dictionary with the following layout:
-				[codeblock]
-				{
-					"success": true
-				}
-				[/codeblock]
-				If it fails, the returned result may contain a message and the ID of a graph node that could be the cause:
-				[codeblock]
-				{
-					"success": false,
-					"node_id": int,
-					"message": String
-				}
-				[/codeblock]
-				The node ID will be -1 if the error is not about a particular node.
+				编译图形以便用于生成数据块。
+			如果编译成功，返回结果为具有以下布局的字典：
+			[codeblock]
+			{
+				"success": true
+			}
+			[/codeblock]
+			如果编译失败，返回结果可能包含消息和可能导致问题的图形节点 ID：
+			[codeblock]
+			{
+				"success": false,
+				"node_id": int,
+				"message": String
+			}
+			[/codeblock]
+			如果错误与特定节点无关，节点 ID 将为 -1。
 			</description>
 		</method>
 		<method name="debug_analyze_range" qualifiers="const">
@@ -87,14 +87,14 @@
 			<param index="1" name="transform" type="Transform3D" />
 			<param index="2" name="size" type="Vector2" />
 			<description>
-				Genereates SDF data within a plane centered on the given transform spanning its X and Y axes, and stores results in pixels of the image. Samples are centered on pixels.
-				The image should preferably have a 32-bit float format, and must not be compressed.
+				在以给定变换为中心、跨越其 X 和 Y 轴的平面内生成 SDF 数据，并将结果存储到图像的像素中。采样点以像素为中心。
+			图像最好采用 32 位浮点格式，并且不能压缩。
 			</description>
 		</method>
 		<method name="get_main_function" qualifiers="const">
 			<return type="VoxelGraphFunction" />
 			<description>
-				Gets the graph used for generation.
+				获取用于生成的图形。
 			</description>
 		</method>
 		<method name="raycast_sdf_approx" qualifiers="const">
@@ -103,35 +103,35 @@
 			<param index="1" name="ray_end" type="Vector3" />
 			<param index="2" name="stride" type="float" />
 			<description>
-				Generates values along a ray to find the first one where SDF &amp;lt 0.0, and return distance along the ray. If no hit is found, returns -1.0.
-				This is an approximation: the error margin of the returned value will be up to the given stride.
-				The longer the distance, the more expensive it is.
-				The lower the stride, the more expensive and accurate it is.
+				沿射线生成值，以找到第一个 SDF &amp;lt 0.0 的位置，并返回沿射线的距离。如果未命中，则返回 -1.0。
+			这是近似值：返回值的误差范围最多为给定的步长。
+			距离越长，代价越高。
+			步长越小，代价越高但越精确。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="debug_block_clipping" type="bool" setter="set_debug_clipped_blocks" getter="is_debug_clipped_blocks" default="false">
-			When enabled, if the graph outputs SDF data, generated blocks that would otherwise be clipped will be inverted. This has the effect of them showing up as "walls artifacts", which is useful to visualize where the optimization occurs.
+			启用后，如果图形输出 SDF 数据，那些本会被裁剪的生成数据块将被反转。这会使它们显示为"墙体伪影"，有助于可视化优化发生的位置。
 		</member>
 		<member name="sdf_clip_threshold" type="float" setter="set_sdf_clip_threshold" getter="get_sdf_clip_threshold" default="1.5">
-			When generating SDF blocks for a terrain, if the range analysis of a block is beyond this threshold, its SDF data will be considered either fully air, or fully matter (using high constants, positive or negative). This optimizes memory because chunks entirely underground or in the air will have the same value on every voxel. It also saves processing time because SDF calculations (noise etc) are skipped. To turn off this optimization, set it to a high value.
-			Downside: if you use operations to edit the terrain assuming coherent SDF, they might behave incorrectly at boundaries where the clipping starts to occur. This is notably the case of [method VoxelTool.grow_sphere].
+			为地形生成 SDF 数据块时，如果某个数据块的范围分析超过此阈值，其 SDF 数据将被视为完全为空气或完全为实体（使用高常量，正或负）。这会优化内存，因为完全位于地下或空中的区块在每个体素上都具有相同的值。同时也会节省处理时间，因为会跳过 SDF 计算（噪声等）。要关闭此优化，请将其设置为一个较高的值。
+			缺点：如果你在假设 SDF 连续的情况下使用操作来编辑地形，那么在开始发生裁剪的边界处，这些操作可能会表现异常。典型的例子是 [method VoxelTool.grow_sphere]。
 		</member>
 		<member name="subdivision_size" type="int" setter="set_subdivision_size" getter="get_subdivision_size" default="16">
-			When generating SDF blocks for a terrain, and if block size is divisible by this value, range analysis will operate on such subdivision. This allows to optimize away more precise areas. However, it may not be set too small otherwise overhead will outweight the benefits.
+			为地形生成 SDF 数据块时，如果区块大小可被此值整除，范围分析将基于该细分进行。这样可以优化掉更精确的区域。但是，该值不能设置得太小，否则开销将超过收益。
 		</member>
 		<member name="texture_mode" type="int" setter="set_texture_mode" getter="get_texture_mode" enum="VoxelGeneratorGraph.TextureMode" default="0">
-			Sets which voxel format will be produced by texture outputs, if present.
+			设置纹理输出（如果存在）将产生的体素格式。
 		</member>
 		<member name="use_optimized_execution_map" type="bool" setter="set_use_optimized_execution_map" getter="is_using_optimized_execution_map" default="true">
-			If enabled, when generating blocks for a terrain, the generator will attempt to skip specific nodes if they are found to have no importance in specific areas.
+			启用后，在为地形生成数据块时，如果发现某些节点在特定区域中不重要，生成器将尝试跳过它们。
 		</member>
 		<member name="use_subdivision" type="bool" setter="set_use_subdivision" getter="is_using_subdivision" default="true">
-			If enabled, [member subdivision_size] will be used.
+			启用后，将使用 [member subdivision_size]。
 		</member>
 		<member name="use_xz_caching" type="bool" setter="set_use_xz_caching" getter="is_using_xz_caching" default="true">
-			If enabled, the generator will run only once branches of the graph that only depend on X and Z. This is effective when part of the graph generates a heightmap, as this part is not volumetric.
+			启用后，生成器将只运行图形中仅依赖 X 和 Z 的分支一次。当图形的一部分生成高度图时，这会很有效，因为该部分不是体积化的。
 		</member>
 	</members>
 	<signals>
@@ -143,10 +143,10 @@
 	</signals>
 	<constants>
 		<constant name="TEXTURE_MODE_MIXEL4" value="0" enum="TextureMode">
-			Writes texture data into [constant VoxelBuffer.CHANNEL_INDICES] as 4 packed 4-bit indices and into [constant VoxelBuffer.CHANNEL_WEIGHTS] as 4 packed 4-bit weights. See [VoxelMesherTransvoxel] and docs about smooth voxels to see how this data is used.
+			将纹理数据写入 [constant VoxelBuffer.CHANNEL_INDICES]，作为 4 个打包的 4 位索引；写入 [constant VoxelBuffer.CHANNEL_WEIGHTS]，作为 4 个打包的 4 位权重。有关此数据的用法，请参阅 [VoxelMesherTransvoxel] 以及关于平滑体素的文档。
 		</constant>
 		<constant name="TEXTURE_MODE_SINGLE" value="1" enum="TextureMode">
-			Writes texture data into [constant VoxelBuffer.CHANNEL_INDICES] as one 8-bit value per voxel. If you want to use this mode, make sure your voxels have the appropriate format (see [VoxelFormat])
+			将纹理数据写入 [constant VoxelBuffer.CHANNEL_INDICES]，每个体素一个 8 位值。如果你想使用此模式，请确保你的体素具有合适的格式（参见 [VoxelFormat]）。
 		</constant>
 	</constants>
 </class>

@@ -9,8 +9,8 @@ class Voxel_ThreadedTask;
 
 namespace voxel::godot {
 
-// Godot-facing singleton class.
-// the real class is internal and does not need anything from Object.
+// 面向 Godot 的单例类。
+// 真正的类在内部实现，不依赖 Object 的任何功能。
 class VoxelEngine : public Object {
 	GDCLASS(VoxelEngine, Object)
 public:

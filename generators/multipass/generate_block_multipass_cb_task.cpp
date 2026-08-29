@@ -43,7 +43,7 @@ void GenerateBlockMultipassCBTask::run(voxel::ThreadedTaskContext &ctx) {
 	Ref<VoxelGenerator> generator = _stream_dependency->generator;
 	ERR_FAIL_COND(generator.is_null());
 
-	// TODO Have a way for generators to provide their own task, instead of shoehorning it here
+	// TODO 想办法让生成器提供自己的任务，而不是在这里硬塞
 	Ref<VoxelGeneratorMultipassCB> multipass_generator = generator;
 	VOXEL_ASSERT_RETURN(multipass_generator.is_valid());
 
@@ -59,18 +59,18 @@ void GenerateBlockMultipassCBTask::run(voxel::ThreadedTaskContext &ctx) {
 	const int column_height = multipass_generator->get_column_height_blocks();
 
 	if (_block_position.y < column_min_y || _block_position.y >= column_min_y + column_height) {
-		// Fallback on single pass
+		// 回退到单 pass
 
 	} else {
 		const Vector2i column_position(_block_position.x, _block_position.z);
-		// TODO Candidate for postponing? Lots of them, might cause contention
+		// TODO 可推迟的候选？数量很多，可能会引起争用
 		SpatialLock2D::Read srlock(map.spatial_lock, BoxBounds2i::from_position(column_position));
 		VoxelGeneratorMultipassCBStructs::Column *column = nullptr;
 		{
 			MutexLock mlock(map.mutex);
 			auto column_it = map.columns.find(column_position);
 			if (column_it == map.columns.end()) {
-				// Drop, for some reason it wasn't available
+				// 丢弃，出于某种原因它不可用
 				return;
 			}
 
@@ -78,47 +78,46 @@ void GenerateBlockMultipassCBTask::run(voxel::ThreadedTaskContext &ctx) {
 		}
 
 		if (column == nullptr) {
-			// Drop.
-			// Either we returned here after subtasks got cancelled, or the target column simply got unloaded before
-			// the task started running.
+			// 丢弃。
+			// 要么是我们在子任务被取消后返回这里，要么是目标列在任务开始运行前被卸载了。
 			return;
 		}
 
 		const int block_index = _block_position.y - column_min_y;
 
 		if (column->subpass_index != final_subpass_index) {
-			// The block isn't finished
+			// 数据块尚未完成
 			if (_stage == 1) {
-				// We came back here after having scheduled subtasks, means they had to cancel.
-				// Drop
-				// TODO We really need to find a way to streamline this coroutine-like task workflow
+				// 我们在调度子任务后回到这里，意味着它们不得不取消。
+				// 丢弃
+				// TODO 我们真的需要想办法简化这种类似协程的任务流程
 				return;
 			}
 
 			VoxelGeneratorMultipassCBStructs::Block &block = column->blocks[block_index];
 
 			if (block.final_pending_task != nullptr) {
-				// There is already a generate task for that block.
+				// 该数据块已有一个生成任务。
 
-				// It must not be the current task. Only tasks that are not scheduled and not running can be stored
-				// in here. If it is, something went wrong.
+				// 它绝不能是当前任务。只有未调度、未运行的任务才能存储
+				// 在这里。如果是当前任务，那就出问题了。
 				VOXEL_ASSERT(block.final_pending_task != this);
 
-				// This can happen if you teleport forward, then go back, then forward again.
-				// Because VoxelTerrain forgets about "loading blocks" falling out of its play area, while
-				// multipass generators forget about them in a larger radius, therefore causing the same block
-				// to be requested again while the previous request is still cached, not having run yet.
-				// We may not delete this task.
+				// 如果你向前传送，再回去，然后再向前传送，就可能发生这种情况。
+				// 因为 VoxelTerrain 会忘记"加载中的数据块"落出其活动区域，而
+				// 多 pass 生成器会在更大的半径内忘记它们，因此会导致同一数据块
+				// 在前一个请求仍被缓存、尚未运行时被再次请求。
+				// 我们不能删除这个任务。
 
-				// Drop current task, we should get the work done by the existing task
+				// 丢弃当前任务，我们应让现有任务来完成工作
 				return;
-				// TODO Not sure if we should let the terrain see this as a drop if there is an existing task!
-				// It could cause a request loop even though a task already is pending
+				// TODO 不确定如果已有任务，我们是否应该让地形将其视为丢弃！
+				// 即使已有任务在等待，它也可能导致请求循环
 			}
 
 			if ((column->pending_subpass_tasks_mask & (1 << final_subpass_index)) == 0) {
-				// No tasks working on it, and we are the first top-level task.
-				// Spawn a subtask to bring this column to final state.
+				// 没有任务在处理它，而我们是第一个顶层任务。
+				// 生成一个子任务，把这一列带到最终状态。
 				GenerateColumnMultipassTask *subtask = VOXEL_NEW(GenerateColumnMultipassTask(
 						column_position,
 						_format,
@@ -127,8 +126,8 @@ void GenerateBlockMultipassCBTask::run(voxel::ThreadedTaskContext &ctx) {
 						multipass_generator_internal,
 						multipass_generator,
 						ctx.task_priority,
-						// The subtask takes ownership of the current task, it will schedule it back when it
-						// finishes (or cancels)
+						// 子任务取得当前任务的所有权，它会在完成（或取消）时
+						// 将其调度回来
 						this,
 						make_shared_instance<std::atomic_int>(1)
 				));
@@ -138,25 +137,25 @@ void GenerateBlockMultipassCBTask::run(voxel::ThreadedTaskContext &ctx) {
 				VoxelEngine::get_singleton().push_async_task(subtask);
 
 			} else {
-				// A column task is already underway.
-				// Register as waiting for this column's final result. The block takes ownership.
+				// 一个列任务已经在进行中。
+				// 注册为等待该列的最终结果。数据块取得所有权。
 				block.final_pending_task = this;
 			}
 
-			// Ownership is now either given to a subtask or the desired block.
-			// As such, we must be taken out of the task runner. We'll get scheduled again when the column is
-			// finished, or when it gets unloaded.
+			// 所有权现在要么交给子任务，要么交给目标数据块。
+			// 因此，我们必须从任务运行器中取出。当列完成或卸载时，
+			// 我们会再次被调度。
 			ctx.status = ThreadedTaskContext::STATUS_TAKEN_OUT;
 			_stage = 1;
 			// println(format("Takeout {}", uint64_t(this)));
 
 		} else {
-			// The block is ready
+			// 数据块已就绪
 
 			VoxelGeneratorMultipassCBStructs::Block &block = column->blocks[block_index];
 
-			// TODO Take out voxel data from this block to save memory, it must not be touched by generation anymore
-			// (if we do, we need to change the column's spatial lock to WRITE)
+			// TODO 从该数据块中取出体素数据以节省内存，它不能再被生成触碰
+			// （如果这样做，我们需要将列的空间锁改为 WRITE）
 			voxels = make_shared_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_POOL);
 			voxels->create(block.voxels.get_size());
 			voxels->copy_format(block.voxels);
@@ -168,7 +167,7 @@ void GenerateBlockMultipassCBTask::run(voxel::ThreadedTaskContext &ctx) {
 		return;
 	}
 
-	// Single-pass generation
+	// 单 pass 生成
 
 	if (voxels == nullptr) {
 		voxels = make_shared_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_POOL);
@@ -192,19 +191,19 @@ void GenerateBlockMultipassCBTask::run_stream_saving_and_finish() {
 	if (_stream_dependency->valid) {
 		Ref<VoxelStream> stream = _stream_dependency->stream;
 
-		// TODO In some cases we don't want this to run all the time, do we?
-		// Like in full load mode, where non-edited blocks remain generated on the fly...
+		// TODO 在某些情况下我们并不想一直运行这个，对吧？
+		// 比如在全加载模式下，未编辑的数据块会即时生成……
 		if (stream.is_valid() && stream->get_save_generator_output()) {
 			VOXEL_PRINT_VERBOSE(
 					format("Requesting save of generator output for block {} lod {}", _block_position, int(_lod_index))
 			);
 
-			// TODO Optimization: `voxels` doesn't actually need to be shared
+			// TODO 优化：`voxels` 实际上不需要共享
 			std::shared_ptr<VoxelBuffer> voxels_copy = make_shared_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_POOL);
 			voxels->copy_to(*voxels_copy, true);
 
-			// No instances, generators are not designed to produce them at this stage yet.
-			// No priority data, saving doesn't need sorting.
+			// 没有实例，生成器在这个阶段还不设计为产生它们。
+			// 没有优先级数据，保存不需要排序。
 
 			SaveBlockDataTask *save_task = VOXEL_NEW(SaveBlockDataTask(
 					_volume_id, _block_position, _lod_index, voxels_copy, _stream_dependency, nullptr, false
@@ -240,9 +239,9 @@ void GenerateBlockMultipassCBTask::apply_result() {
 	bool aborted = true;
 
 	if (VoxelEngine::get_singleton().is_volume_valid(_volume_id)) {
-		// TODO Comparing pointer may not be guaranteed
-		// The request response must match the dependency it would have been requested with.
-		// If it doesn't match, we are no longer interested in the result.
+		// TODO 比较指针可能不保证有效
+		// 请求响应必须与请求时所带的依赖匹配。
+		// 如果不匹配，我们就不再对结果感兴趣。
 		if (_stream_dependency->valid) {
 			Ref<VoxelStream> stream = _stream_dependency->stream;
 
@@ -252,8 +251,8 @@ void GenerateBlockMultipassCBTask::apply_result() {
 			o.lod_index = _lod_index;
 			o.dropped = !_has_run;
 			if (stream.is_valid() && stream->get_save_generator_output()) {
-				// We can't consider the block as "generated" since there is no state to tell that once saved,
-				// so it has to be considered an edited block
+				// 我们不能把该数据块视为"已生成"，因为一旦保存，就没有状态可以说明这一点，
+				// 所以必须把它视为已编辑的数据块
 				o.type = VoxelEngine::BlockDataOutput::TYPE_LOADED;
 			} else {
 				o.type = VoxelEngine::BlockDataOutput::TYPE_GENERATED;
@@ -269,13 +268,12 @@ void GenerateBlockMultipassCBTask::apply_result() {
 		}
 
 	} else {
-		// This can happen if the user removes the volume while requests are still about to return
+		// 如果用户在请求即将返回时移除了体积，就可能发生这种情况
 		VOXEL_PRINT_VERBOSE("Gemerated data request response came back but volume wasn't found");
 	}
 
-	// TODO We could complete earlier inside run() if we had access to the data structure to write the block into.
-	// This would reduce latency a little. The rest of things the terrain needs to do with the generated block could
-	// run later.
+	// TODO 如果我们能访问将数据块写入其中的数据结构，就可以更早地在 run() 中完成。
+	// 这可以稍微减少延迟。地形需要用生成的数据块做的其余事情可以稍后运行。
 	if (_tracker != nullptr) {
 		if (aborted) {
 			_tracker->abort();

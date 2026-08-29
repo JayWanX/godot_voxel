@@ -12,7 +12,7 @@
 namespace voxel {
 
 FastNoise2::FastNoise2() {
-	// Setup default
+	// 设置默认值
 	update_generator();
 	// https://github.com/Auburn/FastNoise2/issues/136
 	_generator->GetSIMDLevel();
@@ -30,7 +30,7 @@ bool FastNoise2::is_valid() const {
 }
 
 String FastNoise2::get_encoded_node_tree() const {
-	// There is no way to get back an encoded node tree from `FastNoise::SmartNode<>`
+	// 没有办法从 `FastNoise::SmartNode<>` 拿回编码的节点树
 	return _last_set_encoded_node_tree;
 }
 
@@ -348,14 +348,14 @@ void FastNoise2::get_noise_2d_series(Span<const float> src_x, Span<const float> 
 	ERR_FAIL_COND(!is_valid());
 	ERR_FAIL_COND(src_x.size() != src_y.size() || src_x.size() != dst.size());
 	if (src_x.size() < MIN_BUFFER_SIZE) {
-		// Using backing arrays for input buffers, because SIMD needs to read multiple values. This might make
-		// single-reads a bit slower, but in that case performance likely doesn't matter anyways
+		// 为输入缓冲区使用后备数组，因为 SIMD 需要读取多个值。这可能会使单次读取
+		// 稍慢一点，但那种情况下性能反正很可能无关紧要
 		FixedArray<float, MIN_BUFFER_SIZE> x;
 		FixedArray<float, MIN_BUFFER_SIZE> y;
 		FixedArray<float, MIN_BUFFER_SIZE> n;
-		// We should not need to spend time initializing these arrays because they are just backing memory. We write
-		// over them and FN2 will write over the result anyways. But if we don't do this, GCC is not happy because all
-		// warnings are enabled and treated as errors...
+		// 我们不应该花时间初始化这些数组，因为它们只是后备内存。我们会写入
+		// 它们，FN2 反正也会覆盖结果。但如果我们不这样做，GCC 会不满意，因为所有
+		// 警告都被启用并当作错误处理……
 		fill(x, 0.f);
 		fill(y, 0.f);
 		fill(n, 0.f);
@@ -367,9 +367,9 @@ void FastNoise2::get_noise_2d_series(Span<const float> src_x, Span<const float> 
 		}
 		src_x = to_span(x);
 		src_y = to_span(y);
-		// TODO Need to update FastNoise2.
-		// Using a destination buffer smaller than SIMD level is not supposed to break, but it crashes. Using a backing
-		// array too as workaround.
+		// TODO 需要更新 FastNoise2。
+		// 使用比 SIMD 级别更小的目标缓冲区按理说不应该出问题，但它会崩溃。也用一个后备
+		// 数组作为变通。
 		_generator->GenPositionArray2D(n.data(), n.size(), src_x.data(), src_y.data(), 0, 0, _seed);
 		for (unsigned int i = 0; i < dst.size(); ++i) {
 			dst[i] = n[i];
@@ -392,9 +392,9 @@ void FastNoise2::get_noise_3d_series(
 		FixedArray<float, MIN_BUFFER_SIZE> y;
 		FixedArray<float, MIN_BUFFER_SIZE> z;
 		FixedArray<float, MIN_BUFFER_SIZE> n;
-		// We should not need to spend time initializing these arrays because they are just backing memory. We write
-		// over them and FN2 will write over the result anyways. But if we don't do this, GCC is not happy because all
-		// warnings are enabled and treated as errors...
+		// 我们不应该花时间初始化这些数组，因为它们只是后备内存。我们会写入
+		// 它们，FN2 反正也会覆盖结果。但如果我们不这样做，GCC 会不满意，因为所有
+		// 警告都被启用并当作错误处理……
 		fill(x, 0.f);
 		fill(y, 0.f);
 		fill(z, 0.f);
@@ -411,9 +411,9 @@ void FastNoise2::get_noise_3d_series(
 		src_x = to_span(x);
 		src_y = to_span(y);
 		src_z = to_span(z);
-		// TODO Need to update FastNoise2.
-		// Using a destination buffer smaller than SIMD level is not supposed to break, but it crashes. Using a backing
-		// array too as workaround.
+		// TODO 需要更新 FastNoise2。
+		// 使用比 SIMD 级别更小的目标缓冲区按理说不应该出问题，但它会崩溃。也用一个后备
+		// 数组作为变通。
 		_generator->GenPositionArray3D(n.data(), n.size(), src_x.data(), src_y.data(), src_z.data(), 0, 0, 0, _seed);
 		for (unsigned int i = 0; i < dst.size(); ++i) {
 			dst[i] = n[i];
@@ -465,7 +465,7 @@ void FastNoise2::generate_image(Ref<Image> image, bool tileable) const {
 #ifdef DEBUG_ENABLED
 			CRASH_COND(i >= buffer.size());
 #endif
-			// Assuming -1..1 output. Some noise types can have different range though.
+			// 假定输出范围是 -1..1。不过有些噪声类型可能有不同的范围。
 			const float n = buffer[i] * 0.5f + 0.5f;
 			++i;
 			image->set_pixel(x, y, Color(n, n, n));
@@ -476,12 +476,12 @@ void FastNoise2::generate_image(Ref<Image> image, bool tileable) const {
 void FastNoise2::update_generator() {
 	if (_noise_type == TYPE_ENCODED_NODE_TREE) {
 		CharString cs = _last_set_encoded_node_tree.utf8();
-		// TODO FastNoise2 crashes if given an empty string.
+		// TODO 传入空字符串时 FastNoise2 会崩溃。
 		ERR_FAIL_COND_MSG(cs.length() == 0, "Encoded node tree is empty.");
 		_generator = FastNoise::NewFromEncodedNodeTree(cs.get_data());
 		ERR_FAIL_COND_MSG(!is_valid(), "Encoded node tree is invalid.");
-		// TODO Maybe apply period modifier here?
-		// NoiseTool assumes we scale input coordinates so typical noise made in there has period 1...
+		// TODO 也许在这里应用周期修饰符？
+		// NoiseTool 假定我们对输入坐标做了缩放，所以在那里制作的典型噪声周期为 1……
 		return;
 	}
 
@@ -589,9 +589,9 @@ void FastNoise2::update_generator() {
 }
 
 math::Interval FastNoise2::get_estimated_output_range() const {
-	// TODO Optimize: better range analysis on FastNoise2
-	// Most noises should have known bounds like FastNoiseLite, but the node-graph nature of this library
-	// can make it difficult to calculate. Would be nice if the library could provide that out of the box.
+	// TODO 优化：对 FastNoise2 做更好的范围分析
+	// 大多数噪声应该像 FastNoiseLite 一样有已知边界，但这个库的节点图特性
+	// 使计算变得困难。如果这个库能开箱即用地提供边界就好了。
 	if (is_remap_enabled()) {
 		return math::Interval::from_unordered_values(get_remap_output_min(), get_remap_output_max());
 	} else {

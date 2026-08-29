@@ -3,7 +3,7 @@
 
 #include "../../math/interval.h"
 
-// Interval estimation for Voxel_FastNoiseLite
+// Voxel_FastNoiseLite 的区间估计
 
 namespace voxel {
 

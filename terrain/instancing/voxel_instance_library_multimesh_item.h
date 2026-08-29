@@ -12,7 +12,7 @@
 #include "../../util/godot/core/gdvirtual.h"
 #include "voxel_instance_library_item.h"
 
-// I had to include this because of GDVIRTUAL, otherwise it complains with a narrowing conversion warning
+// 因为 GDVIRTUAL 我不得不包含它，否则会报窄化转换警告
 #include "voxel_instancer.h"
 
 namespace voxel {
@@ -31,8 +31,8 @@ struct InstanceLibraryMultiMeshItemSettings {
 	unsigned int mesh_lod_count = 1;
 	int render_layer = 1;
 
-	// It is preferred to have materials on the mesh already,
-	// but this is in case OBJ meshes are used, which often dont have a material of their own
+	// 最好将材质直接放在网格上，
+	// 但这是针对使用 OBJ 网格的情况，此类网格通常没有自己的材质
 	Ref<Material> material_override;
 
 	RenderingServerEnums::ShadowCastingSetting shadow_casting_setting = RenderingServerEnums::SHADOW_CASTING_SETTING_ON;
@@ -41,11 +41,11 @@ struct InstanceLibraryMultiMeshItemSettings {
 	int collision_mask = 1;
 	int collision_layer = 1;
 	StdVector<CollisionShapeInfo> collision_shapes;
-	// Groups that will be added to colliders if they use nodes
+	// 如果碰撞体使用节点，则会添加到碰撞体的组
 	StdVector<StringName> group_names;
 };
 
-// Settings for a model that can be used by VoxelInstancer
+// 可供 VoxelInstancer 使用的模型设置
 class VoxelInstanceLibraryMultiMeshItem : public VoxelInstanceLibraryItem {
 	GDCLASS(VoxelInstanceLibraryMultiMeshItem, VoxelInstanceLibraryItem)
 public:
@@ -56,8 +56,8 @@ public:
 	static const char *SCENE_SETTINGS_GROUP_NAME;
 
 	static constexpr float MIN_DISTANCE_RATIO = 0.f;
-	// Can be higher than 1 because when used with VoxelTerrain it is based on the half-extents of the visible area,
-	// which is square, so the circular area covered by mesh lods can actually extend a bit further if desired.
+	// 可以大于 1，因为与 VoxelTerrain 一起使用时它基于可见区域的半边长，
+	// 该区域是正方形，因此网格 LOD 覆盖的圆形区域在需要时实际上可以向外延伸一点。
 	static constexpr float MAX_DISTANCE_RATIO = 2.f;
 
 	enum RemovalBehavior {
@@ -117,12 +117,12 @@ public:
 	void set_collision_distance(const float distance);
 	float get_collision_distance() const;
 
-	// Internal
+	// 内部
 
 	void trigger_removal_callback(VoxelInstancer *instancer, const Transform3D &trans);
 
-	// If a scene is assigned to the item, returns settings converted from it.
-	// If no scene is assigned, returns manual settings.
+	// 如果给项目分配了场景，则返回从场景转换而来的设置。
+	// 如果没有分配场景，则返回手动设置。
 	const Settings &get_multimesh_settings() const;
 
 	inline Span<const CollisionShapeInfo> get_collision_shapes() const {
@@ -208,21 +208,21 @@ private:
 	PackedFloat32Array _b_get_mesh_lod_distance_ratios() const;
 	void _b_set_mesh_lod_distance_ratios(PackedFloat32Array ratios);
 
-	// Settings manually set in the inspector, scripts, and saved to the resource file.
+	// 在检视面板和脚本中手动设置，并保存到资源文件中的设置。
 	Settings _manual_settings;
-	// Settings gathered at runtime from the `_scene` property. They are not saved to the resource file. They take
-	// precedence over manual settings.
+	// 运行时从 `_scene` 属性收集的设置。它们不会保存到资源文件中，
+	// 优先级高于手动设置。
 	Settings _scene_settings;
-	// If not null, will be converted and used at runtime instead of manual settings.
-	// This alternative gives several benefits over manual settings:
-	// - Better workflow to setup the model, using Godot's scene editor instead of a limited inspector
-	// - Updates automatically if the scene changes
-	// - Does not bloat the resource (unlike in-editor scene conversion) if the scene is embedding all its meshes and
-	//   textures inside itself. This is often the case of imported scenes: conversion copies a reference to the mesh
-	//   into manual settings, but when Godot saves the resource, it sees the mesh has no dedicated file, so it makes a
-	//   copy of it and embeds it again in the resource.
+	// 如果不为空，则会在运行时转换并使用，而不是使用手动设置。
+	// 与手动设置相比，这种方式有几个好处：
+	// - 使用 Godot 的场景编辑器而不是受限的检视面板来设置模型，工作流更佳
+	// - 场景变化时自动更新
+	// - 如果场景将自身的所有网格和纹理都内嵌其中，就不会使资源膨胀
+	//   （不像在编辑器内转换场景）。导入的场景通常是这种情况：转换会把网格的引用复制
+	//   到手动设置中，但 Godot 保存资源时会发现网格没有独立文件，于是复制一份
+	//   并再次内嵌到资源中。
 	Ref<PackedScene> _scene;
-	// This may be used if the terrain has no LOD or the item is on its last LOD
+	// 当地形没有 LOD 或该项目位于最后一个 LOD 时，可使用它
 	bool _hide_beyond_max_lod = false;
 	FixedArray<float, MAX_MESH_LODS> _mesh_lod_max_distance_ratios;
 

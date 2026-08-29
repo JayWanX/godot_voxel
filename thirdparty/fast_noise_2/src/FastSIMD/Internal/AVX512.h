@@ -321,7 +321,7 @@ namespace FastSIMD
             return _mm512_mask_blend_epi32( m, b, a );
         }
 
-        // Min, Max
+        // Min、Max
 
         FS_INLINE static float32v Min_f32( float32v a, float32v b )
         {
@@ -377,7 +377,7 @@ namespace FastSIMD
             return _mm512_abs_epi32( a );
         }
 
-        // Float math
+        // 浮点运算
 
         FS_INLINE static float32v Sqrt_f32( float32v a )
         {
@@ -394,7 +394,7 @@ namespace FastSIMD
             return _mm512_rcp14_ps( a );
         }
 
-        // Floor, Ceil, Round
+        // Floor、Ceil、Round
 
         FS_INLINE static float32v Floor_f32( float32v a )
         {
@@ -456,7 +456,7 @@ namespace FastSIMD
     }
 #endif
 
-    // Masked float
+    // 掩码 float
 
     template<>
     FS_INLINE AVX512::float32v MaskedAdd_f32<AVX512>( AVX512::float32v a, AVX512::float32v b, AVX512::mask32v m )
@@ -476,7 +476,7 @@ namespace FastSIMD
         return _mm512_mask_mul_ps( a, m, a, b );
     }
 
-    // Masked int32
+    // 掩码 int32
 
     template<>
     FS_INLINE AVX512::int32v MaskedAdd_i32<AVX512>( AVX512::int32v a, AVX512::int32v b, AVX512::mask32v m )
@@ -496,7 +496,7 @@ namespace FastSIMD
         return _mm512_mask_mullo_epi32( a, m, a, b );
     }
 
-    // NMasked float
+    // 非掩码 float
 
     template<>
     FS_INLINE AVX512::float32v NMaskedAdd_f32<AVX512>( AVX512::float32v a, AVX512::float32v b, AVX512::mask32v m )
@@ -516,7 +516,7 @@ namespace FastSIMD
         return _mm512_mask_mul_ps( a, ~m, a, b );
     }
 
-    // NMasked int32
+    // 非掩码 int32
 
     template<>
     FS_INLINE AVX512::int32v NMaskedAdd_i32<AVX512>( AVX512::int32v a, AVX512::int32v b, AVX512::mask32v m )

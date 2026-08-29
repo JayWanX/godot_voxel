@@ -1,42 +1,42 @@
 # VoxelGraphFunction
 
-Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
+继承自：[Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
-Graph for generating or processing series of 3D values.
+用于生成或处理一系列 3D 值的图形。
 
-## Description: 
+## 描述：
 
-Contains a graph that can be used to process series of values, such as voxel positions (when used as main function of a generator), or to be re-used into other graphs (like a sub-graph).
+包含一个可用于处理一系列值的图形，例如体素位置（当用作生成器的主函数时），或用于在其它图形中复用（如子图形）。
 
-Currently this class only stores a graph, it cannot run actual processing on its own. It is usually embedded into another resource which then makes use of the graph in a specific way. 
+目前此类只存储图形，无法自行运行实际处理。它通常被嵌入到另一个资源中，由该资源以特定方式使用此图形。
 
-To generate voxels with it, see [VoxelGeneratorGraph](VoxelGeneratorGraph.md).
+要使用它生成体素，请参见 [VoxelGeneratorGraph](VoxelGeneratorGraph.md)。
 
-Nodes can be connected together from their outputs to the inputs of next nodes. Unconnected inputs can have default values or default implicit connections.
+节点可以从其输出连接到下一个节点的输入。未连接的输入可以具有默认值或默认的隐式连接。
 
-Nodes can also have "parameters" which are constants setup per node.
+节点还可以具有“参数”，即每个节点配置的常量。
 
-Nodes come in 3 main families: inputs (only have outputs), outputs (only have inputs), and others (which have both inputs and output to do some calculation).
+节点分为 3 大类：输入（只有输出）、输出（只有输入）以及其他（既有输入也有输出，用于进行某些计算）。
 
-Node types are identified with the enum [NodeTypeID](VoxelGraphFunction.md#enumerations). This enum shouldn't be used in persistent contexts (such as save files) as its values may change between versions.
+节点类型使用枚举 [NodeTypeID](VoxelGraphFunction.md#enumerations) 标识。此枚举不应在持久化场景（如存档文件）中使用，因为其值可能在版本之间发生变化。
 
-Graphs can only process 32-bit floating point values.
+图形只能处理 32 位浮点值。
 
-Description of node types is present in the graph editor node dialog, or at [https://voxel-tools.readthedocs.io/en/latest/graph_nodes](https://voxel-tools.readthedocs.io/en/latest/graph_nodes).
+节点类型的描述位于图形编辑器的节点对话框中，或参见 [https://voxel-tools.readthedocs.io/en/latest/graph_nodes](https://voxel-tools.readthedocs.io/en/latest/graph_nodes)。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                      | Name                                         | Default 
-------------------------------------------------------------------------- | -------------------------------------------- | --------
-[Array](https://docs.godotengine.org/en/stable/classes/class_array.html)  | [input_definitions](#i_input_definitions)    | []      
-[Array](https://docs.godotengine.org/en/stable/classes/class_array.html)  | [output_definitions](#i_output_definitions)  | []      
+类型                                                                        | 名称                                           | 默认值 
+------------------------------------------------------------------------- | -------------------------------------------- | ----
+[Array](https://docs.godotengine.org/en/stable/classes/class_array.html)  | [input_definitions](#i_input_definitions)    | []  
+[Array](https://docs.godotengine.org/en/stable/classes/class_array.html)  | [output_definitions](#i_output_definitions)  | []  
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                                          | Signature                                                                                                                                                                                                                                                                                                                                                                                   
+返回值                                                                                             | 函数签名                                                                                                                                                                                                                                                                                                                                                                                        
 ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [void](#)                                                                                       | [add_connection](#i_add_connection) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_port_index, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_port_index )        
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)                          | [can_connect](#i_can_connect) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_port_index, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_port_index ) const        
@@ -72,19 +72,19 @@ Return                                                                          
 [void](#)                                                                                       | [set_node_param_null](#i_set_node_param_null) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) param_index )                                                                                                                                                                            
 <p></p>
 
-## Signals: 
+## 信号：<span id="signals"></span>
 
 ### compiled( ) 
 
-Emitted after the graph finished compiling, even if compiling failed.
+图形编译完成后发出，即使编译失败也会发出。
 
 ### node_name_changed( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-*(This signal has no documentation)*
+*(此信号暂无文档)*
 
-## Enumerations: 
+## 枚举：<span id="enumerations"></span>
 
-enum **NodeTypeID**: 
+枚举 **NodeTypeID**：
 
 - <span id="i_NODE_CONSTANT"></span>**NODE_CONSTANT** = **0**
 - <span id="i_NODE_INPUT_X"></span>**NODE_INPUT_X** = **1**
@@ -146,117 +146,117 @@ enum **NodeTypeID**:
 - <span id="i_NODE_FAST_NOISE_2_3D"></span>**NODE_FAST_NOISE_2_3D** = **58**
 
 
-## Property Descriptions
+## 属性描述
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_input_definitions"></span> **input_definitions** = []
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_output_definitions"></span> **output_definitions** = []
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-## Method Descriptions
+## 方法描述
 
 ### [void](#)<span id="i_add_connection"></span> **add_connection**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_port_index, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_port_index ) 
 
-Connects the outputs of a node to the input of another node. Connecting a node to itself, or in a way that can lead it back to itself, is not supported.
+将一个节点的输出连接到另一个节点的输入。不支持将节点连接到自身，或以某种方式使其回到自身。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_can_connect"></span> **can_connect**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_port_index, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_port_index ) 
 
-Tests if two ports can be connected together.
+测试两个端口是否能够连接在一起。
 
 ### [void](#)<span id="i_clear"></span> **clear**( ) 
 
-Removes all nodes from the graph. Input and output definitions will not be cleared.
+从图形中移除所有节点。输入和输出定义不会被清除。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_create_function_node"></span> **create_function_node**( [VoxelGraphFunction](VoxelGraphFunction.md) function, [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html) position, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id=0 ) 
 
-Creates a node based on an existing graph (creates a "sub-graph instance").
+基于现有图形创建节点（创建"子图形实例"）。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_create_node"></span> **create_node**( [NodeTypeID](VoxelGraphFunction.md#enumerations) type_id, [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html) position, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id=0 ) 
 
-Creates a graph node of a given type at a specific visual position.
+在特定的可视位置创建给定类型的图形节点。
 
-The `position` parameter does not affect how the graph will perform, however it helps organizing nodes.
+`position` 参数不会影响图形的运行方式，但它有助于整理节点。
 
-An optional ID can be specified. If left to 0, the ID will be generated.
+可以指定一个可选的 ID。如果保持为 0，则将自动生成 ID。
 
-This function then returns the ID of the node, which may be useful to modify other properties of the node later.
+然后此函数返回节点的 ID，这可能有助于稍后修改节点的其它属性。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_find_node_by_name"></span> **find_node_by_name**( [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) name ) 
 
-Finds a node with the specified name and returns its ID. If the node is not found, returns 0.
+查找具有指定名称的节点并返回其 ID。如果未找到节点，则返回 0。
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_get_connections"></span> **get_connections**( ) 
 
-Gets an array describing all connections between nodes.
+获取描述节点之间所有连接的数组。
 
-The array has the following format:
+该数组具有以下格式：
 
-```
-[
-	{
-		"src_node_id": int,
-		"src_port_index": int,
-		"dst_node_id": int,
-		"dst_port_index": int
-	},
-	...
-]
-```
+	```
+	[
+		{
+			"src_node_id": int,
+			"src_port_index": int,
+			"dst_node_id": int,
+			"dst_port_index": int
+		},
+		...
+	]
+	```
 
 ### [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html)<span id="i_get_node_default_input"></span> **get_node_default_input**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) input_index ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_get_node_default_inputs_autoconnect"></span> **get_node_default_inputs_autoconnect**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)<span id="i_get_node_gui_position"></span> **get_node_gui_position**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-Get the position of the node in the graph editor.
+获取节点在图形编辑器中的位置。
 
 ### [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)<span id="i_get_node_gui_size"></span> **get_node_gui_size**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-Get the size of the node in the graph editor.
+获取节点在图形编辑器中的大小。
 
 ### [PackedInt32Array](https://docs.godotengine.org/en/stable/classes/class_packedint32array.html)<span id="i_get_node_ids"></span> **get_node_ids**( ) 
 
-Get a list of IDs of all the nodes in the graph.
+获取图形中所有节点的 ID 列表。
 
-Note: the order in which IDs are returned is not guaranteed to be the same after nodes are added or removed.
+注意：添加或移除节点后，ID 的返回顺序不保证保持不变。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_node_input_index"></span> **get_node_input_index**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [String](https://docs.godotengine.org/en/stable/classes/class_string.html) input_name ) 
 
-Gets the input index of a node from the input's name.
+根据输入的名称获取节点的输入索引。
 
 ### [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)<span id="i_get_node_name"></span> **get_node_name**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-Gets the user-defined name of the node.
+获取节点的用户自定义名称。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_node_output_index"></span> **get_node_output_index**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [String](https://docs.godotengine.org/en/stable/classes/class_string.html) output_name ) 
 
-Gets the output index of a node from the output's name.
+根据输出的名称获取节点的输出索引。
 
 ### [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html)<span id="i_get_node_param"></span> **get_node_param**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) param_index ) 
 
-Get a parameter of a node. The parameter index corresponds to the position that parameter comes in when seen in the editor.
+获取节点的参数。参数索引对应于该参数在编辑器中出现的位置。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_node_type_count"></span> **get_node_type_count**( ) 
 
-Get how many types of nodes exist in the graph system.
+获取图形系统中存在多少种节点类型。
 
 ### [NodeTypeID](VoxelGraphFunction.md#enumerations)<span id="i_get_node_type_id"></span> **get_node_type_id**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-Get the ID of the type of a node in the graph.
+获取图形中节点类型的 ID。
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_get_node_type_info"></span> **get_node_type_info**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) type_id ) 
 
-Gets information about a node type from [NodeTypeID](VoxelGraphFunction.md#enumerations).
+从 [NodeTypeID](VoxelGraphFunction.md#enumerations) 获取关于节点类型的信息。
 
-The returned data has this structure:
+返回的数据具有以下结构：
 
 ```
 {
@@ -283,62 +283,62 @@ The returned data has this structure:
 
 ### [void](#)<span id="i_paste_graph_with_pre_generated_ids"></span> **paste_graph_with_pre_generated_ids**( [VoxelGraphFunction](VoxelGraphFunction.md) graph, [PackedInt32Array](https://docs.godotengine.org/en/stable/classes/class_packedint32array.html) node_ids, [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html) gui_offset ) 
 
-Copies nodes into another graph, and connections between them only.
+将节点以及它们之间的连接复制到另一个图形中。
 
-Resources in node parameters will be duplicated if they don't have a file path.
+如果节点参数中的资源没有文件路径，它们将被复制。
 
-If `node_ids` is provided with non-zero size, defines the IDs copied nodes will have in the destination graph, in the same order as [get_node_ids](VoxelGraphFunction.md#i_get_node_ids) from the source graph. The array must have the same size as the number of copied nodes and IDs must not already exist in the destination graph. If the array is empty, they will be generated instead.
+如果提供了非零大小的 `node_ids`，则定义复制的节点在目标图形中将具有的 ID，顺序与源图形的 [get_node_ids](VoxelGraphFunction.md#i_get_node_ids) 相同。数组的大小必须与复制的节点数量相同，且 ID 不得已在目标图形中存在。如果数组为空，则将自动生成 ID。
 
 ### [void](#)<span id="i_remove_connection"></span> **remove_connection**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) src_port_index, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) dst_port_index ) 
 
-Removes an existing connection between two nodes of the graph.
+移除图形中两个节点之间的现有连接。
 
 ### [void](#)<span id="i_remove_node"></span> **remove_node**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-Removes a node from the graph.
+从图形中移除一个节点。
 
 ### [void](#)<span id="i_set_expression_node_inputs"></span> **set_expression_node_inputs**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [PackedStringArray](https://docs.godotengine.org/en/stable/classes/class_packedstringarray.html) names ) 
 
-Configures inputs for an Expression node. `names` is the list of input names used in the expression.
+为表达式节点配置输入。`names` 是表达式中使用的输入名称列表。
 
-If you create an Expression node from code, you should call this method afterwards.
+如果你通过代码创建表达式节点，之后应调用此方法。
 
 ### [void](#)<span id="i_set_node_default_input"></span> **set_node_default_input**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) input_index, [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html) value ) 
 
-Sets the value an input of a node will have when it is left unconnected.
+设置节点输入在保持未连接时将具有的值。
 
 ### [void](#)<span id="i_set_node_default_input_by_name"></span> **set_node_default_input_by_name**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [String](https://docs.godotengine.org/en/stable/classes/class_string.html) input_name, [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html) value ) 
 
-Sets the value an input of a node will have when it is left unconnected. The input is specified by its name as seen in the editor.
+设置节点输入在保持未连接时将具有的值。输入通过其在编辑器中显示的名称来指定。
 
 ### [void](#)<span id="i_set_node_default_inputs_autoconnect"></span> **set_node_default_inputs_autoconnect**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-Sets wether a node input with no inbound connection will automatically create a default connection when the graph is compiled.
+设置没有入站连接的节点输入在图形编译时是否会自动创建默认连接。
 
-This is only available on specific nodes (for example, 2D or 3D noise defaults to XYZ inputs). On other nodes, it has no effect.
+这仅适用于特定节点（例如，2D 或 3D 噪声默认使用 XYZ 输入）。在其他节点上，它没有效果。
 
 ### [void](#)<span id="i_set_node_gui_position"></span> **set_node_gui_position**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html) position ) 
 
-Sets the visual position of a node of the graph, as it will appear in the editor.
+设置图形节点的可视位置，即它在编辑器中显示的位置。
 
 ### [void](#)<span id="i_set_node_gui_size"></span> **set_node_gui_size**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html) size ) 
 
-Sets the visual size of a node of the graph, as it will appear in the editor.
+设置图形节点的可视大小，即它在编辑器中显示的大小。
 
 ### [void](#)<span id="i_set_node_name"></span> **set_node_name**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) name ) 
 
-Sets a custom name for a node.
+为节点设置自定义名称。
 
 ### [void](#)<span id="i_set_node_param"></span> **set_node_param**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) param_index, [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html) value ) 
 
-Set a parameter of a node. The parameter index corresponds to the position that parameter comes in when seen in the editor.
+设置节点的参数。参数索引对应于该参数在编辑器中显示的位置。
 
 ### [void](#)<span id="i_set_node_param_by_name"></span> **set_node_param_by_name**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [String](https://docs.godotengine.org/en/stable/classes/class_string.html) param_name, [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html) value ) 
 
-Set a parameter of a node, using its name as it appears in the editor.
+使用节点参数在编辑器中显示的名称来设置其参数。
 
 ### [void](#)<span id="i_set_node_param_null"></span> **set_node_param_null**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) param_index ) 
 
-Set a parameter of a node to null. This method only exists to workaround an issue with Godot's UndoRedo system. Prefer using [set_node_param](VoxelGraphFunction.md#i_set_node_param).
+将节点的参数设置为 null。此方法仅用于规避 Godot 的 UndoRedo 系统的一个问题。建议使用 [set_node_param](VoxelGraphFunction.md#i_set_node_param)。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

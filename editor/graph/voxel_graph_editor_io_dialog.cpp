@@ -50,9 +50,9 @@ VoxelGraphEditorIODialog::VoxelGraphEditorIODialog() {
 
 	get_ok_button()->connect("pressed", callable_mp(this, &VoxelGraphEditorIODialog::_on_ok_pressed));
 
-	// Godot devs added more shadowing warnings around may 2023 but with MSVC it prevents us to use local variable names
-	// that are the same as PRIVATE variables from inherited classes (and Godot does not prefix members)... So sometimes
-	// have to come up with pointless name differences just to avoid it
+	// Godot 开发者在 2023 年 5 月前后增加了更多变量遮蔽警告，但在 MSVC 下这阻止我们使用
+	// 与继承类中 PRIVATE 变量同名的局部变量（而且 Godot 不会给成员加前缀）……所以有时
+	// 不得不提出毫无意义的命名差异来避开它
 	Button *ok_button_ptr = get_ok_button();
 	ok_button_ptr->set_custom_minimum_size(Vector2(100 * EDSCALE, 0));
 
@@ -91,7 +91,7 @@ Control *VoxelGraphEditorIODialog::create_ui(PortsUI &ui, String title, bool is_
 		label->set_text(VOXEL_TTR("Usage: "));
 		gc_settings->add_child(label);
 
-		// TODO Don't allow choosing a non-custom input twice
+		// TODO 不允许两次选择同一个非自定义输入
 		ui.usage = memnew(OptionButton);
 		const NodeTypeDB &type_db = NodeTypeDB::get_singleton();
 		const Category category = is_input ? CATEGORY_INPUT : CATEGORY_OUTPUT;
@@ -118,7 +118,7 @@ Control *VoxelGraphEditorIODialog::create_ui(PortsUI &ui, String title, bool is_
 	hb->add_child(gc_settings);
 	vb->add_child(hb);
 
-	// TODO Add icons
+	// TODO 添加图标
 
 	HBoxContainer *hb_item_buttons = memnew(HBoxContainer);
 
@@ -175,7 +175,7 @@ void VoxelGraphEditorIODialog::set_undo_redo(EditorUndoRedoManager *undo_redo) {
 
 void VoxelGraphEditorIODialog::set_enabled(PortsUI &ui, bool enabled) {
 	if (ui.default_value != nullptr) {
-		// TODO Default values not available yet
+		// TODO 默认值尚不可用
 		ui.default_value->set_editable(false);
 	}
 
@@ -190,7 +190,7 @@ void VoxelGraphEditorIODialog::set_enabled(PortsUI &ui, bool enabled) {
 
 void VoxelGraphEditorIODialog::set_enabled(bool enabled) {
 	_auto_generate_button->set_disabled(!enabled);
-	// TODO Allow editing I/Os manually
+	// TODO 允许手动编辑 I/O
 	set_enabled(_inputs_ui, false);
 	set_enabled(_outputs_ui, false);
 }
@@ -209,7 +209,7 @@ void VoxelGraphEditorIODialog::_notification(int p_what) {
 	}
 }
 
-// Using polling instead of signals. Seems cleaner. We'll see how it holds later.
+// 使用轮询而不是信号。看起来更干净。我们看看它之后表现如何。
 
 void VoxelGraphEditorIODialog::copy_ui_to_data(const PortsUI &ui, StdVector<VoxelGraphFunction::Port> &ports) {
 	const unsigned int item_count = ui.item_list->get_item_count();
@@ -313,7 +313,7 @@ void VoxelGraphEditorIODialog::_on_ok_pressed() {
 
 	_undo_redo->add_undo_method(graph, "_set_input_definitions", previous_inputs);
 	_undo_redo->add_undo_method(graph, "_set_output_definitions", previous_outputs);
-	// Show dialog again, otherwise the user can't see what undo/redo did
+	// 再次显示对话框，否则用户看不到撤销/重做做了什么
 	_undo_redo->add_undo_method(this, "reshow", _graph);
 
 	const bool prev_reshow_value = _reshow_on_undo_redo;

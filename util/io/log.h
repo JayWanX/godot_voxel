@@ -3,8 +3,8 @@
 
 #include "../string/fwd_std_string.h"
 
-// print_verbose() is used everywhere in Godot, but its drawback is that even if you turn it off, strings
-// you print are still allocated and formatted, to not be used. This macro avoids the string.
+// print_verbose() 在 Godot 中到处都在用，但它的缺点是即使你关闭了它，你打印的字符串
+// 仍然会被分配和格式化，然后不被使用。这个宏避免了创建字符串。
 #define VOXEL_PRINT_VERBOSE(msg)                                                                                          \
 	if (voxel::is_verbose_output_enabled()) {                                                                         \
 		voxel::print_line(msg);                                                                                       \
@@ -42,7 +42,7 @@ void print_error(const char *error, const FwdConstStdString &msg, const char *fu
 
 void flush_stdout();
 
-// When defined, redirects `println` to a file instead of standard output.
+// 定义时，将 `println` 重定向到文件而不是标准输出。
 // #define VOXEL_DEBUG_LOG_FILE_ENABLED
 
 #ifdef VOXEL_DEBUG_LOG_FILE_ENABLED

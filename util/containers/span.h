@@ -8,8 +8,8 @@
 
 namespace voxel {
 
-// View into an array, referencing a pointer and a size.
-// STL equivalent would be std::span<T> in C++20
+// 对数组的视图，引用一个指针与大小。
+// STL 中的等价物是 C++20 的 std::span<T>
 template <typename T>
 class [[nodiscard]] Span {
 public:
@@ -26,20 +26,20 @@ public:
 	inline Span(Span<T> &p_other, size_t p_begin, size_t p_end) {
 		VOXEL_ASSERT(p_end >= p_begin);
 		VOXEL_ASSERT(p_begin < p_other.size());
-		VOXEL_ASSERT(p_end <= p_other.size()); // `<=` because p_end is typically `p_begin + size`
+		VOXEL_ASSERT(p_end <= p_other.size()); // `<=` 是因为 p_end 通常为 `p_begin + size`
 		_ptr = p_other._ptr + p_begin;
 		_size = p_end - p_begin;
 	}
 
-	// Initially added to support `Span<const T> = Span<T>`, or `Span<Base> = Span<Derived>`
+	// 最初为支持 `Span<const T> = Span<T>` 或 `Span<Base> = Span<Derived>` 而添加
 	template <typename U>
 	inline Span(Span<U> p_other) {
 		_ptr = p_other.data();
 		_size = p_other.size();
 	}
 
-	// Had to add this because somehow calling `template_func_expecting_span_const_t(Span<T>)` does not work...
-	// Curiously enough, std::span has the same issue. I wonder what I'm missing.
+	// 不得不加上这个，因为不知为何调用 `template_func_expecting_span_const_t(Span<T>)` 无法工作……
+	// 说来奇怪，std::span 也有同样的问题。不知我漏掉了什么。
 	inline Span<const T> to_const() const {
 		return Span<const T>(*this);
 	}
@@ -54,8 +54,8 @@ public:
 		return Span<T>(_ptr + from, _size - from);
 	}
 
-	// Reinterprets the data as a span of a different type. The returned span may have a different number of elements,
-	// but the memory area must be the same number of bytes.
+	// 将数据重新解释为另一种类型的 span。返回的 span 元素数量可能不同，
+	// 但所占内存区域必须是相同的字节数。
 	template <typename U>
 	Span<U> reinterpret_cast_to() const {
 		const size_t size_in_bytes = _size * sizeof(T);
@@ -105,7 +105,7 @@ public:
 		}
 	}
 
-	// Template because T could be const and TDst should not be
+	// 使用模板是因为 T 可能为 const，而 TDst 不应为 const
 	template <typename TDst>
 	inline void copy_to(Span<TDst> other) const {
 		VOXEL_ASSERT(other.size() == _size);
@@ -116,7 +116,7 @@ public:
 		// for (size_t i = 0; i < _size; ++i) {
 		// 	other._ptr[i] = _ptr[i];
 		// }
-		// Should compile to memcpy if T is simple enough
+		// 如果 T 足够简单，应能编译为 memcpy
 		std::copy(_ptr, _ptr + _size, other.data());
 	}
 
@@ -231,7 +231,7 @@ Span<const T> to_span(const std::array<T, N> &a) {
 	return Span<const T>(a.data(), a.size());
 }
 
-// TODO Deprecate, now Span has a conversion constructor that can allow doing that
+// TODO 弃用，现在 Span 拥有转换构造函数可以实现这一点
 template <typename T>
 Span<const T> to_span_const(const Span<T> &a) {
 	return Span<const T>(a.data(), 0, a.size());

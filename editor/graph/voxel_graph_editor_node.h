@@ -17,7 +17,7 @@ namespace pg {
 class VoxelGraphFunction;
 }
 
-// GUI graph node with a few custom data attached.
+// 附加了一些自定义数据的 GUI 图形节点。
 class VoxelGraphEditorNode : public GraphNode {
 	GDCLASS(VoxelGraphEditorNode, GraphNode)
 public:

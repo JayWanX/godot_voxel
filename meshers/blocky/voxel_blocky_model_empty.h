@@ -5,7 +5,7 @@
 
 namespace voxel {
 
-// A model with no visuals and no collisions by default.
+// 默认没有视觉效果也没有碰撞的模型。
 class VoxelBlockyModelEmpty : public VoxelBlockyModel {
 	GDCLASS(VoxelBlockyModelEmpty, VoxelBlockyModel)
 public:

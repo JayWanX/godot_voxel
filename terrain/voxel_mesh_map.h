@@ -8,7 +8,7 @@
 
 namespace voxel {
 
-// Stores meshes and colliders in an infinite sparse grid of chunks (aka blocks).
+// 在无限稀疏的网格（即数据块，blocks）中存储网格和碰撞体。
 template <typename MeshBlock_T>
 class VoxelMeshMap {
 public:
@@ -51,7 +51,7 @@ public:
 			const unsigned int i = it->second.index;
 			CRASH_COND(i >= _blocks.size());
 			MeshBlock_T *block = _blocks[i];
-			CRASH_COND(block == nullptr); // The map should not contain null blocks
+			CRASH_COND(block == nullptr); // 该映射不应包含空数据块
 			CRASH_COND(it->second.block == nullptr);
 #endif
 			_last_accessed_block = it->second.block;
@@ -70,11 +70,10 @@ public:
 			const unsigned int i = it->second.index;
 			CRASH_COND(i >= _blocks.size());
 			MeshBlock_T *block = _blocks[i];
-			CRASH_COND(block == nullptr); // The map should not contain null blocks
+			CRASH_COND(block == nullptr); // 该映射不应包含空数据块
 			CRASH_COND(it->second.block == nullptr);
 #endif
-			// This function can't cache _last_accessed_block, because it's const, so repeated accesses are hashing
-			// again...
+			// 此函数无法缓存 _last_accessed_block，因为它是 const 的，所以重复访问仍需再次哈希……
 			return it->second.block;
 		}
 		return nullptr;
@@ -144,16 +143,16 @@ public:
 private:
 	struct MapItem {
 		MeshBlock_T *block;
-		// Index of the block within the vector storage
+		// 数据块在向量存储中的索引
 		unsigned int index;
 	};
 
 	void remove_block_internal(typename StdUnorderedMap<Vector3i, MapItem>::iterator rm_it, unsigned int index) {
-		// TODO `erase` can occasionally be very slow (milliseconds) if the map contains lots of items.
-		// This might be caused by internal rehashing/resizing.
-		// We should look for a faster container, or reduce the number of entries.
+		// TODO 如果映射中包含大量条目，`erase` 偶尔会非常慢（毫秒级）。
+		// 这可能是由内部的重新哈希/扩容引起的。
+		// 我们应该寻找更快的容器，或者减少条目的数量。
 
-		// This function assumes the block is already freed
+		// 此函数假定数据块已经被释放
 		_blocks_map.erase(rm_it);
 
 		MeshBlock_T *moved_block = _blocks.back();
@@ -171,8 +170,8 @@ private:
 	}
 
 	static void queue_free_mesh_block(MeshBlock_T *block) {
-		// We spread this out because of physics
-		// TODO Could it be enough to do both render and physic deallocation with the task in ~MeshBlock_T()?
+		// 我们将其分散开是因为物理原因
+		// TODO 在 ~MeshBlock_T() 中通过任务同时进行渲染和物理释放是否就足够了？
 		struct FreeMeshBlockTask : public voxel::ITimeSpreadTask {
 			void run(TimeSpreadTaskContext &ctx) override {
 				VOXEL_DELETE(block);
@@ -186,14 +185,14 @@ private:
 	}
 
 private:
-	// Blocks stored with a spatial hash in all 3D directions.
+	// 数据块通过三维空间哈希存储。
 	StdUnorderedMap<Vector3i, MapItem> _blocks_map;
-	// Blocks are stored in a vector to allow faster iteration over all of them.
-	// Use cases for this include updating the transform of the meshes
+	// 数据块存储在向量中，以便更快地遍历所有数据块。
+	// 用例包括更新网格的变换。
 	StdVector<MeshBlock_T *> _blocks;
 
-	// Voxel access will most frequently be in contiguous areas, so the same blocks are accessed.
-	// To prevent too much hashing, this reference is checked before.
+	// 体素访问最常发生在连续区域，因此会访问相同的数据块。
+	// 为避免过多的哈希操作，在哈希之前先检查该引用。
 	mutable MeshBlock_T *_last_accessed_block;
 };
 

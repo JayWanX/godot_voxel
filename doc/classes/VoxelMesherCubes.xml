@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelMesherCubes" inherits="VoxelMesher" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Generates a cubic voxels mesh from colors.
+		根据颜色生成立方体体素网格。
 	</brief_description>
 	<description>
-		Builds meshes representing cubic voxels, based on color values stored in the [constant VoxelBuffer.CHANNEL_COLOR] channel. 
-		Colors will usually be stored in the [code]COLOR[/code] vertex attribute and may require a material with vertex colors enabled, or a custom shader.
+		基于存储在 [constant VoxelBuffer.CHANNEL_COLOR] 通道中的颜色值，构建表示立方体体素的网格。
+		颜色通常会存储在 [code]COLOR[/code] 顶点属性中，可能需要启用顶点颜色的材质，或使用自定义着色器。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -15,7 +15,7 @@
 			<param index="0" name="image" type="Image" />
 			<param index="1" name="voxel_size" type="float" />
 			<description>
-				Generates a 1-voxel thick greedy mesh from pixels of an image.
+				根据图像像素生成 1 体素厚的贪婪网格。
 			</description>
 		</method>
 		<method name="set_material_by_index">
@@ -23,51 +23,51 @@
 			<param index="0" name="id" type="int" enum="VoxelMesherCubes.Materials" />
 			<param index="1" name="material" type="Material" />
 			<description>
-				Sets one of the materials that will be used when building meshes. This is equivalent to using either [member opaque_material] or [member transparent_material].
+				设置构建网格时将使用的其中一个材质。这等效于使用 [member opaque_material] 或 [member transparent_material]。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="color_mode" type="int" setter="set_color_mode" getter="get_color_mode" enum="VoxelMesherCubes.ColorMode" default="0">
-			Sets how voxel color is determined when building the mesh.
+			设置构建网格时如何确定体素颜色。
 		</member>
 		<member name="greedy_meshing_enabled" type="bool" setter="set_greedy_meshing_enabled" getter="is_greedy_meshing_enabled" default="true">
-			Enables greedy meshing: the mesher will attempt to merge contiguous faces having the same color to reduce the number of polygons.
+			启用贪婪网格化：网格生成器将尝试合并具有相同颜色的连续面，以减少多边形数量。
 		</member>
 		<member name="opaque_material" type="Material" setter="_set_opaque_material" getter="_get_opaque_material">
-			Material that will be used for opaque parts of the mesh.
+			将用于网格不透明部分的材质。
 		</member>
 		<member name="palette" type="VoxelColorPalette" setter="set_palette" getter="get_palette">
-			Palette that will be used when using the [constant COLOR_MESHER_PALETTE] color mode.
+			使用 [constant COLOR_MESHER_PALETTE] 颜色模式时将使用的调色板。
 		</member>
 		<member name="transparent_material" type="Material" setter="_set_transparent_material" getter="_get_transparent_material">
-			Material that will be used for transparent parts of the mesh (colors where alpha is not set to max).
+			将用于网格透明部分的材质（alpha 未设为最大的颜色）。
 		</member>
 	</members>
 	<constants>
 		<constant name="MATERIAL_OPAQUE" value="0" enum="Materials">
-			Index of the opaque material.
+			不透明材质的索引。
 		</constant>
 		<constant name="MATERIAL_TRANSPARENT" value="1" enum="Materials">
-			Index of the transparent material.
+			透明材质的索引。
 		</constant>
 		<constant name="MATERIAL_COUNT" value="2" enum="Materials">
-			Maximum number of materials.
+			材质的最大数量。
 		</constant>
 		<constant name="COLOR_RAW" value="0" enum="ColorMode">
-			Voxel values will be directly interpreted as colors.
-			8-bit voxels are interpreted as [code]rrggbbaa[/code] (2 bits per component) where the range per component is converted from 0..3 to 0..255.
-			16-bit voxels are interpreted as [code]rrrrgggg bbbbaaaa[/code] (4 bits per component) where the range per component is converted from 0..15 to 0..255.
-			32-bit voxels are interpreted as [code]rrrrrrrr gggggggg bbbbbbbb aaaaaaaa[/code] (8 bits per component) where each component is in 0..255.
+			体素值将被直接解释为颜色。
+			8 位体素被解释为 [code]rrggbbaa[/code]（每个分量 2 位），每个分量的范围从 0..3 转换为 0..255。
+			16 位体素被解释为 [code]rrrrgggg bbbbaaaa[/code]（每个分量 4 位），每个分量的范围从 0..15 转换为 0..255。
+			32 位体素被解释为 [code]rrrrrrrr gggggggg bbbbbbbb aaaaaaaa[/code]（每个分量 8 位），每个分量在 0..255 之间。
 		</constant>
 		<constant name="COLOR_MESHER_PALETTE" value="1" enum="ColorMode">
-			Voxel values will be interpreted as indices within the color palette assigned in the [member palette] property.
+			体素值将被解释为 [member palette] 属性中分配的调色板内的索引。
 		</constant>
 		<constant name="COLOR_SHADER_PALETTE" value="2" enum="ColorMode">
-			Voxel values will be directly written as such in the mesh, instead of colors.
-			They are written in the red component of the [code]COLOR[/code], leaving red and blue to zero. Note, it will be normalized to 0..1 in shader, so if you need the integer value back you may use [code]int(COLOR.r * 255.0)[/code].
-			The alpha component will be set to the transparency of the corresponding color in [member palette] (a palette resource is still needed to differenciate transparent parts; RGB values are not used).
-			You are expected to use a [ShaderMaterial] to read vertex data and choose the actual color with a custom shader. [StandardMaterial] will not work with this mode.
+			体素值将按原样直接写入网格，而不是颜色。
+			它们被写入 [code]COLOR[/code] 的红色分量，红色和蓝色保持为零。注意，它会在着色器中被归一化到 0..1，因此如果你需要取回整数值，可以使用 [code]int(COLOR.r * 255.0)[/code]。
+			alpha 分量将设置为 [member palette] 中对应颜色的透明度（仍然需要一个调色板资源来区分透明部分；RGB 值不会被使用）。
+			你需要使用 [ShaderMaterial] 来读取顶点数据，并通过自定义着色器选择实际颜色。[StandardMaterial] 无法与此模式配合使用。
 		</constant>
 	</constants>
 </class>

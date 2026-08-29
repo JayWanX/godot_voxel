@@ -1,7 +1,7 @@
 #pragma once
 #include "FastNoise_Config.h"
 
-// Node class definitions
+// 节点类定义
 #include "Generators/BasicGenerators.h"
 #include "Generators/Value.h"
 #include "Generators/Perlin.h"
@@ -16,14 +16,14 @@
 namespace FastNoise
 {
     /// <summary>
-    /// Create new instance of a FastNoise node
+    /// 创建 FastNoise 节点的新实例
     /// </summary>
     /// <example>
     /// auto node = FastNoise::New<FastNoise::Simplex>();
     /// </example>
-    /// <typeparam name="T">Node class to create</typeparam>
-    /// <param name="maxSimdLevel">Max SIMD level, Null = Auto</param>
-    /// <returns>SmartNode<T> is guaranteed not nullptr</returns>
+    /// <typeparam name="T">要创建的节点类</typeparam>
+    /// <param name="maxSimdLevel">最大 SIMD 级别，Null = Auto</param>
+    /// <returns>保证 SmartNode<T> 不为 nullptr</returns>
     template<typename T>
     SmartNode<T> New( FastSIMD::eLevel maxSimdLevel /*= FastSIMD::Level_Null*/ )
     {
@@ -38,13 +38,13 @@ namespace FastNoise
     }
 
     /// <summary>
-    /// Create a tree of FastNoise nodes from an encoded string
+    /// 从编码字符串创建 FastNoise 节点树
     /// </summary>
     /// <example>
     /// FastNoise::SmartNode<> rootNode = FastNoise::NewFromEncodedNodeTree( "DQAFAAAAAAAAQAgAAAAAAD8AAAAAAA==" );
     /// </example>
-    /// <param name="encodedNodeTreeString">Can be generated using the NoiseTool</param>
-    /// <param name="maxSimdLevel">Max SIMD level, Null = Auto</param>
-    /// <returns>Root node of the tree, nullptr for invalid strings</returns>
+    /// <param name="encodedNodeTreeString">可使用 NoiseTool 生成</param>
+    /// <param name="maxSimdLevel">最大 SIMD 级别，Null = Auto</param>
+    /// <returns>树的根节点，无效字符串返回 nullptr</returns>
     FASTNOISE_API SmartNode<> NewFromEncodedNodeTree( const char* encodedNodeTreeString, FastSIMD::eLevel maxSimdLevel = FastSIMD::Level_Null );
 }

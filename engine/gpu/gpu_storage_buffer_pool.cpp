@@ -14,7 +14,7 @@ namespace voxel {
 GPUStorageBufferPool::GPUStorageBufferPool() {
 	uint32_t s = 1;
 	for (unsigned int i = 0; i < _pool_sizes.size(); ++i) {
-		// Have sizes aligned to 4 bytes
+		// 将尺寸对齐到 4 字节
 		_pool_sizes[i] = s * 4;
 		s = math::max(s + 1, s + s / 2);
 	}
@@ -56,7 +56,7 @@ void GPUStorageBufferPool::clear() {
 
 void GPUStorageBufferPool::set_rendering_device(RenderingDevice *rd) {
 	if (_rendering_device != nullptr) {
-		// Clear data from the previous device
+		// 清除前一个设备的数据
 		clear();
 	} else {
 		for (unsigned int i = 0; i < _pool_sizes.size(); ++i) {
@@ -67,8 +67,8 @@ void GPUStorageBufferPool::set_rendering_device(RenderingDevice *rd) {
 }
 
 unsigned int GPUStorageBufferPool::get_pool_index_from_size(uint32_t p_size) const {
-	// Find first size that is equal or higher than the given size.
-	// (first size that does not satisfy `pool_size < p_size`)
+	// 找到第一个大于或等于给定尺寸的池尺寸。
+	// （第一个不满足 `pool_size < p_size` 的尺寸）
 	auto it = std::lower_bound(_pool_sizes.begin(), _pool_sizes.end(), p_size);
 #ifdef DEBUG_ENABLED
 	if (it != _pool_sizes.end()) {
@@ -102,11 +102,10 @@ GPUStorageBuffer GPUStorageBufferPool::allocate(uint32_t p_size, const PackedByt
 	if (pool.buffers.size() == 0) {
 		const unsigned int capacity = _pool_sizes[pool_index];
 		VOXEL_PRINT_VERBOSE(format("Creating VoxelRD pooled storage buffer {}b", capacity));
-		// Unfortunately `storage_buffer_create` in the Godot API requires that you provide a PoolByteArray of the exact
-		// same size, when provided. Our pooling strategy means we are often allocating a bit more than initially
-		// requested. The passed data would fit, but Godot doesn't want that... so in order to avoid having to create an
-		// extended copy of the PackedByteArray, we don't initialize the buffer on creation. Instead, we do it with a
-		// separate call... I have no idea if that has a particular performance impact, apart from more RID lookups.
+		// 遗憾的是，Godot API 中的 `storage_buffer_create` 在提供数据时要求提供精确相同大小的 PoolByteArray。
+		// 我们的池化策略意味着我们经常分配比最初请求稍多一点的空间。传入的数据本来可以放得下，但 Godot 不接受……
+		// 因此，为了避免创建 PackedByteArray 的扩展副本，我们不在创建时初始化缓冲区，而是通过单独的调用完成……
+		// 除了更多的 RID 查找之外，我不确定这是否会有特别的性能影响。
 		// b.rid = rd.storage_buffer_create(capacity, pba);
 		b.rid = rd.storage_buffer_create(capacity);
 		VOXEL_ASSERT_RETURN_V(b.rid.is_valid(), GPUStorageBuffer());

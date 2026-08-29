@@ -10,7 +10,7 @@ namespace voxel {
 
 VoxelBlockyLibraryEditorPlugin::VoxelBlockyLibraryEditorPlugin() {}
 
-// EditorNode isn't ready during plugin construction, so defer work to `init()`.
+// 插件构造期间 EditorNode 尚未就绪，因此将工作推迟到 `init()`。
 void VoxelBlockyLibraryEditorPlugin::init() {
 	EditorUndoRedoManager *undo_redo = get_undo_redo();
 	EditorInterface *editor_interface = get_editor_interface();

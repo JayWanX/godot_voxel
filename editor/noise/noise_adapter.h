@@ -9,8 +9,8 @@
 
 namespace voxel {
 
-// Godot still doesn't allow to inherit from `Noise` (and yet even wouldn't have methods we need) so we have to do this
-// nonsense
+// Godot 仍然不允许继承 `Noise`（而且即使允许，它也没有我们需要的那些方法），所以我们不得不做这种
+// 别扭的事
 // https://github.com/godotengine/godot/pull/100443
 struct NoiseAdapter {
 #ifdef VOXEL_ENABLE_FAST_NOISE_2

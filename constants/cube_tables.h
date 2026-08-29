@@ -6,28 +6,28 @@
 
 namespace voxel::Cube {
 
-// Index convention used in some lookup tables
+// 某些查找表中使用的索引约定
 enum Side {
 	SIDE_LEFT = 0,
 	SIDE_RIGHT,
 	SIDE_BOTTOM,
 	SIDE_TOP,
-	// TODO Enhancement: I would like to swap the Z ones because it's inconsistent with coordinates...
+	// TODO 增强：我想交换 Z 方向的两个，因为它们与坐标不一致……
 	SIDE_BACK,
 	SIDE_FRONT,
 
 	SIDE_COUNT
 };
-// TODO We should use this naming system, taken from Minecraft:
-// - West: -X
-// - East: +X
-// - North: -Z
-// - South: +Z
-// - Down: -Y
-// - Up: +Y
+// TODO 我们应该采用这套命名体系，源自 Minecraft：
+// - West（西）: -X
+// - East（东）: +X
+// - North（北）: -Z
+// - South（南）: +Z
+// - Down（下）: -Y
+// - Up（上）: +Y
 
-// Alias to the above for clarity, fixing some interpretation problems regarding the side_normals table...
-// TODO Bug: I would like to fix the X axes, they are inverted compared to the others
+// 为了清晰起见，作为上述枚举的别名，修复了 side_normals 表的一些解释问题……
+// TODO 缺陷：我想修复 X 轴，它们与其他轴相比是相反的
 enum SideAxis {
 	SIDE_POSITIVE_X = 0,
 	SIDE_NEGATIVE_X,
@@ -37,7 +37,7 @@ enum SideAxis {
 	SIDE_POSITIVE_Z
 };
 
-// Index convention used in some lookup tables
+// 某些查找表中使用的索引约定
 enum Edge {
 	EDGE_BOTTOM_BACK = 0,
 	EDGE_BOTTOM_RIGHT,
@@ -55,7 +55,7 @@ enum Edge {
 	EDGE_COUNT
 };
 
-// Index convention used in some lookup tables
+// 某些查找表中使用的索引约定
 enum Corner {
 	CORNER_BOTTOM_BACK_LEFT = 0,
 	CORNER_BOTTOM_BACK_RIGHT,

@@ -15,9 +15,9 @@ namespace voxel::magica {
 
 struct Model {
 	Vector3i size;
-	// TODO Optimization: implement lazy loading/streaming to reduce intermediary memory allocations?
-	// Loading a full 256^3 model needs 16 megabytes, but a lot of areas might actually be uniform,
-	// and we might not need the actual model immediately
+	// TODO 优化：实现懒加载/流式传输以减少中间内存分配？
+	// 加载完整的 256^3 模型需要 16 兆字节，但很多区域实际上可能是均匀的，
+	// 而且我们可能并不立即需要实际的模型
 	StdVector<uint8_t> color_indexes;
 };
 
@@ -29,7 +29,7 @@ struct Node {
 	};
 
 	int id;
-	// Depending on the type, a node pointer can be casted to different structs
+	// 根据类型不同，节点指针可以被转换为不同的结构体
 	const Type type;
 	StdUnorderedMap<String, String> attributes;
 
@@ -46,7 +46,7 @@ struct Rotation {
 struct TransformNode : public Node {
 	int child_node_id;
 	int layer_id;
-	// Pivot position, which turns out to be at the center in MagicaVoxel
+	// 轴点位置，在 MagicaVoxel 中正好位于中心
 	Vector3i position;
 	Rotation rotation;
 	String name;
@@ -62,7 +62,7 @@ struct GroupNode : public Node {
 };
 
 struct ShapeNode : public Node {
-	int model_id; // corresponds to index in the array of models
+	int model_id; // 对应模型数组中的索引
 	StdUnorderedMap<String, String> model_attributes;
 
 	ShapeNode() : Node(Node::TYPE_SHAPE) {}
@@ -89,9 +89,9 @@ struct Material {
 	float specular = 0.f;
 	float ior = 1.f; // refraction
 	float flux = 0.f;
-	// TODO I don't know what `_att` means
+	// TODO 我不知道 `_att` 是什么意思
 	float att = 0.f;
-	// TODO WTF is `_plastic`?
+	// TODO `_plastic` 到底是什么？
 };
 
 class Data {
@@ -102,7 +102,7 @@ public:
 	unsigned int get_model_count() const;
 	const Model &get_model(unsigned int index) const;
 
-	// Can return -1 if there is no scene graph
+	// 如果没有场景图，可以返回 -1
 	int get_root_node_id() const;
 	const Node *get_node(int id) const;
 
@@ -122,7 +122,7 @@ private:
 	StdVector<UniquePtr<Model>> _models;
 	StdVector<UniquePtr<Layer>> _layers;
 	StdUnorderedMap<int, UniquePtr<Node>> _scene_graph;
-	// Material IDs are supposedly tied to palette indices
+	// 材质 ID 据称与调色板索引相关联
 	StdUnorderedMap<int, UniquePtr<Material>> _materials;
 	int _root_node_id = -1;
 	FixedArray<Color8, 256> _palette;

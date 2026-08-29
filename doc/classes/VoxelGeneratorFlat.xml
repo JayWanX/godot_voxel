@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGeneratorFlat" inherits="VoxelGenerator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Voxel generator producing an infinite flat ground.
+		生成无限平坦地面的体素生成器。
 	</brief_description>
 	<description>
 	</description>
@@ -9,13 +9,13 @@
 	</tutorials>
 	<members>
 		<member name="channel" type="int" setter="set_channel" getter="get_channel" enum="VoxelBuffer.ChannelId" default="1">
-			Channel that will be used to generate the ground. Use [member VoxelBuffer.CHANNEL_SDF] for smooth terrain, other channels for blocky.
+			用于生成地面的通道。使用 [member VoxelBuffer.CHANNEL_SDF] 生成平滑地形，使用其他通道生成方块风地形。
 		</member>
 		<member name="height" type="float" setter="set_height" getter="get_height" default="0.0">
-			Altitude of the ground.
+			地面的高度。
 		</member>
 		<member name="voxel_type" type="int" setter="set_voxel_type" getter="get_voxel_type" default="1">
-			If [member channel] is set to any channel other than [constant VoxelBuffer.CHANNEL_SDF], this value will be used to fill ground voxels, while air voxels will be set to 0.
+			如果 [member channel] 设置为 [constant VoxelBuffer.CHANNEL_SDF] 以外的任何通道，此值将用于填充地面体素，而空气体素将设置为 0。
 		</member>
 	</members>
 </class>

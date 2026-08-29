@@ -13,7 +13,7 @@
 #include "../thread/thread.h"
 #include "threaded_task.h"
 
-// For debugging
+// 用于调试
 // #define VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
 
 #ifdef VOXEL_THREADED_TASK_RUNNER_CHECK_DUPLICATE_TASKS
@@ -24,7 +24,7 @@
 
 namespace voxel {
 
-// Generic thread pool that performs batches of tasks based on dynamic priority
+// 基于动态优先级执行批量任务的通用线程池
 class ThreadedTaskRunner {
 public:
 	static constexpr uint32_t MAX_THREADS = 128;
@@ -39,33 +39,33 @@ public:
 	ThreadedTaskRunner();
 	~ThreadedTaskRunner();
 
-	// Set name prefix to recognize threads of this pool in debug tools.
-	// Must be called before configuring thread count.
+	// 设置名称前缀，以便在调试工具中识别该池的线程。
+	// 必须在配置线程数之前调用。
 	void set_name(const char *name);
 
-	// TODO Add ability to change it while running without skipping tasks
-	// Can't be changed after tasks have been queued
+	// TODO 增加在运行时修改它而不跳过任务的能力
+	// 任务入队后无法更改
 	void set_thread_count(uint32_t count);
 	uint32_t get_thread_count() const {
 		return _thread_count;
 	}
 
-	// TODO Add ability to change it while running
-	// Task priorities can change over time, but computing them too often with many tasks can be expensive,
-	// so they are cached. This sets how often task priorities will be polled.
-	// Can't be changed after tasks have been queued.
+	// TODO 增加在运行时修改它的能力
+	// 任务优先级会随时间改变，但在任务很多时过于频繁地计算代价很高，
+	// 因此会被缓存。这里设置轮询任务优先级的频率。
+	// 任务入队后无法更改。
 	void set_priority_update_period(uint32_t milliseconds);
 
-	// TODO Expect tasks to be unique ptrs?
+	// TODO 是否应期望任务为唯一指针？
 
-	// Schedules a task.
-	// Ownership is NOT passed to the pool, so make sure you get them back when completed if you want to delete them.
-	// All tasks scheduled with `serial=true` will run one after the other, using one thread at a time.
-	// Tasks scheduled with `serial=false` can run in parallel using multiple threads.
-	// Serial execution is useful when such tasks cannot run in parallel due to locking a shared resource. This avoids
-	// clogging up all threads with waiting tasks.
+	// 调度一个任务。
+	// 所有权不会传递给线程池，因此若想删除任务，请确保在完成时取回它们。
+	// 所有以 `serial=true` 调度的任务将依次运行，每次只使用一个线程。
+	// 以 `serial=false` 调度的任务可使用多个线程并行运行。
+	// 当这类任务因锁定共享资源而无法并行时，串行执行很有用。这能避免
+	// 所有线程都被等待中的任务占满。
 	void enqueue(IThreadedTask *task, bool serial);
-	// Schedules multiple tasks at once. Involves less internal locking.
+	// 一次性调度多个任务。涉及更少内部加锁。
 	void enqueue(Span<IThreadedTask *> new_tasks, bool serial);
 
 	template <typename F>
@@ -77,7 +77,7 @@ public:
 			MutexLock lock(_completed_tasks_mutex);
 			append_array(temp, _completed_tasks);
 			_completed_tasks.clear();
-			// std::move doesn't guarantee preservation of vector capacity
+			// std::move 不保证保留 vector 的容量
 			// temp = std::move(_completed_tasks);
 		}
 		for (IThreadedTask *task : temp) {
@@ -89,7 +89,7 @@ public:
 		temp.clear();
 	}
 
-	// Blocks and wait for all tasks to finish (assuming no more are getting added!)
+	// 阻塞并等待所有任务完成（假设不会再有新任务加入！）
 	void wait_for_all_tasks();
 
 	State get_thread_debug_state(uint32_t i) const;
@@ -141,19 +141,19 @@ private:
 	FixedArray<ThreadData, MAX_THREADS> _threads;
 	uint32_t _thread_count = 0;
 
-	// Scheduled tasks are put here first. They will be moved to the main waiting queue by the next available thread.
-	// This is because the main waiting queue can be locked for longer due to dynamic priority sorting.
+	// 被调度的任务先放在这里。下一个空闲线程会将其移动到主等待队列。
+	// 这是因为主等待队列可能因动态优先级排序而被锁定更久。
 	StdVector<TaskItem> _staged_tasks;
 	Mutex _staged_tasks_mutex;
 
-	// Main waiting list. Tasks are picked from it by priority. Priority can also change while tasks are in this list,
-	// so we can't use a simple queue or sort at insertion. Every available thread has to find it and potentially update
-	// it every once in a while.
+	// 主等待列表。任务按优先级从中选取。任务在该列表中时优先级也可能改变，
+	// 因此我们不能使用简单队列或在插入时排序。每个空闲线程都必须找到它，并可能更新
+	// 它，偶尔为之。
 	StdVector<TaskItem> _tasks;
 	Mutex _tasks_mutex;
 	Semaphore _tasks_semaphore;
 
-	// Ongoing tasks that may take more than one iteration
+	// 可能耗时超过一次迭代的进行中任务
 	StdQueue<TaskItem> _spinning_tasks;
 	Mutex _spinning_tasks_mutex;
 
@@ -163,8 +163,8 @@ private:
 	uint32_t _priority_update_period_ms = 32;
 	uint64_t _last_priority_update_time_ms = 0;
 
-	// This boolean is also guarded with `_tasks_mutex`.
-	// Tasks marked as "serial" must be executed by only one thread at a time.
+	// 该布尔值同样由 `_tasks_mutex` 保护。
+	// "被标记为"serial"的任务一次只能由一个线程执行。"
 	bool _is_serial_task_running = false;
 
 	StdString _name;

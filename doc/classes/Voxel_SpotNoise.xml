@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="Voxel_SpotNoise" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Specialization of cellular noise intented for cheap "ore patch" generation or deterministic point scattering.
+		细胞噪声的特化，用于廉价的"矿脉"生成或确定性的点散射。
 	</brief_description>
 	<description>
-		Divides space into a grid where each cell contains a circular "spot". Noise evaluation returns 1 when the position is inside a spot, 0 otherwise. 
-		Limitation: high jitter can make spots clip with cell borders. This is expected. If you need higher quality (but slower) results, you may use another noise library such as [FastNoiseLite].
+		将空间划分为网格，其中每个单元格包含一个圆形的"点"。当位置位于某个点内部时，噪声求值返回 1，否则返回 0。
+		局限：高抖动可能导致点与单元格边界重叠。这是预期的行为。如果你需要更高质量（但更慢）的结果，可以使用其它噪声库，例如 [FastNoiseLite]。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -15,12 +15,14 @@
 			<param index="0" name="x" type="float" />
 			<param index="1" name="y" type="float" />
 			<description>
+				获取给定 2D 坐标处的噪声值。
 			</description>
 		</method>
 		<method name="get_noise_2dv" qualifiers="const">
 			<return type="float" />
 			<param index="0" name="pos" type="Vector2" />
 			<description>
+				获取给定位置处的 2D 噪声值。
 			</description>
 		</method>
 		<method name="get_noise_3d" qualifiers="const">
@@ -29,35 +31,43 @@
 			<param index="1" name="y" type="float" />
 			<param index="2" name="z" type="float" />
 			<description>
+				获取给定 3D 坐标处的噪声值。
 			</description>
 		</method>
 		<method name="get_noise_3dv" qualifiers="const">
 			<return type="float" />
 			<param index="0" name="pos" type="Vector3" />
 			<description>
+				获取给定位置处的 3D 噪声值。
 			</description>
 		</method>
 		<method name="get_spot_positions_in_area_2d" qualifiers="const">
 			<return type="PackedVector2Array" />
 			<param index="0" name="rect" type="Rect2" />
 			<description>
+				获取给定矩形区域内所有点的位置。
 			</description>
 		</method>
 		<method name="get_spot_positions_in_area_3d" qualifiers="const">
 			<return type="PackedVector3Array" />
 			<param index="0" name="aabb" type="AABB" />
 			<description>
+				获取给定 AABB 区域内所有点的位置。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="cell_size" type="float" setter="set_cell_size" getter="get_cell_size" default="32.0">
+			设置每个单元格的大小。
 		</member>
 		<member name="jitter" type="float" setter="set_jitter" getter="get_jitter" default="0.9">
+			设置点的随机偏移量（抖动）。
 		</member>
 		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="1337">
+			设置随机种子。
 		</member>
 		<member name="spot_radius" type="float" setter="set_spot_radius" getter="get_spot_radius" default="3.0">
+			设置每个点的半径。
 		</member>
 	</members>
 </class>

@@ -3,7 +3,7 @@
 
 #include "../../util/godot/classes/control.h"
 
-// Required in header for virtual method declarations.
+// 头文件中需要用到虚方法声明，因此必须包含此头文件。
 #include "../../util/godot/classes/input_event.h"
 
 #include "../../util/godot/macros.h"
@@ -15,9 +15,9 @@ namespace voxel {
 
 class Voxel_Axes3DControl;
 
-// Basic SubViewport embedded in a Control for viewing 3D stuff.
-// Implements camera controls orbitting around the origin.
-// Godot has `MeshEditor` but it is specialized for Mesh resources without access to the hierarchy.
+// 嵌入在 Control 中用于查看 3D 内容的基础 SubViewport。
+// 实现了围绕原点旋转的相机控制。
+// Godot 自带 `MeshEditor`，但它专用于 Mesh 资源，无法访问场景层级。
 class Voxel_ModelViewer : public Control {
 	GDCLASS(Voxel_ModelViewer, Control)
 public:
@@ -25,7 +25,7 @@ public:
 
 	void set_camera_distance(float d);
 
-	// Stuff to view can be instanced under this node
+	// 要查看的内容可以作为该节点的子节点实例化
 	Node *get_viewer_root_node() const;
 
 #if defined(VOXEL_GODOT)

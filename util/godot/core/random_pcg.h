@@ -34,7 +34,7 @@
 
 #ifdef VOXEL_GODOT
 
-// Use built-in version
+// 使用内置版本
 #include <core/math/random_pcg.h>
 
 #else
@@ -70,7 +70,7 @@ namespace godot {
 
 class RandomPCG {
 	pcg32_random_t pcg;
-	uint64_t current_seed = 0; // The seed the current generator state started from.
+	uint64_t current_seed = 0; // 当前生成器状态所基于的种子。
 	uint64_t current_inc = 0;
 
 public:
@@ -102,18 +102,18 @@ public:
 		return pcg32_boundedrand_r(&pcg, bounds);
 	}
 
-	// Obtaining floating point numbers in [0, 1] range with "good enough" uniformity.
-	// These functions sample the output of rand() as the fraction part of an infinite binary number,
-	// with some tricks applied to reduce ops and branching:
-	// 1. Instead of shifting to the first 1 and connecting random bits, we simply set the MSB and LSB to 1.
-	//    Provided that the RNG is actually uniform bit by bit, this should have the exact same effect.
-	// 2. In order to compensate for exponent info loss, we count zeros from another random number,
-	//    and just add that to the initial offset.
-	//    This has the same probability as counting and shifting an actual bit stream: 2^-n for n zeroes.
-	// For all numbers above 2^-96 (2^-64 for floats), the functions should be uniform.
-	// However, all numbers below that threshold are floored to 0.
-	// The thresholds are chosen to minimize rand() calls while keeping the numbers within a totally subjective quality
-	// standard. If clz or ldexp isn't available, fall back to bit truncation for performance, sacrificing uniformity.
+	// 以"足够好"的均匀性获取 [0, 1] 范围内的浮点数。
+	// 这些函数把 rand() 的输出当作无限二进制数的小数部分来采样，
+	// 并应用了一些技巧来减少运算和分支：
+	// 1. 我们不移动到第一个 1 再拼接随机位，而是直接把最高位和最低位设为 1。
+	//    只要 RNG 确实逐位均匀，这应该有完全相同的效果。
+	// 2. 为了补偿指数信息的丢失，我们从另一个随机数中统计前导零的个数，
+	//    然后把它加到初始偏移上。
+	//    这与对真实比特流进行计数和移位具有相同的概率：n 个零的概率为 2^-n。
+	// 对于所有高于 2^-96（float 为 2^-64）的数，这些函数都应是均匀的。
+	// 不过，低于该阈值的所有数都会被下取整为 0。
+	// 阈值的选择是为了尽量减少 rand() 调用次数，同时把数值保持在某种主观的质量
+	// 标准内。如果 clz 或 ldexp 不可用，则回退到按位截断以换取性能，牺牲均匀性。
 	inline double randd() {
 #if defined(CLZ32)
 		uint32_t proto_exp_offset = rand();
@@ -143,12 +143,12 @@ public:
 	inline double randfn(double p_mean, double p_deviation) {
 		return p_mean +
 				p_deviation *
-				(cos(voxel::math::TAU<double> * randd()) * sqrt(-2.0 * log(randd()))); // Box-Muller transform
+				(cos(voxel::math::TAU<double> * randd()) * sqrt(-2.0 * log(randd()))); // Box-Muller 变换
 	}
 	inline float randfn(float p_mean, float p_deviation) {
 		return p_mean +
 				p_deviation *
-				(cos(voxel::math::TAU<float> * randf()) * sqrt(-2.0 * log(randf()))); // Box-Muller transform
+				(cos(voxel::math::TAU<float> * randf()) * sqrt(-2.0 * log(randf()))); // Box-Muller 变换
 	}
 
 	double random(double p_from, double p_to);

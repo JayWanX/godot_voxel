@@ -10,7 +10,7 @@ void register_curve_node(Span<NodeType> types) {
 
 	{
 		struct Params {
-			// TODO Should be `const` but isn't because it auto-bakes, and it's a concern for multithreading
+			// TODO 本应是 `const`，但由于它会自动烘焙而不能如此，这对多线程是个隐患
 			Curve *curve;
 			const CurveRangeData *curve_range_data;
 		};
@@ -22,8 +22,8 @@ void register_curve_node(Span<NodeType> types) {
 		t.params.push_back(NodeType::Param("curve", Curve::get_class_static(), []() {
 			Ref<Curve> curve;
 			curve.instantiate();
-			// The default preset when creating a Curve isn't convenient.
-			// Let's use a linear preset.
+			// 创建 Curve 时默认的预设不方便使用。
+			// 让我们使用线性预设。
 			curve->add_point(Vector2(0, 0));
 			curve->add_point(Vector2(1, 1));
 			curve->set_point_right_mode(0, Curve::TANGENT_LINEAR);
@@ -36,8 +36,8 @@ void register_curve_node(Span<NodeType> types) {
 				ctx.make_error(String(VOXEL_TTR("{0} instance is null")).format(varray(Curve::get_class_static())));
 				return;
 			}
-			// Make sure it is baked. We don't want multithreading to bail out because of a write operation
-			// happening in `interpolate_baked`...
+			// 确保它已烘焙。我们不希望多线程因为 `interpolate_baked` 中的
+			// 写操作而中止……
 			curve->bake();
 			CurveRangeData *curve_range_data = VOXEL_NEW(CurveRangeData);
 			get_curve_monotonic_sections(**curve, curve_range_data->sections);
@@ -77,14 +77,14 @@ void register_curve_node(Span<NodeType> types) {
 			std::shared_ptr<ComputeShaderResource> res = ComputeShaderResourceFactory::create_texture_2d(curve);
 			const StdString uniform_texture = ctx.add_uniform(std::move(res));
 
-			// In Godot 4.4 Curves can be defined beyond 0..1
+			// 在 Godot 4.4 中，Curve 可以定义超出 0..1 的范围
 			const Interval curve_domain = voxel::godot::get_curve_domain(**curve);
 			const float curve_domain_range = curve_domain.length();
 			const float x_remap_a = 1.f / math::max(curve_domain_range, 0.0001f);
 			const float x_remap_b = -curve_domain.min * x_remap_a;
 
-			// We are offsetting X to match the interpolation Godot's Curve does, because the default linear
-			// interpolation sampler is offset by half a pixel
+			// 我们偏移 X 以匹配 Godot 的 Curve 所做的插值，因为默认的线性
+			// 插值采样器会偏移半个像素
 			ctx.add_format(
 					"{} = texture({}, vec2({} * {} + {} + 0.5 / float(textureSize({}, 0).x), 0.0)).r;\n",
 					ctx.get_output_name(0),

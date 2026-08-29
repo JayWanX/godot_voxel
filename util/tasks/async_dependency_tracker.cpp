@@ -26,7 +26,7 @@ AsyncDependencyTracker::AsyncDependencyTracker(
 		IThreadedTask *task = next_tasks[i];
 #ifdef DEBUG_ENABLED
 		for (unsigned int j = i + 1; j < next_tasks.size(); ++j) {
-			// Cannot add twice the same task
+			// 不能重复添加同一个任务
 			VOXEL_ASSERT(next_tasks[j] != task);
 		}
 #endif
@@ -35,11 +35,11 @@ AsyncDependencyTracker::AsyncDependencyTracker(
 }
 
 AsyncDependencyTracker::~AsyncDependencyTracker() {
-	// If we get to destroy tasks from here, it means we aborted. They were not scheduled so we still have
-	// ownership on them, so we have to clean them up.
+	// 如果我们从这里销毁任务，说明已中止。它们尚未被调度，因此我们仍拥有
+	// 其所有权，必须自行清理。
 	for (auto it = _next_tasks.begin(); it != _next_tasks.end(); ++it) {
 		IThreadedTask *task = *it;
-		// TODO Might want to allow customizing that, maybe calling a `->dispose()` function instead?
+		// TODO 或许应允许自定义，比如改为调用 `->dispose()` 函数？
 		VOXEL_DELETE(task);
 	}
 }
@@ -53,20 +53,20 @@ void AsyncDependencyTracker::set_count(int count) {
 
 void AsyncDependencyTracker::post_complete() {
 	_tasks_have_started = true;
-	// Note, this class only allows decrementing this counter down to zero
+	// 注意，该类只允许将该计数器递减到零
 	VOXEL_ASSERT_RETURN_MSG(_count > 0, "post_complete() called more times than expected");
 	VOXEL_ASSERT_RETURN_MSG(_aborted == false, "post_complete() called after abortion");
 	--_count;
 	if (_count == 0 && _next_tasks.size() > 0) {
 		VOXEL_ASSERT_RETURN(_next_tasks_schedule_callback != nullptr);
 		_next_tasks_schedule_callback(to_span(_next_tasks));
-		// Clearing tasks because once they are scheduled we no longer have ownership on them.
+		// 清理任务，因为一旦它们被调度，我们就不再拥有其所有权。
 		_next_tasks.clear();
 	}
-	// The idea of putting next tasks inside this class instead of the tasks directly,
-	// is because it would require such tasks to do the job, but also because when waiting for multiple tasks,
-	// which one has ownership is fuzzy. It could be any of them that finish last.
-	// Putting next tasks in the tracker instead has a clear unique ownership.
+	// 将后续任务放进此类而不是直接放进任务中的想法是，
+	// 因为这会要求那些任务自己完成该工作，而且当等待多个任务时，
+	// 究竟哪个拥有所有权并不明确。可能是其中最后完成的任意一个。
+	// 将后续任务放在追踪器中则具有明确且唯一的所有权。
 }
 
 } // namespace voxel

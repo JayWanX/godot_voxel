@@ -36,9 +36,9 @@ VoxelStreamSQLite::CoordinateFormat to_exposed_coordinate_format(BlockLocation::
 	return static_cast<VoxelStreamSQLite::CoordinateFormat>(format);
 }
 
-// Brings a connection back to a usable state after a transaction failed on it, and tells whether it may be reused.
-// A failed COMMIT notably leaves the transaction open, and SQLite has no nested transactions, so without this every
-// later `begin_transaction` on that connection would fail with "cannot start a transaction within a transaction".
+// 在事务失败后把连接恢复到可用状态，并告知它是否可以复用。
+// 失败的 COMMIT 尤其会把事务留在打开状态，而 SQLite 没有嵌套事务，因此没有此处理时，该连接上后续每次
+// `begin_transaction` 都会以 "cannot start a transaction within a transaction" 失败。
 bool recover_after_failed_transaction(sqlite::Connection &con) {
 	if (con.rollback_transaction()) {
 		VOXEL_PRINT_VERBOSE("VoxelStreamSQLite: recovered connection after a failed transaction");
@@ -69,7 +69,7 @@ VoxelStreamSQLite::~VoxelStreamSQLite() {
 	if (!_globalized_connection_path.empty() && _cache.get_indicative_block_count() > 0) {
 		VOXEL_PRINT_VERBOSE("~VoxelStreamSQLite flushy flushy");
 		if (!flush_cache()) {
-			// Last chance to save that data: past this point it is lost.
+			// 保存该数据的最后机会：过了这个点数据就会丢失。
 			VOXEL_PRINT_ERROR("VoxelStreamSQLite: final flush failed in destructor, unsaved cached data was lost");
 		}
 		VOXEL_PRINT_VERBOSE("~VoxelStreamSQLite flushy done");
@@ -87,16 +87,16 @@ void VoxelStreamSQLite::set_database_path(String path) {
 		return;
 	}
 	if (!_globalized_connection_path.empty() && _cache.get_indicative_block_count() > 0) {
-		// Save cached data before changing the path.
-		// Not using get_connection() because it locks, we are already locked.
+		// 在更改路径之前保存缓存的数据。
+		// 不使用 get_connection()，因为它会加锁，而我们已经处于上锁状态。
 		sqlite::Connection con;
-		// Note, the path could be invalid,
-		// Since Godot helpfully sets the property for every character typed in the inspector.
-		// So there can be lots of errors in the editor if you type it.
+		// 注意，路径可能是无效的，
+		// 因为 Godot 会在检查器中为每次键入的字符都设置该属性。
+		// 因此如果你输入它，编辑器中可能会出现大量错误。
 		if (con.open(_globalized_connection_path.data(), to_internal_coordinate_format(_preferred_coordinate_format))) {
 			if (!flush_cache_to_connection(&con)) {
-				// The connection is local and destroyed right after, so there is nothing to recover, but the
-				// data could not be saved to the previous database before switching away from it.
+				// 该连接是局部的，随后立即被销毁，所以没有需要恢复的东西，但
+				// 在切换到新数据库之前，数据未能保存到之前的数据库中。
 				VOXEL_PRINT_ERROR(
 						"VoxelStreamSQLite: failed to save cached data to the previous database before "
 						"changing the path"
@@ -114,7 +114,7 @@ void VoxelStreamSQLite::set_database_path(String path) {
 	// To support Godot shortcuts like `user://` and `res://` (though the latter won't work on exported builds)
 	_globalized_connection_path = voxel::godot::to_std_string(ProjectSettings::get_singleton()->globalize_path(path));
 
-	// Don't actually open anything here. We'll do it only when necessary
+	// 这里实际上不打开任何东西。我们只在必要时才打开
 }
 
 String VoxelStreamSQLite::get_database_path() const {
@@ -144,7 +144,7 @@ static void set_result_codes(Span<VoxelStream::InstancesQueryData> p_blocks, Vox
 }
 #endif
 
-// Only sets the given subset, leaving blocks already resolved from the cache untouched.
+// 只设置给定的子集，保持已从缓存解析出的数据块不变。
 template <typename TBlockQueryData>
 static void set_result_codes(
 		Span<TBlockQueryData> p_blocks,
@@ -159,8 +159,8 @@ static void set_result_codes(
 void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Getting connection first to allow the key cache to load if enabled.
-	// This should be quick after the first call because the connection is cached.
+	// 先获取连接，以便在启用时让键缓存加载。
+	// 首次调用之后这应该很快，因为连接已被缓存。
 	const ConnectionResult con_res = get_connection();
 
 	switch (con_res.code) {
@@ -178,7 +178,7 @@ void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 
 	ScopeRecycle con_scope(this, con);
 
-	// Check the cache first
+	// 先检查缓存
 	StdVector<unsigned int> blocks_to_load;
 	for (unsigned int i = 0; i < p_blocks.size(); ++i) {
 		VoxelStream::VoxelQueryData &q = p_blocks[i];
@@ -198,7 +198,7 @@ void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 	}
 
 	if (blocks_to_load.size() == 0) {
-		// Everything was cached, no need to query the database
+		// 所有内容都已缓存，无需查询数据库
 		return;
 	}
 
@@ -222,7 +222,7 @@ void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 		const ResultCode res = con->load_block(loc, temp_block_data, sqlite::Connection::VOXELS);
 
 		if (res == RESULT_BLOCK_FOUND) {
-			// TODO Not sure if we should actually expect non-null. There can be legit not found blocks.
+			// TODO 不确定我们是否真的应期待非空。可能存在合法“未找到”的数据块。
 			BlockSerializer::decompress_and_deserialize(to_span_const(temp_block_data), q.voxel_buffer);
 		}
 
@@ -230,8 +230,8 @@ void VoxelStreamSQLite::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 	}
 
 	if (con->end_transaction() == false) {
-		// The transaction only read data, and results were already copied out above, so they remain valid.
-		// Only the connection needs attention.
+		// 该事务只读取数据，结果已在上面复制出来，因此它们仍然有效。
+		// 只有连接需要关注。
 		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to end read transaction, recovering the connection");
 		con_scope.broken = !recover_after_failed_transaction(*con);
 	}
@@ -256,7 +256,7 @@ void VoxelStreamSQLite::save_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 	const Box3i coordinate_range = BlockLocation::get_coordinate_range(coordinate_format);
 	const unsigned int lod_count = BlockLocation::get_lod_count(coordinate_format);
 
-	// First put in cache
+	// 先放入缓存
 	for (unsigned int i = 0; i < p_blocks.size(); ++i) {
 		VoxelStream::VoxelQueryData &q = p_blocks[i];
 		const Vector3i pos = q.position_in_blocks;
@@ -271,11 +271,11 @@ void VoxelStreamSQLite::save_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_bl
 		}
 	}
 
-	// TODO We should consider using a serialized cache, and measure the threshold in bytes
+	// TODO 我们应该考虑使用序列化缓存，并测量以字节为单位的阈值
 	if (_cache.get_indicative_block_count() >= CACHE_SIZE) {
 		if (!flush_cache()) {
-			// Recoverable: blocks stay cached (unless the commit itself failed, which reported above), and the
-			// next save that grows the cache past the threshold will retry.
+			// 可恢复：block 保持缓存状态（除非提交本身失败，如上所述），并且
+			// 下一次使缓存增长超过阈值的保存会重试。
 			VOXEL_PRINT_WARNING("VoxelStreamSQLite: automatic cache flush did not complete, will retry later");
 		}
 	}
@@ -290,10 +290,10 @@ bool VoxelStreamSQLite::supports_instance_blocks() const {
 void VoxelStreamSQLite::load_instance_blocks(Span<VoxelStream::InstancesQueryData> out_blocks) {
 	VOXEL_PROFILE_SCOPE();
 
-	// TODO Get block size from database
+	// TODO 从数据库获取数据块尺寸
 	// const int bs_po2 = constants::DEFAULT_BLOCK_SIZE_PO2;
 
-	// Check the cache first
+	// 先检查缓存
 	StdVector<unsigned int> blocks_to_load;
 	for (size_t i = 0; i < out_blocks.size(); ++i) {
 		VoxelStream::InstancesQueryData &q = out_blocks[i];
@@ -307,7 +307,7 @@ void VoxelStreamSQLite::load_instance_blocks(Span<VoxelStream::InstancesQueryDat
 	}
 
 	if (blocks_to_load.size() == 0) {
-		// Everything was cached, no need to query the database
+		// 所有内容都已缓存，无需查询数据库
 		return;
 	}
 
@@ -365,8 +365,8 @@ void VoxelStreamSQLite::load_instance_blocks(Span<VoxelStream::InstancesQueryDat
 	}
 
 	if (con->end_transaction() == false) {
-		// The transaction only read data, and results were already copied out above, so they remain valid.
-		// Only the connection needs attention.
+		// 该事务只读取数据，结果已在上面复制出来，因此它们仍然有效。
+		// 只有连接需要关注。
 		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to end read transaction, recovering the connection");
 		con_scope.broken = !recover_after_failed_transaction(*con);
 	}
@@ -390,7 +390,7 @@ void VoxelStreamSQLite::save_instance_blocks(Span<VoxelStream::InstancesQueryDat
 	const Box3i coordinate_range = BlockLocation::get_coordinate_range(coordinate_format);
 	const unsigned int lod_count = BlockLocation::get_lod_count(coordinate_format);
 
-	// First put in cache
+	// 先放入缓存
 	for (size_t i = 0; i < p_blocks.size(); ++i) {
 		VoxelStream::InstancesQueryData &q = p_blocks[i];
 
@@ -404,11 +404,11 @@ void VoxelStreamSQLite::save_instance_blocks(Span<VoxelStream::InstancesQueryDat
 		}
 	}
 
-	// TODO Optimization: we should consider using a serialized cache, and measure the threshold in bytes
+	// TODO 优化：我们应该考虑使用序列化缓存，并测量以字节为单位的阈值
 	if (_cache.get_indicative_block_count() >= CACHE_SIZE) {
 		if (!flush_cache()) {
-			// Recoverable: blocks stay cached (unless the commit itself failed, which reported above), and the
-			// next save that grows the cache past the threshold will retry.
+			// 可恢复：block 保持缓存状态（除非提交本身失败，如上所述），并且
+			// 下一次使缓存增长超过阈值的保存会重试。
 			VOXEL_PRINT_WARNING("VoxelStreamSQLite: automatic cache flush did not complete, will retry later");
 		}
 	}
@@ -438,9 +438,9 @@ void VoxelStreamSQLite::load_all_blocks(FullLoadingResult &result) {
 		FullLoadingResult &result;
 	};
 
-	// Using local function instead of a lambda for quite stupid reason admittedly:
-	// Godot's clang-format does not allow to write function parameters in column,
-	// which makes the lambda break line length.
+	// 诚然，由于一个相当愚蠢的原因而使用局部函数而不是 lambda：
+	// Godot 的 clang-format 不允许把函数参数写在一列上，
+	// 这会使 lambda 超出行长限制。
 	struct L {
 		static void process_block_func(
 				void *callback_data,
@@ -486,15 +486,15 @@ void VoxelStreamSQLite::load_all_blocks(FullLoadingResult &result) {
 		}
 	};
 
-	// Had to suffix `_outer`,
-	// because otherwise GCC thinks it shadows a variable inside the local function/captureless lambda
+	// 不得不添加 `_outer` 后缀，
+	// 否则 GCC 认为它会遮蔽局部函数/无捕获 lambda 内部的某个变量
 	Context ctx_outer{ result };
 	const bool request_result = con->load_all_blocks(&ctx_outer, L::process_block_func);
 	ERR_FAIL_COND(request_result == false);
 }
 
 int VoxelStreamSQLite::get_used_channels_mask() const {
-	// Assuming all, since that stream can store anything.
+	// 假定包含全部，因为该流可以存储任何内容。
 	return VoxelBuffer::ALL_CHANNELS_MASK;
 }
 
@@ -524,17 +524,17 @@ void VoxelStreamSQLite::flush() {
 	}
 }
 
-// This function does not lock any mutex for internal use.
-// Returns false if the transaction failed, in which case the connection may need to be recovered before reuse (see
-// `recover_after_failed_transaction`).
+// 此函数不为内部用途锁定任何互斥锁。
+// 若事务失败则返回 false，此时连接在复用前可能需要恢复（参见
+// `recover_after_failed_transaction`）。
 bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connection) {
 	VOXEL_PROFILE_SCOPE();
 	VOXEL_PRINT_VERBOSE(format("VoxelStreamSQLite: Flushing cache ({} elements)", _cache.get_indicative_block_count()));
 
 	ERR_FAIL_COND_V(p_connection == nullptr, false);
 	if (p_connection->begin_transaction() == false) {
-		// Nothing was written or dropped at this point: cached blocks are retained, so a later flush will retry
-		// them. Detailed reporting is left to callers, which know their context.
+		// 此时没有任何东西被写入或丢弃：缓存的数据块被保留，因此后续的刷新会重试
+		// 它们。详细的报告留给调用方处理，因为它们了解自身的上下文。
 		VOXEL_PRINT_VERBOSE("VoxelStreamSQLite: could not begin flush transaction, keeping cached blocks");
 		return false;
 	}
@@ -550,7 +550,7 @@ bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connecti
 
 	const CompressedData::Compression compression_mode = _compression_mode;
 
-	// TODO Needs better error rollback handling
+	// TODO 需要更好的错误回滚处理
 	_cache.flush([p_connection,
 #ifdef VOXEL_ENABLE_INSTANCER
 				  &temp_data,
@@ -565,7 +565,7 @@ bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connecti
 		loc.position = block.position;
 		loc.lod = block.lod;
 
-		// Save voxels
+		// 保存体素
 		if (block.has_voxels) {
 			if (block.voxels_deleted) {
 				p_connection->save_block(loc, Span<const uint8_t>(), sqlite::Connection::VOXELS);
@@ -577,7 +577,7 @@ bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connecti
 			}
 		}
 
-		// Save instances
+		// 保存实例
 		temp_compressed_data.clear();
 #ifdef VOXEL_ENABLE_INSTANCER
 		if (block.instances != nullptr) {
@@ -592,12 +592,12 @@ bool VoxelStreamSQLite::flush_cache_to_connection(sqlite::Connection *p_connecti
 #endif
 		p_connection->save_block(loc, to_span(temp_compressed_data), sqlite::Connection::INSTANCES);
 
-		// TODO Optimization: add a version of the query that can update both at once
+		// TODO 优化：增加一个可同时更新两者的查询版本
 	});
 
 	if (p_connection->end_transaction() == false) {
-		// The cache was already drained into this transaction, so these blocks are dropped without being saved.
-		// This is the lossy case, unlike a failed begin above.
+		// 缓存已被排空到该事务中，因此这些数据块在不保存的情况下被丢弃。
+		// 与上面失败的 begin 不同，这里是会丢失数据的情况。
 		VOXEL_PRINT_ERROR("VoxelStreamSQLite: failed to commit flush transaction, unsaved cached blocks were dropped");
 		return false;
 	}
@@ -620,7 +620,7 @@ VoxelStreamSQLite::ConnectionResult VoxelStreamSQLite::get_connection() {
 			_connection_pool.pop_back();
 			return { existing_connection, ConnectionResult::SUCCESS };
 		}
-		// First connection we get since we set the database path
+		// 自我们设置数据库路径以来获取的第一个连接
 		fpath = _globalized_connection_path;
 		preferred_coordinate_format = _preferred_coordinate_format;
 	}
@@ -646,7 +646,7 @@ VoxelStreamSQLite::ConnectionResult VoxelStreamSQLite::get_connection() {
 
 void VoxelStreamSQLite::recycle_connection(sqlite::Connection *con) {
 	const char *con_path = con->get_opened_file_path();
-	// Put back in the pool if the connection path didn't change
+	// 如果连接路径没有改变，则放回连接池
 	{
 		MutexLock mlock(_connection_mutex);
 		if (_globalized_connection_path == con_path) {
@@ -658,8 +658,8 @@ void VoxelStreamSQLite::recycle_connection(sqlite::Connection *con) {
 }
 
 void VoxelStreamSQLite::destroy_connection(sqlite::Connection *con) {
-	// Defined here rather than inline in the header, where `Connection` is only forward-declared and its destructor
-	// would therefore not run.
+	// 在这里定义而非在头文件中内联，因为头文件中 `Connection` 仅被前置声明，其析构函数
+	// 因此不会运行。
 	delete con;
 }
 
@@ -707,9 +707,9 @@ VoxelStreamSQLite::CoordinateFormat VoxelStreamSQLite::get_current_coordinate_fo
 }
 
 bool VoxelStreamSQLite::copy_blocks_to_other_sqlite_stream(Ref<VoxelStreamSQLite> dst_stream) {
-	// This function may be used as a generic way to migrate an old save to a new one, when the format of the old one
-	// needs to change. If it's just a version change, it might be possible to do it in-place, however changes like
-	// coordinate format affect primary keys, so not doing it in-place is easier.
+	// 当旧存档格式需要改变时，此函数可作为把旧存档迁移到新存档的通用方法。如果只是版本变化，
+	// 或许可以在原地完成，但诸如坐标格式之类
+	// 的变更会影响主键，因此不原地处理会更容易。
 
 	VOXEL_ASSERT_RETURN_V(dst_stream.is_valid(), false);
 	VOXEL_ASSERT_RETURN_V(dst_stream.ptr() != this, false);
@@ -726,8 +726,8 @@ bool VoxelStreamSQLite::copy_blocks_to_other_sqlite_stream(Ref<VoxelStreamSQLite
 	VOXEL_ASSERT_RETURN_V(src_con != nullptr, false);
 	const ScopeRecycle src_con_scope(this, src_con);
 
-	// We can skip deserialization and copy data blocks directly.
-	// We also don't use cache.
+	// 我们可以跳过反序列化而直接拷贝数据块。
+	// 我们也不使用缓存。
 
 	struct Context {
 		sqlite::Connection *dst_con;

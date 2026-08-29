@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelInstancerRigidBody" inherits="RigidBody3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Collision node generated for every collidable multimesh instance created by [VoxelInstancer].
+		为 [VoxelInstancer] 创建的每个可碰撞多网格实例生成的碰撞节点。
 	</brief_description>
 	<description>
-		Instances generated from [VoxelInstanceLibraryMultiMeshItem] don't use nodes to render. However, they can be given collision, in the form of body nodes using this class.
-		Calling [code]queue_free()[/code] on an instance of this node will also unregister the instance from [VoxelInstancer].
+		从 [VoxelInstanceLibraryMultiMeshItem] 生成的实例不使用节点进行渲染。但是，它们可以以使用此类的刚体节点的形式获得碰撞。
+		在此节点的实例上调用 [code]queue_free()[/code] 也会将该实例从 [VoxelInstancer] 中注销。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -13,13 +13,13 @@
 		<method name="get_library_item_id" qualifiers="const">
 			<return type="int" />
 			<description>
-				Gets the ID of the item in the instancer's [VoxelInstanceLibrary] that was used to create the instance having this collider.
+				获取用于创建拥有此碰撞体的实例的、实例化器 [VoxelInstanceLibrary] 中条目的 ID。
 			</description>
 		</method>
 		<method name="queue_free_and_notify_instancer">
 			<return type="void" />
 			<description>
-				Alternative to [code]queue_free[/code] in case you don't want to use [code]call_deferred[/code] to add nodes under [VoxelInstancer] from [method VoxelInstanceLibraryMultiMeshItem._on_instance_removed].
+				[code]queue_free[/code] 的替代方法，用于你不想在 [method VoxelInstanceLibraryMultiMeshItem._on_instance_removed] 中使用 [code]call_deferred[/code] 在 [VoxelInstancer] 下添加节点的情况。
 			</description>
 		</method>
 	</methods>

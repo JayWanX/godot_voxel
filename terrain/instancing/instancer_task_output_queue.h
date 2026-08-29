@@ -12,8 +12,8 @@ namespace voxel {
 struct InstanceLoadingTaskOutput {
 	Vector3i render_block_position;
 	uint8_t layer_id;
-	// Tells which parts of the block contain edited data (non-generated).
-	// When data chunks are half the size of render chunks, this is 8 bits in XYZ order.
+	// 表示数据块中哪些部分包含已编辑的数据（非生成数据）。
+	// 当数据块大小是渲染数据块的一半时，按 XYZ 顺序占 8 位。
 	uint8_t edited_mask;
 	StdVector<Transform3f> transforms;
 };

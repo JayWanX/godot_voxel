@@ -7,8 +7,8 @@
 
 namespace voxel {
 
-// Generator based on a script, like GDScript, C# or NativeScript.
-// The script is expected to properly handle multithreading.
+// 基于脚本的生成器，如 GDScript、C# 或 NativeScript。
+// 脚本应正确处理多线程。
 class VoxelGeneratorScript : public VoxelGenerator {
 	GDCLASS(VoxelGeneratorScript, VoxelGenerator)
 public:
@@ -21,7 +21,7 @@ public:
 
 protected:
 	GDVIRTUAL3(_generate_block, Ref<godot::VoxelBuffer>, Vector3i, int)
-	GDVIRTUAL0RC(int, _get_used_channels_mask) // I think `C` means `const`?
+	GDVIRTUAL0RC(int, _get_used_channels_mask) // 我想 `C` 表示 `const`？
 
 private:
 	static void _bind_methods();

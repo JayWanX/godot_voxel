@@ -1,23 +1,23 @@
 # VoxelBoxMover
 
-Inherits: [RefCounted](https://docs.godotengine.org/en/stable/classes/class_refcounted.html)
+继承自：[RefCounted](https://docs.godotengine.org/en/stable/classes/class_refcounted.html)
 
-## Description: 
+## 描述：
 
-Utility class allowing to reproduce simple move-and-slide logic using only voxel AABBs, similar to Minecraft physics. This class may only be used with blocky voxels.
+工具类，允许仅使用体素 AABB 重现简单的移动-滑动逻辑，类似于 Minecraft 物理。此类只能用于方块风体素。
 
-Store an instance of it within a member variable of your script, and use it within [Node._process](https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-method-process) or [Node._physics_process](https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-method-physics-process) (it works wherever you like).
+将其实例存储在脚本的成员变量中，并在 [Node._process](https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-method-process) 或 [Node._physics_process](https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-method-physics-process) 中使用它（它可以在任何你喜欢的地方工作）。
 
 ```
-var motion = Vector3(0, 0, -10 * delta) # Move forward
+var motion = Vector3(0, 0, -10 * delta) # 向前移动
 motion = _box_mover.get_motion(get_translation(), motion, aabb, terrain_node)
 global_translate(motion)
 ```
 
-## Methods: 
+## 方法：
 
 
-Return                                                                        | Signature                                                                                                                                                                                                                                                                                                                                                           
+返回值                                                                           | 函数签名                                                                                                                                                                                                                                                                                                                                                                
 ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)          | [get_collision_mask](#i_get_collision_mask) ( ) const                                                                                                                                                                                                                                                                                                               
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)      | [get_max_step_height](#i_get_max_step_height) ( ) const                                                                                                                                                                                                                                                                                                             
@@ -30,52 +30,52 @@ Return                                                                        | 
 [void](#)                                                                     | [set_step_climbing_enabled](#i_set_step_climbing_enabled) ( [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled )                                                                                                                                                                                                                        
 <p></p>
 
-## Method Descriptions
+## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_collision_mask"></span> **get_collision_mask**( ) 
 
-Gets the collision mask used to detect collidable voxels.
+获取用于检测可碰撞体素的碰撞掩码。
 
-This collision mask is specific to this collision system, and is defined in [VoxelBlockyModel.collision_mask](VoxelBlockyModel.md#i_collision_mask).
+此碰撞掩码特定于此碰撞系统，在 [VoxelBlockyModel.collision_mask](VoxelBlockyModel.md#i_collision_mask) 中定义。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_get_max_step_height"></span> **get_max_step_height**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html)<span id="i_get_motion"></span> **get_motion**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) pos, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) motion, [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) aabb, [Node](https://docs.godotengine.org/en/stable/classes/class_node.html) terrain ) 
 
-Given a motion vector, returns a modified vector telling you by how much to move your character. This is similar to [KinematicBody.move_and_slide](https://docs.godotengine.org/en/stable/classes/class_kinematicbody.html#class-kinematicbody-method-move-and-slide), except you have to apply the movement.
+给定运动向量，返回一个修改后的向量，告诉你应该移动角色多少。这类似于 [KinematicBody.move_and_slide](https://docs.godotengine.org/en/stable/classes/class_kinematicbody.html#class-kinematicbody-method-move-and-slide)，不同之处在于你需要自己应用该移动。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_has_stepped_up"></span> **has_stepped_up**( ) 
 
-When step climbing is enabled, tells when the last call to [get_motion](VoxelBoxMover.md#i_get_motion) caused climbing to occur.
+启用台阶攀爬时，告知最后一次调用 [get_motion](VoxelBoxMover.md#i_get_motion) 是否发生了攀爬。
 
-Climbing modifies the motion vector upwards so that the body is snapped on top of the step. This can have implications in character controller code, such as considering the character to be on the floor instead of having jumped.
+攀爬会将运动向量向上修改，使角色吸附在台阶顶部。这可能会对角色控制器代码产生影响，例如将角色视为站在地面上而不是发生了跳跃。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_intersects"></span> **intersects**( [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) aabb, [Object](https://docs.godotengine.org/en/stable/classes/class_object.html) terrain ) 
 
-Tests if an axis-aligned box intersects with any voxel collision box.
+测试轴对齐盒是否与任何体素碰撞盒相交。
 
-Note: due to floating point precision, you might get false positives when testing against boxes that are touching voxels bounds. If this is undesired, you might want to shrink your AABB slightly.
+注意：由于浮点精度，当测试的盒与体素边界接触时，你可能会得到误报。如果不希望这样，你可能需要略微缩小 AABB。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_step_climbing_enabled"></span> **is_step_climbing_enabled**( ) 
 
-Tells if step climbing is enabled.
+告知是否启用了台阶攀爬。
 
 ### [void](#)<span id="i_set_collision_mask"></span> **set_collision_mask**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) mask ) 
 
-Sets the collision mask used to detect collidable voxels.
+设置用于检测可碰撞体素的碰撞掩码。
 
-Only voxels sharing at least one bit between the masks will be detected.
+只有两个掩码之间至少共享一个位的体素才会被检测到。
 
-This collision mask is specific to this collision system, and is defined in [VoxelBlockyModel.collision_mask](VoxelBlockyModel.md#i_collision_mask).
+此碰撞掩码特定于此碰撞系统，在 [VoxelBlockyModel.collision_mask](VoxelBlockyModel.md#i_collision_mask) 中定义。
 
 ### [void](#)<span id="i_set_max_step_height"></span> **set_max_step_height**( [float](https://docs.godotengine.org/en/stable/classes/class_float.html) height ) 
 
-Sets the maximum height that can be climbed like "stairs".
+设置可像"楼梯"一样攀爬的最大高度。
 
 ### [void](#)<span id="i_set_step_climbing_enabled"></span> **set_step_climbing_enabled**( [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-When enabled, [get_motion](VoxelBoxMover.md#i_get_motion) will attempt to climb up small steps. This allows to implement Minecraft-like stairs.
+启用后，[get_motion](VoxelBoxMover.md#i_get_motion) 将尝试攀爬较小的台阶。这允许实现类似 Minecraft 的楼梯。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

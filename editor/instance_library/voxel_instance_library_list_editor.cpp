@@ -64,9 +64,9 @@ void VoxelInstanceLibraryListEditor::setup(const Control *icon_provider, VoxelIn
 		add_child(buttons_container);
 	}
 
-	// Dialogs
-	// TODO Could need optimization.
-	// In the editor, dialogs are full-blown windows, and here they get re-created every time a library is inspected.
+	// 对话框
+	// TODO 可能需要优化。
+	// 在编辑器中，对话框是独立的窗口，而这里每次检查一个库时它们都会被重新创建。
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Dialogs");
 
@@ -120,12 +120,12 @@ void VoxelInstanceLibraryListEditor::_notification(int p_what) {
 			_open_scene_dialog->queue_free();
 			_open_scene_dialog = nullptr;
 
-			// Unregister from library, we don't want a dangling pointer
+			// 从库中注销，我们不想留下悬空指针
 			set_library(Ref<VoxelInstanceLibrary>());
 			break;
 
 		case NOTIFICATION_PROCESS: {
-			// Poll differences instead of signals
+			// 用轮询检测差异，而不是信号
 			const int item_list_count = _item_list->get_item_count();
 			if (_library.is_null()) {
 				if (item_list_count > 0) {
@@ -141,7 +141,7 @@ void VoxelInstanceLibraryListEditor::_notification(int p_what) {
 						const int id = _item_list->get_item_metadata(i);
 						Ref<VoxelInstanceLibraryItem> item = _library->get_item(id);
 						if (item.is_null()) {
-							// Something went out of sync?
+							// 有东西失去同步了？
 							update_list_from_library();
 							break;
 						}
@@ -250,14 +250,13 @@ void VoxelInstanceLibraryListEditor::add_multimesh_item() {
 
 	Ref<VoxelInstanceLibraryMultiMeshItem> item;
 	item.instantiate();
-	// Setup some defaults
+	// 设置一些默认值
 	Ref<BoxMesh> mesh;
 	mesh.instantiate();
 	item->set_mesh(mesh, 0);
 
-	// We could decide to use a different default here if we can detect that the instancer the library is used
-	// into is child of a terrain with LOD or no LOD. At the very least it should always be 0 if there is no LOD
-	// support, otherwise things look broken. 0 is the default.
+	// 如果能够检测到使用该库的实例化器所在的地形是否带有 LOD，我们本可以在这里决定使用不同的默认值。
+	// 至少在没有 LOD 支持时它应该始终是 0，否则看起来会坏掉。0 是默认值。
 	// item->set_lod_index(2);
 
 	Ref<VoxelInstanceGenerator> generator;
@@ -283,12 +282,12 @@ void VoxelInstanceLibraryListEditor::add_scene_item(String fpath) {
 
 	Ref<VoxelInstanceLibrarySceneItem> item;
 	item.instantiate();
-	// Setup some defaults
+	// 设置一些默认值
 	item->set_lod_index(2);
 	item->set_scene(scene);
 	Ref<VoxelInstanceGenerator> generator;
 	generator.instantiate();
-	generator->set_density(0.01f); // Low density for scenes because that's heavier
+	generator->set_density(0.01f); // 场景的密度较低，因为它更重
 	item->set_generator(generator);
 
 	const int item_id = _library->get_next_available_id();

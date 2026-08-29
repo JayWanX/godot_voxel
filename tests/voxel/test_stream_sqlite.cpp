@@ -40,14 +40,14 @@ void test_voxel_stream_sqlite_basic(
 		stream->set_database_path(database_path);
 		stream->set_preferred_coordinate_format(coordinate_format);
 		stream->set_compression_mode(compression);
-		// Save block
+		// 保存数据块
 		{
 			VoxelStreamSQLite::VoxelQueryData q{ vb1, vb1_pos, 0, VoxelStream::RESULT_ERROR };
 			stream->save_voxel_block(q);
-			// Result is not set currently for saves...
+			// 目前没有为保存操作设置结果……
 			// VOXEL_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
 		}
-		// Load it back (caching might take effect)
+		// 重新读回（缓存可能生效）
 		{
 			VoxelBuffer loaded_vb1(VoxelBuffer::ALLOCATOR_DEFAULT);
 			VoxelStreamSQLite::VoxelQueryData q{ loaded_vb1, vb1_pos, 0, VoxelStream::RESULT_ERROR };
@@ -55,11 +55,11 @@ void test_voxel_stream_sqlite_basic(
 			VOXEL_TEST_ASSERT(q.result == VoxelStream::RESULT_BLOCK_FOUND);
 			VOXEL_TEST_ASSERT(loaded_vb1.equals(vb1));
 		}
-		// Flush before the stream object is destroyed
+		// 在流对象被销毁前进行刷新
 		stream->flush();
 	}
 	{
-		// Create new stream object and reopen the database (avoids caching effects).
+		// 创建新的流对象并重新打开数据库（避免缓存影响）。
 		Ref<VoxelStreamSQLite> stream;
 		stream.instantiate();
 		stream->set_key_cache_enabled(with_key_cache);
@@ -138,7 +138,7 @@ void test_voxel_stream_sqlite_basic() {
 			godot::VoxelBlockSerializer::Compression::COMPRESSION_LZ4
 	);
 
-	// Extras with large coordinates
+	// 带大坐标的额外测试
 	test_voxel_stream_sqlite_basic(
 			false,
 			VoxelStreamSQLite::COORDINATE_FORMAT_INT64_X19_Y19_Z19_L7,
@@ -182,13 +182,13 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 
 	const String database_path = test_dir.get_path().path_join("database.sqlite");
 
-	// Generate random locations
+	// 生成随机位置
 	RandomPCG rng;
 	rng.seed(131183);
 	std::vector<BlockInfo> blocks;
 	blocks.resize(256);
 	const int radius = 10000;
-	// TODO Generate clusters/lines instead, to match what saves look like in practice?
+	// TODO 改为生成簇/线段，以匹配实际保存的样子？
 	for (unsigned int i = 0; i < blocks.size(); ++i) {
 		for (int attempt = 0; attempt < 10; ++attempt) {
 			const uint8_t lod_index = rng.rand() % constants::MAX_LOD;
@@ -204,7 +204,7 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 		}
 	}
 
-	// Create a database populated with a lot of blocks
+	// 创建一个填充了大量数据块的数据库
 	{
 		Ref<VoxelStreamSQLite> stream;
 		stream.instantiate();
@@ -218,9 +218,9 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 			VoxelBuffer vb(VoxelBuffer::ALLOCATOR_DEFAULT);
 			vb.create(Vector3iUtil::create(1 << constants::DEFAULT_BLOCK_SIZE_PO2));
 
-			// The bottom layer will be filled by the index of the block
+			// 最底层将由数据块的索引填充
 			vb.fill(i, 0);
-			// A random amount of layers above will be random
+			// 上方的随机数量的层将是随机的
 			const int h = rng.rand() % (vb.get_size().y - 1) + 1;
 			Vector3i rpos;
 			for (rpos.z = 0; rpos.z < vb.get_size().z; ++rpos.z) {
@@ -242,7 +242,7 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 		VOXEL_PRINT_VERBOSE(format("Writes time with coordinate format {}: {} us", coordinate_format, elapsed_us));
 	}
 
-	// Roughly shuffle locations
+	// 大致打乱位置
 	for (unsigned int i = 0; i < blocks.size(); ++i) {
 		const unsigned int j = rng.rand() % blocks.size();
 		const BlockInfo &temp = blocks[i];
@@ -250,7 +250,7 @@ void test_voxel_stream_sqlite_coordinate_format(const VoxelStreamSQLite::Coordin
 		blocks[j] = temp;
 	}
 
-	// Reopen and read them all
+	// 重新打开并读取全部
 	{
 		Ref<VoxelStreamSQLite> stream;
 		stream.instantiate();
@@ -337,10 +337,10 @@ void test_voxel_stream_sqlite_key_blob80_encoding() {
 	test_voxel_stream_sqlite_key_blob80_encoding(Vector3i(max_pos.x, min_pos.y, max_pos.z), max_lod_index);
 }
 
-// When COMMIT fails (typically with SQLITE_BUSY, if another connection on the same file holds the write lock),
-// SQLite does not roll the transaction back: the connection is left inside it. Every later BEGIN on that connection
-// then fails with "cannot start a transaction within a transaction". Since connections are pooled and reused, such a
-// connection would keep failing for the rest of the session. This checks it can be brought back to a usable state.
+// 当 COMMIT 失败时（通常为 SQLITE_BUSY，即同一文件上有另一个连接持有写锁），
+// SQLite 不会回滚该事务：连接会一直停留在事务内部。该连接上后续每次 BEGIN
+// 都会以 "cannot start a transaction within a transaction" 失败。由于连接被池化和复用，这样的
+// 连接会在本次会话剩余时间内持续失败。本测试验证它可以被恢复到可用状态。
 void test_voxel_stream_sqlite_transaction_recovery() {
 	using namespace sqlite;
 
@@ -353,20 +353,20 @@ void test_voxel_stream_sqlite_transaction_recovery() {
 	Connection con;
 	VOXEL_TEST_ASSERT(con.open(database_path_str.c_str(), BlockLocation::FORMAT_STRING_CSD));
 
-	// Rolling back with no transaction active is a no-op, not an error.
+	// 在没有活动事务时回滚是无操作，而不是错误。
 	VOXEL_TEST_ASSERT(con.rollback_transaction());
 
 	VOXEL_TEST_ASSERT(con.begin_transaction());
 
-	// Reproduces the state a failed COMMIT leaves behind: still inside a transaction, so this must fail.
-	// Note this legitimately prints "cannot start a transaction within a transaction" while the test passes;
-	// it is the very error being reproduced here.
+	// 重现失败的 COMMIT 所留下的状态：仍处于事务内部，因此这必定失败。
+	// 注意：测试通过时，这里会正常打印“无法在事务内启动事务”；
+	// 这正是此处要重现的那个错误。
 	VOXEL_TEST_ASSERT(con.begin_transaction() == false);
 
 	VOXEL_TEST_ASSERT(con.rollback_transaction());
 
-	// The connection has to be usable again. This also covers `sqlite3_reset` returning the error code of the
-	// previous evaluation of a statement, which would otherwise make this first BEGIN fail once more.
+	// 连接必须再次可用。这也涵盖了 `sqlite3_reset` 返回语句上一次求值错误码的情况，
+	// 否则这会导致第一次 BEGIN 再次失败。
 	VOXEL_TEST_ASSERT(con.begin_transaction());
 	VOXEL_TEST_ASSERT(con.end_transaction());
 }

@@ -14,13 +14,13 @@ struct StreamingDependency;
 struct MeshingDependency;
 class BufferedTaskScheduler;
 
-// Runs a part of the update loop of a VoxelLodTerrain.
-// This part can run on another thread, so multiple terrains can update in parallel.
-// There must be only one running at once per terrain.
-// Note, this task does not include meshing and voxel generation. These are done with different tasks.
+// 运行 VoxelLodTerrain 更新循环的一部分。
+// 这部分可以在另一个线程上运行，因此多个地形可以并行更新。
+// 每个地形同一时间只能有一个在运行。
+// 注意，此任务不包含网格化和体素生成。这些由不同的任务完成。
 //
-// IMPORTANT: The work done by this task must not involve any call to Godot's servers, directly or indirectly.
-// These are deferred to the main thread.
+// 重要提示：此任务所做的工作不得直接或间接涉及对 Godot 服务器的任何调用。
+// 这些都被延迟到主线程执行。
 //
 class VoxelLodTerrainUpdateTask : public IThreadedTask {
 public:
@@ -49,7 +49,7 @@ public:
 
 	void run(ThreadedTaskContext &ctx) override;
 
-	// Functions also used outside of this task
+	// 也可在此任务之外使用的函数
 
 	static void flush_pending_lod_edits(
 			VoxelLodTerrainUpdateData::State &state,
@@ -64,7 +64,7 @@ public:
 			unsigned int lod_count
 	);
 
-	// To use on loaded blocks
+	// 用于已加载的数据块
 	static inline void schedule_mesh_update(
 			VoxelLodTerrainUpdateData::MeshBlockState &block,
 			const Vector3i bpos,
@@ -73,14 +73,14 @@ public:
 	) {
 		if (block.state != VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT) {
 			if (block.visual_active || block.collision_active) {
-				// Schedule an update
+				// 安排一次更新
 				block.state = VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT;
 				block.update_list_index = blocks_pending_update.size();
 				blocks_pending_update.push_back(
 						VoxelLodTerrainUpdateData::MeshToUpdate{ bpos, TaskCancellationToken(), require_visual }
 				);
 			} else {
-				// Just mark it as needing update, so the visibility system will schedule its update when needed.
+				// 仅将其标记为需要更新，以便可见性系统在需要时安排其更新。
 				block.state = VoxelLodTerrainUpdateData::MESH_NEED_UPDATE;
 			}
 		}

@@ -7,12 +7,11 @@
 
 namespace voxel {
 
-// Library exposing every model in a simple array. Indices in the array correspond to voxel data.
-// Rotations and variants have to be setup manually as separate models. You may use this library if your models are
-// simple, or if you want to organize your own system of voxel types.
+// 以简单数组形式公开每个模型的库。数组中的索引对应于体素数据。
+// 旋转和变体必须手动设置为单独的模型。如果你的模型很简单，
+// 或者想组织自己的体素类型体系，可以使用这个库。
 //
-// Should have been named `VoxelBlockyModelLibrary` or `VoxelBlockyLibrarySimple`, but the name was kept for
-// compatibility with previous versions.
+// 本应命名为 `VoxelBlockyModelLibrary` 或 `VoxelBlockyLibrarySimple`，但为了兼容之前的版本保留了此名称。
 class VoxelBlockyLibrary : public VoxelBlockyLibraryBase {
 	GDCLASS(VoxelBlockyLibrary, VoxelBlockyLibraryBase)
 
@@ -27,11 +26,11 @@ public:
 
 	int get_model_index_from_resource_name(String resource_name) const;
 
-	// Convenience method that returns the index of the added model
+	// 返回所添加模型索引的便捷方法
 	int add_model(Ref<VoxelBlockyModel> model);
 
 	//-------------------------
-	// Internal use
+	// 内部使用
 
 	// inline bool has_model(unsigned int id) const {
 	// 	return id < _voxel_models.size() && _voxel_models[id].is_valid();
@@ -60,7 +59,7 @@ private:
 	static void _bind_methods();
 
 private:
-	// Indices matter, they correspond to voxel data
+	// 索引很重要，它们对应于体素数据
 	StdVector<Ref<VoxelBlockyModel>> _voxel_models;
 };
 

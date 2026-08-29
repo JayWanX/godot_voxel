@@ -1,25 +1,25 @@
 # VoxelStreamMemory
 
-Inherits: [VoxelStream](VoxelStream.md)
+继承自：[VoxelStream](VoxelStream.md)
 
-Keeps data into memory rather than writing it on disk.
+将数据保存在内存中，而不是写入磁盘。
 
-## Description: 
+## 描述：
 
-This stream is mainly intented for testing purposes. It shouldn't be used as a proper saving system.
+该数据流主要用于测试目的。它不应被用作正式的保存系统。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                  | Name                                                             | Default 
---------------------------------------------------------------------- | ---------------------------------------------------------------- | --------
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [artificial_save_latency_usec](#i_artificial_save_latency_usec)  | 0       
+类型                                                                    | 名称                                                               | 默认值 
+--------------------------------------------------------------------- | ---------------------------------------------------------------- | ----
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [artificial_save_latency_usec](#i_artificial_save_latency_usec)  | 0   
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_artificial_save_latency_usec"></span> **artificial_save_latency_usec** = 0
 
-Fakes long saving by making the calling thread sleep for some amount of time.
+通过让调用线程休眠一段时间来模拟长时间保存。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

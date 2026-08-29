@@ -11,7 +11,7 @@ namespace voxel {
 class VoxelData;
 class VoxelMesher;
 
-// Helper to get simple AABB physics
+// 用于获取简单 AABB 物理的辅助类
 class VoxelBoxMover : public RefCounted {
 	GDCLASS(VoxelBoxMover, RefCounted)
 public:
@@ -53,12 +53,12 @@ private:
 
 	static void _bind_methods();
 
-	// Config
-	uint32_t _collision_mask = 0xffffffff; // Everything
+	// 配置
+	uint32_t _collision_mask = 0xffffffff; // 全部
 	bool _step_climbing_enabled = false;
 	real_t _max_step_height = 0.5;
 
-	// States
+	// 状态
 	bool _has_stepped_up = false;
 };
 

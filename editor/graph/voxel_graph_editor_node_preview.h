@@ -17,7 +17,7 @@ namespace voxel {
 
 struct GraphEditorAdapter;
 
-// Shows a 2D slice of the 3D set of values coming from an output port
+// 显示来自输出端口的 3D 值集合的 2D 切片
 class VoxelGraphEditorNodePreview : public VBoxContainer {
 	GDCLASS(VoxelGraphEditorNodePreview, VBoxContainer)
 public:

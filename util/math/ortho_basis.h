@@ -7,16 +7,16 @@
 
 namespace voxel::math {
 
-// Orthogonal bases are useful to define 3D rotations that only use 90-degree steps for angles. Because there is only 24
-// possible cases, they can often be encoded as a single byte. It can be recovered as a regular basis using a lookup
+// 正交基适用于仅使用 90 度步进角度的三维旋转。由于只有 24 种
+// 可能情况，它们通常可编码为单个字节。通过查表即可恢复为常规基。
 // table.
 
 static const int ORTHOGONAL_BASIS_COUNT = 24;
 static const int ORTHOGONAL_BASIS_IDENTITY_INDEX = 0;
 
-// Basis where every axis is a unit vector pointing at either -X, +X, -Y, +Y, -Z or +Z, and every axis is perpendicular
-// to each other.
-// There is no loss of precision when operating such basis, and equality comparison can be used safely.
+// 每个轴都是指向 -X、+X、-Y、+Y、-Z 或 +Z 的单位向量，且各轴彼此
+// 垂直。
+// 对此类基进行运算不会损失精度，且可安全使用相等比较。
 struct OrthoBasis {
 	// Axes
 	Vector3i x;
@@ -31,7 +31,7 @@ struct OrthoBasis {
 	bool is_orthonormal() const;
 
 	Vector3i get_axis(const int i) const {
-		// TODO Optimization: could use a union with an array
+		// TODO 优化：可改用与数组的联合体
 		switch (i) {
 			case Vector3i::AXIS_X:
 				return x;
@@ -53,14 +53,14 @@ struct OrthoBasis {
 		// x A A
 		// B x A
 		// B B x
-		// We only need to swap the As with the Bs across the diagonal.
+		// 我们只需沿对角线将 A 与 B 互换。
 		SWAP(x.y, y.x);
 		SWAP(x.z, z.x);
 		SWAP(y.z, z.y);
 	}
 
 	inline void invert() {
-		// The inverse of an orthogonal matrix is its transposed.
+		// 正交矩阵的逆等于其转置。
 		// https://math.stackexchange.com/questions/1936020/why-is-the-inverse-of-an-orthogonal-matrix-equal-to-its-transpose
 		transpose();
 	}
@@ -120,14 +120,14 @@ struct OrthoBasis {
 	}
 };
 
-// With no particular convention, each rotation can be given a name from the 3 axes XYZ in the form:
+// 在不采用特定约定的情况下，每个旋转可用 3 个轴 XYZ 按如下形式命名：
 // `+x+y+z`
 // `-y+x+z`
 // `-x-y+z`
 // ...
 //
-// A slightly more intuitive naming can be used, by considering -Z as forward, Y as up, X as right, and all
-// rotations counter-clockwise, preferring either of the following forms:
+// 可使用更直观的命名：将 -Z 视为前、Y 视为上、X 视为右，所有
+// 旋转均为逆时针，并优先采用以下形式之一：
 //
 // identity
 // y+A             (Y rotation)
@@ -136,38 +136,38 @@ struct OrthoBasis {
 // x+90|270, y+B   (up or down + Y rotation)
 // z+A, y+B        (roll around forward + Y rotation)
 //
-// Note: half of rotations are those with roll around Z. In a Minecraft game, they are never used.
+// 注意：一半的旋转是绕 Z 轴滚转的。在 Minecraft 游戏中，这些旋转从未被使用。
 //
 enum OrthoRotationID {
 	ORTHO_ROTATION_IDENTITY = 0,
 
-	ORTHO_ROTATION_Z_270, // 1 (roll 270)
-	ORTHO_ROTATION_Z_180, // 2 (roll 180)
-	ORTHO_ROTATION_Z_90, // 3 (roll 90)
-	ORTHO_ROTATION_X_270, // 4 (look down)
-	ORTHO_ROTATION_X_270_Y_270, // 5 (look down, turn right)
-	ORTHO_ROTATION_X_270_Y_180, // 6 (look down, turn around Y 180)
-	ORTHO_ROTATION_X_270_Y_90, // 7 (look down, turn left)
-	ORTHO_ROTATION_Z_180_Y_180, // 8 (roll 180, turn around Y 180)
-	ORTHO_ROTATION_Z_90_Y_180, // 9 (roll 90, turn around Y 180)
-	ORTHO_ROTATION_Y_180, // 10  (turn around Y 180)
-	ORTHO_ROTATION_Z_270_Y_180, // 11  (roll 270, turn around Y 180)
-	ORTHO_ROTATION_X_90, // 12 (look up)
-	ORTHO_ROTATION_X_90_Y_90, // 13 (look up, turn left)
-	ORTHO_ROTATION_X_90_Y_180, // 14 (look up, turn around Y 180)
-	ORTHO_ROTATION_X_90_Y_270, // 15 (look up, turn right)
-	ORTHO_ROTATION_Y_270, // 16 (turn right)
-	ORTHO_ROTATION_Z_270_Y_270, // 17 (roll 270, turn right)
-	ORTHO_ROTATION_Z_180_Y_270, // 18 (roll 180, turn right)
-	ORTHO_ROTATION_Z_90_Y_270, // 19 (roll 90, turn right)
-	ORTHO_ROTATION_Z_180_Y_90, // 20 (roll 180, turn left)
-	ORTHO_ROTATION_Z_90_Y_90, // 21 (roll 90, turn left)
-	ORTHO_ROTATION_Y_90, // 22 (turn left)
-	ORTHO_ROTATION_Z_270_Y_90, // 23 (roll 270, turn left)
+	ORTHO_ROTATION_Z_270, // 1（滚转 270°）
+	ORTHO_ROTATION_Z_180, // 2（滚转 180°）
+	ORTHO_ROTATION_Z_90, // 3（滚转 90°）
+	ORTHO_ROTATION_X_270, // 4（向下看）
+	ORTHO_ROTATION_X_270_Y_270, // 5（向下看，向右转）
+	ORTHO_ROTATION_X_270_Y_180, // 6（向下看，绕 Y 转 180°）
+	ORTHO_ROTATION_X_270_Y_90, // 7（向下看，向左转）
+	ORTHO_ROTATION_Z_180_Y_180, // 8（滚转 180°，绕 Y 转 180°）
+	ORTHO_ROTATION_Z_90_Y_180, // 9（滚转 90°，绕 Y 转 180°）
+	ORTHO_ROTATION_Y_180, // 10（绕 Y 转 180°）
+	ORTHO_ROTATION_Z_270_Y_180, // 11（滚转 270°，绕 Y 转 180°）
+	ORTHO_ROTATION_X_90, // 12（向上看）
+	ORTHO_ROTATION_X_90_Y_90, // 13（向上看，向左转）
+	ORTHO_ROTATION_X_90_Y_180, // 14（向上看，绕 Y 转 180°）
+	ORTHO_ROTATION_X_90_Y_270, // 15（向上看，向右转）
+	ORTHO_ROTATION_Y_270, // 16（向右转）
+	ORTHO_ROTATION_Z_270_Y_270, // 17（滚转 270°，向右转）
+	ORTHO_ROTATION_Z_180_Y_270, // 18（滚转 180°，向右转）
+	ORTHO_ROTATION_Z_90_Y_270, // 19（滚转 90°，向右转）
+	ORTHO_ROTATION_Z_180_Y_90, // 20（滚转 180°，向左转）
+	ORTHO_ROTATION_Z_90_Y_90, // 21（滚转 90°，向左转）
+	ORTHO_ROTATION_Y_90, // 22（向左转）
+	ORTHO_ROTATION_Z_270_Y_90, // 23（滚转 270°，向左转）
 
 	ORTHO_ROTATION_COUNT,
 
-	// Alternative
+	// 备选方案
 	//
 	// IDENTITY (FORWARD)
 	// FORWARD_ROLL_270

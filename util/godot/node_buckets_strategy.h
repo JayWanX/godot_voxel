@@ -9,8 +9,8 @@ VOXEL_GODOT_FORWARD_DECLARE(class Node)
 
 namespace voxel::godot {
 
-// A workaround for the fact Godot is very slow at removing nodes from the scene tree if they have many siblings...
-// See https://github.com/godotengine/godot/issues/61929
+// 这是对 Godot 的一个变通：当节点有大量兄弟节点时，从场景树中移除节点非常慢……
+// 参见 https://github.com/godotengine/godot/issues/61929
 template <typename TBucket>
 class NodeBucketsStrategy {
 public:

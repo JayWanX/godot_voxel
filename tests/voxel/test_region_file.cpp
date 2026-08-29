@@ -33,11 +33,11 @@ void test_region_file() {
 			const float r = rng.randf();
 
 			if (r < 0.2f) {
-				// Every so often, make a uniform block
+				// 时不时生成一个均匀的数据块
 				buffer.clear_channel(channel_index, rng.rand() % 256);
 
 			} else if (r < 0.4f) {
-				// Every so often, make a semi-uniform block
+				// 时不时生成一个半均匀的数据块
 				buffer.clear_channel(channel_index, rng.rand() % 256);
 				const int ymax = rng.rand() % buffer.get_size().y;
 				for (int z = 0; z < buffer.get_size().z; ++z) {
@@ -49,7 +49,7 @@ void test_region_file() {
 				}
 
 			} else {
-				// Make a block with enough data to take some significant space even if compressed
+				// 创建一个包含足够数据的 block，即使经过压缩也会占用可观空间
 				for (int z = 0; z < buffer.get_size().z; ++z) {
 					for (int x = 0; x < buffer.get_size().x; ++x) {
 						for (int y = 0; y < buffer.get_size().y; ++y) {
@@ -63,14 +63,14 @@ void test_region_file() {
 
 	RandomBlockGenerator generator;
 
-	// Create a block of voxels
+	// 创建一数据块的体素
 	VoxelBuffer voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 	generator.generate(voxel_buffer);
 
 	{
 		RegionFile region_file;
 
-		// Configure region format
+		// 配置区域格式
 		RegionFormat region_format = region_file.get_format();
 		region_format.block_size_po2 = block_size_po2;
 		for (unsigned int channel_index = 0; channel_index < VoxelBuffer::MAX_CHANNELS; ++channel_index) {
@@ -78,44 +78,44 @@ void test_region_file() {
 		}
 		VOXEL_TEST_ASSERT(region_file.set_format(region_format));
 
-		// Open file
+		// 打开文件
 		const Error open_error = region_file.open(region_file_path, true);
 		VOXEL_TEST_ASSERT(open_error == OK);
 
-		// Save block
+		// 保存数据块
 		const Error save_error =
 				region_file.save_block(Vector3i(1, 2, 3), voxel_buffer, CompressedData::COMPRESSION_LZ4);
 		VOXEL_TEST_ASSERT(save_error == OK);
 
-		// Read back
+		// 读回
 		VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 		const Error load_error = region_file.load_block(Vector3i(1, 2, 3), loaded_voxel_buffer);
 		VOXEL_TEST_ASSERT(load_error == OK);
 
-		// Must be equal
+		// 必须相等
 		VOXEL_TEST_ASSERT(voxel_buffer.equals(loaded_voxel_buffer));
 	}
-	// Load again but using a new region file object
+	// 使用一个新的区域文件对象重新加载
 	{
 		RegionFile region_file;
 
-		// Open file
+		// 打开文件
 		const Error open_error = region_file.open(region_file_path, false);
 		VOXEL_TEST_ASSERT(open_error == OK);
 
-		// Read back
+		// 读回
 		VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 		const Error load_error = region_file.load_block(Vector3i(1, 2, 3), loaded_voxel_buffer);
 		VOXEL_TEST_ASSERT(load_error == OK);
 
-		// Must be equal
+		// 必须相等
 		VOXEL_TEST_ASSERT(voxel_buffer.equals(loaded_voxel_buffer));
 	}
-	// Save many blocks
+	// 保存多个数据块
 	{
 		RegionFile region_file;
 
-		// Open file
+		// 打开文件
 		const Error open_error = region_file.open(region_file_path, false);
 		VOXEL_TEST_ASSERT(open_error == OK);
 
@@ -137,15 +137,15 @@ void test_region_file() {
 			);
 			generator.generate(voxel_buffer);
 
-			// Save block
+			// 保存数据块
 			const Error save_error = region_file.save_block(pos, voxel_buffer, CompressedData::COMPRESSION_LZ4);
 			VOXEL_TEST_ASSERT(save_error == OK);
 
-			// Note, the same position can occur twice, we just overwrite
+			// 注意，同一位置可能出现两次，我们直接覆盖
 			buffers[pos].voxels = std::move(voxel_buffer);
 		}
 
-		// Read back
+		// 读回
 		for (auto it = buffers.begin(); it != buffers.end(); ++it) {
 			VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 			const Error load_error = region_file.load_block(it->first, loaded_voxel_buffer);
@@ -156,11 +156,11 @@ void test_region_file() {
 		const Error close_error = region_file.close();
 		VOXEL_TEST_ASSERT(close_error == OK);
 
-		// Open file
+		// 打开文件
 		const Error open_error2 = region_file.open(region_file_path, false);
 		VOXEL_TEST_ASSERT(open_error2 == OK);
 
-		// Read back again
+		// 再次读回
 		for (auto it = buffers.begin(); it != buffers.end(); ++it) {
 			VoxelBuffer loaded_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 			const Error load_error = region_file.load_block(it->first, loaded_voxel_buffer);
@@ -170,7 +170,7 @@ void test_region_file() {
 	}
 }
 
-// Test based on an issue from `I am the Carl` on Discord. It should only not crash or cause errors.
+// 基于 Discord 上 `I am the Carl` 提出的一个问题而来的测试。它只应保证不崩溃或不出错。
 void test_voxel_stream_region_files() {
 	const int block_size_po2 = 4;
 	const int block_size = 1 << block_size_po2;
@@ -189,7 +189,7 @@ void test_voxel_stream_region_files() {
 		VoxelBuffer buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 		buffer.create(block_size, block_size, block_size);
 
-		// Make a block with enough data to take some significant space even if compressed
+		// 创建一个包含足够数据的 block，即使经过压缩也会占用可观空间
 		for (int z = 0; z < buffer.get_size().z; ++z) {
 			for (int x = 0; x < buffer.get_size().x; ++x) {
 				for (int y = 0; y < buffer.get_size().y; ++y) {
@@ -198,7 +198,7 @@ void test_voxel_stream_region_files() {
 			}
 		}
 
-		// Dividing coordinate so it saves multiple times the same block. That should not crash.
+		// 对坐标进行划分使其多次保存同一个数据块。这不应崩溃。
 		VoxelStream::VoxelQueryData q{ buffer, Vector3(cycle / 16, 0, 0), 0, VoxelStream::RESULT_ERROR };
 		stream->save_voxel_block(q);
 	}
@@ -233,7 +233,7 @@ void test_voxel_stream_region_files_lods() {
 			);
 		}
 		static void generate_block(RandomPCG &rng, VoxelBuffer &buffer, uint32_t index) {
-			// Make a block with enough data to take some significant space even if compressed
+			// 创建一个包含足够数据的 block，即使经过压缩也会占用可观空间
 			for (int z = 0; z < buffer.get_size().z; ++z) {
 				for (int x = 0; x < buffer.get_size().x; ++x) {
 					for (int y = 0; y < buffer.get_size().y; ++y) {

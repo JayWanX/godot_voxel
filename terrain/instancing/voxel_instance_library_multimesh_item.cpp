@@ -23,8 +23,8 @@ Array serialize_collision_shape_infos(const StdVector<CollisionShapeInfo> &infos
 	for (unsigned int i = 0; i < infos.size(); ++i) {
 		const CollisionShapeInfo &info = infos[i];
 		ERR_FAIL_COND_V(info.shape.is_null(), Array());
-		// TODO Shape might or might not be shared, could have odd side-effects,
-		// but not sure how to properly fix these edge cases without convoluted code
+		// TODO 形状可能被共享也可能不被共享，可能产生奇怪的副作用，
+		// 但不确定如何在不写绕弯代码的情况下正确修复这些边界情况
 		a.push_back(info.shape);
 		a.push_back(info.transform);
 	}
@@ -102,7 +102,7 @@ void VoxelInstanceLibraryMultiMeshItem::set_mesh(Ref<Mesh> mesh, int mesh_lod_in
 	}
 	settings.mesh_lods[mesh_lod_index] = mesh;
 
-	// Update count
+	// 更新数量
 	unsigned int count = settings.mesh_lods.size();
 	for (unsigned int i = settings.mesh_lods.size() - 1; i > 0; --i) {
 		if (settings.mesh_lods[i].is_valid()) {
@@ -119,7 +119,7 @@ int VoxelInstanceLibraryMultiMeshItem::get_mesh_lod_count() const {
 	return _manual_settings.mesh_lod_count;
 }
 
-// This version is called when editing in the inspector
+// 在检视面板中编辑时调用此版本
 void VoxelInstanceLibraryMultiMeshItem::set_mesh_lod_distance_ratio(int mesh_lod_index, float ratio) {
 	ERR_FAIL_INDEX(mesh_lod_index, static_cast<int>(_mesh_lod_max_distance_ratios.size()));
 	ratio = math::clamp(ratio, MIN_DISTANCE_RATIO, MAX_DISTANCE_RATIO);
@@ -231,7 +231,7 @@ TypedArray<StringName> VoxelInstanceLibraryMultiMeshItem::get_collider_group_nam
 
 void VoxelInstanceLibraryMultiMeshItem::_get_property_list(List<PropertyInfo> *p_list) const {
 	if (_scene.is_valid()) {
-		// This is only so we have a preview of conversion results.
+		// 这只是为了预览转换结果。
 
 		p_list->push_back(PropertyInfo(
 				Variant::NIL, SCENE_SETTINGS_GROUP_NAME, PROPERTY_HINT_NONE, "scene_", PROPERTY_USAGE_GROUP
@@ -625,7 +625,7 @@ PackedFloat32Array VoxelInstanceLibraryMultiMeshItem::_b_get_mesh_lod_distance_r
 	return ratios;
 }
 
-// This version is called when loading the resource
+// 加载资源时调用此版本
 void VoxelInstanceLibraryMultiMeshItem::_b_set_mesh_lod_distance_ratios(PackedFloat32Array ratios) {
 	VOXEL_ASSERT_RETURN(ratios.size() == static_cast<int>(_mesh_lod_max_distance_ratios.size()));
 	VOXEL_ASSERT_RETURN(is_ascending(to_span(ratios)));
@@ -705,7 +705,7 @@ void VoxelInstanceLibraryMultiMeshItem::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_collision_distance"), &Self::get_collision_distance);
 	ClassDB::bind_method(D_METHOD("set_collision_distance", "distance"), &Self::set_collision_distance);
 
-	// Used in editor only
+	// 仅在编辑器中使用
 	ClassDB::bind_method(
 			D_METHOD("_deserialize_multimesh_item_properties", "props"), &Self::deserialize_multimesh_item_properties
 	);
@@ -754,7 +754,7 @@ void VoxelInstanceLibraryMultiMeshItem::_bind_methods() {
 					Variant::OBJECT,
 					"material_override",
 					PROPERTY_HINT_RESOURCE_TYPE,
-					// TODO Disallow CanvasItemMaterial?
+					// TODO 禁止使用 CanvasItemMaterial？
 					Material::get_class_static()
 			),
 			"set_material_override",
@@ -788,7 +788,7 @@ void VoxelInstanceLibraryMultiMeshItem::_bind_methods() {
 
 	ADD_GROUP("Mesh LOD settings", "");
 
-	// Only for editor and scripting
+	// 仅用于编辑器和脚本
 	ADD_PROPERTY(
 			PropertyInfo(Variant::FLOAT, "mesh_lod0_distance_ratio", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR),
 			"_set_mesh_lod0_distance_ratio",
@@ -810,7 +810,7 @@ void VoxelInstanceLibraryMultiMeshItem::_bind_methods() {
 			"_get_mesh_lod3_distance_ratio"
 	);
 
-	// Only for resource serialization
+	// 仅用于资源序列化
 	ADD_PROPERTY(
 			PropertyInfo(
 					Variant::PACKED_FLOAT32_ARRAY,

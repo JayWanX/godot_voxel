@@ -5,11 +5,11 @@
 
 namespace voxel {
 
-// Alternative implementation of an integer axis-aligned box, storing min and max positions for faster intersection
+// 整数轴对齐包围盒的另一种实现，存储最小和最大位置以加快相交
 // checks.
 struct BoxBounds2i {
 	Vector2i min_pos;
-	Vector2i max_pos; // Exclusive
+	Vector2i max_pos; // 开区间（不含）
 
 	BoxBounds2i() {}
 

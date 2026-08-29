@@ -16,20 +16,20 @@ namespace voxel {
 
 class VoxelGenerator;
 
-// TODO This may have to be moved to the meshing thread some day
+// TODO 有一天这可能不得不移到网格化线程中
 
-// Decides where to spawn instances on top of a voxel surface.
-// Note: to generate voxels themselves, see `VoxelGenerator`.
+// 决定在体素表面上的哪个位置生成实例。
+// 注意：若要生成体素本身，请参阅 `VoxelGenerator`。
 class VoxelInstanceGenerator : public Resource {
 	GDCLASS(VoxelInstanceGenerator, Resource)
 public:
 	enum EmitMode {
-		// Fastest, but can have noticeable patterns when using high densities or using simplified meshes
+		// 最快，但在使用高密度或简化网格时可能出现明显图案
 		EMIT_FROM_VERTICES,
-		// Slower, but should have less noticeable patterns. Assumes all triangles use similar areas,
-		// which is the case with non-simplified meshes obtained with marching cubes.
+		// 较慢，但图案应不那么明显。假设所有三角形面积相近，
+		// 使用移动立方体获得的非简化网格正是这种情况。
 		EMIT_FROM_FACES_FAST,
-		// Slower, but tries to not assume the area of triangles.
+		// 较慢，但尝试不假设三角形面积。
 		EMIT_FROM_FACES,
 		EMIT_ONE_PER_TRIANGLE,
 
@@ -50,24 +50,24 @@ public:
 		DIMENSION_COUNT
 	};
 
-	// This API might change so for now it's not exposed to scripts.
-	// Using 32-bit float transforms because those transforms are chunked, so their origins never really need to hold
-	// large coordinates.
+	// 此 API 可能会更改，因此目前不向脚本公开。
+	// 使用 32 位浮点变换，因为这些变换被分块，其原点实际上不需要保存
+	// 大坐标。
 	void generate_transforms(
 			StdVector<Transform3f> &out_transforms,
 			const Vector3i grid_position,
 			const int lod_index,
 			const int layer_id,
 			Array surface_arrays,
-			// If not negative, vertices at this index and beyond should be ignored
+			// 如果非负，则忽略此索引及之后的顶点
 			const int32_t vertex_range_end,
-			// If not negative, indices at this index and beyond should be ignored
+			// 如果非负，则忽略此索引及之后的索引
 			const int32_t index_range_end,
 			const UpMode up_mode,
-			// When generating a 2x2x2 data block area, bits in `octant_mask` tell which octant should be generated.
-			// Bits set to zero will cause all instances in the corresponding octant to not be generated.
+			// 生成 2x2x2 数据块区域时，`octant_mask` 中的位指示应生成哪个卦限。
+			// 置零的位将导致对应卦限中的所有实例不被生成。
 			const uint8_t octant_mask,
-			// This is block size in world space, not relative to LOD index
+			// 这是世界空间中的数据块大小，与 LOD 索引无关
 			const float block_size,
 			Ref<VoxelGenerator> voxel_generator
 	);
@@ -96,7 +96,7 @@ public:
 	void set_scale_distribution(Distribution distribution);
 	Distribution get_scale_distribution() const;
 
-	// TODO Add scale curve, in real life there are way more small items than big ones
+	// TODO 添加缩放曲线，现实生活中小物件远多于大物件
 
 	void set_offset_along_normal(float offset);
 	float get_offset_along_normal() const;
@@ -225,24 +225,23 @@ private:
 	};
 	GeneratorSDFSnapSettings _gen_sdf_snap_settings;
 
-	// TODO Protect noise and noise graph members from multithreaded access
+	// TODO 保护噪声和噪声图成员免受多线程访问
 
-	// Required inputs:
+	// 必需输入：
 	// - X
 	// - Y
 	// - Z
-	// Possible outputs:
-	// - Density
+	// 可能的输出：
+	// - Density（密度）
 	Ref<pg::VoxelGraphFunction> _noise_graph;
-	// TODO Sampling mode:
-	// - Per vertex: recommended if many items with high density need it (will be shared among them)
-	// - Per instance: recommended if items with low density need it
+	// TODO 采样模式：
+	// - 逐顶点：如果许多高密度项目需要它，则推荐（将在它们之间共享）
+	// - 逐实例：如果低密度项目需要它，则推荐
 
 	float _noise_falloff = 0.f;
 	float _noise_threshold = 0.f;
 
-	// Used when accessing pointer settings, since this generator can be used in a thread while the editor thread can
-	// modify settings.
+	// 访问指针设置时使用，因为编辑器线程可能修改设置的同时，该生成器可能在另一个线程中使用。
 	mutable ShortLock _ptr_settings_lock;
 };
 

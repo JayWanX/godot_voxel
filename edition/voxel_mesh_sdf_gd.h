@@ -15,7 +15,7 @@ VOXEL_GODOT_FORWARD_DECLARE(class SceneTree);
 
 namespace voxel {
 
-// Contains the baked signed distance field of a mesh, which can be used to sculpt terrain.
+// 包含网格的已烘焙有符号距离场，可用于雕刻地形。
 class VoxelMeshSDF : public Resource {
 	GDCLASS(VoxelMeshSDF, Resource)
 public:
@@ -36,7 +36,7 @@ public:
 	static const int MIN_PARTITION_SUBDIV = 2;
 	static const int MAX_PARTITION_SUBDIV = 255;
 
-	// The data cannot be used until baked
+	// 数据在烘焙之前无法使用
 	bool is_baked() const;
 	bool is_baking() const;
 
@@ -60,19 +60,19 @@ public:
 
 	void bake();
 
-// Bakes the SDF asynchronously using threads of the job system.
-// TODO A reference to the SceneTree should not be necessary!
-// It is currently needed to ensure `VoxelServerUpdater` gets created so it can tick the task system...
+// 使用任务系统的线程异步烘焙 SDF。
+// TODO 不应需要 SceneTree 的引用！
+// 目前需要它来确保创建 `VoxelServerUpdater`，以便它能驱动任务系统...
 	void bake_async(SceneTree *scene_tree);
 
-	// Accesses baked SDF data.
-	// WARNING: don't modify this buffer. Only read from it.
-	// There are some usages (like modifiers) that will read it from different threads,
-	// but there is no thread safety in case of direct modification.
-	// TODO Introduce a VoxelBufferReadOnly? Since that's likely the only way in an object-oriented script API...
+	// 访问已烘焙的 SDF 数据。
+	// 警告：不要修改此缓冲区，只能从中读取。
+	// 有一些用法（如修改器）会从不同线程读取它，
+	// 但直接修改时没有线程安全保证。
+	// TODO 引入 VoxelBufferReadOnly？因为这很可能是面向对象脚本 API 中唯一的方式...
 	Ref<godot::VoxelBuffer> get_voxel_buffer() const;
 
-	// Gets the padded bounding box of the model. This is important to know for signed distances to be coherent.
+	// 获取模型带内边距的包围盒。这对有符号距离的一致性很重要。
 	AABB get_aabb() const;
 
 	inline Vector3f get_aabb_min_pos() const {
@@ -96,28 +96,28 @@ private:
 
 	static void _bind_methods();
 
-	// Data
+	// 数据
 	Ref<godot::VoxelBuffer> _voxel_buffer;
 	Vector3f _min_pos;
 	Vector3f _max_pos;
 #ifdef VOXEL_ENABLE_GPU
-	// Stored as a shared_ptr in case that resource is in use while being re-generated
+	// 以 shared_ptr 存储，以防该资源在重新生成时仍在使用中
 	std::shared_ptr<ComputeShaderResource> _gpu_resource;
 	Mutex _gpu_resource_mutex;
 #endif
 
-	// States
+	// 状态
 	bool _is_baking = false;
 
-	// Baking options
+	// 烘焙选项
 	int _cell_count = 64;
 	float _margin_ratio = 0.25;
 	BakeMode _bake_mode = BAKE_MODE_ACCURATE_PARTITIONED;
 	uint8_t _partition_subdiv = 32;
 	bool _boundary_sign_fix = true;
-	// Note, the mesh is referenced here only for convenience. Setting it to null will not clear the SDF.
-	// An SDF should be usable without loading the original mesh onto the graphics card.
-	// The mesh is only used for baking.
+	// 注意，此处引用网格只是为了方便。将其设为 null 不会清除 SDF。
+	// SDF 应该可以在不将原始网格加载到显卡的情况下使用。
+	// 网格仅用于烘焙。
 	Ref<Mesh> _mesh;
 };
 

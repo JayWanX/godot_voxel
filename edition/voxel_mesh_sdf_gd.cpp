@@ -244,7 +244,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 			switch (bake_mode) {
 				case BAKE_MODE_ACCURATE_NAIVE:
 				case BAKE_MODE_ACCURATE_PARTITIONED: {
-					// These two approaches are better parallelized
+					// 这两种方法更适合并行化
 
 					const bool partitioned = bake_mode == BAKE_MODE_ACCURATE_PARTITIONED;
 					if (partitioned) {
@@ -261,8 +261,8 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 
 					shared_data->boundary_sign_fix = boundary_sign_fix;
 
-					// Spawn a parallel task for every Z slice of the grid.
-					// Indexing is ZXY so each thread accesses a contiguous part of memory.
+					// 为网格的每个 Z 切片生成一个并行任务。
+					// 索引采用 ZXY 顺序，因此每个线程访问内存中连续的部分。
 					shared_data->pending_jobs = res.z;
 
 					for (int z = 0; z < res.z; ++z) {
@@ -358,7 +358,7 @@ void VoxelMeshSDF::bake_async(SceneTree *scene_tree) {
 void VoxelMeshSDF::_on_bake_async_completed(Ref<godot::VoxelBuffer> buffer, Vector3 min_pos, Vector3 max_pos) {
 	_is_baking = false;
 
-	// This can mean an error occurred during one of the tasks
+	// 这可能意味着某个任务中发生了错误
 	VOXEL_ASSERT_RETURN(buffer.is_valid());
 
 	_voxel_buffer = buffer;
@@ -516,7 +516,7 @@ void VoxelMeshSDF::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_aabb"), &VoxelMeshSDF::get_aabb);
 	ClassDB::bind_method(D_METHOD("debug_check_sdf", "mesh"), &VoxelMeshSDF::debug_check_sdf);
 
-	// Internal
+	// 内部
 	ClassDB::bind_method(
 			D_METHOD("_on_bake_async_completed", "buffer", "min_pos", "max_pos"),
 			&VoxelMeshSDF::_on_bake_async_completed
@@ -588,7 +588,7 @@ void VoxelMeshSDF::_bind_methods() {
 
 	ADD_SIGNAL(MethodInfo("baked"));
 
-	// These modes are mostly for experimentation, I'm not sure if they will remain
+	// 这些模式主要用于实验，我不确定它们是否会保留
 	BIND_ENUM_CONSTANT(BAKE_MODE_ACCURATE_NAIVE);
 	BIND_ENUM_CONSTANT(BAKE_MODE_ACCURATE_PARTITIONED);
 	BIND_ENUM_CONSTANT(BAKE_MODE_APPROX_INTERP);

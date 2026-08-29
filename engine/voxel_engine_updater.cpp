@@ -2,7 +2,7 @@
 #include "../util/io/log.h"
 #include "voxel_engine.h"
 
-// Needed for doing `Node *root = SceneTree::get_root()`, Window* is forward-declared
+// 执行 `Node *root = SceneTree::get_root()` 所需，Window* 为前置声明
 #include "../util/godot/classes/scene_tree.h"
 #include "../util/godot/classes/window.h"
 
@@ -13,7 +13,7 @@ bool g_updater_created = false;
 VoxelEngineUpdater::VoxelEngineUpdater() {
 	VOXEL_PRINT_VERBOSE("Creating VoxelEngineUpdater");
 	set_process(true);
-	// We don't want it to stop when the scene tree is paused
+	// 我们不希望它在场景树暂停时停止
 	set_process_mode(PROCESS_MODE_ALWAYS);
 	g_updater_created = true;
 }
@@ -38,8 +38,8 @@ void VoxelEngineUpdater::ensure_existence(SceneTree *st) {
 	}
 	VoxelEngineUpdater *u = memnew(VoxelEngineUpdater);
 	u->set_name("VoxelEngineUpdater_dont_touch_this");
-	// TODO This can fail (for example if `Node::data.blocked > 0` while in `_ready()`) but Godot offers no API to check
-	// anything. So if this fail, the node will leak.
+	// TODO 这可能会失败（例如在 `_ready()` 期间 `Node::data.blocked > 0`），但 Godot 未提供任何 API 来检查。
+	// 因此如果失败，节点将泄漏。
 	root->add_child(u);
 
 	VoxelEngine::get_singleton().try_initialize_gpu_features();
@@ -48,7 +48,7 @@ void VoxelEngineUpdater::ensure_existence(SceneTree *st) {
 void VoxelEngineUpdater::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_PROCESS:
-			// To workaround the absence of API to have a custom server processing in the main loop
+			// 为绕开主循环中缺少自定义服务处理 API 的问题
 			voxel::VoxelEngine::get_singleton().process();
 			break;
 

@@ -31,10 +31,10 @@ TextWriter &operator<<(TextWriter &w, const std::string_view s);
 
 #ifdef __GNUC__
 
-// Attempt at fixing GCC having trouble dealing with `unordered_map<StdString, V> map;`.
-// I couldn't understand why exactly that happens, whether it's a bug or not. In Compiler Explorer, all versions prior
-// to GCC 13.1 fail to compile such code, except from 13.1 onwards. Manually defining a hash specialization for our
-// alias seems to workaround it.
+// 尝试修复 GCC 处理 `unordered_map<StdString, V> map;` 时遇到的问题。
+// 我不太理解为什么会发生这种情况，也不确定是不是 bug。在 Compiler Explorer 中，所有早于
+// GCC 13.1 的版本编译这类代码都会失败，只有 13.1 及以后可以。手动为我们的
+// 别名定义哈希特化似乎可以绕过它。
 namespace std {
 template <>
 struct hash<voxel::StdString> {

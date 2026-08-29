@@ -8,7 +8,7 @@
 namespace voxel::tests {
 
 void test_block_serializer_uncompressed() {
-	// Create an example buffer
+	// 创建一个示例 buffer
 	const Vector3i block_size(8, 9, 10);
 	VoxelBuffer voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 	voxel_buffer.create(block_size);
@@ -16,7 +16,7 @@ void test_block_serializer_uncompressed() {
 	voxel_buffer.fill_area(43, Vector3i(2, 3, 4), Vector3i(6, 6, 6), 0);
 	voxel_buffer.fill_area(44, Vector3i(1, 2, 3), Vector3i(5, 5, 5), 1);
 
-	// Serialize without compression wrapper
+	// 不使用压缩包装进行序列化
 	BlockSerializer::SerializeResult result = BlockSerializer::serialize(voxel_buffer);
 	VOXEL_TEST_ASSERT(result.success);
 	StdVector<uint8_t> data = result.data;
@@ -28,12 +28,12 @@ void test_block_serializer_uncompressed() {
 	VoxelBuffer deserialized_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 	VOXEL_TEST_ASSERT(BlockSerializer::deserialize(to_span_const(data), deserialized_voxel_buffer));
 
-	// Must be equal
+	// 必须相等
 	VOXEL_TEST_ASSERT(voxel_buffer.equals(deserialized_voxel_buffer));
 }
 
 void test_block_serializer_compressed(const CompressedData::Compression compression_mode) {
-	// Create an example buffer
+	// 创建一个示例 buffer
 	const Vector3i block_size(8, 9, 10);
 	VoxelBuffer voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 	voxel_buffer.create(block_size);
@@ -54,7 +54,7 @@ void test_block_serializer_compressed(const CompressedData::Compression compress
 		VoxelBuffer deserialized_voxel_buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 		VOXEL_TEST_ASSERT(BlockSerializer::decompress_and_deserialize(to_span_const(data), deserialized_voxel_buffer));
 
-		// Must be equal
+		// 必须相等
 		VOXEL_TEST_ASSERT(voxel_buffer.equals(deserialized_voxel_buffer));
 	}
 }
@@ -67,7 +67,7 @@ void test_block_serializer() {
 }
 
 void test_block_serializer_stream_peer() {
-	// Create an example buffer
+	// 创建一个示例 buffer
 	const Vector3i block_size(8, 9, 10);
 	Ref<godot::VoxelBuffer> voxel_buffer;
 	voxel_buffer.instantiate();

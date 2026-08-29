@@ -16,8 +16,8 @@ namespace voxel {
 
 class Voxel_ChartView;
 
-// This is an experimental tool to check noise properties empirically,
-// by sampling it a lot of times and seeing what the minimum and maximum values are.
+// 这是一个实验性工具，用于经验性地检查噪声属性，
+// 通过大量采样并观察最小值和最大值。
 class Voxel_NoiseAnalysisWindow : public AcceptDialog {
 	GDCLASS(Voxel_NoiseAnalysisWindow, AcceptDialog)
 public:

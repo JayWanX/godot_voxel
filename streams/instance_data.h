@@ -7,23 +7,23 @@
 
 namespace voxel {
 
-// Stores data to pass around until it either gets saved or turned into actual instances
+// 存储用于传递的数据，直到它被保存或转换为实际的实例
 struct InstanceBlockData {
 	struct InstanceData {
-		// Transform of the instance, relative to the origin of the data block.
+		// 实例的变换，相对于数据块的原点。
 		Transform3f transform;
 	};
 
 	enum VoxelInstanceFormat {
-		// Position is lossy-compressed based on the size of the block
+		// 位置为有损压缩，基于区块的大小
 		// - uint16_t x;
 		// - uint16_t y;
 		// - uint16_t z;
 		//
-		// Scale is uniform and is lossy-compressed to 256 values
+		// 缩放是均匀的，被有损压缩为 256 个值
 		// - uint8_t scale;
 		//
-		// Rotation is a compressed quaternion with naive quantization of its members to 256 values
+		// 旋转为一个压缩的四元数，其各分量被朴素地量化为 256 个值
 		// - uint8_t x;
 		// - uint8_t y;
 		// - uint8_t z;
@@ -32,12 +32,12 @@ struct InstanceBlockData {
 	};
 
 	static const int POSITION_RESOLUTION = 65536;
-	// Because position is quantized we need its range, but it cannot be zero so it may be clamped to this.
+	// 因为位置被量化，所以我们需要它的范围；但该范围不能为零，因此可能被钳制到此值。
 	static const float POSITION_RANGE_MINIMUM;
 
 	static const int SIMPLE_11B_V1_SCALE_RESOLUTION = 256;
 	static const int SIMPLE_11B_V1_QUAT_RESOLUTION = 256;
-	// Because scale is quantized we need its range, but it cannot be zero so it may be clamped to this.
+	// 因为缩放被量化，所以我们需要它的范围；但该范围不能为零，因此可能被钳制到此值。
 	static const float SIMPLE_11B_V1_SCALE_RANGE_MINIMUM;
 
 	struct LayerData {
@@ -51,7 +51,7 @@ struct InstanceBlockData {
 	StdVector<LayerData> layers;
 
 	void copy_to(InstanceBlockData &dst) const {
-		// It's all POD so it should work for now
+		// 它们都是 POD 类型，所以目前这样应该可行
 		dst = *this;
 	}
 };

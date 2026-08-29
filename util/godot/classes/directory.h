@@ -20,7 +20,7 @@ inline bool directory_exists(const String &directory_path) {
 }
 
 inline bool directory_exists(DirAccess &dir, const String &relative_directory_path) {
-	// Why this function is not `const`, I wonder
+	// 我很疑惑这个函数为什么不是 `const`
 	return dir.dir_exists(relative_directory_path);
 }
 

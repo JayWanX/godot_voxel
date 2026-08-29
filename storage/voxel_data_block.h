@@ -9,10 +9,10 @@ namespace voxel {
 
 class VoxelBuffer;
 
-// Stores voxel data for a chunk of the volume. Mesh and colliders are stored separately.
-// Voxel data can be present, or not. If not present, it means we know the block contains no edits, and voxels can be
-// obtained by querying generators.
-// Voxel data can also be present as a cache of generators, for cheaper repeated queries.
+// 存储体积中一个 chunk 的体素数据。网格和碰撞体是分开存储的。
+// 体素数据可以存在，也可以不存在。如果不存在，意味着我们知道该块不包含编辑，
+// 可以通过查询生成器获得体素。
+// 体素数据也可以作为生成器的缓存存在，以便更廉价地重复查询。
 class VoxelDataBlock {
 public:
 	RefCount viewers;
@@ -64,14 +64,14 @@ public:
 		return _lod_index;
 	}
 
-	// Tests if voxel data is present.
-	// If false, it means the block has no edits and does not contain cached generated data,
-	// so we may fallback on procedural generators on the fly or request a cache.
+	// 测试体素数据是否存在。
+	// 若为 false，表示该块没有编辑，也不包含缓存的生成数据，
+	// 因此我们可以在运行时回退到程序化生成器，或请求一个缓存。
 	inline bool has_voxels() const {
 		return _voxels != nullptr;
 	}
 
-	// Get voxels, expecting them to be present
+	// 获取体素，期望它们存在
 	VoxelBuffer &get_voxels() {
 #ifdef DEBUG_ENABLED
 		VOXEL_ASSERT(_voxels != nullptr);
@@ -79,7 +79,7 @@ public:
 		return *_voxels;
 	}
 
-	// Get voxels, expecting them to be present
+	// 获取体素，期望它们存在
 	const VoxelBuffer &get_voxels_const() const {
 #ifdef DEBUG_ENABLED
 		VOXEL_ASSERT(_voxels != nullptr);
@@ -87,7 +87,7 @@ public:
 		return *_voxels;
 	}
 
-	// Get voxels, expecting them to be present
+	// 获取体素，期望它们存在
 	std::shared_ptr<VoxelBuffer> get_voxels_shared() const {
 #ifdef DEBUG_ENABLED
 		VOXEL_ASSERT(_voxels != nullptr);
@@ -128,38 +128,38 @@ public:
 	}
 
 private:
-	// Voxel data. If null, it means the data may be obtained with procedural generation.
+	// 体素数据。若为 null，表示数据可以通过程序化生成获得。
 	std::shared_ptr<VoxelBuffer> _voxels;
 
-	// TODO Storing lod index here might not be necessary, it is known since we have to get the map first.
-	// For now it can remain here since in practice it doesn't cost space, due to other stored flags and alignment.
+	// TODO 在这里存储 lod 索引可能没必要，因为我们反正要先拿到地图才能知道。
+	// 目前它可以留在这里，因为由于其他存储的标志和对齐，实际并不占用空间。
 	uint8_t _lod_index = 0;
 
-	// Indicates mipmaps need to be computed since this block was modified.
+	// 表示自该块被修改以来，需要重新计算 mipmap。
 	bool _needs_lodding = false;
 
-	// Indicates if this block is different from the time it was loaded (should be saved)
+	// 表示该块是否与加载时不同（应保存）。
 	bool _modified = false;
 
-	// Tells if the block has ever been edited.
-	// If `false`, then the data is a cache of generators and modifiers. It can be re-generated.
-	// Once it becomes `true`, it usually never comes back to `false` unless reverted.
+	// 表示该块是否曾经被编辑过。
+	// 若为 `false`，则数据是生成器和修改器的缓存，可以重新生成。
+	// 一旦变为 `true`，除非被还原，否则通常不会再回到 `false`。
 	bool _edited = false;
 
-	// TODO Optimization: design a proper way to implement client-side caching for multiplayer
+	// TODO 优化：设计一种合适的方式为多人游戏实现客户端缓存
 	//
-	// Represents how many times the block was edited.
-	// This allows to implement client-side caching in multiplayer.
+	// 表示该块被编辑了多少次。
+	// 这允许在多人游戏中实现客户端缓存。
 	//
-	// Note: when doing client-side caching, if the server decides to revert a block to generator output,
-	// resetting version to 0 might not be a good idea, because if a client had version 1, it could mismatch with
-	// the "new version 1" after the next edit. All clients having ever joined the server would have to be aware
-	// of the revert before they start getting blocks with the server,
-	// or need to be told which version is the "generated" one.
+	// 注意：进行客户端缓存时，如果服务器决定将某个块还原为生成器输出，
+	// 将版本重置为 0 可能不是个好主意，因为如果客户端有版本 1，它可能与
+	// 下次编辑后的"新版本 1"不匹配。所有曾经加入服务器的客户端都必须在
+	// 开始从服务器接收块之前了解该还原，
+	// 或者需要被告知哪个版本是"生成的"版本。
 	// uint32_t _version;
 
-	// Tells if it's worth requesting a more precise version of the data.
-	// Will be `true` if it's not worth it.
+	// 表示是否值得请求更精确的数据版本。
+	// 若不值得，则为 `true`。
 	// bool _max_lod_hint = false;
 };
 

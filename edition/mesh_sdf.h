@@ -13,15 +13,15 @@
 
 namespace voxel::mesh_sdf {
 
-// Utilities to generate a signed distance field from a 3D triangle mesh.
+// 用于从三维三角形网格生成有符号距离场的工具函数。
 
 struct Triangle {
-	// Vertices to provide from the mesh.
+	// 需要从网格提供的顶点。
 	Vector3f v1;
 	Vector3f v2;
 	Vector3f v3;
 
-	// Values precomputed with `prepare_triangles()`.
+	// 使用 `prepare_triangles()` 预计算的值。
 	Vector3f v21;
 	Vector3f v32;
 	Vector3f v13;
@@ -43,9 +43,9 @@ struct Chunk {
 
 struct ChunkGrid {
 	StdVector<Chunk> chunks;
-	Vector3i size; // Size of the grid in cells
-	Vector3f min_pos; // Position of the lower corner of the grid in space units
-	float chunk_size; // Size of a cubic cell in space units
+	Vector3i size; // 网格的尺寸（以格子为单位）
+	Vector3f min_pos; // 网格下角在空间单位中的位置
+	float chunk_size; // 一个立方体格子的大小（以空间单位计）
 };
 
 class GenMeshSDFSubBoxTask : public IThreadedTask {
@@ -68,7 +68,7 @@ public:
 
 	void run(ThreadedTaskContext &ctx) override;
 
-	// Called when `pending_jobs` reaches zero.
+	// 当 `pending_jobs` 归零时被调用。
 	virtual void on_complete() {}
 
 	virtual const char *get_debug_name() const override {
@@ -76,7 +76,7 @@ public:
 	}
 };
 
-// Computes a representation of the mesh that's more optimal to compute distance to triangles.
+// 计算网格的一种表示形式，以便更高效地计算到三角形的距离。
 bool prepare_triangles(
 		Span<const Vector3> vertices,
 		Span<const int> indices,
@@ -85,8 +85,8 @@ bool prepare_triangles(
 		Vector3f &out_max_pos
 );
 
-// Partitions triangles of the mesh such that we can reduce the number of triangles to check when evaluating the SDF.
-// Space is subdivided in a grid of chunks. Triangles overlapping chunks are listed.
+// 对网格的三角形进行分区，以便在计算 SDF 时减少需要检查的三角形数量。
+// 空间被细分为一个由块组成的网格。与块重叠的三角形会被列出。
 void partition_triangles(
 		int subdiv,
 		Span<const Triangle> triangles,
@@ -95,14 +95,14 @@ void partition_triangles(
 		ChunkGrid &chunk_grid
 );
 
-// For each chunk, finds which other non-empty chunks are close to it. The amount of subvidisions should be carefully
-// chosen: too low will cause less triangles to be skipped, too high will make partitionning slower.
-// This is necessary for functions using ChunkGrid.
+// 对于每个块，找出哪些其它非空块与它相邻。细分的数量需要仔细选择：
+// 太低会导致被跳过的三角形变少，太高会使分区变慢。
+// 这对使用 ChunkGrid 的函数是必要的。
 void compute_near_chunks(ChunkGrid &chunk_grid);
 
-// A naive method to get a sampled SDF from a mesh, by checking every triangle at every cell. It's accurate, but much
-// slower than other techniques, but could be used as a CPU-based alternative, for less
-// realtime-intensive tasks. The mesh must be closed, otherwise the SDF will contain errors.
+// 一种从网格获取采样 SDF 的朴素方法，对每个格子检查每个三角形。它很精确，但比
+// 其它技术慢得多，可作为基于 CPU 的替代方案，用于实时性要求较低的
+// 任务。网格必须是闭合的，否则 SDF 会包含错误。
 void generate_mesh_sdf_naive(
 		Span<float> sdf_grid,
 		const Vector3i res,
@@ -111,9 +111,9 @@ void generate_mesh_sdf_naive(
 		const Vector3f max_pos
 );
 
-// Compute the SDF faster by partitionning triangles, while retaining the same accuracy as if all triangles
-// were checked. With Suzanne mesh subdivided once with 3900 triangles and `subdiv = 32`, it's about 8 times fasterthan
-// checking every triangle on every cell.
+// 通过对三角形进行分区来更快地计算 SDF，同时保持与检查所有三角形相同的精度。
+// 对于 Suzanne 网格（一次细分后约 3900 个三角形）且 `subdiv = 32` 时，比在
+// 每个格子上检查每个三角形快约 8 倍。
 void generate_mesh_sdf_partitioned(
 		Span<float> sdf_grid,
 		const Vector3i res,
@@ -123,11 +123,11 @@ void generate_mesh_sdf_partitioned(
 		int subdiv
 );
 
-// Generates an approximation.
-// Subdivides the grid into nodes spanning 4*4*4 cells each.
-// If a node's corner distances are close to the surface, the SDF is fully evaluated. Otherwise, it is interpolated.
-// Tests with Suzanne show it is 2 to 3 times faster than the basic naive method, with only minor quality decrease.
-// It's still quite slow though.
+// 生成一个近似结果。
+// 将网格细分为每个覆盖 4*4*4 个格子的节点。
+// 如果某个节点角点的距离值接近表面，则完全计算 SDF；否则进行插值。
+// 对 Suzanne 的测试表明，它比基本的朴素方法快 2 到 3 倍，且质量只有轻微下降。
+// 不过它仍然相当慢。
 void generate_mesh_sdf_approx_interp(
 		Span<float> sdf_grid,
 		const Vector3i res,
@@ -149,8 +149,8 @@ struct CheckResult {
 	BadCell cell1;
 };
 
-// Checks if SDF variations are legit. The difference between two neighboring cells cannot be higher than the distance
-// between those two cells. This is intended at proper SDF, not approximation or scaled ones.
+// 检查 SDF 的变化是否合法。相邻两个格子之间的差值不能高于
+// 这两个格子之间的距离。这适用于真正的 SDF，而非近似值或缩放后的值。
 CheckResult check_sdf(
 		Span<const float> sdf_grid,
 		Vector3i res,
@@ -159,18 +159,18 @@ CheckResult check_sdf(
 		Vector3f max_pos
 );
 
-// The current method provides imperfect signs. Due to ambiguities, sometimes patches of cells get the wrong sign.
-// This function attempts to correct these.
-// Assumes the sign on the edge of the box is positive and use a floodfill.
-// If we start from the rough SDF we had, we could do a floodfill that considers unexpected sign change as fillable,
-// while an expected sign change would properly stop the fill.
-// However, this workaround won't fix signs inside the volume.
-// I thought of using this with an completely unsigned distance field instead, however I'm not sure if it's possible to
-// accurately tell when when the sign is supposed to flip (i.e when we cross the surface).
+// 当前方法提供的符号不完美。由于存在歧义，有时成片的格子会得到错误的符号。
+// 此函数尝试纠正这些错误。
+// 假定盒子边缘的符号为正，并使用洪泛填充。
+// 如果从已有的粗略 SDF 出发，可以进行一种洪泛填充，把意外的符号变化视为可填充的，
+// 而预期的符号变化则会正确地阻止填充。
+// 不过，这种变通办法无法修复体积内部的符号。
+// 我曾考虑将其与完全无符号的距离场配合使用，但我不确定是否能够
+// 准确判断符号应该在何时翻转（即何时穿过表面）。
 void fix_sdf_sign_from_boundary(Span<float> sdf_grid, Vector3i res, Vector3f min_pos, Vector3f max_pos);
 
-// Generates an approximation.
-// Calculates a thin hull of accurate SDF values, then propagates it with a 26-way floodfill.
+// 生成一个近似结果。
+// 计算一层准确的 SDF 值的薄壳，然后用 26 方向的洪泛填充进行传播。
 void generate_mesh_sdf_approx_floodfill(
 		Span<float> sdf_grid,
 		const Vector3i res,

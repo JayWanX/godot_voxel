@@ -42,8 +42,7 @@ Ref<ShaderMaterial> ShaderMaterialPool::allocate() {
 	material.instantiate();
 	material->set_shader(_template_material->get_shader());
 	for (const StringName &name : _shader_params_cache) {
-		// Note, I don't need to make copies of textures. They are shared (at least those coming from the template
-		// material).
+		// 注意，我不需要复制纹理。它们是共享的（至少来自模板材质的那部分是共享的）。
 		material->set_shader_parameter(name, _template_material->get_shader_parameter(name));
 	}
 	return material;
@@ -63,9 +62,9 @@ Span<const StringName> ShaderMaterialPool::get_cached_shader_uniforms() const {
 void copy_shader_params(const ShaderMaterial &src, ShaderMaterial &dst, Span<const StringName> params) {
 	// Ref<Shader> shader = src.get_shader();
 	// VOXEL_ASSERT_RETURN(shader.is_valid());
-	// Not using `Shader::get_param_list()` because it is not exposed to the script/extension API, and it prepends
-	// `shader_params/` to every parameter name, which is slow and not usable for our case.
-	// TBH List is slow too, I don't know why Godot uses that for lists of shader params.
+	// 不使用 `Shader::get_param_list()`，因为它没有暴露给脚本/扩展 API，而且它会给每个参数名加上
+	// `shader_params/` 前缀，这很慢且不适用于我们的场景。
+	// 说实话 List 也很慢，我不知道为什么 Godot 用链表来存着色器参数列表。
 	// List<PropertyInfo> properties;
 	// RenderingServer::get_singleton()->shader_get_shader_uniform_list(shader->get_rid(), &properties);
 	// for (const PropertyInfo &property : properties) {

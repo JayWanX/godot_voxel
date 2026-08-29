@@ -100,16 +100,15 @@ uint8_t *VoxelMemoryPool::allocate(size_t size) {
 	VOXEL_DSTACK();
 	VOXEL_PROFILE_SCOPE();
 
-	// In practice this is not supposed to happen, it might hide a mistake.
-	// We should be able to keep running with this only guarantee: the returned value should be able to be "freed"
-	// using the same pool.
+	// 实际上这种情况不应发生，它可能掩盖了一个错误。
+	// 我们应当能在以下唯一保证下继续运行：返回的值应能使用同一个池"释放"。
 	VOXEL_ASSERT_RETURN_V(size != 0, nullptr);
 
 	uint8_t *block = nullptr;
-	// Not calculating `pot` immediately because the function we use to calculate it uses 32 bits,
-	// while `size_t` can be larger than that.
+	// 不立即计算 `pot`，因为我们用来计算的函数使用 32 位，
+	// 而 `size_t` 可能比它更大。
 	if (size > get_highest_supported_size()) {
-		// Sorry, memory is not pooled past this size
+		// 抱歉，超过此大小后内存不再入池
 		block = (uint8_t *)VOXEL_ALLOC(size * sizeof(uint8_t));
 		_total_memory += size;
 #ifdef DEBUG_ENABLED
@@ -128,8 +127,8 @@ uint8_t *VoxelMemoryPool::allocate(size_t size) {
 		} else {
 			pool.mutex.unlock();
 			VOXEL_PROFILE_SCOPE_NAMED("new alloc");
-			// All allocations done in this pool have the same size,
-			// which must be greater or equal to `size`
+			// 该池中完成的所有分配都具有相同大小，
+			// 且必须大于或等于 `size`
 			const size_t capacity = get_size_from_pool_index(pot);
 #ifdef DEBUG_ENABLED
 			VOXEL_ASSERT(capacity >= size);
@@ -153,17 +152,17 @@ uint8_t *VoxelMemoryPool::allocate(size_t size) {
 }
 
 void VoxelMemoryPool::recycle(uint8_t *block, size_t size) {
-	// In case we have done empty allocations (we prefer not to do that, but it shouldn't warrant a crash)
+	// 以防我们做了空分配（我们尽量不做，但这不至于需要崩溃）
 	if (block == nullptr && size == 0) {
 		return;
 	}
 	VOXEL_ASSERT(size != 0);
 	VOXEL_ASSERT(block != nullptr);
-	// Not calculating `pot` immediately because the function we use to calculate it uses 32 bits,
-	// while `size_t` can be larger than that.
+	// 不立即计算 `pot`，因为我们用来计算的函数使用 32 位，
+	// 而 `size_t` 可能比它更大。
 	if (size > get_highest_supported_size()) {
 #ifdef DEBUG_ENABLED
-		// Make sure this allocation was done by this pool in this scenario
+		// 确保此分配在此场景下由该池完成
 		_debug_nonpooled_used_blocks.remove(block);
 #endif
 		VOXEL_FREE(block);
@@ -172,7 +171,7 @@ void VoxelMemoryPool::recycle(uint8_t *block, size_t size) {
 		const unsigned int pot = get_pool_index_from_size(size);
 		Pool &pool = _pot_pools[pot];
 #ifdef DEBUG_ENABLED
-		// Make sure this allocation was done by this pool in this scenario
+		// 确保此分配在此场景下由该池完成
 		pool.debug_used_blocks.remove(block);
 #endif
 		MutexLock lock(pool.mutex);

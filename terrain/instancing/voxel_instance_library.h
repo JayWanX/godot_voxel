@@ -16,7 +16,7 @@ namespace voxel {
 class VoxelInstanceLibraryItem;
 class VoxelInstanceGenerator;
 
-// Contains a list of items that can be used by VoxelInstancer, associated with a unique ID
+// 包含可由 VoxelInstancer 使用的项目列表，每个项目关联一个唯一 ID
 class VoxelInstanceLibrary : public Resource, public IInstanceLibraryItemListener {
 	GDCLASS(VoxelInstanceLibrary, Resource)
 
@@ -32,7 +32,7 @@ public:
 	int find_item_by_name(String p_name) const;
 	int get_item_count() const;
 
-	// Internal
+	// 内部
 
 	const VoxelInstanceLibraryItem *get_item_const(int id) const;
 	VoxelInstanceLibraryItem *get_item(int id);
@@ -111,8 +111,8 @@ private:
 
 	static void _bind_methods();
 
-	// ID => Item
-	// Using a map keeps items ordered, so the last item has highest ID
+	// ID => 项目
+	// 使用 map 保持项目有序，因此最后一个项目拥有最高的 ID
 	StdMap<int, Ref<VoxelInstanceLibraryItem>> _items;
 
 	StdVector<IInstanceLibraryItemListener *> _listeners;
@@ -126,7 +126,7 @@ private:
 		std::atomic_bool needs_update = false;
 	};
 
-	// Packed representation of items for use in procedural generation tasks
+	// 项目的打包表示形式，供程序化生成任务使用
 	PackedItems _packed_items;
 
 #ifdef TOOLS_ENABLED

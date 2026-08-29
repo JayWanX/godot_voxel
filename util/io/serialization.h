@@ -19,16 +19,16 @@ inline Endianness get_platform_endianness() {
 		return ENDIANNESS_LITTLE_ENDIAN;
 	}
 	return ENDIANNESS_BIG_ENDIAN;
-	// TODO In C++20 we'll be able to use std::endian
+	// TODO 在 C++20 中我们将可以使用 std::endian
 }
 
 template <typename Container_T>
 struct MemoryWriterTemplate {
 	Container_T &data;
-	// Using network-order by default
-	// TODO Apparently big-endian is dead
-	// I chose it originally to match "network byte order",
-	// but as I read comments about it there seem to be no reason to continue using it. Needs a version increment.
+	// 默认使用网络字节序
+	// TODO 显然大端序已经过时了
+	// 我最初选择它是为了匹配"网络字节序"，
+	// 但在我阅读相关评论后，似乎没有理由继续使用它。需要提升版本号。
 	Endianness endianness = ENDIANNESS_BIG_ENDIAN;
 
 	MemoryWriterTemplate(Container_T &p_data, Endianness p_endianness) : data(p_data), endianness(p_endianness) {}
@@ -134,7 +134,7 @@ typedef MemoryWriterTemplate<ByteSpanWithPosition> MemoryWriterExistingBuffer;
 struct MemoryReader {
 	Span<const uint8_t> data;
 	size_t pos = 0;
-	// Using network-order by default
+	// 默认使用网络字节序
 	Endianness endianness = ENDIANNESS_BIG_ENDIAN;
 
 	MemoryReader(Span<const uint8_t> p_data, Endianness p_endianness) : data(p_data), endianness(p_endianness) {}
@@ -225,7 +225,7 @@ struct MemoryReader {
 		return len;
 	}
 
-	// For API compatibility
+	// 用于 API 兼容性
 	inline size_t get_position() const {
 		return pos;
 	}

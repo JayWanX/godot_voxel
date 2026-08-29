@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelAStarGrid3D" inherits="RefCounted" is_experimental="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Grid-based A* pathfinding algorithm adapted to blocky voxel terrain.
+		基于网格的 A* 寻路算法，适用于方块风体素地形。
 	</brief_description>
 	<description>
-		This can be used to find paths between two voxel positions on blocky terrain.
-		It is tuned for agents 2 voxels tall and 1 voxel wide, which must stand on solid voxels and can jump 1 voxel high.
-		No navmesh is required, it uses voxels directly with no baking. However, search radius is limited by an area (50 voxels and above starts to be relatively expensive).
-		At the moment, this pathfinder only considers voxels with ID 0 to be air, and the rest is considered solid.
-		Note: "positions" in this class are expected to be in voxels. If your terrain is offset or if voxels are smaller or bigger than world units, you may have to convert coordinates.
+		可用于在方块风地形上的两个体素位置之间寻找路径。
+		该算法针对高 2 个体素、宽 1 个体素的角色调优，角色必须站在实心体素上，且最多能跳 1 个体素高。
+		不需要导航网格，它直接使用体素而无需烘焙。不过，搜索半径受区域限制（50 个体素及以上就开始相对昂贵）。
+		目前，此寻路器仅将 ID 为 0 的体素视为空气，其余均视为实心。
+		注意：此类中的"位置"均以体素为单位。如果地形有偏移，或体素比世界单位更小或更大，则可能需要转换坐标。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -16,7 +16,7 @@
 		<method name="debug_get_visited_positions" qualifiers="const">
 			<return type="Vector3i[]" />
 			<description>
-				Gets the list of voxel positions that were visited by the last pathfinding request (relates to how A* works under the hood). This is for debugging.
+				获取上次寻路请求所访问过的体素位置列表（与 A* 在底层的工作方式相关）。仅用于调试。
 			</description>
 		</method>
 		<method name="find_path">
@@ -24,11 +24,11 @@
 			<param index="0" name="from_position" type="Vector3i" />
 			<param index="1" name="to_position" type="Vector3i" />
 			<description>
-				Calculates a path starting from a voxel position to a target voxel position. 
-				Those positions should be air voxels just above ground with enough room for agents to fit in. 
-				The returned path will be a series of contiguous voxel positions to walk through in order to get to the destination. 
-				If no path is found, or if either start or destination position is outside of the search area, an empty array will be returned.
-				You may also use [method set_region] to specify the search area.
+				计算从体素位置到目标体素位置的路径。
+				这些位置应为紧贴地面、且有足够空间容纳角色的空气体素。
+				返回的路径将是一系列连续的体素位置，按顺序行走即可到达目的地。
+				如果未找到路径，或者起点或终点位置位于搜索区域之外，将返回空数组。
+				你也可以使用 [method set_region] 指定搜索区域。
 			</description>
 		</method>
 		<method name="find_path_async">
@@ -36,35 +36,35 @@
 			<param index="0" name="from_position" type="Vector3i" />
 			<param index="1" name="to_position" type="Vector3i" />
 			<description>
-				Same as [method find_path], but performs the calculation on a separate thread. The result will be emitted with the [signal async_search_completed] signal.
-				Only one asynchronous search can be active at a given time. Use [method is_running_async] to check this.
+				与 [method find_path] 相同，但在单独的线程上执行计算。结果将通过 [signal async_search_completed] 信号发出。
+				同一时间只能有一个异步搜索处于活动状态。可使用 [method is_running_async] 进行检查。
 			</description>
 		</method>
 		<method name="get_region">
 			<return type="AABB" />
 			<description>
-				Gets the maximum region limit that will be considered for pathfinding, in voxels.
+				获取将纳入寻路考虑的最大区域限制，单位为体素。
 			</description>
 		</method>
 		<method name="is_running_async" qualifiers="const">
 			<return type="bool" />
 			<description>
-				Returns true if a path is currently being calculated asynchronously. See [method find_path_async].
+				如果当前正在异步计算路径，则返回 true。参见 [method find_path_async]。
 			</description>
 		</method>
 		<method name="set_region">
 			<return type="void" />
 			<param index="0" name="box" type="AABB" />
 			<description>
-				Sets the maximum region limit that will be considered for pathfinding, in voxels. You should usually set this before calling [method find_path].
-				The larger the region, the more expensive the search can get. Keep in mind voxel volumes scale cubically, so don't use this on large areas (for example 50 voxels is quite big).
+				设置将纳入寻路考虑的最大区域限制，单位为体素。通常应在调用 [method find_path] 之前设置。
+				区域越大，搜索开销可能越高。请记住体素体积按立方增长，因此不要在过大区域上使用（例如 50 个体素已经相当大）。
 			</description>
 		</method>
 		<method name="set_terrain">
 			<return type="void" />
 			<param index="0" name="terrain" type="VoxelTerrain" />
 			<description>
-				Sets the terrain that will be used to do searches in.
+				设置用于执行搜索的地形。
 			</description>
 		</method>
 	</methods>
@@ -72,7 +72,7 @@
 		<signal name="async_search_completed">
 			<param index="0" name="path" type="Vector3i[]" />
 			<description>
-				Emitted when searches triggered with [method find_path_async] are complete.
+				当通过 [method find_path_async] 触发的搜索完成时发出。
 			</description>
 		</signal>
 	</signals>

@@ -32,14 +32,13 @@ VoxelTerrainMultiplayerSynchronizer::VoxelTerrainMultiplayerSynchronizer() {
 	set_process(true);
 }
 
-// Helper function
+// 辅助函数
 bool VoxelTerrainMultiplayerSynchronizer::is_server() const {
 	VOXEL_ASSERT_RETURN_V(is_inside_tree(), false);
-	// Note, when using multiple Multiplayer branches in the scene tree, `get_multiplayer` can be significantly slower,
-	// because it involves constructing a NodePath and then querying a HashMap<NodePah,V> to check which nodes have
-	// custom multiplayer. In cases Godot thought of, this is not a big issue, but in our case this can have a
-	// noticeable impact because `is_server()` can be called a thousand times in a frame when a viewer joins or
-	// teleports.
+	// 注意：当场景树中有多个 Multiplayer 分支时，`get_multiplayer` 可能会明显变慢，
+	// 因为它需要构造一个 NodePath，然后查询一个 HashMap<NodePah,V> 来检查哪些节点具有
+	// 自定义的多人游戏设置。在 Godot 考虑到的场景中这不是大问题，但在我们的场景中，
+	// 这可能会产生显著影响，因为当观察者加入或传送时，`is_server()` 在一帧内可能会被调用上千次。
 	Ref<MultiplayerAPI> mp = get_multiplayer();
 	VOXEL_ASSERT_RETURN_V(mp.is_valid(), false);
 	return mp->is_server();
@@ -72,16 +71,14 @@ void VoxelTerrainMultiplayerSynchronizer::send_block(
 	// print_line(String("Server: send block {0}").format(varray(bpos)));
 
 	// rpc_id(viewer_peer_id, VoxelStringNames::get_singleton().receive_block, data);
-	// Instead of sending it right away, defer it until the terrain finished processing. Sending individual blocks with
-	// the RPC system is too slow.
+	// 与其立即发送，不如推迟到地形处理完成后再发送。用 RPC 系统逐个发送数据块太慢了。
 	_deferred_block_messages_per_peer[viewer_peer_id].push_back(DeferredBlockMessage{ message_data });
 }
 
-// TODO Have a way to implement ghost edits?
-// If someone wants to spam edits to appear smooth on clients, this would have terrible impact on networking
-// performance. So perhaps the server needs to cluster edits that are close together, and send the area in batch.
-// Conversely, the client would have to apply the edit locally, while having a way to revert it if the server
-// isn't acknowledging it for some time.
+// TODO 是否有办法实现"幽灵编辑"（ghost edits）？
+// 如果有人想要通过快速连续编辑让客户端看起来流畅，这会对网络性能产生严重影响。
+// 因此也许服务器需要将相近的编辑聚簇，并批量发送整个区域。
+// 反之，客户端需要在本地应用编辑，同时如果服务器在一段时间内没有确认，需要有办法回滚。
 
 void VoxelTerrainMultiplayerSynchronizer::send_area(Box3i voxel_box) {
 	VOXEL_PROFILE_SCOPE();
@@ -90,7 +87,7 @@ void VoxelTerrainMultiplayerSynchronizer::send_area(Box3i voxel_box) {
 	StdVector<ViewerID> viewers;
 	_terrain->get_viewers_in_area(viewers, voxel_box);
 
-	// Not particularly efficient for single-voxel edits, but should scale ok with bigger boxes
+	// 对单个体素编辑来说效率不高，但面对更大的盒子应该能较好地扩展
 	VoxelBuffer voxels(VoxelBuffer::ALLOCATOR_POOL);
 	voxels.create(voxel_box.size);
 	_terrain->get_storage().copy(voxel_box.position, voxels, 0xff, true);
@@ -112,7 +109,7 @@ void VoxelTerrainMultiplayerSynchronizer::send_area(Box3i voxel_box) {
 	mw.store_buffer(to_span(result.data));
 	for (const ViewerID viewer_id : viewers) {
 		const int peer_id = VoxelEngine::get_singleton().get_viewer_network_peer_id(viewer_id);
-		// TODO Don't bother copying and serializing if no networked viewers are around?
+		// TODO 如果周围没有联网的观察者，是否不必费心复制和序列化？
 		if (peer_id != -1 && peer_id != MultiplayerPeer::TARGET_PEER_SERVER) {
 			rpc_id(peer_id, VoxelStringNames::get_singleton()._rpc_receive_area, pba);
 		}
@@ -156,9 +153,8 @@ void VoxelTerrainMultiplayerSynchronizer::process() {
 		}
 
 		PackedByteArray pba;
-		// Make one big fat message per frame per peer, because sending many is super-slow with Godot's ENet multiplayer
-		// integration. It calls flush() on every RPC and that takes a lot of time, and there is overhead caused by
-		// the high-level features...
+		// 每帧、每个对端（peer）生成一条大而粗的消息，因为用 Godot 的 ENet 多人游戏发送大量小消息
+		// 超级慢。它在每次 RPC 时都会调用 flush()，这很耗时，而且高层特性还会带来额外开销……
 
 		unsigned int size = 0;
 		for (const DeferredBlockMessage &message : messages) {
@@ -198,8 +194,8 @@ void VoxelTerrainMultiplayerSynchronizer::_b_receive_blocks(PackedByteArray mess
 
 	for (unsigned int i = 0; i < block_count; ++i) {
 		Vector3i bpos;
-		// This effectively limits volume size to 1,048,576. If really required, we could double this data to cover
-		// more.
+		// 这实际上将体积大小限制为 1,048,576。如果确实需要，我们可以将此数据加倍以覆盖
+		// 更多范围。
 		bpos.x = int16_t(mr.get_16());
 		bpos.y = int16_t(mr.get_16());
 		bpos.z = int16_t(mr.get_16());
@@ -237,8 +233,8 @@ void VoxelTerrainMultiplayerSynchronizer::_b_receive_area(PackedByteArray messag
 	_terrain->get_storage().paste(pos, voxels, 0xff, false, true);
 	_terrain->post_edit_area(
 			Box3i(pos, voxels.get_size()),
-			// Don't bother for now, update mesh regardless. If necessary we would have to add a flag with the message
-			// to tell it's not actually changing voxels (if it's metadata changes), but might not be worth it
+			// 暂时先不区分，无论如何都更新网格。如有必要，我们需要在消息中添加一个标志
+			// 来告知它实际上并未改变体素（如果是元数据变化），但可能不值得
 			true
 	);
 }
@@ -277,8 +273,8 @@ void VoxelTerrainMultiplayerSynchronizer::get_configuration_warnings(PackedStrin
 #endif
 
 void VoxelTerrainMultiplayerSynchronizer::_bind_methods() {
-	// TODO These methods are not supposed to be exposed. They only exist for Godot's high-level multiplayer to find
-	// them.
+	// TODO 这些方法本不该被暴露。它们存在只是为了 Godot 的高层多人游戏能够找到
+	// 它们。
 	ClassDB::bind_method(
 			D_METHOD("_rpc_receive_blocks", "data"), &VoxelTerrainMultiplayerSynchronizer::_b_receive_blocks
 	);

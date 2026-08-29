@@ -1,32 +1,27 @@
 //================================================================================
 //
-// The Transvoxel Algorithm look-up tables
+// Transvoxel 算法查找表
 //
-// Copyright 2009 by Eric Lengyel
+// 版权所有 2009 Eric Lengyel
 //
-// The following data originates from Eric Lengyel's Transvoxel Algorithm.
+// 以下数据源自 Eric Lengyel 的 Transvoxel 算法。
 // http://transvoxel.org/
 //
-// The data in this file may be freely used in implementations of the Transvoxel
-// Algorithm. If you do use this data, or any transformation of it, in your own
-// projects, commercial or otherwise, please give credit by indicating in your
-// source code that the data is part of the author's implementation of the
-// Transvoxel Algorithm and that it came from the web address given above.
-// (Simply copying and pasting the two lines of the previous paragraph would be
-// perfect.) If you distribute a commercial product with source code included,
-// then the credit in the source code is required.
+// 本文件中的数据可在 Transvoxel 算法的实现中自由使用。如果你在自己的项目中
+// （无论是商业项目还是其它项目）使用了这些数据或其任何变换形式，请在源代码中
+// 注明这些数据是作者实现的 Transvoxel 算法的一部分，并且来源于上面给出的网址。
+// （只需复制粘贴上一段的两行文字即可。）
+// 如果你分发包含源代码的商业产品，则必须在源代码中注明。
 //
-// If you distribute any kind of product that uses this data, a credit visible to
-// the end-user would be appreciated, but it is not required. However, you may
-// not claim that the entire implementation of the Transvoxel Algorithm is your
-// own if you use the data in this file or any transformation of it.
+// 如果你分发任何使用这些数据的产品，若能提供终端用户可见的署名信息将不胜感激，
+// 但这并非强制要求。但是，如果你使用本文件中的数据或其任何变换形式，
+// 则不得声称 Transvoxel 算法的整个实现是你自己的。
 //
-// The format of the data in this file is described in the dissertation "Voxel-
-// Based Terrain for Real-Time Virtual Simulations", available at the web page
-// given above. References to sections and figures below pertain to that paper.
+// 本文件中的数据格式在论文《Voxel-Based Terrain for Real-Time Virtual
+// Simulations》中有所描述，该论文可在上面给出的网页上获取。
+// 下文对章节和图的引用均针对该论文。
 //
-// The contents of this file are protected by copyright and may not be publicly
-// reproduced without permission.
+// 本文件内容受版权保护，未经许可不得公开复制。
 //
 //================================================================================
 
@@ -34,13 +29,13 @@
 
 namespace voxel::transvoxel::tables {
 
-// The RegularCellData structure holds information about the triangulation
-// used for a single equivalence class in the modified Marching Cubes algorithm,
-// described in Section 3.2.
+// RegularCellData 结构体保存了修改后的 Marching Cubes 算法中
+// 单个等价类所使用的三角剖分信息，
+// 详见第 3.2 节。
 
 struct RegularCellData {
-	unsigned char geometryCounts; // High nibble is vertex count, low nibble is triangle count.
-	unsigned char vertexIndex[15]; // Groups of 3 indexes giving the triangulation.
+	unsigned char geometryCounts; // 高半字节为顶点数，低半字节为三角形数。
+	unsigned char vertexIndex[15]; // 每 3 个索引一组构成三角剖分。
 
 	inline unsigned char get_vertex_index(unsigned int i) const {
 #ifdef DEBUG_ENABLED
@@ -58,13 +53,13 @@ struct RegularCellData {
 	}
 };
 
-// The TransitionCellData structure holds information about the triangulation
-// used for a single equivalence class in the Transvoxel Algorithm transition cell,
-// described in Section 4.3.
+// TransitionCellData 结构体保存了 Transvoxel 算法过渡单元中
+// 单个等价类所使用的三角剖分信息，
+// 详见第 4.3 节。
 
 struct TransitionCellData {
-	long geometryCounts; // High nibble is vertex count, low nibble is triangle count.
-	unsigned char vertexIndex[36]; // Groups of 3 indexes giving the triangulation.
+	long geometryCounts; // 高半字节为顶点数，低半字节为三角形数。
+	unsigned char vertexIndex[36]; // 每 3 个索引一组构成三角剖分。
 
 	inline unsigned char get_vertex_index(unsigned int i) const {
 #ifdef DEBUG_ENABLED
@@ -82,11 +77,10 @@ struct TransitionCellData {
 	}
 };
 
-// The regularCellClass table maps an 8-bit regular Marching Cubes case index to
-// an equivalence class index. Even though there are 18 equivalence classes in our
-// modified Marching Cubes algorithm, a couple of them use the same exact triangulations,
-// just with different vertex locations. We combined those classes for this table so
-// that the class index ranges from 0 to 15.
+// regularCellClass 表将 8 位的常规 Marching Cubes case 索引映射为
+// 等价类索引。尽管我们的修改版 Marching Cubes 算法中有 18 个等价类，
+// 但其中有几个使用了完全相同的三角剖分，只是顶点位置不同。
+// 我们在本表中合并了这些类，使类索引范围在 0 到 15 之间。
 // clang-format off
 const unsigned char regularCellClass[256] = {
 	0x00, 0x01, 0x01, 0x03, 0x01, 0x03, 0x02, 0x04, 0x01, 0x02, 0x03, 0x04, 0x03, 0x04, 0x04, 0x03,
@@ -114,8 +108,8 @@ inline unsigned char get_regular_cell_class(unsigned int i) {
 	return regularCellClass[i];
 }
 
-// The regularCellData table holds the triangulation data for all 16 distinct classes to
-// which a case can be mapped by the regularCellClass table.
+// regularCellData 表保存了 regularCellClass 表可映射到的
+// 全部 16 个不同类的三角剖分数据。
 // clang-format off
 const RegularCellData regularCellData[16] = {
 	{ 0x00, {} },
@@ -143,11 +137,11 @@ inline const RegularCellData &get_regular_cell_data(unsigned int i) {
 	return regularCellData[i];
 }
 
-// The regularVertexData table gives the vertex locations for every one of the 256 possible
-// cases in the modified Marching Cubes algorithm. Each 16-bit value also provides information
-// about whether a vertex can be reused from a neighboring cell. See Section 3.3 for details.
-// The low byte contains the indexes for the two endpoints of the edge on which the vertex lies,
-// as numbered in Figure 3.7. The high byte contains the vertex reuse data shown in Figure 3.8.
+// regularVertexData 表给出了修改后的 Marching Cubes 算法中全部 256 种
+// 可能 case 的顶点位置。每个 16 位值还提供了
+// 顶点是否可以从相邻单元复用的信息。详见第 3.3 节。
+// 低字节包含顶点所在边的两个端点的索引，
+// 编号方式如图 3.7 所示。高字节包含图 3.8 所示的顶点复用数据。
 // clang-format off
 const unsigned short regularVertexData[256][12] = {
 	{},
@@ -416,12 +410,12 @@ inline unsigned short get_regular_vertex_data(unsigned int i, unsigned int j) {
 	return regularVertexData[i][j];
 }
 
-// The transitionCellClass table maps a 9-bit transition cell case index to an equivalence
-// class index. Even though there are 73 equivalence classes in the Transvoxel Algorithm,
-// several of them use the same exact triangulations, just with different vertex locations.
-// We combined those classes for this table so that the class index ranges from 0 to 55.
-// The high bit is set in the cases for which the inverse state of the voxel data maps to
-// the equivalence class, meaning that the winding order of each triangle should be reversed.
+// transitionCellClass 表将 9 位的过渡单元 case 索引映射为等价类索引。
+// 尽管 Transvoxel 算法中有 73 个等价类，但其中几个使用了完全相同的三角剖分，
+// 只是顶点位置不同。我们在本表中合并了这些类，
+// 使类索引范围在 0 到 55 之间。
+// 对于体素数据取反状态仍映射到该等价类的 case，会设置高位，
+// 这意味着每个三角形的绕序应反转。
 // clang-format off
 const unsigned char transitionCellClass[512] = {
 	0x00, 0x01, 0x02, 0x84, 0x01, 0x05, 0x04, 0x04, 0x02, 0x87, 0x09, 0x8C, 0x84, 0x0B, 0x05, 0x05,
@@ -465,9 +459,9 @@ inline unsigned char get_transition_cell_class(unsigned int i) {
 	return transitionCellClass[i];
 }
 
-// The transitionCellData table holds the triangulation data for all 56 distinct classes to
-// which a case can be mapped by the transitionCellClass table. The class index should be ANDed
-// with 0x7F before using it to look up triangulation data in this table.
+// transitionCellData 表保存了 transitionCellClass 表可映射到的
+// 全部 56 个不同类的三角剖分数据。使用类索引查询本表中的三角剖分数据之前，
+// 应先将其与 0x7F 进行 AND 运算。
 // clang-format off
 const TransitionCellData transitionCellData[56] = {
 	{ 0x00, {} },
@@ -535,8 +529,8 @@ inline const TransitionCellData &get_transition_cell_data(unsigned int i) {
 	return transitionCellData[i];
 }
 
-// The transitionCornerData table contains the transition cell corner reuse data
-// shown in Figure 4.18.
+// transitionCornerData 表包含过渡单元角的复用数据，
+// 如图 4.18 所示。
 // clang-format off
 const unsigned char transitionCornerData[13] = {
 	0x30, 0x21, 0x20, 0x12, 0x40, 0x82, 0x10, 0x81, 0x80, 0x37, 0x27, 0x17, 0x87
@@ -549,11 +543,11 @@ inline unsigned char get_transition_corner_data(unsigned int i) {
 	return transitionCornerData[i];
 }
 
-// The transitionVertexData table gives the vertex locations for every one of the 512 possible
-// cases in the Tranvoxel Algorithm. Each 16-bit value also provides information about whether
-// a vertex can be reused from a neighboring cell. See Section 4.5 for details. The low byte
-// contains the indexes for the two endpoints of the edge on which the vertex lies, as numbered
-// in Figure 4.16. The high byte contains the vertex reuse data shown in Figure 4.17.
+// transitionVertexData 表给出了 Transvoxel 算法中全部 512 种
+// 可能 case 的顶点位置。每个 16 位值还提供了
+// 顶点是否可以从相邻单元复用的信息。详见第 4.5 节。低字节
+// 包含顶点所在边的两个端点的索引，编号方式
+// 如图 4.16 所示。高字节包含图 4.17 所示的顶点复用数据。
 // clang-format off
 const unsigned short transitionVertexData[512][12] = {
 	{},

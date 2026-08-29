@@ -15,11 +15,11 @@ void process_unload_data_blocks_sliding_box(
 		const VoxelLodTerrainUpdateData::Settings &settings
 ) {
 	VOXEL_PROFILE_SCOPE_NAMED("Sliding box data unload");
-	// TODO Could it actually be enough to have a rolling update on all blocks?
+	// TODO 对所有数据块进行滚动更新是否真的就足够了？
 
 	VOXEL_ASSERT_RETURN_MSG(data.is_streaming_enabled(), "This function is not meant to run in full load mode");
 
-	// This should be the same distance relatively to each LOD
+	// 相对于每个 LOD，这应该是相同的距离
 	const int data_block_size = data.get_block_size();
 	const int data_block_size_po2 = data.get_block_size_po2();
 	const int data_block_region_extent =
@@ -30,23 +30,23 @@ void process_unload_data_blocks_sliding_box(
 
 	const int lod_count = data.get_lod_count();
 
-	// Ignore largest lod because it can extend a little beyond due to the view distance setting.
-	// Instead, those blocks are unloaded by the octree forest management.
-	// TODO Where?
+	// 忽略最大的 LOD，因为它可能因视距设置而略微超出范围。
+	// 这些数据块改由八叉树林管理来卸载。
+	// TODO 在哪里？
 	//
-	// Iterating from big to small LOD so we can exit earlier if bounds don't intersect.
+	// 从大 LOD 向小 LOD 迭代，以便在边界不相交时提前退出。
 	for (int lod_index = lod_count - 2; lod_index >= 0; --lod_index) {
 		VOXEL_PROFILE_SCOPE();
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
 
-		// Each LOD keeps a box of loaded blocks, and only some of the blocks will get polygonized.
-		// The player can edit them so changes can be propagated to lower lods.
+		// 每个 LOD 保存一个已加载数据块的盒子，只有部分数据块会被多边形化。
+		// 玩家可以编辑它们，因此更改可以传播到更低的 LOD。
 
 		const unsigned int block_size_po2 = data_block_size_po2 + lod_index;
 		const Vector3i viewer_block_pos_within_lod =
 				VoxelDataMap::voxel_to_block_b(math::floor_to_int(p_viewer_pos), block_size_po2);
 
-		// Should be correct as long as bounds size is a multiple of the biggest LOD chunk
+		// 只要边界大小是最大 LOD 数据块的整数倍，这应该是正确的
 		const Box3i bounds_in_blocks =
 				Box3i(bounds_in_voxels.position >> block_size_po2, //
 					  bounds_in_voxels.size >> block_size_po2);
@@ -58,12 +58,12 @@ void process_unload_data_blocks_sliding_box(
 		);
 
 		if (!new_box.intersects(bounds_in_blocks) && !prev_box.intersects(bounds_in_blocks)) {
-			// If this box doesn't intersect either now or before, there is no chance a smaller one will
+			// 若此盒子现在或之前都不相交，则更小的盒子也不会有机会相交
 			break;
 		}
 
 		if (prev_box != new_box) {
-			// Eliminate pending blocks that aren't needed
+			// 清除不再需要的挂起数据块
 			VOXEL_PROFILE_SCOPE_NAMED("Unload data");
 
 			// VoxelDataLodMap::Lod &data_lod = data.lods[lod_index];
@@ -82,8 +82,8 @@ void process_unload_data_blocks_sliding_box(
 
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Cancel updates");
-			// Cancel block updates that are not within the padded region
-			// (since neighbors are always required to remesh)
+			// 取消不在填充区域内的数据块更新
+			// （因为始终需要相邻数据块来重新网格化）
 
 			const Box3i padded_new_box = new_box.padded(-1);
 			Box3i mesh_box;
@@ -122,9 +122,9 @@ void process_unload_mesh_blocks_sliding_box(
 		const VoxelData &data
 ) {
 	VOXEL_PROFILE_SCOPE_NAMED("Sliding box mesh unload");
-	// TODO Could it actually be enough to have a rolling update on all blocks?
+	// TODO 对所有数据块进行滚动更新是否真的就足够了？
 
-	// This should be the same distance relatively to each LOD
+	// 相对于每个 LOD，这应该是相同的距离
 	const int mesh_block_size_po2 = settings.mesh_block_size_po2;
 	const int mesh_block_size = 1 << mesh_block_size_po2;
 	const int mesh_block_region_extent =
@@ -132,9 +132,9 @@ void process_unload_mesh_blocks_sliding_box(
 	const int lod_count = data.get_lod_count();
 	const Box3i bounds_in_voxels = data.get_bounds();
 
-	// Ignore largest lod because it can extend a little beyond due to the view distance setting.
-	// Instead, those blocks are unloaded by the octree forest management.
-	// Iterating from big to small LOD so we can exit earlier if bounds don't intersect.
+	// 忽略最大的 LOD，因为它可能因视距设置而略微超出范围。
+	// 这些数据块改由八叉树林管理来卸载。
+	// 从大 LOD 向小 LOD 迭代，以便在边界不相交时提前退出。
 	for (int lod_index = lod_count - 2; lod_index >= 0; --lod_index) {
 		VOXEL_PROFILE_SCOPE();
 		VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
@@ -153,11 +153,11 @@ void process_unload_mesh_blocks_sliding_box(
 		);
 
 		if (!new_box.intersects(bounds_in_blocks) && !prev_box.intersects(bounds_in_blocks)) {
-			// If this box doesn't intersect either now or before, there is no chance a smaller one will
+			// 若此盒子现在或之前都不相交，则更小的盒子也不会有机会相交
 			break;
 		}
 
-		// Eliminate pending blocks that aren't needed
+		// 清除不再需要的挂起数据块
 
 		if (prev_box != new_box) {
 			VOXEL_PROFILE_SCOPE_NAMED("Unload meshes");
@@ -174,7 +174,7 @@ void process_unload_mesh_blocks_sliding_box(
 
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Cancel updates");
-			// Cancel block updates that are not within the new region
+			// 取消不在新区域内的数据块更新
 			unordered_remove_if(
 					lod.mesh_blocks_pending_update,
 					[new_box](const VoxelLodTerrainUpdateData::MeshToUpdate &mtu) { //
@@ -195,7 +195,7 @@ void process_octrees_sliding_box(
 		const VoxelData &data
 ) {
 	VOXEL_PROFILE_SCOPE_NAMED("Sliding box octrees");
-	// TODO Investigate if multi-octree can produce cracks in the terrain (so far I haven't noticed)
+	// TODO 调查多八叉树是否会在地形中产生裂缝（到目前为止我还没有注意到）
 
 	const unsigned int lod_count = data.get_lod_count();
 	const unsigned int mesh_block_size_po2 = settings.mesh_block_size_po2;
@@ -248,16 +248,16 @@ void process_octrees_sliding_box(
 
 				const unsigned int last_lod_index = lod_count - 1;
 
-				// We just drop the octree and hide blocks it was considering as visible.
-				// Normally such octrees shouldn't bee too deep as they will likely be at the edge
-				// of the loaded area, unless the player teleported far away.
+				// 我们直接丢弃八叉树，并隐藏它之前视为可见的数据块。
+				// 通常这种八叉树不会太深，因为它们很可能位于已加载区域
+				// 的边缘，除非玩家传送了很远的距离。
 				CleanOctreeAction a{ state, block_pos_maxlod << last_lod_index };
 				item.octree.clear(a);
 
 				state.octree_streaming.lod_octrees.erase(it);
 
-				// Unload last lod from here, as it may extend a bit further than the others.
-				// Other LODs are unloaded earlier using a sliding region.
+				// 从这里卸载最后一个 LOD，因为它可能比其它 LOD 延伸得更远一些。
+				// 其它 LOD 通过滑动区域更早卸载。
 				VoxelLodTerrainUpdateData::Lod &last_lod = state.lods[last_lod_index];
 				last_lod.mesh_map_state.map.erase(pos);
 				last_lod.mesh_blocks_to_unload.push_back(pos);
@@ -269,11 +269,11 @@ void process_octrees_sliding_box(
 			unsigned int lod_count;
 
 			void operator()(const Vector3i &pos) {
-				// That's a new cell we are entering, shouldn't be anything there
+				// 这是我们正要进入的新单元，那里不应有任何东西
 				CRASH_COND(state.octree_streaming.lod_octrees.find(pos) != state.octree_streaming.lod_octrees.end());
 
-				// Create new octree
-				// TODO Use ObjectPool to store them, deletion won't be cheap
+				// 创建新的八叉树
+				// TODO 使用 ObjectPool 存储它们，删除成本不低
 				std::pair<StdMap<Vector3i, VoxelLodTerrainUpdateData::OctreeItem>::iterator, bool> p =
 						state.octree_streaming.lod_octrees.insert({ pos, VoxelLodTerrainUpdateData::OctreeItem() });
 				CRASH_COND(p.second == false);
@@ -320,7 +320,7 @@ bool add_loading_block(VoxelLodTerrainUpdateData::Lod &lod, Vector3i position) {
 	auto it = lod.loading_blocks.find(position);
 
 	if (it == lod.loading_blocks.end()) {
-		// First viewer to request it
+		// 第一个请求它的观察者
 		VoxelLodTerrainUpdateData::LoadingDataBlock new_loading_block;
 		new_loading_block.viewers.add();
 
@@ -328,7 +328,7 @@ bool add_loading_block(VoxelLodTerrainUpdateData::Lod &lod, Vector3i position) {
 
 		return true;
 	}
-	// TODO Current octree logic can't reliably add to refcount only once
+	// TODO 当前的八叉树逻辑无法可靠地只增加一次引用计数
 	// 	it->second.viewers.add();
 	return false;
 }
@@ -358,17 +358,17 @@ bool check_block_mesh_updated(
 #ifdef DEBUG_ENABLED
 				ERR_FAIL_COND_V(!check_block_sizes(data_block_size, mesh_block_size), false);
 #endif
-				// TODO Why are we only checking neighbors?
-				// This is also redundant when called from `check_block_loaded_and_meshed`
+				// TODO 为什么我们只检查相邻数据块？
+				// 从 `check_block_loaded_and_meshed` 调用时这也显得冗余
 
-				// Find data block neighbors positions
+				// 查找数据块相邻位置
 				const int factor = mesh_block_size / data_block_size;
 				const Vector3i data_block_pos0 = factor * mesh_block_pos;
 				const Box3i data_box(
 						data_block_pos0 - Vector3i(1, 1, 1), Vector3iUtil::create(factor) + Vector3i(2, 2, 2)
 				);
 				const Box3i bounds = data.get_bounds().downscaled(data_block_size);
-				// 56 is the maximum amount of positions that can be gathered this way with mesh block size 32.
+				// 56 是当网格数据块大小为 32 时，用这种方式能收集到的最大位置数量。
 				FixedArray<Vector3i, 56> neighbor_positions;
 				unsigned int neighbor_positions_count = 0;
 				data_box.for_inner_outline([bounds, &neighbor_positions, &neighbor_positions_count](Vector3i pos) {
@@ -381,12 +381,12 @@ bool check_block_mesh_updated(
 				static thread_local StdVector<Vector3i> tls_missing;
 				tls_missing.clear();
 
-				// Check if neighbors are loaded
+				// 检查相邻数据块是否已加载
 				data.get_missing_blocks(to_span(neighbor_positions, neighbor_positions_count), lod_index, tls_missing);
 
 				surrounded = tls_missing.size() == 0;
 
-				// Schedule loading for missing neighbors
+				// 安排加载缺失的相邻数据块
 				MutexLock lock(lod.loading_blocks_mutex);
 				for (const Vector3i &missing_pos : tls_missing) {
 					if (add_loading_block(lod, missing_pos)) {
@@ -429,19 +429,19 @@ VoxelLodTerrainUpdateData::MeshBlockState &insert_new(
 		Vector3i pos
 ) {
 #ifdef DEBUG_ENABLED
-	// We got here because the map didn't contain the element. If it did contain it already, that's a bug.
+	// 我们能到这里是因为映射不包含该元素。如果已经包含，那是一个 bug。
 	static VoxelLodTerrainUpdateData::MeshBlockState s_default;
 	ERR_FAIL_COND_V(mesh_map.find(pos) != mesh_map.end(), s_default);
 #endif
-	// C++ standard says if the element is not present, it will be default-constructed.
-	// So here is how to insert a default, non-movable struct into an unordered_map.
+	// C++ 标准规定，若元素不存在，它将被默认构造。
+	// 因此这里是向 unordered_map 插入默认、不可移动结构体的方法。
 	// https://stackoverflow.com/questions/22229773/map-unordered-map-with-non-movable-default-constructible-value-type
 	VoxelLodTerrainUpdateData::MeshBlockState &block = mesh_map[pos];
 
-	// This approach doesn't compile, had to workaround with the writing [] operator.
+	// 这种方法无法编译，不得不改用写操作的 [] 运算符绕过。
 	/*
 	auto p = lod.mesh_map_state.map.emplace(pos, VoxelLodTerrainUpdateData::MeshBlockState());
-	// We got here because the map didn't contain the element. If it did contain it already, that's a bug.
+	// 我们到这里是因为映射中不包含该元素。如果已经包含，那就是一个 bug。
 	CRASH_COND(p.second == false);
 	*/
 
@@ -465,9 +465,9 @@ bool check_block_loaded_and_meshed(
 #ifdef DEBUG_ENABLED
 		ERR_FAIL_COND_V(!check_block_sizes(data_block_size, mesh_block_size), false);
 #endif
-		// We want to know everything about the data intersecting this mesh block.
-		// This is not known in advance when we stream it, it has to be requested.
-		// When not streaming, `block == null` is the same as `!block->has_voxels()` so we wouldn't need to enter here.
+		// 我们想知道与此网格数据块相交的数据的一切信息。
+		// 流式加载时无法预先得知，必须请求。
+		// 不流式加载时，`block == null` 等同于 `!block->has_voxels()`，因此我们不需要进入这里。
 
 		static thread_local StdVector<Vector3i> tls_missing;
 		tls_missing.clear();
@@ -477,12 +477,12 @@ bool check_block_loaded_and_meshed(
 
 		data.get_missing_blocks(data_blocks_box, lod_index, tls_missing);
 
-		// TODO Octree logic: add refcount to data blocks that were already loaded?
-		// How do we know if it's actually the first time we check this area while blocks were already loaded?
-		// We can come here several times, with some blocks progressively loading until they are all loaded.
-		// But that means if we use `view_area`, we'll add extra refcount unwantedly.
-		// Maybe we can add state to octree nodes to check if it's the first time we request children?
-		// Another option is to do this with the sliding box logic, which is far simpler to understand.
+		// TODO 八叉树逻辑：为已加载的数据块增加引用计数？
+		// 当数据块已加载时，我们如何知道这真的是第一次检查该区域？
+		// 我们可能会多次进入这里，一些数据块会逐渐加载直到全部加载完成。
+		// 但这意味着如果我们使用 `view_area`，会不必要地增加额外引用计数。
+		// 也许可以给八叉树节点添加状态，以检查是否是第一次请求子节点？
+		// 另一个选择是用滑动盒子逻辑来完成，它更容易理解。
 
 		if (tls_missing.size() > 0) {
 			VoxelLodTerrainUpdateData::Lod &lod = state.lods[lod_index];
@@ -505,8 +505,8 @@ bool check_block_loaded_and_meshed(
 	VoxelLodTerrainUpdateData::MeshBlockState *mesh_block = nullptr;
 	auto mesh_block_it = lod.mesh_map_state.map.find(p_mesh_block_pos);
 	if (mesh_block_it == lod.mesh_map_state.map.end()) {
-		// If this ever becomes a source of contention with the main thread's `apply_mesh_update`,
-		// we could defer additions to the end of octree fitting.
+		// 若这成为与主线程 `apply_mesh_update` 的竞争来源，
+		// 我们可以将添加操作推迟到八叉树适配结束时。
 		RWLockWrite wlock(lod.mesh_map_state.map_lock);
 		mesh_block = &insert_new(lod.mesh_map_state.map, p_mesh_block_pos);
 		mesh_block->mesh_viewers.add();
@@ -535,7 +535,7 @@ void process_octrees_fitting(
 	const bool force_update_octrees = state.octree_streaming.force_update_octrees_next_update;
 	state.octree_streaming.force_update_octrees_next_update = false;
 
-	// Octrees may not need to update every frame under certain conditions
+	// 在某些条件下，八叉树可能不需要每帧更新
 	if (!state.octree_streaming.had_blocked_octree_nodes_previous_update && !force_update_octrees &&
 		p_viewer_pos.distance_squared_to(Vector3(state.octree_streaming.local_viewer_pos_previous_octree_update)) <
 				math::squared(octree_leaf_node_size / 2)) {
@@ -548,10 +548,10 @@ void process_octrees_fitting(
 
 	unsigned int blocked_octree_nodes = 0;
 
-	// Off by one bit: second bit is LOD0, first bit is unused
+	// 偏移一位：第二位是 LOD0，第一位未使用
 	uint32_t lods_to_update_transitions = 0;
 
-	// TODO Optimization: Maintain a vector to make iteration faster?
+	// TODO 优化：维护一个向量以加快迭代？
 	for (auto octree_it = state.octree_streaming.lod_octrees.begin();
 		 octree_it != state.octree_streaming.lod_octrees.end();
 		 ++octree_it) {
@@ -573,7 +573,7 @@ void process_octrees_fitting(
 				const Vector3i bpos = node_pos + (block_offset_lod0 >> lod_index);
 				auto mesh_block_it = lod.mesh_map_state.map.find(bpos);
 
-				// Never show a child that hasn't been meshed, if we got here that would be a bug
+				// 绝不显示尚未网格化的子节点，若我们到达这里，那将是一个 bug
 				CRASH_COND(mesh_block_it == lod.mesh_map_state.map.end());
 				CRASH_COND(mesh_block_it->second.state != VoxelLodTerrainUpdateData::MESH_UP_TO_DATE);
 
@@ -605,10 +605,10 @@ void process_octrees_fitting(
 				Vector3i bpos = node_pos + (block_offset_lod0 >> lod_index);
 				auto mesh_block_it = lod.mesh_map_state.map.find(bpos);
 
-				// If we teleport far away, the area we were in is going to merge,
-				// and blocks may have been unloaded completely.
-				// So in that case it's normal to not find any block.
-				// Otherwise, there must always be a visible parent in the end, unless the octree vanished.
+				// 若我们传送到远处，我们之前所在的区域将合并，
+				// 数据块可能已被完全卸载。
+				// 因此在这种情况下找不到任何数据块是正常的。
+				// 否则，最终必须始终有一个可见的父节点，除非八叉树消失了。
 				if (mesh_block_it != lod.mesh_map_state.map.end() &&
 					mesh_block_it->second.state == VoxelLodTerrainUpdateData::MESH_UP_TO_DATE) {
 					// self->set_mesh_block_active(*block, true);
@@ -621,7 +621,7 @@ void process_octrees_fitting(
 			}
 
 			void hide_parent(Vector3i node_pos, int lod_index) {
-				destroy_child(node_pos, lod_index); // Same
+				destroy_child(node_pos, lod_index); // 相同
 			}
 
 			bool can_create_root(int lod_index) {
@@ -645,19 +645,19 @@ void process_octrees_fitting(
 				const Vector3i offset = block_offset_lod0 >> child_lod_index;
 				bool can = true;
 
-				// Can only subdivide if higher detail meshes are ready to be shown, otherwise it will produce holes
+				// 只有更高质量的网格准备好显示时才能细分，否则会产生空洞
 				for (int i = 0; i < 8; ++i) {
-					// Get block pos local-to-region + convert to local-to-terrain
+					// 获取相对于区域的数据块位置 + 转换为相对于地形的本地坐标
 					const Vector3i child_pos = LodOctree::get_child_position(node_pos, i) + offset;
-					// We have to ping ALL children, because the reason we are here is we want them loaded
+					// 我们必须请求所有子节点，因为我们在这里的原因就是希望它们被加载
 					can &= check_block_loaded_and_meshed(
 							state, settings, data, child_pos, child_lod_index, data_blocks_to_load
 					);
 				}
 
-				// Can only subdivide if blocks of a higher LOD index are present around,
-				// otherwise it will cause cracks.
-				// Need to check meshes, not voxels?
+				// 只有周围存在更高 LOD 索引的数据块时才能细分，
+				// 否则会产生裂缝。
+				// 需要检查网格而非体素？
 				// const int lod_index = child_lod_index + 1;
 				// if (lod_index < self->get_lod_count()) {
 				// 	const Vector3i parent_offset = block_offset_lod0 >> lod_index;
@@ -679,20 +679,20 @@ void process_octrees_fitting(
 					)) {
 					return false;
 				}
-				// Can only unsubdivide if the parent mesh is ready
+				// 只有父网格就绪时才能取消细分
 				VoxelLodTerrainUpdateData::Lod &lod = state.lods[parent_lod_index];
 
 				Vector3i bpos = node_pos + (block_offset_lod0 >> parent_lod_index);
 				auto mesh_block_it = lod.mesh_map_state.map.find(bpos);
 
 				if (mesh_block_it == lod.mesh_map_state.map.end()) {
-					// The block got unloaded. Exceptionally, we can join.
-					// There will always be a grand-parent because we never destroy them when they split,
-					// and we never create a child without creating a parent first.
+					// 数据块已被卸载。例外地，我们可以合并。
+					// 总会有一个祖父节点，因为当它们分裂时我们从不销毁它们，
+					// 而且我们从不先创建子节点而不创建父节点。
 					return true;
 				}
 
-				// The block is loaded (?) but the mesh isn't up to date, we need to ping and wait.
+				// 数据块已加载（？）但网格不是最新的，我们需要请求并等待。
 				const bool can = check_block_mesh_updated(
 						state, data, mesh_block_it->second, bpos, parent_lod_index, data_blocks_to_load, settings
 				);
@@ -724,8 +724,8 @@ void process_octrees_fitting(
 		blocked_octree_nodes += octree_actions.blocked_count;
 	}
 
-	// Ideally, this stat should stabilize to zero.
-	// If not, something in block management prevents LODs from properly show up and should be fixed.
+	// 理想情况下，此统计值应稳定为零。
+	// 若非如此，则数据块管理中的某些东西阻止了 LOD 正常显示，应予以修复。
 	state.stats.blocked_lods = blocked_octree_nodes;
 	state.octree_streaming.had_blocked_octree_nodes_previous_update = blocked_octree_nodes > 0;
 
@@ -745,22 +745,22 @@ void process_octree_streaming(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Unload data blocks falling out of block region extent.
-	// We only unload data if data streaming is enabled. Otherwise it's always loaded.
+	// 卸载超出数据块区域范围的已加载数据块。
+	// 仅当数据流式加载启用时才卸载数据。否则数据始终加载。
 	if (data.is_streaming_enabled()) {
 		process_unload_data_blocks_sliding_box(state, data, viewer_pos, data_blocks_to_save, settings);
 	}
 
-	// Unload mesh blocks falling out of block region extent
+	// 卸载超出网格数据块区域范围的已加载网格数据块
 	process_unload_mesh_blocks_sliding_box(state, viewer_pos, settings, data);
 
-	// Create and remove octrees in a grid around the viewer.
-	// Mesh blocks drive the loading of voxel data and visuals.
+	// 在观察者周围的网格中创建和移除八叉树。
+	// 网格数据块驱动体素数据和视觉的加载。
 	process_octrees_sliding_box(state, viewer_pos, settings, data);
 
 	state.stats.blocked_lods = 0;
 
-	// Find which blocks we need to load and see, within each octree
+	// 在每个八叉树内找出我们需要加载和查看的数据块
 	if (stream_enabled) {
 		process_octrees_fitting(state, settings, data, viewer_pos, data_blocks_to_load);
 	}

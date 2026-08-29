@@ -16,7 +16,7 @@ namespace voxel {
 
 struct InstancerQuickReloadingCache;
 
-// Loads all instances of all layers of a specific LOD in a specific chunk
+// 加载特定数据块中特定 LOD 的所有图层的所有实例
 class LoadInstanceChunkTask : public IThreadedTask {
 public:
 	LoadInstanceChunkTask(

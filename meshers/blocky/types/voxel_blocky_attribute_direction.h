@@ -32,7 +32,7 @@ private:
 	static void _bind_methods();
 
 	bool _horizontal_only = false;
-	// TODO Corresponding ortho rotations
+	// TODO 对应的正交旋转
 };
 
 } // namespace voxel

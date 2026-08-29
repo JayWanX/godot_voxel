@@ -28,10 +28,10 @@ class VoxelSaveCompletionTracker;
 class VoxelInstancer;
 #endif
 
-// Paged terrain made of voxel blocks of variable level of detail.
-// Designed for highest view distances, preferably using smooth voxels.
-// Voxels are polygonized around the viewer by distance in a very large sphere, usually extending beyond far clip.
-// VoxelStream and VoxelGenerator must support LOD.
+// 由可变细节层级体素数据块构成的分页地形。
+// 面向最高视距设计，最好使用平滑体素。
+// 体素以距离为依据在观察者周围一个非常大的球体内被多边形化，通常延伸到远裁剪面之外。
+// VoxelStream 和 VoxelGenerator 必须支持 LOD。
 class VoxelLodTerrain : public VoxelNode {
 	GDCLASS(VoxelLodTerrain, VoxelNode)
 public:
@@ -65,7 +65,7 @@ public:
 	void set_generate_collisions(bool enabled);
 	bool get_generate_collisions() const;
 
-	// Sets up to which amount of LODs collision will generate. -1 means all of them.
+	// 设置碰撞将生成到哪一层 LOD。-1 表示全部生成。
 	void set_collision_lod_count(int lod_count);
 	int get_collision_lod_count() const;
 
@@ -137,11 +137,11 @@ public:
 	void set_cache_generated_blocks(bool enabled);
 	bool get_cache_generated_blocks() const;
 
-	// These must be called after an edit
+	// 这些必须在编辑后调用
 	void post_edit_area(Box3i p_box, bool update_mesh);
 	void post_edit_modifiers(Box3i p_voxel_box);
 
-	// TODO This still sucks atm cuz the edit will still run on the main thread
+	// TODO 目前这仍然很糟糕，因为编辑仍将在主线程上运行
 	void push_async_edit(IThreadedTask *task, Box3i box, std::shared_ptr<AsyncDependencyTracker> tracker);
 	void abort_async_edits();
 
@@ -164,11 +164,11 @@ public:
 		PROCESS_CALLBACK_DISABLED
 	};
 
-	// This was originally added to fix a problem with rigidbody teleportation and floating world origin:
-	// The player teleported at a different rate than the rest of the world due to delays in transform updates,
-	// which caused the world to unload and then reload entirely over the course of 3 frames,
-	// producing flickers and CPU lag. Changing process mode allows to align update rate,
-	// and freeze LOD for the duration of the teleport.
+	// 这最初是为了修复刚体传送与漂浮世界原点的问题而添加的：
+	// 由于变换更新的延迟，玩家以不同于世界其余部分的速度传送，
+	// 导致世界在 3 帧时间内完全卸载然后重新加载，
+	// 产生闪烁和 CPU 卡顿。更改处理模式可以对齐更新速率，
+	// 并在传送期间冻结 LOD。
 	void set_process_callback(ProcessCallback mode);
 	ProcessCallback get_process_callback() const {
 		return _process_callback;
@@ -177,20 +177,20 @@ public:
 	Ref<VoxelTool> get_voxel_tool() override;
 
 	struct Stats {
-		// Amount of octree nodes waiting for data. It should reach zero when everything is loaded.
+		// 等待数据的八叉树节点数量。当一切加载完成时应归零。
 		uint32_t blocked_lods = 0;
-		// How many data blocks were rejected this frame (due to loading too late for example).
+		// 本帧被拒绝的数据块数量（例如因加载过晚）。
 		uint32_t dropped_block_loads = 0;
-		// How many mesh blocks were rejected this frame (due to loading too late for example).
+		// 本帧被拒绝的网格数据块数量（例如因加载过晚）。
 		uint32_t dropped_block_meshs = 0;
-		// Time spent in the last update unloading unused blocks and detecting required ones, in microseconds
+		// 上次更新中卸载未使用数据块及检测所需数据块所花时间，单位微秒
 		uint32_t time_detect_required_blocks = 0;
-		// Time spent in the last update requesting data blocks, in microseconds
+		// 上次更新中请求数据块所花时间，单位微秒
 		uint32_t time_io_requests = 0;
-		// Time spent in the last update requesting meshes, in microseconds
+		// 上次更新中请求网格所花时间，单位微秒
 		uint32_t time_mesh_requests = 0;
-		// Total time spent in the last update task, in microseconds.
-		// This only includes the threadable part, not the whole `process` function.
+		// 上次更新任务所花总时间，单位微秒。
+		// 仅包含可线程化的部分，而非整个 `process` 函数。
 		uint32_t time_update_task = 0;
 	};
 
@@ -206,14 +206,13 @@ public:
 		STREAMING_SYSTEM_CLIPBOX = VoxelLodTerrainUpdateData::STREAMING_SYSTEM_CLIPBOX
 	};
 
-	// This is temporary, to avoid breaking projects as the new system gets improved and allowing to transition
-	// progressively.
+	// 这是临时的，以便在新系统改进过程中不破坏现有项目，并允许逐步过渡。
 	StreamingSystem get_streaming_system() const;
 	void set_streaming_system(StreamingSystem v);
 
 	Node3D *convert_to_nodes(const BitField<NodeConversionFlags> flags) const override;
 
-	// Debugging
+	// 调试
 
 	Array debug_raycast_mesh_block(Vector3 world_origin, Vector3 world_direction) const;
 	Dictionary debug_get_data_block_info(Vector3 fbpos, int lod_index) const;
@@ -254,13 +253,13 @@ public:
 	Node3D *debug_dump_as_nodes(bool include_instancer) const;
 	Error debug_dump_as_scene(String fpath, bool include_instancer) const;
 
-	// Editor
+	// 编辑器
 
 #ifdef TOOLS_ENABLED
 	void get_configuration_warnings(PackedStringArray &warnings) const override;
 #endif // TOOLS_ENABLED
 
-	// Internal
+	// 内部
 
 #ifdef VOXEL_ENABLE_INSTANCER
 	void set_instancer(VoxelInstancer *instancer);
@@ -348,7 +347,7 @@ private:
 	void update_gizmos();
 #endif
 
-	// Bindings
+	// 绑定
 
 	Ref<VoxelSaveCompletionTracker> _b_save_modified_blocks();
 	void _b_set_voxel_bounds(AABB aabb);
@@ -372,32 +371,32 @@ private:
 	Ref<Material> _material;
 	bool _material_uses_lod_info = false;
 
-	// The main reason this pool even exists is because of this: https://github.com/godotengine/godot/issues/34741
-	// Blocks need individual shader parameters for several features,
-	// so a lot of ShaderMaterial copies using the same shader are created.
-	// The terrain must be able to run in editor, but in that context, Godot connects a signal of Shader to
-	// every ShaderMaterial using it. Godot does that in order to update properties in THE inspector if the shader
-	// changes (which is debatable since only the edited material needs this, if it even is edited!).
-	// The problem is, that also means every time `ShaderMaterial::duplicate()` is called, when it assigns `shader`,
-	// it has to add a connection to a HUGE list. Which is very slow, enough to cause stutters.
+	// 这个池存在的首要原因是这个：https://github.com/godotengine/godot/issues/34741
+	// 数据块需要为多个特性使用各自的着色器参数，
+	// 因此会创建大量使用同一着色器的 ShaderMaterial 副本。
+	// 地形必须能在编辑器中运行，但在那种情况下，Godot 会将 Shader 的信号连接到
+	// 使用它的每个 ShaderMaterial。Godot 这样做是为了在检查器中更新属性，如果着色器
+	// 发生变化（这点值得商榷，因为只有被编辑的材质需要这样，甚至可能根本没被编辑！）。
+	// 问题是，这也意味着每次调用 `ShaderMaterial::duplicate()` 时，当它赋值 `shader` 时，
+	// 都必须向一个巨大的列表添加连接。这非常慢，足以导致卡顿。
 	ShaderMaterialPoolVLT _shader_material_pool;
 
 	FixedArray<VoxelMeshMap<VoxelMeshBlockVLT>, constants::MAX_LOD> _mesh_maps_per_lod;
 
-	// Copies of meshes just for fading out.
-	// Used when a transition mask changes. This can make holes appear if not smoothly faded.
+	// 仅用于淡出的网格副本。
+	// 在过渡掩码改变时使用。若不平滑淡出，可能会出现空洞。
 	struct FadingOutMesh {
-		// Position in space coordinates local to the volume
+		// 相对于体积的局部空间坐标位置
 		Vector3 local_position;
 		voxel::godot::DirectMeshInstance mesh_instance;
-		// Changing properties is the reason we may want to fade the mesh, so we may hold on a copy of the material with
-		// properties before the fade starts.
+		// 属性变化是我们可能想淡出网格的原因，因此我们可以在淡出开始前保留一份
+		// 具有相应属性的材质副本。
 		Ref<ShaderMaterial> shader_material;
-		// Going from 1 to 0
+		// 从 1 到 0 变化
 		float progress;
 	};
 
-	// These are "fire and forget"
+	// 这些是“发射后不管”
 	StdVector<FadingOutMesh> _fading_out_meshes;
 
 	unsigned int _collision_lod_count = 0;
@@ -408,9 +407,9 @@ private:
 	FixedArray<StdVector<Vector3i>, constants::MAX_LOD> _deferred_collision_updates_per_lod;
 
 	float _lod_fade_duration = 0.f;
-	// Note, direct pointers to mesh blocks should be safe because these blocks are always destroyed from the same
-	// thread that updates fading blocks. If a mesh block is destroyed, these maps should be updated at the same time.
-	// TODO Optimization: use FlatMap? Need to check how many blocks get in there, probably not many
+	// 注意，指向网格数据块的直接指针应当是安全的，因为这些数据块总是在更新淡出数据块的同一
+	// 线程上被销毁。若某个网格数据块被销毁，这些映射应同时更新。
+	// TODO 优化：改用 FlatMap？需要检查有多少数据块会进入其中，可能不多
 	FixedArray<StdMap<Vector3i, VoxelMeshBlockVLT *>, constants::MAX_LOD> _fading_blocks_per_lod;
 
 	struct FadingDetailTexture {
@@ -427,7 +426,7 @@ private:
 
 	Ref<VoxelMesher> _mesher;
 
-	// Data stored with a shared pointer so it can be sent to asynchronous tasks
+	// 数据以共享指针存储，以便发送给异步任务
 	bool _threaded_update_enabled = false;
 	std::shared_ptr<VoxelData> _data;
 	std::shared_ptr<VoxelLodTerrainUpdateData> _update_data;

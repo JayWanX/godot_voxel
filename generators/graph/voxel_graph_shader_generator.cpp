@@ -3,7 +3,7 @@
 #include "../../engine/gpu/compute_shader_resource.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_map.h"
-#include "../../util/godot/core/array.h" // for `varray`
+#include "../../util/godot/core/array.h" // 用于 `varray`
 #include "../../util/godot/core/string.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
@@ -58,10 +58,10 @@ CompilationResult generate_shader(
 		const NodeType &node_type = type_db.get_type(node.type_id);
 		if (node_type.category == pg::CATEGORY_OUTPUT) {
 			if (restricted_outputs.size() == 0) {
-				// Get all outputs
+				// 获取所有输出
 				terminal_nodes.push_back(node.id);
 			} else {
-				// Only get dependencies of specific outputs
+				// 仅获取特定输出的依赖
 				if (contains(restricted_outputs, VoxelGraphFunction::NodeTypeID(node.type_id))) {
 					terminal_nodes.push_back(node.id);
 				}
@@ -73,7 +73,7 @@ CompilationResult generate_shader(
 		return CompilationResult::make_error("Can't generate shader, the graph does not contain the required outputs.");
 	}
 
-	// Exclude debug nodes
+	// 排除调试节点
 	// unordered_remove_if(terminal_nodes, [&expanded_graph, &type_db](uint32_t node_id) {
 	// 	const ProgramGraph::Node &node = expanded_graph.get_node(node_id);
 	// 	const NodeType &type = type_db.get_type(node.type_id);
@@ -117,7 +117,7 @@ CompilationResult generate_shader(
 
 	codegen.indent();
 
-	// This map only contains output ports.
+	// 此映射仅包含输出端口。
 	StdUnorderedMap<ProgramGraph::PortLocation, StdString> port_to_var;
 
 	FixedArray<StdString, 8> unconnected_input_var_names;
@@ -196,8 +196,8 @@ CompilationResult generate_shader(
 				}
 				continue;
 			}
-			// TODO Custom inputs
-			// TODO Custom outputs
+			// TODO 自定义输入
+			// TODO 自定义输出
 			default:
 				break;
 		}
@@ -218,8 +218,8 @@ CompilationResult generate_shader(
 				VOXEL_ASSERT(it != port_to_var.end());
 				input_names[port_index] = it->second.c_str();
 			} else {
-				// No incoming connections to this input. Make up a variable so following code can stay the same.
-				// It will only be used for this node.
+				// 此输入没有入站连接。编造一个变量，使后续代码保持不变。
+				// 它仅用于此节点。
 				StdString &var_name = unconnected_input_var_names[port_index];
 				var_name = codegen.generate_var_name();
 				input_names[port_index] = var_name.c_str();
@@ -230,7 +230,7 @@ CompilationResult generate_shader(
 		for (unsigned int port_index = 0; port_index < node.outputs.size(); ++port_index) {
 			const StdString var_name = codegen.generate_var_name();
 			auto p = port_to_var.insert({ { node_id, port_index }, var_name });
-			VOXEL_ASSERT(p.second); // Conflict with an existing port?
+			VOXEL_ASSERT(p.second); // 与现有端口冲突？
 			output_names[port_index] = p.first->second.c_str();
 			codegen.add_format("float {};\n", var_name.c_str());
 		}

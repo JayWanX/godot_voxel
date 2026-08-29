@@ -104,7 +104,7 @@ float VoxelTool::get_texture_falloff() const {
 Ref<VoxelRaycastResult> VoxelTool::raycast(Vector3 pos, Vector3 dir, float max_distance, uint32_t collision_mask) {
 	ERR_PRINT("Not implemented");
 	return Ref<VoxelRaycastResult>();
-	// See derived classes for implementations
+	// 具体实现请参见派生类
 }
 
 void VoxelTool::set_raycast_normal_enabled(bool enabled) {
@@ -120,7 +120,7 @@ float VoxelTool::get_voxel_f(Vector3i pos) const {
 }
 
 float VoxelTool::get_voxel_f_interpolated(const Vector3 pos) const {
-	// Default, slow implementation
+	// 默认的、较慢的实现
 	return get_sdf_interpolated([this](Vector3i ipos) { return _get_voxel_f(ipos); }, pos);
 }
 
@@ -150,7 +150,7 @@ void VoxelTool::do_point(Vector3i pos) {
 		return;
 	}
 	if (_channel == VoxelBuffer::CHANNEL_SDF) {
-		// Not consistent SDF, but should work
+		// 不是一致的 SDF，但应该能用
 		_set_voxel_f(pos, _mode == MODE_REMOVE ? constants::SDF_FAR_OUTSIDE : constants::SDF_FAR_INSIDE);
 	} else {
 		_set_voxel(pos, _mode == MODE_REMOVE ? _eraser_value : _value);
@@ -176,13 +176,13 @@ void VoxelTool::_set_voxel_f(Vector3i pos, float v) {
 	ERR_PRINT("Not implemented");
 }
 
-// The following are default legacy implementations. They may be slower than specialized ones, so they can often be
-// defined in subclasses of VoxelTool. Ideally, a function may be exposed on the base class only if it has an optimal
-// definition in all specialized classes.
+// 以下是默认的旧式实现。它们可能比专门化的实现更慢，因此通常会
+// 在 VoxelTool 的子类中定义。理想情况下，只有当某个函数在所有专门化子类中都有最优
+// 实现时，才应在基类中暴露该函数。
 
 void VoxelTool::do_sphere(Vector3 p_center, float radius) {
 	VOXEL_PROFILE_SCOPE();
-	// Default, suboptimal implementation
+	// 默认的、次优的实现
 
 	const Box3i box(
 			math::floor_to_int(p_center) - Vector3iUtil::create(Math::floor(radius)),
@@ -215,7 +215,7 @@ void VoxelTool::do_sphere(Vector3 p_center, float radius) {
 	_post_edit(box);
 }
 
-// Erases matter in every voxel where the provided buffer has matter.
+// 在提供的缓冲区中存在物质的每个体素处擦除物质。
 void VoxelTool::sdf_stamp_erase(Ref<godot::VoxelBuffer> stamp, Vector3i pos) {
 	VOXEL_ASSERT_RETURN(stamp.is_valid());
 	sdf_stamp_erase(stamp->get_buffer(), pos);
@@ -236,7 +236,7 @@ void VoxelTool::sdf_stamp_erase(const VoxelBuffer &stamp, Vector3i pos) {
 		const float dst_sdf =
 				stamp.get_voxel_f(pos_in_stamp.x, pos_in_stamp.y, pos_in_stamp.z, VoxelBuffer::CHANNEL_SDF);
 		if (dst_sdf <= 0.f) {
-			// Not consistent SDF, but should work ok
+			// 不是一致的 SDF，但应该能正常工作
 			_set_voxel_f(pos_in_volume, constants::SDF_FAR_OUTSIDE);
 		}
 	});
@@ -246,7 +246,7 @@ void VoxelTool::sdf_stamp_erase(const VoxelBuffer &stamp, Vector3i pos) {
 
 void VoxelTool::do_box(Vector3i begin, Vector3i end) {
 	VOXEL_PROFILE_SCOPE();
-	// Default, suboptimal implementation
+	// 默认的、次优的实现
 
 	Vector3iUtil::sort_min_max(begin, end);
 	const Box3i box = Box3i::from_min_max(begin, end + Vector3i(1, 1, 1));
@@ -257,8 +257,8 @@ void VoxelTool::do_box(Vector3i begin, Vector3i end) {
 	}
 
 	if (_channel == VoxelBuffer::CHANNEL_SDF) {
-		// TODO Better quality
-		// Not consistent SDF, but should work ok
+		// TODO 提高质量
+		// 不是一致的 SDF，但应该能正常工作
 		box.for_each_cell([this](Vector3i pos) {
 			_set_voxel_f(pos, sdf_blend(constants::SDF_FAR_INSIDE, get_voxel_f(pos), static_cast<ops::Mode>(_mode)));
 		});
@@ -273,19 +273,19 @@ void VoxelTool::do_box(Vector3i begin, Vector3i end) {
 
 void VoxelTool::do_path(Span<const Vector3> positions, Span<const float> radii) {
 	ERR_PRINT("Not implemented");
-	// Implemented in derived classes
+	// 在派生类中实现
 }
 
 #ifdef VOXEL_ENABLE_MESH_SDF
 void VoxelTool::do_mesh(const VoxelMeshSDF &mesh_sdf, const Transform3D &transform, const float isolevel) {
 	ERR_PRINT("Not implemented");
-	// Implemented in derived classes
+	// 在派生类中实现
 }
 #endif
 
 void VoxelTool::copy(Vector3i pos, VoxelBuffer &dst, uint8_t channels_mask, const bool with_metadata) const {
 	ERR_PRINT("Not implemented");
-	// Implemented in derived classes
+	// 在派生类中实现
 }
 
 void VoxelTool::copy(Vector3i pos, Ref<godot::VoxelBuffer> dst, uint8_t channel_mask, const bool with_metadata) const {
@@ -300,7 +300,7 @@ void VoxelTool::copy(Vector3i pos, Ref<godot::VoxelBuffer> dst, uint8_t channel_
 
 void VoxelTool::paste(Vector3i p_pos, const VoxelBuffer &src, uint8_t channels_mask) {
 	ERR_PRINT("Not implemented");
-	// Implemented in derived classes
+	// 在派生类中实现
 }
 
 void VoxelTool::paste(Vector3i p_pos, Ref<godot::VoxelBuffer> p_voxels, uint8_t channels_mask) {
@@ -320,7 +320,7 @@ void VoxelTool::paste_masked(
 ) {
 	ERR_FAIL_COND(p_voxels.is_null());
 	ERR_PRINT("Not implemented");
-	// Implemented in derived classes
+	// 在派生类中实现
 }
 
 void VoxelTool::paste_masked_writable_list(
@@ -333,7 +333,7 @@ void VoxelTool::paste_masked_writable_list(
 		PackedInt32Array dst_writable_list
 ) {
 	VOXEL_PRINT_ERROR("Not implemented");
-	// Implemented in derived classes
+	// 在派生类中实现
 }
 
 void VoxelTool::smooth_sphere(Vector3 sphere_center, float sphere_radius, int blur_radius) {
@@ -357,7 +357,7 @@ void VoxelTool::smooth_sphere(Vector3 sphere_center, float sphere_radius, int bl
 	buffer.create(padded_voxel_box.size);
 
 	if (_channel == VoxelBuffer::CHANNEL_SDF) {
-		// Note, this only applies to SDF. It won't blur voxel texture data.
+		// 注意，这仅适用于 SDF，不会模糊体素纹理数据。
 
 		copy(padded_voxel_box.position, buffer, (1 << VoxelBuffer::CHANNEL_SDF), false);
 
@@ -374,8 +374,8 @@ void VoxelTool::smooth_sphere(Vector3 sphere_center, float sphere_radius, int bl
 }
 
 void VoxelTool::grow_sphere(Vector3 sphere_center, float sphere_radius, float strength) {
-	// TODO: In the future, it may be preferable to use additional "GROW"/"SHRINK" voxel tool modes instead.
-	// see: https://github.com/Voxel/godot_voxel/pull/594
+	// TODO：未来可能更倾向于使用额外的 “GROW”/“SHRINK” 体素工具模式来替代。
+	// 参见：https://github.com/Voxel/godot_voxel/pull/594
 	VOXEL_PROFILE_SCOPE();
 	VOXEL_ASSERT_RETURN(sphere_radius >= 0.01f);
 
@@ -393,7 +393,7 @@ void VoxelTool::grow_sphere(Vector3 sphere_center, float sphere_radius, float st
 	buffer.create(voxel_box.size);
 
 	if (_channel == VoxelBuffer::CHANNEL_SDF) {
-		// Note, this only applies to SDF. It won't affect voxel texture data.
+		// 注意，这仅适用于 SDF，不会影响体素纹理数据。
 
 		copy(voxel_box.position, buffer, (1 << VoxelBuffer::CHANNEL_SDF), false);
 
@@ -442,10 +442,10 @@ void VoxelTool::do_path_chunked(
 	VOXEL_ASSERT_RETURN(positions.size() >= 2);
 	VOXEL_ASSERT_RETURN(positions.size() == radii.size());
 
-	// TODO Increase margin a bit with smooth voxels?
+	// TODO 对平滑体素是否稍微增大边距？
 	const int margin = 1;
 
-	// Compute total bounding box
+	// 计算总包围盒
 
 	const AABB total_aabb = get_path_aabb(positions, radii).grow(margin);
 	const Box3i total_voxel_box = Box3i::from_min_max(
@@ -468,11 +468,11 @@ void VoxelTool::do_path_chunked(
 	{
 		VoxelDataGrid::LockWrite wlock(grid);
 
-		// Rasterize
+		// 光栅化
 
 		for (unsigned int point_index = 1; point_index < positions.size(); ++point_index) {
-			// TODO Could run this in local space so we dont need doubles
-			// TODO Apply terrain scale
+			// TODO 可以在局部空间中运行，从而无需使用双精度
+			// TODO 应用地形缩放
 			const Vector3f p0 = to_vec3f(positions[point_index - 1]);
 			const Vector3f p1 = to_vec3f(positions[point_index]);
 
@@ -496,13 +496,13 @@ void VoxelTool::do_path_chunked(
 
 			op();
 
-			// Experimented with drawing a 100-point path, the cost of everything outside cone calculation was:
-			// - Non-template: 2.55 ms
-			// - Template: 1.00 ms
-			// With cone calculation:
-			// - Non-template: 5.7 ms
-			// - Template: 4.5 ms
-			// So the template version is faster, but not that much.
+			// 曾试验绘制一条 100 点的路径，锥体计算之外所有操作的开销为：
+			// - 非模板版本：2.55 ms
+			// - 模板版本：1.00 ms
+			// 包含锥体计算时：
+			// - 非模板版本：5.7 ms
+			// - 模板版本：4.5 ms
+			// 因此模板版本更快，但快得不多。
 			//
 			// math::SdfRoundConePrecalc cone;
 			// cone.a = p0;
@@ -543,14 +543,14 @@ void VoxelTool::do_mesh_chunked(
 	const Transform3D &box_to_world = transform;
 	const AABB local_aabb = mesh_sdf.get_aabb();
 
-	// Note, transform is local to the terrain
+	// 注意，变换是相对于地形局部的
 	const AABB aabb = box_to_world.xform(local_aabb);
 	const Box3i voxel_box =
 			Box3i::from_min_max(aabb.position.floor(), (aabb.position + aabb.size).ceil()).clipped(vdata.get_bounds());
 
-	// TODO Sometimes it will fail near unloaded blocks, even though the transformed box does not intersect them.
-	// This could be avoided with a box/transformed-box intersection algorithm. Might investigate if the use case
-	// occurs. It won't happen with full load mode. This also affects other shapes.
+	// TODO 有时在尚未加载的区块附近会失败，即使变换后的包围盒并未与它们相交。
+	// 这可以通过盒体/变换后盒体的相交判定算法来避免。如果确实出现这种使用场景，可以考虑研究一下
+	// 的情况。在完全加载模式下不会发生，其他形状也会受此影响。
 	if (!is_area_editable(voxel_box)) {
 		VOXEL_PRINT_WARNING("Area not editable");
 		return;
@@ -560,16 +560,16 @@ void VoxelTool::do_mesh_chunked(
 		vdata.pre_generate_box(voxel_box);
 	}
 
-	// TODO Maybe more efficient to "rasterize" the box? We're going to iterate voxels the box doesn't intersect.
-	// TODO Maybe we should scale SDF values based on the scale of the transform too
-	// TODO Support other depths, format should be accessible from the volume
+	// TODO 也许将盒体“光栅化”会更高效？我们目前会遍历盒体并未相交的体素。
+	// TODO 也许我们也应该根据变换的缩放来缩放 SDF 值
+	// TODO 支持其他位深，格式应可从体积中访问
 
 	const Transform3D buffer_to_box =
 			Transform3D(Basis().scaled(Vector3(local_aabb.size / buffer.get_size())), local_aabb.position);
 	const Transform3D buffer_to_world = box_to_world * buffer_to_box;
 
-	// Making the model bigger should also make signed distances larger.
-	// Non-uniform scaling is not well supported though.
+	// 让模型变大，也会使有符号距离变大。
+	// 不过，非均匀缩放支持得并不好。
 	const float size_scale = math::get_largest_coord(transform.get_basis().get_scale());
 
 	ops::DoShapeChunked<ops::SdfBufferShape, ops::VoxelDataGridAccess> op;
@@ -577,7 +577,7 @@ void VoxelTool::do_mesh_chunked(
 	op.shape.buffer_size = buffer.get_size();
 	op.shape.isolevel = isolevel;
 	op.shape.sdf_scale = get_sdf_scale() * size_scale;
-	// Note, the passed buffer must not be shared with another thread.
+	// 注意，传入的缓冲区不能与另一个线程共享。
 	// buffer.decompress_channel(channel);
 	VOXEL_ASSERT_RETURN(buffer.get_channel_data_read_only(buffer_channel, op.shape.buffer));
 	op.mode = static_cast<ops::Mode>(get_mode());
@@ -600,7 +600,7 @@ void VoxelTool::do_mesh_chunked(
 }
 #endif
 
-// Binding land
+// 绑定相关代码
 
 uint64_t VoxelTool::_b_get_voxel(Vector3i pos) {
 	return get_voxel(pos);
@@ -819,7 +819,7 @@ void VoxelTool::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("is_area_editable", "box"), &VoxelTool::_b_is_area_editable);
 
-	// Encoding helpers
+	// 编码辅助函数
 	ClassDB::bind_static_method(VoxelTool::get_class_static(), D_METHOD("color_to_u16", "color"), &_b_color_to_u16);
 	ClassDB::bind_static_method(VoxelTool::get_class_static(), D_METHOD("color_to_u32", "color"), &_b_color_to_u32);
 	ClassDB::bind_static_method(

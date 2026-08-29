@@ -24,7 +24,7 @@ enum MenuItemID { //
 
 VoxelInstancerEditorPlugin::VoxelInstancerEditorPlugin() {}
 
-// EditorNode isn't ready during plugin construction, so defer work to `init()`.
+// 插件构造期间 EditorNode 尚未就绪，因此将工作推迟到 `init()`。
 void VoxelInstancerEditorPlugin::init() {
 	MenuButton *menu_button = memnew(MenuButton);
 	menu_button->set_text(VoxelInstancer::get_class_static());
@@ -61,7 +61,7 @@ bool VoxelInstancerEditorPlugin::_voxel_handles(const Object *p_object) const {
 }
 
 void VoxelInstancerEditorPlugin::_voxel_edit(Object *p_object) {
-	// Godot will call `edit(null)` when selecting another node
+	// 选择另一个节点时 Godot 会调用 `edit(null)`
 	if (p_object == nullptr) {
 		VoxelInstancer *instancer = get_instancer();
 		if (instancer != nullptr) {
@@ -147,11 +147,11 @@ VoxelInstancer *VoxelInstancerEditorPlugin::get_instancer() {
 	}
 	Object *obj = ObjectDB::get_instance(_instancer_object_id);
 	if (obj == nullptr) {
-		// Could have been destroyed
+		// 可能已被销毁
 		return nullptr;
 	}
 	VoxelInstancer *instancer = Object::cast_to<VoxelInstancer>(obj);
-	// We don't expect Godot to re-use the same ObjectID for different objects
+	// 我们不期望 Godot 为不同对象复用同一个 ObjectID
 	ERR_FAIL_COND_V(instancer == nullptr, nullptr);
 	return instancer;
 }

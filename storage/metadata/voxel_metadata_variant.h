@@ -7,13 +7,13 @@
 
 namespace voxel::godot {
 
-// TODO Not sure if that should be a custom type. Custom types are supposed to be specific to a game?
+// TODO 不确定这是否应该作为自定义类型。自定义类型本应针对特定游戏？
 enum GodotMetadataTypes { //
 	METADATA_TYPE_VARIANT = VoxelMetadata::TYPE_CUSTOM_BEGIN
 };
 
-// Custom metadata holding a Godot Variant (basically, anything recognized by Godot Engine).
-// Serializability depends on the same rules as Godot's `encode_variant`: no invalid objects, no cycles.
+// 持有 Godot Variant 的自定义元数据（基本上是 Godot 引擎认识的任何东西）。
+// 可序列化性遵循与 Godot 的 `encode_variant` 相同的规则：无无效对象、无循环引用。
 class VoxelMetadataVariant : public ICustomVoxelMetadata {
 public:
 	Variant data;

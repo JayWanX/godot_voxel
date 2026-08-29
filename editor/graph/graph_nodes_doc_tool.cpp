@@ -8,7 +8,7 @@
 
 namespace voxel {
 
-// Temporary data used instead of directly modifying NodeTypeDB
+// 临时数据，用于替代直接修改 NodeTypeDB
 struct GraphNodeDocumentation {
 	String name;
 	String description;
@@ -27,10 +27,10 @@ GraphNodeDocumentation *find_node_by_name(StdVector<GraphNodeDocumentation> &nod
 bool parse_graph_nodes_doc_xml(XMLParser &parser, StdVector<GraphNodeDocumentation> &nodes) {
 	VOXEL_ASSERT_RETURN_V(parser.read() == OK, false);
 
-	// For some reason Godot considers `<?xml` as `NODE_UNKNOWN` and `get_node_name` returns the ENTIRE line without
-	// `<`, unlike what I assumed when reading Godot's doctool.
-	// doctool gets away with it because it has a `NODE_UNKNOWN` fallback so nobody noticed.
-	// See https://github.com/godotengine/godot/issues/72517
+	// 出于某种原因，Godot 将 `<?xml` 视为 `NODE_UNKNOWN`，并且 `get_node_name` 返回整行内容而不带
+	// `<`，这与我在阅读 Godot 的 doctool 时假设的不同。
+	// doctool 能够顺利工作是因为它有一个 `NODE_UNKNOWN` 回退，所以没有人注意到这个问题。
+	// 参见 https://github.com/godotengine/godot/issues/72517
 	//
 	// VOXEL_ASSERT_RETURN_V(parser.get_node_type() == XMLParser::NODE_ELEMENT, false);
 	// VOXEL_ASSERT_RETURN_V(parser.get_node_name() == "?xml", false);
@@ -59,8 +59,8 @@ bool parse_graph_nodes_doc_xml(XMLParser &parser, StdVector<GraphNodeDocumentati
 
 				while (parser.read() == OK) {
 					if (parser.get_node_type() == XMLParser::NODE_ELEMENT) {
-						// We don't parse everything, only what is provided from the XML file as source of truth.
-						// Other things' source of truth are coming from C++ and will be written later.
+						// 我们不解析所有内容，只解析 XML 文件中作为事实来源提供的部分。
+						// 其他内容的事实来源来自 C++，稍后才会写入。
 
 						if (parser.get_node_name() == "input") {
 							continue;
@@ -80,7 +80,7 @@ bool parse_graph_nodes_doc_xml(XMLParser &parser, StdVector<GraphNodeDocumentati
 							}
 
 							VOXEL_ASSERT_RETURN_V(parser.read() == OK, false);
-							// End of <description>
+							// <description> 结束
 							VOXEL_ASSERT_RETURN_V(parser.get_node_type() == XMLParser::NODE_ELEMENT_END, false);
 
 							continue;
@@ -89,7 +89,7 @@ bool parse_graph_nodes_doc_xml(XMLParser &parser, StdVector<GraphNodeDocumentati
 						VOXEL_PRINT_WARNING("Unknown XML node");
 
 					} else if (parser.get_node_type() == XMLParser::NODE_ELEMENT_END) {
-						// End of <node>
+						// <node> 结束
 						break;
 					}
 				}
@@ -99,7 +99,7 @@ bool parse_graph_nodes_doc_xml(XMLParser &parser, StdVector<GraphNodeDocumentati
 			}
 
 		} else if (parser.get_node_type() == XMLParser::NODE_ELEMENT_END) {
-			// End of <nodes>
+			// <nodes> 结束
 			break;
 		}
 	}
@@ -181,8 +181,8 @@ void write_graph_nodes_doc_xml(
 			return tab_count + space_count / 4;
 		}
 
-		// Text nodes are parsed as the entire series of characters between `>` and `<`, which is inconvenient when
-		// writing back indented docs
+		// 文本节点被解析为 `>` 与 `<` 之间的整串字符，这在
+		// 回写带缩进的文档时很不方便
 		static String reformat_text(String text, int p_indent_level) {
 			PackedStringArray lines = text.split("\n");
 
@@ -195,7 +195,7 @@ void write_graph_nodes_doc_xml(
 			}
 
 			{
-				// Writing through a raw pointer.
+				// 通过原始指针写入。
 				String *lines_p = lines.ptrw();
 				for (int line_index = 0; line_index < lines.size(); ++line_index) {
 					String s = lines[line_index];
@@ -241,7 +241,7 @@ void write_graph_nodes_doc_xml(
 		for (const pg::NodeType::Port &output : type.outputs) {
 			VOXEL_ASSERT_CONTINUE(!output.name.is_empty());
 			if (output.name[0] == '_') {
-				// Internal
+				// 内部
 				continue;
 			}
 			w.write_line(String("<output name=\"{0}\"/>").format(varray(output.name)));
@@ -273,10 +273,10 @@ void write_graph_nodes_doc_xml(
 	w.write_line("</nodes>");
 }
 
-// Parses an XML file containing documentation about graph nodes,
-// Adds information from known nodes in the engine, and merges it with the information that was in the XML file,
-// Removes information from nodes that are no longer in the engine,
-// and writes the result to an XML file.
+// 解析包含图形节点文档的 XML 文件，
+// 添加引擎中已知节点的信息，并与 XML 文件中已有的信息合并，
+// 移除引擎中已不存在的节点的信息，
+// 并将结果写回 XML 文件。
 void run_graph_nodes_doc_tool(String src_xml_fpath, String dst_xml_fpath) {
 	VOXEL_PRINT_VERBOSE("Running Voxel graph nodes doc tool");
 
@@ -293,7 +293,7 @@ void run_graph_nodes_doc_tool(String src_xml_fpath, String dst_xml_fpath) {
 
 	StdVector<GraphNodeDocumentation> nodes;
 
-	// First populate with all known node types
+	// 首先用所有已知节点类型填充
 	for (int node_type_id = 0; node_type_id < type_db.get_type_count(); ++node_type_id) {
 		const pg::NodeType &type = type_db.get_type(node_type_id);
 
@@ -303,7 +303,7 @@ void run_graph_nodes_doc_tool(String src_xml_fpath, String dst_xml_fpath) {
 		nodes.push_back(doc);
 	}
 
-	// Parse descriptions and categories, which come from the XML file
+	// 解析来自 XML 文件的描述和分类
 	VOXEL_ASSERT_RETURN(parse_graph_nodes_doc_xml(**parser, nodes));
 
 	struct GraphNodeDocumentationComparer {
@@ -317,7 +317,7 @@ void run_graph_nodes_doc_tool(String src_xml_fpath, String dst_xml_fpath) {
 	Ref<FileAccess> fa = FileAccess::open(dst_xml_fpath, FileAccess::WRITE);
 	VOXEL_ASSERT_RETURN_MSG(fa.is_valid(), "Failed to write XML file");
 
-	// Write XML file back with merged information
+	// 将合并后的信息写回 XML 文件
 	write_graph_nodes_doc_xml(**fa, nodes, type_db);
 
 	VOXEL_PRINT_VERBOSE("Voxel graph nodes doc tool is done.");

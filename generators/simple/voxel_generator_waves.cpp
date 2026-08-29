@@ -9,8 +9,8 @@ namespace voxel {
 
 VoxelGeneratorWaves::VoxelGeneratorWaves() {
 	_parameters.pattern_size = Vector2(30, 30);
-	// This might be a different default value than the base class,
-	// because in practice this generator is more discoverable with a small pattern size
+	// 这可能与基类的默认值不同，
+	// 因为实际上这个生成器在图案尺寸较小时更容易被发现
 	set_height_range(30);
 }
 

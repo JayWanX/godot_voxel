@@ -36,10 +36,10 @@ Interval fnl_single_cellular_value_3d(const fast_noise_lite::FastNoiseLite &fn, 
 }
 
 Interval get_fnl_cellular_range_2d(const Voxel_FastNoiseLite &noise) {
-	// There are many combinations with Cellular noise so instead of implementing them with intervals,
-	// I used empiric tests to figure out some bounds.
+	// 细胞噪声的组合很多，所以与其用区间来实现它们，
+	// 我用经验测试来确定一些边界。
 
-	// Value mode must be handled separately.
+	// Value 模式必须单独处理。
 
 	switch (noise.get_cellular_distance_function()) {
 		case Voxel_FastNoiseLite::CELLULAR_DISTANCE_EUCLIDEAN:
@@ -119,10 +119,10 @@ Interval get_fnl_cellular_range_2d(const Voxel_FastNoiseLite &noise) {
 }
 
 Interval get_fnl_cellular_range_3d(const Voxel_FastNoiseLite &noise) {
-	// There are many combinations with Cellular noise so instead of implementing them with intervals,
-	// I used empiric tests to figure out some bounds.
+	// 细胞噪声的组合很多，所以与其用区间来实现它们，
+	// 我用经验测试来确定一些边界。
 
-	// Value mode must be handled separately.
+	// Value 模式必须单独处理。
 
 	return get_fnl_cellular_range_2d(noise);
 }
@@ -151,7 +151,7 @@ void fnl_transform_noise_coordinate_3d(
 		Interval &y,
 		Interval &z
 ) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 
 	x *= fn.mFrequency;
 	y *= fn.mFrequency;
@@ -176,7 +176,7 @@ void fnl_transform_noise_coordinate_3d(
 		} break;
 		case fast_noise_lite::FastNoiseLite::TransformType3D_DefaultOpenSimplex2: {
 			const float R3 = (2.0 / 3.0);
-			Interval r = (x + y + z) * R3; // Rotation, not skew
+			Interval r = (x + y + z) * R3; // 旋转，不是斜切
 			x = r - x;
 			y = r - y;
 			z = r - z;
@@ -193,10 +193,10 @@ Interval fnl_single_opensimplex2_3d(
 		Interval p_y,
 		Interval p_z
 ) {
-	// According to OpenSimplex2 author, the 3D version is supposed to have a max derivative around 4.23718
+	// 据 OpenSimplex2 的作者说，3D 版本的最大导数应该在 4.23718 左右
 	// https://www.wolframalpha.com/input/?i=max+d%2Fdx+32.69428253173828125+*+x+*+%28%280.6-x%5E2%29%5E4%29+from+-0.6+to+0.6
-	// But empiric measures have shown it around 8. Discontinuities do exist in this noise though,
-	// which makes this measuring harder
+	// 但经验测量显示它大约在 8。这种噪声中确实存在不连续点，
+	// 这使得测量更加困难
 	return get_noise_range_3d(
 			[&fn, seed](real_t x, real_t y, real_t z) { //
 				return fn.SingleOpenSimplex2(seed, x, y, z);
@@ -219,7 +219,7 @@ Interval fnl_single_opensimplex2s_3d(
 			[&fn, seed](real_t x, real_t y, real_t z) { //
 				return fn.SingleOpenSimplex2S(seed, x, y, z);
 			},
-			// Max derivative found from empiric tests
+			// 从经验测试中得到的最大导数
 			p_x,
 			p_y,
 			p_z,
@@ -254,7 +254,7 @@ Interval fnl_single_perlin_3d(
 			[&fn, seed](real_t x, real_t y, real_t z) { //
 				return fn.SinglePerlin(seed, x, y, z);
 			},
-			// Max derivative found from empiric tests
+			// 从经验测试中得到的最大导数
 			p_x,
 			p_y,
 			p_z,
@@ -273,7 +273,7 @@ Interval fnl_single_value_cubic_3d(
 			[&fn, seed](real_t x, real_t y, real_t z) { //
 				return fn.SingleValueCubic(seed, x, y, z);
 			},
-			// Max derivative found from empiric tests
+			// 从经验测试中得到的最大导数
 			p_x,
 			p_y,
 			p_z,
@@ -292,7 +292,7 @@ Interval fnl_single_value_3d(
 			[&fn, seed](real_t x, real_t y, real_t z) { //
 				return fn.SingleValue(seed, x, y, z);
 			},
-			// Max derivative found from empiric tests
+			// 从经验测试中得到的最大导数
 			p_x,
 			p_y,
 			p_z,
@@ -301,11 +301,11 @@ Interval fnl_single_value_3d(
 }
 
 Interval fnl_gen_noise_single_2d(const Voxel_FastNoiseLite &noise, const int seed, Interval x, Interval y) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
-	// TODO 2D range variants
-	// TODO More precise analysis using derivatives
+	// TODO 2D 范围变体
+	// TODO 使用导数做更精确的分析
 
 	switch (fn.mNoiseType) {
 		case fast_noise_lite::FastNoiseLite::NoiseType_OpenSimplex2:
@@ -331,7 +331,7 @@ Interval fnl_gen_noise_single_2d(const Voxel_FastNoiseLite &noise, const int see
 }
 
 Interval fnl_gen_noise_single_3d(const Voxel_FastNoiseLite &noise, int seed, Interval x, Interval y, Interval z) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
 	switch (fn.mNoiseType) {
@@ -353,7 +353,7 @@ Interval fnl_gen_noise_single_3d(const Voxel_FastNoiseLite &noise, int seed, Int
 }
 
 Interval fnl_gen_fractal_fbm_2d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
 	int seed = fn.mSeed;
@@ -377,7 +377,7 @@ Interval fnl_gen_fractal_fbm_2d(const Voxel_FastNoiseLite &p_noise, Interval x, 
 }
 
 Interval fnl_gen_fractal_fbm_3d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y, Interval z) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
 	int seed = fn.mSeed;
@@ -402,7 +402,7 @@ Interval fnl_gen_fractal_fbm_3d(const Voxel_FastNoiseLite &p_noise, Interval x, 
 }
 
 Interval fnl_gen_fractal_ridged_2d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
 	int seed = fn.mSeed;
@@ -426,7 +426,7 @@ Interval fnl_gen_fractal_ridged_2d(const Voxel_FastNoiseLite &p_noise, Interval 
 }
 
 Interval fnl_gen_fractal_ridged_3d(const Voxel_FastNoiseLite &p_noise, Interval x, Interval y, Interval z) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = p_noise.get_noise_internal();
 
 	int seed = fn.mSeed;
@@ -451,7 +451,7 @@ Interval fnl_gen_fractal_ridged_3d(const Voxel_FastNoiseLite &p_noise, Interval 
 }
 
 Interval fnl_get_noise_2d(const Voxel_FastNoiseLite &noise, Interval x, Interval y) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
 	fnl_transform_noise_coordinate_2d(fn, x, y);
@@ -464,7 +464,7 @@ Interval fnl_get_noise_2d(const Voxel_FastNoiseLite &noise, Interval x, Interval
 		case Voxel_FastNoiseLite::FRACTAL_RIDGED:
 			return fnl_gen_fractal_ridged_2d(noise, x, y);
 		case Voxel_FastNoiseLite::FRACTAL_PING_PONG:
-			// TODO Ping pong
+			// TODO Ping pong 模式
 			return Interval(-1.f, 1.f);
 		default:
 			VOXEL_PRINT_ERROR("Unhandled fractal type");
@@ -473,7 +473,7 @@ Interval fnl_get_noise_2d(const Voxel_FastNoiseLite &noise, Interval x, Interval
 }
 
 Interval fnl_get_noise_3d(const Voxel_FastNoiseLite &noise, Interval x, Interval y, Interval z) {
-	// Same logic as in the FastNoiseLite internal function
+	// 与 FastNoiseLite 内部函数的逻辑相同
 	const fast_noise_lite::FastNoiseLite &fn = noise.get_noise_internal();
 
 	fnl_transform_noise_coordinate_3d(fn, x, y, z);
@@ -486,7 +486,7 @@ Interval fnl_get_noise_3d(const Voxel_FastNoiseLite &noise, Interval x, Interval
 		case Voxel_FastNoiseLite::FRACTAL_RIDGED:
 			return fnl_gen_fractal_ridged_3d(noise, x, y, z);
 		case Voxel_FastNoiseLite::FRACTAL_PING_PONG:
-			// TODO Ping pong
+			// TODO Ping pong 模式
 			return Interval(-1.f, 1.f);
 		default:
 			VOXEL_PRINT_ERROR("Unhandled fractal type");
@@ -518,7 +518,7 @@ Interval get_fnl_range_3d(const Voxel_FastNoiseLite &noise, Interval x, Interval
 }
 
 math::Interval2 get_fnl_gradient_range_2d(const Voxel_FastNoiseLiteGradient &noise, Interval x, Interval y) {
-	// TODO More precise analysis
+	// TODO 更精确的分析
 	const float amp = Math::abs(noise.get_amplitude());
 	return math::Interval2{
 		Interval{ x.min - amp, x.max + amp }, //
@@ -527,7 +527,7 @@ math::Interval2 get_fnl_gradient_range_2d(const Voxel_FastNoiseLiteGradient &noi
 }
 
 math::Interval3 get_fnl_gradient_range_3d(const Voxel_FastNoiseLiteGradient &noise, Interval x, Interval y, Interval z) {
-	// TODO More precise analysis
+	// TODO 更精确的分析
 	const float amp = Math::abs(noise.get_amplitude());
 	return math::Interval3{
 		Interval{ x.min - amp, x.max + amp }, //

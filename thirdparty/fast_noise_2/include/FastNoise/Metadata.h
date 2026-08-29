@@ -24,24 +24,24 @@ namespace FastNoise
         FASTNOISE_API const Metadata& GetMetadata();
     }
 
-    // Stores definition of a FastNoise node class
-    // Node name, member name+types, functions to set members
+    // 存储 FastNoise 节点类的定义
+    // 节点名、成员名+类型、设置成员的函数
     struct FASTNOISE_API Metadata
     {
         virtual ~Metadata() = default;
 
-        /// <returns>Array containing metadata for every FastNoise node type</returns>
+        /// <returns>包含每种 FastNoise 节点类型元数据的数组</returns>
         static const std::vector<const Metadata*>& GetAll()
         {
             return sAllMetadata;
         }
 
-        /// <returns>Metadata for given Metadata::id</returns>
+        /// <returns>给定 Metadata::id 的元数据</returns>
         static const Metadata* GetFromId( uint16_t nodeId )
         {
-            // Metadata not loaded yet
-            // Don't try to create nodes from metadata during static initialisation
-            // Metadata is loaded using static variable and static variable init is done in a random order
+            // 元数据尚未加载
+            // 不要在静态初始化期间从元数据创建节点
+            // 元数据通过静态变量加载，而静态变量的初始化顺序是随机的
             assert( sAllMetadata.size() );
 
             if( nodeId < sAllMetadata.size() )
@@ -52,7 +52,7 @@ namespace FastNoise
             return nullptr;
         }
 
-        /// <returns>Metadata for given node class</returns>
+        /// <returns>给定节点类的元数据</returns>
         template<typename T>
         static const Metadata& Get()
         {
@@ -65,17 +65,17 @@ namespace FastNoise
         /// <summary>
         /// Serialise node data and any source node datas (recursive)
         /// </summary>
-        /// <param name="nodeData">Root node data</param>
-        /// <param name="fixUp">Remove dependency loops and invalid node types</param>
-        /// <returns>Empty string on error</returns>
+        /// <param name="nodeData">根节点数据</param>
+        /// <param name="fixUp">移除依赖环和无效节点类型</param>
+        /// <returns>出错时返回空字符串</returns>
         static std::string SerialiseNodeData( NodeData* nodeData, bool fixUp = false );
 
         /// <summary>
-        /// Deserialise a string created from SerialiseNodeData to a node data tree
+        /// 将从 SerialiseNodeData 创建的字符串反序列化为节点数据树
         /// </summary>
-        /// <param name="serialisedBase64NodeData">Encoded string to deserialise</param>
-        /// <param name="nodeDataOut">Storage for new node data</param>
-        /// <returns>Root node</returns>
+        /// <param name="serialisedBase64NodeData">要反序列化的已编码字符串</param>
+        /// <param name="nodeDataOut">新节点数据的存储</param>
+        /// <returns>根节点</returns>
         static NodeData* DeserialiseNodeData( const char* serialisedBase64NodeData, std::vector<std::unique_ptr<NodeData>>& nodeDataOut );
 
         struct NameDesc
@@ -86,7 +86,7 @@ namespace FastNoise
             NameDesc( const char* name, const char* desc = "" ) : name( name ), desc( desc ) {}
         };
 
-        // Base member struct
+        // 基础成员结构体
         struct Member
         {
             const char* name = "";
@@ -95,22 +95,22 @@ namespace FastNoise
         };
 
         /// <summary>
-        /// Add spaces to node names: DomainScale -> Domain Scale
+        /// 为节点名添加空格：DomainScale -> Domain Scale
         /// </summary>
-        /// <param name="metadata">FastNoise node metadata</param>
-        /// <param name="removeGroups">Removes metadata groups from name: FractalFBm -> FBm</param>
-        /// <returns>string with formatted name</returns>
+        /// <param name="metadata">FastNoise 节点元数据</param>
+        /// <param name="removeGroups">从名称中移除元数据分组：FractalFBm -> FBm</param>
+        /// <returns>带有格式化名称的 string</returns>
         static std::string FormatMetadataNodeName( const Metadata* metadata, bool removeGroups = false );
 
         /// <summary>
-        /// Adds dimension prefix to member varibles that per-dimension:
+        /// 为按维度区分的成员变量添加维度前缀：
         /// DomainAxisScale::Scale -> X Scale
         /// </summary>
-        /// <param name="member">FastNoise node metadata member</param>
-        /// <returns>string with formatted name</returns>
+        /// <param name="member">FastNoise 节点元数据成员</param>
+        /// <returns>带有格式化名称的 string</returns>
         static std::string FormatMetadataMemberName( const Member& member );
 
-        // float, int or enum value
+        // float、int 或 enum 值
         struct MemberVariable : Member
         {
             enum eType
@@ -155,31 +155,31 @@ namespace FastNoise
             ValueUnion valueDefault, valueMin, valueMax;
             std::vector<const char*> enumNames;
 
-            // Function to set value for given generator
-            // Returns true if Generator is correct node class
+            // 为给定 generator 设置值的函数
+            // 若 Generator 是正确的节点类则返回 true
             std::function<bool( Generator*, ValueUnion )> setFunc;
         };
 
         // Node lookup (must be valid for node to function)
         struct MemberNodeLookup : Member
         {
-            // Function to set source for given generator
-            // Returns true if Generator* is correct node class and SmartNodeArg<> is correct node class
+            // 为给定 generator 设置 source 的函数
+            // 若 Generator* 是正确的节点类且 SmartNodeArg<> 是正确的节点类则返回 true
             std::function<bool( Generator*, SmartNodeArg<> )> setFunc;
         };
 
-        // Either a constant float or node lookup
+        // 常量浮点数或节点查找
         struct MemberHybrid : Member
         {
             float valueDefault = 0.0f;
 
-            // Function to set value for given generator
-            // Returns true if Generator is correct node class
+            // 为给定 generator 设置值的函数
+            // 若 Generator 是正确的节点类则返回 true
             std::function<bool( Generator*, float )> setValueFunc;
 
-            // Function to set source for given generator
-            // Source takes priority if value is also set
-            // Returns true if Generator is correct node class and SmartNodeArg<> is correct node class
+            // 为给定 generator 设置 source 的函数
+            // 若同时也设置了值，则 Source 优先
+            // 若 Generator 是正确的节点类且 SmartNodeArg<> 是正确的节点类则返回 true
             std::function<bool( Generator*, SmartNodeArg<> )> setNodeFunc;
         };
 
@@ -193,14 +193,14 @@ namespace FastNoise
         std::vector<MemberHybrid>     memberHybrids;
 
         /// <summary>
-        /// Create new instance of a FastNoise node from metadata
+        /// 从元数据创建 FastNoise 节点的新实例
         /// </summary>
         /// <example>
         /// auto node = metadata->CreateNode();
         /// metadata->memberVariables[0].setFunc( node.get(), 1.5f );
         /// </example>
-        /// <param name="maxSimdLevel">Max SIMD level, Null = Auto</param>
-        /// <returns>SmartNode<T> is guaranteed not nullptr</returns>
+        /// <param name="maxSimdLevel">最大 SIMD 级别，Null = Auto</param>
+        /// <returns>保证 SmartNode<T> 不为 nullptr</returns>
         virtual SmartNode<> CreateNode( FastSIMD::eLevel maxSimdLevel = FastSIMD::Level_Null ) const = 0;
 
     protected:
@@ -220,8 +220,8 @@ namespace FastNoise
         static std::vector<const Metadata*> sAllMetadata;
     };
 
-    // Stores data to create an instance of a FastNoise node
-    // Node type, member values
+    // 存储创建 FastNoise 节点实例的数据
+    // 节点类型、成员值
     struct FASTNOISE_API NodeData
     {
         NodeData( const Metadata* metadata );

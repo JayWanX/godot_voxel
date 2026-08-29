@@ -8,67 +8,67 @@ namespace voxel {
 
 struct ThreadedTaskContext {
 	enum Status : uint8_t {
-		// The task is complete and will be put in the list of completed tasks by the TaskRunner. It will be deleted
-		// later. This is the default status.
+		// 任务已完成，将由 TaskRunner 放入已完成任务列表。稍后会被删除。
+		// 这是默认状态。
 		STATUS_COMPLETE = 0,
-		// The task is not complete and will be re-run later by the TaskRunner
+		// 任务未完成，稍后将由 TaskRunner 重新运行
 		STATUS_POSTPONED = 1,
-		// The task is not complete and will be re-scheduled by another custom task.
-		// The TaskRunner will simply drop its pointer and won't put it in the list of completed tasks.
-		// Initially added so we can schedule task B from task A, and have B re-schedule A to use results computed in A
+		// 任务未完成，将由另一个自定义任务重新调度。
+		// TaskRunner 会直接丢弃其指针，不会将其放入已完成任务列表。
+		// 最初加入该功能是为了能从任务 A 调度任务 B，并让 B 重新调度 A，以使用 A 中计算的结果
 		STATUS_TAKEN_OUT = 2
 	};
 
-	// Index of the thread within the runner's pool. Can be used to index arrays as an alternative to thread_local
-	// storage.
+	// 线程在运行器线程池中的索引。可作为 thread_local 的替代方案用于数组索引。
+	// 存储。
 	const uint8_t thread_index;
-	// May be set by the task to signal its status after run
+	// 可由任务在运行后设置，以标识其状态
 	Status status;
-	// Cached priority of the current task. May be useful to copy if the current task spawns other related tasks.
+	// 当前任务的缓存优先级。若当前任务产生其他相关任务，复制它可能有用。
 	const TaskPriority task_priority;
-	// If this is set to a non-null task, it will run right after the current one on the same thread.
-	// By doing so, ownership is given to ThreadedTaskRunner. These tasks must not have been owned by the runner
-	// already. Priority of such tasks is not relevant.
+	// 若将其设为非空任务，它将在同一线程上紧接当前任务之后运行。
+	// 这样做会将所有权交给 ThreadedTaskRunner。这些任务此前一定不能被运行器
+	// 拥有过。此类任务的优先级无关紧要。
 	// IThreadedTask *next_immediate_task;
 
 	ThreadedTaskContext(uint8_t p_thread_index, TaskPriority p_priority) :
 			thread_index(p_thread_index),
-			// By default, if the task does not set this status, it will be considered complete after run
+			// 默认情况下，若任务未设置该状态，则运行后被视为已完成
 			status(STATUS_COMPLETE),
 			task_priority(p_priority) {}
 
-	// To allow scheduling tasks from within tasks, without having to pass it in or use a global
+	// 允许在任务内部调度任务，而无需将其传入或使用全局变量
 	// ThreadedTaskRunner &runner;
 };
 
-// Interface for a task that will run in `ThreadedTaskRunner`.
-// The task will run in another thread.
+// 将在 `ThreadedTaskRunner` 中运行的任务的接口。
+// 该任务将在另一个线程中运行。
 class IThreadedTask {
 public:
 	virtual ~IThreadedTask() {}
 
-	// Called from within the thread pool
+	// 从线程池内部调用
 	virtual void run(ThreadedTaskContext &ctx) = 0;
 
-	// Convenience method which can be called by the scheduler of the task (usually on the main thread)
-	// in order to apply results. It is not called from the thread pool.
+	// 便利方法，可由任务的调度器（通常在主线程上）调用，
+	// 以应用结果。它不由线程池调用。
 	virtual void apply_result(){};
 
-	// Hints how soon this task will be executed after being scheduled. This is relevant when there are a lot of tasks.
-	// Lower values means higher priority.
-	// Can change between two calls. The thread pool will poll this value regularly over some time interval.
+	// 提示该任务在被调度后多久会执行。当任务很多时这一点很重要。
+	// 数值越小表示优先级越高。
+	// 两次调用之间可能改变。线程池会在一定时间间隔内定期轮询该值。
 	virtual TaskPriority get_priority() {
-		// Defaulting to maximum priority as it's the most common expectation.
+		// 默认取最高优先级，因为这是最常见的期望。
 		return TaskPriority::max();
 	}
 
-	// May return `true` in order for the thread pool to skip the task
+	// 可返回 `true`，使线程池跳过该任务
 	virtual bool is_cancelled() {
 		return false;
 	}
 
-	// Gets the name of the task for debug purposes. The returned name's lifetime must span the execution of the engine
-	// (usually a string literal).
+	// 出于调试目的获取任务名称。返回的名称的生命周期必须覆盖引擎的执行期
+	// （通常是字符串字面量）。
 	virtual const char *get_debug_name() const {
 		return "<unnamed>";
 	}

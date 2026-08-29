@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelBlockSerializer" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
+		用于保存和加载 [VoxelBuffer] 内数据的底层工具。
 	</brief_description>
 	<description>
-		Low-level utility to save and load the data within a [VoxelBuffer]. This can be useful to send data over the network, or to store it in a file.
+		用于保存和加载 [VoxelBuffer] 内数据的底层工具。可用来通过网络发送数据，或将其存储到文件中。
 
-		To store into a file allocating a PackedByteArray:
+		要存储到文件，先分配 PackedByteArray：
 		[codeblock]
-		# `voxels` is an existing `VoxelBuffer`
+		# `voxels` 是一个已有的 `VoxelBuffer`
 		var data := VoxelBlockSerializer.serialize_to_byte_array(voxels, true)
 		file.store_32(len(data))
 		file.store_buffer(data)
 		[/codeblock]
-		To read it back:
+		再将其读回：
 		[codeblock]
 		var size := file.get_32()
 		var data := file.get_buffer(size)
 		VoxelBlockSerializer.deserialize_from_byte_array(data, voxels, true)
 		[/codeblock]
 
-		To store into a file by re-using a StreamPeerBuffer:
+		通过复用 StreamPeerBuffer 存储到文件：
 		[codeblock]
-		# Note, buffer can be re-used if you do this often
+		# 注意，如果经常这样做，可以复用该 buffer
 		var stream_peer_buffer := StreamPeerBuffer.new()
 		var written_size = VoxelBlockSerializer.serialize_to_stream_peer(stream_peer_buffer, voxels, true)
 		file.store_32(written_size)
 		file.store_buffer(stream_peer_buffer.data_array)
 		[/codeblock]
-		To read it back:
+		再将其读回：
 		[codeblock]
 		var size := file.get_32()
 		var stream_peer_buffer := StreamPeerBuffer.new()
-		# Unfortunately Godot will always allocate memory with this API, can't avoid that
+		# 不幸的是，Godot 使用此 API 时总会分配内存，这一点无法避免
 		stream_peer_buffer.data_array = file.get_buffer(size)
 		VoxelBlockSerializer.deserialize_from_stream_peer(stream_peer_buffer, voxels, size, true)
 		[/codeblock]
@@ -45,7 +46,7 @@
 			<param index="1" name="voxel_buffer" type="VoxelBuffer" />
 			<param index="2" name="decompress" type="bool" />
 			<description>
-				Reads the data of a [VoxelBuffer] from a [PackedByteArray].
+				从 [PackedByteArray] 读取 [VoxelBuffer] 的数据。
 			</description>
 		</method>
 		<method name="deserialize_from_stream_peer" qualifiers="static">
@@ -55,7 +56,7 @@
 			<param index="2" name="size" type="int" />
 			<param index="3" name="decompress" type="bool" />
 			<description>
-				Reads the data of a [VoxelBuffer] from a [StreamPeer]. You must provide the number of bytes to read.
+				从 [StreamPeer] 读取 [VoxelBuffer] 的数据。你必须提供要读取的字节数。
 			</description>
 		</method>
 		<method name="serialize_to_byte_array" qualifiers="static">
@@ -63,7 +64,7 @@
 			<param index="0" name="voxel_buffer" type="VoxelBuffer" />
 			<param index="1" name="compress" type="int" enum="VoxelBlockSerializer.Compression" />
 			<description>
-				Stores the data of a [VoxelBuffer] into a [PackedByteArray].
+				将 [VoxelBuffer] 的数据存储到 [PackedByteArray] 中。
 			</description>
 		</method>
 		<method name="serialize_to_stream_peer" qualifiers="static">
@@ -72,19 +73,19 @@
 			<param index="1" name="voxel_buffer" type="VoxelBuffer" />
 			<param index="2" name="compress" type="int" enum="VoxelBlockSerializer.Compression" />
 			<description>
-				Stores the data of a [VoxelBuffer] into a [StreamPeer]. Returns the number of written bytes.
+				将 [VoxelBuffer] 的数据存储到 [StreamPeer] 中。返回写入的字节数。
 			</description>
 		</method>
 	</methods>
 	<constants>
 		<constant name="COMPRESSION_NONE" value="0" enum="Compression">
-			Don't compress the data.
+			不压缩数据。
 		</constant>
 		<constant name="COMPRESSION_LZ4" value="1" enum="Compression">
-			Use the LZ4 default compression algorithm. Fast, but lower compression ratio.
+			使用 LZ4 默认压缩算法。速度快，但压缩率较低。
 		</constant>
 		<constant name="COMPRESSION_ZSTD" value="2" enum="Compression">
-			Use the Zstandard default compression algorithm. Good compression ratio but slower.
+			使用 Zstandard 默认压缩算法。压缩率较高，但速度较慢。
 		</constant>
 	</constants>
 </class>

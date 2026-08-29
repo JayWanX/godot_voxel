@@ -1,61 +1,61 @@
-Instance block format v0
+实例数据块格式 v0
 =======================
 
 !!! warning
-    This document is about an old version of the format. You may check the most recent version.
+    本文档描述的是该格式的旧版本。你可以查看最新版本。
 
-This page describes the binary format used by the module to save instances to files or databases.
+本页描述该模块用于将实例保存到文件或数据库的二进制格式。
 
-Specification
+规范
 ---------------
 
-### Compressed container
+### 压缩容器
 
-A block is usually serialized as compressed data.
-See [Compressed container format](compressed_container.md) for specification.
+数据块通常被序列化为压缩数据。
+规范请参见[压缩容器格式](compressed_container.md)。
 
 
-### Binary data
+### 二进制数据
 
-This data uses big-endian.
+此数据使用大端字节序。
 
-In pseudo-code:
+用伪代码表示：
 
 ```cpp
-// Root structure
+// 根结构
 struct InstanceBlockData {
-	// Version tag in case more stuff is added in the future
+	// 版本标记，以防将来增加更多内容
 	uint8_t version = 0;
-    // There can be up to 256 different layers in one block
+    // 一个数据块中最多可以有 256 个不同的层
 	uint8_t layer_count;
-	// To compress positions we need to know their range.
-	// It's local to the block so we know it starts from zero.
+	// 要压缩位置，我们需要知道它们的范围。
+	// 它是数据块局部的，因此我们知道它从零开始。
 	float position_range;
 	LayerData layers[layer_count];
-	// Magic number to signal the end of the data block
+	// 用于标记数据块结束的魔数
 	uint32_t control_end = 0x900df00d;
 };
 
 struct LayerData {
-	uint16_t id; // Identifies the type of instances (rocks, grass, pebbles, bushes etc)
+	uint16_t id; // 标识实例的类型（岩石、草、鹅卵石、灌木等）
 	uint16_t count;
-	// To be able to compress scale we must know its range
+	// 要压缩缩放比例，我们必须知道它的范围
 	float scale_min;
 	float scale_max;
-	// This tells which format instances of this layer use. For now I always use the same format,
-	// But maybe some types of instances will need more, or less data?
+	// 这告诉此层的实例使用哪种格式。目前我始终使用相同的格式，
+	// 但也许某些类型的实例会需要更多或更少的数据？
 	uint8_t format = 0;
 	InstanceData data[count];
 };
 
 struct InstanceData {
-	// Position is lossy-compressed based on the size of the block
+	// 位置根据数据块的大小进行有损压缩
 	uint16_t x;
 	uint16_t y;
 	uint16_t z;
-	// Scale is uniform and is lossy-compressed to 256 values
+	// 缩放比例是统一的，并有损压缩到 256 个值
 	uint8_t scale;
-	// Rotation is a compressed quaternion
+	// 旋转是压缩后的四元数
 	uint8_t x;
 	uint8_t y;
 	uint8_t z;

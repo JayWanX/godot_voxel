@@ -2,21 +2,21 @@
 
 namespace voxel::Cube {
 
-// The following tables respect the following conventions
+// 以下表格遵循以下约定
 //
 //    7-------6
 //   /|      /|
-//  / |     / |  Corners
+//  / |     / |  角点
 // 4-------5  |
 // |  3----|--2
 // | /     | /     y z
-// |/      |/      |/   OpenGL axis convention
+// |/      |/      |/   OpenGL 坐标轴约定
 // 0-------1    x--o
 //
 //
 //     o---10----o
 //    /|        /|
-//  11 7       9 6   Edges
+//  11 7       9 6   边
 //  /  |      /  |
 // o----8----o   |
 // |   o---2-|---o
@@ -25,13 +25,13 @@ namespace voxel::Cube {
 // |/        |/
 // o----0----o
 //
-// Sides are ordered according to the Voxel::Side enum.
-// Edges are ordered according to the Voxel::Edge enum (only g_edge_inormals!).
+// 面按 Voxel::Side 枚举顺序排列。
+// 边按 Voxel::Edge 枚举顺序排列（仅 g_edge_inormals！）。
 //
 
 // clang-format off
 
-// Ordered as per the cube corners diagram
+// 按照立方体角点示意图的顺序排列
 const Vector3f g_corner_position[CORNER_COUNT] = {
 	Vector3f(1, 0, 0), //
 	Vector3f(0, 0, 0), //
@@ -47,12 +47,12 @@ const Vector3f g_corner_position[CORNER_COUNT] = {
 // |   |
 // 0---1
 const int g_side_quad_triangles[SIDE_COUNT][6] = {
-	{ 0, 2, 1, 0, 3, 2 }, // LEFT (+x)
-	{ 0, 2, 1, 0, 3, 2 }, // RIGHT (-x)
-	{ 0, 2, 1, 0, 3, 2 }, // BOTTOM (-y)
-	{ 0, 2, 1, 0, 3, 2 }, // TOP (+y)
-	{ 0, 2, 1, 0, 3, 2 }, // BACK (-z)
-	{ 0, 2, 1, 0, 3, 2 }, // FRONT (+z)
+	{ 0, 2, 1, 0, 3, 2 }, // 左 (+x)
+	{ 0, 2, 1, 0, 3, 2 }, // 右 (-x)
+	{ 0, 2, 1, 0, 3, 2 }, // 底 (-y)
+	{ 0, 2, 1, 0, 3, 2 }, // 顶 (+y)
+	{ 0, 2, 1, 0, 3, 2 }, // 后 (-z)
+	{ 0, 2, 1, 0, 3, 2 }, // 前 (+z)
 };
 
 // const int g_side_quad_triangles_alt[6] = { 0, 3, 1, 1, 3, 2 };
@@ -61,14 +61,14 @@ const int g_side_quad_triangles[SIDE_COUNT][6] = {
 // const unsigned int g_side_sign[SIDE_COUNT] = { 0, 1, 0, 1, 0, 1 };
 
 const Vector3i g_side_normals[SIDE_COUNT] = {
-	// TODO Bug: wrong! Left should be -X
+	// TODO 缺陷：错误！LEFT 应为 -X
 	Vector3i(1, 0, 0), // LEFT
 	Vector3i(-1, 0, 0), // RIGHT
 
 	Vector3i(0, -1, 0), // BOTTOM
 	Vector3i(0, 1, 0), // TOP
 
-	// TODO Bug: wrong! Front should be -Z
+	// TODO 缺陷：错误！FRONT 应为 -Z
 	Vector3i(0, 0, -1), // BACK
 	Vector3i(0, 0, 1), // FRONT
 };
@@ -84,8 +84,8 @@ const float g_side_tangents[SIDE_COUNT][4] = { //
 	{ 1.f, 0.f, 0.f, 1.f }
 };
 
-// Corners have same winding, relative to the face's normal.
-// X and Z sides have their top corners coming last.
+// 角点的环绕顺序相同，相对于面的法线方向。
+// X 和 Z 面最上面的角点排在最后。
 const unsigned int g_side_corners[SIDE_COUNT][4] = {
 	{ 3, 0, 4, 7 }, //
 	{ 1, 2, 6, 5 }, //
@@ -151,7 +151,7 @@ const unsigned int g_edge_corners[EDGE_COUNT][2] = {
 	{ 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 } //
 };
 
-// Order is irrelevant
+// 顺序无关紧要
 const Vector3i g_moore_neighboring_3d[MOORE_NEIGHBORING_3D_COUNT] = {
 	Vector3i(-1, -1, -1),
 	Vector3i(0, -1, -1),
@@ -184,8 +184,8 @@ const Vector3i g_moore_neighboring_3d[MOORE_NEIGHBORING_3D_COUNT] = {
 	Vector3i(1, 1, 1),
 };
 
-// Order is IMPORTANT:
-// This is used in multithread context, in which we may iterate blocks in XYZ order, to avoid deadlocks.
+// 顺序很重要：
+// 这用于多线程环境，我们可能按 XYZ 顺序遍历区块，以避免死锁。
 const Vector3i g_ordered_moore_area_3d[MOORE_AREA_3D_COUNT] = { //
 	Vector3i(-1, -1, -1), //
 	Vector3i(0, -1, -1), //

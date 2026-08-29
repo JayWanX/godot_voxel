@@ -1,7 +1,7 @@
 #include "render_detail_texture_task.h"
 #include "../../util/profiling.h"
 #include "../voxel_engine.h"
-// #include "../../util/string/format.h" // Debug
+// #include "../../util/string/format.h" // 调试
 #include "../../constants/voxel_constants.h"
 #include "../../modifiers/voxel_modifier_stack.h"
 #include "../../storage/voxel_data.h"
@@ -69,7 +69,7 @@ void RenderDetailTextureTask::run_on_cpu() {
 
 	const unsigned int tile_resolution = get_detail_texture_tile_resolution_for_lod(detail_texture_settings, lod_index);
 
-	// LOD0 coordinates
+	// LOD0 坐标
 	const Vector3i size_in_voxels = mesh_block_size << lod_index;
 	const Vector3i origin_in_voxels = mesh_block_position * size_in_voxels;
 
@@ -94,7 +94,7 @@ void RenderDetailTextureTask::run_on_cpu() {
 			normalmap_data, tile_resolution, mesh_block_size, detail_texture_settings.octahedral_encoding_enabled
 	);
 
-	// Debug
+	// 调试
 	// debug_dump_atlas(images.atlas,
 	// 		String("debug_data/debug_normalmap_atlas_{0}_{1}_{2}_lod{3}_n{4}.png")
 	// 				.format(varray(mesh_block_position.x, mesh_block_position.y, mesh_block_position.z, lod_index,
@@ -126,13 +126,13 @@ void RenderDetailTextureTask::apply_result() {
 	}
 
 	if (!VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
-		// This can happen if the user removes the volume while requests are still about to return
+		// 当用户移除了体素体积而请求仍将返回时，可能会发生这种情况
 		VOXEL_PRINT_VERBOSE("Normalmap task completed but volume wasn't found");
 		return;
 	}
 
 	VoxelEngine::BlockDetailTextureOutput o;
-	// TODO Check for invalidation due to property changes
+	// TODO 检查是否因属性变化而失效
 
 	o.position = mesh_block_position;
 	o.lod_index = lod_index;
@@ -145,13 +145,13 @@ void RenderDetailTextureTask::apply_result() {
 }
 
 TaskPriority RenderDetailTextureTask::get_priority() {
-	// Priority by distance, but after meshes
+	// 按距离排序的优先级，但位于网格之后
 	TaskPriority p = priority_dependency.evaluate(lod_index, constants::TASK_PRIORITY_DETAIL_TEXTURES_BAND2, nullptr);
 	return p;
 }
 
 bool RenderDetailTextureTask::is_cancelled() {
-	// TODO Cancel if too far?
+	// TODO 如果太远就取消？
 	return false;
 }
 
@@ -219,8 +219,8 @@ RenderDetailTextureGPUTask *RenderDetailTextureTask::make_gpu_task() {
 	std::shared_ptr<ComputeShader> shader = generator->get_detail_rendering_shader();
 	VOXEL_ASSERT_RETURN_V(shader != nullptr, nullptr);
 
-	// Fallback on CPU for tiles containing edited voxels.
-	// TODO Figure out an efficient way to have sparse voxel data available on the GPU
+	// 对包含已编辑体素的瓦片回退到 CPU 处理。
+	// TODO 找出一种高效的方法，让稀疏体素数据在 GPU 上可用
 	const Vector3i size_in_voxels = mesh_block_size << lod_index;
 	const Vector3i origin_in_voxels = mesh_block_position * size_in_voxels;
 	DetailTextureData edited_tiles_normalmap_data;
@@ -260,12 +260,12 @@ RenderDetailTextureGPUTask *RenderDetailTextureTask::make_gpu_task() {
 	params.tiles_y = tiles_across;
 	params.tile_size_pixels = tile_resolution;
 
-	// Create GPU task
+	// 创建 GPU 任务
 
 	RenderDetailTextureGPUTask *gpu_task = VOXEL_NEW(RenderDetailTextureGPUTask);
 	gpu_task->texture_width = pixels_across;
 	gpu_task->texture_height = pixels_across;
-	// TODO Mesh data need std::move or std::shared_ptr, we only read it
+	// TODO 网格数据需要 std::move 或 std::shared_ptr，我们只读取它
 	gpu_task->mesh_indices = mesh_indices;
 
 	StdVector<Vector4f> &dst_vertices = gpu_task->mesh_vertices;
@@ -373,16 +373,16 @@ static void combine_edited_tiles(
 void RenderDetailTexturePass2Task::run(ThreadedTaskContext &ctx) {
 	VOXEL_PROFILE_SCOPE();
 
-	// TODO Suggestion: given how fast GPU normalmaps are computed, maybe we could output them first,
-	// and get the edits later, even if that means computing tiles redundantly, because at least we get a
-	// result quicker rather than a "hole" of lack of detail
+	// TODO 建议：鉴于 GPU 法线贴图计算速度很快，也许可以先输出它们，
+	// 之后再获取编辑结果，即使这意味着重复计算一些瓦片，因为至少我们能更快
+	// 得到结果，而不是出现一个缺少细节的"空洞"
 
-	// We don't really use the alpha channel so far, but otherwise Godot complains RGB8 isn't supported by GPU
+	// 我们目前其实不使用 alpha 通道，但否则 Godot 会抱怨 GPU 不支持 RGB8
 	const Image::Format atlas_pixel_format = Image::FORMAT_RGBA8;
 	const unsigned int atlas_pixel_size = 4;
 
-	// TODO Optimization: currently, the GPU task still generates tiles that would otherwise be replaced with edited
-	// tiles. Maybe we should find a way to tell the GPU task to exclude these tiles efficiently?
+	// TODO 优化：目前，GPU 任务仍然会生成那些本应被编辑瓦片替换的瓦片。
+	// 也许我们应该想办法高效地告诉 GPU 任务排除这些瓦片？
 	if (edited_tiles_texture_data.tiles.size() > 0) {
 		combine_edited_tiles(
 				atlas_data,
@@ -395,7 +395,7 @@ void RenderDetailTexturePass2Task::run(ThreadedTaskContext &ctx) {
 
 	DetailImages images;
 
-	// TODO Octahedral compression
+	// TODO 八面体压缩
 	images.atlas = Image::create_from_data(atlas_width, atlas_height, false, atlas_pixel_format, atlas_data);
 	ERR_FAIL_COND(images.atlas.is_null());
 
@@ -413,13 +413,13 @@ void RenderDetailTexturePass2Task::run(ThreadedTaskContext &ctx) {
 
 void RenderDetailTexturePass2Task::apply_result() {
 	if (!VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
-		// This can happen if the user removes the volume while requests are still about to return
+		// 当用户移除了体素体积而请求仍将返回时，可能会发生这种情况
 		VOXEL_PRINT_VERBOSE("Normalmap task completed but volume wasn't found");
 		return;
 	}
 
 	VoxelEngine::BlockDetailTextureOutput o;
-	// TODO Check for invalidation due to property changes
+	// TODO 检查是否因属性变化而失效
 
 	o.position = mesh_block_position;
 	o.lod_index = lod_index;

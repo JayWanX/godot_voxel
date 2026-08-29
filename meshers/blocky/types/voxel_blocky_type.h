@@ -9,17 +9,17 @@
 
 namespace voxel {
 
-// High-level representation of a "type" of voxel for use with `VoxelMesherBlocky` and `VoxelBlockyTypeLibrary`.
-// One type can represent multiple possible values in voxel data, corresponding to states of that type (such as
-// rotation, connections, on/off etc).
+// 一种体素"类型"的高层表示，用于 `VoxelMesherBlocky` 和 `VoxelBlockyTypeLibrary`。
+// 一种类型可以在体素数据中表示多个可能的值，对应于该类型的状态（例如
+// 旋转、连接、开/关等）。
 class VoxelBlockyType : public Resource {
 	GDCLASS(VoxelBlockyType, Resource)
 public:
-	// Should be kept as low as possible. Increase if needed.
+	// 应尽可能保持较低。需要时再增加。
 	static const int MAX_ATTRIBUTES = 4;
-	// Maximum amount of variants that can be edited as a list of combinations.
-	// Technical limit is 65536, but reaching hundreds indicates a design problem, and can be overwhelming to edit. Such
-	// amount of variants is possible though, in which case we should implement conditionals.
+	// 可作为组合列表编辑的最大变体数量。
+	// 技术上限是 65536，但达到数百就表明存在设计问题，且编辑起来会不堪重负。不过
+	// 这种数量的变体是有可能的，此时我们应该实现条件逻辑。
 	static const int MAX_EDITING_VARIANTS = 256;
 
 	VoxelBlockyType();
@@ -36,12 +36,12 @@ public:
 
 	void get_checked_attributes(StdVector<Ref<VoxelBlockyAttribute>> &out_attribs) const;
 
-	// Identifies one model variant of a type, as the attributes and values it has.
+	// 标识类型的一个模型变体，即它拥有的属性及其值。
 	struct VariantKey {
-		// Names must be sorted by string (not StringName pointer comparison).
-		// In the design, this is not really required, user and config files can specify attributes in any order,
-		// but we do this at runtime to improve performance when looking them up.
-		// Names and values must be packed at the beginning of arrays. Unused values must be defaulted.
+		// 名称必须按字符串排序（不是 StringName 指针比较）。
+		// 在设计上这并非必需，用户和配置文件可以任意顺序指定属性，
+		// 但我们在运行时这样做以提升查找性能。
+		// 名称和值必须紧排在数组开头。未使用的值必须为默认值。
 		FixedArray<StringName, MAX_ATTRIBUTES> attribute_names;
 		FixedArray<uint8_t, MAX_ATTRIBUTES> attribute_values;
 
@@ -60,7 +60,7 @@ public:
 		void sort();
 	};
 
-	// Get or set models specifically associated to a particular variant (they are not necessarily the final result)
+	// 获取或设置与特定变体关联的模型（它们不一定是最终结果）
 	void set_variant(const VariantKey &key, Ref<VoxelBlockyModel> model);
 	Ref<VoxelBlockyModel> get_variant(const VariantKey &key) const;
 
@@ -83,13 +83,13 @@ public:
 	void generate_keys(StdVector<VariantKey> &out_keys, bool include_rotations) const;
 
 private:
-	// Filters null entries, removes duplicates and sorts attributes before they can be used in processing
+	// 在属性可用于处理之前，过滤空项、移除重复项并对属性排序
 	static void gather_and_sort_attributes(
 			const StdVector<Ref<VoxelBlockyAttribute>> &attributes_with_maybe_nulls,
 			StdVector<Ref<VoxelBlockyAttribute>> &out_attributes
 	);
 
-	// Generates all combinations from pre-sorted attributes.
+	// 从已排序的属性生成所有组合。
 	static void generate_keys(
 			const StdVector<Ref<VoxelBlockyAttribute>> &attributes,
 			StdVector<VariantKey> &out_keys,
@@ -112,24 +112,24 @@ private:
 
 	static void _bind_methods();
 
-	// Name of the type, as used in development, config files, save files or commands. It must be unique, and maybe
-	// prefixed if your game supports modding. To display it in-game, it may be preferable to use a translation
-	// dictionary rather than using it directly.
+	// 类型的名称，用于开发、配置文件、存档文件或命令中。它必须是唯一的，
+	// 如果你的游戏支持 modding，可能还需要加前缀。要在游戏中显示它，
+	// 可能更推荐使用翻译字典而不是直接使用它。
 	StringName _name;
 
 	Ref<VoxelBlockyModel> _base_model;
 
-	// List of unchecked attributes, as specified in the editor. Can have nulls, duplicates, and is not sorted.
-	// They are stored this way to allow editing in the Godot editor...
-	// TODO Rename `_unchecked_attributes`?
+	// 编辑器中指定的未检查属性列表。可能包含空值、重复项，并且未排序。
+	// 以这种方式存储是为了方便在 Godot 编辑器中编辑……
+	// TODO 重命名为 `_unchecked_attributes`？
 	StdVector<Ref<VoxelBlockyAttribute>> _attributes;
 
-	// TODO Automatic rotation isn't always possible.
-	// For example, if a 3-axis block is asymetric and needs to always point down in its Y axis configuration, there is
-	// no way to choose that (other than wasting a 6-dir attribute)
+	// TODO 自动旋转并不总是可行。
+	// 例如，如果一个 3 轴数据块不对称，并且在其 Y 轴配置中需要始终朝下，
+	// 就没有办法做到这一点（除非浪费一个 6 方向属性）
 
-	// If true, rotation attributes will not require the user to specify models for each rotation. They will be
-	// automatically generated, using the default rotation as reference.
+	// 如果为 true，旋转属性将不需要用户为每次旋转指定模型。它们将
+	// 自动生成，以默认旋转为参照。
 	bool _automatic_rotations = true;
 
 	struct VariantData {
@@ -137,13 +137,13 @@ private:
 		Ref<VoxelBlockyModel> model;
 	};
 
-	// This only contains variants explicitely defined by the user in the editor. Not all runtime variants are here.
-	// Can also contain variants that have no relation to any attribute, but these are not saved. They remain in memory
-	// to allow the user to go back and forth between configurations in the editor as they make changes.
-	// Saved variants are determined from the combination of current valid attributes.
+	// 这里只包含用户在编辑器中显式定义的变体。并非所有运行时变体都在其中。
+	// 也可能包含与任何属性都无关的变体，但这些变体不会被保存。它们保留在内存中，
+	// 以便用户在编辑器中做更改时可以在不同配置之间来回切换。
+	// 已保存的变体由当前有效属性的组合决定。
 	StdVector<VariantData> _variants;
 
-	// TODO Conditional models
+	// TODO 条件模型
 };
 
 String to_string(const VoxelBlockyType::VariantKey &key);

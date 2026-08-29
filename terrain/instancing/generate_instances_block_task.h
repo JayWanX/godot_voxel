@@ -14,7 +14,7 @@
 
 namespace voxel {
 
-// TODO Optimize: eventually this should be moved closer to the meshing task, including edited instances
+// TODO 优化：最终这应移到更靠近网格化任务的位置，包括已编辑的实例
 class GenerateInstancesBlockTask : public IThreadedTask {
 public:
 	Vector3i mesh_block_grid_position;
@@ -28,7 +28,7 @@ public:
 	int32_t index_range_end = -1;
 	Ref<VoxelInstanceGenerator> generator;
 	Ref<VoxelGenerator> voxel_generator;
-	// Can be pre-populated by edited transforms
+	// 可由已编辑的变换预先填充
 	StdVector<Transform3f> transforms;
 	std::shared_ptr<InstancerTaskOutputQueue> output_queue;
 

@@ -7,8 +7,8 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Nicolas Capens. Advanced Rasterization. 2004
+// 此作品基于：
+// Nicolas Capens. 高级光栅化. 2004
 namespace meshopt
 {
 
@@ -26,7 +26,7 @@ static float computeDepthGradients(float& dzdx, float& dzdy, float x1, float y1,
 	// z3 = z1 + dzdx * (x3 - x1) + dzdy * (y3 - y1)
 	// (x2-x1 y2-y1)(dzdx) = (z2-z1)
 	// (x3-x1 y3-y1)(dzdy)   (z3-z1)
-	// we'll solve it with Cramer's rule
+	// 我们将用克莱默（Cramer）法则求解
 	float det = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
 	float invdet = (det == 0) ? 0 : 1 / det;
 
@@ -36,15 +36,15 @@ static float computeDepthGradients(float& dzdx, float& dzdy, float x1, float y1,
 	return det;
 }
 
-// half-space fixed point triangle rasterizer
+// 半空间定点三角形光栅化器
 static void rasterize(OverdrawBuffer* buffer, float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z)
 {
-	// compute depth gradients
+	// 计算深度梯度
 	float DZx, DZy;
 	float det = computeDepthGradients(DZx, DZy, v1x, v1y, v1z, v2x, v2y, v2z, v3x, v3y, v3z);
 	int sign = det > 0;
 
-	// flip backfacing triangles to simplify rasterization logic
+	// 翻转背面三角形以简化光栅化逻辑
 	if (sign)
 	{
 		// flipping v2 & v3 preserves depth gradients since they're based on v1; only v1z is used below
@@ -58,7 +58,7 @@ static void rasterize(OverdrawBuffer* buffer, float v1x, float v1y, float v1z, f
 		DZy = -DZy;
 	}
 
-	// coordinates, 28.4 fixed point
+	// 坐标，28.4 定点
 	int X1 = int(16.0f * v1x + 0.5f);
 	int X2 = int(16.0f * v2x + 0.5f);
 	int X3 = int(16.0f * v3x + 0.5f);
@@ -67,9 +67,9 @@ static void rasterize(OverdrawBuffer* buffer, float v1x, float v1y, float v1z, f
 	int Y2 = int(16.0f * v2y + 0.5f);
 	int Y3 = int(16.0f * v3y + 0.5f);
 
-	// bounding rectangle, clipped against viewport
-	// since we rasterize pixels with covered centers, min >0.5 should round up
-	// as for max, due to top-left filling convention we will never rasterize right/bottom edges
+	// 包围矩形，针对视口裁剪
+	// 由于我们光栅化中心被覆盖的像素，min >0.5 应向上取整
+	// 至于 max，由于左上填充约定，我们永远不会光栅化右/下边缘
 	// so max >= 0.5 should round down for inclusive bounds, and up for exclusive (in our case)
 	int minx = X1 < X2 ? X1 : X2;
 	minx = minx < X3 ? minx : X3;
@@ -91,7 +91,7 @@ static void rasterize(OverdrawBuffer* buffer, float v1x, float v1y, float v1z, f
 	maxy = (maxy + 7) >> 4;
 	maxy = maxy > kViewport ? kViewport : maxy;
 
-	// deltas, 28.4 fixed point
+	// 增量，28.4 定点
 	int DX12 = X1 - X2;
 	int DX23 = X2 - X3;
 	int DX31 = X3 - X1;
@@ -100,13 +100,13 @@ static void rasterize(OverdrawBuffer* buffer, float v1x, float v1y, float v1z, f
 	int DY23 = Y2 - Y3;
 	int DY31 = Y3 - Y1;
 
-	// fill convention correction
+	// 填充约定校正
 	int TL1 = DY12 < 0 || (DY12 == 0 && DX12 > 0);
 	int TL2 = DY23 < 0 || (DY23 == 0 && DX23 > 0);
 	int TL3 = DY31 < 0 || (DY31 == 0 && DX31 > 0);
 
-	// half edge equations, 24.8 fixed point
-	// note that we offset minx/miny by half pixel since we want to rasterize pixels with covered centers
+	// 半平面方程，24.8 定点
+	// 注意：我们将 minx/miny 偏移半个像素，因为要光栅化中心被覆盖的像素
 	int FX = (minx << 4) + 8;
 	int FY = (miny << 4) + 8;
 	int CY1 = DX12 * (FY - Y1) - DY12 * (FX - X1) + TL1 - 1;
@@ -123,7 +123,7 @@ static void rasterize(OverdrawBuffer* buffer, float v1x, float v1y, float v1z, f
 
 		for (int x = minx; x < maxx; x++)
 		{
-			// check if all CXn are non-negative
+			// 检查所有 CXn 是否非负
 			if ((CX1 | CX2 | CX3) >= 0)
 			{
 				if (ZX >= buffer->z[y][x][sign])
@@ -133,14 +133,14 @@ static void rasterize(OverdrawBuffer* buffer, float v1x, float v1y, float v1z, f
 				}
 			}
 
-			// signed left shift is UB for negative numbers so use unsigned-signed casts
+			// 负数进行有符号左移是未定义行为，因此使用无符号与有符号之间的转换
 			CX1 -= int(unsigned(DY12) << 4);
 			CX2 -= int(unsigned(DY23) << 4);
 			CX3 -= int(unsigned(DY31) << 4);
 			ZX += DZx;
 		}
 
-		// signed left shift is UB for negative numbers so use unsigned-signed casts
+		// 负数进行有符号左移是未定义行为，因此使用无符号与有符号之间的转换
 		CY1 += int(unsigned(DX12) << 4);
 		CY2 += int(unsigned(DX23) << 4);
 		CY3 += int(unsigned(DX31) << 4);

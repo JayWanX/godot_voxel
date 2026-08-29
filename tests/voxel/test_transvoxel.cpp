@@ -5,7 +5,7 @@
 namespace voxel::tests {
 
 void test_transvoxel_issue772() {
-	// There was a wrong assertion check on the values of component indices when texturing mode is SINGLE_S4
+	// 当纹理模式为 SINGLE_S4 时，对分量索引值存在错误的断言检查
 
 	VoxelBuffer voxels(VoxelBuffer::ALLOCATOR_DEFAULT);
 	voxels.set_channel_depth(VoxelBuffer::CHANNEL_INDICES, VoxelBuffer::DEPTH_8_BIT);
@@ -34,7 +34,7 @@ void test_transvoxel_issue772() {
 	mesher.instantiate();
 	mesher->set_texturing_mode(VoxelMesherTransvoxel::TEXTURES_SINGLE_S4);
 	VoxelMesher::Output output;
-	// Used to crash
+	// 曾经会导致崩溃
 	mesher->build(output, VoxelMesher::Input{ voxels, nullptr, Vector3i(), 0, false, false, false });
 
 	VOXEL_TEST_ASSERT(!VoxelMesher::is_mesh_empty(output.surfaces));

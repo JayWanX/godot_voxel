@@ -1,11 +1,11 @@
 # VoxelBlockyModelEmpty
 
-Inherits: [VoxelBlockyModel](VoxelBlockyModel.md)
+继承自：[VoxelBlockyModel](VoxelBlockyModel.md)
 
-Explicitely represents an empty model.
+明确表示一个空模型。
 
-## Description: 
+## 描述：
 
-This can be used for the default air model (at index 0), but may also be useful if you want to define a model that has no visuals, but still has collision or other attributes different than air.
+这可用于默认的空气模型（索引 0），但如果你想定义一个没有视觉效果、但仍具有碰撞或其他不同于空气属性的模型，它也很有用。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

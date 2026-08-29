@@ -6,7 +6,7 @@
 
 namespace voxel::magica {
 
-// Imports a vox file as a scene, where the internal scene layout is preserved as nodes
+// 将 vox 文件作为场景导入，内部场景布局以节点形式保留
 class VoxelVoxSceneImporter : public voxel::godot::Voxel_EditorImportPlugin {
 	GDCLASS(VoxelVoxSceneImporter, voxel::godot::Voxel_EditorImportPlugin)
 public:

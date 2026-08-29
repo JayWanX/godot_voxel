@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelTool" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Helper class to easily access and modify voxels
+		用于轻松访问和修改体素的辅助类。
 	</brief_description>
 	<description>
-		Abstract interface to access and edit voxels. It allows accessing individual voxels, or doing bulk operations such as carving large chunks or copy/paste boxes.
-		It's not a class to instantiate alone, you may get it from the voxel objects you want to work with, because it has multiple derived implementations.
-		By default, if an operation overlaps a non-editable area (if not loaded yet for example), the operation will be cancelled. This behavior may vary in derived classes.
+		用于访问和编辑体素的抽象接口。它允许访问单个体素，或执行批量操作，例如雕刻大块区域或复制/粘贴长方体。
+		它不是一个单独实例化的类，你可以从想要操作的体素对象中获取它，因为它有多个派生实现。
+		默认情况下，如果操作与不可编辑区域重叠（例如尚未加载），该操作将被取消。此行为在派生类中可能有所不同。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -15,21 +15,21 @@
 			<return type="int" />
 			<param index="0" name="color" type="Color" />
 			<description>
-				Encodes normalized 4-float color into 16-bit integer data. It is used with the COLOR channel, in cases where the channel represents direct colors (without using a palette).
+				将归一化的 4 浮点颜色编码为 16 位整数数据。它与 COLOR 通道一起使用，适用于该通道表示直接颜色（不使用调色板）的情况。
 			</description>
 		</method>
 		<method name="color_to_u16_weights" qualifiers="static">
 			<return type="int" />
 			<param index="0" name="_unnamed_arg0" type="Color" />
 			<description>
-				Encodes normalized 4-float color into 16-bit integer data, for use with the WEIGHTS channel.
+				将归一化的 4 浮点颜色编码为 16 位整数数据，用于 WEIGHTS 通道。
 			</description>
 		</method>
 		<method name="color_to_u32" qualifiers="static">
 			<return type="int" />
 			<param index="0" name="color" type="Color" />
 			<description>
-				Encodes normalized 4-float color into 32-bit integer data, for use with the COLOR channel.
+				将归一化的 4 浮点颜色编码为 32 位整数数据，用于 COLOR 通道。
 			</description>
 		</method>
 		<method name="copy">
@@ -39,9 +39,9 @@
 			<param index="2" name="channels_mask" type="int" default="255" />
 			<param index="3" name="with_metadata" type="bool" default="true" />
 			<description>
-				Copies voxels in a box and stores them in the passed buffer. The source format will overwrite the destination.
-				[code]src_pos[/code] is the lowest corner of the box, and its size is determined by the size of [code]dst_buffer[/code].
-				[code]channels_mask[/code] is a bitmask where each bit tells which channels will be copied. Example: [code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] to get only SDF data. Use [constant VoxelBuffer.ALL_CHANNELS_MASK] if you want them all.
+				复制长方体中的体素并将其存储到传入的缓冲区中。源格式将覆盖目标格式。
+				[code]src_pos[/code] 是长方体的最低角，其大小由 [code]dst_buffer[/code] 的大小决定。
+				[code]channels_mask[/code] 是一个位掩码，每个位表示将复制哪些通道。示例：[code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] 仅获取 SDF 数据。如果全部都要，请使用 [constant VoxelBuffer.ALL_CHANNELS_MASK]。
 			</description>
 		</method>
 		<method name="do_box">
@@ -49,10 +49,10 @@
 			<param index="0" name="begin" type="Vector3i" />
 			<param index="1" name="end" type="Vector3i" />
 			<description>
-				Operate on a rectangular cuboid section of the terrain.
-				With blocky voxels, [code]begin[/code] and [code]end[/code] are inclusive.
-				With smooth voxels, [code]end[/code] is exclusive.
-				You may choose which operation to do before calling this function, by setting [member mode]. With blocky voxels, you may also set [member value] to choose which voxel ID to use.
+				对地形的一个矩形长方体区域进行操作。
+				对于方块体素，[code]begin[/code] 和 [code]end[/code] 是包含的。
+				对于平滑体素，[code]end[/code] 是不包含的。
+				在调用此函数之前，你可以通过设置 [member mode] 选择要执行的操作。对于方块体素，你还可以设置 [member value] 来选择要使用的体素 ID。
 			</description>
 		</method>
 		<method name="do_mesh">
@@ -61,7 +61,7 @@
 			<param index="1" name="transform" type="Transform3D" />
 			<param index="2" name="isolevel" type="float" default="0.0" />
 			<description>
-				Applies the given mesh shape to the terrain. The model must be baked into a signed distance field with [VoxelMeshSDF]. [code]transform[/code] may be used to position, rotate and scale the model. Non-uniform scale might introduce artifacts. [code]isolevel[/code] is a distance that inflates or contracts the model if increased or decreased respectively. Quality depends on resolution of the model's SDF, and performance will be lower than primitive shapes such as [method do_sphere].
+				将给定的网格形状应用于地形。模型必须使用 [VoxelMeshSDF] 烘焙为有符号距离场。[code]transform[/code] 可用于定位、旋转和缩放模型。非均匀缩放可能会引入伪影。[code]isolevel[/code] 是一个距离，增加或减少会分别使模型膨胀或收缩。质量取决于模型 SDF 的分辨率，性能将低于 [method do_sphere] 等基本形状。
 			</description>
 		</method>
 		<method name="do_path">
@@ -69,16 +69,16 @@
 			<param index="0" name="points" type="PackedVector3Array" />
 			<param index="1" name="radii" type="PackedFloat32Array" />
 			<description>
-				Traces a "tube" defined by a list of points, each having a corresponding radius to control the width of the tube at each point. The begin and end of the path is rounded. This is equivalent to placing/carving multiple connected capsules with varying top/bottom radius. The path is not using bezier or splines, each point is connected linearly to the next. If you need more smoothness, you may add points to areas that need them. The more points, the slower it is.
+				沿着由一系列点定义的“管道”进行雕刻或放置，每个点都有对应的半径来控制管道在该点的宽度。路径的起点和终点是圆形的。这相当于放置/雕刻多个上下半径变化的相连胶囊体。路径不使用贝塞尔曲线或样条线，每个点都与下一个点线性连接。如果你需要更平滑，可以在需要的区域添加点。点越多，速度越慢。
 			</description>
 		</method>
 		<method name="do_point">
 			<return type="void" />
 			<param index="0" name="pos" type="Vector3i" />
 			<description>
-				Operates on a single voxel.
-				You may choose which operation to do before calling this function, by setting [member mode]. With blocky voxels, you may also set [member value] to choose which voxel ID to use.
-				This function is not well adapted to smooth voxels, and can introduce blockyness.
+				对单个体素进行操作。
+				在调用此函数之前，你可以通过设置 [member mode] 选择要执行的操作。对于方块体素，你还可以设置 [member value] 来选择要使用的体素 ID。
+				此函数不适合平滑体素，可能会引入块状感。
 			</description>
 		</method>
 		<method name="do_sphere">
@@ -86,30 +86,30 @@
 			<param index="0" name="center" type="Vector3" />
 			<param index="1" name="radius" type="float" />
 			<description>
-				Operate on voxels within a sphere.
-				You may choose which operation to do before calling this function, by setting [member mode]. With blocky voxels, you may also set [member value] to choose which voxel ID to use.
+				对球体内的体素进行操作。
+				在调用此函数之前，你可以通过设置 [member mode] 选择要执行的操作。对于方块体素，你还可以设置 [member value] 来选择要使用的体素 ID。
 			</description>
 		</method>
 		<method name="get_voxel">
 			<return type="int" />
 			<param index="0" name="pos" type="Vector3i" />
 			<description>
-				Gets data from voxel at [code]pos[/code] coordinates. The returned value will be an unsigned integer. The meaning of the value depends on [member channel] the tool is set to.
-				When using [constant VoxelBuffer.CHANNEL_SDF] for smooth voxels, the returned value will be an encoded value, so you may use [method get_voxel_f] to get a float value instead.
+				获取 [code]pos[/code] 坐标处体素的数据。返回的值将是无符号整数。值的含义取决于工具当前设置的 [member channel]。
+				对于平滑体素，使用 [constant VoxelBuffer.CHANNEL_SDF] 时返回的值将是编码值，因此你可以改用 [method get_voxel_f] 获取浮点值。
 			</description>
 		</method>
 		<method name="get_voxel_f">
 			<return type="float" />
 			<param index="0" name="pos" type="Vector3i" />
 			<description>
-				Gets data from voxel at [code]pos[/code] coordinates, interpreting it as a floating-point SDF value. This is recommended to query the [constant VoxelBuffer.CHANNEL_SDF] channel for smooth voxels.
+				获取 [code]pos[/code] 坐标处体素的数据，并将其解释为浮点 SDF 值。建议用它来查询平滑体素的 [constant VoxelBuffer.CHANNEL_SDF] 通道。
 			</description>
 		</method>
 		<method name="get_voxel_metadata" qualifiers="const">
 			<return type="Variant" />
 			<param index="0" name="pos" type="Vector3i" />
 			<description>
-				Gets arbitrary data attached to a specific voxel.
+				获取附加到特定体素上的任意数据。
 			</description>
 		</method>
 		<method name="grow_sphere">
@@ -118,28 +118,28 @@
 			<param index="1" name="sphere_radius" type="float" />
 			<param index="2" name="strength" type="float" />
 			<description>
-				Adds/removes (depending on [code]mode[/code]) a value to/from all voxels within a sphere. Added/removed value will be equal to [code]strength[/code] at the center of the sphere, and decreases linearly to zero at the surface of the sphere. Voxels outside the sphere will not be affected.
-				[code]sphere_center[/code] is position in the terrain that will be smoothed out.
-				[code]sphere_radius[/code] radius of a sphere from the [code]center[/code] where voxel values will be affected. Should be greater than zero.
-				[code]strength[/code] value that controls maximal value that will be added/removed to/from voxels. Suggested range is [0, 10].
-				Note 1: This is currently implemented only for terrain that uses SDF data (smooth voxels).
-				Note 2: This is meant to be analogous to Surface tool from Unreal Engine Voxel Plugin.
-				Note 3: This method assumes terrain SDF is coherent. If it isn't, you may notice differences in speeds at which terrain erodes or grows. For example, some generators fallback to a constant SDF when far away from the surface in order to speed up calculations (see [member VoxelGeneratorGraph.sdf_clip_threshold]).
-				Note 4: If you want to use this method to dig terrain "smoothly" by calling it every frame, an alternative is to use [method do_sphere] but instead of the center being on the surface, move it back by about 0.95% of the radius so only a small fraction of the sphere will penetrate, digging a hole progressively.
+				根据 [code]mode[/code] 向球体内的所有体素添加/移除一个值。添加/移除的值在球体中心处等于 [code]strength[/code]，并向球体表面线性递减为零。球体外的体素不受影响。
+				[code]sphere_center[/code] 是地形中将被平滑处理的位置。
+				[code]sphere_radius[/code] 是从 [code]center[/code] 起的球体半径，在该范围内体素值将受到影响。应大于零。
+				[code]strength[/code] 控制向体素添加/从体素移除的最大值。建议范围为 [0, 10]。
+				注意 1：目前仅对使用 SDF 数据（平滑体素）的地形实现。
+				注意 2：此函数旨在类比虚幻引擎 Voxel 插件中的 Surface 工具。
+				注意 3：此方法假设地形 SDF 是连贯的。如果不是，你可能会注意到地形侵蚀或生长的速度存在差异。例如，一些生成器在远离表面时会回退到恒定 SDF 以加速计算（参见 [member VoxelGeneratorGraph.sdf_clip_threshold]）。
+				注意 4：如果你想每帧调用此方法以“平滑地”挖掘地形，另一种选择是使用 [method do_sphere]，但不要将中心放在表面上，而是将其移回约半径的 0.95%，这样只有一小部分球体会穿透，从而逐步挖掘出一个洞。
 			</description>
 		</method>
 		<method name="is_area_editable" qualifiers="const">
 			<return type="bool" />
 			<param index="0" name="box" type="AABB" />
 			<description>
-				Returns [code]true[/code] if the specified voxel area can be edited. This can also be interpreted as the area being "loaded". Note: when using LOD, only the nearest LOD (0) is editable. Other factors can influence whether an area is editable or not, such as streaming mode or terrain bounds.
+				如果指定的体素区域可编辑，则返回 [code]true[/code]。这也可以解释为该区域“已加载”。注意：使用 LOD 时，只有最近的 LOD（0）可编辑。其他因素也会影响区域是否可编辑，例如流式加载模式或地形边界。
 			</description>
 		</method>
 		<method name="normalize_color" qualifiers="static">
 			<return type="Color" />
 			<param index="0" name="_unnamed_arg0" type="Color" />
 			<description>
-				A helper method to set the sum of channels of the `Color` to 1.
+				一个辅助方法，用于将 `Color` 的通道之和设置为 1。
 			</description>
 		</method>
 		<method name="paste">
@@ -148,9 +148,9 @@
 			<param index="1" name="src_buffer" type="VoxelBuffer" />
 			<param index="2" name="channels_mask" type="int" default="255" />
 			<description>
-				Paste voxels in a box from the given buffer at a specific location.
-				[code]dst_pos[/code] is the lowest corner of the box, and its size is determined by the size of [code]src_buffer[/code].
-				[code]channels_mask[/code] is a bitmask where each bit tells which channels will be modified. Example: [code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] only write SDF data. Use [constant VoxelBuffer.ALL_CHANNELS_MASK] if you want them all.
+				从给定缓冲区在特定位置粘贴一个长方体中的体素。
+				[code]dst_pos[/code] 是长方体的最低角，其大小由 [code]src_buffer[/code] 的大小决定。
+				[code]channels_mask[/code] 是一个位掩码，每个位表示将修改哪些通道。示例：[code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] 仅写入 SDF 数据。如果全部都要，请使用 [constant VoxelBuffer.ALL_CHANNELS_MASK]。
 			</description>
 		</method>
 		<method name="paste_masked">
@@ -161,11 +161,11 @@
 			<param index="3" name="mask_channel" type="int" />
 			<param index="4" name="mask_value" type="int" />
 			<description>
-				Paste voxels in a box from the given buffer at a specific location. Voxels having a specific value in a mask channel will not be pasted.
-				[code]dst_pos[/code] is the lowest corner of the box, and its size is determined by the size of [code]src_buffer[/code].
-				[code]channels_mask[/code] is a bitmask where each bit tells which channels will be modified. Example: [code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] only write SDF data. Use [constant VoxelBuffer.ALL_CHANNELS_MASK] if you want them all.
-				[code]src_mask_channel[/code] channel from the source buffer that will be used to lookup mask values.
-				[code]src_mask_value[/code] if voxels of the source buffer have this value in the channel specified for masking, then they won't be pasted.
+				从给定缓冲区在特定位置粘贴一个长方体中的体素。在掩码通道中具有特定值的体素将不会被粘贴。
+				[code]dst_pos[/code] 是长方体的最低角，其大小由 [code]src_buffer[/code] 的大小决定。
+				[code]channels_mask[/code] 是一个位掩码，每个位表示将修改哪些通道。示例：[code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] 仅写入 SDF 数据。如果全部都要，请使用 [constant VoxelBuffer.ALL_CHANNELS_MASK]。
+				[code]src_mask_channel[/code] 源缓冲区中用于查找掩码值的通道。
+				[code]src_mask_value[/code] 如果源缓冲区的体素在用于掩码的通道中具有此值，则它们将不会被粘贴。
 			</description>
 		</method>
 		<method name="paste_masked_writable_list">
@@ -178,13 +178,13 @@
 			<param index="5" name="dst_mask_channel" type="int" />
 			<param index="6" name="dst_writable_list" type="PackedInt32Array" />
 			<description>
-				Paste voxels in a box from the given buffer at a specific location. Voxels having a specific value in a mask channel of the source buffer will not be pasted, and existing voxels at the destination will only be modified if they have specific values.
-				[code]dst_pos[/code] is the lowest corner of the box, and its size is determined by the size of [code]src_buffer[/code].
-				[code]channels_mask[/code] is a bitmask where each bit tells which channels will be modified. Example: [code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] only write SDF data. Use [constant VoxelBuffer.ALL_CHANNELS_MASK] if you want them all.
-				[code]src_mask_channel[/code] channel from the source buffer that will be used to lookup mask values.
-				[code]src_mask_value[/code] if voxels of the source buffer have this value in the channel specified for masking, then they won't be pasted.
-				[code]dst_mask_channel[/code] channel from the destination that will be used to select writable voxels.
-				[code]dst_writable_list[/code] List of values the destination voxels must have in order to be written to. Values in that list must be between 0 and 65535. A very large amount of values can also affect performance.
+				从给定缓冲区在特定位置粘贴一个长方体中的体素。源缓冲区中在掩码通道中具有特定值的体素将不会被粘贴，并且目标处已有的体素只有在具有特定值时才会被修改。
+				[code]dst_pos[/code] 是长方体的最低角，其大小由 [code]src_buffer[/code] 的大小决定。
+				[code]channels_mask[/code] 是一个位掩码，每个位表示将修改哪些通道。示例：[code]1 &lt;&lt; VoxelBuffer.CHANNEL_SDF[/code] 仅写入 SDF 数据。如果全部都要，请使用 [constant VoxelBuffer.ALL_CHANNELS_MASK]。
+				[code]src_mask_channel[/code] 源缓冲区中用于查找掩码值的通道。
+				[code]src_mask_value[/code] 如果源缓冲区的体素在用于掩码的通道中具有此值，则它们将不会被粘贴。
+				[code]dst_mask_channel[/code] 目标处用于选择可写体素的通道。
+				[code]dst_writable_list[/code] 目标体素必须具有的值列表，才能被写入。该列表中的值必须在 0 到 65535 之间。大量的值也可能影响性能。
 			</description>
 		</method>
 		<method name="raycast">
@@ -194,17 +194,17 @@
 			<param index="2" name="max_distance" type="float" default="10.0" />
 			<param index="3" name="collision_mask" type="int" default="4294967295" />
 			<description>
-				Runs a voxel-based raycast to find the first hit from an origin and a direction. Coordinates are in world space.
-				Returns a result object if a voxel got hit, otherwise returns [code]null[/code].
-				This is useful when colliders cannot be relied upon. It might also be faster (at least at short range), and is more precise to find which voxel is hit. It internally uses the DDA algorithm.
-				[code]collision_mask[/code] is currently only used with blocky voxels. It is combined with [member VoxelBlockyModel.collision_mask] to decide which voxel types the ray can collide with.
+				运行基于体素的射线投射，从原点沿方向查找第一个命中。坐标位于世界空间中。
+				如果命中了体素，则返回一个结果对象，否则返回 [code]null[/code]。
+				当碰撞体不可靠时，这很有用。它也可能更快（至少在短距离内），并且能更精确地找到命中的体素。它在内部使用 DDA 算法。
+				[code]collision_mask[/code] 目前仅用于方块体素。它与 [member VoxelBlockyModel.collision_mask] 结合使用，以决定射线可以与哪些体素类型碰撞。
 			</description>
 		</method>
 		<method name="set_raycast_normal_enabled">
 			<return type="void" />
 			<param index="0" name="enabled" type="bool" />
 			<description>
-				Sets whether [method raycast] will compute hit normals. This is true by default.
+				设置 [method raycast] 是否计算命中法线。默认情况下为 true。
 			</description>
 		</method>
 		<method name="set_voxel">
@@ -212,7 +212,7 @@
 			<param index="0" name="pos" type="Vector3i" />
 			<param index="1" name="v" type="int" />
 			<description>
-				Sets the raw integer value of a specific voxel on the current channel.
+				设置当前通道上特定体素的原始整数值。
 			</description>
 		</method>
 		<method name="set_voxel_f">
@@ -220,7 +220,7 @@
 			<param index="0" name="pos" type="Vector3i" />
 			<param index="1" name="v" type="float" />
 			<description>
-				Sets the signed distance field (SDF) value a specific voxel. This should preferably be used on the SDF channel.
+				设置特定体素的有符号距离场（SDF）值。这最好在 SDF 通道上使用。
 			</description>
 		</method>
 		<method name="set_voxel_metadata">
@@ -228,8 +228,8 @@
 			<param index="0" name="pos" type="Vector3i" />
 			<param index="1" name="meta" type="Variant" />
 			<description>
-				Attaches arbitrary data on a specific voxel. Old data is replaced. Passing [code]null[/code] will erase metadata.
-				If the underlying voxels can be saved, this metadata will also be saved, so make sure the data supports serialization (i.e you can't put nodes or arbitrary objects in it).
+				在特定体素上附加任意数据。旧数据将被替换。传入 [code]null[/code] 将清除元数据。
+				如果底层体素可以被保存，此元数据也会被保存，因此请确保数据支持序列化（即你不能在其中放入节点或任意对象）。
 			</description>
 		</method>
 		<method name="smooth_sphere">
@@ -238,79 +238,79 @@
 			<param index="1" name="sphere_radius" type="float" />
 			<param index="2" name="blur_radius" type="int" />
 			<description>
-				Smoothens out terrain by performing box blur in a spherical area. Strength will be maximal at the center of the sphere, and decreases linearly to zero at the surface of the sphere. Voxels outside the sphere will not be affected.
-				[code]sphere_center[/code] is position in the terrain that will be smoothed out.
-				[code]sphere_radius[/code] radius of a sphere from the [code]center[/code] where voxel values will be affected. Should be greater than zero.
-				[code]blur_radius[/code] half the box blur length that will be sampled to calculate average voxel values. Higher values results in more aggressive smoothing. Should be at least 1.
-				Note 1: This is currently implemented only for terrain that uses SDF data (smooth voxels).
-				Note 2: Beware of using high [code]sphere_radius[/code] and high [code]blur_radius[/code] as the performance can drop quickly if this is called 60 times a second.
+				通过在球形区域中执行盒式模糊来平滑地形。强度在球体中心处最大，并向球体表面线性递减为零。球体外的体素不受影响。
+				[code]sphere_center[/code] 是地形中将被平滑处理的位置。
+				[code]sphere_radius[/code] 是从 [code]center[/code] 起的球体半径，在该范围内体素值将受到影响。应大于零。
+				[code]blur_radius[/code] 用于采样计算平均体素值的盒式模糊长度的一半。值越大，平滑越激进。应至少为 1。
+				注意 1：目前仅对使用 SDF 数据（平滑体素）的地形实现。
+				注意 2：注意不要使用过高的 [code]sphere_radius[/code] 和过高的 [code]blur_radius[/code]，因为如果每秒调用 60 次，性能会迅速下降。
 			</description>
 		</method>
 		<method name="u16_indices_to_vec4i" qualifiers="static">
 			<return type="Vector4i" />
 			<param index="0" name="_unnamed_arg0" type="int" />
 			<description>
-				Decodes raw voxel integer data from the INDICES channel into a 4-integer vector.
+				将 INDICES 通道的原始体素整数数据解码为 4 整数向量。
 			</description>
 		</method>
 		<method name="u16_weights_to_color" qualifiers="static">
 			<return type="Color" />
 			<param index="0" name="_unnamed_arg0" type="int" />
 			<description>
-				Decodes raw voxel integer data from the WEIGHTS channel into a normalized 4-float color.
+				将 WEIGHTS 通道的原始体素整数数据解码为归一化的 4 浮点颜色。
 			</description>
 		</method>
 		<method name="vec4i_to_u16_indices" qualifiers="static">
 			<return type="int" />
 			<param index="0" name="_unnamed_arg0" type="Vector4i" />
 			<description>
-				Encodes a 4-integer vector into 16-bit integer voxel data, for use in the INDICES channel.
+				将 4 整数向量编码为 16 位整数体素数据，用于 INDICES 通道。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="channel" type="int" setter="set_channel" getter="get_channel" enum="VoxelBuffer.ChannelId">
-			Set which channel will be edited. When used on a terrain node, it will default to the first available channel, based on the stream and generator.
+			设置将编辑的通道。在地形节点上使用时，它将根据数据流和生成器默认为第一个可用通道。
 		</member>
 		<member name="eraser_value" type="int" setter="set_eraser_value" getter="get_eraser_value">
-			Sets which value will be used to erase voxels when editing the [constant VoxelBuffer.CHANNEL_TYPE] channel in [constant MODE_REMOVE] mode. Only relevant for blocky voxels.
+			设置在以 [constant MODE_REMOVE] 模式编辑 [constant VoxelBuffer.CHANNEL_TYPE] 通道时用于擦除体素的值。仅与方块体素相关。
 		</member>
 		<member name="mode" type="int" setter="set_mode" getter="get_mode" enum="VoxelTool.Mode">
-			Sets how [code]do_*[/code] functions will behave. This may vary depending on the channel.
+			设置 [code]do_*[/code] 函数的行为方式。这可能会因通道而异。
 		</member>
 		<member name="sdf_scale" type="float" setter="set_sdf_scale" getter="get_sdf_scale">
-			When working with smooth voxels, applies a scale to the signed distance field. A high scale (1 or higher) will tend to produce blocky results, and a low scale (below 1, but not too close to zero) will tend to be smoother.
+			处理平滑体素时，对有符号距离场应用缩放。高缩放（1 或更高）往往会产生块状结果，低缩放（低于 1，但不要太接近零）往往会更平滑。
 
-			This is related to the [enum VoxelBuffer.Depth] configuration on voxels. For 8-bit and 16-bit, there is a limited range of values the Signed Distance Field can take, and by default it is clamped to -1..1, so the gradient can only range across 2 voxels. But when LOD is used, it is better to stretch that range over a longer distance, and this is achieved by scaling SDF values.
+			这与体素的 [enum VoxelBuffer.Depth] 配置有关。对于 8 位和 16 位，有符号距离场可以取的值范围有限，默认情况下被限制在 -1..1，因此梯度只能跨越 2 个体素。但使用 LOD 时，最好将该范围拉伸到更长的距离，这可以通过缩放 SDF 值来实现。
 		</member>
 		<member name="sdf_strength" type="float" setter="set_sdf_strength" getter="get_sdf_strength">
-			When editing [constant VoxelBuffer.CHANNEL_SDF] of smooth Terrains in [constant VoxelTool.MODE_ADD] or [constant VoxelTool.MODE_REMOVE], determines the interpolation phase between current values and values set by the tool. Can be interpreted as the amount of "matter" added or subtracted.
+			在 [constant VoxelTool.MODE_ADD] 或 [constant VoxelTool.MODE_REMOVE] 模式下编辑平滑地形的 [constant VoxelBuffer.CHANNEL_SDF] 时，决定当前值与工具设置值之间的插值相位。可以理解为添加或减去的“物质”量。
 		</member>
 		<member name="texture_falloff" type="float" setter="set_texture_falloff" getter="get_texture_falloff">
-			Range [0.001..1.0]. Determines texture blending strength when tool is set to [constant VoxelTool.MODE_TEXTURE_PAINT]. Lower values produce sharper transitions. Can be compared to brush softness in an image editing program. This is only relevant with smooth voxels and texturing modes that support long gradients.
+			范围 [0.001..1.0]。当工具设置为 [constant VoxelTool.MODE_TEXTURE_PAINT] 时，决定纹理混合强度。较低的值产生更锐利的过渡。可以类比图像编辑程序中的画笔硬度。这仅与平滑体素和支持长渐变的纹理模式相关。
 		</member>
 		<member name="texture_index" type="int" setter="set_texture_index" getter="get_texture_index">
-			Index of the texture used in smooth voxel texture painting mode. The choice of this index depends on the way you setup rendering of textured voxel meshes (for example, layer index in a texture array).
+			平滑体素纹理绘制模式中使用的纹理索引。此索引的选择取决于你如何设置带纹理体素网格的渲染（例如，纹理数组中的图层索引）。
 		</member>
 		<member name="texture_opacity" type="float" setter="set_texture_opacity" getter="get_texture_opacity">
-			Range [0.0..1.0]. Determines the maximum weight of a [member texture_index] when tool is set to [constant VoxelTool.MODE_TEXTURE_PAINT]. Can be compared to brush opacity in an image editing program.
+			范围 [0.0..1.0]。当工具设置为 [constant VoxelTool.MODE_TEXTURE_PAINT] 时，决定 [member texture_index] 的最大权重。可以类比图像编辑程序中的画笔不透明度。
 		</member>
 		<member name="value" type="int" setter="set_value" getter="get_value">
-			Sets which voxel value will be used. This is not relevant when editing [constant VoxelBuffer.CHANNEL_SDF].
+			设置将使用的体素值。编辑 [constant VoxelBuffer.CHANNEL_SDF] 时与此无关。
 		</member>
 	</members>
 	<constants>
 		<constant name="MODE_ADD" value="0" enum="Mode">
-			When editing [constant VoxelBuffer.CHANNEL_SDF], will add matter. Useful for building.
+			编辑 [constant VoxelBuffer.CHANNEL_SDF] 时，将添加物质。适用于建造。
 		</constant>
 		<constant name="MODE_REMOVE" value="1" enum="Mode">
-			When editing [constant VoxelBuffer.CHANNEL_SDF], will subtract matter. Useful for digging.
+			编辑 [constant VoxelBuffer.CHANNEL_SDF] 时，将减去物质。适用于挖掘。
 		</constant>
 		<constant name="MODE_SET" value="2" enum="Mode">
-			Replace voxel values without any blending. Useful for blocky voxels.
+			替换体素值而不进行任何混合。适用于方块体素。
 		</constant>
 		<constant name="MODE_TEXTURE_PAINT" value="3" enum="Mode">
-			When editing [constant VoxelBuffer.CHANNEL_SDF] in smooth Terrain, enables texture painting. The value of [member texture_index] will be added to texture indices of the affected voxels. The texture's weight will be blended based on the values of [member texture_falloff] and [member texture_opacity]. Results will differ depending on which texturing mode is used by the mesher.
+			在平滑地形中编辑 [constant VoxelBuffer.CHANNEL_SDF] 时，启用纹理绘制。[member texture_index] 的值将添加到受影响体素的纹理索引中。纹理的权重将根据 [member texture_falloff] 和 [member texture_opacity] 的值进行混合。结果将根据网格器使用的纹理模式而有所不同。
 		</constant>
 	</constants>
 </class>

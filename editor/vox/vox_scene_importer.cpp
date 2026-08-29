@@ -47,8 +47,8 @@ String VoxelVoxSceneImporter::_voxel_get_resource_type() const {
 }
 
 float VoxelVoxSceneImporter::_voxel_get_priority() const {
-	// Higher import priority means the importer is preferred over another.
-	// By default, use this importer (the other Vox importer has lower priority).
+	// 导入优先级越高，说明该导入器优先于另一个被选用。
+	// 默认情况下使用这个导入器（另一个 Vox 导入器的优先级较低）。
 	return 1.0;
 }
 
@@ -82,10 +82,10 @@ void add_mesh_instance(Ref<Mesh> mesh, ::Node *parent, ::Node *owner, Vector3 of
 	parent->add_child(mesh_instance);
 	mesh_instance->set_owner(owner);
 	mesh_instance->set_position(offset);
-	// Assuming `GI_MODE_DYNAMIC` means GIProbe and SDFGI?
+	// 假设 `GI_MODE_DYNAMIC` 意味着 GIProbe 和 SDFGI？
 	mesh_instance->set_gi_mode(GeometryInstance3D::GI_MODE_DYNAMIC);
-	// TODO Colliders? Needs conventions or attributes probably.
-	// But due to the nature of voxels, users may often prefer to place colliders themselves (slopes notably).
+	// TODO 碰撞体？很可能需要约定或属性。
+	// 但鉴于体素的特性，用户可能往往更愿意自己放置碰撞体（尤其是斜面）。
 }
 
 struct VoxMesh {
@@ -132,18 +132,18 @@ Error process_scene_node_recursively(
 					p_enable_baked_lighting
 			);
 
-			// If the parent isn't anything special and has only one child,
-			// it may be cleaner to flatten the hierarchy. We keep the root node unaffected.
-			// TODO Any way to not need a string to check if a node is a specific class?
+			// 如果父节点没什么特别且只有一个子节点，
+			// 展平层级可能更干净。我们保持根节点不受影响。
+			// TODO 有没有办法不用字符串来判断节点是否是特定类？
 			if (node != out_root_node && node->get_class() == "Node3D" && node->get_child_count() == 1) {
 				Node3D *child = Object::cast_to<Node3D>(node->get_child(0));
 				if (child != nullptr) {
 					node->remove_child(child);
 					parent_node->remove_child(node);
 					child->set_transform(node->get_transform() * child->get_transform());
-					// TODO Would be nice if I could just replace the node without any fuss but `replace_by` is too busy
+					// TODO 如果我能直接替换节点而不用折腾就好了，但 `replace_by` 太麻烦
 					parent_node->add_child(child);
-					// Removal from previous parent unsets the owner, so we have to set it again
+					// 从先前的父节点移除会取消 owner 设置，因此我们必须重新设置
 					child->set_owner(out_root_node);
 					memdelete(node);
 				}
@@ -194,7 +194,7 @@ Error process_scene_node_recursively(
 	f->store_8('G');
 	f->store_8('D');
 	f->store_8('S');
-	f->store_8('T'); //godot streamable texture
+	f->store_8('T'); //godot 可流式纹理
 
 	f->store_16(p_image->get_width());
 	f->store_16(0);
@@ -209,7 +209,7 @@ Error process_scene_node_recursively(
 		format |= StreamTexture::FORMAT_BIT_STREAM;
 	}
 	if (p_mipmaps) {
-		format |= StreamTexture::FORMAT_BIT_HAS_MIPMAPS; //mipmaps bit
+		format |= StreamTexture::FORMAT_BIT_HAS_MIPMAPS; //mipmaps 位
 	}
 	if (p_detect_3d) {
 		format |= StreamTexture::FORMAT_BIT_DETECT_3D;
@@ -221,7 +221,7 @@ Error process_scene_node_recursively(
 	// COMPRESS_LOSSLESS
 
 	const bool lossless_force_png = ProjectSettings::get_singleton()->get("rendering/lossless_compression/force_png");
-	// Note: WebP has a size limit
+	// 注意：WebP 有大小限制
 	const bool use_webp = !lossless_force_png && p_image->get_width() <= 16383 && p_image->get_height() <= 16383;
 	Ref<Image> image = p_image->duplicate();
 	if (p_mipmaps) {
@@ -293,7 +293,7 @@ Error VoxelVoxSceneImporter::_voxel_import(
 	StdVector<VoxMesh> meshes;
 	meshes.resize(data.get_model_count());
 
-	// Get color palette
+	// 获取颜色调色板
 	Ref<VoxelColorPalette> palette;
 	palette.instantiate();
 	for (unsigned int i = 0; i < data.get_palette().size(); ++i) {
@@ -314,13 +314,13 @@ Error VoxelVoxSceneImporter::_voxel_import(
 		mat.instantiate();
 		mat->set_roughness(1.f);
 		if (!p_store_colors_in_textures) {
-			// In this case we store colors in vertices
+			// 这种情况下我们把颜色存储在顶点中
 			mat->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
 		}
 	}
 	materials[1]->set_transparency(StandardMaterial3D::TRANSPARENCY_ALPHA);
 
-	// Build meshes from voxel models
+	// 从体素模型构建网格
 	for (unsigned int model_index = 0; model_index < data.get_model_count(); ++model_index) {
 		const magica::Model &model = data.get_model(model_index);
 
@@ -349,9 +349,9 @@ Error VoxelVoxSceneImporter::_voxel_import(
 			continue;
 		}
 
-		// Save atlas
-		// TODO Saving atlases separately is impossible because of https://github.com/godotengine/godot/issues/51163
-		// Instead, I do like ResourceImporterScene: I leave them UNCOMPRESSED inside the materials...
+		// 保存 atlas
+		// TODO 由于 https://github.com/godotengine/godot/issues/51163，单独保存 atlas 是不可能的
+		// 相反，我像 ResourceImporterScene 那样：将它们以 UNCOMPRESSED 形式保留在 materials 内部……
 		/*String atlas_path;
 		if (atlas.is_valid()) {
 			atlas_path = String("{0}.atlas{1}.stex").format(varray(p_save_path, model_index));
@@ -365,18 +365,18 @@ Error VoxelVoxSceneImporter::_voxel_import(
 		// 	atlas->save_png(String("debug_atlas{0}.png").format(varray(model_index)));
 		// }
 
-		// Assign materials
+		// 分配 materials
 		if (p_store_colors_in_textures) {
-			// Can't share materials at the moment, because each atlas is specific to its mesh
+			// 目前无法共享 materials，因为每个 atlas 都特定于其 mesh
 			for (unsigned int surface_index = 0; surface_index < surface_index_to_material.size(); ++surface_index) {
 				const unsigned int material_index = surface_index_to_material[surface_index];
 				CRASH_COND(material_index >= materials.size());
 				Ref<StandardMaterial3D> material = materials[material_index]->duplicate();
 				if (atlas.is_valid()) {
-					// TODO Do I absolutely HAVE to load this texture back to memory AND renderer just so import works??
+					// TODO 为了让导入正常工作，我是否真的必须将此 texture 重新加载到内存和 renderer 中？？
 					// Ref<Texture> texture = ResourceLoader::load(atlas_path);
-					// TODO THIS IS A WORKAROUND, it is not supposed to be an ImageTexture...
-					// See earlier code, I could not find any way to reference a separate StreamTexture.
+					// TODO 这是一个临时的解决方案（WORKAROUND），它本不应该是 ImageTexture……
+					// 参看前面的代码，我找不到任何办法来引用单独的 StreamTexture。
 					Ref<ImageTexture> texture = ImageTexture::create_from_image(atlas);
 					material->set_texture(StandardMaterial3D::TEXTURE_ALBEDO, texture);
 					material->set_texture_filter(StandardMaterial3D::TEXTURE_FILTER_NEAREST);
@@ -393,38 +393,38 @@ Error VoxelVoxSceneImporter::_voxel_import(
 
 		VoxMesh mesh_info;
 		mesh_info.mesh = mesh;
-		// In MagicaVoxel scene graph, pivots are at the center of models, not at the lower corner.
-		// TODO I don't know if this is correct, but I could not find a reference saying how that pivot should be
-		// calculated
+		// 在 MagicaVoxel 的场景图中，轴点位于模型中心，而不是下角。
+		// TODO 我不知道这是否正确，但我找不到说明该轴点应如何
+		// 计算的参考
 		mesh_info.pivot = (voxels.get_size() / 2 - Vector3iUtil::create(1));
 		meshes[model_index] = mesh_info;
 	}
 
 	Node3D *root_node = nullptr;
 	if (data.get_root_node_id() != -1) {
-		// Convert scene graph into a node tree
+		// 将场景图转换为节点树
 		process_scene_node_recursively(
 				data, data.get_root_node_id(), nullptr, root_node, 0, meshes, p_scale, p_enable_baked_lighting
 		);
 		ERR_FAIL_COND_V(root_node == nullptr, ERR_INVALID_DATA);
 
 	} else if (meshes.size() > 0) {
-		// Some vox files don't have a scene graph
+		// 某些 vox 文件没有场景图
 		root_node = memnew(Node3D);
 		const VoxMesh &mesh0 = meshes[0];
 		add_mesh_instance(mesh0.mesh, root_node, root_node, Vector3(), p_enable_baked_lighting);
 	}
 
-	// Save meshes
+	// 保存网格
 	for (unsigned int model_index = 0; model_index < meshes.size(); ++model_index) {
 		VOXEL_PROFILE_SCOPE();
 		Ref<Mesh> mesh = meshes[model_index].mesh;
-		// Some models might be empty, as seen earlier
+		// 某些模型可能为空，如前所述
 		if (mesh.is_null()) {
 			continue;
 		}
 		String res_save_path = String("{0}.model{1}.mesh").format(varray(p_save_path, model_index));
-		// `FLAG_CHANGE_PATH` did not do what I thought it did.
+		// `FLAG_CHANGE_PATH` 没有按我预期的方式工作。
 		mesh->set_path(res_save_path);
 		const Error mesh_save_err = save_resource(mesh, res_save_path, ResourceSaver::FLAG_NONE);
 		ERR_FAIL_COND_V_MSG(
@@ -434,7 +434,7 @@ Error VoxelVoxSceneImporter::_voxel_import(
 
 	root_node->set_name(p_save_path.get_file().get_basename());
 
-	// Save scene
+	// 保存场景
 	{
 		VOXEL_PROFILE_SCOPE();
 		Ref<PackedScene> scene;
@@ -450,11 +450,11 @@ Error VoxelVoxSceneImporter::_voxel_import(
 }
 
 bool VoxelVoxSceneImporter::_voxel_can_import_threaded() const {
-	// By default it is `true`, but `ResourceSaver::save` ended up deadlocking the editor when saving meshes.
-	// I don't know if this is a known issue or something importers should do when saving meshes.
+	// 默认为 `true`，但保存网格时 `ResourceSaver::save` 最终导致编辑器死锁。
+	// 我不知道这是已知问题，还是导入器在保存网格时应该处理的事情。
 
-	// TODO Make a bug report? Might take a while to create an MRP :(
-	// this happens in a crowded project and might be timing-dependent...
+	// TODO 是否提交 bug 报告？创建最小复现工程可能要花点时间 :(
+	// 这发生在内容繁杂的项目中，可能与时序有关……
 
 	return false;
 }

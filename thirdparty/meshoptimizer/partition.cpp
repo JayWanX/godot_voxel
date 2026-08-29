@@ -7,8 +7,8 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Takio Kurita. An efficient agglomerative clustering algorithm using a heap. 1991
+// 此作品基于：
+// Takio Kurita. 使用堆的高效凝聚聚类算法. 1991
 namespace meshopt
 {
 
@@ -31,7 +31,7 @@ static void filterClusterIndices(unsigned int* data, unsigned int* offsets, cons
 	{
 		offsets[i] = unsigned(cluster_write);
 
-		// copy cluster indices, skipping duplicates
+		// 复制簇索引，跳过重复项
 		for (size_t j = 0; j < cluster_index_counts[i]; ++j)
 		{
 			unsigned int v = cluster_indices[cluster_start + j];
@@ -42,7 +42,7 @@ static void filterClusterIndices(unsigned int* data, unsigned int* offsets, cons
 			used[v] = 1;
 		}
 
-		// reset used flags for the next cluster
+		// 为下一个簇重置使用标志
 		for (size_t j = offsets[i]; j < cluster_write; ++j)
 			used[data[j]] = 0;
 
@@ -62,7 +62,7 @@ static void computeClusterBounds(float* cluster_bounds, const unsigned int* clus
 	{
 		float center[3] = {0, 0, 0};
 
-		// approximate center of the cluster by averaging all vertex positions
+		// 通过对所有顶点位置求平均来近似簇的中心
 		for (size_t j = cluster_offsets[i]; j < cluster_offsets[i + 1]; ++j)
 		{
 			const float* p = vertex_positions + cluster_indices[j] * vertex_stride_float;
@@ -72,7 +72,7 @@ static void computeClusterBounds(float* cluster_bounds, const unsigned int* clus
 			center[2] += p[2];
 		}
 
-		// note: technically clusters can't be empty per meshopt_partitionCluster but we check for a division by zero in case that changes
+		// 注意：按 meshopt_partitionCluster 的定义，簇不可能为空，但以防万一我们仍检查除零
 		if (size_t cluster_size = cluster_offsets[i + 1] - cluster_offsets[i])
 		{
 			center[0] /= float(cluster_size);
@@ -80,7 +80,7 @@ static void computeClusterBounds(float* cluster_bounds, const unsigned int* clus
 			center[2] /= float(cluster_size);
 		}
 
-		// compute radius of the bounding sphere for each cluster
+		// 计算每个簇的包围球半径
 		float radiussq = 0;
 
 		for (size_t j = cluster_offsets[i]; j < cluster_offsets[i + 1]; ++j)
@@ -103,7 +103,7 @@ static void buildClusterAdjacency(ClusterAdjacency& adjacency, const unsigned in
 {
 	unsigned int* ref_offsets = allocator.allocate<unsigned int>(vertex_count + 1);
 
-	// compute number of clusters referenced by each vertex
+	// 计算每个顶点引用的簇数
 	memset(ref_offsets, 0, vertex_count * sizeof(unsigned int));
 
 	for (size_t i = 0; i < cluster_count; ++i)
@@ -112,27 +112,27 @@ static void buildClusterAdjacency(ClusterAdjacency& adjacency, const unsigned in
 			ref_offsets[cluster_indices[j]]++;
 	}
 
-	// compute (worst-case) number of adjacent clusters for each cluster
+	// 计算每个簇的（最坏情况）相邻簇数
 	size_t total_adjacency = 0;
 
 	for (size_t i = 0; i < cluster_count; ++i)
 	{
 		size_t count = 0;
 
-		// worst case is every vertex has a disjoint cluster list
+		// 最坏情况是每个顶点都有不相交的簇列表
 		for (size_t j = cluster_offsets[i]; j < cluster_offsets[i + 1]; ++j)
 			count += ref_offsets[cluster_indices[j]] - 1;
 
-		// ... but only every other cluster can be adjacent in the end
+		// ... 但最终只有每隔一个簇可能相邻
 		total_adjacency += count < cluster_count - 1 ? count : cluster_count - 1;
 	}
 
-	// we can now allocate adjacency buffers
+	// 现在可以分配邻接缓冲区
 	adjacency.offsets = allocator.allocate<unsigned int>(cluster_count + 1);
 	adjacency.clusters = allocator.allocate<unsigned int>(total_adjacency);
 	adjacency.shared = allocator.allocate<unsigned int>(total_adjacency);
 
-	// convert ref counts to offsets
+	// 将引用计数转换为偏移量
 	size_t total_refs = 0;
 
 	for (size_t i = 0; i < vertex_count; ++i)
@@ -144,7 +144,7 @@ static void buildClusterAdjacency(ClusterAdjacency& adjacency, const unsigned in
 
 	unsigned int* ref_data = allocator.allocate<unsigned int>(total_refs);
 
-	// fill cluster refs for each vertex
+	// 为每个顶点填充簇引用
 	for (size_t i = 0; i < cluster_count; ++i)
 	{
 		for (size_t j = cluster_offsets[i]; j < cluster_offsets[i + 1]; ++j)
@@ -155,7 +155,7 @@ static void buildClusterAdjacency(ClusterAdjacency& adjacency, const unsigned in
 	memmove(ref_offsets + 1, ref_offsets, vertex_count * sizeof(unsigned int));
 	ref_offsets[0] = 0;
 
-	// fill cluster adjacency for each cluster...
+	// 为每个簇填充簇邻接...
 	adjacency.offsets[0] = 0;
 
 	for (size_t i = 0; i < cluster_count; ++i)
@@ -168,7 +168,7 @@ static void buildClusterAdjacency(ClusterAdjacency& adjacency, const unsigned in
 		{
 			unsigned int v = cluster_indices[j];
 
-			// merge the entire cluster list of each vertex into current list
+			// 将每个顶点的整个簇列表合并进当前列表
 			for (size_t k = ref_offsets[v]; k < ref_offsets[v + 1]; ++k)
 			{
 				unsigned int c = ref_data[k];
@@ -187,7 +187,7 @@ static void buildClusterAdjacency(ClusterAdjacency& adjacency, const unsigned in
 						break;
 					}
 
-				// .. or append a new cluster
+				// .. 或追加一个新簇
 				if (!found)
 				{
 					adj[count] = c;
@@ -203,7 +203,7 @@ static void buildClusterAdjacency(ClusterAdjacency& adjacency, const unsigned in
 
 	assert(adjacency.offsets[cluster_count] <= total_adjacency);
 
-	// ref_offsets can't be deallocated as it was allocated before adjacency
+	// ref_offsets 不能释放，因为它在邻接之前就已分配
 	allocator.deallocate(ref_data);
 }
 
@@ -211,7 +211,7 @@ struct ClusterGroup
 {
 	int group;
 	int next;
-	unsigned int size; // 0 unless root
+	unsigned int size; // 除非是根节点，否则为 0
 	unsigned int vertices;
 };
 
@@ -226,7 +226,7 @@ static void heapPush(GroupOrder* heap, size_t size, GroupOrder item)
 	// insert a new element at the end (breaks heap invariant)
 	heap[size++] = item;
 
-	// bubble up the new element to its correct position
+	// 将新元素上浮到其正确位置
 	size_t i = size - 1;
 	while (i > 0 && heap[i].order < heap[(i - 1) / 2].order)
 	{
@@ -247,11 +247,11 @@ static GroupOrder heapPop(GroupOrder* heap, size_t size)
 	// move the last element to the top (breaks heap invariant)
 	heap[0] = heap[--size];
 
-	// bubble down the new top element to its correct position
+	// 将新的顶部元素下沉到其正确位置
 	size_t i = 0;
 	while (i * 2 + 1 < size)
 	{
-		// find the smallest child
+		// 找到最小的子节点
 		size_t j = i * 2 + 1;
 		j += (j + 1 < size && heap[j + 1].order < heap[j].order);
 
@@ -259,7 +259,7 @@ static GroupOrder heapPop(GroupOrder* heap, size_t size)
 		if (heap[j].order >= heap[i].order)
 			break;
 
-		// otherwise, swap the parent and child and continue
+		// 否则，交换父节点和子节点并继续
 		GroupOrder temp = heap[i];
 		heap[i] = heap[j];
 		heap[j] = temp;
@@ -348,7 +348,7 @@ static int pickGroupToMerge(const ClusterGroup* groups, int id, const ClusterAdj
 			// normalize shared count by the expected boundary of each group (+ keeps scoring symmetric)
 			float score = float(int(shared)) * (group_rsqrt + other_rsqrt);
 
-			// incorporate spatial score to favor merging nearby groups
+			// 融入空间得分，以偏向合并距离相近的组
 			if (cluster_bounds)
 				score *= 1.f + 0.4f * boundsScore(&cluster_bounds[id * 4], &cluster_bounds[other * 4]);
 
@@ -383,11 +383,11 @@ size_t meshopt_partitionClusters(unsigned int* destination, const unsigned int* 
 	unsigned int* cluster_newindices = allocator.allocate<unsigned int>(total_index_count);
 	unsigned int* cluster_offsets = allocator.allocate<unsigned int>(cluster_count + 1);
 
-	// make new cluster index list that filters out duplicate indices
+	// 创建过滤掉重复索引的新簇索引列表
 	filterClusterIndices(cluster_newindices, cluster_offsets, cluster_indices, cluster_index_counts, cluster_count, used, vertex_count, total_index_count);
 	cluster_indices = cluster_newindices;
 
-	// compute bounding sphere for each cluster if positions are provided
+	// 若提供了位置，为每个簇计算包围球
 	float* cluster_bounds = NULL;
 
 	if (vertex_positions)
@@ -405,7 +405,7 @@ size_t meshopt_partitionClusters(unsigned int* destination, const unsigned int* 
 	GroupOrder* order = allocator.allocate<GroupOrder>(cluster_count);
 	size_t pending = 0;
 
-	// create a singleton group for each cluster and order them by priority
+	// 为每个簇创建单例组，并按优先级排序
 	for (size_t i = 0; i < cluster_count; ++i)
 	{
 		groups[i].group = int(i);
@@ -421,12 +421,12 @@ size_t meshopt_partitionClusters(unsigned int* destination, const unsigned int* 
 		heapPush(order, pending++, item);
 	}
 
-	// iteratively merge the smallest group with the best group
+	// 迭代地将最小的组与最佳组合并
 	while (pending)
 	{
 		GroupOrder top = heapPop(order, pending--);
 
-		// this group was merged into another group earlier
+		// 该组此前已被合并进另一组
 		if (groups[top.id].size == 0)
 			continue;
 
@@ -437,20 +437,20 @@ size_t meshopt_partitionClusters(unsigned int* destination, const unsigned int* 
 			groups[i].group = -1;
 		}
 
-		// the group is large enough, emit as is
+		// 组已足够大，按原样输出
 		if (groups[top.id].size >= target_partition_size)
 			continue;
 
 		int best_group = pickGroupToMerge(groups, top.id, adjacency, max_partition_size, cluster_bounds);
 
-		// we can't grow the group any more, emit as is
+		// 无法再扩增该组，按原样输出
 		if (best_group == -1)
 			continue;
 
-		// compute shared vertices to adjust the total vertices estimate after merging
+		// 计算共享顶点，以在合并后调整总顶点估算
 		unsigned int shared = countShared(groups, top.id, best_group, adjacency);
 
-		// combine groups by linking them together
+		// 通过相互链接来合并组
 		assert(groups[best_group].size > 0);
 
 		for (int i = top.id; i >= 0; i = groups[i].next)
@@ -468,14 +468,14 @@ size_t meshopt_partitionClusters(unsigned int* destination, const unsigned int* 
 		groups[best_group].size = 0;
 		groups[best_group].vertices = 0;
 
-		// merge bounding spheres if bounds are available
+		// 若存在包围数据，则合并包围球
 		if (cluster_bounds)
 		{
 			mergeBounds(&cluster_bounds[top.id * 4], &cluster_bounds[best_group * 4]);
 			memset(&cluster_bounds[best_group * 4], 0, 4 * sizeof(float));
 		}
 
-		// re-associate all clusters back to the merged group
+		// 将所有簇重新关联回合并后的组
 		for (int i = top.id; i >= 0; i = groups[i].next)
 			groups[i].group = int(top.id);
 

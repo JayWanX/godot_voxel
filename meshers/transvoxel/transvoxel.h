@@ -12,23 +12,23 @@
 
 namespace voxel::transvoxel {
 
-// How many extra voxels are needed towards the negative axes
+// 朝向负轴方向需要多少额外体素
 static const int MIN_PADDING = 1;
-// How many extra voxels are needed towards the positive axes
+// 朝向正轴方向需要多少额外体素
 static const int MAX_PADDING = 2;
-// Transvoxel guarantees a maximum number of triangle generated for each 2x2x2 cell of voxels.
+// Transvoxel 保证每个 2x2x2 体素单元生成的三角形数量有上限。
 static const unsigned int MAX_TRIANGLES_PER_CELL = 5;
 
 enum TexturingMode {
 	TEXTURES_NONE,
-	// Blends the 4 most-represented textures in the given block, ignoring the others.
-	// Texture indices and blend factors have 4-bit precision (maximum 16 textures and 16 transition gradients),
-	// and are respectively encoded in UV.x and UV.y.
+	// 混合给定数据块中最具代表性的 4 种纹理，忽略其余纹理。
+	// 纹理索引和混合因子具有 4 位精度（最多 16 种纹理和 16 种过渡梯度），
+	// 并分别编码在 UV.x 和 UV.y 中。
 	TEXTURES_MIXEL4_S4,
-	// Each voxel has only one material index, and up to 4 can blend in shader
+	// 每个体素只有一个材质索引，着色器中最多可混合 4 个
 	TEXTURES_SINGLE_S4,
 #ifdef VOXEL_ENABLE_TRANSVOXEL_MATERIAL_SINGLE_S2
-	// Each voxel has only one material index, and up to 2 can blend in shader
+	// 每个体素只有一个材质索引，着色器中最多可混合 2 个
 	TEXTURES_SINGLE_S2,
 #endif
 	TEXTURES_MODE_COUNT
@@ -36,8 +36,8 @@ enum TexturingMode {
 
 struct LodAttrib {
 	Vector3f secondary_position;
-	// Mask telling if a cell the vertex belongs to is on a side of the block.
-	// Each bit corresponds to a side.
+	// 掩码，指示顶点所属的单元是否位于数据块的一侧。
+	// 每个位对应一个侧面。
 	// 0: -X
 	// 1: +X
 	// 2: -Y
@@ -45,11 +45,11 @@ struct LodAttrib {
 	// 4: -Z
 	// 5: +Z
 	uint8_t cell_border_mask;
-	// Mask telling if the vertex is on a side of the block. Same convention as above.
+	// 掩码，指示顶点是否位于数据块的一侧。约定同上。
 	uint8_t vertex_border_mask;
-	// Flag telling if the vertex belongs to a transition mesh.
+	// 标志，指示顶点是否属于过渡网格。
 	uint8_t transition;
-	// Unused. Necessary to align to 4*sizeof(float) so it can be memcpied to a rendering buffer.
+	// 未使用。用于对齐到 4*sizeof(float)，以便复制到渲染缓冲区。
 	uint8_t _pad;
 };
 
@@ -69,9 +69,8 @@ struct MeshArrays {
 	StdVector<Vector3f> normals;
 	StdVector<LodAttrib> lod_data;
 
-	// Not really floats, only aligned to 32-bit. Actual layout depends on texturing mode
-	// TODO Maybe use directly the right struct and reinterpret at the end? This has been float only because Godot only
-	// lets us pass it as float
+	// 并非真正的浮点数，只是对齐到 32 位。实际布局取决于纹理模式
+	// TODO 也许可以直接使用正确的结构体，并在最后重新解释？之所以一直是 float，是因为 Godot 只允许我们以 float 传递
 	StdVector<float> texturing_data_1f32;
 	StdVector<Vector2f> texturing_data_2f32;
 
@@ -156,11 +155,11 @@ private:
 	Vector3i _block_size;
 };
 
-// This is only to re-use some data computed for regular mesh into transition meshes
+// 这只是为了将常规网格计算出的某些数据复用到过渡网格中
 struct DefaultTextureIndicesData {
 	FixedArray<uint8_t, 4> indices;
 	uint32_t packed_indices = 0;
-	// TODO Use an optional?
+	// TODO 是否使用 optional？
 	bool use = false;
 };
 

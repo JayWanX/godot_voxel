@@ -18,11 +18,11 @@ int VoxelInstancerRigidBody::get_library_item_id() const {
 
 void VoxelInstancerRigidBody::_notification(int p_what) {
 	switch (p_what) {
-		// TODO Optimization: this is also called when we quit the game or destroy the world
-		// which can make things a bit slow, but I don't know if it can easily be avoided
+		// TODO 优化：当我们退出游戏或销毁世界时也会调用它，
+		// 这可能会让操作稍慢，但我不确定能否轻松避免
 		case NOTIFICATION_UNPARENTED:
-			// The user could queue_free() that node in game,
-			// so we have to notify the instancer to remove the multimesh instance and pointer
+			// 用户可能在游戏中 queue_free() 该节点，
+			// 因此我们必须通知实例化器移除 multimesh 实例和指针
 			if (_parent != nullptr) {
 				_parent->on_body_removed(_data_block_position, _render_block_index, _instance_index);
 				_parent = nullptr;
@@ -31,9 +31,9 @@ void VoxelInstancerRigidBody::_notification(int p_what) {
 	}
 }
 
-// This method exists to workaround not being able to add or remove children to the same parent,
-// in case this is necessary in removal behaviors. But it requires the user to explicitely call that instead of
-// queue_free().
+// 此方法的存在是为了绕过无法向同一父节点添加或移除子节点的问题，
+// 以防移除行为中需要这样做。但它要求用户显式调用，而不是
+// queue_free()。
 void VoxelInstancerRigidBody::queue_free_and_notify_instancer() {
 	queue_free();
 	if (_parent != nullptr) {

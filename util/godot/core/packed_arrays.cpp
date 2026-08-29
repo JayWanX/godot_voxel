@@ -10,12 +10,12 @@ namespace voxel::godot {
 
 void copy_to(PackedVector3Array &dst, const Span<const Vector3f> src) {
 	dst.resize(src.size());
-	// resize can fail in case allocation was not possible
+	// 如果无法分配内存，resize 可能失败
 	ERR_FAIL_COND(dst.size() != static_cast<int>(src.size()));
 
-	// TODO Any way to do this without macros in C++17?
+	// TODO 在 C++17 中有什么不用宏就能实现的方法吗？
 #ifdef REAL_T_IS_DOUBLE
-	// Convert floats to doubles
+	// 将 float 转换为 double
 	const unsigned int count = dst.size() * Vector3f::AXIS_COUNT;
 	real_t *dst_w = reinterpret_cast<real_t *>(dst.ptrw());
 	const float *src_r = reinterpret_cast<const float *>(src.data());
@@ -30,11 +30,11 @@ void copy_to(PackedVector3Array &dst, const Span<const Vector3f> src) {
 
 void copy_to(PackedVector2Array &dst, const Span<const Vector2f> src) {
 	dst.resize(src.size());
-	// resize can fail in case allocation was not possible
+	// 如果无法分配内存，resize 可能失败
 	ERR_FAIL_COND(dst.size() != static_cast<int>(src.size()));
 
 #ifdef REAL_T_IS_DOUBLE
-	// Convert floats to doubles
+	// 将 float 转换为 double
 	const unsigned int count = dst.size() * Vector2f::AXIS_COUNT;
 	real_t *dst_w = reinterpret_cast<real_t *>(dst.ptrw());
 	const float *src_r = reinterpret_cast<const float *>(src.data());

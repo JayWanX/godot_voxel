@@ -1,107 +1,106 @@
-Quick start
+快速开始
 ==============
 
-Demo projects
+演示项目
 ------------------
 
-Now that your Godot Engine has voxel support built in, you can either download one of the demos and start playing around with them:
+既然你的 Godot Engine 已经内置了体素支持，你可以下载其中一个演示项目并开始试用：
 
-- [Voxel's basic demos](https://github.com/Voxel/voxelgame)
-- [Voxel's solar system demo](https://github.com/Voxel/solar_system_demo)
-- [TinmanJuggernaut's fps_demo](https://github.com/tinmanjuggernaut/voxelgame)
+- [Voxel 基础演示](https://github.com/Voxel/voxelgame)
+- [Voxel 太阳系演示](https://github.com/Voxel/solar_system_demo)
+- [TinmanJuggernaut 的 fps_demo](https://github.com/tinmanjuggernaut/voxelgame)
 
-Videos
+视频
 --------
 
-You can watch some of the video tutorials available (they might come out of date!):
+你可以观看一些现有的视频教程（它们可能已经过时了！）：
 
-- [Voxel Terrain Tutorial with Godot's voxel tools module using the Smooth Transvoxel method (by Aknakos)](https://www.youtube.com/watch?v=YDHkTJ6Na9U) (17 Jun 2021)
-- [How To Make Voxel Terrains In Godot (by Tokisan Games)](https://www.youtube.com/watch?v=zfzmcbR1H_0) (4 Nov 2019)
-- [Godot Voxel Tools (by Gamesfromscratch)](https://www.youtube.com/watch?v=WxZK_Yg5kU0) (25 Jul 2020)
+- [使用 Smooth Transvoxel 方法的 Godot 体素工具模块体素地形教程（作者：Aknakos）](https://www.youtube.com/watch?v=YDHkTJ6Na9U) (2021 年 6 月 17 日)
+- [如何在 Godot 中制作体素地形（作者：Tokisan Games）](https://www.youtube.com/watch?v=zfzmcbR1H_0) (2019 年 11 月 4 日)
+- [Godot 体素工具（作者：Gamesfromscratch）](https://www.youtube.com/watch?v=WxZK_Yg5kU0) (2020 年 7 月 25 日)
 
 
-Short recipes
+简短示例
 ---------------
 
-The following sections contain basic quick start instructions to get voxel terrains running.
-For more in-depth information, see the rest of the documentation.
+以下章节包含让体素地形跑起来的基本快速入门说明。
+更多深入信息请参阅文档的其他部分。
 
-Before each example, you may do the following:
+在每个示例之前，你可以做以下准备工作：
 
-- Create a new project and a new 3D scene. Give it some light by adding a `DirectionalLight` node, and orientate it so it shines approximately downwards. You can enable `Shadows` too.
+- 创建一个新项目和一个新的 3D 场景。添加一个 `DirectionalLight` 节点来提供光照，并调整其方向使其大致朝下照射。你也可以启用 `Shadows`。
 
-### Blocky heightmap terrain using `VoxelTerrain`
+### 使用 `VoxelTerrain` 创建方块风高度图地形
 
-1) Add a `VoxelTerrain` node, and adjust the following settings in the inspector:
+1) 添加一个 `VoxelTerrain` 节点，并在检查器中调整以下设置：
 	
-1.1) Under the `materials` section, create a new `StandardMaterial3D` in the first slot. Click that material, and in the "Vertex Color" category, enable "Use as Albedo" (`vertex_color_as_albedo`). This will give the blocks better shading.
+1.1) 在 `materials` 部分，在第一个槽位创建一个新的 `StandardMaterial3D`。点击该材质，在“Vertex Color”类别中启用“Use as Albedo”（`vertex_color_as_albedo`）。这将使方块获得更好的着色。
 
-1.2) Click on the `Generator` property: create a new `VoxelGeneratorNoise2D`. Then click on it and set its `Channel` parameter to `TYPE`. Also make sure the `noise` property is assigned to a noise resource.
+1.2) 点击 `Generator` 属性：创建一个新的 `VoxelGeneratorNoise2D`。然后点击它，将其 `Channel` 参数设为 `TYPE`。同时确保 `noise` 属性已分配一个噪声资源。
 
-1.3) Click on the `Mesher` property: create a new `VoxelMesherBlocky`. In the `library` property, create a new `VoxelBlockyLibrary`. In the `models` property, create a new item of type `VoxelBlockyModelEmpty` (this will be "air"). Create another item of type `VoxelBlockyModelCube` (this will be a solid cube).
+1.3) 点击 `Mesher` 属性：创建一个新的 `VoxelMesherBlocky`。在 `library` 属性中，创建一个新的 `VoxelBlockyLibrary`。在 `models` 属性中，创建一个类型为 `VoxelBlockyModelEmpty` 的新条目（这将作为“空气”）。再创建一个类型为 `VoxelBlockyModelCube` 的条目（这将作为实心方块）。
 
-1.4) Select the terrain node again, and in the `Terrain` menu on top of the viewport, click `Re-generate`. At this point you should start to see a terrain made of cubes appear in the editor viewport.
+1.4) 再次选中地形节点，在视口顶部的 `Terrain` 菜单中点击 `Re-generate`。此时你应该会看到由方块构成的地形出现在编辑器视口中。
 
-2) The terrain is not setup to appear in-game yet. Add a `Camera3D` node, and elevate it so it's above the terrain. You may also want to angle it a bit downward to see more of the landscape.
+2) 地形还没有设置好在游戏中显示。添加一个 `Camera3D` 节点，并将其抬高到地形上方。你可能还想让它略微向下倾斜，以便看到更多的地形景观。
 
-3) Add a `VoxelViewer` node under the camera. When the game runs, this node will tell the voxel engine where to generate voxels, as the camera moves around.
+3) 在相机下添加一个 `VoxelViewer` 节点。游戏运行时，该节点会随着相机的移动告知体素引擎在何处生成体素。
 
-4) Make sure your scene contains an environment and a light, so you can see the terrain in-game (by default the default lighting you see in editor will not apply in game, leaving everything unlit and grey). 
+4) 确保你的场景包含环境和光照，这样你才能在游戏中看到地形（默认情况下，你在编辑器中看到的默认光照不会应用到游戏中，所有东西都会处于无光照的灰色状态）。
 
-![Screenshot of the preview environment menu](images/add_environment_to_scene.webp)
+![预览环境菜单截图](images/add_environment_to_scene.webp)
 
-5) Play the scene: you should see the terrain appear!
+5) 运行场景：你应该能看到地形出现了！
 
-![Screenshot of blocky terrain from the quick start guide](images/quickstart_blocky_terrain_result.webp)
+![快速入门指南中的方块风地形截图](images/quickstart_blocky_terrain_result.webp)
 
-You can modify the shape of the terrain by changing noise parameters under the generator. 
+你可以通过修改生成器下的噪声参数来改变地形的形状。
 
-`VoxelMesherBlocky` allows to specify way more than just white cubes: you can define multiple models, with varying textures, materials and shapes, in order to compose a world like you would see in Minecraft for example.
-
-
-### Large smooth heightmap with overhangs using `VoxelLODTerrain`
-
-1) Add a `VoxelLodTerrain` node, and adjust the following settings in the inspector:
-
-1.1) `Generator`: create a new `VoxelGeneratorNoise`. Then click on it and set its `Channel` parameter to `SDF`. Also make sure the `noise` property is assigned to a noise resource.
-
-1.2) `Mesher`: create a new `VoxelMesherTransvoxel`.
-
-2) At this point you should start to see a smooth, spongy terrain appear in the editor viewport. You might need to look around and zoom out a bit. If you can't see anything, you can force a reload by reopening the scene, or using the menu `Terrain -> Re-generate`.
-
-3) The terrain is not setup to appear in-game yet. Add a `Camera3D` node, and elevate it so it's above the terrain. You may also want to angle it a bit downward to see more of the landscape.
-
-4) Add a `VoxelViewer` node under the camera. When the game runs, this node will tell the voxel engine where to generate voxels, as the camera moves around.
-
-5) Make sure your scene contains an environment and a light, so you can see the terrain in-game (by default the default lighting you see in editor will not apply in game, leaving everything unlit and grey). 
-
-6) Play the scene: you should see the terrain appear!
-
-![Screenshot of smooth terrain from the quick start guide](images/quickstart_smooth_lod_terrain_result.webp)
-
-You can modify the shape of the terrain by changing noise parameters under the generator. 
-
-Painting textures from voxel data is possible, but it's also common to use procedural texturing using a shader.
+`VoxelMesherBlocky` 能定义的远不止白色方块：你可以定义多个模型，搭配不同的纹理、材质和形状，从而构建出类似 Minecraft 那样的世界。
 
 
-Is Voxel tools for you?
+### 使用 `VoxelLODTerrain` 创建带悬崖的大规模平滑高度图
+
+1) 添加一个 `VoxelLodTerrain` 节点，并在检查器中调整以下设置：
+
+1.1) `Generator`：创建一个新的 `VoxelGeneratorNoise`。然后点击它，将其 `Channel` 参数设为 `SDF`。同时确保 `noise` 属性已分配一个噪声资源。
+
+1.2) `Mesher`：创建一个新的 `VoxelMesherTransvoxel`。
+
+2) 此时你应该会看到平滑、海绵状的地形出现在编辑器视口中。你可能需要环顾四周并稍微缩小视野。如果什么都看不到，可以通过重新打开场景或使用菜单 `Terrain -> Re-generate` 强制重新加载。
+
+3) 地形还没有设置好在游戏中显示。添加一个 `Camera3D` 节点，并将其抬高到地形上方。你可能还想让它略微向下倾斜，以便看到更多的地形景观。
+
+4) 在相机下添加一个 `VoxelViewer` 节点。游戏运行时，该节点会随着相机的移动告知体素引擎在何处生成体素。
+
+5) 确保你的场景包含环境和光照，这样你才能在游戏中看到地形（默认情况下，你在编辑器中看到的默认光照不会应用到游戏中，所有东西都会处于无光照的灰色状态）。
+
+6) 运行场景：你应该能看到地形出现了！
+
+![快速入门指南中的平滑地形截图](images/quickstart_smooth_lod_terrain_result.webp)
+
+你可以通过修改生成器下的噪声参数来改变地形的形状。
+
+根据体素数据绘制纹理是可行的，但使用着色器进行程序化纹理也很常见。
+
+
+Voxel Tools 适合你吗？
 --------------------------
 
-It's easy to think a project needs voxels, but they are less needed than it sounds. Also, just because there is a 3D grid somewhere in a game doesn't necessarily mean this module is appropriate. This module is more fit to certain cases than others, and will not necessarily focus on every kind of technology or feature using voxels.
+很容易认为项目需要体素，但实际上它们的需求没有听起来那么大。此外，仅仅因为游戏中某处有 3D 网格，并不一定意味着本模块就合适。本模块更适用于某些特定场景，不一定会覆盖所有使用体素的技术或功能。
 
-Here are some reasons why you might not need it:
+以下是一些你可能并不需要它的理由：
 
-- "I need a procedurally generated world": if you don't need overhangs you can go with a heightmap approach. Heightmaps are faster and easier to work with.
+- “我需要一个程序化生成的世界”：如果你不需要悬崖，可以采用高度图方案。高度图速度更快，也更容易处理。
 
-- "I need destructible models": voxels in this module are "blobby" or "blocky", they can't represent every possible shape. If you need something precise, you could try more specialized alternatives like CSG nodes or precomputed destruction.
+- “我需要可破坏的模型”：本模块中的体素是“团块状”或“方块风”的，无法表示所有可能的形状。如果你需要精确的东西，可以尝试更专业的替代方案，例如 CSG 节点或预计算的破坏。
 
-- "I need a terrain with overhangs and caves": do you need it to be editable by players? If not, then you can model the terrain in any 3D modeller and optimize it up-front. You can mix heightmaps + 3D models. You might rely on voxels to make the authoring process easier, but in the exported game you will only need the meshes and static colliders.
+- “我需要一个带悬崖和洞穴的地形”：你需要让玩家编辑它吗？如果不需要，你可以在任何 3D 建模软件中建模地形并预先优化。你可以混合使用高度图 + 3D 模型。你或许可以借助体素来简化制作过程，但在导出的游戏中你只需要网格和静态碰撞体。
 
-- "I need to make a planet": you can make more efficient planets by stitching 6 spherified heightmaps together. Take a cube where each face is a heightmap, then puff that cube to turn it into a sphere.
+- “我需要制作一颗行星”：你可以通过拼接 6 个球面化高度图来制作更高效的行星。取一个每个面都是高度图的立方体，然后将该立方体鼓起变成一个球体。
 
-- "I want to make Minecraft but different and with my own blocks": Minecraft is a lot more than voxels. While the module can replicate basic functionalities, it is more general/low-level than this at the moment, so it doesn't provide a lot of features found in Minecraft out of the box. Alternatively, you could create a mod with [Minetest](https://www.minetest.net/), which is a more specialized engine.
+- “我想做一个与 Minecraft 不同、用自己方块的作品”：Minecraft 远不止体素这么简单。虽然本模块可以复刻基本功能，但它目前更通用/更底层，因此无法开箱即用地提供 Minecraft 中的大量功能。另外，你也可以用 [Minetest](https://www.minetest.net/) 创建模组，那是一个更专业的引擎。
 
-- "I want super small voxels like Teardown or John Lin's sandbox": these games use a very different tech than this module uses. They raytrace voxels in real-time. This module instead uses a classic polygon-based approach. While you could in theory make terrain that looks like that, it won't perform well. 
+- “我想要像 Teardown 或 John Lin 沙盒那样超小的体素”：这些游戏使用的技术与本模块截然不同。它们对体素进行实时光线追踪，而本模块则使用经典的多边形方案。虽然理论上你可以做出类似外观的地形，但性能不会很好。
 
-- "GridMap sucks": how large do you want your grid to be? How complex are your models? This module's blocky mesher is geared towards very large grids with simple geometry, so it has its own restrictions.
-
+- “GridMap 不好用”：你希望网格有多大？你的模型有多复杂？本模块的方块风网格生成器面向的是几何简单的超大网格，因此它有自己的限制。

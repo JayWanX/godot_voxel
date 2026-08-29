@@ -5,27 +5,26 @@
 
 namespace voxel {
 
-// My own implementation of FastNoiseLite for Godot Engine.
-// Godot 4 comes with its own FastNoiseLite, but mine predated it. So it needs to be prefixed to avoid conflict.
-// Each has pros and cons. Godot's implementation has a few practical differences:
+// 我为 Godot Engine 实现的 FastNoiseLite。
+// Godot 4 自带自己的 FastNoiseLite，但我的版本比它早。所以需要加前缀以避免冲突。
+// 两者各有利弊。Godot 的实现有一些实际差异：
 //
-// - get_noise* methods are not inline. That means there is a potential performance loss when calling it many times
-//  (basically all the time in this module).
+// - get_noise* 方法不是内联的。这意味着多次调用时可能有性能损失
+//  （本模块中基本一直都在调用）。
 //
-// - get_noise* methods are not `const`. Means any person creating a Noise implementation can mutate internal state,
-//   which is bad for multithreaded usage. IMO noise should not have state, and if it does, it must be explicit and not
-//   change "lazily". Devs aren't sure yet if they should change that.
+// - get_noise* 方法不是 `const`。这意味着任何创建 Noise 实现的人都可以修改内部状态，
+//   这对多线程使用不利。在我看来噪声不应该有状态，即便有也必须是显式的，不能
+//    "惰性"地改变。开发者也还没确定是否应该改变这一点。
 //
-// - `real_t` is used everywhere, instead of just coordinates. That means builds with `float=64` might be slower,
-//   especially in cases where such precision isn't necessary *for the use case of noise generation*.
+// - 到处使用 `real_t`，而不只是坐标。这意味着 `float=64` 的构建可能更慢，
+//   尤其是在*对噪声生成这个用例*来说并不需要这种精度的情况下。
 //
-// - Domain warp is not exposed as its own thing, so can't generate from (x,y,z) coordinates in a single call
+// - 域扭曲（Domain warp）没有作为独立的东西暴露，所以无法在单次调用中从 (x,y,z) 坐标生成
 //
-// - The internal instance of the FastNoiseLite object is not accessible, and it doesn't have the access changes present
-//   in the module's version, so it is not possible to do range analysis more precisely. This is important for
-//   `VoxelGeneratorGraph`.
+// - FastNoiseLite 对象的内部实例不可访问，而且它没有模块版本中的那些访问更改，
+//   所以无法做更精确的范围分析。这对 `VoxelGeneratorGraph` 很重要。
 //
-// - Does not use `GDVirtual`, so it cannot be extended by scripts.
+// - 不使用 `GDVirtual`，所以无法被脚本扩展。
 //
 class Voxel_FastNoiseLite : public Resource {
 	GDCLASS(Voxel_FastNoiseLite, Resource)
@@ -76,7 +75,7 @@ public:
 
 	Voxel_FastNoiseLite();
 
-	// Properties
+	// 属性
 
 	void set_noise_type(NoiseType type);
 	NoiseType get_noise_type() const;
@@ -120,7 +119,7 @@ public:
 	void set_rotation_type_3d(RotationType3D type);
 	RotationType3D get_rotation_type_3d() const;
 
-	// Queries
+	// 查询
 
 	inline float get_noise_2d(real_t x, real_t y) const {
 		if (_warp_noise.is_valid()) {
@@ -136,10 +135,10 @@ public:
 		return _fn.GetNoise(x, y, z);
 	}
 
-	// TODO Have a separate cell noise? It outputs multiple things, but we only get one.
-	// To get the others the API forces to calculate it a second time, and it's the most expensive noise...
+	// TODO 要不要单独做一个细胞噪声？它输出多种东西，但我们只需要一种。
+	// 要获取其他值，API 迫使我们再计算一次，而这又是最昂贵的噪声……
 
-	// Internal
+	// 内部
 
 	inline float get_noise_2d_unwarped(const real_t x, const real_t y) const {
 		return _fn.GetNoise(x, y);
@@ -174,7 +173,7 @@ private:
 
 	::fast_noise_lite::FastNoiseLite _fn;
 
-	// TODO FastNoiseLite should rather have getters
+	// TODO FastNoiseLite 更应该提供 getter
 
 	NoiseType _noise_type = TYPE_OPEN_SIMPLEX_2;
 	int _seed = 0;

@@ -42,7 +42,7 @@ void VoxelTerrainEditorPlugin::init() {
 
 	Node *base_control = get_editor_interface()->get_base_control();
 
-	// This plugin actually owns the singleton
+	// 这个插件实际上拥有这个单例
 	VoxelAboutWindow::create_singleton(*base_control);
 
 	_save_file_dialog = memnew(EditorFileDialog);
@@ -100,7 +100,7 @@ ViewerID create_editor_viewer() {
 	vd.horizontal = 512;
 	vd.vertical = 512;
 	VoxelEngine::get_singleton().set_viewer_distances(id, vd);
-	// No collision needed in editor, also it updates faster without
+	// 编辑器中不需要碰撞，而且没有碰撞更新也更快
 	VoxelEngine::get_singleton().set_viewer_requires_collisions(id, false);
 	return id;
 }
@@ -156,11 +156,11 @@ void VoxelTerrainEditorPlugin::_voxel_make_visible(bool visible) {
 	_task_indicator->set_visible(visible);
 	set_process(visible);
 
-	// TODO There are deselection problems I cannot fix cleanly!
+	// TODO 有一些我无法干净修复的取消选中问题！
 
-	// Can't use `make_visible(false)` to reset our reference to the node or reset gizmos,
-	// because of https://github.com/godotengine/godot/issues/40166
-	// So we'll need to check if _node is null all over the place
+	// 不能使用 `make_visible(false)` 来重置我们对节点的引用或重置 gizmo，
+	// 因为 https://github.com/godotengine/godot/issues/40166
+	// 所以我们到处都需要检查 _node 是否为 null
 }
 
 EditorPlugin::AfterGUIInput VoxelTerrainEditorPlugin::_voxel_forward_3d_gui_input(
@@ -168,7 +168,7 @@ EditorPlugin::AfterGUIInput VoxelTerrainEditorPlugin::_voxel_forward_3d_gui_inpu
 		const Ref<InputEvent> &p_event
 ) {
 	if (_editor_viewer_enabled) {
-		// Will be clamped by terrain max view distance
+		// 会被地形最大视野距离限制
 		VoxelEngine::Viewer::Distances vd;
 		vd.horizontal = p_camera->get_far();
 		vd.vertical = p_camera->get_far();

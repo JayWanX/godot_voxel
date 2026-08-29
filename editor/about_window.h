@@ -14,8 +14,8 @@ class VoxelAboutWindow : public AcceptDialog {
 public:
 	VoxelAboutWindow();
 
-	// The same window can be shown by more than one plugin, therefore it is created only once internally.
-	// It cannot be created in the initialization of the module because the editor isn't available yet.
+	// 同一个窗口可能被多个插件显示，因此它在内部只创建一次。
+	// 它不能在模块初始化时创建，因为此时编辑器尚未就绪。
 	static void create_singleton(Node &base_control);
 	static void destroy_singleton();
 	static void popup_singleton();

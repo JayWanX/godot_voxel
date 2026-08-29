@@ -78,7 +78,7 @@ GraphEditConnection get_graph_edit_closest_connection_at_point(
 		const real_t max_distance
 ) {
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR < 3
-	// Not exposed. Could probably re-implement ourselves, but it doesn't seem worth it.
+	// 未暴露。也许可以自己重新实现，但似乎不值得。
 	return GraphEditConnection();
 
 #else

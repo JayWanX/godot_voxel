@@ -10,16 +10,16 @@ namespace voxel {
 
 class VoxelGraphEditor;
 
-// Nodes aren't resources so this translates them into a form the inspector can understand.
-// This makes it easier to support undo/redo and sub-resources.
-// WARNING: `AnimationPlayer` will allow to keyframe properties, but there really is no support for that.
+// 节点不是资源，因此这里将它们转换为检查器能理解的形式。
+// 这使支持撤销/重做和子资源变得更容易。
+// 警告：`AnimationPlayer` 允许对属性做关键帧，但实际上这里并不支持。
 class VoxelGraphNodeInspectorWrapper : public RefCounted {
 	GDCLASS(VoxelGraphNodeInspectorWrapper, RefCounted)
 public:
 	void setup(uint32_t p_node_id, VoxelGraphEditor *ed);
 
-	// May be called when the graph editor is destroyed. This prevents from accessing dangling pointers in the eventual
-	// case where UndoRedo invokes functions from this editor after the plugin is removed.
+	// 可能在图形编辑器被销毁时调用。这可以防止在插件被移除后，
+	// 万一 UndoRedo 从该编辑器调用函数时访问到悬空指针。
 	void detach_from_graph_editor();
 
 	inline Ref<pg::VoxelGraphFunction> get_graph() const {

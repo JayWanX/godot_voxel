@@ -79,7 +79,7 @@ VoxelGraphEditorNodePreview::VoxelGraphEditorNodePreview() {
 void VoxelGraphEditorNodePreview::update_from_buffer(const pg::Runtime::Buffer &buffer) {
 	ERR_FAIL_COND(RESOLUTION * RESOLUTION != static_cast<int>(buffer.size));
 
-	// TODO Support debugging inputs
+	// TODO 支持调试输入
 	ERR_FAIL_COND_MSG(
 			buffer.data == nullptr,
 			buffer.is_binding ? "Plugging a debug view on an input is not supported yet."
@@ -89,7 +89,7 @@ void VoxelGraphEditorNodePreview::update_from_buffer(const pg::Runtime::Buffer &
 	PackedByteArray image_data;
 	image_data.resize(buffer.size * sizeof(float));
 	{
-		// Not using `set_pixel` because it is a lot slower.
+		// 不使用 `set_pixel`，因为它慢得多。
 		float *image_data_w = reinterpret_cast<float *>(image_data.ptrw());
 		for (unsigned int i = 0; i < buffer.size; ++i) {
 			image_data_w[i] = buffer.data[i];
@@ -108,8 +108,8 @@ void VoxelGraphEditorNodePreview::update_display_settings(const pg::VoxelGraphFu
 	const float fraction_period = graph.get_node_param(node_id, 2);
 	const int mode = graph.get_node_param(node_id, 3);
 
-	// Note, remap is only used with greyscale display mode, such that min is black and max is white.
-	// When using SDF it's more useful to keep -1..1 to measure distortions of the field.
+	// 注意，重映射只用于灰度显示模式，使最小值对应黑色、最大值对应白色。
+	// 使用 SDF 时，保留 -1..1 范围对于测量场的畸变更有用。
 	const math::LinearFuncParams remap = math::remap_intervals_to_linear_params(min_value, max_value, 0.f, 1.f);
 
 	ERR_FAIL_COND(_material.is_null());
@@ -128,18 +128,18 @@ void VoxelGraphEditorNodePreview::update_previews(
 		const float transform_scale,
 		const Vector2f transform_offset
 ) {
-	// TODO Use a thread?
+	// TODO 使用线程？
 	VOXEL_PRINT_VERBOSE("Updating slice previews");
 
 	if (previews.size() == 0) {
 		return;
 	}
 
-	// Generate data
+	// 生成数据
 	{
 		const int preview_size_x = RESOLUTION;
 		const int preview_size_y = RESOLUTION;
-		// TODO This might be too big for buffer size?
+		// TODO 这对缓冲区大小来说会不会太大了？
 		const int buffer_size = preview_size_x * preview_size_y;
 		StdVector<float> x_vec;
 		StdVector<float> y_vec;
@@ -182,7 +182,7 @@ void VoxelGraphEditorNodePreview::update_previews(
 
 	const pg::Runtime::State &last_state = adapter.get_last_state_from_current_thread();
 
-	// Update previews
+	// 更新预览
 	for (const VoxelGraphEditorNodePreviewInfo &info : previews) {
 		const pg::Runtime::Buffer &buffer = last_state.get_buffer(info.address);
 		info.control->update_from_buffer(buffer);

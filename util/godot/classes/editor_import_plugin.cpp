@@ -168,7 +168,7 @@ Error Voxel_EditorImportPlugin::_voxel_import(
 }
 
 bool Voxel_EditorImportPlugin::_voxel_can_import_threaded() const {
-	// According to docs
+	// 根据文档
 	// https://docs.godotengine.org/en/stable/classes/class_editorimportplugin.html#class-editorimportplugin-private-method-can-import-threaded
 	return true;
 }

@@ -11,8 +11,8 @@
 
 namespace voxel {
 
-// A mutex-like primitive that is expected to be locked for short periods of time.
-// It can be implemented either with a SpinLock or a Mutex, depending on test results.
+// 一种类似互斥量的原语，预期只会被短时间锁定。
+// 根据测试结果，它可以用自旋锁或互斥量实现。
 
 #ifdef VOXEL_SHORT_LOCK_IS_MUTEX
 typedef BinaryMutex ShortLock;

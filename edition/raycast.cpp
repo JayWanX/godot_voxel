@@ -12,10 +12,10 @@
 
 namespace voxel {
 
-// Binary search can be more accurate than linear regression because the SDF can be inaccurate in the first place.
-// An alternative would be to polygonize a tiny area around the middle-phase hit position.
-// `d1` is how far from `pos0` along `dir` the binary search will take place.
-// The segment may be adjusted internally if it does not contain a zero-crossing of the
+// 二分搜索可能比线性回归更精确，因为 SDF 本身可能就不准确。
+// 另一种方案是将中阶段命中位置周围的一小块区域多边形化。
+// `d1` 是二分搜索将沿 `dir` 距 `pos0` 多远进行。
+// 若该线段不包含零交叉，则可能会在内部调整。
 template <typename Volume_F>
 float approximate_distance_to_isosurface_binary_search(
 		const Volume_F &f,
@@ -26,8 +26,8 @@ float approximate_distance_to_isosurface_binary_search(
 ) {
 	float d0 = 0.f;
 	float sdf0 = get_sdf_interpolated(f, pos0);
-	// The position given as argument may be a rough approximation coming from the middle-phase,
-	// so it can be slightly below the surface. We can adjust it a little so it is above.
+	// 作为参数给出的位置可能来自中阶段，是一个粗略的近似值，
+	// 因此可能略低于表面。我们可以稍作调整使其位于表面之上。
 	for (int i = 0; i < 4 && sdf0 < 0.f; ++i) {
 		d0 -= 0.5f;
 		sdf0 = get_sdf_interpolated(f, pos0 + dir * d0);
@@ -40,7 +40,7 @@ float approximate_distance_to_isosurface_binary_search(
 	}
 
 	if ((sdf0 > 0) != (sdf1 > 0)) {
-		// Binary search
+		// 二分搜索
 		for (int i = 0; i < iterations; ++i) {
 			const float dm = 0.5f * (d0 + d1);
 			const float sdf_mid = get_sdf_interpolated(f, pos0 + dir * dm);
@@ -55,7 +55,7 @@ float approximate_distance_to_isosurface_binary_search(
 		}
 	}
 
-	// Pick distance closest to the surface
+	// 选择最接近表面的距离
 	if (Math::abs(sdf0) < Math::abs(sdf1)) {
 		return d0;
 	} else {
@@ -101,14 +101,14 @@ Vector3f get_interpolated_raw_sdf_gradient_4x4x4_p111_t(const VoxelBuffer &vb, c
 	return math::interpolate_trilinear<Vector3f>(g000, g100, g101, g001, g010, g110, g111, g011, pf);
 }
 
-// Gets the gradient from within a cube defined from voxel (1,1,1) to (2,2,2) in a buffer of 4x4x4 voxels,
-// without accounting for internal scaling. This may be used for computing normals.
+// 在 4x4x4 体素的缓冲区中，从由体素 (1,1,1) 到 (2,2,2) 定义的立方体内部获取梯度，
+// 不考虑内部缩放。这可用于计算法线。
 Vector3f get_interpolated_raw_sdf_gradient_4x4x4_p111(const VoxelBuffer &vb, const Vector3f pf) {
 	const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
 
 	switch (vb.get_channel_compression(channel)) {
 		case VoxelBuffer::COMPRESSION_UNIFORM:
-			// No gradients!
+			// 无梯度！
 			return Vector3f();
 
 		case VoxelBuffer::COMPRESSION_NONE: {
@@ -155,19 +155,19 @@ Ref<VoxelRaycastResult> raycast_sdf(
 		const uint8_t binary_search_iterations,
 		const bool normal_enabled
 ) {
-	// TODO Implement reverse raycast? (going from inside ground to air, could be useful for undigging)
+	// TODO 实现反向射线投射？（从地面内部射向空气，可能对“挖掘”有用）
 
-	// TODO Optimization: voxel raycast uses `get_voxel` which is the slowest, but could be made faster.
-	// Instead, do a broad-phase on blocks. If a block's voxels need to be parsed, get all positions the ray could go
-	// through in that block, then query them all at once (better for bulk processing without going again through
-	// locking and data structures, and allows SIMD). Then check results in order.
-	// If no hit is found, carry on with next blocks.
+	// TODO 优化：体素射线投射使用的是 `get_voxel`，这是最慢的方式，但可以做得更快。
+	// 相反，可以对块做粗阶段。如果某个块的体素需要被解析，就获取射线在该块中可能经过的
+	// 所有位置，然后一次性全部查询（更适合批量处理，无需再次经过
+	// 锁与数据结构，并支持 SIMD）。然后按顺序检查结果。
+	// 若未找到命中，则继续处理下一个块。
 
 	struct RaycastPredicate {
 		const VoxelData &data;
 
 		bool operator()(const VoxelRaycastState &rs) {
-			// This is not particularly optimized, but runs fast enough for player raycasts
+			// 这并不是特别优化，但对于玩家射线投射来说运行速度足够快
 			VoxelSingleValue defval;
 			defval.f = constants::SDF_FAR_OUTSIDE;
 			const VoxelSingleValue v = data.get_voxel(rs.hit_position, VoxelBuffer::CHANNEL_SDF, defval);
@@ -177,18 +177,18 @@ Ref<VoxelRaycastResult> raycast_sdf(
 
 	Ref<VoxelRaycastResult> res;
 
-	// We use grid-raycast as a middle-phase to roughly detect where the hit will be
+	// 我们使用网格射线投射作为中阶段，大致检测命中位置在哪里
 	RaycastPredicate predicate = { voxel_data };
 	Vector3i hit_pos;
 	Vector3i prev_pos;
 	float hit_distance;
 	float hit_distance_prev;
-	// Voxels polygonized using marching cubes influence a region centered on their lower corner,
-	// and extend up to 0.5 units in all directions.
+	// 使用 marching cubes 多边形化的体素会影响以其下角为中心的区域，
+	// 并在所有方向上延伸最多 0.5 个单位。
 	//
 	//   o--------o--------o
-	//   | A      |     B  |  Here voxel B is full, voxels A, C and D are empty.
-	//   |       xxx       |  Matter will show up at the lower corner of B due to interpolation.
+	//   | A      |     B  |  这里体素 B 是实心的，体素 A、C 和 D 是空的。
+	//   |       xxx       |  由于插值，物质会出现在 B 的下角。
 	//   |     xxxxxxx     |
 	//   o---xxxxxoxxxxx---o
 	//   |     xxxxxxx     |
@@ -196,8 +196,8 @@ Ref<VoxelRaycastResult> raycast_sdf(
 	//   | C      |     D  |
 	//   o--------o--------o
 	//
-	// `voxel_raycast` operates on a discrete grid of cubic voxels, so to account for the smooth interpolation,
-	// we may offset the ray so that cubes act as if they were centered on the filtered result.
+	// `voxel_raycast` 在离散的立方体体素网格上运行，因此为了考虑平滑插值，
+	// 我们可能会偏移射线，使立方体表现得好像以过滤后的结果为中心。
 	const Vector3 offset(0.5, 0.5, 0.5);
 	if (voxel_raycast(
 				ray_origin + offset,
@@ -209,12 +209,12 @@ Ref<VoxelRaycastResult> raycast_sdf(
 				hit_distance,
 				hit_distance_prev
 		)) {
-		// Approximate surface
+		// 近似表面
 
 		float d = hit_distance;
 
 		if (binary_search_iterations > 0) {
-			// This is not particularly optimized, but runs fast enough for player raycasts
+			// 这并不是特别优化，但对于玩家射线投射来说运行速度足够快
 			struct VolumeSampler {
 				const VoxelData &data;
 
@@ -334,8 +334,8 @@ Ref<VoxelRaycastResult> raycast_blocky(
 		res.instantiate();
 		res->position = hit_voxel_pos;
 		res->previous_position = prev_voxel_pos;
-		// TODO Might have to break compat some day so `position` becomes the actual hit position,
-		// instead of having to use that distance
+		// TODO 也许某天需要打破兼容性，让 `position` 成为实际的命中位置，
+		// 而不是必须使用该距离
 		res->distance_along_ray = hit_pos.distance_to(ray_origin);
 		res->normal = hit_normal;
 	}
@@ -427,12 +427,12 @@ Ref<VoxelRaycastResult> raycast_generic_world(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// TODO Implement broad-phase on blocks to minimize locking and increase performance
+	// TODO 在块上实现粗阶段以尽量减少锁定并提高性能
 
-	// TODO Optimization: voxel raycast uses `get_voxel` which is the slowest, but could be made faster.
-	// See `VoxelToolLodTerrain` for information about how to implement improvements.
+	// TODO 优化：体素射线投射使用的是 `get_voxel`，这是最慢的方式，但可以做得更快。
+	// 有关如何实现改进的信息，请参阅 `VoxelToolLodTerrain`。
 
-	// TODO Switch to "from/to" parameters instead of "from/dir/distance"
+	// TODO 改用 “from/to” 参数，而不是 “from/dir/distance”
 
 	const Vector3 ray_end_world = ray_origin_world + ray_dir_world * max_distance_world;
 

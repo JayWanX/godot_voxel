@@ -7,7 +7,7 @@
 
 namespace voxel {
 
-// Convenience alias that uses our own default allocator
+// 使用我们自己的默认分配器的便捷别名
 template <typename TValue, typename TAllocator = StdDefaultAllocator<TValue>>
 using StdQueue = std::queue<TValue, std::deque<TValue, TAllocator>>;
 

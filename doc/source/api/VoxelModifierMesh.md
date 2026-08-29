@@ -1,26 +1,26 @@
 # VoxelModifierMesh
 
-Inherits: [VoxelModifier](VoxelModifier.md)
+继承自：[VoxelModifier](VoxelModifier.md)
 
-Voxel modifier that uses [VoxelMeshSDF](VoxelMeshSDF.md).
+使用 [VoxelMeshSDF](VoxelMeshSDF.md) 的体素修改器。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                      | Name                     | Default 
-------------------------------------------------------------------------- | ------------------------ | --------
-[float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [isolevel](#i_isolevel)  | 0.0     
-[VoxelMeshSDF](VoxelMeshSDF.md)                                           | [mesh_sdf](#i_mesh_sdf)  |         
+类型                                                                        | 名称                       | 默认值 
+------------------------------------------------------------------------- | ------------------------ | ----
+[float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [isolevel](#i_isolevel)  | 0.0 
+[VoxelMeshSDF](VoxelMeshSDF.md)                                           | [mesh_sdf](#i_mesh_sdf)  |     
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_isolevel"></span> **isolevel** = 0.0
 
-Offsets isolevel of SDF mesh. Positive value makes object appear thicker as well as smoother and negative value - thinner.
+偏移 SDF 网格的等值面。正值使对象看起来更厚也更平滑，负值则更薄。
 
 ### [VoxelMeshSDF](VoxelMeshSDF.md)<span id="i_mesh_sdf"></span> **mesh_sdf**
 
-SDF mesh that is used for modifier.
+用于修改器的 SDF 网格。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

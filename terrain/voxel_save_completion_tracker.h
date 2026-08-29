@@ -7,8 +7,8 @@
 
 namespace voxel {
 
-// Return value of aynchronous saving functions, allowing to query progress.
-// Wraps a task tracker for Godot script API. Might become generic in the future if needed in other places?
+// 异步保存函数的返回值，允许查询进度。
+// 为 Godot 脚本 API 包装一个任务追踪器。如果将来其他地方需要，可能会变成通用的？
 class VoxelSaveCompletionTracker : public RefCounted {
 	GDCLASS(VoxelSaveCompletionTracker, RefCounted)
 public:

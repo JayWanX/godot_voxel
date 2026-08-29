@@ -1,32 +1,32 @@
 # VoxelInstancerRigidBody
 
-Inherits: [RigidBody3D](https://docs.godotengine.org/en/stable/classes/class_rigidbody3d.html)
+继承自：[RigidBody3D](https://docs.godotengine.org/en/stable/classes/class_rigidbody3d.html)
 
-Collision node generated for every collidable multimesh instance created by [VoxelInstancer](VoxelInstancer.md).
+为 [VoxelInstancer](VoxelInstancer.md) 创建的每个可碰撞多网格实例生成的碰撞节点。
 
-## Description: 
+## 描述：
 
-Instances generated from [VoxelInstanceLibraryMultiMeshItem](VoxelInstanceLibraryMultiMeshItem.md) don't use nodes to render. However, they can be given collision, in the form of body nodes using this class.
+从 [VoxelInstanceLibraryMultiMeshItem](VoxelInstanceLibraryMultiMeshItem.md) 生成的实例不使用节点进行渲染。但是，它们可以以使用此类的刚体节点的形式获得碰撞。
 
-Calling `queue_free()` on an instance of this node will also unregister the instance from [VoxelInstancer](VoxelInstancer.md).
+在此节点的实例上调用 `queue_free()` 也会将该实例从 [VoxelInstancer](VoxelInstancer.md) 中注销。
 
-## Methods: 
+## 方法：
 
 
-Return                                                                | Signature                                                                  
+返回值                                                                   | 函数签名                                                                       
 --------------------------------------------------------------------- | ---------------------------------------------------------------------------
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [get_library_item_id](#i_get_library_item_id) ( ) const                    
 [void](#)                                                             | [queue_free_and_notify_instancer](#i_queue_free_and_notify_instancer) ( )  
 <p></p>
 
-## Method Descriptions
+## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_library_item_id"></span> **get_library_item_id**( ) 
 
-Gets the ID of the item in the instancer's [VoxelInstanceLibrary](VoxelInstanceLibrary.md) that was used to create the instance having this collider.
+获取用于创建拥有此碰撞体的实例的、实例化器 [VoxelInstanceLibrary](VoxelInstanceLibrary.md) 中条目的 ID。
 
 ### [void](#)<span id="i_queue_free_and_notify_instancer"></span> **queue_free_and_notify_instancer**( ) 
 
-Alternative to `queue_free` in case you don't want to use `call_deferred` to add nodes under [VoxelInstancer](VoxelInstancer.md) from [VoxelInstanceLibraryMultiMeshItem._on_instance_removed](VoxelInstanceLibraryMultiMeshItem.md#i__on_instance_removed).
+`queue_free` 的替代方法，用于你不想在 [VoxelInstanceLibraryMultiMeshItem._on_instance_removed](VoxelInstanceLibraryMultiMeshItem.md#i__on_instance_removed) 中使用 `call_deferred` 在 [VoxelInstancer](VoxelInstancer.md) 下添加节点的情况。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

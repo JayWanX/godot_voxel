@@ -17,7 +17,7 @@ void test_unordered_remove_if() {
 			return n;
 		}
 	};
-	// Remove one at beginning
+	// 移除开头的一个元素
 	{
 		StdVector<int> vec;
 		vec.push_back(0);
@@ -32,7 +32,7 @@ void test_unordered_remove_if() {
 				L::count(vec, 0) == 0 && L::count(vec, 1) == 1 && L::count(vec, 2) == 1 && L::count(vec, 3) == 1
 		);
 	}
-	// Remove one in middle
+	// 移除中间的一个元素
 	{
 		StdVector<int> vec;
 		vec.push_back(0);
@@ -47,7 +47,7 @@ void test_unordered_remove_if() {
 				L::count(vec, 0) == 1 && L::count(vec, 1) == 1 && L::count(vec, 2) == 0 && L::count(vec, 3) == 1
 		);
 	}
-	// Remove one at end
+	// 移除末尾的一个元素
 	{
 		StdVector<int> vec;
 		vec.push_back(0);
@@ -62,7 +62,7 @@ void test_unordered_remove_if() {
 				L::count(vec, 0) == 1 && L::count(vec, 1) == 1 && L::count(vec, 2) == 1 && L::count(vec, 3) == 0
 		);
 	}
-	// Remove multiple
+	// 移除多个元素
 	{
 		StdVector<int> vec;
 		vec.push_back(0);
@@ -77,7 +77,7 @@ void test_unordered_remove_if() {
 				L::count(vec, 0) == 1 && L::count(vec, 1) == 0 && L::count(vec, 2) == 0 && L::count(vec, 3) == 1
 		);
 	}
-	// Remove last
+	// 移除仅剩的最后一个元素
 	{
 		StdVector<int> vec;
 		vec.push_back(0);

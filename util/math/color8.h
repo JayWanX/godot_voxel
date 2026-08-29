@@ -5,7 +5,7 @@
 
 namespace voxel {
 
-// Color with 8-bit components. Lighter to store than its floating-point counterpart.
+// 8 位分量的颜色。比浮点版本更省存储空间。
 struct Color8 {
 	union {
 		struct {
@@ -31,7 +31,7 @@ struct Color8 {
 
 	static inline Color8 from_u8(uint8_t v) {
 		// rrggbbaa
-		// Each color component is in 0..3, bring back to 0..255
+		// 每个颜色分量取值范围为 0..3，需映射回 0..255
 		// 0, 85, 170, 255
 		return Color8( //
 				(v >> 6) * 85, //
@@ -43,7 +43,7 @@ struct Color8 {
 
 	static inline Color8 from_u16(uint16_t v) {
 		// rrrrgggg bbbbaaaa 🐐
-		// Each color component is in 0..15, bring back to 0..255
+		// 每个颜色分量取值范围为 0..15，需映射回 0..255
 		//   0,  17,  34,  51,
 		//  68, 85,  102, 119,
 		// 136, 153, 170, 187,

@@ -187,10 +187,10 @@ void VoxelAboutWindow::popup_singleton() {
 }
 
 VoxelAboutWindow::VoxelAboutWindow() {
-	// Generated with the help of https://github.com/Voxel/godot_scene_code_converter
+	// 借助 https://github.com/Voxel/godot_scene_code_converter 生成
 
 	set_title(VOXEL_TTR("About Voxel Tools"));
-	// set_resizable(true); // TODO How to set if a Window is resizable or not?
+	// set_resizable(true); // TODO 如何设置 Window 是否可调整大小？
 	set_min_size(Vector2(600, 300) * EDSCALE);
 
 	VBoxContainer *v_box_container = memnew(VBoxContainer);
@@ -206,7 +206,7 @@ VoxelAboutWindow::VoxelAboutWindow() {
 	h_box_container->set_v_size_flags(Control::SIZE_EXPAND_FILL);
 
 	TextureRect *texture_rect = memnew(TextureRect);
-	// TODO Can't access ANY icon from here because they all return the default empty icon at this stage...
+	// TODO 此时无法访问任何图标，因为它们在这个阶段都会返回默认的空图标...
 	// texture_rect->set_texture(get_icon("VoxelTerrainLarge", "EditorIcons"));
 	texture_rect->set_stretch_mode(TextureRect::STRETCH_KEEP_CENTERED);
 	_icon_texture_rect = texture_rect;
@@ -324,7 +324,7 @@ VoxelAboutWindow::VoxelAboutWindow() {
 	tab_container->set_tab_title(0, VOXEL_TTR("About"));
 	tab_container->set_tab_title(1, VOXEL_TTR("License"));
 
-	// Third-party licenses
+	// 第三方许可证
 	if (VOXEL_THIRD_PARTY_COUNT > 0) {
 		HSplitContainer *third_party_container = memnew(HSplitContainer);
 		ItemList *third_party_list = memnew(ItemList);
@@ -369,7 +369,7 @@ void VoxelAboutWindow::_notification(int p_what) {
 }
 
 void VoxelAboutWindow::_on_about_rich_text_label_meta_clicked(Variant meta) {
-	// Open hyperlinks
+	// 打开超链接
 	OS::get_singleton()->shell_open(meta);
 }
 

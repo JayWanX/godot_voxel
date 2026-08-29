@@ -14,15 +14,15 @@
 
 #define FASTSIMD_64BIT (INTPTR_MAX == INT64_MAX)
 
-#define FASTSIMD_COMPILE_SCALAR (!(FASTSIMD_x86 && FASTSIMD_64BIT)) // Don't compile for x86 64bit since CPU is guaranteed SSE2 support 
+#define FASTSIMD_COMPILE_SCALAR (!(FASTSIMD_x86 && FASTSIMD_64BIT)) // 不要为 x86 64 位编译，因为 CPU 保证支持 SSE2
 
-#define FASTSIMD_COMPILE_SSE    (FASTSIMD_x86 & false) // Not supported
+#define FASTSIMD_COMPILE_SSE    (FASTSIMD_x86 & false) // 不支持
 #define FASTSIMD_COMPILE_SSE2   (FASTSIMD_x86 & true )
 #define FASTSIMD_COMPILE_SSE3   (FASTSIMD_x86 & true )
 #define FASTSIMD_COMPILE_SSSE3  (FASTSIMD_x86 & true )
 #define FASTSIMD_COMPILE_SSE41  (FASTSIMD_x86 & true )
 #define FASTSIMD_COMPILE_SSE42  (FASTSIMD_x86 & true )
-#define FASTSIMD_COMPILE_AVX    (FASTSIMD_x86 & false) // Not supported
+#define FASTSIMD_COMPILE_AVX    (FASTSIMD_x86 & false) // 不支持
 #define FASTSIMD_COMPILE_AVX2   (FASTSIMD_x86 & true )
 #define FASTSIMD_COMPILE_AVX512 (FASTSIMD_x86 & true )
 

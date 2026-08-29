@@ -10,7 +10,7 @@ namespace voxel {
 VoxelBlockyAttributeDirection::VoxelBlockyAttributeDirection() {
 	_name = VoxelStringNames::get_singleton().direction;
 	_is_rotation = true;
-	_default_value = DIR_NEGATIVE_Z; // Forward
+	_default_value = DIR_NEGATIVE_Z; // 前方
 
 	_value_names.resize(DIR_COUNT);
 	_value_names[DIR_NEGATIVE_X] = VoxelStringNames::get_singleton().negative_x;

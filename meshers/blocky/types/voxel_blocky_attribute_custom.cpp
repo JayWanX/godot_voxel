@@ -9,7 +9,7 @@
 namespace voxel {
 
 VoxelBlockyAttributeCustom::VoxelBlockyAttributeCustom() {
-	// Defaults to a boolean value.
+	// 默认为布尔值。
 	_value_names.resize(2);
 	update_values();
 }
@@ -29,7 +29,7 @@ void VoxelBlockyAttributeCustom::set_value_count(int count) {
 		update_values();
 		notify_property_list_changed();
 		emit_changed();
-		// Can't check validity of default value because when loading the resource Godot can set it in any order...
+		// 无法检查默认值的有效性，因为加载资源时 Godot 可能以任意顺序设置它……
 	}
 }
 
@@ -40,7 +40,7 @@ void VoxelBlockyAttributeCustom::set_value_name(int index, StringName p_name) {
 
 void VoxelBlockyAttributeCustom::set_default_value(int v) {
 	v = math::clamp(v, 0, MAX_VALUES);
-	// Can't check validity of default value because when loading the resource Godot can set it in any order...
+	// 无法检查默认值的有效性，因为加载资源时 Godot 可能以任意顺序设置它……
 	if (v != _default_value) {
 		_default_value = v;
 		emit_changed();
@@ -78,7 +78,7 @@ bool VoxelBlockyAttributeCustom::_set(const StringName &p_name, const Variant &p
 		String what = name_str.get_slicec('/', 2);
 
 		if (what == "name") {
-			// Godot can set properties in any order so we have to be permissive here...
+			// Godot 可以以任意顺序设置属性，所以这里我们必须宽松处理……
 			VOXEL_ASSERT_RETURN_V(idx >= 0 && idx < MAX_VALUES, false);
 			if (idx >= int(_value_names.size())) {
 				_value_names.resize(idx + 1);

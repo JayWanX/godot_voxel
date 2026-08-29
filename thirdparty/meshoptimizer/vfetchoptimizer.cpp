@@ -37,7 +37,7 @@ size_t meshopt_optimizeVertexFetch(void* destination, unsigned int* indices, siz
 
 	meshopt_Allocator allocator;
 
-	// support in-place optimization
+	// 支持就地（in-place）优化
 	if (destination == vertices)
 	{
 		unsigned char* vertices_copy = allocator.allocate<unsigned char>(vertex_count * vertex_size);
@@ -45,7 +45,7 @@ size_t meshopt_optimizeVertexFetch(void* destination, unsigned int* indices, siz
 		vertices = vertices_copy;
 	}
 
-	// build vertex remap table
+	// 构建顶点重映射表
 	unsigned int* vertex_remap = allocator.allocate<unsigned int>(vertex_count);
 	memset(vertex_remap, -1, vertex_count * sizeof(unsigned int));
 
@@ -58,15 +58,15 @@ size_t meshopt_optimizeVertexFetch(void* destination, unsigned int* indices, siz
 
 		unsigned int& remap = vertex_remap[index];
 
-		if (remap == ~0u) // vertex was not added to destination VB
+		if (remap == ~0u) // 顶点未添加到目标 VB 中
 		{
-			// add vertex
+			// 添加顶点
 			memcpy(static_cast<unsigned char*>(destination) + next_vertex * vertex_size, static_cast<const unsigned char*>(vertices) + index * vertex_size, vertex_size);
 
 			remap = next_vertex++;
 		}
 
-		// modify indices in place
+		// 就地修改索引
 		indices[i] = remap;
 	}
 

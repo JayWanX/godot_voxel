@@ -10,7 +10,7 @@ namespace {
 const uint32_t TRAILING_MAGIC = 0x900df00d;
 enum FormatVersion {
 	INSTANCE_BLOCK_FORMAT_VERSION_0 = 0,
-	// Now using little-endian.
+	// 现使用小端字节序。
 	INSTANCE_BLOCK_FORMAT_VERSION_1 = 1
 };
 } // namespace
@@ -19,7 +19,7 @@ const float InstanceBlockData::POSITION_RANGE_MINIMUM = 0.01f;
 
 const float InstanceBlockData::SIMPLE_11B_V1_SCALE_RANGE_MINIMUM = 0.01f;
 
-// TODO Unify with functions from VoxelBuffer?
+// TODO 与 VoxelBuffer 中的函数统一？
 
 inline uint8_t norm_to_u8(float x) {
 	return math::clamp(static_cast<int>(128.f * x + 128.f), 0, 0xff);
@@ -57,9 +57,9 @@ struct CompressedQuaternion4b {
 bool serialize_instance_block_data(const InstanceBlockData &src, StdVector<uint8_t> &dst) {
 	const uint8_t instance_format = InstanceBlockData::FORMAT_SIMPLE_11B_V1;
 
-	// TODO Apparently big-endian is dead
-	// I chose it originally to match "network byte order",
-	// but as I read comments about it there seem to be no reason to continue using it. Needs a version increment.
+	// TODO 大端字节序显然已不再使用
+	// 我最初选择它是为了与“网络字节序”保持一致，
+	// 但据我所读到的相关说明，似乎没有理由继续使用它了。需要增加版本号。
 	voxel::MemoryWriter w(dst, voxel::ENDIANNESS_LITTLE_ENDIAN);
 
 	VOXEL_ASSERT_RETURN_V(src.position_range >= 0.f, false);
@@ -69,8 +69,8 @@ bool serialize_instance_block_data(const InstanceBlockData &src, StdVector<uint8
 	w.store_8(src.layers.size());
 	w.store_float(position_range);
 
-	// TODO Introduce a margin to position coordinates, stuff can spawn offset from the ground.
-	// Or just compute the ranges
+	// TODO 为位置坐标引入一个边距，因为物体可能会相对地面偏移生成。
+	// 或者直接计算其范围
 	const float pos_norm_scale = 1.f / position_range;
 
 	for (size_t i = 0; i < src.layers.size(); ++i) {

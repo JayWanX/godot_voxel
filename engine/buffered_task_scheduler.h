@@ -9,7 +9,7 @@ namespace voxel {
 
 class IThreadedTask;
 
-// Helper class to store tasks and schedule them in a single batch
+// 辅助类，用于存储任务并以单一批次调度它们
 class BufferedTaskScheduler {
 public:
 	static BufferedTaskScheduler &get_for_current_thread();
@@ -32,7 +32,7 @@ public:
 
 	void flush();
 
-	// No destructor! This does not take ownership, it is only a helper. Flush should be called after each use.
+	// 无析构函数！此类不拥有所有权，它只是一个辅助工具。每次使用后都应调用 Flush。
 
 private:
 	BufferedTaskScheduler();

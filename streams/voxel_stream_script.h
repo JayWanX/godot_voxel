@@ -7,9 +7,9 @@
 
 namespace voxel {
 
-// Provides access to a source of paged voxel data, which may load and save.
-// Must be implemented in a multi-thread-safe way.
-// If you are looking for a more specialized API to generate voxels, use VoxelGenerator.
+// 提供对分页体素数据源的访问，可加载和保存。
+// 必须以多线程安全的方式实现。
+// 若你需要更专业的 API 来生成体素，请使用 VoxelGenerator。
 class VoxelStreamScript : public VoxelStream {
 	GDCLASS(VoxelStreamScript, VoxelStream)
 public:
@@ -21,10 +21,10 @@ public:
 	bool is_runnable() const override;
 
 protected:
-	// TODO Why is it unable to convert `Result` into `Variant` even though a cast is defined in voxel_stream.h???
+	// TODO 为什么即使在 voxel_stream.h 中定义了转换，仍无法将 `Result` 转换为 `Variant`？？？
 	GDVIRTUAL3R(int, _load_voxel_block, Ref<godot::VoxelBuffer>, Vector3i, int)
 	GDVIRTUAL3(_save_voxel_block, Ref<godot::VoxelBuffer>, Vector3i, int)
-	GDVIRTUAL0RC(int, _get_used_channels_mask) // I think `C` means `const`?
+	GDVIRTUAL0RC(int, _get_used_channels_mask) // 我想 `C` 表示 `const`？
 
 	static void _bind_methods();
 };

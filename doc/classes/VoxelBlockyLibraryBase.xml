@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelBlockyLibraryBase" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Contains a list of models that can be used by [VoxelMesherBlocky].
+		包含一组可供 [VoxelMesherBlocky] 使用的模型列表。
 	</brief_description>
 	<description>
-		Models used by [VoxelMesherBlocky] must be baked before they can be used efficiently at runtime. The way this process happens depends on the implementation of this class. It can be a simple list of models, or a list of high-level types generating variant models. Check child classes for more information.
+		[VoxelMesherBlocky] 使用的模型必须先烘焙，才能在运行时高效使用。此过程的执行方式取决于该类的实现。它可以是简单的模型列表，也可以是生成变体模型的高级类型列表。请查看子类以了解更多信息。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -12,20 +12,20 @@
 		<method name="bake">
 			<return type="void" />
 			<description>
-				Bakes the library. The data of models is optimized in order to combine them more efficiently when generating voxel meshes.
+				烘焙库。模型数据会被优化，以便在生成体素网格时更高效地合并它们。
 			</description>
 		</method>
 		<method name="get_materials" qualifiers="const">
 			<return type="Material[]" />
 			<description>
-				Gets a list of all distinct materials found in all models of the library.
-				Note, if at least one non-empty model has no material, there will be one [code]null[/code] entry in this list to represent "The default material".
+				获取库中所有模型里全部不同材质的列表。
+				注意，如果至少一个非空模型没有材质，此列表中将会有一个 [code]null[/code] 条目来表示“默认材质”。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="bake_tangents" type="bool" setter="set_bake_tangents" getter="get_bake_tangents" default="true">
-			Enable this option if you need normal mapping on your voxels. If you don't need it, disabling can reduce memory usage and give a small speed boost.
+			如果你需要体素上的法线贴图，请启用此选项。如果不需要，禁用可以降低内存占用并获得少量性能提升。
 		</member>
 	</members>
 	<constants>

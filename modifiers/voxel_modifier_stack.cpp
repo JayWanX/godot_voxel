@@ -61,7 +61,7 @@ Span<const Vector3f> get_positions_temporary(
 	return positions;
 }
 
-// TODO Use VoxelBuffer helper function
+// TODO 使用 VoxelBuffer 辅助函数
 void decompress_sdf_to_buffer(VoxelBuffer &voxels, StdVector<float> &sdf) {
 	VOXEL_DSTACK();
 
@@ -181,13 +181,13 @@ void VoxelModifierStack::apply(VoxelBuffer &voxels, AABB aabb) const {
 	VoxelModifierContext ctx;
 	bool any_intersection = false;
 
-	// This version can be slower because we are trying to workaround a side-effect of fixed-point compression.
-	// Processing through the whole block is easier, but it can introduce artifacts because scaling and applying
-	// modifiers can cause tiny changes all over the area when encoded back to snorm/i16/i8, not just inside the shape.
-	// Even if modifiers are made to do nothing, the presence of one in a mesh block and not in another block can
-	// produce a seam in between them (one will have evaluated SDF with it, and the other without). So we try to
-	// modify only the area that intersects the block, and we re-encode only what was modified.
-	// Another option later could be to use uncompressed blocks (32-bit float) when doing on-the-fly sampling?
+	// 这个版本可能更慢，因为我们试图规避定点压缩带来的副作用。
+	// 处理整个区块更简单，但可能会引入伪影，因为缩放和应用
+	// 修改器在编码回 snorm/i16/i8 时会导致整个区域出现微小变化，而不仅限于形状内部。
+	// 即使修改器什么都不做，某个网格区块中存在修改器而另一个区块中没有，也
+	// 会在两者之间产生接缝（其中一个会用它计算过 SDF，另一个则没有）。因此我们试图
+	// 只修改与区块相交的区域，并且只重新编码被修改的部分。
+	// 另一种后期可选方案是：在进行即时采样时使用未压缩的区块（32 位浮点）？
 
 	thread_local StdVector<float> tls_block_sdf_initial;
 	thread_local StdVector<float> tls_block_sdf;
@@ -217,7 +217,7 @@ void VoxelModifierStack::apply(VoxelBuffer &voxels, AABB aabb) const {
 				memcpy(tls_block_sdf.data(), tls_block_sdf_initial.data(), tls_block_sdf.size() * sizeof(float));
 			}
 
-			// Get modifier bounds in voxels
+			// 获取修改器在体素中的边界
 			Box3i modifier_box(math::floor(modifier_aabb.position * w_to_v), math::ceil(modifier_aabb.size * w_to_v));
 			modifier_box.clip(Box3i(origin_voxels, voxels.get_size()));
 			const Vector3i local_origin_in_voxels = modifier_box.position - origin_voxels;
@@ -245,8 +245,8 @@ void VoxelModifierStack::apply(VoxelBuffer &voxels, AABB aabb) const {
 			ctx.sdf = to_span(area_sdf);
 			modifier->apply(ctx);
 
-			// Write modifications back to the full-block decompressed buffer
-			// TODO Maybe use an unchecked version for a bit more speed?
+			// 将修改写回整块解压缓冲区
+			// TODO 也许可以使用未检查版本以稍微提升速度？
 			copy_3d_region_zxy(
 					to_span(tls_block_sdf),
 					voxels.get_size(),

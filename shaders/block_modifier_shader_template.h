@@ -1,4 +1,4 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
 const char *g_block_modifier_shader_template_0 =
@@ -13,13 +13,13 @@ const char *g_block_modifier_shader_template_0 =
 "	int buffer_offset;\n"
 "} u_params;\n"
 "\n"
-"// SDF is modified in-place\n"
+"// SDF 就地修改\n"
 "layout (set = 0, binding = 1, std430) restrict buffer InSDBuffer {\n"
 "	float values[];\n"
 "} u_inout_sd;\n"
 "\n"
-"// Parameters common to all modifiers.\n"
-"// Keeping the same binding number as other shader types, to simplify usage in C++\n"
+"// 所有修改器共用的参数。\n"
+"// 与其他着色器类型保持相同的绑定号，以简化 C++ 中的使用\n"
 "layout (set = 0, binding = 4, std430) restrict readonly buffer BaseModifierParams {\n"
 "	mat4 world_to_model;\n"
 "	int operation;\n"
@@ -37,7 +37,7 @@ const char *g_block_modifier_shader_template_1 =
 "	return mix(b, a, h) - s * h * (1.0 - h);\n"
 "}\n"
 "\n"
-"// Inverted a and b because it subtracts SDF a from SDF b\n"
+"// 交换 a 和 b，因为它是从 SDF b 中减去 SDF a\n"
 "float sd_smooth_subtract(float b, float a, float s) {\n"
 "	const float h = clamp(0.5 - 0.5 * (b + a) / s, 0.0, 1.0);\n"
 "	return mix(b, -a, h) + s * h * (1.0 - h);\n"
@@ -50,8 +50,8 @@ const char *g_block_modifier_shader_template_1 =
 "void main() {\n"
 "	const ivec3 rpos = ivec3(gl_GlobalInvocationID.xyz);\n"
 "\n"
-"	// The output buffer might not have a 3D size multiple of our group size.\n"
-"	// Some of the parallel executions will not do anything.\n"
+"	// 输出缓冲区可能没有与工作组大小成倍数的 3D 尺寸。\n"
+"	// 一些并行执行将不会做任何事。\n"
 "	if (rpos.x >= u_params.block_size.x || rpos.y >= u_params.block_size.y || rpos.z >= u_params.block_size.z) {\n"
 "		return;\n"
 "	}\n"

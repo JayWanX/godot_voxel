@@ -46,7 +46,7 @@ void VoxelBlockyTypeLibrary::bake() {
 
 	const uint64_t time_before = Time::get_singleton()->get_ticks_usec();
 
-	// This is the only place we modify the data.
+	// 这是唯一修改数据的地方。
 
 	_indexed_materials.clear();
 	_baked_data.models.clear();
@@ -75,12 +75,12 @@ void VoxelBlockyTypeLibrary::bake() {
 			id.variant_key = keys[rel_key_index];
 
 			size_t model_index;
-			// TODO Optimize this (when needed)
-			// Find existing slot in the ID map. If found, use pre-allocated index.
+			// TODO 优化此处（需要时再做）
+			// 在 ID 映射中查找现有槽位。如果找到，使用预先分配的索引。
 			if (!find(to_span_const(_id_map), id, model_index)) {
-				// If not found, pick an empty slot if any
+				// 如果未找到，则挑选一个空槽位（如果有）
 				if (!find(to_span_const(_id_map), VoxelID(), model_index)) {
-					// If not found, allocate a new index at the end
+					// 如果仍未找到，则在末尾分配一个新索引
 					model_index = _baked_data.models.size();
 					_baked_data.models.push_back(blocky::BakedModel());
 					_id_map.push_back(id);
@@ -143,12 +143,12 @@ void VoxelBlockyTypeLibrary::update_id_map(StdVector<VoxelID> &id_map, StdVector
 			id.variant_key = key;
 
 			size_t model_index;
-			// TODO Optimize this (when needed)
-			// Find existing slot in the ID map. If found, use pre-allocated index.
+			// TODO 优化此处（需要时再做）
+			// 在 ID 映射中查找现有槽位。如果找到，使用预先分配的索引。
 			if (!find(to_span_const(id_map), id, model_index)) {
-				// If not found, pick an empty slot if any
+				// 如果未找到，则挑选一个空槽位（如果有）
 				if (!find(to_span_const(id_map), VoxelID(), model_index)) {
-					// If not found, allocate a new index at the end
+					// 如果仍未找到，则在末尾分配一个新索引
 					model_index = id_map.size();
 					id_map.push_back(id);
 				}
@@ -168,7 +168,7 @@ void VoxelBlockyTypeLibrary::update_id_map(StdVector<VoxelID> &id_map, StdVector
 void VoxelBlockyTypeLibrary::get_configuration_warnings(PackedStringArray &out_warnings) const {
 	VOXEL_PROFILE_SCOPE();
 
-	// Check null indices
+	// 检查空索引
 	StdVector<unsigned int> null_indices;
 	for (unsigned int i = 0; i < _types.size(); ++i) {
 		if (_types[i].is_null()) {
@@ -182,7 +182,7 @@ void VoxelBlockyTypeLibrary::get_configuration_warnings(PackedStringArray &out_w
 		);
 	}
 
-	// Check duplicate names
+	// 检查重复名称
 	struct DuplicateName {
 		String name;
 		unsigned int index1;
@@ -213,7 +213,7 @@ void VoxelBlockyTypeLibrary::get_configuration_warnings(PackedStringArray &out_w
 		out_warnings.push_back(message);
 	}
 
-	// Check types
+	// 检查类型
 	unsigned int type_index = 0;
 	for (const Ref<VoxelBlockyType> &type : _types) {
 		if (type.is_null()) {
@@ -231,9 +231,9 @@ void VoxelBlockyTypeLibrary::get_configuration_warnings(PackedStringArray &out_w
 		++type_index;
 	}
 
-	// TODO Check inconsistent attributes across types?
-	// Currently, two attributes with the same name on two different types can have completely different values or
-	// meaning. This is probably not a good idea.
+	// TODO 检查不同类型之间的属性是否一致？
+	// 目前，两个不同类型上同名的属性可能具有完全不同的值或
+	// 含义。这可能不是一个好主意。
 }
 
 #endif
@@ -359,7 +359,7 @@ int VoxelBlockyTypeLibrary::get_model_index_with_attributes(StringName type_name
 
 	FixedArray<std::pair<StringName, uint8_t>, VoxelBlockyType::MAX_ATTRIBUTES> unordered_key;
 
-	// Parse attributes
+	// 解析属性
 	for (unsigned int attrib_spec_index = 0; attrib_spec_index < attribute_count; ++attrib_spec_index) {
 		Variant dict_key = dict_keys[attrib_spec_index];
 		Variant vv = attribs_dict[dict_key];
@@ -383,7 +383,7 @@ int VoxelBlockyTypeLibrary::get_model_index_with_attributes(StringName type_name
 		unordered_key[attrib_spec_index] = pair;
 	}
 
-	// Sort, because sets of attributes have a fixed order so they can be looked up more efficiently
+	// 排序，因为属性集有固定的顺序，以便更高效地查找
 	VoxelBlockyAttribute::sort_by_name(Span<std::pair<StringName, uint8_t>>(unordered_key.data(), attribute_count));
 
 	for (unsigned int i = 0; i < attribute_count; ++i) {
@@ -395,7 +395,7 @@ int VoxelBlockyTypeLibrary::get_model_index_with_attributes(StringName type_name
 }
 
 int VoxelBlockyTypeLibrary::get_model_index(const VoxelID queried_id) const {
-	// Not optimized, we'll see if it needs to be a HashMap or other
+	// 未优化，我们之后再看看是否需要 HashMap 或其他结构
 	for (unsigned int i = 0; i < _id_map.size(); ++i) {
 		const VoxelID &id = _id_map[i];
 		if (id == queried_id) {
@@ -406,7 +406,7 @@ int VoxelBlockyTypeLibrary::get_model_index(const VoxelID queried_id) const {
 }
 
 Ref<VoxelBlockyType> VoxelBlockyTypeLibrary::get_type_from_name(StringName p_name) const {
-	// Not optimized, we'll see if it needs to be a HashMap or other
+	// 未优化，我们之后再看看是否需要 HashMap 或其他结构
 	for (const Ref<VoxelBlockyType> &type : _types) {
 		if (type.is_valid() && type->get_unique_name() == p_name) {
 			return type;
@@ -541,26 +541,26 @@ private:
 	static inline bool is_name_char(char c) {
 		return is_name_starter(c) ||
 				is_digit(c)
-				// Special addition so names can contain a namespace
+				// 特殊补充，以便名称可以包含命名空间
 				|| c == ':';
 	}
 
 	static inline bool is_keyword(Span<const char32_t> str, const char *keyword) {
 		unsigned int i = 0;
 		while (keyword[i] != '\0') {
-			// Keywords are all ASCII, but our input text might not be
+			// 关键字都是 ASCII，但我们的输入文本可能不是
 			if (str[i] != char32_t(keyword[i])) {
 				return false;
 			}
 			++i;
 		}
 		if (i == str.size()) {
-			// All characters matched
+			// 所有字符都匹配
 			return true;
 		}
-		// We matched all characters but the tested string is longer.
-		// Check if it ends with a separating character. If not, then it contains a longer name and therefore won't
-		// match.
+		// 我们匹配了所有字符，但被测试的字符串更长。
+		// 检查它是否以分隔字符结尾。如果不是，则它包含一个更长的名称，因此不会
+		// 匹配。
 		++i;
 		return !is_name_char(str[i]);
 	}
@@ -657,8 +657,8 @@ bool VoxelBlockyTypeLibrary::parse_voxel_id(const String &p_str, VoxelID &out_id
 			out_id.variant_key.attribute_values[attribute_index] = token.boolean_value ? 1 : 0;
 
 		} else {
-			// TODO Can't parse named attribute values without recognizing their type!
-			// It may be possible to recognize built-in attributes, but not custom ones...
+			// TODO 无法在不识别其类型的情况下解析命名属性值！
+			// 识别内置属性或许可行，但自定义属性不行……
 			VOXEL_PRINT_ERROR("Unsupported value");
 			return false;
 		}
@@ -742,7 +742,7 @@ bool VoxelBlockyTypeLibrary::load_id_map_from_json(String json_string) {
 
 String VoxelBlockyTypeLibrary::VoxelID::to_string() const {
 	String s = type_name;
-	// Assuming the key is sorted, we can check if it contains variant parameters by just checking the first
+	// 假定键已排序，我们只需检查第一个即可知道是否包含变体参数
 	if (!voxel::godot::is_empty(variant_key.attribute_names[0])) {
 		s += "[";
 		s += variant_key.to_string();
@@ -810,7 +810,7 @@ PackedStringArray VoxelBlockyTypeLibrary::_b_serialize_id_map_to_string_array() 
 }
 
 PackedStringArray VoxelBlockyTypeLibrary::_b_get_id_map() {
-	// This is a hack so that when we save a library, its internal ID map is updated and saved.
+	// 这是一个小技巧：这样在保存库时，其内部 ID 映射会被更新并保存。
 	update_id_map();
 	return serialize_id_map_to_string_array();
 }
@@ -859,7 +859,7 @@ void VoxelBlockyTypeLibrary::_bind_methods() {
 			"get_types"
 	);
 
-	// Internal property
+	// 内部属性
 	ADD_PROPERTY(
 			PropertyInfo(Variant::PACKED_STRING_ARRAY, "_id_map_data", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_STORAGE),
 			"_set_id_map_data",

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelFormat" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Specifies the format of voxels.
+		指定体素的格式。
 	</brief_description>
 	<description>
-		Specifies the format of voxels. Currently, it only stores how many bytes each channel uses per voxel.
-		Voxels have a default format which is often enough for most use cases, but sometimes it is necessary to change it. In this case, you may create a new [VoxelFormat] resource, do the changes, and assign it to a [VoxelNode].
-		WARNING: it is recommended to choose a format early in development (whether it is the default, or a custom one). If you want to change much later and you have saves in the wild, you will have to figure out how to convert them, otherwise loading them will be problematic.
+		指定体素的格式。目前，它只存储每个通道在单个体素中占用的字节数。
+		体素有一个默认格式，对大多数使用场景来说通常已经足够，但有时有必要更改它。在这种情况下，你可以创建一个新的 [VoxelFormat] 资源，进行更改，并将其分配给 [VoxelNode]。
+		警告：建议在开发早期就确定格式（无论是默认格式还是自定义格式）。如果你想在很晚之后更改，并且已有存档，那么你必须想办法转换它们，否则加载时会出问题。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -15,21 +15,21 @@
 			<return type="void" />
 			<param index="0" name="buffer" type="VoxelBuffer" />
 			<description>
-				Clears and formats the [VoxelBuffer] using properties from the current format. Should be used on a buffer that hasn't been modified yet.
+				使用当前格式的属性清除并格式化 [VoxelBuffer]。应在尚未修改过的缓冲区上使用。
 			</description>
 		</method>
 		<method name="create_buffer" qualifiers="const">
 			<return type="VoxelBuffer" />
 			<param index="0" name="size" type="Vector3i" />
 			<description>
-				Creates a new [VoxelBuffer] that has the current format.
+				创建一个具有当前格式的新 [VoxelBuffer]。
 			</description>
 		</method>
 		<method name="get_channel_depth" qualifiers="const">
 			<return type="int" enum="VoxelBuffer.Depth" />
 			<param index="0" name="channel_index" type="int" enum="VoxelBuffer.ChannelId" />
 			<description>
-				Gets the depth of a specific channel. See [enum VoxelBuffer.Depth] for more information.
+				获取特定通道的位深。更多信息请参见 [enum VoxelBuffer.Depth]。
 			</description>
 		</method>
 		<method name="set_channel_depth">
@@ -37,7 +37,7 @@
 			<param index="0" name="channel_index" type="int" enum="VoxelBuffer.ChannelId" />
 			<param index="1" name="depth" type="int" enum="VoxelBuffer.Depth" />
 			<description>
-				Sets the depth of a specific channel. See [enum VoxelBuffer.Depth] for more information.
+				设置特定通道的位深。更多信息请参见 [enum VoxelBuffer.Depth]。
 			</description>
 		</method>
 	</methods>
@@ -45,16 +45,16 @@
 		<member name="_data" type="Array" setter="_set_data" getter="_get_data" default="[0, 1, 1, 0, 1, 1, 0, 0, 0]">
 		</member>
 		<member name="color_depth" type="int" setter="set_channel_depth" getter="get_channel_depth" enum="VoxelBuffer.Depth" default="0">
-			Depth of [constant VoxelBuffer.CHANNEL_COLOR].
+				[constant VoxelBuffer.CHANNEL_COLOR] 的位深。
 		</member>
 		<member name="indices_depth" type="int" setter="set_channel_depth" getter="get_channel_depth" enum="VoxelBuffer.Depth" default="1">
-			Depth of [constant VoxelBuffer.CHANNEL_INDICES]. Only 8-bit and 16-bit depths are supported.
+				[constant VoxelBuffer.CHANNEL_INDICES] 的位深。仅支持 8 位和 16 位位深。
 		</member>
 		<member name="sdf_depth" type="int" setter="set_channel_depth" getter="get_channel_depth" enum="VoxelBuffer.Depth" default="1">
-			Depth of [constant VoxelBuffer.CHANNEL_SDF].
+				[constant VoxelBuffer.CHANNEL_SDF] 的位深。
 		</member>
 		<member name="type_depth" type="int" setter="set_channel_depth" getter="get_channel_depth" enum="VoxelBuffer.Depth" default="1">
-			Depth of [constant VoxelBuffer.CHANNEL_TYPE]. Only 8-bit and 16-bit depths are supported.
+				[constant VoxelBuffer.CHANNEL_TYPE] 的位深。仅支持 8 位和 16 位位深。
 		</member>
 	</members>
 </class>

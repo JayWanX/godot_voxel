@@ -1,38 +1,38 @@
 # VoxelBlockyFluid
 
-Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
+继承自：[Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
-Properties of a blocky fluid.
+方块风流体的属性。
 
-## Description: 
+## 描述：
 
-Common properties of a specific fluid. It may be shared between multiple blocky models, each representing a level/state of the fluid.
+某种特定流体的通用属性。它可以在多个方块风模型之间共享，每个模型代表流体的一种液位/状态。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                            | Name                                               | Default 
-------------------------------------------------------------------------------- | -------------------------------------------------- | --------
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [dip_when_flowing_down](#i_dip_when_flowing_down)  | false   
-[Material](https://docs.godotengine.org/en/stable/classes/class_material.html)  | [material](#i_material)                            |         
+类型                                                                              | 名称                                                 | 默认值   
+------------------------------------------------------------------------------- | -------------------------------------------------- | ------
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [dip_when_flowing_down](#i_dip_when_flowing_down)  | false 
+[Material](https://docs.godotengine.org/en/stable/classes/class_material.html)  | [material](#i_material)                            |       
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_dip_when_flowing_down"></span> **dip_when_flowing_down** = false
 
-When enabled, if all following conditions are met for a given fluid voxel:
+启用后，如果给定流体系体素满足以下所有条件：
 
-- It doesn't have maximum level
+- 未达到最大液位
 
-- It isn't covered by another voxel of the same fluid type 
+- 未被同类型流体的其他体素覆盖
 
-- It can flow downwards (below is air or fluid of the same type)
+- 可以向下流动（下方为空气或同类型流体）
 
-Then the shape of the voxel will change to be "pushed" downwards, creating steeper slopes. Note, this also means the voxel will look as if it has minimum level in some situations. However, in practice these cases don't occur often. You may decide whether to use this option depending on how your fluid simulates.
+则该体素的形状将变为“被向下挤压”的形状，从而形成更陡峭的坡度。注意，这也会导致体素在某些情况下看起来像是处于最低液位。不过在实践中，这些情况并不常发生。你可以根据流体的模拟方式来决定是否使用此选项。
 
 ### [Material](https://docs.godotengine.org/en/stable/classes/class_material.html)<span id="i_material"></span> **material**
 
-Material used by all states of the fluid. Note that UVs of a fluid are different than a regular model, so you may need a [ShaderMaterial](https://docs.godotengine.org/en/stable/classes/class_shadermaterial.html) to handle flowing animation. See [https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids](https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids)
+流体所有状态所使用的材质。注意，流体的 UV 与普通模型不同，因此你可能需要一个 [ShaderMaterial](https://docs.godotengine.org/en/stable/classes/class_shadermaterial.html) 来处理流动动画。参见 [https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids](https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids)
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

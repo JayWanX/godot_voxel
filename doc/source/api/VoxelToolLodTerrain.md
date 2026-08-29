@@ -1,19 +1,19 @@
 # VoxelToolLodTerrain
 
-Inherits: [VoxelTool](VoxelTool.md)
+继承自：[VoxelTool](VoxelTool.md)
 
-Implementation of [VoxelTool](VoxelTool.md) specialized for uses on [VoxelLodTerrain](VoxelLodTerrain.md).
+专用于 [VoxelLodTerrain](VoxelLodTerrain.md) 的 [VoxelTool](VoxelTool.md) 实现。
 
-## Description: 
+## 描述：
 
-Functions in this class are specific to [VoxelLodTerrain](VoxelLodTerrain.md). For generic functions, you may also check [VoxelTool](VoxelTool.md).
+此类中的函数特定于 [VoxelLodTerrain](VoxelLodTerrain.md)。对于通用函数，你也可以查看 [VoxelTool](VoxelTool.md)。
 
-It's not a class to instantiate alone, you may get it from [VoxelLodTerrain](VoxelLodTerrain.md) using the `get_voxel_tool()` method.
+它不是一个可以单独实例化的类，你可以使用 `get_voxel_tool()` 方法从 [VoxelLodTerrain](VoxelLodTerrain.md) 获取它。
 
-## Methods: 
+## 方法：
 
 
-Return                                                                    | Signature                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+返回值                                                                       | 函数签名                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
 ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [void](#)                                                                 | [do_graph](#i_do_graph) ( [VoxelGeneratorGraph](VoxelGeneratorGraph.md) graph, [Transform3D](https://docs.godotengine.org/en/stable/classes/class_transform3d.html) transform, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) area_size )                                                                                                                                                                                                                         
 [void](#)                                                                 | [do_hemisphere](#i_do_hemisphere) ( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) center, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) radius, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) flat_direction, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) smoothness=0.0 )                                                                                                
@@ -26,62 +26,62 @@ Return                                                                    | Sign
 [void](#)                                                                 | [stamp_sdf](#i_stamp_sdf) ( [VoxelMeshSDF](VoxelMeshSDF.md) mesh_sdf, [Transform3D](https://docs.godotengine.org/en/stable/classes/class_transform3d.html) transform, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) isolevel, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) sdf_scale )  *(deprecated)*                                                                                                                                   
 <p></p>
 
-## Method Descriptions
+## 方法描述
 
 ### [void](#)<span id="i_do_graph"></span> **do_graph**( [VoxelGeneratorGraph](VoxelGeneratorGraph.md) graph, [Transform3D](https://docs.godotengine.org/en/stable/classes/class_transform3d.html) transform, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) area_size ) 
 
-Uses a [VoxelGeneratorGraph](VoxelGeneratorGraph.md) as a brush, which allows to program SDF operations performed by the brush.
+使用 [VoxelGeneratorGraph](VoxelGeneratorGraph.md) 作为画笔，允许对画笔执行的 SDF 操作进行编程。
 
-The graph must have an SDF input and an SDF output, and preferably work assuming a shape of unit size. For example, an additive sphere brush may use an `SdfSphere` node with radius 1 with a `Min` to combine it with terrain SDF.
+该图必须具有 SDF 输入和 SDF 输出，并且最好假定形状为单位大小。例如，加法球体画笔可以使用半径为 1 的 `SdfSphere` 节点配合 `Min` 将其与地形 SDF 组合。
 
-See also [online documentation](https://voxel-tools.readthedocs.io/en/latest/generators/#using-voxelgeneratorgraph-as-a-brush).
+另请参阅[在线文档](https://voxel-tools.readthedocs.io/en/latest/generators/#using-voxelgeneratorgraph-as-a-brush)。
 
 ### [void](#)<span id="i_do_hemisphere"></span> **do_hemisphere**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) center, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) radius, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) flat_direction, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) smoothness=0.0 ) 
 
-Operates on a hemisphere, where `flat_direction` is pointing away from the flat surface (like a normal). `smoothness` determines how the flat part blends with the rounded part, with higher values producing softer more rounded edge.
+对半球进行操作，其中 `flat_direction` 指向远离平面表面（类似于法线）。`smoothness` 决定平坦部分与圆角部分的混合程度，值越高，边缘越柔和、越圆润。
 
 ### [void](#)<span id="i_do_sphere_async"></span> **do_sphere_async**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) center, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) radius ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_raycast_binary_search_iterations"></span> **get_raycast_binary_search_iterations**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_get_voxel_f_interpolated"></span> **get_voxel_f_interpolated**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) position ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_run_blocky_random_tick"></span> **run_blocky_random_tick**( [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) area, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) voxel_count, [Callable](https://docs.godotengine.org/en/stable/classes/class_callable.html) callback, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) batch_count=16, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) tags_mask=4294967295 ) 
 
-Picks random voxels within the specified area. If voxel models have [VoxelBlockyModel.random_tickable](VoxelBlockyModel.md#i_random_tickable) set to `true` and [VoxelBlockyModel.tags_mask](VoxelBlockyModel.md#i_tags_mask) matches any bit in `tags_mask`, executes a function on them. This only works for terrains using [VoxelMesherBlocky](VoxelMesherBlocky.md).
+在指定区域内选取随机体素。如果体素模型将 [VoxelBlockyModel.random_tickable](VoxelBlockyModel.md#i_random_tickable) 设置为 `true` 且 [VoxelBlockyModel.tags_mask](VoxelBlockyModel.md#i_tags_mask) 与 `tags_mask` 中的任何位匹配，则对它们执行函数。这仅适用于使用 [VoxelMesherBlocky](VoxelMesherBlocky.md) 的地形。
 
-The given callback takes two arguments: voxel position (Vector3i), voxel value (int).
+给定的回调接受两个参数：体素位置（Vector3i）、体素值（int）。
 
 
-The purpose of `batch_count` is to optimize the picking process through the internal data structure. The algorithm goes as follows: `voxel_count` is divided in batches of length `batch_count`. For each batch, a random block intersecting `area` is chosen, and `batch_count` voxels are picked at random inside of it. If `voxel_count` is not divisible by `batch_count`, an extra block will be picked to do the remainder.
+`batch_count` 的目的是通过内部数据结构优化选取过程。算法如下：`voxel_count` 被分成若干个长度为 `batch_count` 的批次。对于每个批次，会选择与 `area` 相交的随机块，并在其中随机选取 `batch_count` 个体素。如果 `voxel_count` 不能被 `batch_count` 整除，将额外选取一个块来处理余数。
 
-`batch` can bias randomness by concentrating picks in specific blocks, but if this function is used every frame over time, that bias should average out. If you want no bias at all, set `batch_count` to 1.
+`batch` 可以通过将选取集中在特定块中来引入随机性偏差，但如果此函数随时间每帧调用，该偏差应该会平均化。如果你完全不想要偏差，请将 `batch_count` 设置为 1。
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_separate_floating_chunks"></span> **separate_floating_chunks**( [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) box, [Node](https://docs.godotengine.org/en/stable/classes/class_node.html) parent_node ) 
 
-Turns floating voxels into RigidBodies.
+将漂浮的体素转换为刚体。
 
-Chunks of floating voxels are detected within a box. The box is relative to the voxel volume this VoxelTool is attached to. Chunks have to be contained entirely within that box to be considered floating. Chunks are removed from the source volume and transformed into RigidBodies with convex collision shapes. They will be added as child of the provided node. They will start "kinematic", and turn "rigid" after a short time, to allow the terrain to update its colliders after the removal (otherwise they will overlap). The function returns an array of these rigid bodies, which you can use to attach further behavior to them (such as disappearing after some time or distance for example).
+在长方体内部检测漂浮体素块。该长方体相对于此 VoxelTool 所附着的体素体积。块必须完全包含在该长方体内部才会被视为漂浮。块会从源体积中移除，并转换为具有凸碰撞形状的刚体。它们将被添加为所提供节点的子节点。它们将以“kinematic”状态开始，并在短暂时间后变为“rigid”，以便地形在移除后更新其碰撞体（否则它们会重叠）。该函数返回这些刚体的数组，你可以用它来为刚体附加进一步的行为（例如在一段时间或距离后消失）。
 
-This algorithm can become expensive quickly, so the box should not be too big. A size of around 30 voxels should be ok.
+此算法会很快变得昂贵，因此长方体不应太大。大约 30 个体素的大小应该可以。
 
 ### [void](#)<span id="i_set_raycast_binary_search_iterations"></span> **set_raycast_binary_search_iterations**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) iterations ) 
 
-Picks random voxels within the specified area and executes a function on them. This only works for terrains using [VoxelMesherBlocky](VoxelMesherBlocky.md). Only voxels where [Voxel.random_tickable](https://docs.godotengine.org/en/stable/classes/class_voxel.html#class-voxel-property-random-tickable) is `true` will be picked.
+在指定区域内选取随机体素并对其执行函数。这仅适用于使用 [VoxelMesherBlocky](VoxelMesherBlocky.md) 的地形。只会选取 [Voxel.random_tickable](https://docs.godotengine.org/en/stable/classes/class_voxel.html#class-voxel-property-random-tickable) 为 `true` 的体素。
 
-The given callback takes two arguments: voxel position (Vector3i), voxel value (int).
+给定的回调接受两个参数：体素位置（Vector3i）、体素值（int）。
 
-Only voxels at LOD 0 will be considered.
+只会考虑 LOD 0 处的体素。
 
 ### [void](#)<span id="i_stamp_sdf"></span> **stamp_sdf**( [VoxelMeshSDF](VoxelMeshSDF.md) mesh_sdf, [Transform3D](https://docs.godotengine.org/en/stable/classes/class_transform3d.html) transform, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) isolevel, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) sdf_scale ) 
 
-*This method is deprecated. Use [VoxelTool.do_mesh](VoxelTool.md#i_do_mesh) instead.*
+*此方法已弃用。 Use [VoxelTool.do_mesh](VoxelTool.md#i_do_mesh) instead.*
 
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

@@ -4,7 +4,7 @@
 namespace voxel {
 
 TextWriter &operator<<(TextWriter &w, const Box3i &box) {
-	// TODO For some reason the one-liner version didn't compile?
+	// TODO 不知为何单行版本无法编译？
 	w << "(o:";
 	w << box.position;
 	w << ", s:";

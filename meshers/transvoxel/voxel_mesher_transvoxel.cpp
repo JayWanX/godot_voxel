@@ -26,11 +26,11 @@ Ref<ShaderMaterial> g_minimal_shader_material;
 } // namespace
 
 namespace transvoxel {
-// Wrapping thread-locals in functions so they initialize the first time they are needed, instead of when the
-// application starts. This works around a bug in the static debug MSVC runtime (/MTd). At time of writing, Godot is
-// using /MT even in debug builds, which prevents from getting safety checks from the standard library.
-// See https://github.com/baldurk/renderdoc/issues/1743
-// and https://developercommunity.visualstudio.com/t/race-condition-on-g-tss-mutex-with-static-crt/672664
+// 将 thread-local 包装在函数中，使它们在首次需要时才初始化，而不是在应用程序启动时初始化。
+// 这可以规避静态调试 MSVC 运行时（/MTd）中的一个 bug。在撰写本文时，即使在调试构建中 Godot 也
+// 使用 /MT，这导致无法获得标准库提供的安全检查。
+// 参见 https://github.com/baldurk/renderdoc/issues/1743
+// 以及 https://developercommunity.visualstudio.com/t/race-condition-on-g-tss-mutex-with-static-crt/672664
 MeshArrays &get_tls_mesh_arrays() {
 	thread_local MeshArrays tls_mesh_arrays;
 	return tls_mesh_arrays;
@@ -88,7 +88,7 @@ int VoxelMesherTransvoxel::get_used_channels_mask() const {
 }
 
 bool VoxelMesherTransvoxel::is_generating_collision_surface() const {
-	// Via submesh indices
+	// 通过子网格索引
 	return true;
 }
 
@@ -98,14 +98,14 @@ void fill_surface_arrays(Array &arrays, const transvoxel::MeshArrays &src) {
 	PackedVector3Array vertices;
 	PackedVector3Array normals;
 	PackedFloat32Array lod_data; // 4*float32
-	PackedFloat32Array texturing_data; // 2*4*uint8 as 2*float32, or 3*uint8 as 1*float32
+	PackedFloat32Array texturing_data; // 2*4*uint8 作为 2*float32，或 3*uint8 作为 1*float32
 	PackedInt32Array indices;
 
 	copy_to(vertices, to_span_const(src.vertices));
 
 	// raw_copy_to(lod_data, src.lod_data);
 	lod_data.resize(src.lod_data.size() * 4);
-	// Based on the layout, position is first 3 floats, and 4th float is actually a bitmask
+	// 根据布局，前 3 个 float 是位置，第 4 个 float 实际上是一个位掩码
 	static_assert(sizeof(transvoxel::LodAttrib) == 16);
 	memcpy(lod_data.ptrw(), src.lod_data.data(), lod_data.size() * sizeof(float));
 
@@ -158,7 +158,7 @@ void simplify(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Gather and check input
+	// 收集并检查输入
 
 	ERR_FAIL_COND(p_target_ratio < 0.f || p_target_ratio > 1.f);
 	ERR_FAIL_COND(p_error_threshold < 0.f || p_error_threshold > 1.f);
@@ -173,11 +173,11 @@ void simplify(
 
 	float lod_error = 0.f;
 
-	// Simplify
+	// 简化
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("meshopt_simplify");
 
-		// TODO See build script about the `voxelmeshopt::` namespace
+		// TODO 关于 `voxelmeshopt::` 命名空间，请参见构建脚本
 		const unsigned int lod_index_count = voxelmeshopt::meshopt_simplify(
 				&lod_indices[0],
 				reinterpret_cast<const unsigned int *>(src_mesh.indices.data()),
@@ -187,7 +187,7 @@ void simplify(
 				sizeof(Vector3f),
 				target_index_count,
 				p_error_threshold,
-				// Crucial for chunk borders, see https://github.com/zeux/meshoptimizer/issues/311
+				// 对数据块边界至关重要，参见 https://github.com/zeux/meshoptimizer/issues/311
 				voxelmeshopt::meshopt_SimplifyLockBorder,
 				&lod_error
 		);
@@ -195,7 +195,7 @@ void simplify(
 		lod_indices.resize(lod_index_count);
 	}
 
-	// Produce output
+	// 生成输出
 
 	Array surface;
 	surface.resize(Mesh::ARRAY_MAX);
@@ -215,7 +215,7 @@ void simplify(
 	remap_vertex_array(src_mesh.texturing_data_2f32, dst_mesh.texturing_data_2f32, remap_indices, unique_vertex_count);
 
 	dst_mesh.indices.resize(lod_indices.size());
-	// TODO Not sure if arguments are correct
+	// TODO 不确定参数是否正确
 	voxelmeshopt::meshopt_remapIndexBuffer(
 			reinterpret_cast<unsigned int *>(dst_mesh.indices.data()),
 			lod_indices.data(),
@@ -226,13 +226,13 @@ void simplify(
 
 } // namespace
 
-// TODO Maybe we could auto-detect? It could become ambiguous tho
+// TODO 也许我们可以自动检测？不过可能会变得有歧义
 static VoxelMesherTransvoxel::TexturingMode check_texturing_mode(
 		const VoxelMesherTransvoxel::TexturingMode expected_tex_mode,
 		const VoxelBuffer &vb
 ) {
 #ifdef TOOLS_ENABLED
-	// Do more advanced error reporting in development
+	// 在开发版本中做更完善的错误报告
 	switch (expected_tex_mode) {
 		case VoxelMesherTransvoxel::TEXTURES_MIXEL4_S4: {
 			const VoxelBuffer::Depth indices_depth = vb.get_channel_depth(VoxelBuffer::CHANNEL_INDICES);
@@ -287,16 +287,16 @@ void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher
 
 	const VoxelBuffer::ChannelId sdf_channel = VoxelBuffer::CHANNEL_SDF;
 
-	// Initialize dynamic memory:
-	// These vectors are re-used.
-	// We don't know in advance how much geometry we are going to produce.
-	// Once capacity is big enough, no more memory should be allocated
+	// 初始化动态内存：
+	// 这些向量会被复用。
+	// 我们事先不知道将生成多少几何体。
+	// 一旦容量足够大，就不应再分配内存
 	transvoxel::MeshArrays &mesh_arrays = transvoxel::get_tls_mesh_arrays();
 	mesh_arrays.clear();
 
 	const VoxelBuffer &voxels = input.voxels;
 	if (voxels.is_uniform(sdf_channel)) {
-		// There won't be anything to polygonize since the SDF has no variations, so it can't cross the isolevel
+		// SDF 没有变化，因此不会与等值面相交，也就没有可多边形化的内容
 		return;
 	}
 
@@ -324,19 +324,19 @@ void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher
 	);
 
 	if (mesh_arrays.vertices.size() == 0) {
-		// The mesh can be empty
+		// 网格可能为空
 		return;
 	}
 	if (mesh_arrays.indices.size() == 0) {
-		// The mesh can have vertices, but still be empty, for example because triangles are all degenerate
+		// 网格可能有顶点但仍然为空，例如因为三角形全是退化的
 		return;
 	}
 
 	transvoxel::MeshArrays *combined_mesh_arrays = &mesh_arrays;
 	if (_mesh_optimization_params.enabled) {
-		// TODO When voxel texturing is enabled, this will decrease quality a lot.
-		// There is no support yet for taking textures into account when simplifying.
-		// See https://github.com/zeux/meshoptimizer/issues/158
+		// TODO 启用体素纹理时，这会大幅降低质量。
+		// 目前简化时还不支持考虑纹理。
+		// 参见 https://github.com/zeux/meshoptimizer/issues/158
 		simplify(
 				mesh_arrays,
 				tls_simplified_mesh_arrays,
@@ -351,8 +351,8 @@ void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher
 	output.collision_surface.submesh_index_end = combined_mesh_arrays->indices.size();
 
 	if (_transitions_enabled && input.lod_hint) {
-		// We combine transition meshes with the regular mesh, because it results in less draw calls than if they were
-		// separate. This only requires a vertex shader trick to discard them when neighbors change.
+		// 我们将过渡网格与常规网格合并，因为这样比分开时产生的绘制调用更少。
+		// 这只需要一个顶点着色器技巧，在邻居变化时丢弃它们。
 		VOXEL_ASSERT(combined_mesh_arrays != nullptr);
 
 		for (int dir = 0; dir < Cube::SIDE_COUNT; ++dir) {
@@ -382,10 +382,10 @@ void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher
 
 	output.primitive_type = Mesh::PRIMITIVE_TRIANGLES;
 
-	// Transvoxel transitions data
+	// Transvoxel 过渡数据
 	output.mesh_flags = (RenderingServerEnums::ARRAY_CUSTOM_RGBA_FLOAT << Mesh::ARRAY_FORMAT_CUSTOM0_SHIFT);
 
-	// Texture data
+	// 纹理数据
 	switch (texture_mode) {
 		case TEXTURES_NONE:
 			break;
@@ -399,7 +399,7 @@ void VoxelMesherTransvoxel::build(VoxelMesher::Output &output, const VoxelMesher
 	}
 }
 
-// Only exists for testing
+// 仅用于测试
 Ref<ArrayMesh> VoxelMesherTransvoxel::build_transition_mesh(Ref<godot::VoxelBuffer> voxels, int direction) {
 	static thread_local transvoxel::Cache s_cache;
 	static thread_local transvoxel::MeshArrays s_mesh_arrays;
@@ -409,12 +409,12 @@ Ref<ArrayMesh> VoxelMesherTransvoxel::build_transition_mesh(Ref<godot::VoxelBuff
 	ERR_FAIL_COND_V(voxels.is_null(), Ref<ArrayMesh>());
 
 	if (voxels->is_uniform(VoxelBuffer::CHANNEL_SDF)) {
-		// Uniform SDF won't produce any surface
+		// 均匀的 SDF 不会产生任何表面
 		return Ref<ArrayMesh>();
 	}
 
-	// TODO We need to output transition meshes through the generic interface, they are part of the result
-	// For now we can't support proper texture indices in this specific case
+	// TODO 我们需要通过通用接口输出过渡网格，它们是结果的一部分
+	// 目前在这种特定情况下我们还无法支持正确的纹理索引
 	transvoxel::DefaultTextureIndicesData default_texture_indices_data;
 	default_texture_indices_data.use = false;
 	transvoxel::build_transition_mesh(
@@ -583,7 +583,7 @@ void VoxelMesherTransvoxel::_bind_methods() {
 	BIND_ENUM_CONSTANT(TEXTURES_MIXEL4_S4);
 	BIND_ENUM_CONSTANT(TEXTURES_SINGLE_S4);
 
-	// Legacy alias for MIXEL4_S4
+	// MIXEL4_S4 的旧别名
 	BIND_CONSTANT(TEXTURES_BLEND_4_OVER_16);
 }
 

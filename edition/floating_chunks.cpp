@@ -23,8 +23,8 @@ namespace voxel {
 void box_propagate_ccl(Span<uint8_t> cells, const Vector3i size) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Propagate non-zero cells towards zero cells in a 3x3x3 pattern.
-	// Used on a grid produced by Connected-Component-Labelling.
+	// 以 3x3x3 的模式将非零格子向零格子传播。
+	// 用于由连通分量标记（Connected-Component-Labelling）产生的网格。
 
 	// Z
 	{
@@ -34,8 +34,8 @@ void box_propagate_ccl(Span<uint8_t> cells, const Vector3i size) {
 		unsigned int i = 0;
 		for (pos.x = 0; pos.x < size.x; ++pos.x) {
 			for (pos.y = 0; pos.y < size.y; ++pos.y) {
-				// Note, border cells are not handled. Not just because it's more work, but also because that could
-				// make the label touch the edge, which is later interpreted as NOT being an island.
+				// 注意，边界格子不处理。不仅因为工作量更大，还因为那样可能会
+				// 让标签触及边缘，而这之后会被解释为不是岛屿。
 				pos.z = 2;
 				i = Vector3iUtil::get_zxy_index(pos, size);
 				for (; pos.z < size.z - 2; ++pos.z, i += dz) {
@@ -46,7 +46,7 @@ void box_propagate_ccl(Span<uint8_t> cells, const Vector3i size) {
 						}
 						if (cells[i + dz] == 0) {
 							cells[i + dz] = c;
-							// Skip next cell, otherwise it would cause endless propagation
+							// 跳过下一个格子，否则会导致无限传播
 							i += dz;
 							++pos.z;
 						}
@@ -111,11 +111,11 @@ void box_propagate_ccl(Span<uint8_t> cells, const Vector3i size) {
 	}
 }
 
-// Turns floating chunks of voxels into rigidbodies:
-// Detects separate groups of connected voxels within a box. Each group fully contained in the box is removed from
-// the source volume, and turned into a rigidbody.
-// This is one way of doing it, I don't know if it's the best way (there is rarely a best way)
-// so there are probably other approaches that could be explored in the future, if they have better performance
+// 将漂浮的体素块转换为刚体：
+// 检测盒子内相互连接的不同体素组。完全包含在盒子内的每个组都会从
+// 源体积中移除，并转换为刚体。
+// 这只是一种实现方式，我不知道它是否是最好的（很少存在最好的方式）
+// 所以未来或许可以探索其它性能更好的方法
 Array separate_floating_chunks(
 		VoxelTool &voxel_tool,
 		Box3i world_box,
@@ -126,13 +126,13 @@ Array separate_floating_chunks(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Checks
+	// 检查
 	ERR_FAIL_COND_V(mesher.is_null(), Array());
 	ERR_FAIL_COND_V(parent_node == nullptr, Array());
 
-	// Copy source data
+	// 复制源数据
 
-	// TODO Do not assume channel, at the moment it's hardcoded for smooth terrain
+	// TODO 不要假定通道，目前它是为平滑地形硬编码的
 	static const int channels_mask = (1 << VoxelBuffer::CHANNEL_SDF);
 	static const VoxelBuffer::ChannelId main_channel = VoxelBuffer::CHANNEL_SDF;
 
@@ -143,22 +143,22 @@ Array separate_floating_chunks(
 		voxel_tool.copy(world_box.position, source_copy_buffer, channels_mask, false);
 	}
 
-	// Label distinct voxel groups
+	// 标记不同的体素组
 
-	// TODO Candidate for temp allocator
+	// TODO 可作为临时分配器的候选
 	static thread_local StdVector<uint8_t> ccl_output;
 	ccl_output.resize(Vector3iUtil::get_volume_u64(world_box.size));
 
 	unsigned int label_count = 0;
 
 	{
-		// TODO Allow to run the algorithm at a different LOD, to trade precision for speed
+		// TODO 允许在不同 LOD 下运行该算法，以精度换取速度
 		VOXEL_PROFILE_SCOPE_NAMED("CCL scan");
 		IslandFinder island_finder;
 		island_finder.scan_3d(
 				Box3i(Vector3i(), world_box.size),
 				[&source_copy_buffer](Vector3i pos) {
-					// TODO Can be optimized further with direct access
+					// TODO 可以通过直接访问进一步优化
 					return source_copy_buffer.get_voxel_f(pos.x, pos.y, pos.z, main_channel) < 0.f;
 				},
 				to_span(ccl_output),
@@ -168,24 +168,24 @@ Array separate_floating_chunks(
 
 	struct Bounds {
 		Vector3i min_pos;
-		Vector3i max_pos; // inclusive
+		Vector3i max_pos; // 包含
 		bool valid = false;
 	};
 
 	if (main_channel == VoxelBuffer::CHANNEL_SDF) {
-		// Propagate labels to improve SDF quality, otherwise gradients of separated chunks would cut off abruptly.
-		// Limitation: if two islands are too close to each other, one will win over the other.
-		// An alternative could be to do this on individual chunks?
+		// 传播标签以改善 SDF 质量，否则分离块的梯度会突然截断。
+		// 局限：如果两个岛屿距离太近，其中一个会覆盖另一个。
+		// 另一种方案是在单个块上执行此操作？
 		box_propagate_ccl(to_span(ccl_output), world_box.size);
 	}
 
-	// Compute bounds of each group
+	// 计算每个组的边界
 
 	StdVector<Bounds> bounds_per_label;
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Bounds calculation");
 
-		// Adding 1 because label 0 is the index for "no label"
+		// 加 1，因为标签 0 是“无标签”的索引
 		bounds_per_label.resize(label_count + 1);
 
 		unsigned int ccl_index = 0;
@@ -232,8 +232,8 @@ Array separate_floating_chunks(
 		}
 	}
 
-	// Eliminate groups that touch the box border,
-	// because that means we can't tell if they are truly hanging in the air or attached to land further away
+	// 排除触及盒子边界的组，
+	// 因为那意味着我们无法判断它们是真正悬空，还是连接到更远处的陆地上
 
 	const Vector3i lbmax = world_box.size - Vector3i(1, 1, 1);
 	for (unsigned int label = 1; label < bounds_per_label.size(); ++label) {
@@ -253,7 +253,7 @@ Array separate_floating_chunks(
 		}
 	}
 
-	// Create voxel buffer for each group
+	// 为每个组创建体素缓冲区
 
 	struct InstanceInfo {
 		VoxelBuffer voxels;
@@ -285,10 +285,10 @@ Array separate_floating_chunks(
 			VoxelBuffer &buffer = instances_info.back().voxels;
 			buffer.create(size.x, size.y, size.z);
 
-			// Read voxels from the source volume
+			// 从源体积读取体素
 			voxel_tool.copy(world_pos, buffer, channels_mask, false);
 
-			// Cleanup padding borders
+			// 清理内边距边界
 			const Box3i inner_box(
 					Vector3iUtil::create(min_padding),
 					buffer.get_size() - Vector3iUtil::create(min_padding + max_padding)
@@ -297,7 +297,7 @@ Array separate_floating_chunks(
 				buffer.fill_area_f(constants::SDF_FAR_OUTSIDE, box.position, box.position + box.size, main_channel);
 			});
 
-			// Filter out voxels that don't belong to this label
+			// 过滤掉不属于该标签的体素
 			for (int z = local_bounds.min_pos.z; z <= local_bounds.max_pos.z; ++z) {
 				for (int x = local_bounds.min_pos.x; x <= local_bounds.max_pos.x; ++x) {
 					for (int y = local_bounds.min_pos.y; y <= local_bounds.max_pos.y; ++y) {
@@ -320,8 +320,8 @@ Array separate_floating_chunks(
 		}
 	}
 
-	// Erase voxels from source volume.
-	// Must be done after we copied voxels from it.
+	// 从源体积中擦除体素。
+	// 必须在从源体积复制体素之后执行。
 
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Erasing");
@@ -335,11 +335,11 @@ Array separate_floating_chunks(
 		}
 	}
 
-	// Find out which materials contain parameters that require instancing.
+	// 找出哪些材质包含需要实例化的参数。
 	//
-	// Since 7dbc458bb4f3e0cc94e5070bd33bde41d214c98d it's no longer possible to quickly check if a
-	// shader has a uniform by name using Shader's parameter cache. Now it seems the only way is to get the whole list
-	// of parameters and find into it, which is slow and tedious to write.
+	// 自提交 7dbc458bb4f3e0cc94e5070bd33bde41d214c98d 起，已无法再通过 Shader 的参数缓存
+	// 快速检查某个 shader 是否按名称拥有某个 uniform。现在唯一的方法似乎是获取完整的
+	// 参数列表并在其中查找，这既慢又写起来繁琐。
 
 	uint32_t materials_to_instance_mask = 0;
 	{
@@ -375,7 +375,7 @@ Array separate_floating_chunks(
 		}
 	}
 
-	// Create instances
+	// 创建实例
 
 	Array nodes;
 
@@ -413,7 +413,7 @@ Array separate_floating_chunks(
 			const Transform3D local_transform(
 					Basis(),
 					info.world_pos
-							// Undo min padding
+							// 撤销最小内边距
 							+ Vector3i(1, 1, 1)
 			);
 
@@ -422,10 +422,10 @@ Array separate_floating_chunks(
 					Ref<ShaderMaterial> sm = materials[i];
 					VOXEL_ASSERT_CONTINUE(sm.is_valid());
 					sm = sm->duplicate(false);
-					// That parameter should have a valid default value matching the local transform relative to the
-					// volume, which is usually per-instance, but in Godot 3 we have no such feature, so we have to
-					// duplicate.
-					// TODO Try using per-instance parameters for scalar uniforms (Godot 4 doesn't support textures)
+					// 该参数应当有一个有效的默认值，与相对于体积的局部变换相匹配，
+					// 这通常是按实例区分的，但在 Godot 3 中没有这样的功能，所以不得不
+					// 进行复制。
+					// TODO 尝试对标量 uniform 使用按实例的参数（Godot 4 不支持纹理）
 					sm->set_shader_parameter(
 							VoxelStringNames::get_singleton().u_block_local_transform, local_transform
 					);
@@ -433,11 +433,11 @@ Array separate_floating_chunks(
 				}
 			}
 
-			// TODO If normalmapping is used here with the Transvoxel mesher, we need to either turn it off just for
-			// this call, or to pass the right options
+			// TODO 如果此处与 Transvoxel 网格化器一起使用法线贴图，我们需要要么仅针对
+			// 此调用关闭它，要么传入正确的选项
 			Ref<ArrayMesh> mesh = mesher->build_mesh(info.voxels, materials, Dictionary());
-			// The mesh is not supposed to be null,
-			// because we build these buffers from connected groups that had negative SDF.
+			// 网格不应为空，
+			// 因为我们是从具有负 SDF 的连通组构建这些缓冲区的。
 			ERR_CONTINUE(mesh.is_null());
 
 			if (voxel::godot::is_mesh_empty(**mesh)) {
@@ -460,14 +460,14 @@ Array separate_floating_chunks(
 			// 	memdelete(f);
 			// }
 
-			// TODO Option to make multiple convex shapes
-			// TODO Use the fast way. This is slow because of the internal TriangleMesh thing and mesh data query.
-			// TODO Don't create a body if the mesh has no triangles
+			// TODO 提供生成多个凸形状的选项
+			// TODO 使用快速方式。由于内部的 TriangleMesh 和网格数据查询，这很慢。
+			// TODO 如果网格没有三角形，则不创建刚体
 			Ref<Shape3D> shape = mesh->create_convex_shape();
 			ERR_CONTINUE(shape.is_null());
 			CollisionShape3D *collision_shape = memnew(CollisionShape3D);
 			collision_shape->set_shape(shape);
-			// Center the shape somewhat, because Godot is confusing node origin with center of mass
+			// 将形状稍微居中，因为 Godot 把节点原点与质心混淆了
 			const Vector3i size =
 					local_bounds.max_pos - local_bounds.min_pos + Vector3iUtil::create(1 + max_padding + min_padding);
 			const Vector3 offset = -Vector3(size) * 0.5f;
@@ -479,14 +479,14 @@ Array separate_floating_chunks(
 			rigid_body->set_freeze_mode(RigidBody3D::FREEZE_MODE_KINEMATIC);
 			rigid_body->set_freeze_enabled(true);
 
-			// Switch to rigid after a short time to workaround clipping with terrain,
-			// because colliders are updated asynchronously
+			// 短暂时间后切换为刚体模式，以解决与地形的穿插问题，
+			// 因为碰撞体是异步更新的
 			Timer *timer = memnew(Timer);
 			timer->set_wait_time(0.2);
 			timer->set_one_shot(true);
 			timer->connect("timeout", callable_mp(rigid_body, &RigidBody3D::set_freeze_enabled).bind(false));
-			// Cannot use start() here because it requires to be inside the SceneTree,
-			// and we don't know if it will be after we add to the parent.
+			// 这里不能使用 start()，因为它要求位于 SceneTree 内，
+			// 而我们在添加到父节点之前不知道它是否会处于其中。
 			timer->set_autostart(true);
 			rigid_body->add_child(timer);
 

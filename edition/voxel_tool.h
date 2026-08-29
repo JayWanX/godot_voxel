@@ -9,7 +9,7 @@
 #include "funcs.h"
 #include "voxel_raycast_result.h"
 
-// TODO Need to review VoxelTool to account for transformed volumes
+// TODO 需要审查 VoxelTool 以考虑变换后的体积
 
 namespace voxel {
 
@@ -17,11 +17,11 @@ namespace voxel {
 class VoxelMeshSDF;
 #endif
 
-// High-level voxel editing interface.
-// It's not a class to instantiate alone, get it from the voxel objects you want to work with.
-// There might be some overhead, so if a specific case needs optimization, it may be implemented with the underlying
-// data structure directly, or eventually added to the corresponding implementation of VoxelTool. If most
-// implementations provide the same feature, it may be added to the base class.
+// 高级体素编辑接口。
+// 这不是一个需要单独实例化的类，请从你想要操作的体素对象中获取它。
+// 可能会有些开销，因此如果某个特定场景需要优化，可以直接用底层数据结构实现，
+// 或最终添加到 VoxelTool 的对应实现中。如果大多数实现都提供相同的功能，
+// 则可以添加到基类中。
 class VoxelTool : public RefCounted {
 	GDCLASS(VoxelTool, RefCounted)
 public:
@@ -66,10 +66,10 @@ public:
 	void set_sdf_strength(float strength);
 	float get_sdf_strength() const;
 
-	// TODO Methods working on a whole area must use an implementation that minimizes locking!
+	// TODO 对整个区域操作的方法必须使用尽量减少锁的实现！
 
-	// The following methods represent one edit each. Pick the correct one for the job.
-	// For example, using `do_box` will be more efficient than calling `do_point` many times.
+	// 以下每个方法代表一次编辑。请为工作选择合适的那个。
+	// 例如，使用 `do_box` 比多次调用 `do_point` 更高效。
 	virtual void set_voxel(Vector3i pos, uint64_t v);
 	virtual void set_voxel_f(Vector3i pos, float v);
 	virtual void do_point(Vector3i pos);
@@ -124,7 +124,7 @@ public:
 
 	void set_raycast_normal_enabled(bool enabled);
 
-	// Checks if an edit affecting the given box can be applied, fully or partially
+	// 检查影响给定盒的编辑是否可以应用，无论是完全还是部分
 	virtual bool is_area_editable(const Box3i &box) const;
 
 	virtual void set_voxel_metadata(const Vector3i pos, const Variant &meta);
@@ -135,8 +135,8 @@ public:
 protected:
 	static void _bind_methods();
 
-	// These methods never go alone, but may be used in others.
-	// They don't represent an edit, they only abstract the lower-level API
+	// 这些方法从不单独使用，但可以在其它方法中使用。
+	// 它们不代表一次编辑，只是对底层 API 的抽象
 	virtual uint64_t _get_voxel(Vector3i pos) const;
 	virtual float _get_voxel_f(Vector3i pos) const;
 	virtual void _set_voxel(Vector3i pos, uint64_t v);
@@ -161,8 +161,8 @@ protected:
 #endif
 
 private:
-	// Bindings to convert to more specialized C++ types and handle virtuality,
-	// cuz I don't know if it works by binding straight
+	// 用于转换为更具体的 C++ 类型并处理虚特性的绑定，
+	// 因为我不确定直接绑定是否可行
 
 	uint64_t _b_get_voxel(Vector3i pos);
 	float _b_get_voxel_f(Vector3i pos);
@@ -194,17 +194,17 @@ private:
 
 protected:
 	uint64_t _value = 0;
-	uint64_t _eraser_value = 0; // air
+	uint64_t _eraser_value = 0; // 空气
 	VoxelBuffer::ChannelId _channel = VoxelBuffer::CHANNEL_TYPE;
 	float _sdf_scale = 1.f;
 	float _sdf_strength = 1.f;
 	Mode _mode = MODE_ADD;
-	// If true, operations will be allowed even if the affected area is partially outside the bounds of editable voxels.
-	// Depending on the context, it may be useful, or cause iconsistent results.
+	// 如果为 true，即使受影响区域部分超出可编辑体素的边界，也允许进行操作。
+	// 视上下文而定，这可能有用，也可能导致不一致的结果。
 	bool _allow_out_of_bounds = false;
 	bool _raycast_normal_enabled = true;
 
-	// Used on smooth terrain
+	// 用于平滑地形
 	ops::TextureParams _texture_params;
 };
 

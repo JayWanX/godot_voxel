@@ -6,8 +6,8 @@
 
 namespace voxel {
 
-// 3x3 matrix specialized at representing a 3D basis.
-// Ported from Godot Engine using always 32-bit floats.
+// 专用于表示三维基（basis）的 3x3 矩阵。
+// 从 Godot Engine 移植，始终使用 32 位浮点数。
 struct Basis3f {
 	Vector3f rows[3] = { //
 		Vector3f(1, 0, 0), //
@@ -49,7 +49,7 @@ struct Basis3f {
 	}
 
 	void set_axis_angle(const Vector3f p_axis, float cosine, float sine) {
-		// Rotation matrix from axis and angle, see
+		// 由旋转轴与角度构造的旋转矩阵，参见
 		// https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_angle
 		// #ifdef DEBUG_ENABLED
 		// 		VOXEL_ASSERT_RETURN(math::is_normalized(p_axis));
@@ -81,7 +81,7 @@ struct Basis3f {
 #ifdef DEBUG_ENABLED
 		VOXEL_ASSERT(p_index < 3);
 #endif
-		// Set actual basis axis column (we store transposed as rows to match Godot's storage).
+		// 设置实际的基轴列（我们以行形式存储转置矩阵，以匹配 Godot 的存储方式）。
 		rows[0][p_index] = p_value.x;
 		rows[1][p_index] = p_value.y;
 		rows[2][p_index] = p_value.z;
@@ -129,7 +129,7 @@ struct Basis3f {
 	}
 
 	void orthonormalize() {
-		// Gram-Schmidt Process
+		// Gram-Schmidt 正交化过程
 
 		Vector3f x = get_column(0);
 		Vector3f y = get_column(1);
@@ -159,14 +159,14 @@ struct Basis3f {
 	}
 
 	Quaternionf get_rotation_quaternion() const {
-		// Assumes that the matrix can be decomposed into a proper rotation and scaling matrix as M = R.S,
-		// and returns the Euler angles corresponding to the rotation part, complementing get_scale().
-		// See the comment in get_scale() for further information.
+		// 假设该矩阵可分解为一个正交旋转矩阵与一个缩放矩阵，即 M = R·S，
+		// 并返回对应旋转部分的欧拉角，与 get_scale() 互补。
+		// 更多信息参见 get_scale() 中的注释。
 		Basis3f m = orthonormalized();
 		const float det = m.determinant();
 		if (det < 0) {
-			// Ensure that the determinant is 1, such that result is a proper rotation matrix which can be represented
-			// by Euler angles.
+			// 确保行列式为 1，使结果为一个可表示为
+			// 欧拉角的正交旋转矩阵。
 			m.scale(-1);
 		}
 
@@ -180,7 +180,7 @@ struct Basis3f {
 		//  independent vectors.");
 		// #endif
 
-		// Allow getting a quaternion from an unnormalized transform
+		// 允许从未归一化的变换获取四元数
 
 		const Basis3f m = *this;
 		const float trace = m.rows[0][0] + m.rows[1][1] + m.rows[2][2];

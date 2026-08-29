@@ -1,5 +1,5 @@
 #ifdef VOXEL_GODOT
-// Module specific
+// 模块专用
 #include "register_types.h"
 #endif
 
@@ -99,10 +99,10 @@
 #endif
 
 #include "util/godot/classes/engine.h"
-#include "util/godot/classes/os.h" // for get_command_line_arguments
+#include "util/godot/classes/os.h" // 用于获取命令行参数（get_command_line_arguments）
 #include "util/godot/classes/project_settings.h"
 #include "util/godot/core/class_db.h"
-// Just for size reminders
+// 仅作为尺寸提醒
 #include "util/godot/classes/control.h"
 #include "util/godot/classes/mesh_instance_3d.h"
 #include "util/godot/classes/sprite_2d.h"
@@ -148,14 +148,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// This is used to have an idea of the memory footprint of various objects as Godot and Voxel development progresses.
+// 此功能用于在 Godot 与 Voxel 模块的开发过程中，了解各类对象的内存占用情况。
 void print_size_reminders() {
 	using namespace voxel;
 	using namespace voxel;
 
-	// Note, this only logs the base size each of these classes. They can often have a bigger memory
-	// footprint due to dynamically-allocated members (arrays, dictionaries, RIDs referring to even more data in
-	// RenderingServer...)
+	// 注意，这里只记录这些类各自的基础大小。由于动态分配的成员（数组、字典、
+	// 以及指向更多数据的 RID，例如在
+	// RenderingServer 中），它们的实际内存占用往往会更大。
 
 	VOXEL_PRINT_VERBOSE(format("Size of Variant: {}", sizeof(Variant)));
 	VOXEL_PRINT_VERBOSE(format("Size of Object: {}", sizeof(Object)));
@@ -205,14 +205,14 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		open_log_file();
 #endif
 
-		// TODO Enhancement: can I prevent users from instancing `VoxelEngine`?
-		// This class is used as a singleton so it's not really abstract.
-		// Should I use `register_abstract_class` anyways?
+		// TODO 增强：能否阻止用户实例化 `VoxelEngine`？
+		// 此类被当作单例使用，因此实际上并不是抽象的。
+		// 是否应该改用 `register_abstract_class`？
 		ClassDB::register_class<voxel::godot::VoxelEngine>();
 
 		// Misc
 
-		// Should be abstract, but isn't for compatibility with old versions that didn't have separate VoxelBlockyModel
+		// 本应为抽象类，但为了与未单独拆分出 VoxelBlockyModel 的旧版本兼容，所以没有这么做
 		// classes
 		ClassDB::register_class<VoxelBlockyModel>();
 
@@ -252,20 +252,20 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		ClassDB::register_class<VoxelStreamScript>();
 		ClassDB::register_class<VoxelStreamMemory>();
 
-		// Generators
+		// 生成器
 		ClassDB::register_abstract_class<VoxelGenerator>();
 		ClassDB::register_class<VoxelGeneratorGraph>();
 		ClassDB::register_class<VoxelGeneratorScript>();
 		ClassDB::register_class<VoxelGeneratorMultipassCB>();
 
-		// Utilities
+		// 工具
 		ClassDB::register_class<VoxelBoxMover>();
 		ClassDB::register_class<VoxelRaycastResult>();
 		ClassDB::register_abstract_class<VoxelTool>();
 		ClassDB::register_abstract_class<VoxelToolTerrain>();
 		ClassDB::register_abstract_class<VoxelToolLodTerrain>();
-		// I had to bind this one despite it being useless as-is because otherwise Godot lazily initializes its class.
-		// And this can happen in a thread, causing crashes due to the concurrent access
+		// 我不得不绑定这一个，尽管它本身没有用处，否则 Godot 会惰性初始化它的类。
+		// 而这可能发生在某个线程中，并因并发访问而导致崩溃
 		ClassDB::register_abstract_class<VoxelToolBuffer>();
 		ClassDB::register_abstract_class<VoxelToolMultipassGenerator>();
 		ClassDB::register_class<voxel::godot::VoxelBlockSerializer>();
@@ -281,7 +281,7 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		ClassDB::register_class<VoxelMesherBlocky>();
 		ClassDB::register_class<VoxelMesherCubes>();
 
-		// See SCsub
+		// 参见 SCsub
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 		ClassDB::register_class<FastNoise2>();
 #endif
@@ -342,15 +342,15 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 #endif
 
 #ifdef VOXEL_GODOT
-		// Compatibility with older version
+		// 与旧版本的兼容性
 		// ClassDB::add_compatibility_class("VoxelLibrary", "VoxelBlockyLibrary");
 		// ClassDB::add_compatibility_class("Voxel", "VoxelBlockyModel");
 		ClassDB::add_compatibility_class("VoxelInstanceLibraryItem", "VoxelInstanceLibraryMultiMeshItem");
-		// Not possible to add a compat class for this one because the new name is indistinguishable from an old one.
-		// However this is an abstract class so it should not be found in resources hopefully
+		// 无法为此添加兼容类，因为新名称与旧名称无法区分。
+		// 不过这是一个抽象类，希望能因此不会出现在资源中
 		// ClassDB::add_compatibility_class("VoxelInstanceLibraryItemBase", "VoxelInstanceLibraryItem");
 #endif
-		// Setup engine after classes are registered.
+		// 在类注册完成后再初始化引擎。
 
 		voxel::godot::StringNames::create_singleton();
 		VoxelMemoryPool::create_singleton();
@@ -420,7 +420,7 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 #endif
 
 #ifdef TOOLS_ENABLED
-		// TODO Any way to define a custom command line argument that closes Godot afterward?
+		// TODO 有没有办法定义一个自定义命令行参数，在之后关闭 Godot？
 
 		const PackedStringArray command_line_arguments = voxel::godot::get_command_line_arguments();
 		const String doc_tool_cmd = "--voxel_doc_tool";
@@ -451,10 +451,10 @@ void uninitialize_voxel_module(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
 		voxel::godot::remove_singleton("VoxelEngine");
 
-		// At this point, the GDScript module has nullified GDScriptLanguage::singleton!!
-		// That means it's impossible to free scripts still referenced by VoxelEngine. And that can happen, because
-		// users can write custom generators, which run inside threads, and these threads are hosted in the engine
-		// singleton... See https://github.com/Voxel/godot_voxel/issues/189
+		// 此时，GDScript 模块已经将 GDScriptLanguage::singleton 置空！！
+		// 这意味着无法释放仍被 VoxelEngine 引用的脚本。而这种情况确实可能发生，因为
+		// 用户可以编写自定义生成器，它们在子线程中运行，而这些线程托管在引擎的
+		// 单例中……参见 https://github.com/Voxel/godot_voxel/issues/189
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 		VoxelMesherTransvoxel::free_static_resources();
@@ -464,7 +464,7 @@ void uninitialize_voxel_module(ModuleInitializationLevel p_level) {
 		voxel::godot::VoxelEngine::destroy_singleton();
 		VoxelEngine::destroy_singleton();
 
-		// Do this last as VoxelEngine might still be holding some refs to voxel blocks
+		// 这一步要最后执行，因为 VoxelEngine 可能仍持有一些体素区块的引用
 		VoxelMemoryPool::destroy_singleton();
 
 		voxel::godot::StringNames::destroy_singleton();
@@ -478,7 +478,7 @@ void uninitialize_voxel_module(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
 		VoxelGraphEditorNodePreview::unload_resources();
 
-		// Plugins are automatically unregistered since https://github.com/godotengine/godot-cpp/pull/1138
+		// 插件自 https://github.com/godotengine/godot-cpp/pull/1138 起会自动注销
 	}
 #endif // TOOLS_ENABLED
 }

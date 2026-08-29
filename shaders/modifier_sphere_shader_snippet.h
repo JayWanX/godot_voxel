@@ -1,10 +1,10 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
 const char *g_modifier_sphere_shader_snippet =
 "\n"
 "layout (set = 0, binding = 5) restrict readonly buffer ShapeParams {\n"
-"	// Center not necessary, transform is applied in common shader code\n"
+"	// 不需要中心点，变换在公共着色器代码中应用\n"
 "	//vec3 center;\n"
 "	float radius;\n"
 "} u_shape_params;\n"

@@ -15,7 +15,7 @@ namespace voxel {
 
 VoxelGraphEditorShaderDialog::VoxelGraphEditorShaderDialog() {
 	set_title(VOXEL_TTR("Generated shader"));
-	// set_resizable(true); // TODO How to set if a Window is resizable or not?
+	// set_resizable(true); // TODO 如何设置 Window 是否可调整大小？
 	set_min_size(Vector2(600, 300) * EDSCALE);
 
 	VBoxContainer *v_box_container = memnew(VBoxContainer);

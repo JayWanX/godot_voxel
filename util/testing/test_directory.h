@@ -5,7 +5,7 @@
 
 namespace voxel::testing {
 
-// Creates a temporary directory when an instance of this class is created, and removes it after use
+// 创建本类实例时创建一个临时目录，使用完毕后将其移除
 class TestDirectory {
 public:
 	TestDirectory();

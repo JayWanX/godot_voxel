@@ -34,7 +34,7 @@ void VoxelAStarGrid3DInternal::init_cache() {
 }
 
 bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
-	// TODO We could align the cache with the voxel chunk grid to avoid more expensive copies across chunk borders
+	// TODO 我们可以将缓存与体素数据块（chunk）网格对齐，以避免跨数据块边界进行更昂贵的复制
 	const Vector3i gpos = pos - get_region().position;
 	const Vector3i cpos = gpos >> Chunk::SIZE_PO2;
 	const Vector3i rpos = gpos & Chunk::SIZE_MASK;
@@ -68,7 +68,7 @@ bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
 					Span<const uint8_t> values;
 					VOXEL_ASSERT(_voxel_buffer.get_channel_data(channel_index, values));
 					uint64_t i = 0;
-					// Assuming ZXY loop order
+					// 假定为 ZXY 循环顺序
 					for (const uint8_t v : values) {
 						chunk.solid_bits |= (v == 0 ? uint64_t(0) : (uint64_t(1) << i));
 						++i;
@@ -103,7 +103,7 @@ bool VoxelAStarGrid3DInternal::is_solid(Vector3i pos) {
 
 void VoxelAStarGrid3D::set_terrain(VoxelTerrain *node) {
 	VOXEL_ASSERT_RETURN(node != nullptr);
-	// Can't modify the pathfinder while it is running in a different thread
+	// 当寻路器在另一个线程中运行时不能修改它
 	VOXEL_ASSERT_RETURN(_is_running_async == false);
 	_path_finder.data = node->get_storage_shared();
 }
@@ -230,7 +230,7 @@ AABB VoxelAStarGrid3D::_b_get_region() {
 	return AABB(to_vec3(region.position), to_vec3(region.size));
 }
 
-// Intermediate method to enforce the signal to be emitted on the main thread
+// 中间方法，用于确保信号在主线程上发出
 void VoxelAStarGrid3D::_b_on_async_search_completed(TypedArray<Vector3i> path) {
 	_is_running_async = false;
 	emit_signal(VoxelStringNames::get_singleton().async_search_completed, path);
@@ -250,7 +250,7 @@ void VoxelAStarGrid3D::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("debug_get_visited_positions"), &VoxelAStarGrid3D::debug_get_visited_positions);
 
-	// Internal
+	// 内部
 	ClassDB::bind_method(
 			D_METHOD("_on_async_search_completed", "path"), &VoxelAStarGrid3D::_b_on_async_search_completed
 	);

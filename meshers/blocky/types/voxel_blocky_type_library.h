@@ -7,9 +7,8 @@
 
 namespace voxel {
 
-// Library exposing an array of types, for a more high-level system similar to Minecraft blocks. Indices in this array
-// don't matter, but names do. Models, rotations and voxel IDs are automatically generated based on attributes of each
-// type.
+// 暴露类型数组的库，用于类似 Minecraft 数据块的高层系统。此数组中的索引
+// 无关紧要，但名称很重要。模型、旋转和体素 ID 会根据每种类型的属性自动生成。
 class VoxelBlockyTypeLibrary : public VoxelBlockyLibraryBase {
 	GDCLASS(VoxelBlockyTypeLibrary, VoxelBlockyLibraryBase)
 public:
@@ -24,13 +23,13 @@ public:
 
 	int get_model_index_default(StringName type_name) const;
 
-	// Shortcut, doesn't require to specify attribute names.
+	// 快捷方式，无需指定属性名称。
 	int get_model_index_single_attribute(StringName type_name, Variant p_attrib_value) const;
 
-	// Gets model index from a type name and the value of all its attributes. Values can be specified
-	// either as integers, booleans, or their name if they have one.
+	// 从类型名称及其所有属性的值获取模型索引。值可以指定
+	// 为整数、布尔值，或者如果有名称则使用其名称。
 	//
-	// Example of arguments:
+	// 参数示例：
 	//
 	// (&"mygame:button", {
 	//     "direction": VoxelBlockyAttributeDirection.DIR_POSITIVE_Z,
@@ -38,24 +37,24 @@ public:
 	//     "powered": false
 	// })
 	//
-	// Warning: this method is slow. Consider using it in non-intensive code (editing few voxels at a time?), or cache
-	// the result in a variable.
-	// It is slow because:
-	// - Dictionary and each of its keys have to be allocated on the heap
-	// - Dictionary keys can't be `StringName` by design (Godot converts them to `String`, but
-	//   internally the function has to convert them back to `StringName`)
-	// - The function has to iterate the dictionary, which is another thing dictionaries are slow for.
-	//   Dictionary is however used for ease of use, and to match the setter function.
-	// - Attributes have to be sorted and looked up into internal data structures to obtain the actual voxel ID.
+	// 警告：此方法较慢。请考虑在非密集代码中使用（例如一次只编辑少量体素？），或者将
+	// 结果缓存在变量中。
+	// 它很慢是因为：
+	// - Dictionary 及其每个键都必须在堆上分配
+	// - 按设计 Dictionary 键不能是 `StringName`（Godot 会将它们转换为 `String`，但
+	//   函数内部必须将它们转回 `StringName`）
+	// - 函数必须遍历字典，而这正是字典缓慢的另一个原因。
+	//   不过使用 Dictionary 是为了方便，并与 setter 函数保持一致。
+	// - 必须对属性进行排序并在内部数据结构中查找，以获取实际的体素 ID。
 	//
 	int get_model_index_with_attributes(StringName type_name, Dictionary attribs_dict) const;
 
 	Ref<VoxelBlockyType> get_type_from_name(StringName p_name) const;
 
-	// Returned array has two elements:
-	// - The type's name as StringName
-	// - A dictionary where the key is attribute name (unfortunately a String because Godot devs decided to force
-	//   converting StringNames to String in Dictionaries) and value is the current integer value of that attribute.
+	// 返回的数组有两个元素：
+	// - 类型名称（StringName）
+	// - 一个字典，其中键是属性名称（很遗憾是 String，因为 Godot 开发者决定强制
+	//   在 Dictionary 中将 StringName 转换为 String），值是该属性当前的整数值。
 	Array get_type_name_and_attributes_from_model_index(int i) const;
 
 	bool load_id_map_from_string_array(PackedStringArray array);
@@ -67,7 +66,7 @@ public:
 	void get_id_map_preview(PackedStringArray &out_ids, StdVector<uint16_t> &used_ids) const;
 
 private:
-	// Fully qualified name identifying a specific model, as a type and the state of each attribute.
+	// 标识特定模型的完整限定名称，由类型和每个属性的状态组成。
 	struct VoxelID {
 		StringName type_name;
 		VoxelBlockyType::VariantKey variant_key;
@@ -95,13 +94,13 @@ private:
 
 	static void _bind_methods();
 
-	// Unordered. Can contain nulls.
+	// 无序。可能包含 null。
 	StdVector<Ref<VoxelBlockyType>> _types;
 
-	// Maps voxel data indices to fully-qualified model names. This is used to make sure model IDs remain the same, as
-	// long as their type has the same name and attribute values are the same.
-	// Can refer to types that no longer exist.
-	// Indices and size match `_baked_data.models`.
+	// 将体素数据索引映射到完整限定的模型名称。这用于确保模型 ID 保持不变，
+	// 只要其类型具有相同的名称且属性值相同。
+	// 可能引用已不存在的类型。
+	// 索引和大小与 `_baked_data.models` 匹配。
 	StdVector<VoxelID> _id_map;
 };
 

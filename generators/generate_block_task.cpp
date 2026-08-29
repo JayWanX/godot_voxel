@@ -80,9 +80,8 @@ void GenerateBlockTask::run_gpu_task(voxel::ThreadedTaskContext &ctx) {
 	Ref<VoxelGenerator> generator = _stream_dependency->generator;
 	ERR_FAIL_COND(generator.is_null());
 
-	// TODO Broad-phase to avoid the GPU part entirely?
-	// Implement and call `VoxelGenerator::generate_broad_block()`
-
+	// TODO 做宽阶段（broad-phase）以避免完全走 GPU 部分？
+	// 实现并调用 `VoxelGenerator::generate_broad_block()`
 	std::shared_ptr<ComputeShader> generator_shader = generator->get_block_rendering_shader();
 	ERR_FAIL_COND(generator_shader == nullptr);
 
@@ -118,7 +117,7 @@ void GenerateBlockTask::run_gpu_task(voxel::ThreadedTaskContext &ctx) {
 
 	ctx.status = ThreadedTaskContext::STATUS_TAKEN_OUT;
 
-	// Start GPU task, we'll continue after it
+	// 启动 GPU 任务，我们将在它之后继续
 	VoxelEngine::get_singleton().push_gpu_task(gpu_task);
 }
 
@@ -157,19 +156,19 @@ void GenerateBlockTask::run_stream_saving_and_finish() {
 	if (_stream_dependency->valid) {
 		Ref<VoxelStream> stream = _stream_dependency->stream;
 
-		// TODO In some cases we don't want this to run all the time, do we?
-		// Like in full load mode, where non-edited blocks remain generated on the fly...
+		// TODO 某些情况下我们并不希望它一直运行，对吧？
+		// 比如在全量加载模式下，未编辑的数据块仍在实时生成……
 		if (stream.is_valid() && stream->get_save_generator_output()) {
 			VOXEL_PRINT_VERBOSE(
 					format("Requesting save of generator output for block {} lod {}", _position, int(_lod_index))
 			);
 
-			// TODO Optimization: `voxels` doesn't actually need to be shared
+			// TODO 优化：`voxels` 其实不需要共享
 			std::shared_ptr<VoxelBuffer> voxels_copy = make_shared_instance<VoxelBuffer>(VoxelBuffer::ALLOCATOR_POOL);
 			_voxels->copy_to(*voxels_copy, true);
 
-			// No instances, generators are not designed to produce them at this stage yet.
-			// No priority data, saving doesn't need sorting.
+			// 没有实例，生成器在设计上目前还不会产生实例。
+			// 没有优先级数据，保存不需要排序。
 
 			SaveBlockDataTask *save_task = VOXEL_NEW(SaveBlockDataTask(
 					_volume_id, _position, _lod_index, voxels_copy, _stream_dependency, nullptr, false
@@ -205,9 +204,9 @@ void GenerateBlockTask::apply_result() {
 	bool aborted = true;
 
 	if (VoxelEngine::get_singleton().is_volume_valid(_volume_id)) {
-		// TODO Comparing pointer may not be guaranteed
-		// The request response must match the dependency it would have been requested with.
-		// If it doesn't match, we are no longer interested in the result.
+		// TODO 比较指针可能无法保证可靠
+		// 请求的响应必须与请求它时所用的依赖项匹配。
+		// 如果不匹配，说明我们不再关心该结果。
 		if (_stream_dependency->valid) {
 			Ref<VoxelStream> stream = _stream_dependency->stream;
 
@@ -217,8 +216,8 @@ void GenerateBlockTask::apply_result() {
 			o.lod_index = _lod_index;
 			o.dropped = !_has_run;
 			if (stream.is_valid() && stream->get_save_generator_output()) {
-				// We can't consider the block as "generated" since there is no state to tell that once saved,
-				// so it has to be considered an edited block
+				// 我们不能把该数据块视为"已生成"，因为一旦保存就无法判断其状态，
+				// 所以它必须被视为已编辑的数据块
 				o.type = VoxelEngine::BlockDataOutput::TYPE_LOADED;
 			} else {
 				o.type = VoxelEngine::BlockDataOutput::TYPE_GENERATED;
@@ -234,13 +233,12 @@ void GenerateBlockTask::apply_result() {
 		}
 
 	} else {
-		// This can happen if the user removes the volume while requests are still about to return
+		// 这种情况可能发生在请求即将返回时用户移除了 volume
 		VOXEL_PRINT_VERBOSE("Gemerated data request response came back but volume wasn't found");
 	}
 
-	// TODO We could complete earlier inside run() if we had access to the data structure to write the block into.
-	// This would reduce latency a little. The rest of things the terrain needs to do with the generated block could
-	// run later.
+	// TODO 如果能在 run() 内访问到写入数据块所需的数据结构，我们就可以更早完成。
+	// 这能稍微降低延迟。地形需要对该生成数据块做的其余工作可以放到之后执行。
 	if (_tracker != nullptr) {
 		if (aborted) {
 			_tracker->abort();

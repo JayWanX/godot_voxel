@@ -1,150 +1,150 @@
-Performance
+性能
 ================
 
-This section discusses performance-related topics, such as making the voxel engine run fast. It can be more technical than the other sections.
+本节讨论与性能相关的主题，例如如何让体素引擎运行得更快。本节内容可能比其他章节更具技术性。
 
 
-Threads
+线程
 -----------
 
-### Thread count
+### 线程数量
 
-This module uses threads to speed up heavy operations and avoid stalls.
+本模块使用线程来加速繁重的操作并避免卡顿。
 
-Depending on how many threads your CPU can run at the same time, the optimal number of threads can vary. This may also differ for players running your game.
-The module automatically determines the number of threads to use at runtime, based on how many concurrent threads the CPU supports.
+根据 CPU 能同时运行的线程数量，最优的线程数量可能有所不同。这对运行你游戏的玩家来说也可能不同。
+模块会在运行时根据 CPU 支持的并发线程数自动确定要使用的线程数量。
 
-You can change how many threads are allocated in your Project Settings, in the `Voxel` section (if you don't see it, try checking "Advanced Settings").
+你可以在项目设置（Project Settings）的 `Voxel` 部分中更改分配的线程数量（如果看不到，请尝试勾选"高级设置"）。
 
-The automatic calculation will be based on the following properties:
+自动计算将基于以下属性：
 
-Parameter name                              | Type    | Description
+参数名                                  | 类型    | 描述
 --------------------------------------------|---------|-----------------------------------------------------------------
-`voxel/threads/count/minimum`               | `int`   | Minimum amount of threads
-`voxel/threads/count/margin_below_maximum`  | `int`   | How many threads below max concurrent count should be considered maximum. `0` means the maximum concurrent count will be the maximum. `1` means the maximum concurrent count minus 1 will be the maximum.
-`voxel/threads/count/ratio_over_maximum`    | `float` | Portion of max concurrent threads to attempt using, between 0 and 1. For example, `0.5` will attempt to use half of them. The result will be clamped using the other options.
+`voxel/threads/count/minimum`               | `int`   | 线程的最小数量
+`voxel/threads/count/margin_below_maximum`  | `int`   | 比最大并发数低多少应被视为最大值。`0` 表示最大并发数即最大值。`1` 表示最大并发数减 1 即最大值。
+`voxel/threads/count/ratio_over_maximum`    | `float` | 尝试使用的最大并发线程比例，取值在 0 到 1 之间。例如 `0.5` 将尝试使用其中一半。结果会被其它选项钳制。
 
-Several notes:
+几点说明：
 
-- It is recommended to not use all available threads for voxel stuff. Games use more for other things, and players may even do something else in background (such as music, YouTube playlist or voice chat).
-- It is not possible to use zero threads. The module is designed to use threads at the moment.
-- You can check at runtime how many theads are allocated with a script and using `VoxelEngine.get_stats()`. It is also printed if `debug/settings/stdout/verbose_stdout` is enabled in project settings (or `-v` in command line).
-- Changing these settings requires an editor restart (or game restart) to take effect.
+- 建议不要将所有可用线程都用于体素相关任务。游戏还需要更多线程做其它事情，玩家也可能在后台做别的事（如听音乐、播放 YouTube 列表或语音聊天）。
+- 不可能使用零个线程。模块目前的设计就是使用线程的。
+- 你可以在运行时通过脚本使用 `VoxelEngine.get_stats()` 查看分配了多少线程。如果在项目设置中启用了 `debug/settings/stdout/verbose_stdout`（或在命令行加 `-v`），它也会被打印出来。
+- 更改这些设置需要重启编辑器（或重启游戏）才能生效。
 
-### Main thread timeout
+### 主线程超时
 
-Some tasks still have to run on the main thread, and sometimes their total time can exceed the duration of a frame, if we were to add all the remaining things that have to be processed.
+有些任务仍然必须在主线程上运行，有时如果把所有剩余待处理事项加在一起，它们的总耗时可能超过一帧的时长。
 
-To mitigate this, the module has an option to stop processing these tasks beyond a certain amount of milliseconds, and continue them over next frames. In `ProjectSettings`, look for `voxel/threads/main/time_budget_ms`.
+为缓解这种情况，模块提供了一个选项，可以在超过一定毫秒数后停止处理这些任务，并在后续帧中继续处理。在 `ProjectSettings` 中查找 `voxel/threads/main/time_budget_ms`。
 
 
-Rendering
+渲染
 ----------
 
-Terrains are rendered with many unique meshes. That can amount for a lot of draw calls and work for the engine to cull. It is possible to reduce the number of blocks in several ways:
+地形由大量独立网格渲染。这可能产生大量绘制调用，并给引擎的剔除带来很多工作。有几种方法可以减少数据块数量：
 
-- Reduce view distance
-- Reduce LOD distance, if you use `VoxelLodTerrain`
-- Increase mesh block size: they default to 16, but it can be set to 32 instead. This reduces the number of draw calls, but may increase the time it takes to modify voxels.
-
-
-### Slow mesh updates issue with OpenGL
-
-#### Issue
-
-Godot 3.x is using OpenGL, and there is an issue which currently degrades performance of this voxel engine a lot. Framerate is not necessarily bad, but the speed at which voxel terrain updates is very low, compared to what it should be. So far the issue has been seen on Windows, on both Intel or nVidia cards.
-
-Note: Godot 4.x will have an OpenGL renderer, but this issue has not been tested here yet.
-
-#### Workarounds
-
-Note: you don't have to do them all at once, picking just one of them can improve the situation.
-
-- Increase `voxel/threads/main/time_budget_ms` to a value higher than frame time (by default it is about 8 ms, which is half of a frame). However this can slowdown FPS while meshes are updated.
-- Or turn on `debug/settings/stdout/verbose_stdout` in project settings. This internally enables an OpenGL debugging extension, which for some reason fixes the expected timing of OpenGL calls. It's the most effective fix regarding framerate, but has drawbacks because it prints a lot, and was intented as a debugging feature.
-- Or turn off `display/window/vsync/use_vsync` in project settings. Not as effective and eats more resources, but improves performance.
-- Or turn on `display/window/vsync/vsync_via_compositor` in project settings. Not as effective but can improve performance in windowed mode.
-
-#### Explanation
-
-The engine relies a lot on uploading many meshes at runtime, and this cannot be threaded efficiently in Godot 3.x so far. So instead, meshes are uploaded in the main thread, until part of the frame time elapsed. Beyond that time, the engine stops and continues next frame. This is intented to smooth out the load and avoid stutters *caused by the task CPU-side*. Other tasks that cannot be threaded are also put into the same queue, like creating colliders.
-
-Unfortunately, the first call to OpenGL during the frame appears to take a whopping 15 milliseconds *on the CPU*. This happens no matter how heavy the call is. The voxel engine detects that, and immediately stops uploading meshes, thinking it has done too much. As a result, typically only one mesh ends up being uploaded each frame, which is ridiculously low. We could lift the time limit, but if it were to continue running tasks, it would start stuttering due to overshooting the 16ms limit of the frame.
-
-When one workaround is used, like enabling `verbose_stdout`, this slowdown completely disappears. Instead, the "delay" moves at the end of the frame. This has been linked to a debugging OpenGL extension getting turned on.
-For more information, see [Godot issue #52801](https://github.com/godotengine/godot/issues/52801).
+- 减小视距
+- 减小 LOD 距离（如果你使用 `VoxelLodTerrain`）
+- 增大网格数据块尺寸：默认是 16，但可以改为 32。这会减少绘制调用数量，但可能增加修改体素所需的时间。
 
 
-### Slowdown when moving fast with Vulkan
+### OpenGL 下网格更新缓慢的问题
 
-#### Issue
+#### 问题
 
-If you move fast while near a terrain with a lot of chunks (mesh size 16 and high LOD detail), the renderer can cause noticeable slowdowns. This is because Godot4's Vulkan allocator is much slower to destroy mesh buffers than Godot 3 was, and it does that on the main thread. When you move fast, a lot of meshes get created in front of the camera, and a lot get destroyed behind the camera at the same time. Creation is cheap, destruction is expensive.
+Godot 3.x 使用 OpenGL，存在一个问题会大幅降低本体素引擎的性能。帧率不一定差，但体素地形的更新速度远低于应有的水平。到目前为止，该问题已在 Windows 上、Intel 和 nVidia 显卡上出现。
 
-This was observed by profiling with Tracy in a `release_debug` build (typical mode used for official optimized builds):
+注意：Godot 4.x 将提供 OpenGL 渲染器，但此问题尚未在此处测试。
 
-![Screenshot of Tracy profiler showing slow buffer deallocation](images/tracy_profile_slow_vulkan_dealloc.webp)
+#### 解决方法
 
-Lots of buffers get freed on the main thread at the end of the frame, and it can take a while, causing a CPU spike.
-On the other hand, there is no such issue when the same amount of meshes is allocated.
-This issue also was not noticeable in Godot 3.
+注意：你不必同时使用所有方法，只选其中一种即可改善情况。
 
-This problem reproduces specifically when a lot of small meshes are destroyed (small as in 16x16 pieces of terrain, variable size), while a lot of them (thousands) already exist at the same time. Note, some of them are not necessarily visible.
+- 将 `voxel/threads/main/time_budget_ms` 增加到高于帧时长的值（默认为约 8 毫秒，即半帧）。但这样在网格更新期间可能会降低 FPS。
+- 或者在项目设置中开启 `debug/settings/stdout/verbose_stdout`。这会在内部启用一个 OpenGL 调试扩展，出于某种原因它能修正 OpenGL 调用的预期时序。这是对帧率最有效的修复，但也有缺点：它会打印大量内容，而且本意是作为调试功能。
+- 或者关闭项目设置中的 `display/window/vsync/use_vsync`。效果不如前两者，消耗更多资源，但能提升性能。
+- 或者开启 `display/window/vsync/vsync_via_compositor`。效果较差，但在窗口模式下可以改善性能。
 
-#### Workarounds
+#### 原理解释
 
-It is not possible for the module to just "pool the meshes", because when new meshes need to be created, the API requires to create new buffers anyways and drops the old ones (AFAIK). It is also not possible to use a thread on our side because the work is deferred to the end of the frame, not on the call site.
+引擎在很大程度上依赖在运行时上传大量网格，而这在 Godot 3.x 中目前无法高效地线程化。因此，网格在主线程中上传，直到耗尽部分帧时间。超过该时间后，引擎便停止并留到下一帧继续。这是为了平滑负载并避免*由 CPU 端任务引起的*卡顿。其他无法线程化的任务也会放入同一队列，例如创建碰撞体。
 
-A mitigation is in place to smooth the spikes by spreading the amount of destroyed meshes over time, but the slowdown is still noticeable.
+不幸的是，每帧第一次调用 OpenGL 似乎*在 CPU 上*就要花费高达 15 毫秒。无论调用本身有多重都是如此。体素引擎检测到这一点后，会误以为自己做得太多而立即停止上传网格。结果是每帧通常只上传一个网格，这低得离谱。我们可以提高时间限制，但如果它继续运行任务，就会因超过 16 毫秒的帧上限而开始卡顿。
 
-The only workarounds involve limiting the game:
-
-- Increase mesh block size to 32 to reduce their number, at the expense of edition cost
-- Limit the speed at which the player can move when close to voxels
-- Reduce LOD distance so less blocks have to be destroyed, at the expense of quality
+当使用某种解决方法（如启用 `verbose_stdout`）时，这种变慢会完全消失。相反，"延迟"会移到帧的末尾。这与一个被启用的调试用 OpenGL 扩展有关。
+更多信息请参阅 [Godot issue #52801](https://github.com/godotengine/godot/issues/52801)。
 
 
-Physics
+### Vulkan 下快速移动时变慢
+
+#### 问题
+
+如果你在靠近包含大量数据块（网格尺寸 16 且 LOD 细节较高）的地形时快速移动，渲染器可能造成明显的变慢。这是因为 Godot4 的 Vulkan 分配器销毁网格缓冲区的速度远慢于 Godot 3，而且它是在主线程上进行的。当你快速移动时，大量网格在镜头前被创建，同时大量网格在镜头后被销毁。创建很廉价，销毁却很昂贵。
+
+这是通过使用 Tracy 在 `release_debug` 构建（官方优化构建的典型模式）中进行性能分析观察到的：
+
+![Tracy 性能分析器截图，显示缓慢的缓冲区释放](images/tracy_profile_slow_vulkan_dealloc.webp)
+
+大量缓冲区在帧末于主线程上被释放，这可能需要一段时间，导致 CPU 尖峰。
+另一方面，当分配相同数量的网格时，却没有此类问题。
+这个问题在 Godot 3 中也不明显。
+
+该问题会在大量小网格（16x16 的地形小块，大小可变）被销毁、同时已有大量网格（数千个）存在时复现。注意，其中一些网格不一定可见。
+
+#### 解决方法
+
+模块无法简单地"复用网格"，因为当需要创建新网格时，API 要求无论如何都要创建新缓冲区并丢弃旧缓冲区（据我所知）。我们这边也无法使用线程，因为该工作被推迟到帧末执行，而不是在调用点执行。
+
+虽然已加入一种缓解措施，通过把被销毁网格的数量摊开到一段时间内来平滑尖峰，但变慢仍然明显。
+
+唯一的解决方法涉及限制游戏：
+
+- 将网格数据块尺寸增大到 32 以减少其数量，代价是编辑开销增加
+- 当玩家靠近体素时限制其移动速度
+- 减小 LOD 距离以减少必须销毁的数据块数量，代价是质量下降
+
+
+物理
 ----------
 
-The voxel engine offers two different approaches to physics:
-- Standard Physics: the official API Godot exposes through `PhysicsServer3D` (Godot Physics, Godot Jolt...).
-- Box Physics: a small specialized API that only works with axis-aligned boxes on blocky terrain, exposed with `VoxelBoxMover` and voxel raycasts. It is much more limited and requires some setup, but performs faster.
+体素引擎提供两种不同的物理方案：
+- 标准物理：Godot 通过 `PhysicsServer3D` 暴露的官方 API（Godot Physics、Godot Jolt 等）。
+- 盒体物理：一个小型专用 API，仅适用于方块地形上的轴对齐盒体，通过 `VoxelBoxMover` 和体素射线检测暴露。它功能受限较多且需要一些设置，但性能更快。
 
-### Standard Physics
+### 标准物理
 
-#### Mesh colliders simulation
+#### 网格碰撞体模拟
 
-Similar to rendering 16x16x16 or 32x32x32 blocks, the voxel engine uses "mesh" colliders for every terrain block (or "chunk"). These colliders are static and can be concave. Therefore, any terrain shape should be supported, but depends a lot on how performant these colliders are in the underlying physics engine.
+与渲染 16x16x16 或 32x32x32 数据块类似，体素引擎为每个地形数据块（或"区块"）使用"网格"碰撞体。这些碰撞体是静态的，且可以是凹形的。因此，任何地形形状都应受支持，但很大程度取决于底层物理引擎中这些碰撞体的性能表现。
 
-Moving terrain remains possible, but do not expect physics to work correctly on the surface while moving it.
+移动地形仍然是可能的，但在移动过程中不要指望其表面上的物理能正确工作。
 
-#### Tunnelling 
+#### 隧穿
 
-Mesh colliders used by terrain have no "thickness". An object can sit undisturbed outside or inside of it, contrary to convex colliders which usually have a "depenetration force" pushing objects away from their inside. This makes mesh colliders more prone to "tunneling": if an object goes too fast, or is too small relative to its velocity, it can pass through the ground.
+地形使用的网格碰撞体没有"厚度"。物体可以不受干扰地停留在其内部或外部，这与凸碰撞体通常具有将物体从其内部推开的"去穿透力"不同。这使得网格碰撞体更容易发生"隧穿"：如果物体移动过快，或相对其速度而言太小，就可能穿过地面。
 
-- Limit speed of your objects
-- For fast-moving objects (projectiles?), use elongated shapes, or just raycasts, making sure that the "trail" of the shape "connects" between each physics frame
-- Enable Continuous Collision Detection, if the physics engine supports it
-- Check voxel data to find out if a point is underground and move up the object
+- 限制物体的速度
+- 对于快速移动的物体（抛射物？），使用细长形状，或直接使用射线检测，确保形状的"轨迹"在每个物理帧之间"相连"
+- 如果物理引擎支持，启用连续碰撞检测（Continuous Collision Detection）
+- 检查体素数据以判断某点是否在地下，并将物体上移
 
-#### Shape creation is very slow
+#### 创建形状非常慢
 
-Similar to rendering, the voxel engine has to convert voxels into meshes ("meshing"), and does this with our own prioritised pool of threads.
-It will use those meshes as colliders. Creating a collider from a mesh is actually much more expensive than meshing itself (about 3 to 5 times), because it involves creating an acceleration structure to speed up collision detection (BVH, octree...).
+与渲染类似，体素引擎必须将体素转换为网格（"网格化"），并使用我们自己的带优先级的线程池来完成。
+它会将这些网格用作碰撞体。从网格创建碰撞体实际上比网格化本身昂贵得多（大约 3 到 5 倍），因为这涉及创建加速结构（BVH、八叉树等）来加速碰撞检测。
 
-Unfortunately, Godot does not offer a reliable way to safely create these shapes *including their acceleration structure* from within out meshing threads. So instead, we had to defer it all to the main thread, and spread it over multiple frames. This slows down terrain loading tremendously (compared to disabling collisions).
+遗憾的是，Godot 没有提供可靠的方法来在我们的网格化线程中安全地创建*包含其加速结构的*形状。因此，我们不得不把这一切推迟到主线程，并摊开到多帧执行。这极大地拖慢了地形加载速度（与禁用碰撞相比）。
 
-- A [proposal](https://github.com/godotengine/godot-proposals/issues/483) has been opened to expose this issue, still not addressed
-- [Godot Jolt](https://github.com/godotengine/godot/pull/99895) also has this issue, exacerbated by the fact it was implemented to defer shape setup to the very last moment, when entering the scene tree. So even if we were allowed to create mesh colliders from our threads, it still defers all the hard work to the main thread.
+- 已有一个[提案](https://github.com/godotengine/godot-proposals/issues/483)提出此问题，但尚未解决
+- [Godot Jolt](https://github.com/godotengine/godot/pull/99895) 也有此问题，而且由于它被实现为把形状设置推迟到最后一刻（进入场景树时），问题更加严重。因此即使允许我们从线程创建网格碰撞体，它仍会把所有繁重工作推迟到主线程。
 
 
-Voxel Iteration order
+体素迭代顺序
 -----------------
 
-In this engine, voxels are stored in flat arrays indexed in ZXY order. Y is the "deepest" coordinate: when iterating a `VoxelBuffer` of dimensions `(size.x, size.y, size.z)`, adding 1 to the Y coordinate is equivalent to advancing by 1 element in memory. Conversely, adding 1 to the X coordinate advances by `size.y` elements, and adding 1 to the Z coordinate advances by `(size.x * size.y)` elements.
+在本引擎中，体素存储在以 ZXY 顺序索引的扁平数组中。Y 是最"深"的坐标：当迭代一个尺寸为 `(size.x, size.y, size.z)` 的 `VoxelBuffer` 时，Y 坐标加 1 相当于在内存中前进 1 个元素。反之，X 坐标加 1 前进 `size.y` 个元素，Z 坐标加 1 前进 `(size.x * size.y)` 个元素。
 
-Therefore, for cache locality, iterating voxels is best done in this order:
+因此，为了缓存局部性，迭代体素最好按以下顺序进行：
 
 ```
 for z in size.z:
@@ -154,192 +154,192 @@ for z in size.z:
             # ...
 ```
 
-The only reason for this particular choice was that most games use Y as the vertical coordinate, so some operations can be done quickly alongside the vertical axis. It was decided in early days of the project and was kept for consistency. But generally, this convention should only matter if you are working on low-level code.
+做出这一特定选择的唯一原因是：大多数游戏将 Y 作为垂直坐标，因此一些操作可以沿垂直轴快速完成。这是在项目早期决定的，并一直保留以保持一致性。但一般来说，这种约定只在你处理底层代码时才重要。
 
 
 GDScript
 ----------
 
-GDScript is already quite slow to perform intensive operations such as doing 3D for loops to process voxel buffers with complex conditions. You may use it that way for prototyping, but it is not scalable. Another approach is to use it as a "logic glue" to compose lower-level functions together that do the expensive work, such as `VoxelTool` or `VoxelBuffer` methods, or delegating to graphs.
+对于处理体素缓冲区等涉及复杂条件的 3D for 循环这类密集操作，GDScript 已经相当慢。你可以用它来快速原型验证，但它不可扩展。另一种做法是把它当作"逻辑胶水"，把完成繁重工作的底层函数组合起来，例如 `VoxelTool` 或 `VoxelBuffer` 的方法，或者委托给图表。
 
-It also suffers from a significant performance penalty when used inside multiple threads in editor tests. This is especially relevant when implementing `VoxelGeneratorScript` for example. When run from the editor, Godot uses debug synchronization primitives that hugely slow down function calls, to the point using less threads could make your code faster. This issue is not present in exported builds.
+在编辑器测试中多线程使用时，它还会产生显著的性能损失。这在实现 `VoxelGeneratorScript` 时尤其明显。当从编辑器运行时，Godot 使用调试同步原语，这会极大拖慢函数调用，以至于使用更少的线程反而可能让代码更快。这个问题在导出的构建中不存在。
 
 
-Access to voxels from different threads
+从不同线程访问体素
 -----------------------------
 
-This section explains in more detail how multithreading is implemented with voxel storage, and what are the implications when you access and modify voxels.
+本节更详细地解释体素存储中多线程的实现方式，以及访问和修改体素时的注意事项。
 
 
-### The problem
+### 问题
 
-Up to version `godot3.2.3` of the module, reading and writing to voxels did not care about multithreading. It was possible to access them without locking, because all the threaded operations using them (saving and meshing) were given copies of the voxels, made on the main thread.
+在模块的 `godot3.2.3` 版本之前，读写体素并不考虑多线程。可以在不加锁的情况下访问它们，因为所有使用它们的线程化操作（保存和网格化）拿到的都是体素的副本，这些副本在主线程上制作。
 
-This made things simple, however it causes several issues.
+这使事情变得简单，但会引发几个问题。
 
-- If threads are unable to consume tasks faster than they are issued, copies of voxel data will keep accumulating rapidly and make the game run out of memory.
-- Copying blocks and their neighbors takes time and is potentially wasteful because it's not guaranteed to be used.
-- It assumes the threaded task will only need to access a specific block at a fixed LOD, which is not always the case in other voxel engines (such as UE4 Voxel Plugin by Phyronnaz). For example, Transvoxel running on a big block may attempt to access higher-resolution blocks to better approximate the isosurface, which is not possible with the current approach.
-
-
-### Internal changes
-
-The old design starts to change in version `godot3.2.4`. Copies aren't made preemptively on the main thread anymore, and are done in the actual threaded task instead. This means accessing voxels now require to lock the data during each transaction, to make sure each thread gets consistent data.
-Locking is required **if you access voxels which are part of a multithreaded volume**, like a terrain present in the scene tree. You don't need to if you know the data is not used by any other thread, like inside generators, custom streams, known copies or other storage not owned by an active component of the voxel engine.
-
-#### RWLocks per VoxelBuffer
-
-The locking strategy was initially implemented by adding an `RWLock` on every `VoxelBuffer`. Such locks are read-write-locks, also known as shared mutexes.
-
-While simple, this method meant that if you had a 16x16x16 loaded terrain area containing voxels, you'd have to allocate 4,096 `RWLocks` from the system, and lock them all if a region needed to be accessed. For example, updating a mesh means accessing a block and its 26 neighbors, so 27 locks. They also had to be locked in a specific order, because two threads trying to lock multiple blocks in different order would lead to a dead-lock, freezing the game.
-`RWLock` is also quite heavy on Windows, taking 244 bytes (half of the base data structure for data blocks).
-Besides, certain platforms (such as consoles or mobile systems) might not allow creating that many locks.
-
-#### Spatial lock (17/06/2023)
-
-Later on, `RWLocks` were removed from `VoxelBuffer`. They were replaced with `SpatialLock3D`.
-
-A spatial lock is just a list of boxes protected by a mutex. If you want to read voxels in a specific area, try adding that box to the list, and remove it once you're done. If you want to also write voxels, tag that box as "write mode".
-The spatial lock will block locking attempts if an existing box in "write mode" is intersecting yours, while allowing multiple "read mode" boxes to overlap. It essentially acts the same as `RWLock`, except only one short-duration mutex is used to protect the list, and there is no need for thousands of them to exist.
-This approach requires the same amount of locks regardless of the size of the box.
-
-#### Read and write
-
-Multiple threads can read the same block, but only one can modify it at once. If a thread wants to modify the block while it is already locked for *read*, the thread will be blocked until all other threads finished reading it. This can cause stutter if done too often on the main thread, so if it becomes a problem, a possible solution is to lock for *read*, copy the block and then modify it (Copy-on-Write). Another solution is to run expensive modifications in a thread and use "try lock" instead of "lock", delaying the task instead of blocking the thread.
+- 如果线程消耗任务的速度跟不上任务产生的速度，体素数据的副本就会迅速累积，导致游戏内存耗尽。
+- 复制数据块及其邻居需要时间，而且可能造成浪费，因为不保证会被用到。
+- 它假定线程化任务只需要访问特定 LOD 下的特定数据块，但在其他体素引擎（如 Phyronnaz 的 UE4 Voxel Plugin）中并不总是如此。例如，在大型数据块上运行的 Transvoxel 可能会尝试访问更高分辨率的数据块以更好地逼近等值面，而当前的方法无法做到。
 
 
-### Editing voxels efficiently
+### 内部变化
 
-This matters for scripters.
+旧设计在 `godot3.2.4` 版本开始改变。副本不再在主线程上预先制作，而是在实际的线程化任务中进行。这意味着访问体素现在需要在每次事务期间锁定数据，以确保每个线程获得一致的数据。
+如果你访问**多线程体积的一部分**的体素（例如场景树中的地形），则需要加锁。如果你确定数据不被任何其他线程使用（例如生成器内部、自定义数据流、已知的副本或不由体素引擎活动组件拥有的其他存储），则无需加锁。
 
-If you use `VoxelTool`, all locking mechanisms are handled for you automatically. However, you must be aware that it doesn't come for free: if you want to access voxels randomly and modify them randomly, you will pretty much get the worst overhead. If you want to access a well-defined region and you know where to read, and where to write ahead of time, then optimizing becomes possible.
+#### 每个 VoxelBuffer 的 RWLock
 
-For example, *on a terrain node*, `VoxelTool.get_voxel` or `set_voxel` are the simplest, yet the slowest way to modify voxels. This is not only because of locking, but also because the engine has to go all the way through several data structures to access the voxel. This is perfectly fine for small isolated edits, like the player digging or building piece by piece. 
+锁策略最初是通过在**每个** `VoxelBuffer` 上添加 `RWLock` 实现的。这种锁是读写锁，也称为共享互斥锁。
 
-This is what happen when you change a single voxel in a terrain (as of 17/06/2023. May also vary depending on the operation and terrain configuration):
+虽然简单，但这种方法意味着：如果你有一个包含体素的 16x16x16 已加载地形区域，就需要从系统分配 4,096 个 `RWLock`，并且访问某个区域时必须全部锁定。例如，更新网格意味着访问一个数据块及其 26 个邻居，也就是 27 个锁。它们还必须按特定顺序锁定，因为两个线程以不同顺序锁定多个数据块会导致死锁，使游戏冻结。
+在 Windows 上 `RWLock` 也相当重，占 244 字节（是数据块基础数据结构的一半）。
+此外，某些平台（如主机或移动系统）可能不允许创建这么多锁。
 
-- Your voxel position is converted into block coordinates
-- The map containing blocks is locked (so we are sure nothing else modifies it as we access it)
-- The block is queried. If it isn't loaded, the edit will fail as "area not editable".
-- If the block is loaded but does not cache voxel data (in some configurations, non-edited blocks do not store data), the whole block will be generated on the spot using `VoxelGenerator` and modifiers and will be inserted in the map.
-- The map containing blocks is unlocked
-- The block itself gets locked in Write mode. Nothing else can access it. If something else is already using the block, the current thread will block until it unlocks.
-- Your voxel position is converted into block-relative voxel position and bound-checked
-- The voxel channel is accessed: if it contains no voxel data due to the whole block containing the same value (optimization), data will get allocated so that the voxel you are modifying can take a different value.
-- The channel's format is checked: coming from a script, the value you pass could be a 64-bit integer or a float, but channel data may be 8, 16, 32 or 64 bits with various encodings. By default, it is 16 bits, so the value may get clamped and encoded.
-- The value actually gets stored
-- The block is unlocked and marked as modified
-- The terrain is notified that a change occurred in the block you edited.
-- If the terrain has a mesher, a re-meshing task will be scheduled (if not already done so far) to update visuals and maybe collisions.
-- If the terrain has a network synchronizer, it will schedule an "area changed" RPC message.
-- If the terrain has a VoxelInstancer, it will check if instances lost contact with ground.
+#### 空间锁（17/06/2023）
 
-As you can see, a lot is going on with a single voxel. Repeating this all over for many voxels is not efficient.
-That's why bulk edits may be preferred, because a lot of these operations will happen only once for the whole edit, an the only thing that will get executed many times is the actual voxel data changes.
+后来，`RWLock` 从 `VoxelBuffer` 中移除，被 `SpatialLock3D` 取代。
 
-If you want to excavate whole chunks or generating structures, try to use specialized bulk functions instead, such as `do_sphere()`, `do_box()`, `raycast` or `paste()`. These will be more efficient because they can cache data structures on the way and perform locking in the best way they can.
+空间锁只是一个由互斥锁保护的盒体列表。如果你想读取特定区域的体素，尝试将该盒体加入列表，完成后将其移除。如果还要写入体素，则将该盒体标记为"写入模式"。
+如果列表中已有处于"写入模式"的盒体与你的盒体相交，空间锁会阻塞加锁尝试，同时允许多个"读取模式"的盒体重叠。它的作用本质上与 `RWLock` 相同，只不过只需一个短时互斥锁来保护列表，也无需存在成千上万个锁。
+这种方法所需的锁数量与盒体大小无关。
 
-If your changes are very custom or depend on a lot of pre-existing voxels, you can use `copy()` to extract a chunk of voxels into a `VoxelBuffer` so you can read them very fast without locking. You can even choose to do your changes on that same buffer, and finally use `paste()` when you're done.
+#### 读与写
+
+多个线程可以同时读取同一数据块，但同一时刻只能有一个线程修改它。如果一个线程想在数据块已被*读取*锁定的情况下修改它，该线程将被阻塞，直到所有其他线程读取完毕。如果这在主线程上过于频繁地发生，会导致卡顿，所以如果这成为问题，一个可行的解决方案是获取*读取*锁、复制数据块然后修改它（写时复制）。另一个方案是在线程中执行昂贵的修改，并使用"尝试加锁"而非"加锁"，从而推迟任务而不是阻塞线程。
 
 
-Tuning `VoxelGeneratorGraph`
+### 高效编辑体素
+
+这对脚本编写者很重要。
+
+如果你使用 `VoxelTool`，所有锁定机制都会自动为你处理。但你必须意识到这并非没有代价：如果你要随机访问和随机修改体素，你将获得最差的开销。如果你要访问一个明确定义的区域，并且提前知道在哪里读取、在哪里写入，那么优化就成为可能。
+
+例如，*在地形节点上*，`VoxelTool.get_voxel` 或 `set_voxel` 是修改体素最简单却也最慢的方式。这不仅是因为加锁，还因为引擎必须一路穿过多个数据结构才能访问体素。对于小规模、零散的编辑（例如玩家一块一块地挖掘或建造）来说，这完全没问题。
+
+这就是你在地形中修改单个体素时发生的过程（截至 17/06/2023。也可能因操作和地形配置而异）：
+
+- 你的体素位置被转换为数据块坐标
+- 包含数据块的映射被锁定（这样我们就能确保在访问时没有其他东西修改它）
+- 查询数据块。如果未加载，编辑将以"区域不可编辑"失败。
+- 如果数据块已加载但没有缓存体素数据（在某些配置下，未编辑的数据块不存储数据），将使用 `VoxelGenerator` 和修改器就地生成整个数据块，并插入到映射中。
+- 包含数据块的映射被解锁
+- 数据块本身以写入模式被锁定。其他任何东西都不能访问它。如果已有其他东西正在使用该数据块，当前线程将阻塞，直到它解锁。
+- 你的体素位置被转换为相对于数据块的体素位置，并进行边界检查
+- 访问体素通道：如果由于整个数据块包含相同值（优化）而没有体素数据，则会分配数据，以便你修改的体素可以取不同的值。
+- 检查通道格式：来自脚本时，你传入的值可能是 64 位整数或浮点数，但通道数据可能是 8、16、32 或 64 位，且具有各种编码。默认情况下为 16 位，因此该值可能会被钳制和编码。
+- 值实际被存储
+- 数据块被解锁并标记为已修改
+- 地形收到通知：你编辑的数据块中发生了变化。
+- 如果地形有网格化器，将调度一个重新网格化任务（如果之前没有调度过）以更新视觉效果，可能还有碰撞。
+- 如果地形有网络同步器，它将调度一条"区域已更改"的 RPC 消息。
+- 如果地形有 `VoxelInstancer`，它将检查实例是否与地面失去接触。
+
+如你所见，单个体素就涉及很多操作。对许多体素反复这样做是低效的。
+这就是为什么批量编辑更受青睐：其中很多操作对整个编辑只发生一次，唯一会被多次执行的是实际的体素数据修改。
+
+如果你想挖掘整个区块或生成结构，请尽量使用专门的批量函数，例如 `do_sphere()`、`do_box()`、`raycast` 或 `paste()`。这些函数更高效，因为它们可以在过程中缓存数据结构，并以最佳方式进行加锁。
+
+如果你的修改非常定制化，或依赖大量已存在的体素，你可以使用 `copy()` 将一块体素提取到 `VoxelBuffer` 中，以便不加锁地快速读取。你甚至可以决定在同一个缓冲区上执行修改，最后使用 `paste()` 完成。
+
+
+调优 `VoxelGeneratorGraph`
 -------------------------------
 
-`VoxelGeneratorGraph` uses a number of optimization strategies to make the calculations faster. You may want to fine-tune them in some cases depending on the kind of volume you want to generate, although it should run ok by default. When you get more familiar with the tool it may be useful to know how it works under the hood, notably to troubleshoot generation issues when they occur.
+`VoxelGeneratorGraph` 使用多种优化策略来加速计算。在某些情况下，你可能希望根据要生成的体积类型对其进行微调，尽管默认情况下它应该运行良好。当你更熟悉该工具后，了解它在底层是如何工作的可能会很有用，尤其是在排查生成问题时。
 
-### Buffer processing (CPU)
+### 缓冲区处理（CPU）
 
-Contrary to many node-based or expression tools existing in Godot so far, voxel graphs are not tailored to run on voxels one by one. The main use case is to process a bunch of them. Indeed, for a 16x16x16 block, there are 4096 voxels to generate. That would mean traversing the entire graph 4096 times, and the cost of doing that individually can exceed the cost of the calculations themselves. Besides, switching constantly between node types to run different operations is not CPU-friendly due to all the jumps required.
+与 Godot 目前已有的许多基于节点或表达式的工具不同，体素图表并非为逐个处理体素而设计。主要用例是成批处理它们。确实，对于一个 16x16x16 的数据块，需要生成 4096 个体素。这意味着要遍历整个图表 4096 次，而单独遍历的成本可能超过计算本身的成本。此外，在节点类型之间不断切换以执行不同的操作对 CPU 也不友好，因为需要大量跳转。
 
-So instead, outputs of each node are associated small buffers for a subset of the voxels, say, a 16x16 slice. Then, the graph is traversed once ahead-of-time to obtain a simple list of operations. It is guaranteed that if a node depends on another, the other will have run before.
+因此，每个节点的输出会为体素的子集关联小型缓冲区，例如一个 16x16 的切片。然后，图表会预先遍历一次，得到一个简单的操作列表。这样可以保证：如果一个节点依赖另一个节点，另一个节点会先执行。
 
-![Graph to operations schema](images/voxel_graph_operation_list.webp)
+![图表到操作的示意图](images/voxel_graph_operation_list.webp)
 
-Finally, the generator executes the list, node by node, and each node computes a bunch of voxels at once instead of just one. This ensures that the CPU is almost exclusively used for the operations themselves, providing performance similar to C++, while graph traversal becomes neglibible. It also offers the opportunity to use [SIMD](https://en.wikipedia.org/wiki/SIMD) very easily, which can be even faster than if the code was written in plain C++.
+最后，生成器逐个节点执行该列表，每个节点一次计算一批体素而不是只算一个。这确保 CPU 几乎完全用于操作本身，提供与 C++ 相当的性能，而图表遍历的开销可忽略不计。它还提供了轻松使用 [SIMD](https://en.wikipedia.org/wiki/SIMD) 的机会，这甚至可能比用纯 C++ 编写的代码更快。
 
-Buffer processing is mostly an internal detail so there are no particular settings on the scripting API.
+缓冲区处理主要是内部细节，因此脚本 API 上没有特别的设置。
 
-### Range analysis (CPU)
+### 范围分析（CPU）
 
-Before processing voxels in a specific region of space (a box), the generator first runs a [range analysis](https://en.wikipedia.org/wiki/Interval_arithmetic) pass. Each node has an alternative implementation using intervals, with the sole purpose of estimating the range of values it will output in the area. It's like a broad-phase before the heavy work.
+在处理空间中特定区域（一个盒体）的体素之前，生成器首先会执行一遍[范围分析](https://en.wikipedia.org/wiki/Interval_arithmetic)。每个节点都有一个使用区间的替代实现，其唯一目的是估算该区域中输出的值范围。这就像繁重工作之前的粗测阶段。
 
-It is possible to inspect results of this pass in the editor by enabling it with the `Analyse range` button. The analysis will focus on the box specified in the dialog, which will appear as a yellow wireframe in the 3D viewport.
+你可以在编辑器中通过 `Analyse range` 按钮启用该功能来查看此遍的结果。分析将聚焦于对话框中指定的盒体，该盒体会在 3D 视口中以黄色线框显示。
 
-![Analyse range editor screenshot](images/range_analysis_dialog.webp)
+![范围分析编辑器截图](images/range_analysis_dialog.webp)
 
-You can also hover the output label of any node to see what range was calculated for it:
+你也可以悬停在任意节点的输出标签上，查看为其计算出的范围：
 
-![Range analysis tooltips](images/range_analysis_tooltip.webp)
-
-!!! note
-    Noise is typically between -1 and 1, but we take it a step further. Ranges are approximated using maximum derivatives, which is how fast noise can vary along a given distance. Each noise algorithm has its own. We calculate noise at the center of the box, and add half of the maximum derivative, positively and negatively. In other words, in the box, we know noise cannot exceed the central value + the maximum variation along extents of the box. At close range, this can successfully detect valleys and hills, without fully computing them.
-
-Results of this pass are used for several optimization techniques described below.
-
-### SDF clipping (CPU)
-
-3D volumes represented with meshes to form a terrain have an interesting property: to generate them, we are mostly interested in the areas where voxel values are crossing the isolevel (zero). That means we could completely discard regions of space that are guaranteed to never get near zero, and simplify them to a single value (like "only matter" or "only air"). Doing that in 3 dimensions has tremendous speed implications so it is a major feature of this generator.
-
-Range analysis is used to perform this optimization. In a given area, if the maximum value of SDF is lower than a threshold below zero, then the whole block is skipped and assigned a uniform negative value. The same happens with a threshold above zero.
-
-It is possible to choose that threshold with the `sdf_clip_threshold` property in the inspector. If given an extremely large value like `10000`, it will essentially turn off this optimization.
-
-It is exposed because in some situations, clipping can cause artifacts when the edge of a block is too close from a clipped one. Indeed, clipping blocks cause discontinuities in the distance field.
-
-![Sdf clipping schema](images/sdf_clipping.webp)
-
-Usually they happen far enough from the surface to be of any concern, but sometimes they can come close if the threshold is too low:
-
-![Sdf clipping artifacts](images/sdf_clipping_artifacts.webp)
-
-So by default the threshold is above zero and should cover most cases.
-
-It is also possible to instruct the generator to invert clipped blocks, which will make them stand out:
-
-![Sdf clipping debug](images/sdf_clip_debug.webp)
-
-
-### Local optimization (CPU)
-
-Conditionals (`if/else`) are not supported by this voxel graph implementation. The main reason is because of the buffer processing approach. The CPU can churn through buffers very fast, but branching on a per-voxel basis would disrupt it. Besides, range analysis might get a lot more complicated if branching was added. They can exist within nodes, but cannot exist as a graph-level primitive. So the usual approach is to blend things by mixing, adding, subtracting parts of the graph. But when a graph becomes big, even with SDF clipping, performance could be better. Conditionals are often used to optimize locally, so how can we do this without?
-
-Let's consider an example world made of two biomes, each generated with a big node setup, and blended together across the world's X axis.
-
-![Two biomes](images/biomes.webp)
-
-If we don't optimize this, both biomes will constantly get calculated at every point of space close enough to the surface. But if we look at the range analysis we performed earlier, and focus on one of the biomes, we notice that the range of values received by the `Mix` node are such that only one biome is blended. In other words, one of the inputs of `Mix` has no effect on its result, and is therefore ignored there.
-
-![Ignored input](images/range_of_ignored_input.webp)
-
-So each biome then only computes its own branch when far away enough from the blending area:
-
-![Ignored biome range debug](images/biomes_optimization.png)
-
-Thanks again to range analysis, the generator is able to detect this locally, and *dynamically skips whole branches of nodes* if they are found to not affect the final result. Therefore, it is not required to add conditionals for this use case, it's done automatically. You can visualize this by turning on the analysis tool, which will grey out nodes that are ignored in the specified area.
-
-Internally, the generator parses the graph locally (using a faster data structure since the graph is compiled) to obtain an alternative list of operations. This list is currently nicknamed an `execution map`, because it maps the full list of operations to a reduced one.
-
-![Execution map schema](images/voxel_graph_operation_list_optimized.webp)
-
-This setting can be toggled in the inspector.
+![范围分析提示](images/range_analysis_tooltip.webp)
 
 !!! note
-    This feature may be more or less precise depending on the range of values parts of the graph are producing. So it is possible that two different graphs providing the same result can run at different speeds. For this reason, analysing ranges can prove useful to understand why parts of the graph are still computed.
+    噪声通常在 -1 到 1 之间，但我们更进一步。范围使用最大导数近似，也就是噪声沿给定距离的变化速度。每种噪声算法都有自己的最大导数。我们计算盒体中心的噪声，并正负加上最大导数的一半。换句话说，在盒体内，我们知道噪声不会超过中心值加上沿盒体范围的最大变化量。在近距离内，这可以成功检测出山谷和山丘，而无需完整计算它们。
+
+这一遍的结果用于下面描述的多种优化技术。
+
+### SDF 裁剪（CPU）
+
+以网格表示地形体积的 3D 体积有一个有趣的特性：要生成它们，我们主要关心体素值穿过等值面（零）的区域。这意味着我们可以完全丢弃保证永远不会接近零的空间区域，并将其简化为单一值（如"仅实体"或"仅空气"）。在三维空间中这样做会带来巨大的速度提升，因此这是该生成器的一个重要特性。
+
+范围分析被用来执行这种优化。在给定区域中，如果 SDF 的最大值低于零以下的一个阈值，则整个数据块被跳过并赋予统一的负值。阈值高于零时也是如此。
+
+你可以在检查器中通过 `sdf_clip_threshold` 属性选择该阈值。如果给定一个极大的值（如 `10000`），它基本上会关闭这种优化。
+
+之所以暴露该属性，是因为在某些情况下，当一个数据块的边缘离被裁剪的数据块太近时，裁剪会造成伪影。确实，裁剪数据块会在距离场中造成不连续。
+
+![SDF 裁剪示意图](images/sdf_clipping.webp)
+
+通常它们发生在离表面足够远的地方，不足为虑，但有时如果阈值过低，它们也可能靠得很近：
+
+![SDF 裁剪伪影](images/sdf_clipping_artifacts.webp)
+
+因此默认情况下阈值高于零，应能覆盖大多数情况。
+
+你也可以指示生成器反转被裁剪的数据块，使它们突出显示：
+
+![SDF 裁剪调试](images/sdf_clip_debug.webp)
 
 
-### Subdivision (CPU)
+### 局部优化（CPU）
 
-Previous optimizations are tied to the size of the considered area. The bigger the area, the less precise they will be. For example, with a larger box, it is more likely to find a place where voxels produce a surface. It is also more likely for more biomes or other shapes to appear and blend together. Besides, changing the size of our world chunks isn't a light decision.
+此体素图表实现不支持条件语句（`if/else`）。主要原因在于缓冲区处理的方式。CPU 可以非常快速地处理缓冲区，但逐体素分支会打乱这一流程。此外，如果加入分支，范围分析可能会复杂得多。分支可以存在于节点内部，但不能作为图表层面的原语。所以通常的做法是通过混合、相加、相减图表的部分来混合事物。但当图表变大时，即使有 SDF 裁剪，性能仍可能更好。条件语句常用于局部优化，那么没有它我们该怎么做？
 
-So a simple improvement is to tell the generator to further subdivide itself the region of space it works on. Usually a subdivision size of 16x16x16 is ok. 8x8x8 is even more precise, but below that size the cost of iteration will eventually exceed the cost of computations again (see Buffer processing). Subdivision sizes must also divide volume block sizes without remainder. This is mostly to avoid having to deal with buffers of different sizes.
+让我们考虑一个由两个生物群系组成的示例世界，每个生物群系由一个大型节点设置生成，并沿世界的 X 轴混合在一起。
+
+![两个生物群系](images/biomes.webp)
+
+如果不优化，两个生物群系都会在靠近表面的每个空间点上被不断计算。但如果我们看看之前进行的范围分析，并聚焦其中一个生物群系，就会发现 `Mix` 节点收到的值范围使得只有一个生物群系被混合。换句话说，`Mix` 的一个输入对其结果没有影响，因此在那里被忽略。
+
+![被忽略的输入](images/range_of_ignored_input.webp)
+
+于是每个生物群系在离混合区域足够远时只计算自己的分支：
+
+![被忽略生物群系范围调试](images/biomes_optimization.png)
+
+再次感谢范围分析，生成器能够在本地检测到这一点，如果发现*整条节点分支*不影响最终结果，就会*动态跳过它们*。因此，对于这种用例无需添加条件语句，它会自动完成。你可以通过打开分析工具来可视化这一点，被忽略的节点在指定区域会变灰。
+
+在内部，生成器会在本地解析图表（由于图表已编译，使用更快的数据结构），以得到替代的操作列表。这个列表目前被昵称为 `execution map`，因为它将完整操作列表映射到精简后的列表。
+
+![执行映射示意图](images/voxel_graph_operation_list_optimized.webp)
+
+此设置可以在检查器中切换。
+
+!!! note
+    该功能的精确程度可能取决于图表各部分产生的值范围。因此，两个结果相同但结构不同的图表可能以不同速度运行。出于这个原因，分析范围可能有助于理解图表某些部分为何仍被计算。
 
 
-### XZ caching (CPU)
+### 细分（CPU）
 
-When generating voxel-based terrains, despite the attractiveness of overhangs, there can be a large part of your generator only relying on the X and Z coordinates. Typically, generating from 2D noise as a base layer is one of these situations.
-When the generator is done with a slice along X and Z, it increases Y and does the slice above. But since 2D noise only depends on X and Z, it would get recomputed again. And noise is expensive.
+前面的优化与所考虑区域的大小相关。区域越大，它们就越不精确。例如，盒体越大，就越可能找到体素产生表面的位置。也越可能有更多生物群系或其他形状出现并混合在一起。此外，更改世界区块的大小并不是一个轻松的决定。
 
-This situation is similar to the following pseudocode:
+所以一个简单的改进是告诉生成器自行进一步细分其工作的空间区域。通常 16x16x16 的细分尺寸就足够了。8x8x8 更精确，但低于该尺寸，迭代成本最终会再次超过计算成本（参见缓冲区处理）。细分尺寸还必须能整除体积数据块尺寸而不产生余数。这主要是为了避免处理不同大小的缓冲区。
+
+
+### XZ 缓存（CPU）
+
+在生成基于体素的地形时，尽管悬垂很有吸引力，但生成器可能有很大一部分只依赖 X 和 Z 坐标。通常，以 2D 噪声作为基础层进行生成就是这种情况之一。
+当生成器处理完一个沿 X 和 Z 的切片后，它会增加 Y 并处理上面的切片。但由于 2D 噪声只取决于 X 和 Z，它会被重新计算。而噪声是昂贵的。
+
+这种情况类似于下面的伪代码：
 
 ```
 for z in size_z:
@@ -348,7 +348,7 @@ for z in size_z:
             set_voxel(x, y, z, noise2d(x, z) + y)
 ```
 
-Typically, to optimize this, you would move out the `noise2d` call into the outer loop, like so:
+通常，要优化这一点，你会把 `noise2d` 调用移到外层循环，像这样：
 
 ```
 for z in size_z:
@@ -358,27 +358,27 @@ for z in size_z:
             set_voxel(x, y, z, n + y)
 ```
 
-This way, the 2D noise is only computed once for each column of voxels along Y, which speeds up generation a lot.
+这样，沿 Y 方向的每一列体素只需计算一次 2D 噪声，大大加快了生成速度。
 
-In Voxel Graphs, the same optimization occurs. When the list of operations is computed, they are put in two groups: `XZ` and `XZY`. All operations that only depend on X and Z are put into the `XZ` group, and others go into the `XZY` group.
-When generating a block of voxels, the `XZ` group is executed once for the first slice of voxels, and the `XZY` group is executed for every slice, re-using results from the `XZ` group.
+在体素图表中也会发生同样的优化。计算操作列表时，它们被分成两组：`XZ` 和 `XZY`。所有只依赖 X 和 Z 的操作都放入 `XZ` 组，其余操作放入 `XZY` 组。
+生成一个体素数据块时，`XZ` 组只对第一批体素执行一次，而 `XZY` 组对每一批都执行，并复用 `XZ` 组的结果。
 
-This optimization only applies on both X and Z axes. It can be toggled in the inspector.
+此优化只适用于 X 和 Z 两条轴。它可以在检查器中切换。
 
 
-### Buffer reduction (CPU)
+### 缓冲区精简（CPU）
 
-The graph attempts to use as few temporary buffers as possible. For example, if you have 10 nodes processing before the output, it won't necessarily allocate 10 unique buffers to store intermediary outputs. Instead, buffers will be re-used for multiple nodes, if that doesn't change the result. Buffers are assigned ahead-of-time, when the graph is compiled. It saves memory, and might improve performance because less data has to be loaded into CPU cache.
-This feature is disabled when the graph is compiled in debug mode, as it allows inspecting the state of each output.
+图表会尽量使用尽可能少的临时缓冲区。例如，如果输出前有 10 个节点在处理，它不一定会分配 10 个独立缓冲区来存储中间输出。相反，如果不会改变结果，缓冲区会被多个节点复用。缓冲区在图表编译时预先分配。这能节省内存，也可能提升性能，因为需要载入 CPU 缓存的数据更少。
+当图表以调试模式编译时，此功能会被禁用，因为它允许检查每个输出的状态。
 
 ### GPU
 
-Earlier sections were related to the CPU backend of `VoxelGeneratorGraph`. There is a GPU backend, which runs very differently. None of the CPU optimization settings apply to that backend.
+前面的章节与 `VoxelGeneratorGraph` 的 CPU 后端相关。还有一个运行方式截然不同的 GPU 后端。上述 CPU 优化设置均不适用于该后端。
 
-The GPU backend will generate a compute shader for each kind of usage (at time of writing: chunk generation, and detail texture rendering). These compute shaders are dispatched from a separate `RenderingDevice`, in a background thread, so while they use the graphics card, they usually don't lead to framerate drops. You can see the generated code using the `Generate Shader` menu in the graph editor.
+GPU 后端会为每种用途生成一个计算着色器（在编写本文时：区块生成和细节纹理渲染）。这些计算着色器从独立的 `RenderingDevice` 在后台线程中分发，因此虽然它们使用显卡，但通常不会导致帧率下降。你可以使用图表编辑器中的 `Generate Shader` 菜单查看生成的代码。
 
-Shader compilation is done on a separate thread as well, and can take a while depending on the complexity of your graph. It can be noticed if the first chunk takes an unusual amount of time to generate.
-If you notice this but still want to use the GPU backend, you may simplify your graph:
-- Reduce the number of noise nodes, in particular `FastNoiseLite`. While this node gets the same results as the CPU version, it's a huge library in regard to shaders, and the more calls there are, the more complex compilation will get (either from GLSL to SPIRV, but also from SPIRV to GPU-specific format).
-- Use less complex noise types. Cellular kinds are more costly.
-- Replace noise nodes with image nodes that seamlessly repeat, i.e bake noise up-front. This is also faster to execute, at the cost of eventual repetition. Combining them at different rates can make it less obvious.
+着色器编译也在单独的线程上进行，根据图表的复杂程度可能需要一段时间。如果第一个区块花费了异常长的时间生成，你可能会注意到这一点。
+如果你注意到这个问题但仍想使用 GPU 后端，可以简化图表：
+- 减少噪声节点的数量，尤其是 `FastNoiseLite`。虽然该节点与 CPU 版本得到相同结果，但就着色器而言它是一个庞大的库，调用越多，编译就会越复杂（不仅从 GLSL 到 SPIRV，还有从 SPIRV 到 GPU 专用格式）。
+- 使用较不复杂的噪声类型。细胞类噪声更昂贵。
+- 用无缝重复的图像节点替换噪声节点，即预先烘焙噪声。执行也更快，代价是最终会出现重复。以不同速率组合它们可以使其不那么明显。

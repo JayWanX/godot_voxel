@@ -21,19 +21,19 @@ bool create_empty_file(String fpath) {
 
 bool remove_dir_if_exists(const char *p_dirpath) {
 	String dirpath = p_dirpath;
-	// If this is an empty string we could end up deleting the whole project, don't risk that
+	// 如果这是空字符串，我们可能会删掉整个项目，不要冒这个险
 	ERR_FAIL_COND_V(dirpath.is_empty(), false);
 
 	Ref<DirAccess> da = DirAccess::open(".");
 	if (da->dir_exists(dirpath)) {
 		String prev_dir = da->get_current_dir();
 
-		// Note, this does not change the working directory of the application.
-		// Very important to do that first, otherwise `erase_contents_recursive` would erase the whole project
+		// 注意，这不会改变应用程序的工作目录。
+		// 必须先做这一步，非常重要，否则 `erase_contents_recursive` 会擦除整个项目
 		const Error cd_err = da->change_dir(dirpath);
 		ERR_FAIL_COND_V(cd_err != OK, false);
 
-		// `remove` fails if the directory is not empty
+		// 如果目录非空，`remove` 会失败
 		const Error contents_remove_err = voxel::godot::erase_directory_contents_recursive(**da);
 		ERR_FAIL_COND_V(contents_remove_err != OK, false);
 		// OS::get_singleton()->move_to_trash(dirpath); // ?
@@ -41,7 +41,7 @@ bool remove_dir_if_exists(const char *p_dirpath) {
 		const Error cd_err2 = da->change_dir(prev_dir);
 		ERR_FAIL_COND_V(cd_err2 != OK, false);
 
-		// Remove empty dir
+		// 移除空目录
 		const Error remove_err = da->remove(dirpath);
 		ERR_FAIL_COND_V(remove_err != OK, false);
 	}

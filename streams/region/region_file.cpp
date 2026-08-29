@@ -13,7 +13,7 @@ namespace voxel {
 namespace {
 const uint8_t FORMAT_VERSION = 3;
 
-// Version 2 is like 3, but does not include any format information
+// 版本 2 与版本 3 类似，但不包含任何格式信息
 const uint8_t FORMAT_VERSION_LEGACY_2 = 2;
 // const uint8_t FORMAT_VERSION_LEGACY_1 = 1;
 
@@ -33,7 +33,7 @@ bool RegionFormat::validate() const {
 	ERR_FAIL_COND_V(region_size.z < 0 || region_size.z >= static_cast<int>(MAX_BLOCKS_ACROSS), false);
 	ERR_FAIL_COND_V(block_size_po2 <= 0, false);
 
-	// Test worst case limits (this does not include arbitrary metadata, so it can't be 100% accurrate...)
+	// 测试最坏情况下的限制（这不包含任意元数据，因此无法做到 100% 准确……）
 	size_t bytes_per_block = 0;
 	for (unsigned int i = 0; i < channel_depths.size(); ++i) {
 		bytes_per_block += VoxelBuffer::get_depth_bit_count(channel_depths[i]) / 8;
@@ -58,8 +58,8 @@ bool RegionFormat::verify_block(const VoxelBuffer &block) const {
 namespace {
 
 uint32_t get_header_size_v3(const RegionFormat &format) {
-	// Which file offset blocks data is starting
-	// magic + version + blockinfos
+	// 区块数据从哪个文件偏移量开始
+	// 魔数 + 版本 + 数据块信息
 	return MAGIC_AND_VERSION_SIZE + FIXED_HEADER_DATA_SIZE + (format.has_palette ? PALETTE_SIZE_IN_BYTES : 0) +
 			Vector3iUtil::get_volume_u64(format.region_size) * sizeof(RegionBlockInfo);
 }
@@ -70,7 +70,7 @@ bool save_header(
 		const RegionFormat &format,
 		const StdVector<RegionBlockInfo> &block_infos
 ) {
-	// `f` could be anywhere in the file, we seek to ensure we start at the beginning
+	// `f` 可能位于文件的任意位置，我们通过 seek 确保从开头开始
 	f.seek(0);
 
 	voxel::godot::store_buffer(f, Span<const uint8_t>(reinterpret_cast<const uint8_t *>(FORMAT_REGION_MAGIC), 4));
@@ -101,7 +101,7 @@ bool save_header(
 		f.store_8(0x00);
 	}
 
-	// TODO Deal with endianness, this should be little-endian
+	// TODO 处理字节序问题，这里应使用小端
 	voxel::godot::store_buffer(
 			f,
 			Span<const uint8_t>(
@@ -174,7 +174,7 @@ bool load_header(
 	out_version = version;
 	out_block_infos.resize(Vector3iUtil::get_volume_u64(out_format.region_size));
 
-	// TODO Deal with endianness
+	// TODO 处理字节序问题
 	const size_t blocks_len = out_block_infos.size() * sizeof(RegionBlockInfo);
 	const size_t read_size = voxel::godot::get_buffer(f, Span<uint8_t>((uint8_t *)out_block_infos.data(), blocks_len));
 	ERR_FAIL_COND_V(read_size != blocks_len, false);
@@ -187,7 +187,7 @@ bool load_header(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RegionFile::RegionFile() {
-	// Defaults
+	// 默认值
 	_header.format.block_size_po2 = 4;
 	_header.format.region_size = Vector3i(16, 16, 16);
 	fill(_header.format.channel_depths, VoxelBuffer::DEPTH_8_BIT);
@@ -204,14 +204,14 @@ Error RegionFile::open(const String &fpath, bool create_if_not_found) {
 	_file_path = fpath;
 
 	Error file_error;
-	// Open existing file for read and write permissions. This should not create the file if it doesn't exist.
-	// Note, there is no read-only mode supported, because there was no need for it yet.
+	// 以读写权限打开已存在的文件。如果文件不存在，则不应创建它。
+	// 注意，目前不支持只读模式，因为暂时还没有这种需求。
 	Ref<FileAccess> f = voxel::godot::open_file(fpath, FileAccess::READ_WRITE, file_error);
 	if (file_error != OK) {
 		if (create_if_not_found) {
 			CRASH_COND(f.is_valid());
 
-			// Checking folders, needed for region "forests"
+			// 检查文件夹，区域“森林”需要用到
 			const String fpath_base_dir = fpath.get_base_dir();
 			const Error dir_err = check_directory_created_with_file_locker(fpath_base_dir);
 
@@ -219,7 +219,7 @@ Error RegionFile::open(const String &fpath, bool create_if_not_found) {
 				return ERR_CANT_CREATE;
 			}
 
-			// This time, we attempt to create the file
+			// 这一次我们尝试创建文件
 			f = voxel::godot::open_file(fpath, FileAccess::WRITE_READ, file_error);
 			if (file_error != OK) {
 				ERR_PRINT(String("Failed to create file {0}").format(varray(fpath)));
@@ -242,15 +242,15 @@ Error RegionFile::open(const String &fpath, bool create_if_not_found) {
 
 	_file_access = f;
 
-	// Precalculate location of sectors and which block they contain.
-	// This will be useful to know when sectors get moved on insertion and removal
+	// 预先计算扇区的位置以及它们所属的区块。
+	// 当扇区在插入和删除时被移动，这将有助于了解情况。
 
 	struct BlockInfoAndIndex {
 		RegionBlockInfo b;
 		unsigned int i;
 	};
 
-	// Filter only present blocks and keep the index around because it represents the 3D position of the block
+	// 只筛选存在的区块，并保留其索引，因为它代表了该区块的 3D 位置
 	StdVector<BlockInfoAndIndex> blocks_sorted_by_offset;
 	for (unsigned int i = 0; i < _header.blocks.size(); ++i) {
 		const RegionBlockInfo b = _header.blocks[i];
@@ -292,8 +292,8 @@ Error RegionFile::close() {
 	if (_file_access.is_valid()) {
 		if (_header_modified) {
 			if (!save_header(**_file_access)) {
-				// TODO Need to do a big pass on these errors codes so we can return meaningful ones...
-				// Godot codes are quite limited
+			// TODO 需要好好梳理一遍这些错误码，以便返回有意义的错误信息……
+			// Godot 的错误码相当有限
 				err = ERR_FILE_CANT_WRITE;
 			}
 		}
@@ -321,7 +321,7 @@ bool RegionFile::set_format(const RegionFormat &format) {
 	ERR_FAIL_COND_V_MSG(_file_access.is_valid(), false, "Can't set format when the file already exists");
 	ERR_FAIL_COND_V(!format.validate(), false);
 
-	// This will be the format used to create the next file if not found on open()
+	// 如果 open() 时未找到文件，将使用此格式来创建下一个文件
 	_header.format = format;
 	_header.blocks.resize(Vector3iUtil::get_volume_u64(format.region_size));
 
@@ -355,7 +355,7 @@ Error RegionFile::load_block(const Vector3i position, VoxelBuffer &out_block) {
 	}
 
 	ERR_FAIL_COND_V(out_block.get_size() != out_block.get_size(), ERR_INVALID_PARAMETER);
-	// Configure block format
+	// 配置区块格式
 	for (unsigned int channel_index = 0; channel_index < _header.format.channel_depths.size(); ++channel_index) {
 		out_block.set_channel_depth(channel_index, _header.format.channel_depths[channel_index]);
 	}
@@ -388,7 +388,7 @@ Error RegionFile::save_block(
 	ERR_FAIL_COND_V(_file_access.is_null(), ERR_FILE_CANT_WRITE);
 	FileAccess &f = **_file_access;
 
-	// We should be allowed to migrate before write operations
+	// 在写操作之前，我们应当被允许进行迁移
 	if (_header.version != FORMAT_VERSION) {
 		ERR_FAIL_COND_V(migrate_to_latest(f) == false, ERR_UNAVAILABLE);
 	}
@@ -398,12 +398,12 @@ Error RegionFile::save_block(
 	RegionBlockInfo &block_info = _header.blocks[lut_index];
 
 	if (block_info.data == 0) {
-		// The block isn't in the file yet, append at the end
+		// 该区块尚不在文件中，追加到末尾
 
 		const unsigned int end_offset = _blocks_begin_offset + _sectors.size() * _header.format.sector_size;
 		f.seek(end_offset);
 		const unsigned int block_offset = f.get_position();
-		// Check position matches the sectors rule
+		// 检查位置是否符合扇区规则
 		CRASH_COND((block_offset - _blocks_begin_offset) % _header.format.sector_size != 0);
 
 		BlockSerializer::SerializeResult res = BlockSerializer::serialize_and_compress(block, compression_mode);
@@ -430,7 +430,7 @@ Error RegionFile::save_block(
 		_header_modified = true;
 
 	} else {
-		// The block is already in the file
+		// 该区块已在文件中
 
 		CRASH_COND(_sectors.size() == 0);
 
@@ -447,10 +447,10 @@ Error RegionFile::save_block(
 		CRASH_COND(new_sector_count < 1);
 
 		if (new_sector_count <= old_sector_count) {
-			// We can write the block at the same spot
+			// 我们可以将区块写入原来的位置
 
 			if (new_sector_count < old_sector_count) {
-				// The block now uses less sectors, we can compact others.
+				// 该区块现在使用的扇区更少了，可以压缩其他区块来腾出空间。
 				remove_sectors_from_block(position, old_sector_count - new_sector_count);
 				_header_modified = true;
 			}
@@ -465,12 +465,12 @@ Error RegionFile::save_block(
 			CRASH_COND(written_size != (end_pos - block_offset));
 
 		} else {
-			// The block now uses more sectors, we have to move others.
-			// Note: we could shift blocks forward, but we can also remove the block entirely and rewrite it at the end.
-			// Need to investigate if it's worth implementing forward shift instead.
-			// TODO Prefer doing an end swap kind of thing?
+			// 该区块现在使用了更多扇区，我们必须移动其他区块。
+			// 注意：我们可以将区块整体前移，但也可以直接删除该区块并在末尾重写。
+			// 需要研究一下是否值得实现前移的方式。
+			// TODO 是否更倾向于做某种“尾部交换”的操作？
 
-			// This also shifts the rest of the file so the freed sectors may get re-occupied.
+			// 这也会移动文件其余部分，因此释放的扇区可能会被重新占用。
 			remove_sectors_from_block(position, old_sector_count);
 
 			const size_t block_offset = _blocks_begin_offset + _sectors.size() * _header.format.sector_size;
@@ -507,7 +507,7 @@ void RegionFile::pad_to_sector_size(FileAccess &f) {
 	const int64_t pad = int64_t(_header.format.sector_size) - (rpos - 1) % int64_t(_header.format.sector_size) - 1;
 	CRASH_COND(pad < 0);
 	for (int64_t i = 0; i < pad; ++i) {
-		// Virtual function called many times, hmmmm...
+		// 虚函数被多次调用，嗯……
 		f.store_8(0);
 	}
 }
@@ -515,9 +515,9 @@ void RegionFile::pad_to_sector_size(FileAccess &f) {
 void RegionFile::remove_sectors_from_block(Vector3i block_pos, unsigned int p_sector_count) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Removes sectors from a block, starting from the last ones.
-	// So if a block has 5 sectors and we remove 2, the first 3 will be preserved.
-	// Then all following sectors are moved earlier in the file to fill the gap.
+	// 从一个区块中移除扇区，从最后的几个扇区开始。
+	// 例如，如果一个区块有 5 个扇区，我们移除 2 个，那么前 3 个会被保留。
+	// 随后，所有后续的扇区都在文件中向前移动以填补空缺。
 
 	CRASH_COND(_file_access.is_null());
 	CRASH_COND(p_sector_count <= 0);
@@ -544,12 +544,12 @@ void RegionFile::remove_sectors_from_block(Vector3i block_pos, unsigned int p_se
 	StdVector<uint8_t> temp;
 	temp.resize(sector_size);
 
-	// TODO There might be a faster way to shrink a file
-	// Erase sectors from file
+	// TODO 也许有更快的方法来收缩文件
+	// 从文件中擦除扇区
 	while (src_offset < old_end_offset) {
 		f.seek(src_offset);
 		const size_t read_bytes = voxel::godot::get_buffer(f, to_span(temp));
-		CRASH_COND(read_bytes != sector_size); // Corrupted file
+		CRASH_COND(read_bytes != sector_size); // 文件已损坏
 
 		f.seek(dst_offset);
 		voxel::godot::store_buffer(f, to_span(temp));
@@ -558,10 +558,10 @@ void RegionFile::remove_sectors_from_block(Vector3i block_pos, unsigned int p_se
 		dst_offset += sector_size;
 	}
 
-	// TODO We need to truncate the end of the file since we effectively shortened it,
-	// but FileAccess doesn't have any function to do that... so can't rely on EOF either
+	// TODO 我们需要截断文件末尾，因为我们实际上缩短了文件，
+	// 但 FileAccess 没有任何函数可以做到这一点……所以也不能依赖 EOF
 
-	// Erase sectors from cache
+	// 从缓存中擦除扇区
 	_sectors.erase(
 			_sectors.begin() + (block_info.get_sector_index() + block_info.get_sector_count() - p_sector_count),
 			_sectors.begin() + (block_info.get_sector_index() + block_info.get_sector_count())
@@ -569,15 +569,15 @@ void RegionFile::remove_sectors_from_block(Vector3i block_pos, unsigned int p_se
 
 	const unsigned int old_sector_index = block_info.get_sector_index();
 
-	// Reduce sectors of current block in header.
+	// 在头部中减少当前区块的扇区数。
 	if (block_info.get_sector_count() > p_sector_count) {
 		block_info.set_sector_count(block_info.get_sector_count() - p_sector_count);
 	} else {
-		// Block removed
+		// 区块已移除
 		block_info.data = 0;
 	}
 
-	// Shift sector index of following blocks
+	// 移动后续区块的扇区索引
 	if (old_sector_index < _sectors.size()) {
 		for (unsigned int i = 0; i < _header.blocks.size(); ++i) {
 			RegionBlockInfo &b = _header.blocks[i];
@@ -589,7 +589,7 @@ void RegionFile::remove_sectors_from_block(Vector3i block_pos, unsigned int p_se
 }
 
 bool RegionFile::save_header(FileAccess &f) {
-	// We should be allowed to migrate before write operations.
+	// 在写操作之前，我们应当被允许进行迁移.
 	if (_header.version != FORMAT_VERSION) {
 		ERR_FAIL_COND_V(migrate_to_latest(f) == false, false);
 	}
@@ -602,11 +602,11 @@ bool RegionFile::save_header(FileAccess &f) {
 bool RegionFile::migrate_from_v2_to_v3(FileAccess &f, RegionFormat &format) {
 	VOXEL_PRINT_VERBOSE(voxel::format("Migrating region file {} from v2 to v3", _file_path));
 
-	// We can migrate if we know in advance what format the file should contain.
+	// 如果我们提前知道文件应当包含的格式，就可以进行迁移。
 	ERR_FAIL_COND_V_MSG(format.block_size_po2 == 0, false, "Cannot migrate without knowing the correct format");
 
-	// Which file offset blocks data is starting
-	// magic + version + blockinfos
+	// 区块数据从哪个文件偏移量开始
+	// 魔数 + 版本 + 数据块信息
 	const unsigned int old_header_size = Vector3iUtil::get_volume_u64(format.region_size) * sizeof(uint32_t);
 
 	const unsigned int new_header_size = get_header_size_v3(format) - MAGIC_AND_VERSION_SIZE;
@@ -617,7 +617,7 @@ bool RegionFile::migrate_from_v2_to_v3(FileAccess &f, RegionFormat &format) {
 	f.seek(MAGIC_AND_VERSION_SIZE);
 	voxel::godot::insert_bytes(f, extra_bytes_needed);
 
-	// Set version because otherwise `save_header` will attempt to migrate again causing stack-overflow
+	// 设置版本号，否则 `save_header` 会尝试再次迁移，从而导致栈溢出
 	_header.version = FORMAT_VERSION;
 
 	return save_header(f);
@@ -628,7 +628,7 @@ bool RegionFile::migrate_to_latest(FileAccess &f) {
 
 	uint8_t version = _header.version;
 
-	// Make a backup?
+	// 是否要做一个备份？
 	// {
 	// 	DirAccessRef da = DirAccess::create_for_path(_file_path.get_base_dir());
 	// 	ERR_FAIL_COND_V_MSG(!da, false, String("Can't make a backup before migrating {0}").format(varray(_file_path)));
@@ -685,7 +685,7 @@ bool RegionFile::has_block(unsigned int index) const {
 	return _header.blocks[index].data != 0;
 }
 
-// Checks to detect some corruption signs in the file
+// 检查以检测文件中是否存在某些损坏迹象
 void RegionFile::debug_check() {
 	ERR_FAIL_COND(!is_open());
 	ERR_FAIL_COND(_file_access.is_null());

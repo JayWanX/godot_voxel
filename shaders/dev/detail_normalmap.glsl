@@ -1,14 +1,14 @@
 #[compute]
 #version 450
 
-// Takes signed distance values and computes a world-space normal from them.
-// The normal's direction is then clamped based on triangles associated with each value.
-// Then results are encoded in an output image.
+// 接收有符号距离值，并据此计算世界空间法线。
+// 随后根据与每个值关联的三角形对法线方向进行限制。
+// 然后将结果编码到输出图像中。
 
 layout (local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
 
 layout (set = 0, binding = 0, std430) restrict readonly buffer SDBuffer {
-	// 4 values per index
+	// 每个索引 4 个值
 	float values[];
 } u_in_sd;
 
@@ -21,17 +21,17 @@ layout (set = 0, binding = 2, std430) restrict readonly buffer MeshIndices {
 } u_indices;
 
 layout (set = 0, binding = 3, std430) restrict readonly buffer HitBuffer {
-	// X, Y, Z is hit position (UNUSED)
-	// W is integer triangle index
+	// X、Y、Z 为命中位置（未使用）
+	// W 为整数三角形索引
 	vec4 positions[];
 } u_hits;
 
 layout (set = 0, binding = 4, std430) restrict readonly buffer Params {
 	int tile_size_pixels;
 	int tiles_x;
-	// cos(max_deviation_angle)
+	// cos(最大偏差角)
 	float max_deviation_cosine;
-	// sin(max_deviation_angle)
+	// sin(最大偏差角)
 	float max_deviation_sine;
 } u_params;
 
@@ -44,7 +44,7 @@ vec3 get_triangle_normal(vec3 v0, vec3 v1, vec3 v2) {
 }
 
 mat3 basis_from_axis_angle_cs(vec3 p_axis, float cosine, float sine) {
-	// Rotation matrix from axis and angle, see
+	// 由轴和角度构造的旋转矩阵，参见
 	// https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_angle
 
 	mat3 cols;
@@ -114,11 +114,11 @@ void main() {
 	const vec3 v1 = u_vertices.data[i1];
 	const vec3 v2 = u_vertices.data[i2];
 
-	// In theory we could compute triangle normals once per triangle,
-	// seems more efficient. But would it be significantly faster?
+	// 理论上我们可以为每个三角形计算一次三角形法线，
+	// 看起来更高效。但会明显更快吗？
 	const vec3 tri_normal = get_triangle_normal(v0, v1, v2);
 
-	// Clamp normal if it deviates too much
+	// 若法线偏离过多则将其限制
 	const float tdot = dot(normal, tri_normal);
 	if (tdot < u_params.max_deviation_cosine) {
 		if (tdot < -0.999) {

@@ -17,8 +17,8 @@
 
 namespace voxel::godot {
 
-// This obscure method is actually used to get the XYZW tinting colors for controls that expose coordinates.
-// In modules, this is `_get_property_colors`.
+// 这个晦涩的方法实际用于获取暴露坐标控件的 XYZW 着色颜色。
+// 在模块中，这就是 `_get_property_colors`。
 Span<const Color> editor_property_get_colors(EditorProperty &self);
 
 class Voxel_EditorProperty : public EditorProperty {
@@ -31,7 +31,7 @@ public:
 #ifdef VOXEL_GODOT
 protected:
 #endif
-	// This method is protected in core, but still overridable.
+	// 此方法在 core 中是受保护的，但依然可被重写。
 	void _set_read_only(bool p_read_only) override;
 
 protected:

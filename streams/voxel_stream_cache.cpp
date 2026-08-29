@@ -10,19 +10,19 @@ bool VoxelStreamCache::load_voxel_block(Vector3i position, uint8_t lod_index, Vo
 	auto it = lod.blocks.find(position);
 
 	if (it == lod.blocks.end()) {
-		// Not in cache, will have to query
+		// 不在缓存中，需要查询
 		return false;
 
 	} else {
 		const Block &block = it->second;
 		if (!block.has_voxels) {
-			// Has a block in cache but there is no voxel data
+			// 缓存中有数据块但没有体素数据
 			return false;
 		}
-		// In cache, serve it
+		// 已在缓存中，直接提供
 
-		// Copying is required since the cache has ownership on its data,
-		// and the requests wants us to populate the buffer it provides
+		// 必须进行拷贝，因为缓存拥有其数据的所有权，
+		// 而请求方需要我们去填充它提供的缓冲区
 		block.voxels.copy_to(out_voxels, true);
 
 		return true;
@@ -39,18 +39,18 @@ void VoxelStreamCache::save_voxel_block(Vector3i position, uint8_t lod_index, Vo
 	);
 
 	if (it == lod.blocks.end()) {
-		// Not cached yet, create an entry
+		// 尚未缓存，创建条目
 		Block b;
 		b.position = position;
 		b.lod = lod_index;
-		// TODO Optimization: if we know the buffer is not shared, we could use move instead
+		// TODO 优化：如果我们知道缓冲区未共享，就可以改用 move 操作
 		voxels.copy_to(b.voxels, true);
 		b.has_voxels = true;
 		lod.blocks.insert(std::make_pair(position, std::move(b)));
 		++_count;
 
 	} else {
-		// Cached already, overwrite
+		// 已缓存，覆盖
 		voxels.move_to(it->second.voxels);
 		it->second.has_voxels = true;
 	}
@@ -68,18 +68,18 @@ bool VoxelStreamCache::load_instance_block(
 	auto it = lod.blocks.find(position);
 
 	if (it == lod.blocks.end()) {
-		// Not in cache, will have to query
+		// 不在缓存中，需要查询
 		lod.rw_lock.read_unlock();
 		return false;
 
 	} else {
-		// In cache, serve it
+		// 已在缓存中，直接提供
 
 		if (it->second.instances == nullptr) {
 			out_instances = nullptr;
 
 		} else {
-			// Copying is required since the cache has ownership on its data
+			// 必须进行拷贝，因为缓存拥有其数据的所有权
 			out_instances = make_unique_instance<InstanceBlockData>();
 			it->second.instances->copy_to(*out_instances);
 		}
@@ -99,7 +99,7 @@ void VoxelStreamCache::save_instance_block(
 	auto it = lod.blocks.find(position);
 
 	if (it == lod.blocks.end()) {
-		// Not cached yet, create an entry
+		// 尚未缓存，创建条目
 		Block b;
 		b.position = position;
 		b.lod = lod_index;
@@ -108,7 +108,7 @@ void VoxelStreamCache::save_instance_block(
 		++_count;
 
 	} else {
-		// Cached already, overwrite
+		// 已缓存，覆盖
 		it->second.instances = std::move(instances);
 	}
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelToolTerrain" inherits="VoxelTool" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Implementation of [VoxelTool] specialized for uses on [VoxelTerrain].
+		专用于 [VoxelTerrain] 的 [VoxelTool] 实现。
 	</brief_description>
 	<description>
-		Functions in this class are specific to [VoxelTerrain]. For generic functions, you may also check [VoxelTool].
-		It's not a class to instantiate alone, you may get it from [VoxelTerrain] using the `get_voxel_tool()` method.
+		此类中的函数特定于 [VoxelTerrain]。对于通用函数，你也可以查看 [VoxelTool]。
+		它不是一个可以单独实例化的类，你可以使用 `get_voxel_tool()` 方法从 [VoxelTerrain] 获取它。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -17,7 +17,7 @@
 			<param index="2" name="flat_direction" type="Vector3" />
 			<param index="3" name="smoothness" type="float" default="0.0" />
 			<description>
-				Operates on a hemisphere, where [code]flat_direction[/code] is pointing away from the flat surface (like a normal). [code]smoothness[/code] determines how the flat part blends with the rounded part, with higher values producing softer more rounded edge.
+				对半球进行操作，其中 [code]flat_direction[/code] 指向远离平面表面（类似于法线）。[code]smoothness[/code] 决定平坦部分与圆角部分的混合程度，值越高，边缘越柔和、越圆润。
 			</description>
 		</method>
 		<method name="for_each_voxel_metadata_in_area">
@@ -25,9 +25,9 @@
 			<param index="0" name="voxel_area" type="AABB" />
 			<param index="1" name="callback" type="Callable" />
 			<description>
-				Executes a function for each voxel holding metadata in the given area.
-				The given callback takes two arguments: voxel position (Vector3i), voxel metadata (Variant).
-				IMPORTANT: inserting new or removing metadata from inside this function is not allowed.
+				对给定区域内每个持有元数据的体素执行函数。
+				给定的回调接受两个参数：体素位置（Vector3i）、体素元数据（Variant）。
+				重要提示：不允许在此函数内部插入新元数据或移除元数据。
 			</description>
 		</method>
 		<method name="run_blocky_random_tick">
@@ -38,11 +38,11 @@
 			<param index="3" name="batch_count" type="int" default="16" />
 			<param index="4" name="tags_mask" type="int" default="4294967295" />
 			<description>
-				Picks random voxels within the specified area. If voxel models have [member VoxelBlockyModel.random_tickable] set to [code]true[/code] and [member VoxelBlockyModel.tags_mask] matches any bit in [code]tags_mask[/code], executes a function on them. This only works for terrains using [VoxelMesherBlocky].
-				The given callback takes two arguments: voxel position (Vector3i), voxel value (int).
+				在指定区域内选取随机体素。如果体素模型将 [member VoxelBlockyModel.random_tickable] 设置为 [code]true[/code] 且 [member VoxelBlockyModel.tags_mask] 与 [code]tags_mask[/code] 中的任何位匹配，则对它们执行函数。这仅适用于使用 [VoxelMesherBlocky] 的地形。
+				给定的回调接受两个参数：体素位置（Vector3i）、体素值（int）。
 
-				The purpose of [code]batch_count[/code] is to optimize the picking process through the internal data structure. The algorithm goes as follows: [code]voxel_count[/code] is divided in batches of length [code]batch_count[/code]. For each batch, a random block intersecting [code]area[/code] is chosen, and [code]batch_count[/code] voxels are picked at random inside of it. If [code]voxel_count[/code] is not divisible by [code]batch_count[/code], an extra block will be picked to do the remainder.
-				[code]batch[/code] can bias randomness by concentrating picks in specific blocks, but if this function is used every frame over time, that bias should average out. If you want no bias at all, set [code]batch_count[/code] to 1.
+				[code]batch_count[/code] 的目的是通过内部数据结构优化选取过程。算法如下：[code]voxel_count[/code] 被分成若干个长度为 [code]batch_count[/code] 的批次。对于每个批次，会选择与 [code]area[/code] 相交的随机块，并在其中随机选取 [code]batch_count[/code] 个体素。如果 [code]voxel_count[/code] 不能被 [code]batch_count[/code] 整除，将额外选取一个块来处理余数。
+				[code]batch[/code] 可以通过将选取集中在特定块中来引入随机性偏差，但如果此函数随时间每帧调用，该偏差应该会平均化。如果你完全不想要偏差，请将 [code]batch_count[/code] 设置为 1。
 			</description>
 		</method>
 	</methods>

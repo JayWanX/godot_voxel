@@ -27,7 +27,7 @@ public:
 	bool is_cancelled() override;
 	void apply_result() override;
 
-	// Not an input, but can be assigned a re-usable instance to avoid allocating one in the task
+	// 不是输入，但可以分配一个可复用的实例，避免在任务中分配一个
 	std::shared_ptr<VoxelBuffer> voxels;
 
 private:
@@ -41,8 +41,8 @@ private:
 	uint8_t _block_size;
 	bool _drop_beyond_max_distance = true;
 	PriorityDependency _priority_dependency;
-	std::shared_ptr<StreamingDependency> _stream_dependency; // For saving generator output
-	std::shared_ptr<AsyncDependencyTracker> _tracker; // For async edits
+	std::shared_ptr<StreamingDependency> _stream_dependency; // 用于保存生成器的输出
+	std::shared_ptr<AsyncDependencyTracker> _tracker; // 用于异步编辑
 	TaskCancellationToken _cancellation_token;
 
 	bool _has_run = false;

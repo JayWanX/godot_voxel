@@ -1,135 +1,135 @@
-Getting Voxel Tools
+获取 Voxel Tools
 =====================
 
-This project is a [Module](#module) that gets bundled into a custom build of Godot Engine and custom export templates.
+本项目是一个 [模块](#module)，会被打包进 Godot Engine 的自定义构建和自定义导出模板中。
 
-Module
+模块<span id="module"></span>
 --------
 
-The following section applies to the Module edition of Voxel Tools.
+以下章节适用于 Voxel Tools 的模块版。
 
-### Precompiled builds
+### 预编译版本
 
-#### Release builds
+#### 正式版
 
-Builds are provided at [https://github.com/Voxel/godot_voxel/releases](https://github.com/Voxel/godot_voxel/releases).
-Module builds are usually prefixed as `Godot 4.x.x + Voxel Tools 1.x.x`.
+版本可在 [https://github.com/Voxel/godot_voxel/releases](https://github.com/Voxel/godot_voxel/releases) 获取。
+模块版本通常以 `Godot 4.x.x + Voxel Tools 1.x.x` 为前缀命名。
 
-The project follows a continuous development cycle, so "releases" are merely snapshots of development versions. Because Github requires an account to download latest development versions from Github Actions, releases are published for convenience.
+本项目遵循持续开发周期，因此“正式版”只是开发版本的快照。由于从 Github Actions 下载最新开发版本需要 Github 账号，为了方便起见发布了正式版。
 
-The engine is massive and targets a lot of platforms, while our module is small in comparison and we don't have dedicated build containers, so not all combinations of editors and export templates are available. You can develop your game and test it with the editor on main desktop platforms, but if a combination of platforms/options isn't provided, you will have to build them yourself.
+引擎非常庞大且面向众多平台，相比之下我们的模块很小，而且我们没有专用的构建容器，因此并非所有编辑器与导出模板的组合都可用。你可以在主要桌面平台上用编辑器开发和测试游戏，但如果某个平台/选项组合未提供，你就需要自行构建。
 
-#### Development builds
+#### 开发版
 
-Development builds contain the very latest features and bug fixes (although they can also contain unknown bugs). They are available on Github Actions.
-
-!!! note
-	You need a Github account to download artifacts from Github Actions. Otherwise, links will not work.
-
-Pick your platform:
-
-- [Windows builds](https://github.com/Voxel/godot_voxel/actions/workflows/windows.yml)
-- [Linux builds](https://github.com/Voxel/godot_voxel/actions/workflows/linux.yml)
-- [MacOS builds](https://github.com/Voxel/godot_voxel/actions/workflows/macos.yml)
-
-Then click on the latest successful build, with a green checkmark:
-
-![Screenshot of a list of builds, with the latest successful one circled in green](images/ci_builds_latest_link.webp)
-
-Then scroll to the bottom, you should see download links:
-
-![Github actions screenshot](images/github_actions_windows_artifacts.webp)
-
-In case there are multiple downloadable artifacts, the editor build will be the one with `editor` in the name.
-
-These builds correspond to the `master` version depicted in the [changelog](https://github.com/Voxel/godot_voxel/blob/master/CHANGELOG.md).
-They are built using Godot's latest stable version branch (for example, `4.2` at time of writing), instead of `master`, unless indicated otherwise.
-A new build is made each time commits are pushed to the main branch, but also when other developers make Pull Requests, so careful about which one you pick.
+开发版包含最新的功能和错误修复（尽管也可能包含未知的 bug）。它们可在 Github Actions 上获取。
 
 !!! note
-	Mono builds (C# support) [are also done](https://github.com/Voxel/godot_voxel/actions/workflows/mono.yml), however they no longer work out of the box. For more information, see [C# support](#c-suppport).
+	你需要一个 Github 账号才能从 Github Actions 下载构建产物。否则链接将无法使用。
+
+选择你的平台：
+
+- [Windows 版本](https://github.com/Voxel/godot_voxel/actions/workflows/windows.yml)
+- [Linux 版本](https://github.com/Voxel/godot_voxel/actions/workflows/linux.yml)
+- [MacOS 版本](https://github.com/Voxel/godot_voxel/actions/workflows/macos.yml)
+
+然后点击带有绿色勾选标记的最新成功构建：
+
+![构建列表截图，最新的成功构建已用绿色圆圈标出](images/ci_builds_latest_link.webp)
+
+然后滚动到底部，你应该能看到下载链接：
+
+![Github Actions 截图](images/github_actions_windows_artifacts.webp)
+
+如果有多个可下载的构建产物，名称中包含 `editor` 的即为编辑器版本。
+
+这些版本对应于 [更新日志](https://github.com/Voxel/godot_voxel/blob/master/CHANGELOG.md) 中描述的 `master` 版本。
+除非另有说明，它们使用 Godot 最新的稳定版本分支（例如撰写本文时的 `4.7`）而非 `master` 构建。
+每次提交推送到主分支时都会构建新版本，其他开发者提交 Pull Request 时也会构建，所以要留意你选择的是哪一个。
+
+!!! note
+	Mono 构建（C# 支持）[也有提供](https://github.com/Voxel/godot_voxel/actions/workflows/mono.yml)，但它们不再开箱即用。更多信息请参阅 [C# 支持](#c-and-module-defined-classes)。
 
 
-### Building yourself
+### 自行构建
 
-See [Building as a module](development.md#building)
+参见 [作为模块构建](development.md#building)
 
 
-### Exporting
+### 导出
 
 !!! note 
-	You will need this section if you want to export your game into an executable.
+	如果你想将游戏导出为可执行文件，则需要阅读本节。
 
-#### Supported platforms
+#### 支持的平台
 
-This module supports all platforms Godot supports, on which threads are available.
+本模块支持 Godot 所支持的所有具备线程能力的平台。
 
-Some features might not always be available:
+某些功能可能并非始终可用：
 
-- SIMD noise with FastNoise2 0.10 can only benefit from an x86 CPU and falls back to scalar otherwise, which is slower
-- GPU features require support for compute shaders (Forward+ renderer)
-- Threads might not work on all browsers with the web export
+- 使用 FastNoise2 0.10 的 SIMD 噪声只能从 x86 CPU 中受益，否则会回退到标量计算，速度较慢
+- GPU 功能需要计算着色器支持（Forward+ 渲染器）
+- Web 导出的线程在部分浏览器上可能无法工作
 
-#### Getting a template
+#### 获取模板
 
-In Godot Engine, exporting your game as an executable for a target platform requires a "template". A template is an optimized build of Godot Engine without the editor stuff. Godot combines your project files with that template and makes the final executable.
+在 Godot Engine 中，将游戏导出为目标平台的可执行文件需要一个“模板”。模板是不包含编辑器内容的 Godot Engine 优化构建。Godot 会将你的项目文件与该模板组合，生成最终的可执行文件。
 
-If you only download the Godot Editor with the module, it will allow you to develop and test your game, but if you export without any other setup, Godot will attempt to use a vanilla template, which won't have the module. Therefore, it will fail to open some scenes.
+如果你只下载包含模块的 Godot 编辑器，它可以让你开发和测试游戏，但如果你不做任何其他设置就进行导出，Godot 会尝试使用不包含该模块的原版模板。因此，某些场景将无法打开。
 
-As mentionned in earlier sections, you can get pre-built templates for some platforms and configurations.
+如前文所述，你可以为某些平台和配置获取预构建的模板。
 
-If there is no pre-built template available for your platform, you may build it yourself. This is the same as building Godot with the module, only with different options. See the [Godot Documentation](https://docs.godotengine.org/en/latest/development/compiling/index.html) for more details, under the "building export templates" category of the platform you target.
+如果你的平台没有可用的预构建模板，你可以自行构建。这与使用模块构建 Godot 相同，只是选项不同。更多细节请参阅 [Godot 文档](https://docs.godotengine.org/en/latest/development/compiling/index.html) 中你所针对平台下的“构建导出模板”分类。
 
-#### Using a template
+#### 使用模板
 
-Once you have a template build, tell Godot to use it in the Export configurations. Fill in the path to a custom template in the "Custom Template" section:
+拿到模板构建后，在导出配置中告诉 Godot 使用它。在“Custom Template”部分填写自定义模板的路径：
 
-![Screenshot of Godot export configuration window with a custom template assigned for Windows](images/export_template_window.webp)
+![Godot 导出配置窗口截图，为 Windows 指定了自定义模板](images/export_template_window.webp)
 
 
-C# support
+C# 支持
 --------------
 
-C# is a bit of a special case in Godot, especially when it comes to plugins. It requires extra work to setup.
+在 Godot 中，C# 有点特殊，尤其是在插件方面。它的配置需要额外的工作。
 
-### Module
+### 模块
 
-Working builds used to be available on Github Actions (as "Mono Builds"). Unfortunately, Godot 4 changed the way C# integrates by using the Nuget package manager. This made it harder for module developers to provide ready-to-use executables, and hard for users too:
+可用的构建过去可以在 Github Actions 上获取（称为“Mono Builds”）。不幸的是，Godot 4 改用 Nuget 包管理器来集成 C#，这使得模块开发者更难提供开箱即用的可执行文件，对用户来说也更难：
 
-- When you make a project in Godot C#, it fetches the "vanilla" Godot SDK from Nuget, but it is only available for official stable versions, so you can't use CI builds of the engine that use the latest development version of Godot.
-- Modules add new classes to the API which are not present in the official SDK. It would require to create SDKs for every combination of modules you want to use and upload them to Nuget, which isn't practical.
-- You could revert to the latest official SDK available on Nuget, but to access module APIs you would have to use workarounds such as `obj.Get(string)`, `Set(string)` and `Call(string, args)` in code, which is hard to use, inefficient and terrible to maintain.
+- 当你在 Godot C# 中创建项目时，它会从 Nuget 获取“原版”Godot SDK，但它仅适用于官方稳定版本，因此你无法使用基于 Godot 最新开发版本的引擎 CI 构建。
+- 模块会向 API 添加官方 SDK 中不存在的新类。这需要为你想使用的每种模块组合创建 SDK 并上传到 Nuget，这并不实际。
+- 你可以回退到 Nuget 上可用的最新官方 SDK，但要访问模块 API，就必须在代码中使用 `obj.Get(string)`、`Set(string)` 和 `Call(string, args)` 之类的变通方法，这些方法难以使用、效率低下且极难维护。
 
-To obtain a working version, you have to generate the SDK yourself and use a local Nuget repository instead of the official one. Follow the steps described in the [Godot Documentation for C#](https://docs.godotengine.org/en/stable/engine_details/development/compiling/compiling_with_dotnet.html).
-
-
-### Ownership checks
-
-Voxel Tools does some sanity checks when running some virtual methods, such as custom generators. These checks involve reference counting. However, that doesn't work in C# because it is a garbage-collected language: `RefCounted` objects going out of scope are not actually freed until the garbage collector runs. This can cause false-positive errors.
-
-You may turn off those checks in Project Settings: `voxel/ownership_checks`
+要获得可用的版本，你必须自行生成 SDK，并使用本地 Nuget 仓库代替官方仓库。请按照 [Godot C# 文档](https://docs.godotengine.org/en/stable/engine_details/development/compiling/compiling_with_dotnet.html) 中描述的步骤操作。
 
 
-### C# and module-defined classes
+### 所有权检查
 
-C# support of extensions implemented in C++ is not well defined at the moment.
+Voxel Tools 在运行某些虚方法（如自定义生成器）时会做一些健全性检查。这些检查涉及引用计数。然而，这在 C# 中无法正常工作，因为 C# 是垃圾回收语言：超出作用域的 `RefCounted` 对象在垃圾回收器运行之前并不会真正释放。这可能会导致误报错误。
 
-The issue is that the Godot API C# can use (nicknamed the "glue") is generated when Godot itself is built, so it only contains core vanilla classes. Everything else (extensions, GDScript) is missing from it, so it requires to use Godot's reflection methods.
-In theory, C++ extensions could provide a strongly-typed API since they have function pointers that could be bound to C#, but this has not been implemented by Godot so far.
+你可以在项目设置中关闭这些检查：`voxel/ownership_checks`
 
-So the only way to interact from C# with classes defined by an extension is to use the following:
 
-- Calling methods: [call](https://docs.godotengine.org/en/stable/classes/class_object.html#class-object-method-call)
-- Getting or setting properties: [get](https://docs.godotengine.org/en/stable/classes/class_object.html#class-object-method-get) and [set](https://docs.godotengine.org/en/stable/classes/class_object.html#class-object-method-set) 
-- Creating new instances: [ClassDB.instantiate](https://docs.godotengine.org/en/stable/classes/class_classdb.html#class-classdb-method-instantiate).
+### C# 与模块定义的类<span id="c-and-module-defined-classes"></span>
+
+目前，对用 C++ 实现的扩展的 C# 支持尚未明确定义。
+
+问题在于，C# 可以使用的 Godot API（俗称“glue”）是在 Godot 本身构建时生成的，因此它只包含核心的原版类。其他一切（扩展、GDScript）都不在其中，因此需要使用 Godot 的反射方法。
+理论上，C++ 扩展可以提供强类型 API，因为它们拥有可绑定到 C# 的函数指针，但 Godot 至今尚未实现这一点。
+
+因此，从 C# 与扩展定义的类交互的唯一方式是使用以下方法：
+
+- 调用方法：[call](https://docs.godotengine.org/en/stable/classes/class_object.html#class-object-method-call)
+- 获取或设置属性：[get](https://docs.godotengine.org/en/stable/classes/class_object.html#class-object-method-get) 和 [set](https://docs.godotengine.org/en/stable/classes/class_object.html#class-object-method-set) 
+- 创建新实例：[ClassDB.instantiate](https://docs.godotengine.org/en/stable/classes/class_classdb.html#class-classdb-method-instantiate)。
 
 ```cs
-// /!\ Pseudo-code, untested
+// /!\ 伪代码，未测试
 GodotObject model = Godot.ClassDB.Instantiate("VoxelBlockyModelCube");
 model.Call("set_tile", Godot.ClassDB.ClassGetIntegerConstant("VoxelBlockyModel", "SIDE_NEGATIVE_X"), new Vector2I(1, 1))
 model.Set("atlas_size_in_tiles", new Vector2I(8, 8));
 ```
 
-This approach however carries a lot of overhead, impacts performance, and is tedious to use.
+然而，这种方法开销很大，影响性能，而且使用起来很繁琐。
 
-Similar situations are presented in Godot's documentation about [Cross-Language Scripting](https://docs.godotengine.org/en/stable/tutorials/scripting/cross_language_scripting.html)
+Godot 文档中的[跨语言脚本](https://docs.godotengine.org/en/stable/tutorials/scripting/cross_language_scripting.html)也介绍了类似的情况。

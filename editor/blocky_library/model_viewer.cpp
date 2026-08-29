@@ -33,8 +33,8 @@ Voxel_ModelViewer::Voxel_ModelViewer() {
 
 	const float editor_scale = EDSCALE;
 
-	// SubViewportContainer inherits Container for some reason, so it is not possible to add child controls using
-	// anchors and margins. Therefore, the container is child of our control, rather than being the container itself.
+	// SubViewportContainer 出于某种原因继承了 Container，因此无法使用
+	// 锚点和边距来添加子控件。所以让该容器作为我们控件的子节点，而不是让容器本身成为控件。
 	SubViewportContainer *viewport_container = memnew(SubViewportContainer);
 	viewport_container->add_child(_viewport);
 	viewport_container->set_stretch(true);

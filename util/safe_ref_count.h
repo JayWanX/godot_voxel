@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Thread-safe reference counter.
+// 线程安全的引用计数器。
 class SafeRefCount {
 public:
 	SafeRefCount() {}

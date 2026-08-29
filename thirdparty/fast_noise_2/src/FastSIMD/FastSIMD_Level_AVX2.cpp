@@ -2,7 +2,7 @@
 
 #if FASTSIMD_COMPILE_AVX2
 
-// To compile AVX2 support enable AVX(2) code generation compiler flags for this file
+// 要编译 AVX2 支持，请为此文件启用 AVX(2) 代码生成的编译器标志
 #ifndef __AVX__
 #ifdef _MSC_VER
 #error To compile AVX set C++ code generation to use /arch:AVX on FastSIMD_Level_AVX2.cpp, or change "#define FASTSIMD_COMPILE_AVX2" in FastSIMD_Config.h

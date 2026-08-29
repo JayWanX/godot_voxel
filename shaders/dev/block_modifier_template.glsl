@@ -10,13 +10,13 @@ layout (set = 0, binding = 0, std430) restrict readonly buffer Params {
 	int buffer_offset;
 } u_params;
 
-// SDF is modified in-place
+// SDF 就地修改
 layout (set = 0, binding = 1, std430) restrict buffer InSDBuffer {
 	float values[];
 } u_inout_sd;
 
-// Parameters common to all modifiers.
-// Keeping the same binding number as other shader types, to simplify usage in C++
+// 所有修改器共用的参数。
+// 与其他着色器类型保持相同的绑定号，以简化 C++ 中的使用
 layout (set = 0, binding = 4, std430) restrict readonly buffer BaseModifierParams {
 	mat4 world_to_model;
 	int operation;
@@ -35,7 +35,7 @@ float sd_smooth_union(float a, float b, float s) {
 	return mix(b, a, h) - s * h * (1.0 - h);
 }
 
-// Inverted a and b because it subtracts SDF a from SDF b
+// 交换 a 和 b，因为它是从 SDF b 中减去 SDF a
 float sd_smooth_subtract(float b, float a, float s) {
 	const float h = clamp(0.5 - 0.5 * (b + a) / s, 0.0, 1.0);
 	return mix(b, -a, h) + s * h * (1.0 - h);
@@ -48,8 +48,8 @@ int get_zxy_index(ivec3 pos, ivec3 size) {
 void main() {
 	const ivec3 rpos = ivec3(gl_GlobalInvocationID.xyz);
 
-	// The output buffer might not have a 3D size multiple of our group size.
-	// Some of the parallel executions will not do anything.
+	// 输出缓冲区可能没有与工作组大小成倍数的 3D 尺寸。
+	// 一些并行执行将不会做任何事。
 	if (rpos.x >= u_params.block_size.x || rpos.y >= u_params.block_size.y || rpos.z >= u_params.block_size.z) {
 		return;
 	}

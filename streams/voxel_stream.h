@@ -26,11 +26,11 @@ namespace godot {
 class VoxelBuffer;
 }
 
-// Provides access to a source of paged voxel data, which may load and save.
-// This is intended for files, so it may run in a single background thread and gets requests in batches.
-// Must be implemented in a thread-safe way.
+// 提供对分页体素数据源的访问，可加载和保存。
+// 该设计针对文件，因此可在单个后台线程中运行，并批量接收请求。
+// 必须以线程安全的方式实现。
 //
-// If you are looking for a more specialized API to generate voxels with more threads, use VoxelGenerator.
+// 若你需要更专业的 API 以使用更多线程生成体素，请使用 VoxelGenerator。
 //
 class VoxelStream : public Resource {
 	GDCLASS(VoxelStream, Resource)
@@ -44,11 +44,11 @@ public:
 	~VoxelStream();
 
 	enum ResultCode : uint8_t {
-		// Something went wrong, the request should be aborted
+		// 出现错误，应中止该请求
 		RESULT_ERROR,
-		// The block could not be found in the stream. The requester may fallback on the generator.
+		// 在数据流中找不到该数据块。请求方可以回退到生成器。
 		RESULT_BLOCK_NOT_FOUND,
-		// The block was found, so the requester won't use the generator.
+		// 已找到该数据块，因此请求方不会使用生成器。
 		RESULT_BLOCK_FOUND,
 
 		_RESULT_COUNT
@@ -58,7 +58,7 @@ public:
 		VoxelBuffer &voxel_buffer;
 		Vector3i position_in_blocks;
 		uint8_t lod_index;
-		// This is currently not used in save queries. Maybe it should?
+		// 目前在保存查询中未使用该字段。也许应该使用？
 		ResultCode result;
 	};
 
@@ -71,24 +71,24 @@ public:
 	};
 #endif
 
-	// TODO Deprecate
-	// Queries a block of voxels beginning at the given world-space voxel position and LOD.
-	// If you use LOD, the result at a given coordinate must always remain the same regardless of it.
-	// In other words, voxels values must solely depend on their coordinates or fixed parameters.
+	// TODO 弃用
+	// 查询从给定世界坐标体素位置和 LOD 开始的一块体素。
+	// 若使用 LOD，给定坐标处的结果必须始终保持一致，无论 LOD 如何。
+	// 换言之，体素值必须仅取决于其坐标或固定参数。
 	virtual void load_voxel_block(VoxelQueryData &query_data);
 
-	// TODO Deprecate
+	// TODO 弃用
 	virtual void save_voxel_block(VoxelQueryData &query_data);
 
-	// Note: Don't modify the order of `p_blocks`.
+	// 注意：不要修改 `p_blocks` 的顺序。
 	virtual void load_voxel_blocks(Span<VoxelQueryData> p_blocks);
 
-	// Returns multiple blocks of voxels to the stream.
-	// This function is recommended if you save to files, because you can batch their access.
+	// 向数据流返回多个体素数据块。
+	// 若保存到文件，推荐使用此函数，因为可以批量访问。
 	virtual void save_voxel_blocks(Span<VoxelQueryData> p_blocks);
 
 #ifdef VOXEL_ENABLE_INSTANCER
-	// TODO Merge support functions into a single getter with Feature bitmask
+	// TODO 将支持函数合并为带功能位掩码的单个 getter
 	virtual bool supports_instance_blocks() const;
 
 	virtual void load_instance_blocks(Span<InstancesQueryData> out_blocks);
@@ -96,7 +96,7 @@ public:
 #endif
 
 	struct FullLoadingResult {
-		// TODO Perhaps this needs to be decoupled. Not all voxel blocks have instances and vice versa
+		// TODO 也许这需要解耦。并非所有体素数据块都有实例，反之亦然
 		struct Block {
 			std::shared_ptr<VoxelBuffer> voxels;
 #ifdef VOXEL_ENABLE_INSTANCER
@@ -114,41 +114,40 @@ public:
 
 	virtual void load_all_blocks(FullLoadingResult &result);
 
-	// Tells which channels can be found in this stream.
-	// The simplest implementation is to return them all.
-	// One reason to specify which channels are available is to help the editor detect configuration issues,
-	// and to avoid saving some of the channels if only specific ones are meant to be saved.
+	// 告知此数据流中可找到哪些通道。
+	// 最简单的实现是全部返回。
+	// 指定可用通道的一个原因是帮助编辑器检测配置问题，
+	// 并且若只想保存特定通道，可避免保存其他通道。
 	virtual int get_used_channels_mask() const;
 
-	// Gets which block size this stream will provide, as a power of two.
-	// File streams are likely to impose a specific block size,
-	// and changing it can be very expensive so the API is usually specific too
+	// 获取此数据流将提供的数据块大小，以 2 的幂表示。
+	// 文件数据流很可能强制规定特定的数据块大小，
+	// 更改它可能代价高昂，因此 API 通常也是特定的
 	virtual int get_block_size_po2() const;
 
-	// Gets at how many levels of details blocks can be queried.
+	// 获取数据块可被查询的细节层级（LOD）数量。
 	virtual int get_lod_count() const;
 
 	virtual Box3i get_supported_block_range() const;
 
-	// Should generated blocks be saved immediately? If not, they will be saved only when modified.
-	// If this is enabled, generated blocks will immediately be considered edited and will be saved to the stream.
-	// Warning: this is incompatible with non-destructive workflows such as modifiers.
+	// 生成的数据块是否应立即保存？若不，它们将仅在修改后被保存。
+	// 若启用，生成的数据块将立即被视为已编辑并保存到数据流。
+	// 警告：这与修改器等非破坏性工作流不兼容。
 	void set_save_generator_output(bool enabled);
 	bool get_save_generator_output() const;
 
-	// If the stream doesn't immediately write data to the filesystem (using a cache to batch I/Os for example), forces
-	// all pending data to be written.
-	// This should not be called frequently if performance is a concern, as it would require much more file I/Os. May be
-	// used if you require all data to be written now. Note that implementations should already do this automatically
-	// when the resource is destroyed or their configuration changes. Some implementations may do nothing if they have
-	// no cache.
+	// 若数据流不立即将数据写入文件系统（例如使用缓存批量处理 I/O），则强制
+	// 写入所有待处理数据。
+	// 若关心性能，则不应频繁调用此方法，因为会需要更多文件 I/O。可
+	// 在需要立即写入全部数据时使用。注意，实现应当已在资源销毁或其配置改变时自动执行此操作。
+	// 某些实现若无缓存，可能什么都不做。
 	virtual void flush();
 
 	void set_compression_mode(const godot::VoxelBlockSerializer::Compression mode);
 	godot::VoxelBlockSerializer::Compression get_compression_mode() const;
 
-	// Hints whether the stream's functions can be called. Mainly used in case of script implementations, to avoid error
-	// spams.
+	// 提示数据流的函数是否可以调用。主要用于脚本实现，以避免错误
+	// 刷屏。
 	virtual bool is_runnable() const;
 
 protected:

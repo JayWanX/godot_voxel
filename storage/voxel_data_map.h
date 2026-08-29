@@ -7,7 +7,7 @@
 #include "../util/containers/std_unordered_map.h"
 #include "../util/math/box3i.h"
 #include "../util/profiling.h"
-#include "voxel_buffer.h" // Used in template methods
+#include "voxel_buffer.h" // 在模板方法中使用
 #include "voxel_data_block.h"
 #include "voxel_format.h"
 
@@ -15,23 +15,23 @@ namespace voxel {
 
 class VoxelGenerator;
 
-// Sparse voxel storage by means of cubic chunks, within a constant LOD.
+// 在恒定 LOD 内，通过立方体 chunk 实现的稀疏体素存储。
 //
-// When doing data streaming, the volume is *partially* loaded. If a block is not found at some coordinates,
-// it means we don't know if it contains edits or not. Knowing this is important to avoid writing or caching voxel data
-// in blank areas, that may be completely different once loaded.
-// When using "full load" of edits, it doesn't matter. If all edits are loaded, we know up-front that everything else
-// isn't edited (which also means we may not find blocks without data in them).
+// 进行数据流式传输时，体积是*部分*加载的。如果在某些坐标找不到块，
+// 说明我们不知道它是否包含编辑。了解这一点很重要，可以避免在空白区域
+// 写入或缓存体素数据，因为那些区域一旦加载可能完全不同。
+// 使用"完整加载"编辑时，这无关紧要。如果所有编辑都已加载，我们预先知道
+// 其他所有内容都未编辑（这也意味着我们可能找不到没有数据的块）。
 //
 class VoxelDataMap {
 public:
-	// This is block size in VOXELS. To convert to space units, use `block_size << lod_index`.
+	// 这是以体素为单位的块大小。要转换为空间单位，请使用 `block_size << lod_index`。
 	static const unsigned int BLOCK_SIZE_PO2 = constants::DEFAULT_BLOCK_SIZE_PO2;
 	static const unsigned int BLOCK_SIZE = 1 << BLOCK_SIZE_PO2;
 	static const unsigned int BLOCK_SIZE_MASK = BLOCK_SIZE - 1;
 
-	// Converts voxel coordinates into block coordinates.
-	// Don't use division because it introduces an offset in negative coordinates.
+	// 将体素坐标转换为块坐标。
+	// 不要使用除法，因为它会在负坐标中引入偏移。
 	static inline Vector3i voxel_to_block_b(Vector3i pos, int block_size_pow2) {
 		return pos >> block_size_pow2;
 	}
@@ -44,7 +44,7 @@ public:
 		return Vector3i(pos.x & BLOCK_SIZE_MASK, pos.y & BLOCK_SIZE_MASK, pos.z & BLOCK_SIZE_MASK);
 	}
 
-	// Converts block coordinates into voxel coordinates.
+	// 将块坐标转换为体素坐标。
 	inline Vector3i block_to_voxel(Vector3i bpos) const {
 		return bpos * BLOCK_SIZE;
 	}
@@ -87,7 +87,7 @@ public:
 		copy(min_pos, dst_buffer, channels_mask, nullptr, nullptr, with_metadata);
 	}
 
-	// Gets a copy of all voxels in the area starting at min_pos having the same size as dst_buffer.
+	// 获取从 min_pos 开始、与 dst_buffer 大小相同的区域内所有体素的副本。
 	void copy(
 			const Vector3i min_pos,
 			VoxelBuffer &dst_buffer,
@@ -119,7 +119,7 @@ public:
 			const bool with_metadata
 	);
 
-	// Moves the given buffer into a block of the map. The buffer is referenced, no copy is made.
+	// 将给定缓冲区移入地图的一个块中。该缓冲区被引用，不进行复制。
 	VoxelDataBlock *set_block_buffer(Vector3i bpos, std::shared_ptr<VoxelBuffer> &buffer, bool overwrite);
 	VoxelDataBlock *set_empty_block(Vector3i bpos, bool overwrite);
 	void set_block(Vector3i bpos, const VoxelDataBlock &block);
@@ -232,19 +232,19 @@ private:
 	// void set_block_size_pow2(unsigned int p);
 
 private:
-	// Blocks stored with a spatial hash in all 3D directions.
-	// Before I used Godot 3's HashMap with RELATIONSHIP = 2 because that delivers better performance compared to
-	// defaults, but it sometimes has very long stalls on removal, which std::unordered_map doesn't seem to have
-	// (not as badly). Also overall performance is slightly better.
-	// Note: pointers to elements remain valid when inserting or removing others (only iterators may be invalidated)
+	// 块以三维方向上的空间哈希存储。
+	// 以前我使用 Godot 3 的 HashMap（RELATIONSHIP = 2），因为它比默认配置性能更好，
+	// 但它在删除时有时会有很长的停顿，而 std::unordered_map 似乎没有
+	// （至少没那么严重）。而且整体性能略好。
+	// 注意：插入或删除其他元素时，指向元素的指针仍然有效（只有迭代器可能失效）
 	StdUnorderedMap<Vector3i, VoxelDataBlock> _blocks_map;
 
-	// This was a possible optimization in a single-threaded scenario, but it's not in multithread.
-	// We want to be able to do shared read-accesses but this is a mutable variable.
-	// If we want this back, it may be thread-local in some way.
+	// 这在单线程场景中可能是可行的优化，但在多线程中不行。
+	// 我们希望能够共享读访问，但这是一个可变变量。
+	// 如果我们想恢复这个，它可能要以某种方式是线程局部的。
 	//
-	// Voxel access will most frequently be in contiguous areas, so the same blocks are accessed.
-	// To prevent too much hashing, this reference is checked before.
+	// 体素访问最常发生在连续区域，因此会访问相同的块。
+	// 为了防止过多的哈希计算，会先检查这个引用。
 	// mutable VoxelDataBlock *_last_accessed_block = nullptr;
 
 	unsigned int _lod_index = 0;

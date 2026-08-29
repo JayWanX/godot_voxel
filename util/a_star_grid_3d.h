@@ -11,8 +11,8 @@
 
 namespace voxel {
 
-// Variant of AStar specialized in 3D grids.
-// This implementation can be executed step by step, for debugging or spreading cost over time.
+// AStar 的变体，专门用于三维网格。
+// 该实现可以逐步执行，便于调试或将开销分摊到时间内。
 class AStarGrid3D {
 public:
 	AStarGrid3D();
@@ -60,13 +60,13 @@ private:
 
 		Vector3i position;
 
-		// Sum of all costs travelling every point until reaching this point, along the best path so far
+		// 沿目前最优路径，到达该点前经过每个点的所有代价之和
 		float gscore;
 
-		// Estimated cost from this point to the destination
+		// 从该点到目标的估计代价
 		float fscore;
 
-		// Preceding point along the best path so far
+		// 目前最优路径上的前一个点
 		uint32_t came_from_point_index;
 
 		bool in_open_set;
@@ -80,16 +80,16 @@ private:
 			const Point &b = (*pool)[bi];
 			return a.fscore > b.fscore;
 
-			// The following spams "bad comparison function", no clue why, despite being the way AStarGrid2D works.
-			// It goes away when replacing >= with >, but then it's no longer the same logic.
-			// From my profilings so far, it also makes no difference
+			// "下面这段代码会反复报"bad comparison function"，不知原因，尽管它正是 AStarGrid2D 的工作方式。"
+			// 把 >= 替换为 > 后该问题消失，但那样逻辑就不同了。
+			// 从我目前的性能分析来看，这也没有区别
 			// if (a.fscore < b.fscore) {
 			// 	return true;
 			// }
 			// if (a.fscore > b.fscore) {
 			// 	return false;
 			// }
-			// // If the fscores are the same then prioritize the points that are further away from the start.
+			// // 如果 fscores 相同，则优先考虑离起点更远的点。
 			// return a.gscore >= b.gscore;
 		}
 	};
@@ -103,7 +103,7 @@ private:
 		}
 
 		inline void pop() {
-			// Remove the current point from the open list.
+			// 将当前点从开放列表中移除。
 			sorter.pop_heap(0, items.size(), items.data());
 			items.pop_back();
 		}
@@ -123,7 +123,7 @@ private:
 
 		void update_priority(uint32_t v) {
 			for (unsigned int i = 0; i < items.size(); ++i) {
-				// This would normally need a way to define a custom equality comparison, but in our use case it works
+				// 这通常需要一个自定义相等比较的方法，但在我们的使用场景中这样做是可行的
 				if (items[i] == v) {
 					sorter.push_heap(0, i, 0, v, items.data());
 					break;
@@ -135,29 +135,29 @@ private:
 	uint32_t _start_point_index;
 	Vector3i _target_position;
 	bool _is_running = false;
-	// Agent size, defaulting to a player 2 voxels tall and 1 voxel wide. Should be slightly lower than one voxel to
-	// give some wiggle room.
-	// TODO Specify agent origin manually, because it's tricky to check if it fits a cell when it is larger than one
-	// cell. The algorithm only travels through cell centers, so depending on the agent's origin, some paths will never
-	// be taken, even though it could if it could travel between cells. Usually a good choice is to divide the agent
-	// into grid cells body parts can fit in, and put its origin at the center of its lower-left corner. This needs to
-	// be taken into account when reading the final path.
+	// 智能体尺寸，默认相当于一个高 2 体素、宽 1 体素的玩家。应略小于一个体素，以
+	// 留出一点余量。
+	// TODO 手动指定智能体原点，因为当它大于一个格时，检查是否适配某个格会比较麻烦；
+	// 该算法只经过格的中心，因此根据智能体原点的不同，某些路径将永远
+	// 不会被采用，即使它在格间移动时本可以。通常较好的做法是将智能体
+	// 划分为可容纳其身体各部分的网格格，并将其原点放在左下角的中心。这需要在
+	// 读取最终路径时加以考虑。
 	Vector3f _agent_size = Vector3f(0.8f, 1.8f, 0.8f);
 	Vector3f _fitting_offset;
 	int _max_fall_height = 3;
 
-	// Nodes with a cumulated edge cost greater than this will be ignored.
-	// This limits the effective cost a path can have, in addition to the region check.
-	// By default, edge cost is distance, so it would be maximum path length.
+	// 累积边代价大于此值的节点将被忽略。
+	// 除区域检查外，这也限制了路径的有效代价上限。
+	// 默认情况下，边代价即距离，因此它相当于最大路径长度。
 	float _max_path_cost = 1000.f;
 
 	Box3i _region;
 	StdVector<Point> _points_pool;
 	PriorityQueue _open_list;
 
-	// Only visited points will be in this map. Should use less memory than if we made a big 3D grid of points, because
-	// in practice we may only visit a fraction of them.
-	// Eventually we could try a chunked grid if that's faster?
+	// 只有被访问过的点才会进入该映射。相比建立一个大的三维点网格，它应占用更少内存，因为
+	// 实际上我们可能只访问其中的一小部分。
+	// 最终若更快的话，我们可以尝试分块网格？
 	StdUnorderedMap<Vector3i, uint32_t> _points_map;
 
 	StdVector<Vector3i> _path;

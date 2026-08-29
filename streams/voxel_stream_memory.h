@@ -14,8 +14,8 @@
 
 namespace voxel {
 
-// "fake" stream that just stores copies of the data in memory instead of saving them to the filesystem. May be used for
-// testing.
+// "fake" 数据流，只在内存中保存数据副本，而非保存到文件系统。可用于
+// 测试。
 class VoxelStreamMemory : public VoxelStream {
 	GDCLASS(VoxelStreamMemory, VoxelStream)
 public:

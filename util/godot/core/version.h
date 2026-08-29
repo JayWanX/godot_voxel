@@ -5,7 +5,7 @@
 
 #include <core/version.h>
 
-// Expose Godot's version macros under a prefixed name for clarity.
+// 为了清晰起见，以带前缀的名称暴露 Godot 的版本宏。
 
 #ifndef GODOT_VERSION_MAJOR
 #define GODOT_VERSION_MAJOR VERSION_MAJOR

@@ -18,7 +18,7 @@ void copy_3d_region_zxy(
 	clip_copy_region(src_min, src_max, src_size, dst_min, dst_size);
 	const Vector3i area_size = src_max - src_min;
 	if (area_size.x <= 0 || area_size.y <= 0 || area_size.z <= 0) {
-		// Degenerate area, we'll not copy anything.
+		// 退化的区域，不复制任何内容。
 		return;
 	}
 
@@ -37,14 +37,14 @@ void copy_3d_region_zxy(
 #endif
 
 	if (area_size == src_size && area_size == dst_size) {
-		// Copy everything
+		// 复制全部
 		VOXEL_ASSERT_RETURN(dst.size() == src.size());
 		memcpy(dst.data(), src.data(), dst.size());
 
 	} else {
-		// Copy area row by row:
-		// This offset is how much to move in order to advance by one row (row direction is Y),
-		// essentially doing y+1
+		// 逐行复制区域：
+		// 该偏移量是前进一行所需的移动量（行方向为 Y），
+		// 本质上相当于执行 y+1
 		const unsigned int src_row_offset = src_size.y * item_size;
 		const unsigned int dst_row_offset = dst_size.y * item_size;
 		Vector3i pos;
@@ -58,8 +58,8 @@ void copy_3d_region_zxy(
 				VOXEL_ASSERT_RETURN(dst.size() - dst_ri >= area_size.y * item_size);
 				VOXEL_ASSERT_RETURN(src.size() - src_ri >= area_size.y * item_size);
 #endif
-				// TODO Cast src and dst to `restrict` so the optimizer can assume addresses don't overlap,
-				//      which might allow to write as a for loop (which may compile as a `memcpy`)?
+				// TODO 将 src 和 dst 转换为 `restrict`，使优化器可以假定地址不重叠，
+				//      这可能允许写成 for 循环（或许能编译成 `memcpy`）？
 				memcpy(&dst[dst_ri], &src[src_ri], area_size.y * item_size);
 				src_ri += src_row_offset;
 				dst_ri += dst_row_offset;
@@ -78,7 +78,7 @@ Vector3i get_3d_array_transform_origin(const math::OrthoBasis &basis, const Vect
 	dst_size[ya] = src_size.y;
 	dst_size[za] = src_size.z;
 
-	// If an axis is negative, it means iteration starts from the end
+	// 如果某个轴为负，表示迭代从末尾开始
 	const int ox = basis.get_axis(xa).x < 0 ? dst_size.x - 1 : 0;
 	const int oy = basis.get_axis(ya).y < 0 ? dst_size.y - 1 : 0;
 	const int oz = basis.get_axis(za).z < 0 ? dst_size.z - 1 : 0;

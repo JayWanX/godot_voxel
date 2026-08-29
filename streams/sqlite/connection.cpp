@@ -55,7 +55,7 @@ struct BindBlockCoordinates {
 			case COORDINATE_COLUMN_STRING: {
 				const std::string_view eloc = location.encode_string_csd(buffer);
 
-				// We use SQLITE_STATIC to tell SQLite we are managing that memory
+				// 我们使用 SQLITE_STATIC 告知 SQLite 由我们管理这块内存
 				const int rc = sqlite3_bind_text(statement, param_index, eloc.data(), eloc.size(), SQLITE_STATIC);
 				if (rc != SQLITE_OK) {
 					ERR_PRINT(sqlite3_errmsg(db));
@@ -67,7 +67,7 @@ struct BindBlockCoordinates {
 				Span<uint8_t> eloc = to_span(buffer).sub(0, BLOB80_LENGTH);
 				location.encode_blob80(eloc);
 
-				// We use SQLITE_STATIC to tell SQLite we are managing that memory
+				// 我们使用 SQLITE_STATIC 告知 SQLite 由我们管理这块内存
 				const int rc = sqlite3_bind_blob(statement, param_index, eloc.data(), eloc.size(), SQLITE_STATIC);
 				if (rc != SQLITE_OK) {
 					ERR_PRINT(sqlite3_errmsg(db));
@@ -84,14 +84,14 @@ struct BindBlockCoordinates {
 	}
 
 	inline bool unbind(sqlite3 *db, sqlite3_stmt *statement, int param_index) {
-		// Not done at the moment. We assume the statement will always be reset before use, and bindings will ALWAYS
-		// be overwritten the next time a query gets made.
-		// The code below currently throws an `SQLITE_MISUSE` error because we would also need to call reset() after
-		// the query...
+		// 目前没做这一步。我们假定语句在每次使用前都会被重置，并且绑定在下一次查询时总会被覆盖
+		// 即在下一次进行查询时总会覆盖这些绑定。
+		// 下面的代码目前会抛出 `SQLITE_MISUSE` 错误，因为查询之后我们还需要调用 reset()
+		// 即查询之后……
 
-		// Unbind the key for correctness, as the doc says the use of SQLITE_STATIC means the bound object must
-		// remain valid until the parameter is bound to something else (in which case, we explicitely do it).
-		// Not sure if we actually need to do that in practice.
+		// 为了正确性需要解除键的绑定，因为文档说明使用 SQLITE_STATIC 意味着绑定对象必须
+		// 保持有效，直到该参数被绑定到其它东西为止（这种情况下我们会显式解除绑定）。
+		// 不确定实践中是否真的需要这样做。
 		//
 		// if (key_column_type == COORDINATE_COLUMN_STRING) {
 		// 	const int rc = sqlite3_bind_text(statement, param_index, nullptr, 0, SQLITE_STATIC);
@@ -126,7 +126,7 @@ inline bool read_block_location(
 		case COORDINATE_COLUMN_STRING: {
 			const unsigned char *eloc = sqlite3_column_text(statement, param_index);
 			const unsigned int eloc_len = sqlite3_column_bytes(statement, param_index);
-			// That's ugly...
+			// 这有点难看……
 			const std::string_view s(reinterpret_cast<const char *>(eloc), eloc_len);
 			VOXEL_ASSERT_RETURN_V(BlockLocation::decode_string_csd(s, out_location), false);
 		} break;
@@ -152,27 +152,27 @@ struct TransactionScope {
 	TransactionScope(Connection &p_db) : db(p_db) {
 		began = db.begin_transaction();
 		if (!began) {
-			// Attempt to clear any leftover transaction state so the connection remains usable. The scoped
-			// queries will still run, just not atomically.
+			// 尝试清除任何残留的事务状态，使连接保持可用。这些作用域内的
+			// 查询仍会运行，只是不是原子的。
 			db.rollback_transaction();
 		}
 	}
 	~TransactionScope() {
 		if (began && !db.end_transaction()) {
-			// A COMMIT that fails (SQLITE_BUSY notably) leaves the transaction open, which would make every
-			// later BEGIN on this connection fail. Roll it back so the connection can be reused.
+			// 失败的 COMMIT（尤其是 SQLITE_BUSY）会让事务保持打开状态，这将导致该连接上后续每次
+			// BEGIN 都失败。回滚它以便连接可以复用。
 			db.rollback_transaction();
 		}
 	}
 };
 
-// How long a connection waits for a lock held by another connection before giving up with SQLITE_BUSY.
-// Several connections of the same stream can be open on the same file at once (see VoxelStreamSQLite's connection
-// pool), so they do contend: a background streaming thread loading blocks, and a `flush()` called from game code,
-// for example. Transactions here are bounded (a cache flush writes at most VoxelStreamSQLite::CACHE_SIZE blocks), so
-// realistic waits are much shorter than this; the timeout is a safety net rather than an expected cost. It is kept
-// modest because `flush()` is callable from the main thread, where a long block would be a visible freeze, and
-// because exceeding it is no longer fatal: callers recover the connection with `rollback_transaction`.
+// 一个连接在因 SQLITE_BUSY 放弃之前，等待另一个连接持有的锁多长时间。
+// 同一流的多个连接可以同时打开到同一个文件（参见 VoxelStreamSQLite 的连接池
+// ），因此它们确实会竞争：一个加载数据块的后台流式线程，以及一个从游戏代码中调用的 `flush()`，
+// 例如。这里的事务是有界的（一次缓存刷新最多写入 VoxelStreamSQLite::CACHE_SIZE 个数据块），因此
+// 实际的等待通常远短于此；超时是一个安全网，而非预期的代价。它保持
+// 之所以取适中的值，是因为 `flush()` 可以从主线程调用，在那里长时间阻塞会表现为明显的卡顿，而且
+// 因为超过它不再致命：调用方可以用 `rollback_transaction` 恢复连接。
 const int TRANSACTION_BUSY_TIMEOUT_MS = 1000;
 
 static bool prepare(sqlite3 *db, sqlite3_stmt **s, const char *sql) {
@@ -210,11 +210,11 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 		return false;
 	}
 
-	// Without a busy handler, any statement that can't take a lock held by another connection fails immediately
-	// instead of waiting for it. That notably affects COMMIT, which leaves the transaction open when it fails.
+	// 如果没有 busy 处理器，任何无法获取另一连接所持锁的语句都会立即失败
+	// 而不是等待锁。这尤其影响 COMMIT，它在失败时会让事务保持打开状态。
 	sqlite3_busy_timeout(_db, TRANSACTION_BUSY_TIMEOUT_MS);
 
-	// Note, SQLite uses UTF-8 encoding by default. We rely on that.
+	// 注意，SQLite 默认使用 UTF-8 编码。我们依赖这一点。
 	// https://www.sqlite.org/c3ref/open.html
 
 	sqlite3 *db = _db;
@@ -222,7 +222,7 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 
 	const CoordinateColumnType block_key_column_type = get_coordinate_column_type(preferred_coordinate_format);
 
-	// Create tables if they don't exist.
+	// 如果表不存在，则创建它们。
 	const char *tables[3] = {
 		"CREATE TABLE IF NOT EXISTS meta (version INTEGER, block_size_po2 INTEGER, coordinate_format INTEGER)",
 		"",
@@ -261,7 +261,7 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 		return false;
 	}
 
-	// Prepare statements
+	// 准备语句
 	if (!prepare(
 				db,
 				&_update_voxel_block_statement,
@@ -330,10 +330,10 @@ bool Connection::open(const char *fpath, const BlockLocation::CoordinateFormat p
 		return false;
 	}
 
-	// Is the database setup?
+	// 数据库是否已设置？
 	Meta meta = load_meta();
 	if (meta.version == -1) {
-		// Setup database
+		// 设置数据库
 		meta.version = VERSION_LATEST;
 		// Defaults
 		meta.block_size_po2 = constants::DEFAULT_BLOCK_SIZE_PO2;
@@ -435,15 +435,15 @@ bool Connection::rollback_transaction() {
 		return false;
 	}
 
-	// `sqlite3_reset` returns the error code of the *previous* evaluation of the statement, so a statement that
-	// failed once keeps reporting that same failure the next time it is used, even though the reset itself did
-	// happen. Clear that leftover state here, otherwise the recovered connection would spuriously fail its next
-	// `begin_transaction`.
+	// `sqlite3_reset` 返回语句*上一次*求值的错误码，因此一条曾失败的语句
+	// 会在下次使用时继续报告同样的失败，即使重置本身已经
+	// 发生。在此清除残留状态，否则恢复后的连接会在下一次调用时莫名地失败
+	// 即 `begin_transaction`。
 	sqlite3_reset(_begin_statement);
 	sqlite3_reset(_end_statement);
 
-	// No transaction is active, so there is nothing to roll back. Issuing ROLLBACK anyway would fail with
-	// "cannot rollback - no transaction is active".
+	// 当前没有活动事务，因此没有需要回滚的内容。无论如何发出 ROLLBACK 都会以
+	// "cannot rollback - no transaction is active" 失败。
 	if (sqlite3_get_autocommit(_db) != 0) {
 		return true;
 	}
@@ -493,7 +493,7 @@ bool Connection::save_block(const BlockLocation loc, const Span<const uint8_t> b
 	if (block_data.size() == 0) {
 		rc = sqlite3_bind_null(update_block_statement, 2);
 	} else {
-		// We use SQLITE_TRANSIENT so SQLite will make its own copy of the data
+		// 我们使用 SQLITE_TRANSIENT，以便 SQLite 制作自己的数据副本
 		rc = sqlite3_bind_blob(update_block_statement, 2, block_data.data(), block_data.size(), SQLITE_TRANSIENT);
 	}
 	if (rc != SQLITE_OK) {
@@ -560,7 +560,7 @@ VoxelStream::ResultCode Connection::load_block(
 				out_block_data.resize(blob_size);
 				memcpy(out_block_data.data(), blob, blob_size);
 			}
-			// The query is still ongoing, we'll need to step one more time to complete it
+			// 查询仍在进行中，我们需要再执行一步以完成它
 			continue;
 		}
 		if (rc != SQLITE_DONE) {
@@ -617,8 +617,8 @@ bool Connection::load_all_blocks(
 			const void *instances_blob = sqlite3_column_blob(load_all_blocks_statement, 2);
 			const size_t instances_blob_size = sqlite3_column_bytes(load_all_blocks_statement, 2);
 
-			// Using a function pointer because returning a big list of a copy of all the blobs can
-			// waste a lot of temporary memory
+			// 使用函数指针，因为返回所有 blob 副本的大列表会
+			// 浪费大量临时内存
 			process_block_func(
 					callback_data,
 					loc,
@@ -669,8 +669,8 @@ bool Connection::load_all_block_keys(
 					read_block_location(_meta.coordinate_format, key_column_type, load_all_block_keys_statement, 0, loc)
 			);
 
-			// Using a function pointer because returning a big list of a copy of all the blobs can
-			// waste a lot of temporary memory
+			// 使用函数指针，因为返回所有 blob 副本的大列表会
+			// 浪费大量临时内存
 			process_block_func(callback_data, loc);
 
 		} else if (rc == SQLITE_DONE) {
@@ -700,10 +700,10 @@ int Connection::load_version() {
 	rc = sqlite3_step(load_version_statement);
 	if (rc == SQLITE_ROW) {
 		version = sqlite3_column_int(load_version_statement, 0);
-		// The query is still ongoing, we'll need to step one more time to complete it
+		// 查询仍在进行中，我们需要再执行一步以完成它
 		rc = sqlite3_step(load_version_statement);
 	} else {
-		// There was no row. This database is probably not setup.
+		// 没有返回任何行。该数据库可能尚未设置好。
 		return VERSION_LATEST;
 	}
 
@@ -745,11 +745,11 @@ Connection::Meta Connection::load_meta() {
 			invalid_version = true;
 		}
 
-		// The query is still ongoing, we'll need to step one more time to complete it
+		// 查询仍在进行中，我们需要再执行一步以完成它
 		rc = sqlite3_step(load_meta_statement);
 
 	} else if (rc == SQLITE_DONE) {
-		// There was no row. This database is probably not setup.
+		// 没有返回任何行。该数据库可能尚未设置好。
 		return Meta();
 	}
 	if (rc != SQLITE_DONE) {
@@ -839,7 +839,7 @@ void Connection::save_meta(Meta meta) {
 	for (unsigned int channel_index = 0; channel_index < meta.channels.size(); ++channel_index) {
 		const Meta::Channel &channel = meta.channels[channel_index];
 		if (!channel.used) {
-			// TODO Remove rows for unused channels? Or have a `used` column?
+			// TODO 移除未使用通道的行？还是加一个 `used` 列？
 			continue;
 		}
 
@@ -875,7 +875,7 @@ bool Connection::migrate_from_v0_to_v1() {
 	}
 	VOXEL_ASSERT_RETURN_V(_meta.version == VERSION_V0, false);
 
-	// Prepare statements
+	// 准备语句
 	struct Statements {
 		Connection &db;
 		sqlite3_stmt *alter_table = nullptr;

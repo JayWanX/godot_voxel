@@ -21,7 +21,7 @@ VoxelBlockyAttributeAxis::VoxelBlockyAttributeAxis() {
 	FixedArray<math::OrthoBasis, VoxelBlockyAttributeAxis::AXIS_COUNT> bases;
 	bases[VoxelBlockyAttributeAxis::AXIS_X].rotate_y_90_ccw();
 	bases[VoxelBlockyAttributeAxis::AXIS_Y].rotate_x_90_ccw();
-	// AXIS_Z is identity
+	// AXIS_Z 是单位变换
 
 	_ortho_rotations.resize(bases.size());
 	for (unsigned int axis_index = 0; axis_index < bases.size(); ++axis_index) {

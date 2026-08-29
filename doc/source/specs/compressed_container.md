@@ -1,16 +1,16 @@
-Compressed data format
+压缩数据格式
 ========================
 
-Some custom formats used in this engine can be wrapped in a compressed container.
+此引擎中使用的某些自定义格式可以包装在压缩容器中。
 
-Specification
+规范
 ----------------
 
-### Endianness
+### 字节序
 
-By default, little-endian.
+默认为小端字节序。
 
-### Compressed container
+### 压缩容器
 
 ```
 CompressedData
@@ -18,13 +18,12 @@ CompressedData
 - data
 ```
 
-Compressed data starts with one byte. Depending on its value, what follows is different.
+压缩数据以单字节开始。根据其值，后续内容会有所不同。
 
-- `0`: no compression. Following bytes can be read directly. This is rarely used and could be for debugging.
-- `1`: LZ4_BE compression, *deprecated*. The next big-endian 32-bit unsigned integer is the size of the decompressed data, and following bytes are compressed data using LZ4 default parameters.
-- `2`: LZ4 compression, The next little-endian 32-bit unsigned integer is the size of the decompressed data, and following bytes are compressed data using LZ4 default parameters. This is the default mode.
-- `3`: Zstandard compression. The next little-endian 32-bit unsigned integer is the size of the decompressed data, and the following bytes are compressed data using Zstandard default parameters.
+- `0`：无压缩。后续字节可直接读取。这很少使用，可能用于调试。
+- `1`：LZ4_BE 压缩，*已弃用*。下一个大端 32 位无符号整数是解压后数据的大小，后续字节是使用 LZ4 默认参数压缩的数据。
+- `2`：LZ4 压缩。下一个小端 32 位无符号整数是解压后数据的大小，后续字节是使用 LZ4 默认参数压缩的数据。这是默认模式。
+- `3`：Zstandard 压缩。下一个小端 32 位无符号整数是解压后数据的大小，后续字节是使用 Zstandard 默认参数压缩的数据。
 
 !!! note
-    Depending on the type of data, knowing its decompressed size may be important when parsing it later.
-
+    根据数据类型的不同，在后续解析时知道其解压后的大小可能很重要。

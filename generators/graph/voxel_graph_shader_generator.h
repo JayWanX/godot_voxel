@@ -12,7 +12,7 @@
 
 namespace voxel::pg {
 
-// Generates GLSL code from the given graph.
+// 根据给定的图生成 GLSL 代码。
 CompilationResult generate_shader(
 		const ProgramGraph &p_graph,
 		Span<const VoxelGraphFunction::Port> input_defs,
@@ -22,7 +22,7 @@ CompilationResult generate_shader(
 		Span<const VoxelGraphFunction::NodeTypeID> restricted_outputs
 );
 
-// Sent as argument to functions implementing generator nodes, in order to generate shader code.
+// 作为参数传递给实现生成器节点的函数，用于生成着色器代码。
 class ShaderGenContext {
 public:
 	ShaderGenContext(
@@ -70,7 +70,7 @@ public:
 	}
 
 	void require_lib_code(const char *lib_name, const char *code);
-	// If the code is too long for a string constant, it can be provided as a list of strings
+	// 若代码对于字符串常量来说太长，可以以字符串列表的形式提供
 	void require_lib_code(const char *lib_name, const char **code);
 
 	StdString add_uniform(std::shared_ptr<ComputeShaderResource> res);

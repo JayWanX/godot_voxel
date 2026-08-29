@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Interface for an output stream of characters
+// 字符输出流的接口
 class TextWriter {
 public:
 	TextWriter(Span<char> buf);

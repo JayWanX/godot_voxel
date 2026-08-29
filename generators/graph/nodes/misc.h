@@ -106,12 +106,12 @@ void register_misc_nodes(Span<NodeType> types) {
 
 			if (tested_value.min >= threshold) {
 				ctx.set_output(0, b);
-				// `a` won't be used
+				// `a` 不会被使用
 				ctx.ignore_input(0);
 
 			} else if (tested_value.max < threshold) {
 				ctx.set_output(0, a);
-				// `b` won't be used
+				// `b` 不会被使用
 				ctx.ignore_input(1);
 
 			} else {

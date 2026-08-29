@@ -15,10 +15,10 @@
 
 namespace voxel {
 
-// Explicit conversion methods. Not in respective files because it would cause circular dependencies.
+// 显式转换方法。不放在各自文件中，否则会引起循环依赖。
 
-// Godot => Godot
-// Note, in Godot modules there are implicit conversions. But I dont like implicit.
+// Godot 格式 => Godot 格式
+// 注意，Godot 模块中存在隐式转换。但我不喜欢隐式转换。
 
 inline Vector2i to_vec2i(const Vector2 v) {
 	return Vector2i(v.x, v.y);
@@ -32,14 +32,14 @@ inline Vector3 to_vec3(const Vector3i v) {
 	return Vector3(v.x, v.y, v.z);
 }
 
-// Make `to_vec3` calls fail if no explicit overload is found.
-// To avoid Godot from silently converting Vector3 to Vector3i due to the compiler matching that function overload when
-// accidentally passing a `Vector3` to `to_vec3`. Our style is to have explicit vector conversions, but when mistakes
-// occur, it clashes with Godot's style, creating bugs that are hard to spot.
+// 若找不到显式重载，则让 `to_vec3` 调用编译失败。
+// 为了避免 Godot 在意外传入 `Vector3` 时，因编译器匹配到该重载而静默地将 Vector3 转换为 Vector3i，
+// （我们的风格是显式向量转换，但出错时
+// 会与 Godot 的风格冲突，产生难以察觉的 bug）。
 template <typename T>
 inline Vector3 to_vec3(T v) = delete;
 
-// Godot => VOXEL
+// Godot 格式 => VOXEL 格式
 
 inline Vector2f to_vec2f(Vector2 v) {
 	return Vector2f(v.x, v.y);
@@ -73,7 +73,7 @@ inline Transform3f to_transform3f(const Transform3D &t) {
 	return Transform3f(to_basis3f(t.basis), to_vec3f(t.origin));
 }
 
-// VOXEL => Godot
+// VOXEL 格式 => Godot 格式
 
 template <typename T>
 inline Vector2 to_vec2(const Vector2T<T> v) {
@@ -107,7 +107,7 @@ inline Transform3D to_transform3(const Transform3f &t) {
 	return Transform3D(to_basis3(t.basis), to_vec3(t.origin));
 }
 
-// VOXEL => VOXEL
+// VOXEL 格式 => VOXEL 格式
 
 template <typename T>
 inline Vector3d to_vec3d(const Vector3T<T> v) {

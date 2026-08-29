@@ -95,7 +95,7 @@ void AStarGrid3D::step() {
 		return;
 	}
 
-	// Remove the current point from the open list.
+	// 将当前点从开放列表中移除。
 	_open_list.pop();
 
 	_points_pool[current_point_index].in_open_set = false;
@@ -115,9 +115,9 @@ void AStarGrid3D::step() {
 
 			Point p;
 			p.position = npos;
-			// We haven't visited this node yet so it's not calculated.
-			// We set it to infinite (large) number so it will naturally be higher than the computed gscore and will
-			// get pushed to the open list
+			// 我们尚未访问该节点，因此它尚未被计算。
+			// 我们将其设为无穷大（一个很大的数），这样它自然会比计算出的 gscore 更大，并会
+			// 被加入开放列表
 			p.gscore = 999999999.f;
 			p.fscore = 0.f;
 			p.came_from_point_index = Point::NO_CAME_FROM;
@@ -134,9 +134,9 @@ void AStarGrid3D::step() {
 
 		Point &neighbor_point = _points_pool[neighbor_point_index];
 
-		// Adding an epsilon to fix float precision issues, which can cause all visited nodes to get
-		// visited again due to a tiny difference, doubling search time in some cases. Normally, cost between nodes
-		// increases way more than this epsilon.
+		// 加入一个 epsilon 以修正浮点精度问题，否则该问题可能导致所有已访问节点被
+		// 因微小差异而再次访问，在某些情况下使搜索时间翻倍。通常节点间的代价
+		// 增长远大于这个 epsilon。
 		const float epsilon = 0.001f;
 
 		if (tentative_gscore + epsilon < neighbor_point.gscore && tentative_gscore < _max_path_cost) {
@@ -157,7 +157,7 @@ void AStarGrid3D::step() {
 }
 
 bool AStarGrid3D::is_solid(Vector3i pos) {
-	// Implemented in subclasses
+	// 在子类中实现
 	return false;
 }
 
@@ -200,7 +200,7 @@ const Vector3i g_directions_2d[8] = {
 } // namespace
 
 void AStarGrid3D::get_neighbor_positions(Vector3i pos, StdVector<Vector3i> &out_positions) {
-	// Implementation specialized for agents walking on top of solid surfaces
+	// 针对在实体表面上方行走的智能体专门实现的版本
 
 	VOXEL_PROFILE_SCOPE();
 
@@ -223,14 +223,14 @@ void AStarGrid3D::get_neighbor_positions(Vector3i pos, StdVector<Vector3i> &out_
 
 		} else {
 			if (c_below == false) {
-				// Coming from a "floating" position (jump?)
+				// 来自“悬浮”位置（跳跃？）
 				const Vector3i npos_below = npos - Vector3i(0, 1, 0);
 				if (!_region.contains(npos_below)) {
 					continue;
 				}
 				const bool npos_below_c = is_solid(npos_below);
 				if (npos_below_c == false) {
-					// Can't fly
+					// 无法飞行
 					continue;
 				}
 			}
@@ -261,14 +261,14 @@ void AStarGrid3D::get_neighbor_positions(Vector3i pos, StdVector<Vector3i> &out_
 
 	{
 		// VOXEL_PROFILE_SCOPE_NAMED("Agent fitting checks");
-		// TODO This takes half of time in profiled results
+		// TODO 这在性能分析的结果中占了一半的时间
 
 		unordered_remove_if(out_positions, [this, pos](Vector3i npos) {
-			// Check if fits the target cell
+			// 检查是否适配目标格
 			if (!fits(to_vec3f(npos) + Vector3f(0.5f) + _fitting_offset, _agent_size * 0.5f)) {
 				return true;
 			}
-			// Check if fits between the source and destination cells
+			// 检查是否适配源格与目标格之间
 			const Vector3f midp = to_vec3f(pos + npos + Vector3(1, 1, 1)) * 0.5f;
 			if (!fits(midp + _fitting_offset, _agent_size * 0.5f)) {
 				return true;
@@ -318,7 +318,7 @@ void AStarGrid3D::clear() {
 
 float AStarGrid3D::evaluate_heuristic(Vector3i pos, Vector3i target_pos) const {
 	const Vector3i diff = target_pos - pos;
-	// Manhattan
+	// 曼哈顿
 	return Math::abs(diff.x) + Math::abs(diff.y) + Math::abs(diff.z);
 }
 

@@ -8,8 +8,8 @@
 
 namespace voxel {
 
-// Stores mesh and collider for one chunk of `VoxelTerrain`.
-// It doesn't store voxel data, because it may be using different block size, or different data structure.
+// 为 `VoxelTerrain` 的一个数据块存储网格和碰撞体。
+// 它不存储体素数据，因为可能使用不同的数据块大小或不同的数据结构。
 class VoxelMeshBlockVLT : public VoxelMeshBlock {
 public:
 	enum FadingState { //
@@ -19,21 +19,21 @@ public:
 	};
 
 	FadingState fading_state = FADING_NONE;
-	// 1.f when fully opaque, 0.f when fully transparent
+	// 1.f 表示完全不透明，0.f 表示完全透明
 	float fading_progress = 0.f;
-	// Voxel LOD works by splitting a block into up to 8 higher-resolution blocks.
-	// The parent block and its children can be called a "LOD group".
-	// Only non-overlapping blocks in a LOD group can be considered active at once.
-	// So when LOD fading is used, we no longer use `visible` to find which block is active,
-	// because blocks can use a cross-fade effect. Overlapping blocks of the same LOD group can be visible at once.
-	// Hence the need to use this boolean.
+	// 体素 LOD 通过将一个数据块分裂为最多 8 个更高分辨率的数据块来工作。
+	// 父数据块及其子数据块可称为“LOD 组”。
+	// 一个 LOD 组中只有不重叠的数据块可以同时处于激活状态。
+	// 因此当使用 LOD 淡入淡出时，我们不再用 `visible` 来判断哪个数据块处于激活状态，
+	// 因为数据块可以使用交叉淡入淡出效果。同一 LOD 组中重叠的数据块可以同时可见。
+	// 因此需要使用此布尔值。
 	bool visual_active = false;
 
 	// bool got_first_mesh_update = false;
 
-	// 0 means not using fallback.
-	// 1 means using texture of parent LOD (lod_index+1).
-	// 2 means using texture of grand-parent LOD (lod_index+2), etc.
+	// 0 表示不使用回退纹理。
+	// 1 表示使用父级 LOD（lod_index+1）的纹理。
+	// 2 表示使用祖父级 LOD（lod_index+2）的纹理，依此类推。
 	uint8_t detail_texture_fallback_level = 0;
 
 	uint64_t last_collider_update_time = 0;
@@ -45,10 +45,10 @@ public:
 	VoxelMeshBlockVLT(const Vector3i bpos, unsigned int size, unsigned int p_lod_index);
 	~VoxelMeshBlockVLT();
 
-	// Set world used for both collisions and visuals
+	// 设置同时用于碰撞和视觉的世界
 	void set_world(Ref<World3D> p_world);
 
-	// Visuals
+	// 视觉
 
 	void set_visible(bool visible);
 	bool update_fading(float speed);
@@ -93,10 +93,10 @@ public:
 		return _shader_material;
 	}
 
-	// To be used only if the material override on the terrain is not a ShaderMaterial
+	// 仅当地形上的材质覆盖不是 ShaderMaterial 时使用
 	void set_material_override(Ref<Material> material);
 
-	// Transform
+	// 变换
 
 	void set_parent_transform(const Transform3D &parent_transform);
 	void update_transition_mesh_transform(unsigned int side, const Transform3D &parent_transform);
@@ -134,9 +134,9 @@ private:
 
 	uint8_t _transition_mask = 0;
 
-	// See VoxelMesherBlocky.
-	// This unfortunately has to be a whole separate mesh instance because Godot doesn't support setting
-	// `cast_shadow` mode per mesh surface. This might have an impact on performance.
+	// 参见 VoxelMesherBlocky。
+	// 遗憾的是这必须是一个完全独立的网格实例，因为 Godot 不支持按网格表面设置
+	// `cast_shadow` 模式。这可能对性能产生影响。
 	voxel::godot::DirectMeshInstance _shadow_occluder;
 
 #ifdef VOXEL_DEBUG_LOD_MATERIALS

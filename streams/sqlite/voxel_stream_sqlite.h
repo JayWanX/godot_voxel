@@ -15,7 +15,7 @@ class Connection;
 
 namespace voxel {
 
-// Saves voxel data into a single SQLite database file.
+// 将体素数据保存到单个 SQLite 数据库文件中。
 class VoxelStreamSQLite : public VoxelStream {
 	GDCLASS(VoxelStreamSQLite, VoxelStream)
 public:
@@ -24,10 +24,10 @@ public:
 	VoxelStreamSQLite();
 	~VoxelStreamSQLite();
 
-	// Warning: changing this path from a valid one to another is not always safe in a multithreaded context.
-	// If threads were about to write into database A but it gets changed to database B,
-	// that remaining data will get written in database B.
-	// The nominal use case is to set this path when the game starts and not change it until the end of the session.
+	// 警告：在多线程上下文中，把此路径从一个有效值更改到另一个并不总是安全的。
+	// 如果线程正要写入数据库 A，但路径却被改为数据库 B，
+	// 那么剩余的数据将会被写入数据库 B。
+	// 典型的用例是在游戏启动时设置此路径，并在本次会话结束前不再更改它。
 	void set_database_path(String path);
 	String get_database_path() const;
 
@@ -51,11 +51,11 @@ public:
 	int get_used_channels_mask() const override;
 
 	void flush() override;
-	// Returns false if flushing did not complete. In that case, cached blocks are retained if the transaction could
-	// not start, but are lost if the commit itself failed.
+	// 若刷新未完成则返回 false。此时，如果事务无法启动，缓存的数据块会被保留，
+	// 但如果提交本身失败，它们则会丢失。
 	bool flush_cache();
 
-	// Might improve query performance if saved data is very sparse (like when only edited blocks are saved).
+	// 如果保存的数据非常稀疏（例如只保存被编辑过的数据块），这可能会改善查询性能。
 	void set_key_cache_enabled(bool enable);
 	bool is_key_cache_enabled() const;
 
@@ -80,19 +80,19 @@ public:
 private:
 	void rebuild_key_cache();
 
-	// An SQlite3 database is safe to use with multiple threads in serialized mode,
-	// but after having a look at the implementation while stepping with a debugger, here are what actually happens:
+	// 在串行化模式下，SQlite3 数据库可安全地供多个线程使用，
+	// 但用调试器单步查看实现之后，以下是实际发生的情况：
 	//
-	// 1) Prepared statements might be safe to use in multiple threads, but the end result isn't safe.
-	//    Thread A could bind a value, then thread B could bind another value replacing the first before thread A
-	//    executes the statement. So in the end, each thread should get its own set of statements.
+	// 1) 预编译语句可能在多线程下使用是安全的，但最终结果是不安全的。
+	//    线程 A 可能绑定一个值，随后在线程 A 执行语句前，线程 B 可能绑定另一个值替换第一个，
+	//    因此最终每个线程都应有自己的一组语句。
 	//
-	// 2) Executing a statement locks the entire database with a mutex.
-	//    So indeed access is serialized, in the sense that CPU work will execute in series, not in parallel.
-	//    in other words, you loose the speed of multi-threading.
+	// 2) 执行语句会用互斥锁锁住整个数据库。
+	//    所以访问确实是被串行化的，也就是说 CPU 工作会串行执行，而不是并行执行。
+	//    换句话说，你会失去多线程的速度优势。
 	//
-	// Because of this, in our use case, it might be simpler to just leave SQLite in thread-safe mode,
-	// and synchronize ourselves.
+	// 正因为如此，在我们的用例中，让 SQLite 保持线程安全模式也许更简单，
+	// 然后由我们自己来同步。
 
 	struct ConnectionResult {
 		enum Code { SUCCESS, NOT_CONFIGURED, ERROR };
@@ -108,9 +108,9 @@ private:
 	struct ScopeRecycle {
 		VoxelStreamSQLite *stream;
 		sqlite::Connection *connection;
-		// Set when the connection could not be recovered after a failed transaction. Such a connection may still be
-		// inside a transaction at the SQLite level, and would then fail every subsequent `begin_transaction` with
-		// "cannot start a transaction within a transaction", so it must not go back into the pool.
+		// 在事务失败后无法恢复连接时置位。这样的连接在 SQLite 层面可能仍处于
+		// 某个事务之中，随后每次调用 `begin_transaction` 都会以
+		// "cannot start a transaction within a transaction" 失败，因此它绝不能放回连接池。
 		bool broken = false;
 
 		ScopeRecycle(VoxelStreamSQLite *p_stream, sqlite::Connection *p_connection) :
@@ -138,20 +138,20 @@ private:
 	StdString _globalized_connection_path;
 	StdVector<sqlite::Connection *> _connection_pool;
 	Mutex _connection_mutex;
-	// This cache stores blocks in memory, and gets flushed to the database when big enough.
-	// This is because save queries are more expensive.
-	// It also speeds up queries of blocks that were recently saved.
+	// 此缓存将数据块存储在内存中，当足够大时会刷新到数据库。
+	// 这是因为保存类查询的开销更高。
+	// 它还能加快对最近保存的数据块的查询速度。
 	VoxelStreamCache _cache;
-	// The current way we stream data is by querying every block location near each player, to know if there is data.
-	// Therefore testing if a block is present is the beginning of the most frequently executed code path.
-	// In configurations where only edited blocks get saved, very few blocks even get stored in the database,
-	// so it makes sense to cache keys to make this query fast and concurrent.
-	// Note: in the long term, on a game that systematically saves everything it generates instead of just edits,
-	// such a cache can become quite large. In this case we could either allow turning it off, or use an octree.
+	// 我们当前流式传输数据的方式是查询每个玩家附近的每个数据块位置，以判断是否有数据。
+	// 因此测试数据块是否存在，是最常执行的代码路径的开端。
+	// 在只保存被编辑数据块的配置中，存入数据库的数据块非常少，
+	// 因此缓存键以让该查询快速且可并发是有意义的。
+	// 注意：长远来看，对于系统性地保存所有生成内容而非仅保存编辑内容的游戏，
+	// 这样的缓存可能会变得相当大。此时我们可以允许关闭它，或改用八叉树。
 	BlockKeysCache _block_keys_cache;
 	bool _block_keys_cache_enabled = false;
-	// Format that will be used when creating new databases. May not necessarily match the format actually used by
-	// existing databases.
+	// 创建新数据库时将使用的格式。也不一定与现有数据库实际使用的格式一致
+	// 即现有数据库实际所用的格式。
 	CoordinateFormat _preferred_coordinate_format = COORDINATE_FORMAT_STRING_CSD;
 };
 

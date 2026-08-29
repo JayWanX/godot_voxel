@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelStream" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Implements loading and saving voxel blocks, mainly using files.
+		实现体素数据块的加载和保存，主要使用文件。
 	</brief_description>
 	<description>
 	</description>
@@ -11,9 +11,9 @@
 		<method name="flush">
 			<return type="void" />
 			<description>
-				Forces cached data to be saved to the filesystem. Some streams might use a cache to improve performance of frequent I/Os.
-				This should not be called frequently if performance is a concern. May be used if you require all data to be written now. Note that implementations should already do this automatically when the resource is destroyed or their configuration changes. Some implementations may do nothing if they have no cache.
-				Note that terrains save asynchronously, so flushing might not always fulfill your goal if saving tasks are still queued and haven't called into [VoxelStream] yet. See [method VoxelTerrain.save_modified_blocks] or [method VoxelLodTerrain.save_modified_blocks].
+				强制将缓存的数据保存到文件系统。某些数据流可能使用缓存来提高频繁 I/O 的性能。
+				如果在意性能，不应频繁调用此方法。当你需要立即写入所有数据时可以使用。注意，当资源被销毁或其配置更改时，实现应当已经自动完成此操作。某些没有缓存的实现可能什么都不做。
+				注意，地形是异步保存的，因此如果保存任务仍在排队且尚未调用 [VoxelStream]，刷新可能并不总能达成你的目标。参见 [method VoxelTerrain.save_modified_blocks] 或 [method VoxelLodTerrain.save_modified_blocks]。
 			</description>
 		</method>
 		<method name="get_block_size" qualifiers="const">
@@ -32,8 +32,8 @@
 			<param index="1" name="block_position" type="Vector3i" />
 			<param index="2" name="lod_index" type="int" />
 			<description>
-				[code]out_buffer[/code]: Block of voxels to load. Must be a pre-created instance (not null).
-				[code]block_position[/code]: Position of the block in block coordinates within the specified LOD.
+				[code]out_buffer[/code]：要加载的体素数据块。必须是预先创建的实例（不能为 null）。
+				[code]block_position[/code]：指定 LOD 内以数据块坐标表示的区块位置。
 			</description>
 		</method>
 		<method name="save_voxel_block">
@@ -42,29 +42,29 @@
 			<param index="1" name="block_position" type="Vector3i" />
 			<param index="2" name="lod_index" type="int" />
 			<description>
-				[code]buffer[/code]: Block of voxels to save. It is strongly recommended to not keep a reference to that data afterward, because streams are allowed to cache it, and saved data must represent either snapshots (copies) or last references to the data after the volume they belonged to is destroyed.
-				[code]block_position[/code]: Position of the block in block coordinates within the specified LOD.
+				[code]buffer[/code]：要保存的体素数据块。强烈建议之后不要保留该数据的引用，因为数据流允许缓存它，而且保存的数据必须表示快照（副本），或在其所属体积被销毁后对该数据的最后引用。
+				[code]block_position[/code]：指定 LOD 内以数据块坐标表示的区块位置。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="compression_mode" type="int" setter="set_compression_mode" getter="get_compression_mode" enum="VoxelBlockSerializer.Compression" default="1">
-			Specifies which compression algorithm is used when saving blocks. This can reduce the size of save files at the cost of save/load performance.
-			Existing blocks that formerly used a different compression mode can still be loaded, and will use the new mode if saved again.
+			指定保存数据块时使用哪种压缩算法。这可以减小存档文件的大小，但会牺牲保存/加载性能。
+			先前使用不同压缩模式的现有数据块仍然可以加载，如果再次保存，将使用新模式。
 		</member>
 		<member name="save_generator_output" type="bool" setter="set_save_generator_output" getter="get_save_generator_output" default="false">
-			When this is enabled, if a block cannot be found in the stream and it gets generated, then the generated block will immediately be saved into the stream. This can be used if the generator is too expensive to run on the fly (like Minecraft does), but it will require more disk usage (amount of I/Os and space) and increase network traffic. If this setting is off, only modified blocks will be saved.
+			启用此选项后，如果在数据流中找不到某个数据块且它被生成，则生成的数据块将立即保存到数据流中。如果生成器过于昂贵而无法即时运行（就像 Minecraft 所做的那样），可以使用此选项，但它会占用更多磁盘空间（I/O 次数和空间量）并增加网络流量。如果关闭此设置，则只保存被修改的数据块。
 		</member>
 	</members>
 	<constants>
 		<constant name="RESULT_ERROR" value="0" enum="ResultCode">
-			An error occurred when loading the block. The request will be aborted.
+			加载数据块时发生错误。请求将被中止。
 		</constant>
 		<constant name="RESULT_BLOCK_FOUND" value="2" enum="ResultCode">
-			The block was found.
+			找到该数据块。
 		</constant>
 		<constant name="RESULT_BLOCK_NOT_FOUND" value="1" enum="ResultCode">
-			The block was not found. The requester may fallback on using the generator, if any.
+			未找到该数据块。如果有生成器，请求方可以回退使用生成器。
 		</constant>
 	</constants>
 </class>

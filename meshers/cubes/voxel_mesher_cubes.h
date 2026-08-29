@@ -11,7 +11,7 @@
 
 namespace voxel {
 
-// A super simple mesher only producing colored cubes
+// 一个只生成彩色立方体的超级简单的网格生成器
 class VoxelMesherCubes : public VoxelMesher {
 	GDCLASS(VoxelMesherCubes, VoxelMesher)
 public:
@@ -23,15 +23,15 @@ public:
 		MATERIAL_COUNT
 	};
 
-	// Tells how to interpret voxel color data
+	// 说明如何解释体素颜色数据
 	enum ColorMode {
-		// The voxel value will be treated as an RGBA color with components of equal bit depth
+		// 体素值将被视为 RGBA 颜色，各分量位深相等
 		COLOR_RAW = 0,
-		// The voxel value will map to a 32bit color in the palette specified on this mesher
+		// 体素值将映射到此网格生成器上指定的调色板中的 32 位颜色
 		COLOR_MESHER_PALETTE,
-		// The voxel value will be copied directly to the vertex array,
-		// so the proper color can be selected by a shader.
-		// LIMITATION: only one material can be used in this mode at the moment.
+		// 体素值将直接复制到顶点数组，
+		// 以便着色器可以选择正确的颜色。
+		// 限制：目前此模式只能使用一种材质。
 		COLOR_SHADER_PALETTE,
 
 		COLOR_MODE_COUNT
@@ -51,8 +51,8 @@ public:
 	void set_palette(Ref<VoxelColorPalette> palette);
 	Ref<VoxelColorPalette> get_palette() const;
 
-	// TODO: Resource::duplicate() cannot be overriden.
-	// This will lead to performance degradation and maybe unexpected behavior
+	// TODO: Resource::duplicate() 无法被覆写。
+	// 这会导致性能下降，甚至可能出现意外行为
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
 
 	int get_used_channels_mask() const override;
@@ -70,10 +70,10 @@ public:
 
 	static Ref<Mesh> generate_mesh_from_image(Ref<Image> image, float voxel_size);
 
-	// Structs
+	// 结构体
 
-	// Using std::vector because they make this mesher twice as fast than Godot Vectors.
-	// See why: https://github.com/godotengine/godot/issues/24731
+	// 使用 std::vector，因为它们使此网格生成器比 Godot 的 Vector 快一倍。
+	// 原因见：https://github.com/godotengine/godot/issues/24731
 	struct Arrays {
 		StdVector<Vector3f> positions;
 		StdVector<Vector3f> normals;
@@ -93,7 +93,7 @@ public:
 	struct GreedyAtlasData {
 		struct ImageInfo {
 			unsigned int first_color_index;
-			unsigned int first_vertex_index; // From a quad
+			unsigned int first_vertex_index; // 来自一个四边形
 			unsigned int size_x;
 			unsigned int size_y;
 			unsigned int surface_index;
@@ -129,13 +129,13 @@ private:
 		GreedyAtlasData greedy_atlas_data;
 	};
 
-	// Parameters
+	// 参数
 	Parameters _parameters;
 	RWLock _parameters_lock;
 
 	FixedArray<Ref<Material>, MATERIAL_COUNT> _materials;
 
-	// Work cache
+	// 工作缓存
 	static Cache &get_tls_cache();
 };
 

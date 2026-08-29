@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelDataBlockEnterInfo" inherits="Object" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Information sent by a terrain when one of its data blocks enters the area of a [VoxelViewer].
+		当地形的一个数据块进入 [VoxelViewer] 的区域时，由地形发送的信息。
 	</brief_description>
 	<description>
-		Information sent by a terrain when one of its data blocks enters the area of a [VoxelViewer]. See [method VoxelTerrain._on_data_block_entered].
-		Instances of this class must not be stored, as they will become invalid after the call they come from.
+		当地形的一个数据块进入 [VoxelViewer] 的区域时，由地形发送的信息。参见 [method VoxelTerrain._on_data_block_entered]。
+		此类实例不可被存储，因为在产生它们的调用之后，它们将变为无效。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -13,31 +13,31 @@
 		<method name="are_voxels_edited" qualifiers="const">
 			<return type="bool" />
 			<description>
-				Tells if voxels in the block have ever been edited. If not, it means the same data can be obtained by running the generator.
+				指示数据块中的体素是否曾被编辑过。如果没有，则意味着可以通过运行生成器获得相同的数据。
 			</description>
 		</method>
 		<method name="get_lod_index" qualifiers="const">
 			<return type="int" />
 			<description>
-				Gets which LOD index the data block is in.
+				获取数据块所在的 LOD 索引。
 			</description>
 		</method>
 		<method name="get_network_peer_id" qualifiers="const">
 			<return type="int" />
 			<description>
-				Gets the network peer ID of the [VoxelViewer] who caused the block to be referenced.
+				获取导致该数据块被引用的 [VoxelViewer] 的网络对端 ID。
 			</description>
 		</method>
 		<method name="get_position" qualifiers="const">
 			<return type="Vector3i" />
 			<description>
-				Gets the position of the data block, in data block coordinates (voxel coordinates are obtained by multiplying these coordinates with data block size).
+				获取数据块的位置，坐标为数据块坐标（体素坐标由这些坐标乘以数据块大小得到）。
 			</description>
 		</method>
 		<method name="get_voxels" qualifiers="const">
 			<return type="VoxelBuffer" />
 			<description>
-				Gets access to the voxels in the block.
+				获取对数据块内体素的访问。
 			</description>
 		</method>
 	</methods>

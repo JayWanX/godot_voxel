@@ -7,7 +7,7 @@
 #include "../hash_funcs.h"
 #include "../macros.h"
 #include "funcs.h"
-#include <functional> // For std::hash
+#include <functional> // 用于 std::hash
 
 VOXEL_GODOT_NAMESPACE_BEGIN
 
@@ -57,7 +57,7 @@ inline Vector2i ceildiv(const Vector2i v, const Vector2i d) {
 }
 
 inline int chebyshev_distance(const Vector2i &a, const Vector2i &b) {
-	// In Chebyshev metric, points on the sides of a square are all equidistant to its center
+	// 在切比雪夫距离下，正方形各边上的点到其中心距离相等
 	return math::max(Math::abs(a.x - b.x), Math::abs(a.y - b.y));
 }
 
@@ -77,7 +77,7 @@ namespace std {
 template <>
 struct hash<Vector2i> {
 	size_t operator()(const Vector2i &v) const {
-		// TODO This is 32-bit, would it be better if it was 64?
+		// TODO 这是 32 位的，如果改成 64 位是否更好？
 		uint32_t h = voxel::hash_murmur3_one_32(v.x);
 		h = voxel::hash_murmur3_one_32(v.y, h);
 		return voxel::hash_fmix32(h);

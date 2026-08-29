@@ -50,7 +50,7 @@ private:
 	float _smoothness = 0.f;
 };
 
-// Helpers
+// 辅助函数
 
 void post_edit_modifier(VoxelLodTerrain &volume, AABB aabb);
 

@@ -27,9 +27,9 @@ void ImageRangeGrid::generate(const Image &im) {
 		return;
 	}
 
-	const int lod_base = 4; // Start at 16
+	const int lod_base = 4; // 从 16 开始
 
-	// Compute first lod
+	// 计算第一个 LOD
 	{
 		const int chunk_size = 1 << lod_base;
 
@@ -55,12 +55,12 @@ void ImageRangeGrid::generate(const Image &im) {
 
 	int lod_count = 1;
 
-	// Compute next lods based on previous
+	// 基于前一个 LOD 计算后续 LOD
 	for (int lod_index = 1; lod_index < MAX_LODS; ++lod_index, ++lod_count) {
 		const Lod &prev_lod = _lods[lod_index - 1];
 
 		if (prev_lod.size_x == 1 && prev_lod.size_y == 1) {
-			// Can't downscale further
+			// 无法继续缩小
 			break;
 		}
 
@@ -79,10 +79,10 @@ void ImageRangeGrid::generate(const Image &im) {
 
 			for (int cx = 0; cx < lod.size_x; ++cx) {
 				const int src_x = min(cx * 2, prev_lod.size_x);
-				// Index of the lowest chunk in the previous LOD within the 2x2 region covered by the current chunk
+				// 当前块所覆盖的 2x2 区域中，前一个 LOD 内角落块的索引
 				const int src_i = src_x + src_y * prev_lod.size_x;
 
-				// Add 2x2 chunks from previous LOD covered by the current chunk, if available
+				// 如果可用，累加当前块所覆盖的前一个 LOD 中的 2x2 块
 
 				// X, Y
 				Interval r = prev_lod.data[src_i];
@@ -129,9 +129,9 @@ void ImageRangeGrid::generate(const Image &im) {
 namespace {
 
 void interval_to_pixels_repeat(Interval i, int &out_min, int &out_max, int image_len) {
-	// Convert range to a positive integer coordinate space,
-	// where coordinates extend up to twice the length of the image.
-	// The interval gets wrapped within it, assuming a repeating image.
+	// 将范围转换到正整数坐标空间，
+	// 其中坐标最多延伸到图像长度的两倍。
+	// 假设图像重复，区间会在该空间内被环绕。
 
 	int imin = static_cast<int>(Math::floor(i.min));
 	int imax = static_cast<int>(Math::ceil(i.max));
@@ -139,7 +139,7 @@ void interval_to_pixels_repeat(Interval i, int &out_min, int &out_max, int image
 	const int interval_len = imax - imin;
 
 	if (interval_len >= image_len) {
-		// The interval covers the whole length
+		// 区间覆盖了整个长度
 		out_min = 0;
 		out_max = image_len;
 		return;
@@ -152,7 +152,7 @@ void interval_to_pixels_repeat(Interval i, int &out_min, int &out_max, int image
 		imax = imin + interval_len;
 	}
 
-	// Keep it positive
+	// 保持为正
 	if (imin < 0) {
 		imin += image_len;
 		imax += image_len;
@@ -171,9 +171,9 @@ Interval ImageRangeGrid::get_range_repeat(Interval xr, Interval yr) const {
 	interval_to_pixels_repeat(xr, pixel_min_x, pixel_max_x, _pixels_x);
 	interval_to_pixels_repeat(yr, pixel_min_y, pixel_max_y, _pixels_y);
 
-	// Find best LOD to use.
-	// Depending on the length of the largest range, we may evaluate a different LOD to save iterations
-	int lod_index = 0; // relative to _lod_base
+	// 寻找要使用的最佳 LOD。
+	// 根据最大范围的长度，我们可能会评估不同的 LOD 以节省迭代次数
+	int lod_index = 0; // 相对于 _lod_base
 	{
 		int pixel_len = max(pixel_max_x - pixel_min_x, pixel_max_y - pixel_min_y);
 		const int cs = 1 << _lod_base;
@@ -186,18 +186,18 @@ Interval ImageRangeGrid::get_range_repeat(Interval xr, Interval yr) const {
 
 	VOXEL_ASSERT(lod_index < _lod_count);
 
-	// Calculate the area in chunks
+	// 计算块区域
 	const int absolute_lod = _lod_base + lod_index;
 	const int chunk_x_min = arithmetic_rshift(pixel_min_x, absolute_lod);
 	const int chunk_y_min = arithmetic_rshift(pixel_min_y, absolute_lod);
 	int chunk_x_max = arithmetic_rshift(pixel_max_x, absolute_lod);
 	int chunk_y_max = arithmetic_rshift(pixel_max_y, absolute_lod);
 
-	// If the image size is not a power of 2 and the interval crosses the repeating boundary of the image, we have to
-	// lookup one more chunk away, because chunks tile based on a rounded-up size of the image, yet the last chunk is
-	// virtually shorter so the next repetition of the image starts sooner.
-	// Note that `pixel_min_x` can't be >= `pixels_x`, because as soon as it is we wrap it back to the beginning of the
-	// image.
+	// 如果图像大小不是 2 的幂，且区间跨越了图像的重复边界，我们不得不
+	// 再向远处查找一个数据块，因为数据块按图像的向上取整大小平铺，而最后一个数据块
+	// 实际上更短，因此图像的下一次重复会更早开始。
+	// 注意：`pixel_min_x` 不可能 >= `pixels_x`，因为一旦达到该值，
+	// 我们就会将其回绕到图像的开头。
 	if (!_pixels_x_is_power_of_2 && pixel_max_x >= _pixels_x) {
 		++chunk_x_max;
 	}
@@ -207,7 +207,7 @@ Interval ImageRangeGrid::get_range_repeat(Interval xr, Interval yr) const {
 
 	const Lod &lod = _lods[lod_index];
 
-	// Accumulate overlapping chunks
+	// 累加重叠的块
 	Interval r;
 	{
 		const unsigned int loc = math::wrap(chunk_x_min, lod.size_x) + math::wrap(chunk_y_min, lod.size_y) * lod.size_x;

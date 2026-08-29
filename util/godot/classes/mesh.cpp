@@ -21,7 +21,7 @@ bool is_mesh_empty(Span<const Array> surfaces) {
 }
 
 void scale_vec3_array(PackedVector3Array &array, float scale) {
-	// Getting raw pointer for performance.
+	// 出于性能考虑，获取裸指针。
 	Vector3 *array_data = array.ptrw();
 	const int count = array.size();
 	for (int i = 0; i < count; ++i) {
@@ -30,7 +30,7 @@ void scale_vec3_array(PackedVector3Array &array, float scale) {
 }
 
 void offset_vec3_array(PackedVector3Array &array, Vector3 offset) {
-	// Getting raw pointer for performance.
+	// 出于性能考虑，获取裸指针。
 	Vector3 *array_data = array.ptrw();
 	const int count = array.size();
 	for (int i = 0; i < count; ++i) {
@@ -40,7 +40,7 @@ void offset_vec3_array(PackedVector3Array &array, Vector3 offset) {
 
 void scale_surface(Array &surface, float scale) {
 	PackedVector3Array positions = surface[Mesh::ARRAY_VERTEX];
-	// Avoiding stupid CoW, assuming this array holds the only instance of this vector
+	// 避免愚蠢的 CoW（写时复制），假定此数组是此向量的唯一实例
 	surface[Mesh::ARRAY_VERTEX] = PackedVector3Array();
 	scale_vec3_array(positions, scale);
 	surface[Mesh::ARRAY_VERTEX] = positions;
@@ -48,7 +48,7 @@ void scale_surface(Array &surface, float scale) {
 
 void offset_surface(Array &surface, Vector3 offset) {
 	PackedVector3Array positions = surface[Mesh::ARRAY_VERTEX];
-	// Avoiding stupid CoW, assuming this array holds the only instance of this vector
+	// 避免愚蠢的 CoW（写时复制），假定此数组是此向量的唯一实例
 	surface[Mesh::ARRAY_VERTEX] = PackedVector3Array();
 	offset_vec3_array(positions, offset);
 	surface[Mesh::ARRAY_VERTEX] = positions;

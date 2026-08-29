@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="Voxel_FastNoiseLiteGradient" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Generates coherent and fractal noise gradients using the [url=https://github.com/Auburn/FastNoiseLite]FastNoiseLite[/url] library.
+		使用 [url=https://github.com/Auburn/FastNoiseLite]FastNoiseLite[/url] 库生成相干噪声和分形噪声梯度。
 	</brief_description>
 	<description>
-		This is an alternate implementation of [FastNoiseLite], because Godot's integration does not expose methods to access gradients directly.
-		These algorithms are specialized to generate vectors to perturb positions, and can be faster than calculating 2 or 3 times a regular noise.
+		这是 [FastNoiseLite] 的另一种实现，因为 Godot 的集成没有提供直接访问梯度的方法。
+		这些算法专门用于生成扰动位置的向量，可能比计算 2 或 3 次普通噪声更快。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -14,53 +14,73 @@
 			<return type="Vector2" />
 			<param index="0" name="position" type="Vector2" />
 			<description>
+				生成一个用于扰动给定 2D 位置的向量。
 			</description>
 		</method>
 		<method name="warp_3d">
 			<return type="Vector3" />
 			<param index="0" name="position" type="Vector3" />
 			<description>
+				生成一个用于扰动给定 3D 位置的向量。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="amplitude" type="float" setter="set_amplitude" getter="get_amplitude" default="30.0">
+			设置扭曲向量的幅度。
 		</member>
 		<member name="fractal_gain" type="float" setter="set_fractal_gain" getter="get_fractal_gain" default="0.5">
+			设置分形噪声的增益。
 		</member>
 		<member name="fractal_lacunarity" type="float" setter="set_fractal_lacunarity" getter="get_fractal_lacunarity" default="2.0">
+			设置分形噪声的隙度。
 		</member>
 		<member name="fractal_octaves" type="int" setter="set_fractal_octaves" getter="get_fractal_octaves" default="3">
+			设置分形噪声的八度数量。
 		</member>
 		<member name="fractal_type" type="int" setter="set_fractal_type" getter="get_fractal_type" enum="Voxel_FastNoiseLiteGradient.FractalType" default="0">
+			设置分形噪声的类型。
 		</member>
 		<member name="noise_type" type="int" setter="set_noise_type" getter="get_noise_type" enum="Voxel_FastNoiseLiteGradient.NoiseType" default="2">
+			设置噪声的类型。
 		</member>
 		<member name="period" type="float" setter="set_period" getter="get_period" default="64.0">
+			设置噪声的周期。
 		</member>
 		<member name="rotation_type_3d" type="int" setter="set_rotation_type_3d" getter="get_rotation_type_3d" enum="Voxel_FastNoiseLiteGradient.RotationType3D" default="0">
+			设置用于 3D 旋转的类型。
 		</member>
 		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="0">
+			设置随机种子。
 		</member>
 	</members>
 	<constants>
 		<constant name="TYPE_OPEN_SIMPLEX_2" value="0" enum="NoiseType">
+			OpenSimplex2 噪声。
 		</constant>
 		<constant name="TYPE_OPEN_SIMPLEX_2_REDUCED" value="1" enum="NoiseType">
+			OpenSimplex2 的降噪（Reduced）变体。
 		</constant>
 		<constant name="TYPE_VALUE" value="2" enum="NoiseType">
+			值噪声。
 		</constant>
 		<constant name="FRACTAL_NONE" value="0" enum="FractalType">
+			无分形。
 		</constant>
 		<constant name="FRACTAL_DOMAIN_WARP_PROGRESSIVE" value="1" enum="FractalType">
+			渐进式域扭曲分形。
 		</constant>
 		<constant name="FRACTAL_DOMAIN_WARP_INDEPENDENT" value="2" enum="FractalType">
+			独立式域扭曲分形。
 		</constant>
 		<constant name="ROTATION_3D_NONE" value="0" enum="RotationType3D">
+			无 3D 旋转。
 		</constant>
 		<constant name="ROTATION_3D_IMPROVE_XY_PLANES" value="1" enum="RotationType3D">
+			改善 XY 平面的 3D 旋转。
 		</constant>
 		<constant name="ROTATION_3D_IMPROVE_XZ_PLANES" value="2" enum="RotationType3D">
+			改善 XZ 平面的 3D 旋转。
 		</constant>
 	</constants>
 </class>

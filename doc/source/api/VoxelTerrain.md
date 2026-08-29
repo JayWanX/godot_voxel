@@ -1,13 +1,13 @@
 # VoxelTerrain
 
-Inherits: [VoxelNode](VoxelNode.md)
+继承自：[VoxelNode](VoxelNode.md)
 
-Voxel volume using constant level of detail.
+使用恒定细节层级的体素体积。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                            | Name                                                                                 | Default                                                                      
+类型                                                                              | 名称                                                                                   | 默认值                                                                          
 ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -----------------------------------------------------------------------------
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [area_edit_notification_enabled](#i_area_edit_notification_enabled)                  | false                                                                        
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [automatic_loading_enabled](#i_automatic_loading_enabled)                            | true                                                                         
@@ -28,10 +28,10 @@ Type                                                                            
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [use_gpu_generation](#i_use_gpu_generation)                                          | false                                                                        
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                                          | Signature                                                                                                                                                                                                                                                                    
+返回值                                                                                             | 函数签名                                                                                                                                                                                                                                                                         
 ----------------------------------------------------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [void](#)                                                                                       | [_on_area_edited](#i__on_area_edited) ( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_origin, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_size ) virtual                                       
 [void](#)                                                                                       | [_on_data_block_entered](#i__on_data_block_entered) ( [VoxelDataBlockEnterInfo](VoxelDataBlockEnterInfo.md) info ) virtual                                                                                                                                                   
@@ -49,27 +49,27 @@ Return                                                                          
 [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)                  | [voxel_to_data_block](#i_voxel_to_data_block) ( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) voxel_pos ) const                                                                                                                               
 <p></p>
 
-## Signals: 
+## 信号：<span id="signals"></span>
 
 ### block_loaded( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) position ) 
 
-Emitted when a new data block is loaded from stream. This can happen before the mesh or collider becomes available.
+当从数据流加载新数据块时发出。这可能在网格或碰撞体可用之前发生。
 
 ### block_unloaded( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) position ) 
 
-Emitted when a data block is unloaded due to being outside view distance.
+当数据块因超出视距而被卸载时发出。
 
 ### mesh_block_entered( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) position ) 
 
-Emitted when a mesh block receives its first update since it was added in the range of viewers. This is regardless of the mesh being empty or not. It tracks changes of the same state obtained with [is_area_meshed](VoxelTerrain.md#i_is_area_meshed).
+当网格区块自加入观察者范围以来首次收到更新时发出。这与网格是否为空无关。它跟踪与 [is_area_meshed](VoxelTerrain.md#i_is_area_meshed) 获得的相同状态的变化。
 
 ### mesh_block_exited( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) position ) 
 
-Emitted when a mesh block gets unloaded. It is the counterpart of [VoxelTerrain.mesh_block_entered](VoxelTerrain.md#signals).
+当网格区块被卸载时发出。它是 [VoxelTerrain.mesh_block_entered](VoxelTerrain.md#signals) 的对应信号。
 
-## Enumerations: 
+## 枚举：<span id="enumerations"></span>
 
-enum **DebugDrawFlag**: 
+枚举 **DebugDrawFlag**：
 
 - <span id="i_DEBUG_DRAW_VOLUME_BOUNDS"></span>**DEBUG_DRAW_VOLUME_BOUNDS** = **0**
 - <span id="i_DEBUG_DRAW_VISUAL_AND_COLLISION_BLOCKS"></span>**DEBUG_DRAW_VISUAL_AND_COLLISION_BLOCKS** = **1**
@@ -77,119 +77,119 @@ enum **DebugDrawFlag**:
 - <span id="i_DEBUG_DRAW_FLAGS_COUNT"></span>**DEBUG_DRAW_FLAGS_COUNT** = **3**
 
 
-## Property Descriptions
+## 属性描述
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_area_edit_notification_enabled"></span> **area_edit_notification_enabled** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_automatic_loading_enabled"></span> **automatic_loading_enabled** = true
 
-If turned off, the terrain will no longer automatically load blocks around viewers locally. This may be used in multiplayer scenarios, when the terrain is client-side, because blocks will be sent by the server instead.
+如果关闭，地形将不再在本地自动加载观察者周围的数据块。这可用于多人游戏场景中地形位于客户端的情况，因为数据块将由服务器发送。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_block_enter_notification_enabled"></span> **block_enter_notification_enabled** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)<span id="i_bounds"></span> **bounds** = AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)
 
-Defines the bounds within which the terrain is allowed to have voxels. If an infinite world generator is used, blocks will only generate within this region. Everything outside will be left empty.
+定义地形允许存在体素的边界。如果使用无限世界生成器，数据块将仅在此区域内生成。区域外的所有内容都将保持为空。
 
-If any dimension of the new bounds is larger than 512 and [max_view_distance](VoxelTerrain.md#i_max_view_distance) is larger than 512, then [max_view_distance](VoxelTerrain.md#i_max_view_distance) will be clamped to 512. This measure is to avoid crashing due to a potential huge amount of chunks that would load.
+如果新边界的任何维度大于 512 且 [max_view_distance](VoxelTerrain.md#i_max_view_distance) 大于 512，则 [max_view_distance](VoxelTerrain.md#i_max_view_distance) 将被钳制到 512。此措施是为了避免因可能加载的大量区块而导致崩溃。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_layer"></span> **collision_layer** = 1
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_collision_margin"></span> **collision_margin** = 0.04
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_mask"></span> **collision_mask** = 1
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_enabled"></span> **debug_draw_enabled** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_shadow_occluders"></span> **debug_draw_shadow_occluders** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_visual_and_collision_blocks"></span> **debug_draw_visual_and_collision_blocks** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_volume_bounds"></span> **debug_draw_volume_bounds** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_voxel_metadata"></span> **debug_draw_voxel_metadata** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_generate_collisions"></span> **generate_collisions** = true
 
-Enables the generation of collision shapes using the classic physics engine. Use this feature if you need realistic or non-trivial collisions or physics.
+启用使用经典物理引擎生成碰撞形状。如果你需要真实或非平凡的碰撞或物理，请使用此功能。
 
-Note 1: you also need [VoxelViewer](VoxelViewer.md) to request collisions, otherwise they won't generate.
+注意 1：你还需要 [VoxelViewer](VoxelViewer.md) 请求碰撞，否则不会生成。
 
-Note 2: If you need simple Minecraft/AABB physics, you can use [VoxelBoxMover](VoxelBoxMover.md) which may perform better in blocky worlds.
+注意 2：如果你需要简单的 Minecraft/AABB 物理，可以使用 [VoxelBoxMover](VoxelBoxMover.md)，它在方块风世界中可能表现更好。
 
 ### [Material](https://docs.godotengine.org/en/stable/classes/class_material.html)<span id="i_material_override"></span> **material_override**
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_max_view_distance"></span> **max_view_distance** = 128
 
-Sets the maximum distance this terrain can support. If a [VoxelViewer](VoxelViewer.md) requests more, it will be clamped.
+设置此地形可以支持的最大距离。如果 [VoxelViewer](VoxelViewer.md) 请求更大距离，它将被钳制。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_mesh_block_size"></span> **mesh_block_size** = 16
 
-Sets how many voxels across meshes of the terrain span.
+设置地形网格跨越多少个体素。
 
-Voxel chunks are stored in cubic chunks of 16x16x16 voxels, and by default meshes of the terrain match that size. But you can set this to 32 so meshes will span 2x2x2 voxel chunks. This is a performance tradeoff. Higher mesh size may speed up rendering, at the cost of slower mesh updates.
+体素区块以 16x16x16 体素的立方区块存储，默认情况下地形网格与该尺寸匹配。但你可以将其设置为 32，使网格跨越 2x2x2 个体素区块。这是一种性能权衡。更大的网格尺寸可能加快渲染，但会减慢网格更新。
 
-Values other than 16 and 32 are not supported.
+不支持 16 和 32 之外的值。
 
-Note: this setting also affects [VoxelInstancer](VoxelInstancer.md) chunks.
+注意：此设置也会影响 [VoxelInstancer](VoxelInstancer.md) 区块。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_use_gpu_generation"></span> **use_gpu_generation** = false
 
-Enables GPU block generation, which can speed it up. This is only valid for generators that support it. Vulkan is required.
+启用 GPU 数据块生成，可加快生成速度。仅对支持它的生成器有效。需要 Vulkan。
 
-## Method Descriptions
+## 方法描述
 
 ### [void](#)<span id="i__on_area_edited"></span> **_on_area_edited**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_origin, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_size ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i__on_data_block_entered"></span> **_on_data_block_entered**( [VoxelDataBlockEnterInfo](VoxelDataBlockEnterInfo.md) info ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_data_block_to_voxel"></span> **data_block_to_voxel**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) block_pos ) 
 
-Converts data block coordinates into voxel coordinates. Voxel coordinates of a block correspond to its lowest corner.
+将数据块坐标转换为体素坐标。数据块的体素坐标对应于其最低角。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_get_draw_flag"></span> **debug_get_draw_flag**( [DebugDrawFlag](VoxelTerrain.md#enumerations) flag_index ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_debug_set_draw_flag"></span> **debug_set_draw_flag**( [DebugDrawFlag](VoxelTerrain.md#enumerations) flag_index, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_data_block_size"></span> **get_data_block_size**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_get_statistics"></span> **get_statistics**( ) 
 
-Gets debug information about how much time is spent processing the terrain.
+获取关于处理地形所花费时间的调试信息。
 
-The returned dictionary has the following structure:
+返回的字典具有以下结构：
 
 ```
 {
@@ -207,46 +207,46 @@ The returned dictionary has the following structure:
 
 ### [PackedInt32Array](https://docs.godotengine.org/en/stable/classes/class_packedint32array.html)<span id="i_get_viewer_network_peer_ids_in_area"></span> **get_viewer_network_peer_ids_in_area**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_origin, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_size ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_has_data_block"></span> **has_data_block**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) block_position ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_area_meshed"></span> **is_area_meshed**( [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) area_in_voxels ) 
 
-Returns true if the area has been processed by meshing. It does not mean the area actually contains a mesh.
+如果该区域已被网格化处理，则返回 true。这并不意味着该区域实际包含网格。
 
-Returns false if the area has not been processed by meshing (therefore it is unknown whethere there should be a mesh here or not).
+如果该区域尚未经过网格化处理（因此此处是否存在网格未知），则返回 false。
 
-When streaming terrain, this can be used to determine if an area has fully "loaded", in case the game relies meshes or mesh colliders.
+对于流式加载的地形，可用于确定某个区域是否已完全"加载"，以防游戏依赖网格或网格碰撞体。
 
 ### [void](#)<span id="i_save_block"></span> **save_block**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) position ) 
 
-Forces a specific block to be saved.
+强制保存特定数据块。
 
-Note 1: this will only have an effect if the stream setup on this terrain supports saving.
+注意 1：只有当地形上设置的数据流支持保存时，这才有效。
 
-Note 2: saving is asynchronous and won't block the game. the save may complete only a short time after you call this method.
+注意 2：保存是异步的，不会阻塞游戏。保存可能只在你调用此方法后很短的时间内完成。
 
 ### [VoxelSaveCompletionTracker](VoxelSaveCompletionTracker.md)<span id="i_save_modified_blocks"></span> **save_modified_blocks**( ) 
 
-Forces all modified blocks to be saved.
+强制保存所有已修改的数据块。
 
-Note 1: this will only have an effect if the stream setup on this terrain supports saving.
+注意 1：只有当地形上设置的数据流支持保存时，这才有效。
 
-Note 2: saving is asynchronous and won't block the game. the save may complete only a short time after you call this method.
+注意 2：保存是异步的，不会阻塞游戏。保存可能只在你调用此方法后很短的时间内完成。
 
-Use the returned tracker object to know when saving has completed. However, saves occurring after calling this method won't be tracked by this object.
+使用返回的跟踪器对象来了解保存何时完成。但是，在调用此方法之后发生的保存将不会被此对象跟踪。
 
-Note that blocks getting unloaded as the viewer moves around can also trigger saving tasks, independently from this function.
+注意，当观察者移动时被卸载的数据块也会触发保存任务，这与本函数无关。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_try_set_block_data"></span> **try_set_block_data**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) position, [VoxelBuffer](VoxelBuffer.md) voxels ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_voxel_to_data_block"></span> **voxel_to_data_block**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) voxel_pos ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

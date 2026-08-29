@@ -40,7 +40,7 @@ void VoxelBlockyLibrary::clear() {
 void VoxelBlockyLibrary::load_default() {
 	clear();
 
-	// TODO Why not empty?
+	// TODO 为什么不设为空？
 	Ref<VoxelBlockyModelMesh> air;
 	air.instantiate();
 	air->set_name("air");
@@ -62,7 +62,7 @@ void VoxelBlockyLibrary::bake() {
 
 	const uint64_t time_before = Time::get_singleton()->get_ticks_usec();
 
-	// This is the only place we modify the data.
+	// 这是唯一修改数据的地方。
 
 	_indexed_materials.clear();
 	blocky::MaterialIndexer materials{ _indexed_materials };
@@ -126,7 +126,7 @@ int VoxelBlockyLibrary::add_model(Ref<VoxelBlockyModel> model) {
 // }
 
 bool VoxelBlockyLibrary::_set(const StringName &p_name, const Variant &p_value) {
-	// Legacy
+	// 旧版兼容
 
 	String property_name(p_name);
 	if (property_name.begins_with("voxels/")) {
@@ -136,8 +136,8 @@ bool VoxelBlockyLibrary::_set(const StringName &p_name, const Variant &p_value) 
 		Ref<VoxelBlockyModel> legacy_model = p_value;
 
 		if (legacy_model.is_valid()) {
-			// Convert old classes into new classes. This is why `VoxelBlockyModel` is unfortunately not abstract, even
-			// if it should be...
+			// 将旧类转换为新类。这就是 `VoxelBlockyModel` 不幸不是抽象类的原因，
+			// 尽管它本应是...
 
 			const VoxelBlockyModel::LegacyProperties &legacy_properties = legacy_model->get_legacy_properties();
 
@@ -150,9 +150,9 @@ bool VoxelBlockyLibrary::_set(const StringName &p_name, const Variant &p_value) 
 				for (unsigned int side = 0; side < VoxelBlockyModel::SIDE_COUNT; ++side) {
 					cube->set_tile(VoxelBlockyModel::Side(side), to_vec2i(legacy_properties.cube_tiles[side]));
 				}
-				// TODO Can't guarantee that this will work, because Godot could set that property later.
-				// It might actually work if Godot properly sorts properties in TSCN/TRES, because `voxels/*` starts
-				// with `v`, which comes after `atlas_size`.
+				// TODO 无法保证这会生效，因为 Godot 可能会在之后设置该属性。
+				// 如果 Godot 能正确对 TSCN/TRES 中的属性排序，它可能确实会生效，因为 `voxels/*` 以
+				// `v` 开头，排在 `atlas_size` 之后。
 				cube->set_atlas_size_in_tiles(Vector2i(_legacy_atlas_size, _legacy_atlas_size));
 				new_model = cube;
 
@@ -214,7 +214,7 @@ void VoxelBlockyLibrary::get_configuration_warnings(PackedStringArray &out_warni
 
 	if (null_indices.size() > 0) {
 		const String indices_str = godot::join_comma_separated<int>(to_span(null_indices));
-		// Should we really consider it a problem?
+		// 我们真的应该把它视为问题吗？
 		out_warnings.append(String(VOXEL_TTR("The {0} has null model entries: {1}"))
 									.format(varray(VoxelBlockyLibrary::get_class_static(), indices_str)));
 	}

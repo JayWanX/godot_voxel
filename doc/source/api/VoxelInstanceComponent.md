@@ -1,11 +1,11 @@
 # VoxelInstanceComponent
 
-Inherits: [Node](https://docs.godotengine.org/en/stable/classes/class_node.html)
+继承自：[Node](https://docs.godotengine.org/en/stable/classes/class_node.html)
 
-This node gets attached to scene items instanced by [VoxelInstancer](VoxelInstancer.md).
+该节点会被附加到由 [VoxelInstancer](VoxelInstancer.md) 实例化的场景条目上。
 
-## Description: 
+## 描述：
 
-[VoxelInstancer](VoxelInstancer.md) internally adds this node to instanced scenes, so it can track when they get destroyed or removed from the scene tree.
+[VoxelInstancer](VoxelInstancer.md) 在内部将此节点添加到实例化场景中，以便追踪它们何时被销毁或从场景树中移除。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

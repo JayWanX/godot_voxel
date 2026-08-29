@@ -3,7 +3,7 @@
 
 #include "../../util/containers/std_unordered_set.h"
 #include "../../util/string/std_string.h"
-// Stopped using StdStringstream for the time being, because of issues supporting some Linux distros
+// 暂时停止使用 StdStringstream，因为它在某些 Linux 发行版上有支持问题
 // https://github.com/Voxel/godot_voxel/issues/842
 // #include "../../util/string/std_stringstream.h"
 

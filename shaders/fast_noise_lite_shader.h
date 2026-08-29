@@ -1,4 +1,4 @@
-// Generated file
+// 生成的文件
 
 // clang-format off
 const char *g_fast_noise_lite_shader[] = {

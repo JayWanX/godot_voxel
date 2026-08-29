@@ -13,7 +13,7 @@
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 6
 using RenderingServerEnums = RenderingServer;
 #else
-// RenderingServer enums are now in a dedicated namespace called RenderingServerEnums
+// RenderingServer 的枚举现在位于一个名为 RenderingServerEnums 的独立命名空间中
 #include <servers/rendering/rendering_server_enums.h>
 #endif
 
@@ -57,7 +57,7 @@ void get_shader_parameter_list(const RID &shader_rid, StdVector<ShaderParameterI
 
 String get_current_rendering_method_name();
 
-// Enum equivalent to strings used in ProjectSettings and RenderingServer.
+// 与 ProjectSettings 和 RenderingServer 中使用的字符串等价的枚举。
 enum RenderMethod {
 	RENDER_METHOD_FORWARD_PLUS,
 	RENDER_METHOD_MOBILE,
@@ -81,8 +81,8 @@ enum RenderDriverName {
 
 RenderDriverName get_current_rendering_driver();
 
-// Enum equivalent of `ProjectSettings.rendering/driver/threads/thread_model`.
-// This is unfortunately not exposed.
+// `ProjectSettings.rendering/driver/threads/thread_model` 的枚举等价物。
+// 遗憾的是它没有暴露出来。
 enum RenderThreadModel {
 	RENDER_THREAD_UNSAFE,
 	RENDER_THREAD_SAFE,
@@ -91,7 +91,7 @@ enum RenderThreadModel {
 
 RenderThreadModel get_render_thread_model(const ProjectSettings &settings);
 
-// Tells if it is safe to call functions of the RenderingServer from a thread other than the main one.
+// 说明从主线程以外的线程调用 RenderingServer 的函数是否安全。
 bool is_render_thread_model_safe(const RenderThreadModel mode);
 
 } // namespace voxel::godot

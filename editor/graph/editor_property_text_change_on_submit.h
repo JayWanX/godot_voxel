@@ -8,10 +8,10 @@ VOXEL_GODOT_FORWARD_DECLARE(class LineEdit)
 
 namespace voxel {
 
-// The default string editor of the inspector calls the setter of the edited object on every character typed.
-// This is not always desired. Instead, this editor should emit a change only when enter is pressed, or when the
-// editor looses focus.
-// Note: Godot's default string editor for LineEdit is `EditorPropertyText`
+// 检查器的默认字符串编辑器会在每次输入字符时调用被编辑对象的 setter。
+// 这并非总是所期望的。相反，这个编辑器应该只在按下回车键或
+// 编辑器失去焦点时才发出更改。
+// 注意：Godot 针对 LineEdit 的默认字符串编辑器是 `EditorPropertyText`
 class Voxel_EditorPropertyTextChangeOnSubmit : public voxel::godot::Voxel_EditorProperty {
 	GDCLASS(Voxel_EditorPropertyTextChangeOnSubmit, voxel::godot::Voxel_EditorProperty)
 public:

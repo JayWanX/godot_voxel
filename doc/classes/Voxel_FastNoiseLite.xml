@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="Voxel_FastNoiseLite" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Generates coherent and fractal noise using the [url=https://github.com/Auburn/FastNoiseLite]FastNoiseLite[/url] library.
+		使用 [url=https://github.com/Auburn/FastNoiseLite]FastNoiseLite[/url] 库生成相干噪声和分形噪声。
 	</brief_description>
 	<description>
-		This is an alternative implementation of [FastNoiseLite], based on the same library. Some differences include different default values, and use of period instead of frequency in fractal parameters. It is also used in the voxel module in order to bypass the overhead of Godot calls.
+		这是基于同一库的 [FastNoiseLite] 的替代实现。一些差异包括不同的默认值，以及在分形参数中使用周期代替频率。它也在体素模块中使用，以绕过 Godot 调用的开销。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -14,12 +14,14 @@
 			<param index="0" name="x" type="float" />
 			<param index="1" name="y" type="float" />
 			<description>
+				获取给定 2D 坐标处的噪声值。
 			</description>
 		</method>
 		<method name="get_noise_2dv">
 			<return type="float" />
 			<param index="0" name="position" type="Vector2" />
 			<description>
+				获取给定位置处的 2D 噪声值。
 			</description>
 		</method>
 		<method name="get_noise_3d">
@@ -28,93 +30,133 @@
 			<param index="1" name="y" type="float" />
 			<param index="2" name="z" type="float" />
 			<description>
+				获取给定 3D 坐标处的噪声值。
 			</description>
 		</method>
 		<method name="get_noise_3dv">
 			<return type="float" />
 			<param index="0" name="position" type="Vector3" />
 			<description>
+				获取给定位置处的 3D 噪声值。
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="cellular_distance_function" type="int" setter="set_cellular_distance_function" getter="get_cellular_distance_function" enum="Voxel_FastNoiseLite.CellularDistanceFunction" default="1">
+			设置细胞噪声的距离函数。
 		</member>
 		<member name="cellular_jitter" type="float" setter="set_cellular_jitter" getter="get_cellular_jitter" default="1.0">
+			设置细胞噪声的抖动强度。
 		</member>
 		<member name="cellular_return_type" type="int" setter="set_cellular_return_type" getter="get_cellular_return_type" enum="Voxel_FastNoiseLite.CellularReturnType" default="1">
+			设置细胞噪声的返回值类型。
 		</member>
 		<member name="fractal_gain" type="float" setter="set_fractal_gain" getter="get_fractal_gain" default="0.5">
+			设置分形噪声的增益。
 		</member>
 		<member name="fractal_lacunarity" type="float" setter="set_fractal_lacunarity" getter="get_fractal_lacunarity" default="2.0">
+			设置分形噪声的隙度。
 		</member>
 		<member name="fractal_octaves" type="int" setter="set_fractal_octaves" getter="get_fractal_octaves" default="3">
+			设置分形噪声的八度数量。
 		</member>
 		<member name="fractal_ping_pong_strength" type="float" setter="set_fractal_ping_pong_strength" getter="get_fractal_ping_pong_strength" default="2.0">
+			设置乒乓分形的强度。
 		</member>
 		<member name="fractal_type" type="int" setter="set_fractal_type" getter="get_fractal_type" enum="Voxel_FastNoiseLite.FractalType" default="1">
+			设置分形噪声的类型。
 		</member>
 		<member name="fractal_weighted_strength" type="float" setter="set_fractal_weighted_strength" getter="get_fractal_weighted_strength" default="0.0">
+			设置分形噪声的加权强度。
 		</member>
 		<member name="noise_type" type="int" setter="set_noise_type" getter="get_noise_type" enum="Voxel_FastNoiseLite.NoiseType" default="0">
+			设置噪声的类型。
 		</member>
 		<member name="period" type="float" setter="set_period" getter="get_period" default="64.0">
+			设置噪声的周期。
 		</member>
 		<member name="rotation_type_3d" type="int" setter="set_rotation_type_3d" getter="get_rotation_type_3d" enum="Voxel_FastNoiseLite.RotationType3D" default="0">
+			设置用于 3D 旋转的类型。
 		</member>
 		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="0">
+			设置随机种子。
 		</member>
 		<member name="warp_noise" type="Voxel_FastNoiseLiteGradient" setter="set_warp_noise" getter="get_warp_noise">
+			设置用于域扭曲的梯度噪声。
 		</member>
 	</members>
 	<constants>
 		<constant name="TYPE_OPEN_SIMPLEX_2" value="0" enum="NoiseType">
+			OpenSimplex2 噪声。
 		</constant>
 		<constant name="TYPE_OPEN_SIMPLEX_2S" value="1" enum="NoiseType">
+			OpenSimplex2S 噪声。
 		</constant>
 		<constant name="TYPE_CELLULAR" value="2" enum="NoiseType">
+			细胞（蜂窝）噪声。
 		</constant>
 		<constant name="TYPE_PERLIN" value="3" enum="NoiseType">
+			Perlin 噪声。
 		</constant>
 		<constant name="TYPE_VALUE_CUBIC" value="4" enum="NoiseType">
+			三次插值值噪声。
 		</constant>
 		<constant name="TYPE_VALUE" value="5" enum="NoiseType">
+			值噪声。
 		</constant>
 		<constant name="FRACTAL_NONE" value="0" enum="FractalType">
+			无分形。
 		</constant>
 		<constant name="FRACTAL_FBM" value="1" enum="FractalType">
+			FBM（分形布朗运动）分形。
 		</constant>
 		<constant name="FRACTAL_RIDGED" value="2" enum="FractalType">
+			脊状（Ridged）分形。
 		</constant>
 		<constant name="FRACTAL_PING_PONG" value="3" enum="FractalType">
+			乒乓（Ping-pong）分形。
 		</constant>
 		<constant name="ROTATION_3D_NONE" value="0" enum="RotationType3D">
+			无 3D 旋转。
 		</constant>
 		<constant name="ROTATION_3D_IMPROVE_XY_PLANES" value="1" enum="RotationType3D">
+			改善 XY 平面的 3D 旋转。
 		</constant>
 		<constant name="ROTATION_3D_IMPROVE_XZ_PLANES" value="2" enum="RotationType3D">
+			改善 XZ 平面的 3D 旋转。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_EUCLIDEAN" value="0" enum="CellularDistanceFunction">
+			欧几里得距离。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_EUCLIDEAN_SQ" value="1" enum="CellularDistanceFunction">
+			欧几里得距离的平方。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_MANHATTAN" value="2" enum="CellularDistanceFunction">
+			曼哈顿距离。
 		</constant>
 		<constant name="CELLULAR_DISTANCE_HYBRID" value="3" enum="CellularDistanceFunction">
+			混合距离。
 		</constant>
 		<constant name="CELLULAR_RETURN_CELL_VALUE" value="0" enum="CellularReturnType">
+			返回单元格的值。
 		</constant>
 		<constant name="CELLULAR_RETURN_DISTANCE" value="1" enum="CellularReturnType">
+			返回最近单元格的距离。
 		</constant>
 		<constant name="CELLULAR_RETURN_DISTANCE_2" value="2" enum="CellularReturnType">
+			返回次近单元格的距离。
 		</constant>
 		<constant name="CELLULAR_RETURN_DISTANCE_2_ADD" value="3" enum="CellularReturnType">
+			返回最近与次近距离之和。
 		</constant>
 		<constant name="CELLULAR_RETURN_DISTANCE_2_SUB" value="4" enum="CellularReturnType">
+			返回最近与次近距离之差。
 		</constant>
 		<constant name="CELLULAR_RETURN_DISTANCE_2_MUL" value="5" enum="CellularReturnType">
+			返回最近与次近距离之积。
 		</constant>
 		<constant name="CELLULAR_RETURN_DISTANCE_2_DIV" value="6" enum="CellularReturnType">
+			返回最近与次近距离之商。
 		</constant>
 	</constants>
 </class>

@@ -1,25 +1,25 @@
 # VoxelInstanceLibrarySceneItem
 
-Inherits: [VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md)
+继承自：[VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md)
 
-Instancer model using scenes.
+使用场景的实例化器模型。
 
-## Description: 
+## 描述：
 
-This model will spawn scene instances, which may be suited for sparse and complex elements.
+该模型将生成场景实例，可能适合稀疏且复杂的元素。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                                  | Name               | Default 
-------------------------------------------------------------------------------------- | ------------------ | --------
-[PackedScene](https://docs.godotengine.org/en/stable/classes/class_packedscene.html)  | [scene](#i_scene)  |         
+类型                                                                                    | 名称                 | 默认值 
+------------------------------------------------------------------------------------- | ------------------ | ----
+[PackedScene](https://docs.godotengine.org/en/stable/classes/class_packedscene.html)  | [scene](#i_scene)  |     
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [PackedScene](https://docs.godotengine.org/en/stable/classes/class_packedscene.html)<span id="i_scene"></span> **scene**
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

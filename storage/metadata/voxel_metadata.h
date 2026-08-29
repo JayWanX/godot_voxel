@@ -8,27 +8,27 @@
 
 namespace voxel {
 
-// Voxel metadata is arbitrary, sparse data that can be attached to particular voxels.
-// It is not intended at being an efficient or fast storage method, but rather a versatile one for special cases.
-// For example, it can be used to store text, tags, inventory contents, or other complex states attached to a voxel.
-// If you need to store smaller data much more frequently, you may rely on a data channel instead.
+// 体素元数据是任意的、稀疏的数据，可以附加到特定体素上。
+// 它并不是一种高效或快速的存储方式，而是一种针对特殊情况的通用方式。
+// 例如，它可以用来存储文本、标签、物品栏内容，或附加到体素的其他复杂状态。
+// 如果需要更频繁地存储较小数据，可以依靠数据通道。
 
 class ICustomVoxelMetadata;
 
-// Container for one metadata instance. It owns the data.
+// 单个元数据实例的容器。它拥有数据。
 class VoxelMetadata {
 public:
 	enum Type : uint8_t { //
 		TYPE_EMPTY = 0,
 		TYPE_U64 = 1,
-		// Reserved predefined types.
+		// 保留的预定义类型。
 
 		TYPE_CUSTOM_BEGIN = 32,
-		// Types equal or greater will implement `ICustomVoxelMetadata`.
+		// 等于或大于此索引的类型将实现 `ICustomVoxelMetadata`。
 
 		TYPE_APP_SPECIFIC_BEGIN = 40
-		// Nothing prevents registering custom types lower than this index, but for convenience, it should be used for
-		// application-specific types (aka game-specific). Lower indices can be used for engine-specific integrations.
+		// 没有什么阻止注册低于此索引的自定义类型，但为了方便，它应被用于
+		// 应用特定类型（即游戏特定类型）。较低的索引可用于引擎特定集成。
 	};
 
 	static const unsigned int CUSTOM_TYPES_MAX_COUNT = 256 - TYPE_CUSTOM_BEGIN;
@@ -65,7 +65,7 @@ public:
 	ICustomVoxelMetadata &get_custom();
 	const ICustomVoxelMetadata &get_custom() const;
 
-	// Clears this metadata and makes it a duplicate of the given one.
+	// 清除此元数据，并使其成为给定元数据的副本。
 	void copy_from(const VoxelMetadata &src);
 
 	bool equals(const VoxelMetadata &other) const;

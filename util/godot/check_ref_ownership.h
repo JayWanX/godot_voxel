@@ -10,19 +10,19 @@
 
 namespace voxel::godot {
 
-// Checks that nothing takes extra ownership of a RefCounted object between the beginning and the end of a scope.
-// This can be used when calling GDVIRTUAL methods that are passed an object that must not be held by the callee after
-// the end of the call.
+// 检查在作用域开始到结束之间，没有任何东西额外持有某个 RefCounted 对象的引用。
+// 当调用 GDVIRTUAL 方法并传入一个对象、且该对象在调用结束后不能被调用方持有时，可使用此检查。
+// 即在调用结束时该对象不应被调用方持有。
 class CheckRefCountDoesNotChange {
 public:
-	// Ideally this shouldn't need to be turned off in project settings, but some languages like C# like to keep
-	// references on object due to garbage-collection memory model. In those cases, the strategy of this sanity check
-	// falls apart because we can't tell what happened...
+	// 理想情况下不应需要在项目设置中关闭此检查，但像 C# 这样的语言由于垃圾回收内存模型会保留
+	// 对对象的引用。在这种情况下，这项健全性检查的策略就会失效，
+	// 因为我们无从判断发生了什么……
 	static void set_enabled(bool enabled);
 	static bool is_enabled();
 
-	// Note: not taking a `const Ref<RefCounted>&` for convenience, because it may involve casting, which means C++ will
-	// not pass Ref<T> by reference but by value instead, which would increase the refcount.
+	// 注意：为方便起见不接收 `const Ref<RefCounted>&`，因为这可能涉及类型转换，意味着 C++ 会
+	// 按值而非按引用传递 Ref<T>，从而增加引用计数。
 	inline CheckRefCountDoesNotChange(const char *method_name, RefCounted *rc) :
 			_method_name(method_name), _rc(rc), _initial_count(rc->get_reference_count()) {}
 

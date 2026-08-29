@@ -2,7 +2,7 @@
 #include "../constants/voxel_string_names.h"
 #include "../shaders/shaders.h"
 #include "../storage/voxel_buffer_gd.h"
-#include "../util/godot/core/array.h" // for `varray`
+#include "../util/godot/core/array.h" // 用于 `varray`
 #include "../util/godot/core/class_db.h"
 #include "../util/profiling.h"
 #include "generate_block_task.h"
@@ -21,7 +21,7 @@ VoxelGenerator::Result VoxelGenerator::generate_block(VoxelQueryData input) {
 }
 
 IThreadedTask *VoxelGenerator::create_block_task(const BlockTaskParams &params) const {
-	// Default generic task
+	// 默认通用任务
 	return VOXEL_NEW(GenerateBlockTask(params));
 }
 
@@ -33,10 +33,10 @@ VoxelSingleValue VoxelGenerator::generate_single(Vector3i pos, unsigned int chan
 	VoxelSingleValue v;
 	v.i = 0;
 	VOXEL_ASSERT_RETURN_V(channel < VoxelBuffer::MAX_CHANNELS, v);
-	// Default slow implementation
-	// TODO Optimize: a small part of the slowness is caused by the allocator.
-	// It is not a good use of `VoxelMemoryPool` for such a small size called so often.
-	// Instead it would be faster if it was using a temp allocator, or maybe stack-allocated.
+	// 默认的慢速实现
+	// TODO 优化：慢的一部分是由分配器造成的。
+	// 对于如此小且频繁调用的尺寸来说，使用 `VoxelMemoryPool` 并不合适。
+	// 改用临时分配器或者栈上分配会更快。
 	VoxelBuffer buffer(VoxelBuffer::ALLOCATOR_POOL);
 	buffer.create(1, 1, 1);
 	VoxelQueryData q{ buffer, pos, 0 };
@@ -152,19 +152,18 @@ std::shared_ptr<ComputeShader> compile_detail_rendering_compute_shader(
 	);
 
 	String source_text;
-	// We are only sure here what binding it's going to be, we can't do it earlier
+	// 只有在这里我们才能确定 binding 的值，无法更早确定
 	const unsigned int generator_uniform_binding_start = 3;
 	{
-		// Header
+		// 头
 		source_text += g_detail_generator_shader_template_0;
 
 		append_generator_parameter_uniforms(source_text, out_params, shader_data, generator_uniform_binding_start);
 
-		// Generator code
+		// 生成器代码
 		source_text += shader_data.glsl;
 
-		// Generate wrapper to use only one output, and adapt to the function name expected by the detail rendering
-		// template
+		// 生成包装器，只使用一个输出，并适配细节渲染模板所期望的函数名
 		{
 			source_text += "float get_sd(vec3 pos) {\n";
 			int sdf_output_index = -1;
@@ -180,7 +179,7 @@ std::shared_ptr<ComputeShader> compile_detail_rendering_compute_shader(
 					ComputeShaderFactory::create_invalid(),
 					"Can't generate detail generator shader, SDF output not found"
 			);
-			// Call the generator shader function
+			// 调用生成器着色器函数
 			source_text += "\tgenerate(pos";
 			for (unsigned int output_index = 0; output_index < shader_data.outputs.size(); ++output_index) {
 				source_text += String(", v{0}").format(varray(output_index));
@@ -189,11 +188,11 @@ std::shared_ptr<ComputeShader> compile_detail_rendering_compute_shader(
 			source_text += String("\treturn v{0};\n}\n").format(varray(sdf_output_index));
 		}
 
-		// Footer
+		// 尾
 		source_text += g_detail_generator_shader_template_1;
 	}
 
-	// TODO Pick different name somehow for different generators
+	// TODO 想办法为不同的生成器选择不同的名称
 	std::shared_ptr<ComputeShader> shader =
 			ComputeShaderFactory::create_from_glsl(source_text, "voxel.detail_generator.gen");
 
@@ -232,27 +231,27 @@ std::shared_ptr<ComputeShader> compile_block_rendering_compute_shader(
 		outputs.outputs.push_back(output);
 	}
 
-	// Generator code
+	// 生成器代码
 	source_text += shader_data.glsl;
 
-	// Header of main()
+	// main() 的头
 	source_text += g_block_generator_shader_template_1;
 
-	// Call generator function
+	// 调用生成器函数
 	{
 		source_text += "\tgenerate(wpos";
 		for (unsigned int output_index = 0; output_index < shader_data.outputs.size(); ++output_index) {
-			// TODO Perhaps we should be able to pack outputs instead of always using floats?
-			// TODO Maybe interleaved output would be more performant due to data locality?
+			// TODO 也许我们应该能够打包输出，而不是总是使用 float？
+			// TODO 也许交错输出会因为数据局部性而更高效？
 			source_text += String(", u_out.values[out_index + volume * {0}]").format(varray(output_index));
 		}
 		source_text += ");\n";
 	}
 
-	// Footer of main()
+	// main() 的尾
 	source_text += g_block_generator_shader_template_2;
 
-	// TODO Pick different name somehow for different generators
+	// TODO 想办法为不同的生成器选择不同的名称
 	std::shared_ptr<ComputeShader> shader =
 			ComputeShaderFactory::create_from_glsl(source_text, "voxel.block_generator.gen");
 
@@ -301,17 +300,17 @@ void VoxelGenerator::invalidate_shaders() {
 #endif
 
 bool VoxelGenerator::generate_broad_block(VoxelQueryData input) {
-	// By default, generators don't support this separately and just do it inside `generate_block`.
-	// However if a generator supports GPU, it is recommended to implement it.
+	// 默认情况下，生成器不单独支持这一点，而是在 `generate_block` 内部完成。
+	// 但如果生成器支持 GPU，则建议实现它。
 	return false;
 }
 
 void VoxelGenerator::process_viewer_diff(ViewerID viewer_id, Box3i p_requested_box, Box3i p_prev_requested_box) {
-	// Optionally implemented in subclasses
+	// 可选地在子类中实现
 }
 
 void VoxelGenerator::clear_cache() {
-	// Optionally implemented in subclasses
+	// 可选地在子类中实现
 }
 
 bool VoxelGenerator::is_runnable() const {

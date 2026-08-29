@@ -1,21 +1,21 @@
-Voxel block format v1
+体素数据块格式 v1
 ====================
 
 !!! warning
-    This document is about an old version of the format. You may check the most recent version.
+    本文档描述的是该格式的旧版本。你可以查看最新版本。
 
-This page describes the binary format used by default in this module to serialize voxel blocks to files, network or databases.
+本页描述此模块默认用于将体素数据块序列化到文件、网络或数据库的二进制格式。
 
-This format has no version (version 1 is assumed).
+此格式没有版本号（默认为版本 1）。
 
 
-Specification
+规范
 ----------------
 
-### Top-levels
+### 顶层结构
 
-A block is serialized as compressed data.
-This is the format provided by the `VoxelBlockSerializer` utility class. If you don't use compression, the layout will correspond to `BlockData` described in the next listing.
+数据块被序列化为压缩数据。
+这是由 `VoxelBlockSerializer` 工具类提供的格式。如果你不使用压缩，其布局将对应于下一节中描述的 `BlockData`。
 
 ```
 CompressedBlockData
@@ -23,9 +23,9 @@ CompressedBlockData
 - compressed_data
 ```
 
-`compressed_data` must be decompressed using the LZ4 algorithm (without header), into a buffer big enough to contain `decompressed_data_size` bytes. Knowing that size is also important later on.
+`compressed_data` 必须使用 LZ4 算法（无头部）解压缩，解压到足以容纳 `decompressed_data_size` 字节的缓冲区中。该大小信息在后续解析中也很重要。
 
-The obtained data then contains the actual block. It is saved as it comes, and doesn't contain metadata about its version, 3D size or the depth of each channel. If you use this for custom block serialization, you must take care of using a format known in advance when encoding and decoding, or prepending it to the data. Region files declare block format globally.
+解压得到的数据即为实际的数据块内容。它按原样保存，不包含关于其版本、3D 尺寸或每个通道位深度的元数据。如果你将其用于自定义数据块序列化，必须在编码和解码时使用预先约定的格式，或将其前置到数据中。区域文件会在全局声明数据块格式。
 
 ```
 BlockData
@@ -34,9 +34,9 @@ BlockData
 - epilogue
 ```
 
-### Channels
+### 通道
 
-Block data starts with 8 channels one after the other, each with the following structure:
+数据块数据以 8 个依次排列的通道开始，每个通道的结构如下：
 
 ```
 Channel
@@ -44,23 +44,23 @@ Channel
 - data
 ```
 
-`compression` is the same as the `VoxelBuffer::Compression` enum.
-Depending on the value of `compression`, `data` will be different.
+`compression` 与 `VoxelBuffer::Compression` 枚举一致。
+根据 `compression` 的值，`data` 会有所不同。
 
-If compression is `COMPRESSION_NONE` (0), the data will be an array of N bytes, where N is the number of voxels inside a block, multiplied by the number of bytes in the depth setting of the current channel (defined in the meta file seen earlier). For example, a block of size 16 and a channel of 32-bit depth will have `16*16*16*4` bytes to load from the file into this channel.
-The 3D indexing of that data is also in order `ZXY`.
+如果压缩方式是 `COMPRESSION_NONE`（0），数据将是 N 字节的数组，其中 N 是数据块内的体素数量乘以当前通道位深度设置（由前面提到的元文件定义）的字节数。例如，尺寸为 16 的数据块与 32 位位深度的通道将有 `16*16*16*4` 字节需要从文件加载到此通道中。
+该数据的 3D 索引同样按 `ZXY` 顺序排列。
 
-If compression is `COMPRESSION_UNIFORM` (1), the data will be a single voxel value, which means all voxels in the block have that same value. Unused channels will always use this mode. The value can span a variable number of bytes depending on the depth of the current channel:
-- 1 byte if 8-bit
-- 2 bytes if 16-bits
-- 4 bytes if 32-bits
-- 8 bytes if 64-bits
+如果压缩方式是 `COMPRESSION_UNIFORM`（1），数据将是单个体素值，这意味着数据块中的所有体素都具有相同的值。未使用的通道始终使用此模式。该值的字节数取决于当前通道的位深度，可能不同：
+- 8 位时为 1 字节
+- 16 位时为 2 字节
+- 32 位时为 4 字节
+- 64 位时为 8 字节
 
-Other compression values are invalid.
+其它压缩值无效。
 
-### Metadata
+### 元数据
 
-After all channels information, block data can contain metadata information. Blocks that don't contain any will only have a fixed amount of bytes left (from the epilogue) before reaching the size of the total data to read. If there is more, the block contains metadata.
+在所有通道信息之后，数据块数据可以包含元数据信息。不含任何元数据的数据块，在达到总数据读取大小之前，只会剩下固定数量的字节（来自尾部）。如果还有更多内容，则该数据块包含元数据。
 
 ```
 Metadata
@@ -69,11 +69,11 @@ Metadata
 - voxel_metadata[*]
 ```
 
-It starts with one 32-bit unsigned integer representing the total size of all metadata there is to read. That data comes in two groups: one for the whole block, and one per voxel.
+它以单个 32 位无符号整数开始，表示需要读取的所有元数据的总大小。该数据分为两组：一组用于整个数据块，一组用于每个体素。
 
-Block metadata is one Godot `Variant`, encoded using the `encode_variant` method of the engine.
+数据块元数据是单个 Godot `Variant`，使用引擎的 `encode_variant` 方法编码。
 
-Voxel metadata immediately follows. It is a sequence of the following data structures, which must be read until a total of `metadata_size` bytes have been read from the beginning:
+体素元数据紧随其后。它是以下数据结构的序列，必须一直读取，直到从开头读取的字节总数达到 `metadata_size`：
 
 ```
 VoxelMetadata
@@ -83,29 +83,29 @@ VoxelMetadata
 - data
 ```
 
-`x`, `y` and `z` indicate which voxel the data corresponds. `data` is also a `Variant` encoded the same way as described earlier. This results in an associative collection between voxel positions relative to the block and their corresponding metadata.
+`x`、`y` 和 `z` 指示数据对应的体素。`data` 也是一个按前面所述方式编码的 `Variant`。这样就形成了数据块内相对体素位置与其对应元数据之间的关联集合。
 
-### Epilogue
+### 尾部
 
-At the very end, block data finishes with a sequence of 4 bytes, which once read into a `uint32_t` integer must match the value `0x900df00d`. If that condition isn't fulfilled, the block must be assumed corrupted.
+在最后，数据块数据以 4 字节序列结尾，将其读入 `uint32_t` 整数后必须等于值 `0x900df00d`。如果不满足该条件，则该数据块必须视为已损坏。
 
 
-Current Issues
+当前问题
 ----------------
 
-Although this format is currently implemented and usable, it has known issues.
+尽管此格式目前已实现且可用，但它存在已知问题。
 
-### Endianness
+### 字节序
 
-Godot's `encode_variant` doesn't seem to care about endianness across architectures, so it's possible it becomes a problem in the future and gets changed to a custom format.
-The rest of this spec is not affected by this and assumes we use little-endian, however the implementation of block channels currently doesn't consider this either. This may be refined in a later iteration.
+Godot 的 `encode_variant` 似乎不关心不同架构间的字节序，因此将来可能会成为问题并改为自定义格式。
+本规范的其余部分不受此影响，并假定我们使用小端字节序，然而当前数据块通道的实现同样没有考虑这一点。这可能会在后续迭代中改进。
 
-### Absence of metadata
+### 缺少元数据
 
-A block can't be deserialized without external information, the format must be known in advance. In the future it may be added.
+如果没有外部信息，数据块无法被反序列化，格式必须预先已知。未来可能会补充这一点。
 
-### Versioning
+### 版本管理
 
-This format doesn't have a header with version tag, which may be problematic if it changes.
+此格式没有带版本标签的头部，如果格式发生变化可能会带来问题。
 
-User versionning might also be considered as a second layer: if the game needs to replace some metadata with new ones, or swap voxel IDs around due to a change in the game, it is desirable to expose a hook to migrate old versions. 
+用户版本管理也可以作为第二层考虑：如果游戏需要用新元数据替换某些元数据，或由于游戏变更而交换体素 ID，最好提供一个钩子来迁移旧版本。

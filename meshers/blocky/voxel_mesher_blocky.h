@@ -12,8 +12,8 @@
 
 namespace voxel {
 
-// Interprets voxel values as indexes to models in a VoxelBlockyLibrary, and batches them together.
-// Overlapping faces are removed from the final mesh.
+// 将体素值解释为 VoxelBlockyLibrary 中模型的索引，并将它们批量合并。
+// 重叠的面会从最终网格中移除。
 class VoxelMesherBlocky : public VoxelMesher {
 	GDCLASS(VoxelMesherBlocky, VoxelMesher)
 
@@ -57,9 +57,9 @@ public:
 
 	void build(VoxelMesher::Output &output, const VoxelMesher::Input &input) override;
 
-	// TODO: Resource::duplicate() cannot be overriden.
-	// This will lead to performance degradation and maybe unexpected behavior.
-	// The way it works has also changed in Godot 4.5 so I gave up trying to implement it.
+	// TODO: Resource::duplicate() 无法被覆写。
+	// 这会导致性能下降，甚至可能出现意外行为。
+	// 其工作方式在 Godot 4.5 中也发生了变化，所以我放弃了实现它的尝试。
 	//
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
 
@@ -72,8 +72,8 @@ public:
 	Ref<Material> get_material_by_index(unsigned int index) const override;
 	unsigned int get_material_index_count() const override;
 
-	// Using std::vector because they make this mesher twice as fast than Godot Vectors.
-	// See why: https://github.com/godotengine/godot/issues/24731
+	// 使用 std::vector，因为它们使此网格生成器比 Godot 的 Vector 快一倍。
+	// 原因见：https://github.com/godotengine/godot/issues/24731
 	struct Arrays {
 		StdVector<Vector3f> positions;
 		StdVector<Vector3f> normals;
@@ -116,22 +116,22 @@ private:
 		StdVector<Arrays> arrays_per_material;
 	};
 
-	// Parameters
+	// 参数
 	Parameters _parameters;
 	RWLock _parameters_lock;
 
-	// Work cache
+	// 工作缓存
 	static Cache &get_tls_cache();
 };
 
 namespace blocky {
 
 inline bool is_face_visible_regardless_of_shape(const BakedModel &vt, const BakedModel &other_vt) {
-	// TODO Maybe we could get rid of `empty` here and instead set `culls_neighbors` to false during baking
+	// TODO 也许我们可以去掉这里的 `empty`，改而在烘焙期间将 `culls_neighbors` 设为 false
 	return other_vt.empty || (other_vt.transparency_index > vt.transparency_index) || !other_vt.culls_neighbors;
 }
 
-// Does not account for other factors
+// 不考虑其它因素
 inline bool is_face_visible_according_to_shape(
 		const BakedLibrary &lib,
 		const BakedModel &vt,
@@ -140,7 +140,7 @@ inline bool is_face_visible_according_to_shape(
 ) {
 	const unsigned int ai = vt.model.side_pattern_indices[side];
 	const unsigned int bi = other_vt.model.side_pattern_indices[Cube::g_opposite_side[side]];
-	// Patterns are not the same, and B does not occlude A
+	// 模式不相同，且 B 不遮挡 A
 	return (ai != bi) && !lib.get_side_pattern_occlusion(bi, ai);
 }
 

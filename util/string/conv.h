@@ -28,13 +28,13 @@ constexpr int max_float_chars_general() {
 static constexpr unsigned int MAX_INT32_CHAR_COUNT_BASE10 = 11; // -2147483647
 static constexpr unsigned int MAX_INT64_CHAR_COUNT_BASE10 = 20; // -9223372036854775808
 
-// Converts integer to characters. Returns the number of characters written.
+// 将整数转换为字符。返回写入的字符数。
 unsigned int int32_to_string_base10(const int32_t x, Span<uint8_t> s);
 unsigned int int64_to_string_base10(const int64_t x, Span<char> s);
 unsigned int float32_to_string(const float x, Span<char> s);
 unsigned int float64_to_string(const double x, Span<char> s);
 
-// Converts characters to integer. Returns the number of characters read, or -1 in case of failure.
+// 将字符转换为整数。返回读取的字符数，失败时返回 -1。
 int string_base10_to_int32(std::string_view s, int32_t &out_x);
 
 } // namespace voxel

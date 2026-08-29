@@ -1,14 +1,14 @@
 # VoxelBlockyType
 
-Inherits: [Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
+继承自：[Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
 !!! warning
-    This class is marked as experimental. It is subject to likely change or possible removal in future versions. Use at your own discretion.
+    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                                                        | Name                                             | Default    
+类型                                                                                                          | 名称                                               | 默认值        
 ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | -----------
 [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)                                    | [_variant_models_data](#i__variant_models_data)  | []         
 [VoxelBlockyAttribute[]](https://docs.godotengine.org/en/stable/classes/class_voxelblockyattribute[].html)  | [attributes](#i_attributes)                      | []         
@@ -16,47 +16,47 @@ Type                                                                            
 [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)                          | [unique_name](#i_unique_name)                    | &"unnamed" 
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                           | Signature                                                                                                                                                                  
+返回值                                              | 函数签名                                                                                                                                                                       
 ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [VoxelBlockyAttribute](VoxelBlockyAttribute.md)  | [get_rotation_attribute](#i_get_rotation_attribute) ( ) const                                                                                                              
 [void](#)                                        | [set_variant_model](#i_set_variant_model) ( [Array](https://docs.godotengine.org/en/stable/classes/class_array.html) key, [VoxelBlockyModel](VoxelBlockyModel.md) model )  
 <p></p>
 
-## Constants: 
+## 常量：
 
 - <span id="i_MAX_ATTRIBUTES"></span>**MAX_ATTRIBUTES** = **4**
 
-## Property Descriptions
+## 属性描述
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i__variant_models_data"></span> **_variant_models_data** = []
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [VoxelBlockyAttribute[]](https://docs.godotengine.org/en/stable/classes/class_voxelblockyattribute[].html)<span id="i_attributes"></span> **attributes** = []
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [VoxelBlockyModel](VoxelBlockyModel.md)<span id="i_base_model"></span> **base_model**
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)<span id="i_unique_name"></span> **unique_name** = &"unnamed"
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
-## Method Descriptions
+## 方法描述
 
 ### [VoxelBlockyAttribute](VoxelBlockyAttribute.md)<span id="i_get_rotation_attribute"></span> **get_rotation_attribute**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_set_variant_model"></span> **set_variant_model**( [Array](https://docs.godotengine.org/en/stable/classes/class_array.html) key, [VoxelBlockyModel](VoxelBlockyModel.md) model ) 
 
-Explicitely sets which model to use for a given combination of attributes (key).
+明确设置对于给定的属性组合（键）使用哪个模型。
 
-If you have attributes that automatically generate variants (such as rotations), you are expected to only set models for the default value of such attributes. Other models will not be preserved. This is because the default value will be used as a reference to generate the other models.
+如果你有自动生成变体的属性（如旋转），你应仅为这些属性的默认值设置模型。其他模型将不会被保留。这是因为默认值将被用作参考来生成其他模型。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

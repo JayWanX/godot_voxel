@@ -66,9 +66,9 @@ bool check_graph_results_are_equal(VoxelGeneratorGraph &generator1, VoxelGenerat
 	VoxelBuffer block2(VoxelBuffer::ALLOCATOR_DEFAULT);
 	block2.create(block_size);
 
-	// Note, not every graph configuration can be considered invalid when inequal.
-	// SDF clipping does create differences that are supposed to be irrelevant for our use cases.
-	// So it is important that we test generators with the same SDF clipping options.
+	// 注意，并非所有不等价的图配置都可以被视为无效。
+	// SDF 裁剪确实会产生差异，而这些差异在我们的用例中理应是不相关的。
+	// 因此，用相同的 SDF 裁剪选项来测试生成器非常重要。
 	VOXEL_ASSERT(generator1.get_sdf_clip_threshold() == generator2.get_sdf_clip_threshold());
 
 	generator1.generate_block(VoxelGenerator::VoxelQueryData{ block1, origin, 0 });
@@ -264,8 +264,8 @@ void load_graph_with_expression_and_noises(VoxelGraphFunction &g, Ref<Voxel_Fast
 }
 
 void load_graph_with_clamp(VoxelGraphFunction &g, float ramp_half_size) {
-	// Two planes of different height, with a 45-degrees ramp along the X axis between them.
-	// The plane is higher in negative X, and lower in positive X.
+	// 两个高度不同的平面，它们之间沿 X 轴有一段 45 度的斜坡。
+	// 该平面在负 X 方向更高，在正 X 方向更低。
 	//
 	//   X --- Clamp --- + --- Out
 	//                  /
@@ -273,7 +273,7 @@ void load_graph_with_clamp(VoxelGraphFunction &g, float ramp_half_size) {
 
 	const uint32_t n_x = g.create_node(VoxelGraphFunction::NODE_INPUT_X, Vector2());
 	const uint32_t n_y = g.create_node(VoxelGraphFunction::NODE_INPUT_Y, Vector2());
-	// Not using CLAMP_C for testing simplification
+	// 不使用 CLAMP_C 来测试简化
 	const uint32_t n_clamp = g.create_node(VoxelGraphFunction::NODE_CLAMP, Vector2());
 	const uint32_t n_add = g.create_node(VoxelGraphFunction::NODE_ADD, Vector2());
 	const uint32_t n_out = g.create_node(VoxelGraphFunction::NODE_OUTPUT_SDF, Vector2());
@@ -288,8 +288,8 @@ void load_graph_with_clamp(VoxelGraphFunction &g, float ramp_half_size) {
 }
 
 void test_voxel_graph_clamp_simplification() {
-	// The CLAMP node is replaced with a CLAMP_C node on compilation.
-	// This tests that the generator still behaves properly.
+	// 编译时 CLAMP 节点会被替换为 CLAMP_C 节点。
+	// 这用于测试生成器在替换后仍能正常运行。
 	static const float RAMP_HALF_SIZE = 4.f;
 	struct L {
 		static Ref<VoxelGeneratorGraph> create_graph(bool debug) {
@@ -388,7 +388,7 @@ void test_voxel_graph_generator_expressions_2() {
 		VOXEL_TEST_ASSERT(check_graph_results_are_equal(**generator_debug, **generator));
 	}
 
-	// Making sure it didn't leak
+	// 确保它没有泄漏
 	VOXEL_TEST_ASSERT(zfnl.is_valid());
 	VOXEL_TEST_ASSERT(zfnl->get_reference_count() == 1);
 }
@@ -399,10 +399,10 @@ void test_voxel_graph_generator_texturing() {
 
 	VoxelGraphFunction &g = **generator->get_main_function();
 
-	// Plane centered on Y=0, angled 45 degrees, going up towards +X
-	// When Y<0, weight0 must be 1 and weight1 must be 0.
-	// When Y>0, weight0 must be 0 and weight1 must be 1.
-	// When 0<Y<1, weight0 must transition from 1 to 0 and weight1 must transition from 0 to 1.
+	// 平面中心位于 Y=0，倾斜 45 度，朝 +X 方向上升
+	// 当 Y<0 时，weight0 必须为 1，weight1 必须为 0。
+	// 当 Y>0 时，weight0 必须为 0，weight1 必须为 1。
+	// 当 0<Y<1 时，weight0 必须从 1 过渡到 0，weight1 必须从 0 过渡到 1。
 
 	/*
 	 *        Clamp --- Sub1 --- Weight0
@@ -444,7 +444,7 @@ void test_voxel_graph_generator_texturing() {
 					.format(varray(compilation_result.node_id, compilation_result.message))
 	);
 
-	// Single value tests
+	// 单值测试
 	{
 		const float sdf_must_be_in_air = generator->generate_single(Vector3i(-2, 0, 0), VoxelBuffer::CHANNEL_SDF).f;
 		const float sdf_must_be_in_ground = generator->generate_single(Vector3i(2, 0, 0), VoxelBuffer::CHANNEL_SDF).f;
@@ -460,7 +460,7 @@ void test_voxel_graph_generator_texturing() {
 				ProgramGraph::PortLocation{ out_weight1, 0 }, out_weight1_buffer_index
 		));
 
-		// Sample two points 1 unit below ground at to heights on the slope
+		// 在地面下方 1 个单位的斜坡上采样两个点
 
 		{
 			const float sdf = generator->generate_single(Vector3i(-2, -3, 0), VoxelBuffer::CHANNEL_SDF).f;
@@ -496,9 +496,9 @@ void test_voxel_graph_generator_texturing() {
 		}
 	}
 
-	// Block tests
+	// 数据块测试
 	{
-		// packed U16 format decoding has a slightly lower maximum due to a compromise
+		// 由于折中，打包的 U16 格式解码的最大值会略低一些
 		const uint8_t WEIGHT_MAX = 240;
 
 		struct L {
@@ -537,7 +537,7 @@ void test_voxel_graph_generator_texturing() {
 			static void do_block_tests(Ref<VoxelGeneratorGraph> generator) {
 				ERR_FAIL_COND(generator.is_null());
 				{
-					// Block centered on origin
+					// 以原点为中心的数据块
 					VoxelBuffer buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 					buffer.create(Vector3i(16, 16, 16));
 
@@ -548,8 +548,8 @@ void test_voxel_graph_generator_texturing() {
 					L::check_weights(buffer, Vector3i(12, 11, 8), false, true);
 				}
 				{
-					// Two blocks: one above 0, the other below.
-					// The point is to check possible bugs due to optimizations.
+					// 两个数据块：一个在 0 之上，另一个在 0 之下。
+					// 目的是检查可能因优化而产生的 bug。
 
 					// Below 0
 					VoxelBuffer buffer0(VoxelBuffer::ALLOCATOR_DEFAULT);
@@ -573,13 +573,13 @@ void test_voxel_graph_generator_texturing() {
 			}
 		};
 
-		// Putting state on the stack because the debugger doesnt let me access it
+		// 把状态放到栈上，因为调试器不让我访问它
 		// const pg::Runtime::State &state = VoxelGeneratorGraph::get_last_state_from_current_thread();
 
-		// Try first without optimization
+		// 先尝试不使用优化
 		generator->set_use_optimized_execution_map(false);
 		L::do_block_tests(generator);
-		// Try with optimization
+		// 再尝试使用优化
 		generator->set_use_optimized_execution_map(true);
 		L::do_block_tests(generator);
 	}
@@ -587,7 +587,7 @@ void test_voxel_graph_generator_texturing() {
 
 void test_voxel_graph_equivalence_merging() {
 	{
-		// Basic graph with two equivalent branches
+		// 有两个等价分支的基础图
 
 		//        1
 		//         \
@@ -620,7 +620,7 @@ void test_voxel_graph_equivalence_merging() {
 		VOXEL_TEST_ASSERT(value.f == 22);
 	}
 	{
-		// Same as previous but the X input node is shared
+		// 与上一个相同，但 X 输入节点是共享的
 
 		//          1
 		//           \
@@ -675,7 +675,7 @@ void print_sdf_as_ascii(const VoxelBuffer &vb) {
 	for (pos.y = 0; pos.y < vb.get_size().y; ++pos.y) {
 		print_line(format("Y = {}", pos.y));
 		for (pos.z = 0; pos.z < vb.get_size().z; ++pos.z) {
-			// Prints two views of the same row side by side
+			// 并排打印同一行的两个视图
 			StdStringTextWriter ss;
 			StdStringTextWriter ss2;
 			for (pos.x = 0; pos.x < vb.get_size().x; ++pos.x) {
@@ -744,14 +744,14 @@ void test_voxel_graph_generate_block_with_input_sdf() {
 
 	struct L {
 		static void load_graph(VoxelGraphFunction &g) {
-			// Just outputting the input
+			// 只是把输入原样输出
 			const uint32_t n_in_sdf = g.create_node(VoxelGraphFunction::NODE_INPUT_SDF, Vector2());
 			const uint32_t n_out_sdf = g.create_node(VoxelGraphFunction::NODE_OUTPUT_SDF, Vector2());
 			g.add_connection(n_in_sdf, 0, n_out_sdf, 0);
 		}
 
 		static void test(bool subdivision_enabled, int subdivision_size) {
-			// Create generator
+			// 创建生成器
 			Ref<VoxelGeneratorGraph> generator;
 			generator.instantiate();
 			L::load_graph(**generator->get_main_function());
@@ -762,7 +762,7 @@ void test_voxel_graph_generate_block_with_input_sdf() {
 							.format(varray(compilation_result.node_id, compilation_result.message))
 			);
 
-			// Create buffer containing part of a sphere
+			// 创建包含球体一部分的缓冲区
 			VoxelBuffer buffer(VoxelBuffer::ALLOCATOR_DEFAULT);
 			buffer.create(Vector3i(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE));
 			const VoxelBuffer::ChannelId channel = VoxelBuffer::CHANNEL_SDF;
@@ -770,14 +770,14 @@ void test_voxel_graph_generate_block_with_input_sdf() {
 			for (int z = 0; z < buffer.get_size().z; ++z) {
 				for (int x = 0; x < buffer.get_size().x; ++x) {
 					for (int y = 0; y < buffer.get_size().y; ++y) {
-						// Sphere at origin
+						// 位于原点的球体
 						const float sd = math::sdf_sphere(Vector3f(x, y, z), Vector3f(), SPHERE_RADIUS);
 						buffer.set_voxel_f(sd, Vector3i(x, y, z), channel);
 					}
 				}
 			}
 
-			// Make a backup before running the generator
+			// 在运行生成器之前做一次备份
 			VoxelBuffer buffer_before(VoxelBuffer::ALLOCATOR_DEFAULT);
 			buffer_before.create(buffer.get_size());
 			buffer_before.copy_channels_from(buffer);
@@ -812,7 +812,7 @@ Ref<VoxelGraphFunction> create_pass_through_function() {
 	func.instantiate();
 	{
 		VoxelGraphFunction &g = **func;
-		// Pass through
+		// 直通
 		// X --- OutSDF
 		const uint32_t n_x = g.create_node(VoxelGraphFunction::NODE_INPUT_X, Vector2());
 		const uint32_t n_out_sdf = g.create_node(VoxelGraphFunction::NODE_OUTPUT_SDF, Vector2());
@@ -849,12 +849,12 @@ void test_voxel_graph_functions_pass_through() {
 void test_voxel_graph_functions_nested_pass_through() {
 	Ref<VoxelGraphFunction> func1 = create_pass_through_function();
 
-	// Minimal function using another
+	// 使用另一个函数的最小函数
 	Ref<VoxelGraphFunction> func2;
 	func2.instantiate();
 	{
 		VoxelGraphFunction &g = **func2;
-		// Nested pass through
+		// 嵌套直通
 		// X --- Func1 --- OutSDF
 		const uint32_t n_x = g.create_node(VoxelGraphFunction::NODE_INPUT_X, Vector2());
 		const uint32_t n_f = g.create_function_node(func1, Vector2());
@@ -978,7 +978,7 @@ void test_voxel_graph_functions_io_mismatch() {
 		);
 	}
 
-	// Now remove an input from the function, and see how it goes
+	// 现在从函数中移除一个输入，看看结果如何
 	{
 		FixedArray<VoxelGraphFunction::Port, 1> inputs;
 		inputs[0] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_INPUT_X, "x" };
@@ -988,14 +988,14 @@ void test_voxel_graph_functions_io_mismatch() {
 	}
 	{
 		const pg::CompilationResult compilation_result = generator->compile(false);
-		// Compiling should fail, but not crash
+		// 编译应该失败，但不崩溃
 		VOXEL_TEST_ASSERT(compilation_result.success == false);
 		VOXEL_PRINT_VERBOSE(format("Compiling failed with message '{}'", compilation_result.message));
 	}
 	generator->get_main_function()->update_function_nodes(nullptr);
 	{
 		const pg::CompilationResult compilation_result = generator->compile(false);
-		// Compiling should work now
+		// 现在编译应该能通过了
 		VOXEL_TEST_ASSERT(compilation_result.success == true);
 	}
 }
@@ -1056,7 +1056,7 @@ void test_voxel_graph_functions_misc() {
 
 				if (input_count == 4) {
 					g.set_node_default_input(n_f, 3, func_custom_input_defval);
-					// This one shouldn't matter, it's unused, but defined still
+					// 这个应该无所谓，它没有被使用，但仍被定义
 					g.set_node_default_input(n_f, 2, 12345);
 				}
 
@@ -1069,7 +1069,7 @@ void test_voxel_graph_functions_misc() {
 		}
 	};
 
-	// Regular test
+	// 常规测试
 	{
 		Ref<VoxelGraphFunction> func = L::create_misc_function();
 		func->auto_pick_inputs_and_outputs();
@@ -1090,13 +1090,13 @@ void test_voxel_graph_functions_misc() {
 		const float expected = float(pos.x) + float(pos.z) + func_custom_input_defval;
 		VOXEL_TEST_ASSERT(Math::is_equal_approx(sd, expected));
 	}
-	// More input nodes than inputs, but should still compile
+	// 输入节点多于输入参数，但仍应能编译
 	{
 		Ref<VoxelGraphFunction> func = L::create_misc_function();
 		FixedArray<VoxelGraphFunction::Port, 2> inputs;
 		inputs[0] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_INPUT_X, "x" };
 		inputs[1] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_CUSTOM_INPUT, "custom_input" };
-		// 2 input nodes don't have corresponding inputs
+		// 2 个输入节点没有对应的输入
 		FixedArray<VoxelGraphFunction::Port, 2> outputs;
 		outputs[0] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_OUTPUT_SDF, "sdf" };
 		outputs[1] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_CUSTOM_OUTPUT, "custom_output" };
@@ -1111,7 +1111,7 @@ void test_voxel_graph_functions_misc() {
 						.format(varray(compilation_result.node_id, compilation_result.message))
 		);
 	}
-	// Less I/O nodes than I/Os, but should still compile
+	// I/O 节点少于 I/O 数量，但仍应能编译
 	{
 		Ref<VoxelGraphFunction> func = L::create_misc_function();
 		FixedArray<VoxelGraphFunction::Port, 5> inputs;
@@ -1120,7 +1120,7 @@ void test_voxel_graph_functions_misc() {
 		inputs[2] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_CUSTOM_INPUT, "custom_input2" };
 		inputs[3] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_CUSTOM_INPUT, "custom_input3" };
 		inputs[4] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_CUSTOM_INPUT, "custom_input4" };
-		// 2 input nodes don't have corresponding inputs
+		// 2 个输入节点没有对应的输入
 		FixedArray<VoxelGraphFunction::Port, 3> outputs;
 		outputs[0] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_OUTPUT_SDF, "sdf" };
 		outputs[1] = VoxelGraphFunction::Port{ VoxelGraphFunction::NODE_CUSTOM_OUTPUT, "custom_output" };
@@ -1146,7 +1146,7 @@ void test_voxel_graph_issue461() {
 	generator->get_main_function()->create_node(VoxelGraphFunction::NODE_OUTPUT_TYPE, Vector2(), -69);
 	generator->debug_load_waves_preset();
 	generator->debug_load_waves_preset();
-	// This used to crash
+	// 此处曾导致崩溃
 	VoxelGenerator::ShaderSourceData ssd;
 	generator->get_shader_source(ssd);
 }
@@ -1163,13 +1163,13 @@ void get_node_types(const NodeTypeDB &type_db, StdVector<VoxelGraphFunction::Nod
 	}
 }
 
-// The goal of this test is to find crashes. It will probably cause errors, but should not crash.
+// 本测试的目标是发现崩溃。它可能会产生错误，但不应崩溃。
 void test_voxel_graph_fuzzing() {
 	struct L {
 		static String make_random_name(RandomPCG &rng) {
 			String name;
 			const int len = rng.rand() % 8;
-			// Note, we let empty names happen.
+			// 注意，我们允许出现空名称。
 			for (int i = 0; i < len; ++i) {
 				const char c = 'a' + (rng.rand() % ('z' - 'a'));
 				name += c;
@@ -1277,7 +1277,7 @@ void test_voxel_graph_fuzzing() {
 		L::make_random_graph(
 				**generator->get_main_function(),
 				rng,
-				// Disallowing custom I/Os because VoxelGeneratorGraph cannot handle them at the moment
+				// 不允许自定义 I/O，因为 VoxelGeneratorGraph 目前无法处理它们
 				false
 		);
 		pg::CompilationResult compilation_result = generator->compile(false);
@@ -1353,7 +1353,7 @@ void test_voxel_graph_issue427() {
 	g.add_connection(n_sub, 0, n_out_sdf, 0);
 	g.add_connection(n_fn2_2d, 0, n_mul, 0);
 	g.add_connection(n_distance_3d, 0, n_mul, 1);
-	// Was crashing after adding this connection
+	// 添加这个连接后会崩溃
 	g.add_connection(n_mul, 0, n_sub, 1);
 
 	pg::CompilationResult result = graph->compile(true);
@@ -1373,15 +1373,15 @@ void test_voxel_graph_hash() {
 	const uint32_t n_out_sdf = g.create_node(VoxelGraphFunction::NODE_OUTPUT_SDF, Vector2()); // 4
 	const uint32_t n_fn2_2d = g.create_node(VoxelGraphFunction::NODE_FAST_NOISE_2_2D, Vector2()); // 5
 
-	// Initial hash
+	// 初始哈希
 	const uint64_t hash0 = g.get_output_graph_hash();
 
-	// Setting a default input on a node that isn't connected yet to the output
+	// 在尚未连接到输出的节点上设置默认输入
 	g.set_node_default_input(n_mul, 1, 2);
 	const uint64_t hash1 = g.get_output_graph_hash();
 	VOXEL_TEST_ASSERT(hash1 == hash0);
 
-	// Adding connections up to the output
+	// 逐步添加直到连接上输出
 	g.add_connection(n_in_y, 0, n_add, 0);
 	g.add_connection(n_fn2_2d, 0, n_add, 1);
 	g.add_connection(n_add, 0, n_mul, 0);
@@ -1389,23 +1389,23 @@ void test_voxel_graph_hash() {
 	const uint64_t hash2 = g.get_output_graph_hash();
 	VOXEL_TEST_ASSERT(hash2 != hash0);
 
-	// Adding only one connection, creating a diamond
+	// 只添加一条连接，形成菱形
 	g.add_connection(n_fn2_2d, 0, n_mul, 1);
 	const uint64_t hash3 = g.get_output_graph_hash();
 	VOXEL_TEST_ASSERT(hash3 != hash2);
 
-	// Setting a default input
+	// 设置默认输入
 	g.set_node_default_input(n_mul, 1, 4);
 	const uint64_t hash4 = g.get_output_graph_hash();
 	VOXEL_TEST_ASSERT(hash4 != hash3);
 
-	// Setting a noise resource property
+	// 设置噪声资源属性
 	Ref<FastNoise2> noise = g.get_node_param(n_fn2_2d, 0);
 	noise->set_period(noise->get_period() + 10.f);
 	const uint64_t hash5 = g.get_output_graph_hash();
 	VOXEL_TEST_ASSERT(hash5 != hash4);
 
-	// Setting a different noise instance with the same properties
+	// 用相同属性设置一个不同的噪声实例
 	Ref<FastNoise2> noise2 = noise->duplicate();
 	g.set_node_param(n_fn2_2d, 0, noise2);
 	const uint64_t hash6 = g.get_output_graph_hash();
@@ -1428,18 +1428,18 @@ void test_voxel_graph_issue471() {
 	outputs[0].name = "test_output";
 	outputs[0].type = VoxelGraphFunction::NODE_OUTPUT_SDF;
 	func->set_io_definitions(to_span(inputs), to_span(outputs));
-	// Was crashing because input definition wasn't fulfilled (the graph is empty). It should fail with an error.
+	// 之前会崩溃，因为输入定义未得到满足（图是空的）。它本应以报错失败。
 	VoxelGenerator::ShaderSourceData ssd;
 	generator->get_shader_source(ssd);
 }
 #endif
 
-// There was a bug where generating a usual height-based terrain with also a texture output, random blocks fully or
-// partially filled with air would occur underground where such blocks should have been filled with matter. It only
-// happened if the texture output node was present. The cause was that the generator detected and filled the SDF early
-// with matter, for blocks far enough from the surface. But because there was also a texture output, the generator
-// proceeded to still run the graph to just get volumetric texture data (which is expected) but then overwrote SDF with
-// results it did not calculate, effectively filling SDF with garbage.
+// 曾有一个 bug：生成常规高度地形且同时带有纹理输出时，地下会出现完全或
+// 部分填充空气的随机方块，而此类方块本应填充为实体。该问题仅在
+// 存在纹理输出节点时才会发生。原因是生成器对离表面足够远的方块提前检测并填充了 SDF
+// 的实体部分。但由于还带有纹理输出，生成器
+// 仍会继续运行图，仅获取体积纹理数据（这是预期的），但随后又用未被计算的结果覆盖了 SDF，
+// 实际是用垃圾数据填充了 SDF。
 void test_voxel_graph_unused_single_texture_output() {
 	Ref<VoxelGeneratorGraph> generator;
 	generator.instantiate();
@@ -1451,7 +1451,7 @@ void test_voxel_graph_unused_single_texture_output() {
 		//
 		//                             OutSingleTexture
 
-		// Slightly bumpy ground around Y=0, not going higher than 10 or lower than -10 voxels.
+		// 在 Y=0 附近略有起伏的地面，不会高于 10 或低于 -10 体素。
 
 		Ref<VoxelGraphFunction> func = generator->get_main_function();
 		VOXEL_ASSERT(func.is_valid());
@@ -1515,7 +1515,7 @@ void test_voxel_graph_unused_single_texture_output() {
 		generator->generate_block(VoxelGenerator::VoxelQueryData{ voxels, origin_in_voxels, 0 });
 
 		if (bpos.y <= -2) {
-			// We expect only ground below this height (in block coordinates)
+			// 我们预期在此高度以下只有地面（以区块坐标表示）
 			for (int z = 0; z < voxels.get_size().z; ++z) {
 				for (int x = 0; x < voxels.get_size().x; ++x) {
 					for (int y = 0; y < voxels.get_size().y; ++y) {
@@ -1530,7 +1530,7 @@ void test_voxel_graph_unused_single_texture_output() {
 				}
 			}
 		} else if (bpos.y >= 1) {
-			// We expect only air above this height (in block coordinates)
+			// 我们预期在此高度以上只有空气（以区块坐标表示）
 			for (int z = 0; z < voxels.get_size().z; ++z) {
 				for (int x = 0; x < voxels.get_size().x; ++x) {
 					for (int y = 0; y < voxels.get_size().y; ++y) {
@@ -1543,17 +1543,17 @@ void test_voxel_graph_unused_single_texture_output() {
 	}
 }
 
-// There was a bug where texture indices selected using a Spots2D node were returning garbage in areas that were
-// supposed to be optimized out. The bug doesn't happen if local execution map optimization is turned off. In those
-// areas, spots aren't present: range analysis finds Spots2D always returns 0, which means Select ignores it and outputs
-// a constant. But instead, it appears as if it returned the last values obtained in an area where a spot was present.
+// 曾有一个 bug：使用 Spots2D 节点选取的纹理索引在本应被优化掉的区域返回垃圾值。
+// 若关闭本地执行映射优化则不会发生该问题。在这些
+// 区域内不存在斑点：范围分析发现 Spots2D 始终返回 0，意味着 Select 忽略它并输出
+// 一个常量。但实际表现为它返回了存在斑点的区域中所获得的最后取值。
 void test_voxel_graph_spots2d_optimized_execution_map() {
 	Ref<VoxelGeneratorGraph> generator;
 	generator.instantiate();
 
 	const float SPOT_RADIUS = 5.f;
 	const float CELL_SIZE = 64.f;
-	const float JITTER = 0.f; // All spots are centered in their cell
+	const float JITTER = 0.f; // 所有斑点都位于各自的格子中心
 	const unsigned int TEX_INDEX0 = 0;
 	const unsigned int TEX_INDEX1 = 1;
 
@@ -1655,7 +1655,7 @@ void test_voxel_graph_spots2d_optimized_execution_map() {
 		//            /
 		//     Spots2D
 		//
-		// Flat terrain with spots
+		// 带斑点的平坦地形
 
 		Ref<VoxelGraphFunction> func = generator->get_main_function();
 		VOXEL_ASSERT(func.is_valid());
@@ -1769,15 +1769,15 @@ void test_voxel_graph_spots2d_optimized_execution_map() {
 	VoxelBuffer voxels2(VoxelBuffer::ALLOCATOR_DEFAULT);
 	voxels2.create(Vector3iUtil::create(BLOCK_SIZE));
 
-	// First do a run without the optimization
+	// 先执行一次不带优化的运行
 	generator->set_use_optimized_execution_map(false);
 	{
-		// There is a spot in the top-right corner of this area
+		// 该区域的右上角有一个斑点
 		generator->generate_block(VoxelGenerator::VoxelQueryData{ voxels1, Vector3i(16, 0, 16), 0 });
 		// L::print_indices_and_weights(voxels1, 8);
 		VOXEL_TEST_ASSERT(L::has_spot(voxels1));
 
-		// There is no spot here
+		// 这里没有斑点
 		generator->generate_block(VoxelGenerator::VoxelQueryData{ voxels2, Vector3i(0, 0, 0), 0 });
 		// L::print_indices_and_weights(voxels2, 8);
 		VOXEL_TEST_ASSERT(L::has_spot(voxels2) == false);
@@ -1788,7 +1788,7 @@ void test_voxel_graph_spots2d_optimized_execution_map() {
 	VoxelBuffer voxels4(VoxelBuffer::ALLOCATOR_DEFAULT);
 	voxels4.create(Vector3iUtil::create(BLOCK_SIZE));
 
-	// Now do a run with the optimization, results must be the same
+	// 现在执行一次带优化的运行，结果必须相同
 	generator->set_use_optimized_execution_map(true);
 	{
 		generator->generate_block(VoxelGenerator::VoxelQueryData{ voxels3, Vector3i(16, 0, 16), 0 });
@@ -1802,7 +1802,7 @@ void test_voxel_graph_spots2d_optimized_execution_map() {
 		VOXEL_TEST_ASSERT(voxels4.equals(voxels2));
 	}
 
-	// Broader test
+	// 更广泛的测试
 	/*{
 		struct BlockTest {
 			Vector3i origin;
@@ -1834,12 +1834,12 @@ void test_voxel_graph_spots2d_optimized_execution_map() {
 }
 
 void test_voxel_graph_unused_inner_output() {
-	// When compiling a graph with an unused output in one if its inner nodes (not an Output* node), compiling in debug
-	// would crash because it tries to allocate an output buffer with 0 users, which should be allowed specifically in
-	// debug. To reproduce this, we need to have a node with more than one output, and one output being being used for a
-	// graph output. So the node will get compiled as part of the program, but will have an unused output. In non-debug
-	// this output will be allocated as a temporary throwaway buffer, but in debug all outputs are allocated regardless
-	// since buffer allocations are not optimized.
+	// 当编译的图在其某个内部节点（非 Output* 节点）存在未使用的输出时，在 debug 下编译
+	// 会崩溃，因为它试图为 0 个使用者分配输出缓冲区，而这在 debug 下是明确允许的。
+	// 为复现该问题，需要一个有多个输出的节点，且其中一个输出被用于
+	// 图的输出。这样该节点会作为程序的一部分被编译，但会有一个未使用的输出。在非 debug 模式下
+	// 该输出会作为一次性临时缓冲区分配；但在 debug 模式下无论缓冲区分配是否被优化，所有输出都会被分配。
+	// 因为缓冲区分配不会被优化。
 
 	Ref<VoxelGeneratorGraph> generator;
 	generator.instantiate();
@@ -1865,7 +1865,7 @@ void test_voxel_graph_unused_inner_output() {
 		g->add_connection(n_y, 0, n_normalize, 1);
 		g->add_connection(n_z, 0, n_normalize, 2);
 		g->add_connection(n_normalize, 0, n_out, 0);
-		// Leave outputs `ny`, `nz` and `len` unused
+		// 让输出 `ny`、`nz` 和 `len` 保持未使用
 	}
 
 	const CompilationResult result_debug = generator->compile(true);
@@ -2014,7 +2014,7 @@ void test_voxel_graph_image() {
 				image,
 				Box3i(Vector3i(0, -8, 0), Vector3i(16, 16, 16)),
 				math::Interval(0.5f, 0.5f)
-						// Padding a little because images may have only 8 bits of precision
+						// 稍微补充一些，因为图像可能只有 8 位精度
 						.padded(0.01f)
 		);
 	}
@@ -2082,12 +2082,12 @@ void test_voxel_graph_many_weight_outputs() {
 		}
 	}
 
-	// This used to crash/fail because the generator tried to compute spare indices when it doesnt actually make sense
-	// to do so when we have more than 4
+	// 之前会崩溃/失败，因为生成器试图计算多余索引，而当我们有超过 4 个时这样做并无实际意义
+	//
 	const CompilationResult result = generator->compile(false);
 	VOXEL_TEST_ASSERT(result.success);
 
-	// TODO Also run that graph and test outputs?
+	// TODO 还要运行该图并测试输出吗？
 }
 
 void test_image_range_grid() {
@@ -2142,10 +2142,10 @@ void test_image_range_grid() {
 	L::test_range(image, image_range_grid, Interval(50, 200), Interval(105, 240));
 	// Decimal
 	L::test_range(image, image_range_grid, Interval(100, 100.5), Interval(100, 100.5));
-	// Power of two
+	// 二的幂
 	L::test_range(image, image_range_grid, Interval(16, 32), Interval(64, 80));
 	L::test_range(image, image_range_grid, Interval(0, image_width), Interval(0, image_height));
-	// Larger than image size
+	// 大于图像尺寸
 	L::test_range(image, image_range_grid, Interval(-image_width, image_width), Interval(-image_height, image_height));
 	L::test_range(
 			image,
@@ -2153,14 +2153,14 @@ void test_image_range_grid() {
 			Interval(-10 * image_width, 10 * image_width),
 			Interval(-5 * image_height, 5 * image_height)
 	);
-	// Far away
+	// 远处
 	L::test_range(
 			image,
 			image_range_grid,
 			Interval(-10 * image_width + 50, -10 * image_width + 100),
 			Interval(-5 * image_height + 80, -5 * image_height + 90)
 	);
-	// Cross boundary
+	// 跨界
 	L::test_range(
 			image,
 			image_range_grid,
@@ -2199,14 +2199,14 @@ void test_voxel_graph_many_subdivisions() {
 	VoxelBuffer vb(VoxelBuffer::ALLOCATOR_DEFAULT);
 	vb.create(16, 512, 16);
 
-	// Just checking that it doesn't crash.
-	// There was an issue with subdivisions where we gathered "required outputs" filling a small array before running
-	// the graph, but it didn't reset that process at next subdivisions so eventually overran the array
+	// 仅检查它不会崩溃。
+	// 子分块曾有一个问题：运行图之前我们将"所需输出"填入一个小数组，
+	// 但在下一次子分块时没有重置该过程，最终导致数组越界。
 	generator->generate_block(VoxelGenerator::VoxelQueryData{ vb, Vector3i(0, 0, 0), 0 });
 }
 
 void test_voxel_graph_non_square_image() {
-	// There was a bug where the Image node was using with for X and Y instead of using height for Y.
+	// 曾有一个 bug：Image 节点对 X 和 Y 使用了 with，而不是对 Y 使用 height。
 
 	Ref<VoxelGeneratorGraph> generator;
 	generator.instantiate();
@@ -2238,11 +2238,11 @@ void test_voxel_graph_non_square_image() {
 	VOXEL_TEST_ASSERT(sd.f > 2.9f && sd.f < 3.1);
 }
 
-void test_voxel_graph_4_default_weights() { // Related to issue #686
+void test_voxel_graph_4_default_weights() { // 与 issue #686 相关
 	static constexpr uint32_t block_size = 16;
 
 	struct L {
-		// The idea is to generate data into the memory cache, which may affect the result if there is a garbage buffer
+		// 思路是将数据生成到内存缓存中，若存在垃圾缓冲区可能会影响结果。
 		// bug
 		static void warmup() {
 			Ref<VoxelGeneratorGraph> warmup_generator;
@@ -2299,7 +2299,7 @@ void test_voxel_graph_4_default_weights() { // Related to issue #686
 				const uint32_t n_ow1 = g.create_node(VoxelGraphFunction::NODE_OUTPUT_WEIGHT);
 				const uint32_t n_ow2 = g.create_node(VoxelGraphFunction::NODE_OUTPUT_WEIGHT);
 				const uint32_t n_ow3 = g.create_node(VoxelGraphFunction::NODE_OUTPUT_WEIGHT);
-				// Putting this one last can make bugs show up. Unusual setups increase entropy.
+				// 把该测试放在最后可以让 bug 暴露出来。不寻常的配置会增加熵。
 				const uint32_t n_out_sdf = g.create_node(VoxelGraphFunction::NODE_OUTPUT_SDF);
 
 				g.set_node_default_input(n_plane, 1, 1.0);
@@ -2346,7 +2346,7 @@ void test_voxel_graph_4_default_weights() { // Related to issue #686
 }
 
 void test_voxel_graph_empty_image() {
-	// This used to crash
+	// 此处曾导致崩溃
 
 	Ref<VoxelGeneratorGraph> generator;
 	generator.instantiate();
@@ -2368,7 +2368,7 @@ void test_voxel_graph_empty_image() {
 
 	CompilationResult result = generator->compile(false);
 
-	// Try to generate before asserting compilation result. It should fail without crashing.
+	// 在断言编译结果之前尝试生成。它应失败而不崩溃。
 	generator->generate_single(Vector3i(405, 2, 305), VoxelBuffer::CHANNEL_SDF);
 
 	VOXEL_TEST_ASSERT(result.success == false);
@@ -2431,7 +2431,7 @@ void test_voxel_graph_constant_reduction() {
 		g.add_connection(n_add2, 0, n_out_sdf, 0);
 	}
 
-	// TODO Have a test dedicated to `equals`?
+	// TODO 是否有专门针对 `equals` 的测试？
 	VOXEL_TEST_ASSERT(graph->equals(**graph));
 
 	const pg::CompilationResult res = graph->expand_and_reduce();
@@ -2506,12 +2506,12 @@ void test_voxel_graph_issue783() {
 		//        A2 ---|    B2
 		//               ---
 		//
-		// A1 and A2 are equivalent
-		// B1 and B2 are equivalent
+		// A1 和 A2 等价
+		// B1 和 B2 等价
 
-		// TODO This test somewhat depends on StdUnorderedMap implementation details.
-		// The input conditions may or may not satisfy what we are testing depending on the order in which nodes are
-		// added. We want the "equivalence merging" step of the optimizer to evaluate B1 and B2 BEFORE A1 and A2.
+		// TODO 该测试一定程度上依赖 StdUnorderedMap 的实现细节。
+		// 输入条件能否满足我们所测内容取决于节点被添加
+		// 的顺序。我们希望优化器的"等价合并"步骤先对 B1 和 B2 求值，再对 A1 和 A2 求值。
 		// If A1 and A2 are checked first, they will be merged and input conditions will be different for B1 and B2.
 		const uint32_t n_out = mf->create_node(VoxelGraphFunction::NODE_OUTPUT_SDF);
 		const uint32_t n_add = mf->create_node(VoxelGraphFunction::NODE_ADD);
@@ -2531,16 +2531,16 @@ void test_voxel_graph_issue783() {
 		mf->add_connection(n_b2, 0, n_add, 1);
 		mf->add_connection(n_add, 0, n_out, 0);
 
-		// TODO This should not error. Need a way to fail test if an error prints
+		// TODO 此处不应报错。需要一种在打印错误时使测试失败的方法。
 		const CompilationResult result_debug = graph->compile(true);
 		VOXEL_TEST_ASSERT(result_debug.success);
 	}
 }
 
 void test_voxel_graph_broad_block() {
-	// generate_broad_block used to scale SDF when filling the output buffer, but it should not have done that because
-	// VoxelBuffer already scales internally. So when range analysis returns single-value outputs that are small enough
-	// (for example using 1.0 in Select to output air in an area) then it was rounded to 0, which for Transvoxel means
+	// generate_broad_block 在填充输出缓冲区时曾对 SDF 进行缩放，但其实不应如此，因为
+	// VoxelBuffer 内部已进行缩放。所以当范围分析返回足够小的单值输出时
+	// （例如在 Select 中使用 1.0 在某区域输出空气）会被四舍五入为 0，对 Transvoxel 而言这意味着
 	// solid.
 
 	Ref<VoxelGeneratorGraph> graph;

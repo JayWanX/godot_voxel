@@ -3,14 +3,14 @@
 
 namespace voxel::godot {
 
-// There were changes to GraphNode in Godot PR #79311 2167694965ca2f4f16cfc1362d32a2fa01e817a2
+// Godot PR #79311 2167694965ca2f4f16cfc1362d32a2fa01e817a2 中 GraphNode 有一些改动
 
-// For some reason these getters cannot be const...
+// 出于某种原因，这些 getter 不能是 const……
 
 Vector2 get_graph_node_input_port_position(GraphNode &node, int port_index) {
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 1
-	// Can't directly use inputs and output positions... Godot pre-scales them, which makes them unusable
-	// inside NOTIFICATION_DRAW because the node is already scaled
+	// 不能直接使用输入和输出位置……Godot 会预先缩放它们，导致在 NOTIFICATION_DRAW 内部无法使用，
+	// 因为此时节点已经被缩放过
 	const Vector2 scale = node.get_global_transform().get_scale();
 	return node.get_connection_input_position(port_index) / scale;
 #else

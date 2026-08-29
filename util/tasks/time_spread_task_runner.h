@@ -10,9 +10,9 @@
 namespace voxel {
 
 struct TimeSpreadTaskContext {
-	// If this is set to `true` by a task,
-	// it will be re-scheduled to run again, the next time the runner is processed.
-	// Otherwise, the task will be destroyed after it runs.
+	// 若任务将其设为 `true`，
+	// 它将在运行器下次被处理时重新调度再次运行。
+	// 否则，任务在运行后会被销毁。
 	bool postpone = false;
 };
 
@@ -22,7 +22,7 @@ public:
 	virtual void run(TimeSpreadTaskContext &ctx) = 0;
 };
 
-// Runs tasks in the caller thread, within a time budget per call. Kind of like coroutines.
+// 在调用者线程中运行任务，每次调用有时间预算。有点类似于协程。
 class TimeSpreadTaskRunner {
 public:
 	enum Priority { //
@@ -33,7 +33,7 @@ public:
 
 	~TimeSpreadTaskRunner();
 
-	// Pushing is thread-safe.
+	// 入队是线程安全的。
 	void push(ITimeSpreadTask *task, Priority priority = PRIORITY_NORMAL);
 	void push(Span<ITimeSpreadTask *> tasks, Priority priority = PRIORITY_NORMAL);
 
@@ -44,7 +44,7 @@ public:
 private:
 	struct Queue {
 		StdQueue<ITimeSpreadTask *> tasks;
-		// TODO Optimization: naive thread safety. Should be enough for now.
+		// TODO 优化：简单的线程安全。目前应已足够。
 		BinaryMutex tasks_mutex;
 	};
 	FixedArray<Queue, PRIORITY_COUNT> _queues;

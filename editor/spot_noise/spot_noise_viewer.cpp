@@ -97,7 +97,7 @@ void draw_grid(Image &im, float cell_size, Color color) {
 
 } // namespace
 
-// TODO Use thread?
+// TODO 使用线程？
 void Voxel_SpotNoiseViewer::update_preview() {
 	const Vector2i preview_size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 

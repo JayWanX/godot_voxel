@@ -22,12 +22,12 @@ void ProgressiveTaskRunner::process() {
 	_last_process_time_msec = now_msec;
 	VOXEL_ASSERT_RETURN(delta_msec >= 0);
 
-	// The goal is to dequeue everything in S seconds.
-	// So if we have N tasks and `process` is called F times per second, we must dequeue N / (S * F) tasks.
-	// Or put it another way, if we call `process` every D seconds, we must dequeue (D * N) / S tasks.
-	// We make sure a minimum amount is run so it cannot be stuck at 0.
-	// As the number of pending tasks decreases, we want to keep running the highest amount we calculated.
-	// we reset when we are done.
+	// 目标是在 S 秒内将所有任务出队。
+	// 因此若我们有 N 个任务，且每秒调用 `process` F 次，则每次必须出队 N / (S * F) 个任务。
+	// 换句话说，若每 D 秒调用一次 `process`，则必须出队 (D * N) / S 个任务。
+	// 我们确保至少运行一定数量，使其不会卡在 0。
+	// 随着待处理任务数量减少，我们希望保持运行我们计算出的最大数量。
+	// 完成后我们将其重置。
 
 	_dequeue_count = math::max(int64_t(_dequeue_count), (int64_t(_tasks.size()) * delta_msec) / COMPLETION_TIME_MSEC);
 	_dequeue_count = math::min(_dequeue_count, math::max(MIN_COUNT, static_cast<unsigned int>(_tasks.size())));
@@ -37,7 +37,7 @@ void ProgressiveTaskRunner::process() {
 		IProgressiveTask *task = _tasks.front();
 		_tasks.pop();
 		task->run();
-		// TODO Call recycling function instead?
+		// TODO 改为调用回收函数？
 		VOXEL_DELETE(task);
 		--count;
 	}

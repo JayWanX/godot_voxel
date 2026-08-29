@@ -138,7 +138,7 @@ namespace FastNoise
         {
             static_assert( std::is_base_of<Generator, T>::value, "T must be child of FastNoise::Generator class" );
 
-            assert( !gen.get() || GetSIMDLevel() == gen->GetSIMDLevel() ); // Ensure that all SIMD levels match
+            assert( !gen.get() || GetSIMDLevel() == gen->GetSIMDLevel() ); // 确保所有 SIMD 层级一致
 
             SetSourceSIMDPtr( dynamic_cast<const Generator*>( gen.get() ), &memberVariable.simdGeneratorPtr );
             memberVariable.base = gen;

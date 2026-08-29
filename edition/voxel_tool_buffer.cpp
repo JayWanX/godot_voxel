@@ -10,7 +10,7 @@ namespace voxel {
 VoxelToolBuffer::VoxelToolBuffer(Ref<godot::VoxelBuffer> vb) {
 	ERR_FAIL_COND(vb.is_null());
 	_buffer = vb;
-	// Editing a buffer is easier if we can partially overlap outside.
+	// 如果可以部分超出范围重叠，编辑缓冲区会更方便。
 	_allow_out_of_bounds = true;
 }
 
@@ -57,8 +57,8 @@ void VoxelToolBuffer::do_box(Vector3i begin, Vector3i end) {
 		const VoxelBuffer::ChannelId channel = _channel;
 		const ops::Mode mode = static_cast<ops::Mode>(_mode);
 
-		// TODO Better quality
-		// Not consistent SDF, but should work ok
+		// TODO 提高质量
+		// 不是一致的 SDF，但应该能正常工作
 		box.for_each_cell([&vb, sdf_scale, channel, mode](Vector3i pos) {
 			vb.set_voxel_f(ops::sdf_blend(constants::SDF_FAR_INSIDE * sdf_scale, vb.get_voxel_f(pos, channel), mode),
 					pos, channel);
@@ -109,7 +109,7 @@ void VoxelToolBuffer::_set_voxel_f(Vector3i pos, float v) {
 
 void VoxelToolBuffer::_post_edit(const Box3i &box) {
 	ERR_FAIL_COND(_buffer.is_null());
-	// Nothing special to do
+	// 无需特殊处理
 }
 
 void VoxelToolBuffer::set_voxel_metadata(const Vector3i pos, const Variant &meta) {
@@ -153,7 +153,7 @@ void VoxelToolBuffer::paste(Vector3i p_pos, const VoxelBuffer &src, uint8_t chan
 
 					dst.set_voxel(v, x, y, z, channel_index);
 
-					// Overwrite previous metadata
+					// 覆盖先前的元数据
 					dst.erase_voxel_metadata(Vector3i(x, y, z));
 				}
 			}
@@ -252,15 +252,15 @@ void VoxelToolBuffer::do_path(Span<const Vector3> positions, Span<const float> r
 	ERR_FAIL_COND(_buffer.is_null());
 	VoxelBuffer &dst = _buffer->get_buffer();
 
-	// TODO Increase margin a bit with smooth voxels?
+	// TODO 对平滑体素是否稍微增大边距？
 	const int margin = 1;
 
-	// Rasterize
+	// 光栅化
 
 	for (unsigned int point_index = 1; point_index < positions.size(); ++point_index) {
-		// TODO Could run this in local space so we dont need doubles
-		// TODO Apply terrain scale
-		// TODO Do cones in local space, better than using doubles when considering SIMD
+		// TODO 可以在局部空间中运行，从而无需使用双精度
+		// TODO 应用地形缩放
+		// TODO 在局部空间中处理锥体，相比使用双精度更利于 SIMD
 		const Vector3f p0 = to_vec3f(positions[point_index - 1]);
 		const Vector3f p1 = to_vec3f(positions[point_index]);
 
@@ -288,7 +288,7 @@ void VoxelToolBuffer::do_path(Span<const Vector3> positions, Span<const float> r
 		if (get_channel() == VoxelBuffer::CHANNEL_SDF) {
 			switch (get_mode()) {
 				case MODE_ADD: {
-					// TODO Support other depths, format should be accessible from the volume. Or separate encoding?
+					// TODO 支持其他位深，格式应可从体积中访问，或者采用独立的编码？
 					ops::SdfOperation16bit<ops::SdfUnion, ops::SdfRoundCone> op;
 					op.shape = shape;
 					op.op.strength = get_sdf_strength();

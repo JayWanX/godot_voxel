@@ -1,5 +1,5 @@
-// Only include this in the mesher to define it once.
-// It is only in a separate header because I wanted to split things out.
+// 仅在网格生成器中包含它，以使其只定义一次。
+// 单独放在一个头文件中，只是因为我想要拆分内容。
 
 // #ifndef VOXEL_BLOCKY_FLUIDS_MESHING_IMPL_H
 // #define VOXEL_BLOCKY_FLUIDS_MESHING_IMPL_H
@@ -17,7 +17,7 @@ void copy(const BakedFluid::Surface &src, Vector2f src_uv, BakedModel::SideSurfa
 	fill(dst.uvs, src_uv);
 
 	copy(src.indices, dst.indices);
-	// TODO Aren't tangents always the same on sides too? Like normals?
+	// TODO 侧面上的切线不也总是相同的吗？比如法线？
 	copy(src.tangents, dst.tangents);
 }
 
@@ -46,7 +46,7 @@ static const VoxelBlockyFluid::FlowState g_min_corners_mask_to_flowstate[16] = {
 	// 0123
 	// ----
 	// 0000
-	VoxelBlockyFluid::FLOW_IDLE, // Impossible
+	VoxelBlockyFluid::FLOW_IDLE, // 不可能
 	// 0001
 	VoxelBlockyFluid::FLOW_DIAGONAL_POSITIVE_X_POSITIVE_Z,
 	// 0010
@@ -56,7 +56,7 @@ static const VoxelBlockyFluid::FlowState g_min_corners_mask_to_flowstate[16] = {
 	// 0100
 	VoxelBlockyFluid::FLOW_DIAGONAL_NEGATIVE_X_NEGATIVE_Z,
 	// 0101
-	VoxelBlockyFluid::FLOW_IDLE, // Ambiguous
+	VoxelBlockyFluid::FLOW_IDLE, // 有歧义
 	// 0110
 	VoxelBlockyFluid::FLOW_STRAIGHT_NEGATIVE_X,
 	// 0111
@@ -66,7 +66,7 @@ static const VoxelBlockyFluid::FlowState g_min_corners_mask_to_flowstate[16] = {
 	// 1001
 	VoxelBlockyFluid::FLOW_STRAIGHT_POSITIVE_X,
 	// 1010
-	VoxelBlockyFluid::FLOW_IDLE, // Ambiguous
+	VoxelBlockyFluid::FLOW_IDLE, // 有歧义
 	// 1011
 	VoxelBlockyFluid::FLOW_DIAGONAL_POSITIVE_X_POSITIVE_Z,
 	// 1100
@@ -131,7 +131,7 @@ FixedArray<float, 4> get_corner_heights_from_corner_levels(
 		}
 	};
 
-	// TODO Disallow fluids with only one level
+	// TODO 禁止只有一层高度的流体
 	const LevelToHeight level_to_height{ 1.f / static_cast<float>(fluid.max_level) };
 
 	FixedArray<float, 4> heights;
@@ -154,7 +154,7 @@ BakedModel::Surface &get_tls_fluid_top() {
 }
 
 inline void transpose_quad_triangles(Span<int32_t> indices) {
-	// Assumes triangles are like this:
+	// 假设三角形是这样的：
 	// 3---2
 	// |   |  {0, 2, 1, 0, 3, 2} --> { 0, 3, 1, 1, 3, 2 }
 	// 0---1
@@ -182,10 +182,9 @@ bool generate_fluid_model(
 	if (library.has_model(top_voxel_id)) {
 		const BakedModel &top_model = library.models[top_voxel_id];
 		if (top_model.fluid_index == voxel.fluid_index) {
-			// The top side is covered.
+			// 顶面被覆盖。
 			if (visible_sides_mask == 0) {
-				// Fast-path in cases all sides are culled (typically inside large water bodies such as
-				// oceans)
+				// 所有侧面都被剔除时的快速路径（通常在水体内部，如海洋）
 				return false;
 			}
 			fluid_top_covered = true;
@@ -194,24 +193,23 @@ bool generate_fluid_model(
 
 	const BakedFluid &fluid = library.fluids[voxel.fluid_index];
 
-	// Fluids have only one material
+	// 流体只有一种材质
 	static constexpr unsigned int surface_index = 0;
 
-	// We re-use the same memory per thread for each meshed fluid voxel
-	// TODO Candidate for TempAllocator
+	// 每个线程在网格化每个流体体素时复用同一块内存
+	// TODO 可考虑使用 TempAllocator
 	FixedArray<FixedArray<BakedModel::SideSurface, MAX_SURFACES>, Cube::SIDE_COUNT> &fluid_sides =
 			get_tls_fluid_sides_surfaces();
 	BakedModel::Surface &fluid_top_surface = get_tls_fluid_top();
 
-	// TODO Optimize: maybe don't copy if not covered and reference instead?
+	// TODO 优化：如果未被覆盖，也许可以不复制而改为引用？
 
-	// UVs will be assigned differently than typical voxels. The shader is assumed to interpret them in order to render
-	// a flowing animation. Vertex coordinates may be used as UVs instead.
-	// UV.X = which axis the side is on (although it could already be deduced from normals?)
-	// UV.Y = flow state (tells both direction or whether the fluid is idle)
+	// UV 的赋值方式与普通体素不同。假定着色器会解析它们以渲染流动动画。顶点坐标也可用作 UV。
+	// UV.X = 侧面所在的轴（虽然也可以从法线推断？）
+	// UV.Y = 流动状态（既表示方向，也表示流体是否静止）
 
-	// Lateral sides
-	// They always flow to the same direction
+	// 侧面
+	// 它们始终向同一方向流动
 
 	copy(fluid.side_surfaces[Cube::SIDE_NEGATIVE_X],
 		 Vector2f(math::AXIS_X, VoxelBlockyFluid::FLOW_STRAIGHT_POSITIVE_Z),
@@ -229,15 +227,15 @@ bool generate_fluid_model(
 		 Vector2f(math::AXIS_Z, VoxelBlockyFluid::FLOW_STRAIGHT_POSITIVE_Z),
 		 fluid_sides[Cube::SIDE_POSITIVE_Z][surface_index]);
 
-	// Bottom side
-	// It is always idle
+	// 底面
+	// 它始终静止
 
 	copy(fluid.side_surfaces[Cube::SIDE_NEGATIVE_Y],
 		 Vector2f(math::AXIS_Y, VoxelBlockyFluid::FLOW_IDLE),
 		 fluid_sides[Cube::SIDE_NEGATIVE_Y][surface_index]);
 
 	if (fluid_top_covered) {
-		// No top side
+		// 没有顶部侧面
 		fluid_sides[Cube::SIDE_POSITIVE_Y][surface_index].clear();
 		fluid_top_surface.clear();
 
@@ -246,12 +244,12 @@ bool generate_fluid_model(
 				fluid.side_surfaces[Cube::SIDE_POSITIVE_Y],
 				Vector3f(0.f, 1.f, 0.f),
 				fluid.material_id,
-				// TODO Option for collision on the fluid? Not sure if desired
+				// TODO 为流体提供碰撞选项？不确定是否需要
 				false,
 				fluid_top_surface
 		);
 
-		// We'll potentially have to adjust corners of the model based on neighbor levels
+		// 我们可能不得不根据相邻块的液位调整模型的角点
 		//  8 7 6     z
 		//  5 4 3     |
 		//  2 1 0  x--o
@@ -259,8 +257,8 @@ bool generate_fluid_model(
 		uint32_t covered_neighbors = 0;
 		const bool dip_when_flowing_down = fluid.dip_when_flowing_down;
 
-		// TODO Optimize: could sample 4 neighbors first and if the max isn't the same as current level,
-		// sample 4 diagonals too?
+		// TODO 优化：可以先采样 4 个邻居，如果最大值与当前液位不同，
+		// 再采样 4 个对角邻居？
 		unsigned int i = 0;
 		for (int dz = -1; dz <= 1; ++dz) {
 			for (int dx = -1; dx <= 1; ++dx) {
@@ -272,7 +270,7 @@ bool generate_fluid_model(
 					if (nm.fluid_index == voxel.fluid_index) {
 						fluid_levels[i] = nm.fluid_level;
 
-						// We don't test the current voxel, we know it's not covered
+						// 我们不测试当前体素，已知它未被覆盖
 						if (i != 4) {
 							const uint32_t anloc = nloc + y_jump_size;
 							const uint32_t anid = type_buffer[anloc];
@@ -285,11 +283,11 @@ bool generate_fluid_model(
 						}
 
 						if (dip_when_flowing_down) {
-							// When a non-covered fluid voxel is above an area in which it can flow down, fake its level
-							// to be 0 (even if it isn't really) in order to create a steep slope.
-							// Do this except on max level fluids, which can "sustain" themselves. If we don't do this,
-							// lakes and oceans would end up looking lower than they should (assuming their surface is
-							// covered in max level fluid).
+							// 当未覆盖的流体体素下方存在可向下流动的区域时，将其液位
+							// 假装为 0（即使实际不是），以形成陡峭的斜坡。
+							// 最高液位的流体除外，它们可以"自持"。如果不这样做，
+							// 湖泊和海洋最终看起来会比应有的更低（假设它们的表面
+							// 覆盖着最高液位的流体）。
 							if (nm.fluid_level != fluid.max_level && (covered_neighbors & (1 << i)) == 0) {
 								const uint32_t bnloc = nloc - y_jump_size;
 								const uint32_t bnid = type_buffer[bnloc];
@@ -315,7 +313,7 @@ bool generate_fluid_model(
 			}
 		}
 
-		// Adjust top corner heights to form slopes.
+		// 调整顶部角点高度以形成斜坡。
 
 		const FixedArray<uint8_t, 4> corner_levels = get_corner_levels_from_fluid_levels(fluid_levels);
 		const VoxelBlockyFluid::FlowState flow_state = get_fluid_flow_state_from_corner_levels(corner_levels);
@@ -329,7 +327,7 @@ bool generate_fluid_model(
 		//  8 7 6     z
 		//  5 4 3     |
 		//  2 1 0  x--o
-		// Covered neighbors need to be considered at full height
+		// 被覆盖的邻居需要按完整高度考虑
 		if ((covered_neighbors & 0b000'001'011) != 0) {
 			corner_heights[1] = 1.f;
 		}
@@ -346,10 +344,10 @@ bool generate_fluid_model(
 		fluid_top_surface.uvs.resize(4);
 		fill(fluid_top_surface.uvs, Vector2f(math::AXIS_Y, flow_state));
 
-		// TODO Option to alter normals too so they are more "correct"? Not always needed tho?
+		// TODO 是否也提供修改法线的选项以使其更"正确"？但并非总是需要？
 
-		// For lateral sides, we assume top vertices are always the last 2, in
-		// clockwise order relative to the top face
+		// 对于侧面，我们假设顶部顶点始终是最后 2 个，
+		// 并且相对于顶面按顺时针顺序排列
 		{
 			BakedModel::SideSurface &side_surface = fluid_sides[Cube::SIDE_NEGATIVE_X][surface_index];
 			side_surface.positions[2].y = corner_heights[2];
@@ -370,7 +368,7 @@ bool generate_fluid_model(
 			side_surface.positions[2].y = corner_heights[3];
 			side_surface.positions[3].y = corner_heights[2];
 		}
-		// For the top side, we assume vertices are counter-clockwise, and the first is at (+x, -z)
+		// 对于顶面，我们假设顶点按逆时针排列，第一个位于 (+x, -z)
 		{
 			fluid_top_surface.positions[0].y = corner_heights[0];
 			fluid_top_surface.positions[1].y = corner_heights[1];
@@ -378,7 +376,7 @@ bool generate_fluid_model(
 			fluid_top_surface.positions[3].y = corner_heights[3];
 		}
 
-		// We want the diagonal of the top quad's triangles to remain aligned with the flow
+		// 我们希望顶部四边形三角形的对角线保持与流动方向对齐
 		if (flow_state == VoxelBlockyFluid::FLOW_DIAGONAL_POSITIVE_X_POSITIVE_Z ||
 			flow_state == VoxelBlockyFluid::FLOW_DIAGONAL_NEGATIVE_X_NEGATIVE_Z) {
 			transpose_quad_triangles(to_span(fluid_top_surface.indices));
@@ -386,7 +384,7 @@ bool generate_fluid_model(
 	}
 
 	if (fluid_top_covered) {
-		// Expected to be empty, but also provides material ID. Not great tho
+		// 预期为空，但同时也提供了材质 ID。不过并不理想
 		out_model_surfaces = to_span(voxel.model.surfaces);
 	} else {
 		out_model_surfaces = to_single_element_span(fluid_top_surface);

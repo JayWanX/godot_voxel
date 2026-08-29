@@ -21,7 +21,7 @@ int VoxelInstanceLibrary::get_next_available_id() {
 	if (_items.empty()) {
 		return 1;
 	} else {
-		// Get highest key and increment it
+		// 获取最高键并递增它
 		return _items.rbegin()->first + 1;
 	}
 }
@@ -34,7 +34,7 @@ void VoxelInstanceLibrary::add_item(int p_id, Ref<VoxelInstanceLibraryItem> item
 	_items.insert({ id, item });
 	item->add_listener(this, id);
 
-	// This is also called when the resource is loaded, so do this iteratively instead of updating all packed items
+	// 此函数在资源加载时也会被调用，因此采用迭代方式逐个添加，而不是更新所有已打包项
 	Ref<VoxelInstanceGenerator> generator = item->get_generator();
 	if (generator.is_valid()) {
 		PackedItems::Lod &lod = _packed_items.lods[item->get_lod_index()];
@@ -62,7 +62,7 @@ void VoxelInstanceLibrary::remove_item(int p_id) {
 	}
 	_items.erase(it);
 
-	// This is also called when the resource is loaded, so do this iteratively instead of updating all packed items
+	// 此函数在资源加载时也会被调用，因此采用迭代方式逐个添加，而不是更新所有已打包项
 	PackedItems::Lod &lod = _packed_items.lods[item->get_lod_index()];
 	{
 		MutexLock mlock(_packed_items.mutex);
@@ -145,8 +145,8 @@ int VoxelInstanceLibrary::get_item_id(const VoxelInstanceLibraryItem *item) cons
 
 void VoxelInstanceLibrary::on_library_item_changed(int id, IInstanceLibraryItemListener::ChangeType change) {
 	switch (change) {
-		// These changes will be reported after the resource is loaded and should be rare in-game, or occur in the
-		// editor, so we can do a simpler bulk update
+		// 这些变更会在资源加载后上报，在游戏中很少发生，或主要发生在编辑器中，
+		// 因此可以简单地批量更新
 		case IInstanceLibraryItemListener::CHANGE_GENERATOR:
 		case IInstanceLibraryItemListener::CHANGE_LOD_INDEX:
 			update_packed_items();
@@ -185,11 +185,11 @@ void VoxelInstanceLibrary::get_packed_items_at_lod(StdVector<PackedItem> &out_it
 void VoxelInstanceLibrary::update_packed_items() {
 	VOXEL_PROFILE_SCOPE();
 
-	// Yet another candidate for a post-resource-loading callback.
-	// TODO Maybe we could solve this if items were stored in an exposed TypedArray<Item>? We'd do it in the setter?
-	// That doesn't solve cases where items themselves change though
+	// 又一个资源加载后回调的候选场景。
+	// TODO 也许如果将项存储在暴露的 TypedArray<Item> 中就能解决？在 setter 中处理？
+	// 不过这并不能解决项自身发生变化的情况
 
-	// This should be called rarely. Main use case is in the editor, and eventually in-game editing?
+	// 此函数应很少被调用。主要使用场景是在编辑器中，或许还有游戏内编辑？
 
 	PackedItems &packed_items = _packed_items;
 	MutexLock mlock(_packed_items.mutex);
@@ -259,7 +259,7 @@ void VoxelInstanceLibrary::set_item(int id, Ref<VoxelInstanceLibraryItem> item) 
 		add_item(id, item);
 
 	} else {
-		// Replace
+		// 替换
 		if (it->second != item) {
 			Ref<VoxelInstanceLibraryItem> old_item = it->second;
 			if (old_item.is_valid()) {
@@ -271,12 +271,12 @@ void VoxelInstanceLibrary::set_item(int id, Ref<VoxelInstanceLibraryItem> item) 
 			item->add_listener(this, id);
 			notify_listeners(id, IInstanceLibraryItemListener::CHANGE_ADDED);
 
-			// TODO Update packed item?
+			// TODO 更新打包项？
 		}
 	}
 }
 
-// Legacy support
+// 旧版兼容支持
 bool VoxelInstanceLibrary::_set(const StringName &p_name, const Variant &p_value) {
 	const String property_name = p_name;
 	if (property_name.begins_with("item_")) {
@@ -317,7 +317,7 @@ void VoxelInstanceLibrary::_get_property_list(List<PropertyInfo> *p_list) const 
 PackedInt32Array VoxelInstanceLibrary::_b_get_all_item_ids() const {
 	PackedInt32Array ids;
 	ids.resize(_items.size());
-	// Using raw pointer writes for speed.
+	// 为追求速度，使用原始指针写入。
 	int *ids_w = ids.ptrw();
 	int i = 0;
 	for (auto it = _items.begin(); it != _items.end(); ++it) {
@@ -329,7 +329,7 @@ PackedInt32Array VoxelInstanceLibrary::_b_get_all_item_ids() const {
 
 Array VoxelInstanceLibrary::_b_get_data() const {
 	Array data;
-	data.append(0); // Version number
+	data.append(0); // 版本号
 	for (auto it = _items.begin(); it != _items.end(); ++it) {
 		data.append(it->first);
 		data.append(it->second);

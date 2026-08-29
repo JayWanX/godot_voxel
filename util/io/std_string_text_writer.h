@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// TextWriter writing to a string with no staging buffer
+// 写入字符串、不使用暂存缓冲区的 TextWriter
 class StdStringTextWriter : public TextWriter {
 public:
 	StdStringTextWriter() : TextWriter(Span<char>()) {}

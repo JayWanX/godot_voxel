@@ -7,8 +7,8 @@
 
 namespace voxel {
 
-// Takes elements starting from a given position and moves them at the beginning,
-// then shrink the array to fit them. Other elements are discarded.
+// 从给定位置开始取出元素并移动到容器开头，
+// 然后将数组收缩以恰好容纳它们。其余元素被丢弃。
 template <typename T, typename TAllocator>
 void shift_up(std::vector<T, TAllocator> &v, unsigned int pos) {
 	unsigned int j = 0;
@@ -19,24 +19,24 @@ void shift_up(std::vector<T, TAllocator> &v, unsigned int pos) {
 	v.resize(remaining);
 }
 
-// Pops the last element of the vector and place it at the given position.
-// (The element that was at this position is the one removed).
+// 弹出向量的最后一个元素，并将其放到给定位置。
+// （原本位于该位置的元素即被移除的那个。）
 template <typename T, typename TAllocator>
 void unordered_remove(std::vector<T, TAllocator> &v, unsigned int pos) {
 	v[pos] = v.back();
 	v.pop_back();
 }
 
-// Removes all items satisfying the given predicate.
-// This can change the size of the container, and original order of items is not preserved.
+// 移除所有满足给定谓词的元素。
+// 这会改变容器大小，且不保留元素的原始顺序。
 template <typename T, typename TAllocator, typename F>
 inline void unordered_remove_if(std::vector<T, TAllocator> &vec, F predicate) {
 	for (unsigned int i = 0; i < vec.size(); ++i) {
 		if (predicate(vec[i])) {
 			vec[i] = vec.back();
 			vec.pop_back();
-			// Note: can underflow, but it should be fine since it's incremented right after.
-			// TODO Use a while()?
+			// 注意：可能会发生下溢，但应该没问题，因为随后会立即自增。
+			// TODO 使用 while()？
 			--i;
 		}
 	}
@@ -60,9 +60,9 @@ inline void append_array(std::vector<T, TAllocator1> &dst, const std::vector<T, 
 }
 
 /*
-// Removes all items satisfying the given predicate.
-// This can reduce the size of the container. Items are moved to preserve order.
-// More direct option than `vec.erase(std::remove_if(vec.begin(), vec.end(), predicate), vec.end())`.
+// 移除所有满足给定谓词的元素。
+// 这会减小容器大小。元素会被移动以保留顺序。
+// 比 `vec.erase(std::remove_if(vec.begin(), vec.end(), predicate), vec.end())` 更直接。
 template <typename T, typename F>
 inline void remove_if(std::vector<T> &vec, F predicate) {
 	unsigned int i = 0;
@@ -126,11 +126,11 @@ inline bool has_duplicate_f(Span<const T> items, TEqual equal) {
 	return find_duplicate_f(items, equal).is_valid();
 }
 
-// Tests if POD items in an array are all the same.
-// Better tailored for more than hundred items that have power-of-two size.
+// 测试数组中的 POD 元素是否全部相同。
+// 更适合用于数量超过一百且大小为 2 的幂的元素的情形。
 template <typename Item_T>
 inline bool is_uniform(const Item_T *p_data, const size_t item_count) {
-	// Testing uniformity of an empty buffer has no meaningful answer
+	// 测试空缓冲区的均匀性没有意义
 	VOXEL_ASSERT_RETURN_V(item_count > 0, false);
 
 	const Item_T v0 = p_data[0];
@@ -147,7 +147,7 @@ inline bool is_uniform(const Item_T *p_data, const size_t item_count) {
 	if (sizeof(Bucket_T) > sizeof(Item_T) && sizeof(Bucket_T) % sizeof(Item_T) == 0) {
 		static const size_t ITEMS_PER_BUCKET = sizeof(Bucket_T) / sizeof(Item_T);
 
-		// Make a reference bucket
+		// 创建一个参考桶
 		union {
 			Bucket_T packed_items;
 			Item_T items[ITEMS_PER_BUCKET];
@@ -156,7 +156,7 @@ inline bool is_uniform(const Item_T *p_data, const size_t item_count) {
 			reference_bucket.items[i] = v0;
 		}
 
-		// Compare using buckets of items rather than individual items
+		// 使用元素的分桶进行比较，而非逐元素比较
 		const size_t bucket_count = item_count / ITEMS_PER_BUCKET;
 		const Bucket_T *buckets = (const Bucket_T *)p_data;
 		for (size_t i = 0; i < bucket_count; ++i) {
@@ -165,7 +165,7 @@ inline bool is_uniform(const Item_T *p_data, const size_t item_count) {
 			}
 		}
 
-		// Compare last elements individually if they don't fit in a bucket
+		// 若剩余元素无法凑成一个桶，则逐元素比较
 		const size_t remaining_items_start = item_count - (item_count % ITEMS_PER_BUCKET);
 		for (size_t i = remaining_items_start; i < item_count; ++i) {
 			if (p_data[i] != v0) {
@@ -245,16 +245,16 @@ bool contains(const std::vector<T, TAllocator> &vec, TPredicate predicate) {
 	return contains(to_span_const(vec), predicate);
 }
 
-// Gets the number of elements in a compile-time known array
+// 获取编译期已知数组的元素个数
 template <typename T, int N>
 constexpr size_t count_of(const T (&)[N]) {
 	return N;
 }
 
-// Gets the number of characters in a compile-time known string
+// 获取编译期已知字符串的字符个数
 template <int N>
 constexpr size_t string_literal_length(const char (&)[N]) {
-	// -1 to exclude the null-terminating character '\0'
+	// 用于排除空终止字符 '\0'（即减 1）
 	static_assert(N > 0);
 	return N - 1;
 }

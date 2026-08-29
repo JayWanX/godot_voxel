@@ -9,7 +9,7 @@
 
 namespace voxel::godot {
 
-// Mesh utilities
+// Mesh 工具函数
 
 bool is_surface_triangulated(const Array &surface);
 bool is_mesh_empty(Span<const Array> surfaces);

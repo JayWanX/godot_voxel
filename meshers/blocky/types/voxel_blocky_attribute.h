@@ -7,8 +7,8 @@
 
 namespace voxel {
 
-// Attribute that can be attached to a VoxelBlockyType.
-// It has a unique name and can take two or more positive values. Values can be named.
+// 可附加到 VoxelBlockyType 上的属性。
+// 它有唯一的名称，可以取两个或更多非负值。值可以命名。
 class VoxelBlockyAttribute : public Resource {
 	GDCLASS(VoxelBlockyAttribute, Resource)
 public:
@@ -16,13 +16,13 @@ public:
 
 	virtual StringName get_attribute_name() const;
 
-	// TODO Actually this returns the max value +1. This is not the total amount of values the attribute takes!
+	// TODO 实际上返回的是最大值 + 1。这并非该属性取值的总数！
 	int get_value_count() const;
 
 	int get_default_value() const;
 	void set_default_value(int value);
 
-	// TODO -1 means "not found", but I don't like it...
+	// TODO -1 表示"未找到"，但我不喜欢这样……
 	int get_value_from_name(StringName p_name) const;
 
 	StringName get_name_from_value(int v) const;
@@ -34,7 +34,7 @@ public:
 		return _is_rotation;
 	}
 
-	// If the attribute represents a rotation, gets the OrthoBasis index corresponding to that rotation.
+	// 如果属性表示旋转，获取与该旋转对应的 OrthoBasis 索引。
 	unsigned int get_ortho_rotation_index_from_value(int value) const;
 
 	bool is_equivalent(const VoxelBlockyAttribute &other) const;
@@ -57,8 +57,8 @@ protected:
 	StdVector<StringName> _value_names;
 	StdVector<uint8_t> _ortho_rotations;
 
-	// Attributes don't necessarily use all the values in their range, some can be unused. But they should not take part
-	// into the baking process (no "holes").
+	// 属性不一定使用其范围内的所有值，有些值可能未被使用。但它们不应参与
+	// 烘焙过程（不能有"空洞"）。
 	StdVector<uint8_t> _used_values;
 };
 

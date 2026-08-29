@@ -68,7 +68,7 @@ void Voxel_ChartView::on_draw() {
 
 	const Vector2 view_size_pixels = get_rect().size;
 
-	// Background
+	// 背景
 
 	const voxel::godot::StringNames &sn = voxel::godot::StringNames::get_singleton();
 
@@ -82,31 +82,31 @@ void Voxel_ChartView::on_draw() {
 	const Vector2 unit_to_pixels = view_size_pixels / view_size_units;
 
 	const Transform2D m = Transform2D( //
-			Vector2(unit_to_pixels.x, 0.0), // X axis
-			Vector2(0.0, -unit_to_pixels.y), // Y axis
+			Vector2(unit_to_pixels.x, 0.0), // X 轴
+			Vector2(0.0, -unit_to_pixels.y), // Y 轴
 			Vector2(-_view_min.x * unit_to_pixels.x,
-					view_size_pixels.y + _view_min.y * unit_to_pixels.y) // Pixel offset
+					view_size_pixels.y + _view_min.y * unit_to_pixels.y) // 像素偏移
 	);
 
 	// draw_set_transform_matrix();
-	//  Can't use this, because contrary to Godot 3, the thickness of lines drawn with `draw_polyline` will "properly"
-	//  be zoomed and stretched by the view transformation. It is also not possible to specify a different width to
-	//  account for that, because the scale factor is not uniform. So instead, we apply the view transform manually.
+	//  不能使用这个，因为与 Godot 3 不同，`draw_polyline` 绘制线条的粗细会被视图变换“适当地”
+	//  缩放和拉伸。也不可能指定不同的宽度来
+	//  补偿这一点，因为缩放因子不是均匀的。所以相反，我们手动应用视图变换。
 
-	// Lines
+	// 线
 
 	if (_visual_points.size() != _points.size()) {
 		_visual_points.resize(_points.size());
 	}
-	// Write through a Span to the underlying packed array.
+	// 通过 Span 写入底层的打包数组。
 	Span<Vector2> visual_points = to_span(_visual_points);
 	for (int i = 0; i < _points.size(); ++i) {
 		visual_points[i] = m.xform(_points[i]);
 	}
 
 	// draw_polyline(_visual_points, line_color, 2.0, true);
-	//  Even with thickness 2 and antialiasing, `draw_polyline` looks bad (dotted, jagged, inconsistent width).
-	//  Line2D has always been better.
+	//  即使线宽为 2 并开启抗锯齿，`draw_polyline` 看起来也很差（点状、锯齿、线宽不一致）。
+	//  Line2D 一直更好。
 	_line_renderer->set_width(2.f);
 	_line_renderer->set_begin_cap_mode(Line2D::LINE_CAP_NONE);
 	_line_renderer->set_end_cap_mode(Line2D::LINE_CAP_NONE);
@@ -115,12 +115,12 @@ void Voxel_ChartView::on_draw() {
 	_line_renderer->set_default_color(line_color);
 	_line_renderer->set_points(_visual_points);
 
-	// Axes
+	// 坐标轴
 
 	draw_line(m.xform(Vector2(_view_min.x, 0.0)), m.xform(Vector2(_view_max.x, 0.0)), x_axis_color);
 	draw_line(m.xform(Vector2(0.0, _view_min.y)), m.xform(Vector2(0.0, _view_max.y)), y_axis_color);
 
-	// Markings
+	// 刻度
 
 	Ref<Font> font = get_theme_font(sn.font, sn.Label);
 	const int font_size = get_theme_font_size(sn.font_size, sn.Label);
@@ -147,7 +147,7 @@ void Voxel_ChartView::on_draw() {
 			text_color
 	);
 
-	// TODO Draw hovered value
+	// TODO 绘制悬停值
 }
 
 } // namespace voxel

@@ -1,26 +1,26 @@
 # VoxelGeneratorWaves
 
-Inherits: [VoxelGeneratorHeightmap](VoxelGeneratorHeightmap.md)
+继承自：[VoxelGeneratorHeightmap](VoxelGeneratorHeightmap.md)
 
-Voxel generator producing a wavy terrain pattern.
+生成波浪形地形图案的体素生成器。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                          | Name                                 | Default         
+类型                                                                            | 名称                                   | 默认值             
 ----------------------------------------------------------------------------- | ------------------------------------ | ----------------
 [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)  | [pattern_offset](#i_pattern_offset)  | Vector2(0, 0)   
 [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)  | [pattern_size](#i_pattern_size)      | Vector2(30, 30) 
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)<span id="i_pattern_offset"></span> **pattern_offset** = Vector2(0, 0)
 
-Offset (or phase) of the waves.
+波浪的偏移（或相位）。
 
 ### [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)<span id="i_pattern_size"></span> **pattern_size** = Vector2(30, 30)
 
-Length of the waves. Note that this only controls length across the X and Z axes. Height is controlled by [VoxelGeneratorHeightmap.height_start](VoxelGeneratorHeightmap.md#i_height_start) and [VoxelGeneratorHeightmap.height_range](VoxelGeneratorHeightmap.md#i_height_range).
+波浪的长度。注意这仅控制 X 和 Z 轴方向上的长度。高度由 [VoxelGeneratorHeightmap.height_start](VoxelGeneratorHeightmap.md#i_height_start) 和 [VoxelGeneratorHeightmap.height_range](VoxelGeneratorHeightmap.md#i_height_range) 控制。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

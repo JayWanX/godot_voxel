@@ -326,7 +326,7 @@ namespace FastSIMD
             return _mm256_castps_si256( _mm256_blendv_ps( _mm256_castsi256_ps( b ), _mm256_castsi256_ps( a ), _mm256_castsi256_ps( m ) ) );
         }
 
-        // Min, Max
+        // Min、Max
 
         FS_INLINE static float32v Min_f32( float32v a, float32v b )
         {
@@ -387,7 +387,7 @@ namespace FastSIMD
             return _mm256_abs_epi32( a );
         }
 
-        // Float math
+        // 浮点运算
 
         FS_INLINE static float32v Sqrt_f32( float32v a )
         {
@@ -404,7 +404,7 @@ namespace FastSIMD
             return _mm256_rcp_ps( a );
         }
 
-        // Floor, Ceil, Round
+        // Floor、Ceil、Round
 
         FS_INLINE static float32v Floor_f32( float32v a )
         {

@@ -1,331 +1,331 @@
-Generators
+生成器
 =============
 
-`VoxelGenerator` allows to generate voxels given a specific area in space, or from a single position. They can serve as a base to automate the creation of large landscapes, or can be used in a game to generate worlds. They have an important place because storing voxel data is expensive, while procedural sources are lightweight.
+`VoxelGenerator` 允许根据空间中的特定区域或单个位置生成体素。它们可以作为自动化创建大型地景的基础，也可以用于在游戏中生成世界。它们占据重要地位，因为存储体素数据代价高昂，而程序化数据源则很轻量。
 
 
-How generators work
+生成器如何工作
 ----------------------
 
-Generators currently run on the CPU and primarily work on blocks of voxels. For example, given a `VoxelBuffer` of 16x16x16 voxels, they decide what value each one will take. Using blocks makes it easier to split the work across multiple threads, and focus only on the area the player is located, especially if the world is infinite.
+生成器目前在 CPU 上运行，主要处理体素数据块。例如，给定一个 16x16x16 体素的 `VoxelBuffer`，它们决定每个体素将取什么值。使用数据块可以更容易地将工作拆分到多个线程中执行，并且只关注玩家所在的区域，尤其是在无限世界中。
 
-Voxel data is split into various channels, so depending on the kind of volume to generate, one or more different channels will be used. For example, a Minecraft generator will likely use the `TYPE` channel for voxel types, while a smooth terrain generator will use the `SDF` channel to fill in distance field values.
+体素数据被划分为多个通道，因此根据要生成的体积类型，会使用一个或多个不同的通道。例如，Minecraft 风格生成器通常使用 `TYPE` 通道存储体素类型，而平滑地形生成器则使用 `SDF` 通道填充距离场值。
 
-Generators have a thread-safe API. The same generator `generate_block` method may be used by multiple threads at once. However, depending on the class, some parameters might only be modifiable from the main thread, so check the documentation to be sure.
+生成器具有线程安全的 API。同一个生成器的 `generate_block` 方法可以被多个线程同时使用。不过，具体取决于类，某些参数可能只能从主线程修改，请查阅文档确认。
 
-If a volume is not given a generator, blocks will be filled with air by default.
+如果体积没有指定生成器，数据块将默认填充为空气。
 
-### Series generation
+### 序列生成
 
-Some generators support "series generation": in addition to being able to fill 3D grids of voxels ("chunks"), they can also work when given a list of arbitrary floating-point positions (or "point cloud"). This is used by some features like detail rendering (CPU only) and `VoxelInstanceGenerator` snapping to SDF.
+部分生成器支持“序列生成”：除了能填充体素的 3D 网格（“区块”）之外，它们还能在给定任意浮点位置列表（或称“点云”）时工作。这被用于一些功能，例如细节渲染（仅 CPU）和 `VoxelInstanceGenerator` 吸附到 SDF。
 
-Not all generators can do this, and this feature is not required for the terrain system to work. There is also no scripting API to implement this currently.
-`VoxelGeneratorGraph` supports it, and some of the basic generators too.
+并非所有生成器都能做到这一点，而且地形系统正常工作也不需要此功能。目前也没有脚本 API 可以实现它。
+`VoxelGeneratorGraph` 支持该功能，部分基础生成器也支持。
 
 
-Basic generators
+基础生成器
 -------------------
 
-The module provides several built-in generators. They are simple examples to get a quick result, and showing how the base API can be implemented (see source code).
+该模块提供了几个内置生成器。它们是用作快速出效果的简单示例，并展示了基础 API 的实现方式（参见源代码）。
 
-Some of these generators have an option to choose which channel they will work on. If you use a smooth mesher, use the `SDF` channel (1), otherwise use the `TYPE` channel (0).
+其中一些生成器可以选择它们要工作的通道。如果你使用平滑网格生成器，请使用 `SDF` 通道（1），否则使用 `TYPE` 通道（0）。
 
-The following screenshots use a smooth `VoxelLodTerrain`.
+以下截图使用了平滑的 `VoxelLodTerrain`。
 
-### [Flat](api/VoxelGeneratorFlat.md)
+### [平地](api/VoxelGeneratorFlat.md)
 
-Generates a flat ground.
+生成一块平地。
 
-![Screenshot of flat generator](images/generator_flat.webp)
+![平地生成器截图](images/generator_flat.webp)
 
-### [Waves](api/VoxelGeneratorWaves.md)
+### [波浪](api/VoxelGeneratorWaves.md)
 
-Generates waves.
+生成波浪。
 
-![Screenshot of waves generator](images/generator_waves.webp)
+![波浪生成器截图](images/generator_waves.webp)
 
-### [Image](api/VoxelGeneratorImage.md)
+### [图像](api/VoxelGeneratorImage.md)
 
-Generates a heightmap based on an image, repeated infinitely.
+根据图像生成高度图，可无限重复。
 
-![Screenshot of image generator](images/generator_image.webp)
+![图像生成器截图](images/generator_image.webp)
 
 !!! note
-    With this generator, an `Image` resource is required. By default, Godot imports image files as `StreamTexture`. You may change this in the Import dock. At time of writing, in Godot 3, this requires an editor restart.
+    使用此生成器时，需要 `Image` 资源。默认情况下，Godot 会将图像文件导入为 `StreamTexture`。你可以在导入面板中更改此设置。截至撰写本文时，在 Godot 3 中更改后需要重启编辑器。
 
-### [Noise2D](api/VoxelGeneratorNoise2D.md)
+### [噪声2D](api/VoxelGeneratorNoise2D.md)
 
-Generates a heightmap based on fractal noise.
+基于分形噪声生成高度图。
 
-![Screenshot of 2D noise generator](images/generator_noise2d.webp)
+![2D 噪声生成器截图](images/generator_noise2d.webp)
 
-### [Noise (3D)](api/VoxelGeneratorNoise.md)
+### [噪声（3D）](api/VoxelGeneratorNoise.md)
 
-Generates a blobby terrain with overhangs using 3D fractal noise. A gradient is applied along height so the volume becomes air when going up, and closes down into matter when going down.
+使用 3D 分形噪声生成带有悬垂的团块状地形。沿着高度方向施加渐变，使体积向上时变为空气，向下时收敛为实体。
 
-![Screenshot of 3D noise generator](images/generator_noise3d.webp)
+![3D 噪声生成器截图](images/generator_noise3d.webp)
 
 
-Node-graph generators with `VoxelGeneratorGraph`
+使用 `VoxelGeneratorGraph` 的节点图形生成器
 ------------------------------------
 
-Basic generators may often not be suited to make a whole game from, but you don't necessarily need to program one. C++ is a very fast language to program a generator but it can be a tedious workflow, especially when prototyping. If you need smooth terrain, a graph-based generator is available, which offers a very customizable approach to make procedural volumes.
+基础生成器通常不足以支撑整个游戏，但你也未必需要自己编写一个。C++ 是编写生成器的非常高效的语言，但工作流程可能相当繁琐，尤其是在原型阶段。如果你需要平滑地形，可以使用基于图形的生成器，它提供了高度可定制的方法来制作程序化体积。
 
 !!! warning
-    This generator was originally made for smooth terrain, but works with blocky too, to some extent.
+    该生成器最初是为平滑地形设计的，但在一定程度上也适用于方块风地形。
 
 
-### Concept
+### 概念
 
-Voxel graphs allow to represent a 3D density by connecting operation nodes together. It takes 3D coordinates (X, Y, Z), and computes the value of every voxel from them. For example it can do a simple 2D or 3D noise, which can be scaled, deformed, masked using other noises, curves or even images.
+体素图形允许通过连接运算节点来表示 3D 密度。它接收 3D 坐标 (X, Y, Z)，并据此计算每个体素的值。例如它可以执行简单的 2D 或 3D 噪声，这些噪声可以被缩放、变形，并使用其他噪声、曲线甚至图像进行遮罩。
 
-An inspiration of this approach comes again from sculpting of signed-distance-fields (every voxel stores the distance to the nearest surface), which is why the main output node is usually an `SdfOutput`. A bunch of nodes are meant to work on SDF as well. However, it is not strictly necessary to respect perfect distances, as long as the result looks correct for a game, so most of the time it's easier to work with approximations.
-
-!!! note
-    Voxel graphs are half-way between programming 3D shaders and procedural design. It has similar speed to C++ generators but has only basic instructions, so there are some maths involved. This might get eased a bit in the future when more high-level nodes are added.
-
-
-### Examples
-
-#### Flat plane
-
-The simplest possible graph with a visible output is a flat plane. The SDF of a flat plane is the distance to sea-level (0), which is `sdf = y`. In other words, the surface appears where voxel values are crossing zero.
-
-Right-click the background of the graph, choose the nodes `InputY` and `SdfOutput`, then connect them together by dragging their ports together.
-
-![Plane voxel graph screenshot](images/voxel_graph_flat.webp)
-
-It is possible to decide the height of the plane by subtracting a constant (`sdf = y - height`), so that `sdf == 0` will occur at a higher coordinate. To do this, an extra node must be added:
-
-![Offset plane voxel graph screenshot](images/voxel_graph_flat_offset.webp)
-
-By default, the `Add` node does nothing because its `b` port is not connected to anything. It is possible to give a default value to such port. You can set it by clicking on the node and changing it in the inspector.
-
-(note: I used `Add` with a negative value for `b`, but you can also use a `Subtract` node to get the same result).
-
-Making a flat plane also has a shortcut node, `SdfPlane`, which outputs the SDF of a flat plane in one go (equivalent to `y - height`).
-
-#### Noise
-
-A flat plane is simple but a bit boring, so one typical way to generate a terrain is adding good old fractal noise. You can do this in 2D (heightmap) or 3D (volumetric).
-The 2D approach is simpler, as we only need to take our previous setup, and add 2D noise to the result. Also, since noise is generated in the range [-1 to 1], we also need a multiplier to make it larger (`sdf = y - height + noise2d(x, y) * noise_multiplier`).
-
-There are several types of noise available, each with their own parameters. At time of writing, `FastNoise2D` noise is the best option. `Noise2D` works too but it is slightly slower.
-After you create this node, a new `FastNoiseLite` resource must be created in its parameters.
-
-![Voxel graph 2D noise](images/voxel_graph_noise2d.webp)
-
-3D noise is more expensive to compute, but is interesting because it actually produces overhangs or even small caves. It is possible to replace 2D noise with 3D noise in the previous setup:
-
-![Voxel graph 3D noise](images/voxel_graph_noise3d_not_expanded.webp)
-
-You might notice that despite it being 3D, it still appears to produce a heightmap. That's because the addition of `Y` in the graph is gradually offsetting noise values towards higher and higher values when going towards the sky, which makes the surface fade away quickly. We can either multiply `Y` with a value smaller than 1, or we can increase the amplitude of the noise (`sdf = y - height + amplitude * noise3d(x, y, z)`):
-
-![Voxel graph 3D noise expanded](images/voxel_graph_noise3d_expanded.webp)
+这种方法的灵感同样来自符号距离场（SDF）的雕刻（每个体素存储到最近表面的距离），这就是为什么主输出节点通常是 `SdfOutput`。许多节点也专门用于处理 SDF。不过，只要结果在游戏中看起来正确，并不严格要求保持完美的距离，因此大多数时候使用近似值更容易。
 
 !!! note
-    Some nodes have default connections. For example, with 3D noise, if you don't connect inputs, they will automatically assume (X,Y,Z) voxel position by default (see "Auto" labels). If you need a constant in an input, this behavior can be opted out by turning off `autoconnect_default_inputs` in the inspector, or connecting another node.
-
-#### Planet
-
-We are not actually forced to keep generating the world like a plane. We can go even crazier, and do planets. A good way to begin a planet is to make a sphere with the `SdfSphere` node:
-
-![Voxel graph sdf sphere node](images/voxel_graph_sphere.webp)
-
-We cannot really use 2D noise here, so we can add 3D noise as well:
-
-![Voxel graph sdf sphere with noise](images/voxel_graph_sphere_with_noise.webp)
-
-If you increase 3D noise amplitude like before, you might notice floating chunks. You should be able to tune the right amount to make them less likely. Another way is to use a height-based approach: project coordinates on the sphere, instead of global 3D coordinates. Then treat the output of noise as a height.
-
-Picking a ridged fractal can also give an eroded look, although it requires to negate the noise to invert its distance field (if we leave it positive it will look puffed instead of eroded).
-
-![Voxel graph sdf sphere with height noise](images/voxel_graph_sphere_with_noise2.webp)
-
-!!! note
-    You can obtain a donut-shaped planet if you replace the `SdfSphere` node with a `SdfTorus` node.
-    ![Torus voxel graph](images/voxel_graph_torus.webp)
+    体素图形介于编写 3D 着色器和程序化设计之间。其速度与 C++ 生成器相当，但只有基础指令，因此涉及一些数学运算。将来添加更多高级节点后，这可能会有所缓解。
 
 
-More techniques can be found in the [Procedural Generation](procedural_generation.md) section.
+### 示例
 
+#### 平面
 
-### Usage with blocky voxels
+具有可见输出的最简单图形是平面。平面的 SDF 是到海平面（0）的距离，即 `sdf = y`。换句话说，表面出现在体素值穿过零的地方。
 
-It is possible to use this generator with `VoxelMesherBlocky` by using an `OutputType` node instead of `OutputSDF`. However, `VoxelMesherBlocky` expects voxels to be IDs, not SDF values.
+右键点击图形的背景，选择 `InputY` 和 `SdfOutput` 节点，然后通过拖动它们的端口将它们连接起来。
 
-The simplest example is to pick any existing SDF generator, and replace `OutputSDF` with a `Select` node connected to an `OutputType`. The idea is to choose between the ID of two different voxel types (like air or stone) if the SDF value is above or below a threshold.
+![平面体素图形截图](images/voxel_graph_flat.webp)
 
-![Example screenshot of a basic blocky heightmap made with a graph generator](images/voxel_graph_blocky_basic_heightmap.webp)
+可以通过减去一个常量（`sdf = y - height`）来决定平面的高度，这样 `sdf == 0` 将出现在更高的坐标处。为此，需要额外添加一个节点：
 
-If more variety is needed, `Select` nodes can be chained to combine multiple layers, using different thresholds and sources.
+![偏移平面体素图形截图](images/voxel_graph_flat_offset.webp)
 
-![Example screenshot of a blocky heightmap with two biomes made with a graph generator](images/voxel_graph_blocky_biome.webp)
+默认情况下，`Add` 节点不做任何事，因为它的 `b` 端口没有连接到任何东西。可以为此类端口指定默认值。你可以通过点击节点并在检查器中修改来设置它。
 
-`Select` creates a "cut" between the two possible values, and it may be desirable to have some sort of transition. While this isn't possible with `VoxelMesherBlocky` without a lot of different types for each value of the gradient (usually done with a shader), it is however easy to add a bit of noise to the threshold. This reproduces a similar "dithered" transition, as can be seen in Minecraft between sand and dirt.
+（注意：我在 `Add` 中为 `b` 使用了负值，但你也可以使用 `Subtract` 节点获得相同结果）。
 
-![Example screenshot of a blocky heightmap with two biomes and dithering](images/voxel_graph_blocky_biome_dithering.webp)
+制作平面还有一个快捷节点 `SdfPlane`，它可以一步输出平面的 SDF（等价于 `y - height`）。
 
-Currently, graph generators only work per voxel. That makes them good to generate base ground and biomes, but it isn't practical to generate structures like trees or villages with it. This may be easier to accomplish using a second pass on the whole block instead, using a custom generator.
+#### 噪声
 
+平面简单但有点单调，因此生成地形的一种典型方式是添加经典的分形噪声。你可以使用 2D（高度图）或 3D（体积）噪声。
+2D 方法更简单，因为我们只需要沿用之前的设置，并将 2D 噪声加到结果中。另外，由于噪声的生成范围是 [-1, 1]，我们还需要一个乘数将其放大（`sdf = y - height + noise2d(x, y) * noise_multiplier`）。
 
-### Relays
+可用的噪声类型有若干种，每种都有自己的参数。截至撰写本文时，`FastNoise2D` 噪声是最佳选择。`Noise2D` 也可以使用，但速度略慢。
+创建该节点后，必须在其参数中新建一个 `FastNoiseLite` 资源。
 
-A special `Relay` node exists to organize long connections between nodes. They do nothing on their own, they just redirect a connection. It also remains possible for a relay to have multiple destinations.
+![体素图形 2D 噪声](images/voxel_graph_noise2d.webp)
 
-![Screenshot of a relay node](images/relay_node.webp)
+3D 噪声的计算成本更高，但它的有趣之处在于能真正生成悬垂甚至小洞穴。可以在之前的设置中将 2D 噪声替换为 3D 噪声：
 
+![体素图形 3D 噪声](images/voxel_graph_noise3d_not_expanded.webp)
 
-### Preview nodes
+你可能会注意到，尽管它是 3D 的，看起来仍然像在生成高度图。这是因为图形中添加的 `Y` 在朝天空方向逐渐将噪声值偏移到越来越高的值，使得表面迅速消失。我们可以将 `Y` 乘以一个小于 1 的值，也可以增大噪声的振幅（`sdf = y - height + amplitude * noise3d(x, y, z)`）：
 
-It is possible to preview the output of nodes with the `SdfPreview` node. This node will display a slice of the 3D data as a greyscale image, or a colored image depending on its settings. This is useful to check if a branch is outputting expected values.
+![体素图形 3D 噪声展开](images/voxel_graph_noise3d_expanded.webp)
 
 !!! note
-    - Preview nodes will only work if the output they are connected to is also connected to an actual output of the graph.
+    某些节点具有默认连接。例如，对于 3D 噪声，如果你不连接输入，它们将默认自动采用 (X,Y,Z) 体素位置（参见“Auto”标签）。如果某个输入需要常量，可以通过在检查器中关闭 `autoconnect_default_inputs` 或连接另一个节点来退出此行为。
 
-![Screenshot of a preview node showing the output of a plane node](images/graph_preview_node_plane.webp)
+#### 星球
 
-In the example above, the preview shows the output of a `SdfPlane` node. Values are negative below the surface, positive above the surface, and increase gradually along the Y axis. As a result, previews show white above, and black below.
+我们实际上不必一直按平面的方式生成世界。我们甚至可以更疯狂一点，制作星球。制作星球的一个好开端是用 `SdfSphere` 节点做一个球体：
 
-By default, the node shows a slice along the XY plane, but you can change it to the XZ plane in case you need a top-down view, in the `Debug -> Preview Axes` menu on top of the editor.
+![体素图形 sdf 球体节点](images/voxel_graph_sphere.webp)
 
-Here is the output for a sphere of radius 50:
+这里我们无法真正使用 2D 噪声，因此同样可以添加 3D 噪声：
 
-![Screenshot of a preview node showing the output of a sphere node](images/graph_preview_node_sphere.webp)
+![带噪声的体素图形 sdf 球体](images/voxel_graph_sphere_with_noise.webp)
 
-By default, each pixel of the preview corresponds to 1 unit of space. You can zoom by holding the `CTRL` key and using the mouse wheel on top of the preview. You can also move around by holding `CTRL` and dragging the preview's viewport holding the middle mouse button.
-Pan & zoom locations can be reset to defaults by using the menu `Debug -> Preview Axes -> Reset Location`.
+如果像之前一样增大 3D 噪声振幅，你可能会注意到漂浮的区块。你应该能通过调整合适的量来降低这种可能性。另一种方法是使用基于高度的方案：将坐标投影到球面上，而不是使用全局 3D 坐标。然后把噪声输出当作高度。
 
-![Screenshot of a preview node showing the output of a sphere node, zoomed in](images/graph_preview_node_sphere_pan_and_zoom.webp)
+选择脊状分形也可以获得侵蚀外观，不过这需要取反噪声来反转其距离场（如果保持为正值，看起来会像膨胀而不是侵蚀）。
 
-Previews show black and white based on a specific range defined in their properties. By default, -1 is black, 1 is white (so 0 is actually grey). You can change that range by selecting the preview node and using the inspector.
+![带高度噪声的体素图形 sdf 球体](images/voxel_graph_sphere_with_noise2.webp)
 
-![Screenshot of a selected preview node and its min/max properties in the inspector](images/graph_preview_node_min_max_inspector.webp)
-
-When working with signed distance fields (SDF), preview nodes can also display values in a more specialized way. In the inspector, you can change the `mode` to `SDF`:
-
-![Screenshot of a preview node in SDF mode](images/graph_preview_node_sdf_inspector.webp)
-
-This mode shows negative values as blue (inside shape) and positive values as yellow (outside shape).
-It also renders "bands" of repeating gradients to better visualize how they propagate away from the surface. The length of those bands is controlled by `fraction period`.
-
-![Screenshot of a preview node in SDF mode showing sphere gradient fractions](images/graph_preview_node_sphere_gradients.webp)
-
-With a sphere, gradients are quite regular, which is usually best. But when using noise as signed distance field, you can notice how gradients actually evolve below and above the surface:
-
-![Screenshot of a preview node in SDF mode showing noise gradients](images/graph_preview_node_noise_sdf.webp)
-
-Noise is a lot more inconsistent. However, most of the time, this isn't a big deal. It depends on what operations you do with the terrain.
-If the "speed" of gradients varies too sharply, especially near the surface, it can be the cause of precision loss or blockyness in generated meshes. It can also be a problem when approximating the surface solely from SDF voxels or using sphere tracing. 
-
-### Scripting
-
-Graph generators can be modified from a script using the [VoxelGraphFunction](api/VoxelGraphFunction.md) API. This is useful for example if you design a base graph, and want to randomize noise seeds or adjust some constants. `VoxelGeneratorGraph` contains an instance of it as their "main" function. You can access the graph by calling `get_main_function()` on the generator.
-
-Nodes are identified by an ID, so you should give a name to nodes that you want to access so you can get their ID with `find_node_by_name`.
-
-Example in the Solar System demo: [https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306](https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306)
+!!! note
+    如果将 `SdfSphere` 节点替换为 `SdfTorus` 节点，你可以获得甜甜圈形状的星球。
+    ![环形形体素图形](images/voxel_graph_torus.webp)
 
 
-Custom generator
+更多技巧可以参见[程序化生成](procedural_generation.md)一节。
+
+
+### 与方块风体素一起使用
+
+通过使用 `OutputType` 节点代替 `OutputSDF`，可以将此生成器与 `VoxelMesherBlocky` 一起使用。不过，`VoxelMesherBlocky` 期望体素是 ID 而不是 SDF 值。
+
+最简单的示例是选取任意现有的 SDF 生成器，并将 `OutputSDF` 替换为连接到 `OutputType` 的 `Select` 节点。其思路是：当 SDF 值高于或低于阈值时，在两种不同体素类型（如空气或石头）的 ID 之间进行选择。
+
+![使用图形生成器制作的基础方块风高度图示例截图](images/voxel_graph_blocky_basic_heightmap.webp)
+
+如果需要更多变化，可以将 `Select` 节点串联起来，使用不同的阈值和来源组合多个层。
+
+![使用图形生成器制作的双生物群系方块风高度图示例截图](images/voxel_graph_blocky_biome.webp)
+
+`Select` 会在两个可能值之间产生“切割”，你可能希望有一些过渡。虽然使用 `VoxelMesherBlocky` 时，如果没有为渐变的每个值提供大量不同类型（通常借助着色器实现）就无法做到，但向阈值添加少量噪声却很容易。这会重现类似“抖动”的过渡效果，就像 Minecraft 中沙子和泥土之间的过渡一样。
+
+![带抖动的双生物群系方块风高度图示例截图](images/voxel_graph_blocky_biome_dithering.webp)
+
+目前，图形生成器仅按体素工作。这让它们很适合生成基础地面和生物群系，但不适合用它生成树木或村庄等结构。通过使用自定义生成器对整个数据块进行第二次处理，可能更容易实现这一点。
+
+
+### 中继
+
+存在一个特殊的 `Relay` 节点，用于整理节点之间的长连接。它们自身不做任何事，只是重定向连接。中继仍然可以有多个目标。
+
+![中继节点截图](images/relay_node.webp)
+
+
+### 预览节点
+
+可以使用 `SdfPreview` 节点预览节点的输出。该节点会将 3D 数据的一个切片显示为灰度图像，或根据其设置显示为彩色图像。这对于检查某个分支是否输出预期值很有用。
+
+!!! note
+    - 预览节点只有在其所连接的输出同时也连接到图形的一个实际输出时才有效。
+
+![预览节点显示平面节点输出的截图](images/graph_preview_node_plane.webp)
+
+在上面的示例中，预览显示了 `SdfPlane` 节点的输出。表面以下值为负，表面以上值为正，并沿着 Y 轴逐渐增大。因此，预览显示为上方白色、下方黑色。
+
+默认情况下，该节点沿 XY 平面显示切片，但如果你需要俯视图，可以在编辑器顶部的 `Debug -> Preview Axes` 菜单中将其改为 XZ 平面。
+
+以下是半径为 50 的球体的输出：
+
+![预览节点显示球体节点输出的截图](images/graph_preview_node_sphere.webp)
+
+默认情况下，预览的每个像素对应 1 个空间单位。你可以按住 `CTRL` 键并在预览上滚动鼠标滚轮进行缩放。你也可以按住 `CTRL` 并按住鼠标中键拖动预览的视口来平移。
+可以通过 `Debug -> Preview Axes -> Reset Location` 菜单将平移和缩放位置重置为默认值。
+
+![预览节点显示球体节点输出并放大后的截图](images/graph_preview_node_sphere_pan_and_zoom.webp)
+
+预览根据其属性中定义的特定范围显示黑白。默认情况下，-1 为黑色，1 为白色（因此 0 实际上是灰色）。你可以通过选中预览节点并在检查器中修改来更改该范围。
+
+![选中的预览节点及其在检查器中的 min/max 属性截图](images/graph_preview_node_min_max_inspector.webp)
+
+处理符号距离场（SDF）时，预览节点还可以用更专业的方式显示值。在检查器中，你可以将 `mode` 改为 `SDF`：
+
+![处于 SDF 模式的预览节点截图](images/graph_preview_node_sdf_inspector.webp)
+
+该模式将负值显示为蓝色（形状内部），正值显示为黄色（形状外部）。
+它还会渲染重复渐变的“条带”，以便更好地观察它们如何从表面向外传播。这些条带的长度由 `fraction period` 控制。
+
+![处于 SDF 模式的预览节点显示球体渐变分数的截图](images/graph_preview_node_sphere_gradients.webp)
+
+对于球体，渐变相当规则，这通常是最好的。但当你使用噪声作为符号距离场时，可以注意到渐变在表面下方和上方实际上是如何演变的：
+
+![处于 SDF 模式的预览节点显示噪声渐变的截图](images/graph_preview_node_noise_sdf.webp)
+
+噪声要不一致得多。不过大多数时候，这没什么大问题。这取决于你对地形做的运算。
+如果渐变的“速度”变化过于剧烈，尤其是在表面附近，可能会导致生成的网格出现精度损失或方块化。在仅从 SDF 体素近似表面或使用球体追踪时，这也可能成为问题。
+
+### 脚本
+
+可以使用 [VoxelGraphFunction](api/VoxelGraphFunction.md) API 从脚本修改图形生成器。例如，如果你设计了一个基础图形，并想随机化噪声种子或调整某些常量，这会很有用。`VoxelGeneratorGraph` 包含它作为“主”函数的实例。你可以通过调用生成器的 `get_main_function()` 来访问该图形。
+
+节点通过 ID 标识，因此你应该为你想要访问的节点命名，以便可以使用 `find_node_by_name` 获取它们的 ID。
+
+太阳系演示中的示例：[https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306](https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306)
+
+
+自定义生成器
 -----------------
 
-See [Scripting](scripting.md)
+参见[脚本](scripting.md)
 
 
-Using `VoxelGeneratorGraph` as a brush
+将 `VoxelGeneratorGraph` 用作笔刷
 -----------------------------------------
 
-This feature is currently only supported in `VoxelLodTerrain` and smooth voxels.
+此功能目前仅在 `VoxelLodTerrain` 和平滑体素中受支持。
 
-`VoxelTool` offers simple functions to modify smooth terrain with `do_sphere` for example, but it is also possible to define procedural custom brushes using `VoxelGeneratorGraph`. The same workflow applies to making such a graph, except it can accept an `InputSDF` node, so the signed distance field can be modified, not just generated.
+`VoxelTool` 提供了简单函数来修改平滑地形，例如 `do_sphere`，但也可以使用 `VoxelGeneratorGraph` 定义程序化的自定义笔刷。制作此类图形的流程相同，只是它可以接受 `InputSDF` 节点，因此符号距离场不仅可以生成，还可以被修改。
 
-Example of additive `do_sphere` recreated with a graph:
+使用图形重建的叠加式 `do_sphere` 示例：
 
-![Additive sphere brush graph](images/graph_sphere_brush.webp)
+![叠加式球体笔刷图形](images/graph_sphere_brush.webp)
 
-A more complex flattening brush, which both subtracts matter in a sphere and adds matter in a hemisphere to form a ledge (here defaulting to a radius of 30 for better preview, but making unit-sized brushes may be easier to re-use):
+一个更复杂的压平笔刷，它既在球体内减去实体，又在半球内添加实体以形成台阶（这里默认半径为 30 以便更好地预览，但制作单位大小的笔刷可能更易于复用）：
 
-![Dual flattening brush](images/graph_flatten_brush.webp)
+![双重压平笔刷](images/graph_flatten_brush.webp)
 
-One more detail to consider, is how big the original brush is. Usually voxel generators have no particular bounds, but it matters here because it will be used locally. For example if your make a spherical brush, you might use a `SdfSphere` node with radius `1`. Then, your original size will be `(2,2,2)`. You can then transform that brush (scale, rotate...) when using `do_graph` at the desired position.
+另一个需要考虑的细节是原始笔刷有多大。通常体素生成器没有特定边界，但这里很重要，因为它将在局部使用。例如，如果你制作球形笔刷，可以使用半径为 `1` 的 `SdfSphere` 节点。那么你的原始尺寸将是 `(2,2,2)`。然后你可以在所需位置使用 `do_graph` 时变换该笔刷（缩放、旋转等）。
 
 
-Re-usable graphs with `VoxelGraphFunction`
+使用 `VoxelGraphFunction` 创建可复用图形
 --------------------------------------------
 
-`VoxelGraphFunction` allows to create graphs that can be used inside other graphs. This is a convenient way to re-use and share graphs.
+`VoxelGraphFunction` 允许创建可以在其他图形内部使用的图形。这是复用和共享图形的便捷方式。
 
-### Creating a function
+### 创建函数
 
-A `VoxelGraphFunction` can be created in the inspector and edited just like a `VoxelGeneratorGraph`, except it will lack some features only found on the latter. It is recommended to save functions as their own `.tres` files, because this is what allows to pick them up in other graphs.
+`VoxelGraphFunction` 可以在检查器中创建，并像 `VoxelGeneratorGraph` 一样编辑，只是它缺少后者独有的一些功能。建议将函数保存为独立的 `.tres` 文件，因为这才能让它们在其他图形中被选用。
 
 !!! note
-    A `VoxelGraphFunction` cannot contain itself, directly or indirectly. Doing this will result in Godot failing to load it.
+    `VoxelGraphFunction` 不能直接或间接包含自身。这样做会导致 Godot 无法加载它。
 
 
-### Exposing inputs and outputs
+### 暴露输入和输出
 
-To be usable in other graphs, functions should have inputs and outputs. Inputs can be added to the function by creating nodes `InputX`, `InputY`, `InputZ`, `InputSDF` or `CustomInput`. Outputs can be added by creating nodes `OutputX`, `OutputY`, `OutputZ`, `CustomOutput` etc.
+要能在其他图形中使用，函数应该具有输入和输出。可以通过创建 `InputX`、`InputY`、`InputZ`、`InputSDF` 或 `CustomInput` 节点来向函数添加输入。可以通过创建 `OutputX`、`OutputY`、`OutputZ`、`CustomOutput` 等节点来添加输出。
 
-Non-custom inputs and outputs such as `InputX` or `OutputX` are *special* nodes, and are identified by their type. They are recognized by the engine for specific purposes. You can have multiple nodes with the same type, but they will always refer to the same input of the function.
+非自定义的输入和输出（如 `InputX` 或 `OutputX`）是*特殊*节点，通过其类型进行标识。引擎会识别它们用于特定用途。你可以拥有多个相同类型的节点，但它们始终指向函数的同一个输入。
 
-Custom inputs and outputs *are identified by their name*. If you add 2 `CustomInput` nodes and give them the same name, they will get their data from the same input. It is recommended to give a name to custom input and output nodes. Empty names still count as a name (so multiple `CustomInput` without names will refer to the same unnamed input).
-
-
-### Exposing parameters
-
-Currently parameters cannot be exposed, but it is planned.
+自定义输入和输出*通过其名称标识*。如果你添加 2 个 `CustomInput` 节点并赋予它们相同的名称，它们将从同一个输入获取数据。建议为自定义输入和输出节点命名。空名称仍算作一个名称（因此多个没有名称的 `CustomInput` 将指向同一个未命名的输入）。
 
 
-### Handling changes
+### 暴露参数
 
-When an existing function changes (new/removed inputs/outputs for example), it is possible that other graphs using it will break. If you try to open them, some of the nodes and connections could be missing.
-
-Currently, you are expected to fix these graphs, and save them. You can also change the offending function so that its inputs, outputs and parameters are what you expect. However if you save a broken graph, you might loose some connections or nodes.
+目前参数无法暴露，但已在计划中。
 
 
-### Debugging
+### 处理变更
 
-Editor tools such as profiling, output previews or range analysis are currently unsupported inside a `VoxelGraphFunction`. It is also not possible to inspect internal nodes of a function when editing a `VoxelGeneratorGraph`.
+当现有函数发生变更（例如新增/移除输入或输出）时，使用它的其他图形可能会损坏。如果你尝试打开它们，某些节点和连接可能会缺失。
 
-It is planned to have these tools available when editing a standalone `VoxelGraphFunction` in the future. This will be done by moving features out of `VoxelGeneratorGraph` so they become more generic.
-
-Inspecting a function "instance" (and sub-instances...) may be desirable, but it is tricky to implement. It could be done as an "Open Inside" feature, to inspect data within the context of the "containing graph". However because functions are fully unpacked and optimized out internally, the engine has to trace back the information to original nodes. Tracing is already present to some degree, but only maps the "top-level" graph to fully-expanded/optimized graph, with no in-between information. This might be worked on further in the future.
+目前，你需要自行修复这些图形并保存。你也可以修改有问题的函数，使其输入、输出和参数符合你的预期。不过，如果你保存了损坏的图形，可能会丢失一些连接或节点。
 
 
-### VoxelGeneratorGraph nodes
+### 调试
 
-A complete list of nodes [can be found here](graph_nodes.md).
+`VoxelGraphFunction` 内部目前不支持分析器、输出预览或范围分析等编辑器工具。编辑 `VoxelGeneratorGraph` 时也无法检查函数内部节点。
+
+计划将来在编辑独立的 `VoxelGraphFunction` 时提供这些工具。这将通过将功能从 `VoxelGeneratorGraph` 中移出使其更加通用来实现。
+
+检查函数的“实例”（以及子实例...）可能很有用，但实现起来很棘手。它可以作为“Open Inside”（在内部打开）功能来实现，以便在“包含图形”的上下文中检查数据。然而，由于函数在内部会被完全展开并优化掉，引擎必须将信息追溯到原始节点。追溯已经在一定程度上存在，但只能将“顶层”图形映射到完全展开/优化后的图形，没有中间信息。将来可能会进一步改进这一点。
 
 
-Multi-pass generation with `VoxelGeneratorMultipassCB`
+### VoxelGeneratorGraph 节点
+
+节点的完整列表[可以在这里找到](graph_nodes.md)。
+
+
+使用 `VoxelGeneratorMultipassCB` 的多遍生成<span id="multi-pass-generation-with-voxelgeneratormultipasscb"></span>
 -------------------------------------------------------
 
-Sometimes you need to write a custom generator that needs to produce structures *made of voxels in the terrain itself* overlapping neighbor chunks, such as trees. While it is possible to make trees with a [deterministic approach](procedural_generation.md#deterministic-approach), it has limitations and is a bit harder to understand. Also, you might want to have access to an entire vertical section of the world while generating it, instead of just a 16x16x16 chunk.
+有时你需要编写一个自定义生成器，它需要生成*由地形本身中的体素构成*并跨越相邻区块的结构，例如树木。虽然可以使用[确定性方法](procedural_generation.md#deterministic-approach)生成树木，但它有局限性且有点难以理解。此外，你可能希望在生成时访问世界的整个垂直区段，而不仅仅是 16x16x16 的区块。
 
-Contrary to other generators, `VoxelGeneratorMultipassCB` allows you to structure generation in several passes, where you can access neighbor chunks. It also works in columns, so you have access to a full vertical section of the world. Things like placing a structure across chunk borders just works.
+与其他生成器不同，`VoxelGeneratorMultipassCB` 允许你将生成组织为多个遍次，在这些遍次中可以访问相邻区块。它还以列的方式工作，因此你可以访问世界的完整垂直区段。像跨区块边界放置结构这样的事情可以直接实现。
 
-You may find early design information [in this issue](https://github.com/Voxel/godot_voxel/issues/545).
+你可以[在这个 issue](https://github.com/Voxel/godot_voxel/issues/545) 中找到早期设计信息。
 
 
-### World model
+### 世界模型
 
-![Schema of a terrain composed of columns, with one column and its neighbors highlighted as the "extent" of generation passes](images/multipass_columns.webp)
+![由列组成的地形示意图，其中一列及其相邻列被高亮为生成遍次的“范围”](images/multipass_columns.webp)
 
-This generator is suffixed "CB" for "Column-Based". The world this generator works on is "flat". Similar to Minecraft, generation occurs within a fixed region going from minimum to maximum altitude (specified with properties), in columns of 16x16 voxels. Then everything above is air, and everything below is either bedrock or just air too. The amount of neighbor columns a pass can access is called the "extent" of the pass.
+该生成器以“CB”为后缀，代表“基于列（Column-Based）”。该生成器所处理的世界是“扁平”的。与 Minecraft 类似，生成发生在一个从最低到最高海拔（通过属性指定）的固定区域内，以 16x16 体素的列的形式进行。其上方的一切都是空气，下方的一切要么是基岩，要么同样只是空气。一个遍次可以访问的相邻列的数量称为该遍次的“范围（extent）”。
 
-While the multipass column logic only works within the fixed vertical range, it will be possible to define what's outside of that range, but it has to be single pass.
+虽然多遍列逻辑只适用于固定的垂直范围，但可以定义该范围之外的内容，不过它必须通过单遍完成。
 
-In sections below, "column" will refer to a stack of blocks within the fixed region.
+在下面的章节中，“列”将指固定区域内的一叠数据块。
 
 !!! note
-    Fixed column height is a design choice to make the generator simpler to implement, and should cover the majority of terrains. However, this is only a limitation of the generator. `VoxelTerrain` remains unlimited vertically, so players can still build higher than the area handled by the terrain generator.
+    固定列高度是为了让生成器更易实现而做的设计选择，应该能覆盖大多数地形。不过，这只是生成器的限制。`VoxelTerrain` 在垂直方向上仍然没有限制，因此玩家仍然可以在地形生成器处理的区域之上继续建造。
 
 
 ### API
 
-This generator is implemented using a script, similar to `VoxelGeneratorScript`. The difference is this function:
+该生成器使用脚本实现，类似于 `VoxelGeneratorScript`。不同之处在于这个函数：
 
 ```
 extends VoxelGeneratorMultipassCB
@@ -335,43 +335,43 @@ func _generate_pass(voxel_tool: VoxelToolMultipassGenerator, pass_index: int):
 	var max_pos := voxel_tool.get_main_area_max()
 
     if pass_index == 0:
-        # Base terrain
+        # 基础地形
 		for gz in range(min_pos.z, max_pos.z):
 			for gx in range(min_pos.x, max_pos.x):
-                # Do things with `voxel_tool`
+                # 用 `voxel_tool` 做一些事情
                 # ...
 
     elif pass_index == 1:
-        # Trees
+        # 树木
         # ...
 ```
 
-Unlike `VoxelGeneratorScript` where `_generate_block` is called once for every 16x16x16 block of the terrain, `_generate_pass` is called multiple times *for every column of blocks*, once for every pass. Subsequent calls can access and modify voxels left by previous passes.
+与 `VoxelGeneratorScript` 中 `_generate_block` 对地形的每个 16x16x16 数据块调用一次不同，`_generate_pass` 会*对每一列数据块*调用多次，每个遍次调用一次。后续调用可以访问和修改之前遍次留下的体素。
 
-Columns may be designated in two different ways in this process:
+在此过程中，列可以以两种不同的方式被指定：
 
-- "Main" column: this is the column being processed by `_generate_pass`. The available area passed with `voxel_tool` will be centered on that column. Usually, if you plant trees, their trunk should only be planted in the main column, to keep results consistent.
-- "Neighbor" columns: these are around the main column, which also means they will be "seen" by more than one column processing during the same pass.
-
-!!! note
-    Accessing neighbors doesn't mean this generator has access to *voxels of the terrain players have access to*. Internally, the generator has its own separate representation of the world, and only stores blocks that are generating. Columns don't interact with the game, and the game can't interact with them.
+- “主”列：这是由 `_generate_pass` 处理的列。通过 `voxel_tool` 传入的可用区域将以此列为中心。通常，如果你种植树木，其树干应只种在主列中，以保持结果一致。
+- “相邻”列：它们位于主列周围，这也意味着在同一遍次中它们会被不止一个列的处理器“看到”。
 
 !!! note
-    Generator scripts can run directly in the editor with tool mode, **but need extra caution**. For more info, see [tool scripts](editor.md#tool-scripts).
+    访问相邻列并不意味着该生成器可以访问*玩家可以访问的地形体素*。在内部，生成器拥有自己独立的世界表示，并且只存储正在生成的数据块。列不与游戏交互，游戏也无法与它们交互。
+
+!!! note
+    生成器脚本可以在工具模式下直接在编辑器中运行，**但需要格外小心**。更多信息参见[工具脚本](editor.md#tool-scripts)。
 
 
-### Column inter-dependencies
+### 列之间的相互依赖
 
-Inter-dependency is a core concept that makes this generator different from the others. It is a direct result of the fact each column can access its neighbors while generating. It is intuitive to do so, but it creates side-effects.
+相互依赖是使该生成器区别于其他生成器的核心概念。它是每列在生成时都可以访问其相邻列这一事实的直接结果。这样做很直观，但会产生副作用。
 
-#### "Completing" a pass
+#### “完成”一个遍次
 
-Let's say we define 2 passes:
+假设我们定义 2 个遍次：
 
-- Pass 1: base terrain. Just combinations of Perlin noise and shapes, where it is not necessary to access neighbors.
-- Pass 2: trees. They could have various shapes and overlap across chunks, and could check if they fit or if they have access to sunlight. That pass will access up to 1 chunk away.
+- 遍次 1：基础地形。只是 Perlin 噪声和形状的组合，无需访问相邻列。
+- 遍次 2：树木。它们可以有各种形状并跨越区块重叠，还可以检查它们是否合适或能否获得阳光。该遍次最多会访问 1 个区块以外的范围。
 
-With just these two passes, generating one *final* column requires to process a bunch of other columns:
+仅凭这两个遍次，生成一个*最终*列就需要处理一堆其他列：
 
 ```
 a a a a a   a = pass 1 partially affected by b
@@ -381,11 +381,11 @@ a b b b a
 a a a a a
 ```
 
-The reason is that in order to *completely finish* Pass 2 on a specific column, we can't just run it once on that column. We must also do it *on all neighbors that can reach that column*.
+原因是，要在特定列上*完全完成*遍次 2，我们不能只在该列上运行一次。我们还必须在*所有可以到达该列的相邻列*上运行它。
 
-![Schema showing a 3x3 grid of chunks. Each chunk gets processed, bringing more trees overlapping other chunks. Once all chunks have generated trees, the middle one can be considered complete.](images/multipass_tree_inter_dependency.webp)
+![显示 3x3 区块网格的示意图。每个区块都被处理，带来更多重叠到其他区块的树木。一旦所有区块都生成了树木，中间的区块就可以视为已完成。](images/multipass_tree_inter_dependency.webp)
 
-With 3 passes, even more columns have to be partially generated:
+使用 3 个遍次时，需要部分生成的列甚至更多：
 
 ```
 a a a a a a a a a    a = pass 1 partially affected by b
@@ -399,59 +399,59 @@ a b b b b b b b a
 a a a a a a a a a
 ```
 
-The generator does not do all this work from scratch everytime it needs to generate a column.
-Since columns will have to be re-accessed many times, they are cached in an internal map. Columns get unloaded when far enough from any viewer. This map can be previewed in the editor, when the terrain is present in the edited scene:
+生成器不会在每次需要生成一列时都从头开始做所有这些工作。
+由于列会被多次重新访问，它们被缓存在一个内部映射中。当列距离任何观察者足够远时会被卸载。当地形存在于被编辑的场景中时，可以在编辑器中预览该映射：
 
-![Screenshot of the inspector showing the generator, in which the cache of columns is shown](images/multipass_cache_viewer.webp)
+![显示生成器的检查器截图，其中展示了列的缓存](images/multipass_cache_viewer.webp)
 
-Each pass can be seen as concentric rectangular areas extending *beyond the view distance of the viewer* (note, you won't see a preview of these passes if your script is not in tool mode. If it is however, take extra caution, see [Editor preview](editor.md#tool-scripts)).
-Passes that can access neighbors use two shades of color, where the brighter shade means all neighbors have run the same pass.
-
-
-#### Determinism
-
-A key feature of generators is to be deterministic. Generating the same column again must always give the same result, as long as parameters are the same (position, seed...). However, with multipass, a few factors can break determinism.
-
-Column passes are executed in parallel, using multiple threads. Also, players can cause columns to generate from any direction. That means *the order in which columns generate is unpredictable*.
-
-Consider neighbor columns `A` and `B`. `A` could generate a tree overlapping into `B`. But `B` can also generate a tree overlapping into `A`. As a result, if the neighbor tree has already been planted, you have to make sure not to erase parts of its trunk, or even leaves if they are different.
-
-In this case:
-
-- The result might no longer be deterministic, although you could decide it's ok if the differences are acceptable. In some cases results could be the same regardless of order.
-- Structure generation can be bothered a bit, notably placement checks or trees growing through other structures. You might have to place voxels by choosing which voxel types or areas you can overwrite yourself.
+每个遍次都可以看作同心矩形区域，延伸*超出观察者的可视距离*（注意，如果你的脚本不在工具模式下，你将看不到这些遍次的预览。如果在工具模式下，请格外小心，参见[编辑器预览](editor.md#tool-scripts)）。
+可以访问相邻列的遍次使用两种颜色深浅，其中较亮的深浅表示所有相邻列都已运行了相同的遍次。
 
 
-### Limitations
+#### 确定性
 
-- This kind of generator only works with `VoxelTerrain`, because it is very data-heavy: it is too expensive to run on the fly and directly produce LODs, like simpler single-pass generators can. If LOD has to be supported with a terrain using this generator, it will likely have to work differently and update slower, because it is required to generate the highest level of detail everywhere (i.e Distant Horizons mod in Minecraft).
-- It is generally more expensive than single-pass generators, and consumes more memory because it needs to cache partially-generated columns in a radius around every player, *beyond their view distances*. It does this to improve performance (which otherwise would be orders of magnitude worse). With a lot of passes or high extents, the amount of memory consumed by this cache could even exceed visible chunks.
-- Column height is limited for practical reasons. Multipass cubic chunks were experimented with during development of `VoxelGeneratorMultipassCB`, and they were significantly more expensive, and harder to work with in some cases, because of the inability to access a full vertical section (which would have to be infinite).
-- The reachable distance outside the main column is limited. It can be increased, but it gets expensive quickly. If you need to reach further to place very big structures spanning dozens of chunks across, you might have to think of a different approach. For example, generating a "blueprint" up-front (or deterministically), and rasterizing parts of it progressively when they intersect the column.
-- The same instance of generator cannot be shared between multiple terrains. If you need the same generator on two terrains, make a copy.
-- Implementation isn't ideal. `VoxelTerrain` is very generic and works with infinite cubic chunks, while this generator needed different constraints to work well. As a result, there is some overhead that could be avoided if the terrain was entirely rewritten and dedicated to this kind of column structure. It wasn't done because it would become less configurable, break compatibility and take time to develop. 
-- Currently, the column cache isn't saved, contrary to what was described in [issue 545](https://github.com/Voxel/godot_voxel/issues/545). So if the game restarts, some columns and their neighbors can be asked to generate again if blocks weren't saved in a `VoxelStream`. This can be mitigated by saving generated blocks with `VoxelStream.save_generator_output`. In general, don't expect `VoxelGenerator` to be called only once for a given chunk, because it might be called again in corner cases. Generators should be deterministic and not have race conditions.
+生成器的一个关键特性是确定性。只要参数相同（位置、种子等），重新生成同一列必须总是得到相同的结果。然而，使用多遍时，有几个因素可能破坏确定性。
+
+列遍次使用多个线程并行执行。此外，玩家可以从任意方向触发列生成。这意味着*列生成的顺序是不可预测的*。
+
+考虑相邻列 `A` 和 `B`。`A` 可能生成一棵树重叠到 `B` 中。但 `B` 也可能生成一棵树重叠到 `A` 中。因此，如果相邻的树已经种下，你必须确保不要擦除其树干的部分，如果树叶不同也不要擦除树叶。
+
+在这种情况下：
+
+- 结果可能不再具有确定性，不过如果差异可以接受，你也可以决定没问题。在某些情况下，无论顺序如何结果都可能相同。
+- 结构生成可能会受到一些干扰，尤其是放置检查或树木穿过其他结构生长。你可能需要自己选择可以覆盖哪些体素类型或区域来放置体素。
 
 
-Modifiers
+### 限制
+
+- 这类生成器只能与 `VoxelTerrain` 配合使用，因为它数据量非常大：像更简单的单遍生成器那样即时运行并直接生成 LOD 成本太高。如果使用该生成器的地形必须支持 LOD，它很可能需要以不同的方式工作并更新得更慢，因为它需要在所有地方生成最高级别的细节（即 Minecraft 中的 Distant Horizons 模组）。
+- 它通常比单遍生成器更昂贵，并消耗更多内存，因为它需要在每个玩家周围*超出其可视距离*的半径内缓存部分生成的列。它这样做是为了提高性能（否则性能会差几个数量级）。如果遍次很多或范围很大，该缓存消耗的内存甚至可能超过可见区块。
+- 出于实际原因，列的高度是有限的。在开发 `VoxelGeneratorMultipassCB` 期间曾尝试过多遍立方体区块，但它们明显更昂贵，并且在某些情况下更难处理，因为无法访问完整的垂直区段（那必须是无限的）。
+- 主列外部的可达距离是有限的。它可以增大，但很快就会变得昂贵。如果你需要延伸到更远的地方来放置横跨数十个区块的巨型结构，你可能需要考虑不同的方法。例如，预先（或以确定性的方式）生成“蓝图”，并在其与列相交时逐步光栅化其中的部分。
+- 同一个生成器实例不能在地形之间共享。如果你需要在两个地形上使用同一个生成器，请制作副本。
+- 实现并不理想。`VoxelTerrain` 非常通用，适用于无限的立方体区块，而该生成器需要不同的约束才能良好运行。因此，如果完全重写地形并专门针对这种列结构，可以避免一些开销。之所以没有这样做，是因为它会降低可配置性、破坏兼容性并耗费开发时间。
+- 目前，列缓存不会被保存，这与 [issue 545](https://github.com/Voxel/godot_voxel/issues/545) 中描述的不同。因此，如果游戏重启，一些列及其相邻列可能会被要求重新生成（如果数据块没有保存在 `VoxelStream` 中）。可以通过使用 `VoxelStream.save_generator_output` 保存已生成的数据块来缓解这个问题。一般来说，不要指望 `VoxelGenerator` 对给定区块只调用一次，因为在一些边缘情况下它可能会被再次调用。生成器应该是确定性的，并且不能有竞态条件。
+
+
+修改器<span id="modifiers"></span>
 -----------
 
-Modifiers are generators that affect a limited region of the volume. They can stack on top of base generated voxels or other modifiers, and affect the final result. This is a workflow that mostly serves if your world has a finite size, and you want to set up specific shapes of the landscape in a non-destructive way from the editor.
+修改器是影响体积中有限区域的生成器。它们可以叠加在基础生成的体素或其他修改器之上，并影响最终结果。这种工作流主要用于世界尺寸有限，并且你想从编辑器以非破坏性方式设置特定地形形状的情况。
 
 !!! note
-    This feature is only implemented with `VoxelLodTerrain` at the moment, and only works to sculpt smooth voxels. It is in early stages so it is quite limited.
+    目前该功能仅通过 `VoxelLodTerrain` 实现，并且只能雕刻平滑体素。它仍处于早期阶段，因此相当有限。
 
-Modifiers can be added with nodes as child of the terrain. `VoxelModifierSphere` adds or subtracts a sphere, while `VoxelModifierMesh` adds or subtracts a mesh. For the latter, the mesh must be baked into an SDF volume first, using the `VoxelMeshSDF` resource.
+可以通过将节点作为地形的子节点来添加修改器。`VoxelModifierSphere` 添加或减去一个球体，而 `VoxelModifierMesh` 添加或减去一个网格。对于后者，必须首先使用 `VoxelMeshSDF` 资源将网格烘焙到 SDF 体积中。
 
-Because modifiers are part of the procedural generation stack, destructive edits will always override them. If a block is edited, modifiers cannot affect it. It is then assumed that such edits would come from players at runtime, and that modifiers don't change.
+由于修改器属于程序化生成堆栈的一部分，破坏性编辑将始终覆盖它们。如果某个数据块被编辑，修改器就无法再影响它。这里假定此类编辑来自运行时的玩家，并且修改器不会变化。
 
 
-Caching
+缓存
 ---------
 
-Generators are designed to be deterministic: if the same area is generated twice, the result must be the same. This means, ultimately, we only need to store edited voxels (aka "destructive" editing), while non-edited regions can be recomputed on the fly. Even if you want to access one voxel and it happens to be in a non-edited location, then the generator will be called just to obtain that voxel.
+生成器被设计为确定性的：如果同一区域被生成两次，结果必须相同。这意味着，最终我们只需要存储被编辑过的体素（即“破坏性”编辑），而未编辑的区域可以即时重新计算。即使你想访问一个恰好位于未编辑位置的体素，生成器也会被调用以获取该体素。
 
-However, if a generator is too expensive or not expected to run this way, it may be desirable to store the output in memory so that querying the same area again picks up the cached data.
+然而，如果生成器过于昂贵或不希望以这种方式运行，那么可能希望将输出存储在内存中，以便再次查询同一区域时能取到缓存的数据。
 
-By default, `VoxelTerrain` caches blocks in memory until they get far from any viewer. `VoxelLodTerrain` does not cache blocks by default. There is no option yet to change that behavior.
-It is also possible to tell a `VoxelGenerator` to save its outputs to the current `VoxelStream`, if any is setup. However, these blocks will act as edited ones, so they will behave as if it was changes done destructively.
+默认情况下，`VoxelTerrain` 会将数据块缓存在内存中，直到它们远离任何观察者。`VoxelLodTerrain` 默认不缓存数据块。目前还没有选项可以改变这种行为。
+还可以让 `VoxelGenerator` 将其输出保存到当前 `VoxelStream`（如果有设置）。不过，这些数据块将像被编辑过一样，行为上等同于进行了破坏性修改。

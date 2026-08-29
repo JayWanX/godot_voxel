@@ -20,33 +20,33 @@ namespace voxel::tests {
 void test_spatial_lock_misc() {
 	SpatialLock3D spatial_lock;
 
-	// Lock a box around the origin
+	// 锁定原点周围的一个盒体
 	const BoxBounds3i box1 = BoxBounds3i::from_min_max_included(Vector3i(-1, -1, -1), Vector3i(1, 1, 1));
 	spatial_lock.lock_read(box1);
 
-	// Unlock it
+	// 解锁它
 	spatial_lock.unlock_read(box1);
 
-	// Lock it again
+	// 再次锁定它
 	spatial_lock.lock_read(box1);
 
-	// Spawn a thread to lock more boxes
+	// 生成一个线程去锁定更多盒体
 	Thread thread;
 	thread.start(
 			[](void *userdata) {
 				SpatialLock3D &spatial_lock = *static_cast<SpatialLock3D *>(userdata);
 
-				// Try to lock a box overlapping the one locked by the main thread. It's for read too, it should succeed
+				// 尝试锁定一个与主线程所锁盒体重叠的盒体。同样是读锁，应该会成功
 				const BoxBounds3i box2 = BoxBounds3i::from_min_max_included(Vector3i(0, 0, 0), Vector3i(3, 4, 5));
 				VOXEL_TEST_ASSERT(spatial_lock.try_lock_read(box2) == true);
 
 				spatial_lock.unlock_read(box2);
 
-				// Try to lock a box overlapping the one locked by the main thread. It's for write, should not succeed
+				// 尝试锁定一个与主线程所锁盒体重叠的盒体。这次是写锁，不应该成功
 				const BoxBounds3i box3 = BoxBounds3i::from_position(Vector3i(0, 0, 0));
 				VOXEL_TEST_ASSERT(spatial_lock.try_lock_write(box3) == false);
 
-				// Try to lock a box not overlapping the one locked by the main thread. It should succeed.
+				// 尝试锁定一个与主线程所锁盒体不重叠的盒体。应该会成功。
 				const BoxBounds3i box4 = BoxBounds3i::from_position(Vector3i(5, 0, 0));
 				VOXEL_TEST_ASSERT(spatial_lock.try_lock_write(box4) == true);
 
@@ -57,10 +57,10 @@ void test_spatial_lock_misc() {
 
 	thread.wait_to_finish();
 
-	// Unlock the box around origin
+	// 解锁原点周围的盒体
 	spatial_lock.unlock_read(box1);
 
-	// Lock a box for write
+	// 以写模式锁定一个盒体
 	const BoxBounds3i box3 = BoxBounds3i::from_position(Vector3i(0, 0, 0));
 	VOXEL_TEST_ASSERT(spatial_lock.try_lock_write(box3) == true);
 	spatial_lock.unlock_write(box3);
@@ -69,16 +69,16 @@ void test_spatial_lock_misc() {
 }
 
 void test_spatial_lock_spam() {
-	// Spawns many threads that will each lock random boxes in a limited area of a grid of numbers, very frequently.
-	// They either read data, in which case they check it doesn't change while they do so,
-	// or they write data, in which case they reset numbers and increment them predictably, making sure the result is as
-	// expected.
+	// 生成许多线程，每个线程都会非常频繁地在一个数字网格的有限区域内锁定随机盒体。
+	// 它们要么读取数据，此时会检查数据在读取过程中不会发生变化，
+	// 要么写入数据，此时会重置数字并以可预测的方式递增，从而确保结果符合
+	// 预期。
 
 	static const uint64_t THREAD_DURATION_MILLISECONDS = 3000;
 	static const int AREA_SIZE = 10;
 	static const uint64_t LOCK_DURATION_MICROSECONDS = 20;
 
-	// Simple 3D grid
+	// 简单的 3D 网格
 	struct Map {
 	public:
 		Map(Vector3i p_size) {
@@ -115,7 +115,7 @@ void test_spatial_lock_spam() {
 		Vector3i _size;
 	};
 
-	// Data passed to each thread
+	// 传递给每个线程的数据
 	struct Context {
 		SpatialLock3D *spatial_lock;
 		Map *map;
@@ -124,16 +124,16 @@ void test_spatial_lock_spam() {
 
 	struct L {
 		static void modify_cells(Map &map, Box3i box, RandomPCG &rng, uint64_t microseconds) {
-			// Set all cells in the box to a starting value
+			// 将盒体内所有单元格设为一个起始值
 			const int base = rng.rand(1000);
 			box.for_each_cell([&map, base](Vector3i pos) { map.at(pos) = base; });
 
 			const uint64_t time_before = Time::get_singleton()->get_ticks_usec();
 
-			for (int i = 1; /* keep looping at least once */; ++i) {
-				// Increment cells in the box
+			for (int i = 1; /* 至少循环一次 */; ++i) {
+				// 递增盒体内的单元格
 				box.for_each_cell([&map](Vector3i pos) { ++map.at(pos); });
-				// Check they have the expected value
+				// 检查它们是否为预期值
 				VOXEL_TEST_ASSERT(map.cells_in_box_equal(box, base + i));
 
 				if (Time::get_singleton()->get_ticks_usec() - time_before >= microseconds) {
@@ -155,9 +155,9 @@ void test_spatial_lock_spam() {
 			while (true) {
 				int j = 0;
 				box.for_each_cell([&map, &expected_values, &j](Vector3i pos) {
-					// Cells must not change while we read them.
+					// 在我们读取单元格期间，它们不得发生变化。
 					VOXEL_TEST_ASSERT(expected_values[j] == map.at(pos));
-					// Note, iteration order is the same as when we cached expected values
+					// 注意，迭代顺序与缓存预期值时相同
 					++j;
 				});
 
@@ -186,7 +186,7 @@ void test_spatial_lock_spam() {
 
 			StdVector<int> reusable_vector;
 
-			// Keep running for the duration of the test
+			// 在测试期间持续运行
 			while (Time::get_singleton()->get_ticks_msec() - time_before < THREAD_DURATION_MILLISECONDS) {
 				for (int i = 0; i < 10; ++i) {
 					const Box3i box = make_random_box(map.get_size(), rng);
@@ -215,7 +215,7 @@ void test_spatial_lock_spam() {
 
 	Map map(Vector3i(AREA_SIZE, AREA_SIZE, AREA_SIZE));
 	SpatialLock3D spatial_lock;
-	FixedArray<Thread, 7> threads; // Excluding main thread
+	FixedArray<Thread, 7> threads; // 不含主线程
 	FixedArray<Context, 8> contexts;
 	const unsigned int main_thread_index = contexts.size() - 1;
 
@@ -237,10 +237,10 @@ void test_spatial_lock_spam() {
 }
 
 void test_spatial_lock_dependent_map_chunks() {
-	// Simulates a bunch of tasks that could be baking light in columns of chunks.
-	// Each task may write into its neighbors.
-	// This also uses ThreadedTaskRunner and postponing.
-	// Not many tests in here, but can be interesting to analyze the dumps.
+	// 模拟一批可能在区块列中烘焙光照的任务。
+	// 每个任务都可能写入其邻居。
+	// 这里还用到了 ThreadedTaskRunner 和任务延后机制。
+	// 这里的断言不多，但分析导出的记录会很有意思。
 
 	static const int MAP_SIZE = 16;
 
@@ -255,7 +255,7 @@ void test_spatial_lock_dependent_map_chunks() {
 		uint64_t time_us;
 	};
 
-	// To log what actually happened and visualize it
+	// 用于记录实际发生的事情并将其可视化
 	struct EventList {
 		StdVector<Event> events;
 		Mutex mutex;
@@ -287,7 +287,7 @@ void test_spatial_lock_dependent_map_chunks() {
 		}
 	};
 
-	// Writing task
+	// 写入任务
 	class Task1 : public IThreadedTask {
 	public:
 		unsigned int sleep_amount_usec;
@@ -335,7 +335,7 @@ void test_spatial_lock_dependent_map_chunks() {
 		}
 	};
 
-	// Reading task
+	// 读取任务
 	class Task2 : public IThreadedTask {
 	public:
 		unsigned int sleep_amount_usec;
@@ -399,7 +399,7 @@ void test_spatial_lock_dependent_map_chunks() {
 	EventList events;
 	RandomPCG rng;
 
-	// Schedule tasks that will want to access overlapping blocks
+	// 调度一批会访问相互重叠区块的任务
 	Vector2i column_pos;
 	for (column_pos.y = 0; column_pos.y < MAP_SIZE; ++column_pos.y) {
 		for (column_pos.x = 0; column_pos.x < MAP_SIZE; ++column_pos.x) {
@@ -409,7 +409,7 @@ void test_spatial_lock_dependent_map_chunks() {
 				++in_flight_count;
 			}
 
-			// Add some reading requests
+			// 添加一些读取请求
 			for (int i = 0; i < 2; ++i) {
 				Task2 *task = VOXEL_NEW(
 						Task2(1000 + rng.rand(2000),
@@ -429,7 +429,7 @@ void test_spatial_lock_dependent_map_chunks() {
 	VOXEL_TEST_ASSERT(in_flight_count == 0);
 
 #ifdef VOXEL_TEST_TASK_POSTPONING_DUMP_EVENTS
-	// Dump events
+	// 导出事件记录
 	std::ofstream ofs("ddd_block_tasks_test.json", std::ios::binary);
 	if (ofs.good()) {
 		ofs << "{\n";

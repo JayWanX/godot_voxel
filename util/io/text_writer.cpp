@@ -30,7 +30,7 @@ void TextWriter::write_chars(Span<const char> s) {
 		s.copy_to(_buffer.sub(_pos, s.size()));
 		_pos += s.size();
 	} else {
-		// Too big for staging buffer, write directly to sink (which may have higher bounds)
+		// 对暂存缓冲区来说太大，直接写入接收端（其边界可能更高）
 		flush();
 		drain(s);
 	}

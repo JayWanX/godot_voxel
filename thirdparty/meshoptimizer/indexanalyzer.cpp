@@ -33,7 +33,7 @@ meshopt_VertexCacheStatistics meshopt_analyzeVertexCache(const unsigned int* ind
 		bool bc = (timestamp - cache_timestamps[b]) > cache_size;
 		bool cc = (timestamp - cache_timestamps[c]) > cache_size;
 
-		// flush cache if triangle doesn't fit into warp or into the primitive buffer
+		// 若三角形放不进 warp 或图元缓冲区，则清空缓存
 		if ((primgroup_size && primgroup_offset == primgroup_size) || (warp_size && warp_offset + ac + bc + cc > warp_size))
 		{
 			result.warps_executed += warp_offset > 0;
@@ -41,11 +41,11 @@ meshopt_VertexCacheStatistics meshopt_analyzeVertexCache(const unsigned int* ind
 			warp_offset = 0;
 			primgroup_offset = 0;
 
-			// reset cache
+			// 重置缓存
 			timestamp += cache_size + 1;
 		}
 
-		// update cache and add vertices to warp
+		// 更新缓存并将顶点加入 warp
 		for (int j = 0; j < 3; ++j)
 		{
 			unsigned int index = indices[i + j];
@@ -111,7 +111,7 @@ meshopt_VertexFetchStatistics meshopt_analyzeVertexFetch(const unsigned int* ind
 		{
 			size_t line = tag % (sizeof(cache) / sizeof(cache[0]));
 
-			// we store +1 since cache is filled with 0 by default
+			// 我们存储 +1，因为缓存默认以 0 填充
 			result.bytes_fetched += (cache[line] != tag + 1) * kCacheLine;
 			cache[line] = tag + 1;
 		}

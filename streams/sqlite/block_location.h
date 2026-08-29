@@ -10,7 +10,7 @@
 
 namespace voxel::sqlite {
 
-// x,y,z,lod where lod in [0..24[
+// x,y,z,lod，其中 lod 在 [0..24[ 范围内
 static constexpr unsigned int STRING_LOCATION_MAX_LENGTH = MAX_INT32_CHAR_COUNT_BASE10 * 3 + 3 + 2;
 static constexpr unsigned int BLOB80_LENGTH = 10;
 static constexpr unsigned int LOCATION_BUFFER_MAX_LENGTH = math::max(STRING_LOCATION_MAX_LENGTH, BLOB80_LENGTH);
@@ -33,7 +33,7 @@ struct BlockLocation {
 		// Voxels: -4,194,304..4,194,303
 		// LODs: 24
 		FORMAT_INT64_X19_Y19_Z19_L7,
-		// Full range, but might be slowest
+		// 全部范围，但可能最慢
 		FORMAT_STRING_CSD,
 		// Blocks: -16,777,216..16,777,215
 		// Voxels: -268,435,456..268,435,455
@@ -44,14 +44,14 @@ struct BlockLocation {
 
 	uint64_t encode_x16_y16_z16_l16() const {
 		// 0l xx yy zz
-		// TODO Is that actually correct with negative coordinates?
+		// TODO 对于负坐标这真的正确吗？
 		return ((static_cast<uint64_t>(lod) & 0xffff) << 48) | ((static_cast<uint64_t>(position.x) & 0xffff) << 32) |
 				((static_cast<uint64_t>(position.y) & 0xffff) << 16) | (static_cast<uint64_t>(position.z) & 0xffff);
 	}
 
 	static BlockLocation decode_x16_y16_z16_l16(uint64_t id) {
 		BlockLocation b;
-		// We cast first to restore the sign
+		// 我们先进行转换以恢复符号
 		b.position.z = static_cast<int16_t>(id & 0xffff);
 		b.position.y = static_cast<int16_t>((id >> 16) & 0xffff);
 		b.position.x = static_cast<int16_t>((id >> 32) & 0xffff);
@@ -206,8 +206,8 @@ struct BlockLocation {
 			case FORMAT_INT64_X19_Y19_Z19_L7:
 				return Box3i::from_min_max(Vector3iUtil::create(-(1 << 18)), Vector3iUtil::create((1 << 18) - 1));
 			case FORMAT_STRING_CSD:
-				// In theory should be maximum an int32 can hold, but let's use the maximum extent we can get with the
-				// module's own limit constant
+				// 理论上应该是 int32 能容纳的最大值，但我们使用此模块自带限制常量可得的最大范围
+				// 即该模块自身的限制常量
 				return Box3i::from_min_max(
 						Vector3iUtil::create(-(constants::MAX_VOLUME_EXTENT >> constants::DEFAULT_BLOCK_SIZE_PO2)),
 						Vector3iUtil::create((constants::MAX_VOLUME_EXTENT >> constants::DEFAULT_BLOCK_SIZE_PO2))

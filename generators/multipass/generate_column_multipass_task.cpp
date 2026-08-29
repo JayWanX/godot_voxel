@@ -87,12 +87,12 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 			VoxelGeneratorMultipassCB::get_subpass_count_from_pass_count(_generator_internal->passes.size()) - 1;
 
 	if (_cancelled) {
-		// At least one subtask was cancelled, therefore we have to cleanup and return too.
+		// 至少一个子任务被取消，因此我们也必须清理并返回。
 
-		// Unregister from the column if any
+		// 如果有的话，从列中注销
 		{
 			if (!map.spatial_lock.try_lock_write(BoxBounds2i::from_position(_column_position))) {
-				// Try later (funny situation, but that's the pattern)
+				// 稍后重试（有趣的情况，但这就是模式）
 				ctx.status = ThreadedTaskContext::STATUS_POSTPONED;
 				return;
 			}
@@ -103,12 +103,12 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 			MutexLock mlock(map.mutex);
 			auto column_it = map.columns.find(_column_position);
 			if (column_it != map.columns.end()) {
-				// Unregister task from the column
+				// 从列中注销任务
 				Column &column = column_it->second;
 				column.pending_subpass_tasks_mask &= ~(1 << _subpass_index);
 
 				if (_subpass_index == final_subpass_index) {
-					// Schedule pending block requests to make them handle cancellation
+					// 调度挂起的数据块请求，让它们处理取消
 					schedule_final_block_tasks(column, task_scheduler);
 				}
 			}
@@ -123,7 +123,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 	const Pass &pass = _generator_internal->passes[pass_index];
 
 	if (_subpass_index == 0) {
-		// The first subpass can't depend on another subpass
+		// 第一个子 pass 不能依赖另一个子 pass
 		VOXEL_ASSERT(pass.dependency_extents == 0);
 	} else {
 		VOXEL_ASSERT(pass.dependency_extents > 0);
@@ -138,32 +138,32 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 			Vector2iUtil::get_yx_index(Vector2iUtil::create(pass.dependency_extents), neighbors_box.size);
 
 	StdVector<Column *> columns;
-	// TODO Cache memory
+	// TODO 缓存内存
 	columns.reserve(Vector2iUtil::get_area(neighbors_box.size));
 
-	// Lock region we are going to process
+	// 锁定我们要处理的区域
 	{
 		VOXEL_PROFILE_SCOPE_NAMED("Region");
 
-		// Blocking until available causes bottlenecks. Not always big ones, but enough to be very noticeable in the
-		// profiler.
+		// 阻塞直到可用会造成瓶颈。不一定总是大瓶颈，但足以在
+		// 分析器中非常显眼。
 		// SpatialLock3D::Write swlock(map->spatial_lock, neighbors_box);
 		if (!map.spatial_lock.try_lock_write(neighbors_box)) {
-			// Try later
+			// 稍后重试
 			ctx.status = ThreadedTaskContext::STATUS_POSTPONED;
 			return;
 		}
-		// Sometimes I wish `defer` was a thing in C++
+		// 有时我希望 C++ 也有 `defer`
 		SpatialLock2D::UnlockWriteOnScopeExit swlock(map.spatial_lock, neighbors_box);
 
-		// Fetch columns from map
+		// 从地图中获取列
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Fetch columns");
 
-			// TODO We don't create new columns from here, could use a shared lock?
+			// TODO 我们不从这里创建新列，能否使用共享锁？
 			MutexLock mlock(map.mutex);
 
-			// Coordinate order matters (note, Y in Vector2i corresponds to Z in 3D here).
+			// 坐标顺序很重要（注意，这里的 Vector2i 中的 Y 对应 3D 中的 Z）。
 			neighbors_box.for_each_cell_yx([&columns, &map](Vector2i cpos) {
 				auto it = map.columns.find(cpos);
 				Column *column = nullptr;
@@ -182,7 +182,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 		bool spawned_subtasks = false;
 		bool postpone = false;
 
-		// Check loading levels
+		// 检查加载级别
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Check levels");
 
@@ -195,13 +195,13 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 			for (Column *column : columns) {
 				if (column == nullptr) {
-					// No longer loaded, we have to cancel the task
+					// 不再加载，我们必须取消任务
 
 					if (main_column != nullptr) {
 						main_column->pending_subpass_tasks_mask &= ~(1 << _subpass_index);
 
 						if (_subpass_index == final_subpass_index) {
-							// Schedule pending block requests to make them handle cancellation
+							// 调度挂起的数据块请求，让它们处理取消
 							schedule_final_block_tasks(*main_column, task_scheduler);
 						}
 					}
@@ -220,28 +220,28 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 					Column *column = columns[i];
 					VOXEL_ASSERT(column != nullptr);
 
-					// We want all blocks in the neighborhood to be at least at the previous subpass before we can
-					// run the current subpass
+					// 我们希望邻居中的所有数据块至少处于上一个子 pass，然后才能
+					// 运行当前子 pass
 					if (prev_subpass_index >= 0 && column->subpass_index < prev_subpass_index) {
-						// Dependencies not ready yet.
+						// 依赖尚未就绪。
 
 						if (column->loading) {
-							// A task is pending to work on the dependency, so we wait.
-							// TODO Ideally we should subscribe to the completion of that task.
+							// 有一个任务正在处理依赖，所以我们等待。
+							// TODO 理想情况下，我们应该订阅该任务的完成。
 							// println(format("O {} {} {} {} {}", int(_subpass_index), _column_position.x, 0,
 							// 		_column_position.y, Time::get_singleton()->get_ticks_usec()));
 							postpone = true;
 
 						} else if ((column->pending_subpass_tasks_mask & (1 << prev_subpass_index)) != 0) {
-							// A task is pending to work on the dependency, so we wait.
-							// TODO Ideally we should subscribe to the completion of that task.
-							// We can do that
+							// 有一个任务正在处理依赖，所以我们等待。
+							// TODO 理想情况下，我们应该订阅该任务的完成。
+							// 我们可以做到
 							// println(format("O {} {} {} {} {}", int(_subpass_index), _column_position.x, 0,
 							// 		_column_position.y, Time::get_singleton()->get_ticks_usec()));
 							postpone = true;
 
 						} else {
-							// No task is pending to work on the dependency, spawn one.
+							// 没有任务在处理依赖，生成一个。
 
 							if (dependency_counter == nullptr) {
 								dependency_counter = make_shared_instance<std::atomic_int>();
@@ -266,13 +266,13 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 							spawned_subtasks = true;
 						}
-						// TODO If a column got deallocated after it was returned once, restart its generation process.
-						// This would be to cover cases where blocks of a column get requested more than once. In the
-						// ideal case this should not happen, but the real world is a mess:
-						// - The game could have crashed
-						// - Saving could have failed
-						// - Files could have been deleted
-						// - The game could simply want to reset an area
+						// TODO 如果某列在返回一次后被释放，则重新启动其生成过程。
+						// 这旨在覆盖列的数据块被多次请求的情况。理想情况下
+						// 这不应发生，但现实世界一团糟：
+						// - 游戏可能崩溃了
+						// - 保存可能失败了
+						// - 文件可能被删除了
+						// - 游戏可能只是想要重置某个区域
 					}
 
 					++i;
@@ -289,7 +289,7 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 
 		} else {
 			VOXEL_PROFILE_SCOPE_NAMED("Run pass");
-			// We can run the pass
+			// 我们可以运行 pass
 
 			VOXEL_ASSERT(main_column != nullptr);
 
@@ -297,32 +297,30 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 				const int column_height_blocks = _generator_internal->column_height_blocks;
 
 				if (_subpass_index == 0) {
-					// First pass creates blocks
+					// 第一个 pass 创建数据块
 					// main_column->blocks.resize(column_height_blocks);
 					for (Block &block : main_column->blocks) {
 						block.voxels.create(Vector3iUtil::create(_block_size), &_format);
 					}
 				}
 
-				// Debug check
+				// 调试检查
 				// const int subpass_completion_iterations = math::cubed(pass.dependency_extents * 2 + 1);
 				// VOXEL_ASSERT(main_block->subpass_iterations[_subpass_index] < subpass_completion_iterations);
 
-				// The fact we split passes in two doesn't mean we should run the generator again each time. Instead, we
-				// may run the generator only on the first subpass referring to a given pass.
-				// TODO that means part of the tasks we spawn don't actually do expensive work. Could we simplify this
-				// further?
+				// 我们将 pass 分成两个，并不意味着每次都该再次运行生成器。相反，
+				// 我们可能只在引用给定 pass 的第一个子 pass 上运行生成器。
+				// TODO 这意味着我们生成的某些任务实际上并不做繁重的工作。能否进一步简化？
 				const int prev_pass_index = VoxelGeneratorMultipassCB::get_pass_index_from_subpass(prev_subpass_index);
 
 				if (pass_index == 0 || prev_pass_index != pass_index) {
 					const int column_base_y_blocks = _generator_internal->column_base_y_blocks;
 
-					// TODO Cache memory
+					// TODO 缓存内存
 					StdVector<Block *> blocks;
 					blocks.reserve(columns.size() * column_height_blocks);
-					// Compose grid of blocks indexed as ZXY (index+1 goes up along Y).
-					// ZXY indexing is convenient here, since columns are indexed with YX (aka ZX, because Y in 2D is Z
-					// in 3D)
+					// 按 ZXY 索引组成数据块网格（索引+1 沿 Y 上升）。
+					// 这里 ZXY 索引很方便，因为列用 YX（即 ZX，因为 2D 中的 Y 是 3D 中的 Z）索引。
 					for (Column *column : columns) {
 						for (Block &block : column->blocks) {
 							blocks.push_back(&block);
@@ -338,11 +336,11 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 					input.pass_index = pass_index;
 					input.block_size = _block_size;
 
-					// This should be the ONLY place where `_generator` is used.
+					// 这应该是使用 `_generator` 的唯一位置。
 					_generator->generate_pass(input);
 				}
 
-				// Update levels
+				// 更新级别
 				main_column->subpass_index = _subpass_index;
 
 				// for (Column *column : columns) {
@@ -357,15 +355,14 @@ void GenerateColumnMultipassTask::run(ThreadedTaskContext &ctx) {
 			main_column->pending_subpass_tasks_mask &= ~(1 << _subpass_index);
 
 			if (main_column->subpass_index == final_subpass_index) {
-				// All tasks that were waiting for this column to be complete (and did not spawn column subtasks
-				// themselves) may now resume
+				// 所有等待此列完成（且自身未生成列子任务）的任务现在都可以恢复
 				schedule_final_block_tasks(*main_column, task_scheduler);
 			}
 
 			return_to_caller(true);
 		}
 
-	} // Region lock
+	} // 区域锁
 
 	// println(format("End of {} t {}", uint64_t(this), Thread::get_caller_id()));
 	task_scheduler.flush();

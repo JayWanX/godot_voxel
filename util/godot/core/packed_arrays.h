@@ -15,13 +15,13 @@
 
 namespace voxel::godot {
 
-// Specialized copy functions for vectors because they use `real_t`, which can be either `float` or `double`
+// 向量的专用拷贝函数，因为它们使用 `real_t`，而它既可能是 `float` 也可能是 `double`
 void copy_to(PackedVector3Array &dst, const Span<const Vector3f> src);
 void copy_to(PackedVector2Array &dst, const Span<const Vector2f> src);
 
-// Copy functions for matching types.
-// Can't have code using template Vector if we want to support compiling both as module and extension.
-// So the following are defined for every case instead of a template.
+// 类型匹配时的拷贝函数。
+// 如果我们想同时支持以模块和扩展方式编译，就不能使用模板 Vector 的代码。
+// 所以下面为每种情况都定义了，而不是用模板。
 void copy_to(PackedVector3Array &dst, Span<const Vector3> src);
 void copy_to(PackedInt32Array &dst, Span<const int32_t> src);
 void copy_to(PackedColorArray &dst, Span<const Color> src);

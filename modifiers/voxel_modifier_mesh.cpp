@@ -39,8 +39,8 @@ void VoxelModifierMesh::apply(VoxelModifierContext ctx) const {
 	}
 	const VoxelBuffer &buffer = voxel_buffer_gd->get_buffer();
 
-	// TODO VoxelMeshSDF isn't preventing scripts from writing into this buffer from a different thread.
-	// I can't think of a reason to manually modify the buffer of a VoxelMeshSDF at the moment.
+	// TODO VoxelMeshSDF 未能阻止脚本从其他线程写入此缓冲区。
+	// 目前我想不出有什么理由要手动修改 VoxelMeshSDF 的缓冲区。
 
 	const Vector3f min_pos = _mesh_sdf->get_aabb_min_pos();
 	const Vector3f max_pos = _mesh_sdf->get_aabb_max_pos();
@@ -112,7 +112,7 @@ void VoxelModifierMesh::get_shader_data(ShaderData &out_shader_data) {
 		const Vector3f max_pos = _mesh_sdf->get_aabb_max_pos();
 
 		MeshParams mesh_params;
-		// The shader uses a sampler3D so coordinates are normalized
+		// 着色器使用 sampler3D，因此坐标是归一化的
 		mesh_params.model_to_buffer_scale = Vector3f(1.f) / (max_pos - min_pos);
 		mesh_params.model_to_buffer_translation = min_pos;
 		mesh_params.isolevel = _isolevel;

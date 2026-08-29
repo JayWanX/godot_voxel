@@ -7,7 +7,7 @@
 
 namespace voxel {
 
-// Axis-aligned 2D box using integer coordinates
+// 使用整数坐标的轴对齐二维包围盒
 class Box2i {
 public:
 	Vector2i position;
@@ -19,14 +19,14 @@ public:
 
 	Box2i(int ox, int oy, int sx, int sy) : position(ox, oy), size(sx, sy) {}
 
-	// Creates a box centered on a point, specifying half its size.
-	// Warning: if you consider the center being a 1x1x1 box which would be extended, instead of a mathematical point,
-	// you may want to add 1 to extents.
+	// 创建一个以某点为中心、由半尺寸指定大小的包围盒。
+	// 注意：如果你把中心看作一个会被扩展的 1x1x1 包围盒，而非数学意义上的点，
+	// 你可能需要把 extents 加 1。
 	static inline Box2i from_center_extents(Vector2i center, Vector2i extents) {
 		return Box2i(center - extents, 2 * extents);
 	}
 
-	// max is exclusive
+	// max 为开区间（不含）
 	static inline Box2i from_min_max(Vector2i p_min, Vector2i p_max) {
 		return Box2i(p_min, p_max - p_min);
 	}
@@ -83,7 +83,7 @@ public:
 		inline void operator()(const Vector2i pos) {}
 	};
 
-	// Iteration is done in YX order.
+	// 迭代按 YX 顺序进行。
 	template <typename A>
 	inline void for_each_cell_yx(A action) const {
 		const Vector2i max = position + size;
@@ -95,8 +95,8 @@ public:
 		}
 	}
 
-	// Returns true if all cells of the box comply with the given predicate on their position.
-	// Iteration is done in YX order.
+	// 若包围盒内所有格子相对其位置满足给定谓词，则返回 true。
+	// 迭代按 YX 顺序进行。
 	template <typename A>
 	inline bool all_cells_match(A predicate) const {
 		const Vector2i max = position + size;
@@ -111,10 +111,10 @@ public:
 		return true;
 	}
 
-	// Subtracts another box from the current box,
-	// then execute a function on a set of boxes representing the remaining area.
+	// 从当前包围盒中减去另一个包围盒，
+	// 然后对表示剩余区域的包围盒集合依次调用函数。
 	//
-	// For example, seen from 2D, a possible result would be:
+	// 例如，从二维视角看，可能的结果如下：
 	//
 	// o-----------o                 o-----o-----o
 	// | A         |                 | C1  | C2  |
@@ -168,8 +168,8 @@ public:
 		}
 	}
 
-	// Subtracts another box from the current box.
-	// If any, boxes composing the remaining volume are added to the given vector.
+	// 从当前包围盒中减去另一个包围盒。
+	// 如有剩余体积，构成该体积的包围盒会被加入给定的向量中。
 	inline void difference_to_vec(const Box2i &b, StdVector<Box2i> &output) const {
 		difference(b, [&output](const Box2i &sub_box) { output.push_back(sub_box); });
 	}
@@ -178,21 +178,21 @@ public:
 		return Box2i(position.x - m, position.y - m, size.x + 2 * m, size.y + 2 * m);
 	}
 
-	// Converts the rectangle into a coordinate system of higher step size,
-	// rounding outwards of the area covered by the original rectangle if divided coordinates have remainders.
+	// 将该矩形转换到步长更大的坐标系，
+	// 若除以步长后有余数，则向外取整原始矩形所覆盖的区域。
 	inline Box2i downscaled(int step_size) const {
 		Box2i o;
 		o.position = math::floordiv(position, step_size);
-		// TODO Is that ceildiv?
+		// TODO 那是 ceildiv（向上取整除法）吗？
 		Vector2i max_pos = math::floordiv(position + size - Vector2i(1, 1), step_size);
 		o.size = max_pos - o.position + Vector2i(1, 1);
 		return o;
 	}
 
-	// Converts the rectangle into a coordinate system of higher step size,
-	// rounding inwards of the area covered by the original rectangle if divided coordinates have remainders.
-	// This is such that the result is included in the original rectangle (assuming a common coordinate system).
-	// The result can be an empty rectangle.
+	// 将该矩形转换到步长更大的坐标系，
+	// 若除以步长后有余数，则向内取整原始矩形所覆盖的区域。
+	// 这样结果会包含在原始矩形内（假设使用同一坐标系）。
+	// 结果可能是一个空矩形。
 	inline Box2i downscaled_inner(int step_size) const {
 		return Box2i::from_min_max(math::ceildiv(position, step_size), math::floordiv(position + size, step_size));
 	}

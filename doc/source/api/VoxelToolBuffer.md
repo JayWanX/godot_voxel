@@ -1,13 +1,13 @@
 # VoxelToolBuffer
 
-Inherits: [VoxelTool](VoxelTool.md)
+继承自：[VoxelTool](VoxelTool.md)
 
-Implementation of the [VoxelTool](VoxelTool.md) API for [VoxelBuffer](VoxelBuffer.md).
+为 [VoxelBuffer](VoxelBuffer.md) 实现的 [VoxelTool](VoxelTool.md) API。
 
-## Description: 
+## 描述：
 
-There are no functions specific to [VoxelBuffer](VoxelBuffer.md). You may check generic ones in [VoxelTool](VoxelTool.md).
+没有特定于 [VoxelBuffer](VoxelBuffer.md) 的函数。你可以查看 [VoxelTool](VoxelTool.md) 中的通用函数。
 
-Note: contrary to other implementations, this one allows editing even if the area is partially out of bounds.
+注意：与其他实现相反，此实现即使区域部分超出边界也允许编辑。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

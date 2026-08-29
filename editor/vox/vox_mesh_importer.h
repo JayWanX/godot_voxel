@@ -6,7 +6,7 @@
 
 namespace voxel::magica {
 
-// Imports a vox file as a single mesh, where all contents of the vox scene is merged
+// 将 vox 文件导入为单个网格，其中 vox 场景的所有内容都被合并
 class VoxelVoxMeshImporter : public voxel::godot::Voxel_EditorImportPlugin {
 	GDCLASS(VoxelVoxMeshImporter, voxel::godot::Voxel_EditorImportPlugin)
 protected:

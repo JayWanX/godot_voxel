@@ -23,14 +23,14 @@ void get_curve_monotonic_sections(Curve &curve, StdVector<CurveMonotonicSection>
 	bool current_stationary = true;
 	bool current_increasing = false;
 
-	// Iterating up to `res` included, to include the final value (Godot's PR #76617 fixed an issue in Curve, which also
-	// made it apparent that our code didn't properly include the end of the curve)
+	// 迭代到包含 `res` 为止，以包含最后一个值（Godot 的 PR #76617 修复了 Curve 的一个问题，
+	// 同时也让我们注意到我们的代码没有正确包含曲线的末端）
 	for (int i = 1; i < res; ++i) {
-		// We do -1 because [res-1] is the last value in the baked array, therefore `x` must be 1
+		// 使用 -1 是因为 [res-1] 是烘焙数组中的最后一个值，因此 `x` 必须为 1
 		const float x = curve_domain.min + curve_domain_range * static_cast<float>(i) / (res - 1);
 		const float y = curve.sample_baked(x);
-		// Curve can sometimes appear flat but it still oscillates by very small amounts due to float imprecision
-		// which occurred during bake(). Attempting to workaround that by taking the error into account
+		// 曲线有时看起来是平的，但由于 bake() 期间产生的浮点精度误差，它仍会以极小的幅度振荡。
+		// 尝试通过将误差考虑在内来规避该问题
 		const bool increasing = y > prev_y + CURVE_RANGE_MARGIN;
 		const bool decreasing = y < prev_y - CURVE_RANGE_MARGIN;
 		const bool stationary = increasing == false && decreasing == false;
@@ -47,43 +47,42 @@ void get_curve_monotonic_sections(Curve &curve, StdVector<CurveMonotonicSection>
 			section.x_min = prev_x;
 			section.y_min = prev_y;
 			current_increasing = increasing;
-			// Note, `current_stationary` does not become true ever again, because we only care about varying sections.
-			// If a part of the curve becomes stationary, it will be included within the current section until it
-			// starts increasing or decreasing.
+			// 注意，`current_stationary` 不会再变为 true，因为我们只关心变化的区间。
+			// 如果曲线的某一部分变为静止，它会被包含在当前区间内，直到该部分开始递增或递减。
 		}
 
 		prev_x = x;
 		prev_y = y;
 	}
 
-	// Forcing max because the iteration doesn't go up to `res`
+	// 强制为最大值，因为迭代不会进行到 `res`
 	section.x_max = curve_domain.max;
 	section.y_max = prev_y;
 	sections.push_back(section);
 }
 
 Interval get_curve_range(Curve &curve, const StdVector<CurveMonotonicSection> &sections, Interval x) {
-	// This implementation is linear. It assumes curves usually don't have many points.
-	// If a curve has too many points, we may consider dynamically choosing a different algorithm.
+	// 这个实现是线性的。它假设曲线通常不会有太多点。
+	// 如果曲线有太多点，我们可以考虑动态选择不同的算法。
 	Interval y;
 	unsigned int i = 0;
 	const float x_min = sections[0].x_min;
 	if (x.min < x_min) {
-		// X range starts before the curve's minimum X
+		// X 范围起始于曲线最小 X 之前
 		y = Interval::from_single_value(curve.sample_baked(x_min));
 	} else {
-		// Find section from where the range starts
+		// 找到范围起始所在的区间
 		for (; i < sections.size(); ++i) {
 			const CurveMonotonicSection &section = sections[i];
 			if (x.min >= section.x_min) {
 				const float begin_y = curve.sample_baked(x.min);
 				if (x.max < section.x_max) {
-					// X range starts and ends in that section
+					// X 范围在该区间内起始并结束
 					return Interval::from_unordered_values(begin_y, curve.sample_baked(x.max))
 							.padded(CURVE_RANGE_MARGIN);
 				} else {
-					// X range starts in that section, and continues after it.
-					// Will need to keep iterating, starting from here
+					// X 范围在该区间内起始，并在它之后继续。
+					// 需要从这里开始继续迭代
 					y = Interval::from_unordered_values(begin_y, curve.sample_baked(section.x_max));
 					++i;
 					break;
@@ -94,10 +93,10 @@ Interval get_curve_range(Curve &curve, const StdVector<CurveMonotonicSection> &s
 	for (; i < sections.size(); ++i) {
 		const CurveMonotonicSection &section = sections[i];
 		if (x.max >= section.x_max) {
-			// X range covers this whole section and maybe more after it
+			// X 范围覆盖整个区间，也许还有之后的更多部分
 			y.add_interval(Interval::from_unordered_values(section.y_min, section.y_max));
 		} else {
-			// X range ends in that section
+			// X 范围在该区间内结束
 			y.add_interval(Interval::from_unordered_values(section.y_min, curve.sample_baked(x.max)));
 			break;
 		}
@@ -106,7 +105,7 @@ Interval get_curve_range(Curve &curve, const StdVector<CurveMonotonicSection> &s
 }
 
 Interval get_curve_range(Curve &curve, bool &is_monotonic_increasing) {
-	// TODO Would be nice to have the cache directly
+	// TODO 如果能有缓存直接使用就好了
 	const int res = curve.get_bake_resolution();
 	Interval range;
 	const Interval curve_domain = voxel::godot::get_curve_domain(curve);

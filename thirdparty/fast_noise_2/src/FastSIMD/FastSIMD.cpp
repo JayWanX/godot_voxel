@@ -19,12 +19,12 @@
 static_assert(FastSIMD::SIMDTypeList::MinimumCompiled & FastSIMD::COMPILED_SIMD_LEVELS, "FASTSIMD_FALLBACK_SIMD_LEVEL is not a compiled SIMD level, check FastSIMD_Config.h");
 
 #if FASTSIMD_x86
-// Define interface to cpuid instruction.
-// input:  eax = functionnumber, ecx = 0
+// 定义 cpuid 指令的接口。
+// 输入：eax = functionnumber，ecx = 0
 // output: eax = output[0], ebx = output[1], ecx = output[2], edx = output[3]
 static void cpuid( int output[4], int functionnumber )
 {
-#if defined( __GNUC__ ) || defined( __clang__ )              // use inline assembly, Gnu/AT&T syntax
+#if defined( __GNUC__ ) || defined( __clang__ )              // 使用内联汇编，Gnu/AT&T 语法
 
     int a, b, c, d;
     __asm("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(functionnumber), "c"(0) : );
@@ -33,11 +33,11 @@ static void cpuid( int output[4], int functionnumber )
     output[2] = c;
     output[3] = d;
 
-#elif defined( _MSC_VER ) || defined ( __INTEL_COMPILER )     // Microsoft or Intel compiler, intrin.h included
+#elif defined( _MSC_VER ) || defined ( __INTEL_COMPILER )     // Microsoft 或 Intel 编译器，已包含 intrin.h
 
-    __cpuidex( output, functionnumber, 0 ); // intrinsic function for CPUID
+    __cpuidex( output, functionnumber, 0 ); // CPUID 的内置函数
 
-#else                                                      // unknown platform. try inline assembly with masm/intel syntax
+#else                                                      // 未知平台。尝试使用 masm/intel 语法的内联汇编
 
     __asm
     {
@@ -54,14 +54,14 @@ static void cpuid( int output[4], int functionnumber )
 #endif
 }
 
-// Define interface to xgetbv instruction
+// 定义 xgetbv 指令的接口
 static int64_t xgetbv( int ctr )
 {
-#if (defined( _MSC_FULL_VER ) && _MSC_FULL_VER >= 160040000) || (defined( __INTEL_COMPILER ) && __INTEL_COMPILER >= 1200) // Microsoft or Intel compiler supporting _xgetbv intrinsic
+#if (defined( _MSC_FULL_VER ) && _MSC_FULL_VER >= 160040000) || (defined( __INTEL_COMPILER ) && __INTEL_COMPILER >= 1200) // 支持 _xgetbv 内置函数的 Microsoft 或 Intel 编译器
 
-    return _xgetbv( ctr ); // intrinsic function for XGETBV
+    return _xgetbv( ctr ); // XGETBV 的内置函数
 
-#elif defined( __GNUC__ )                                    // use inline assembly, Gnu/AT&T syntax
+#elif defined( __GNUC__ )                                    // 使用内联汇编，Gnu/AT&T 语法
 
     uint32_t a, d;
     __asm("xgetbv" : "=a"(a), "=d"(d) : "c"(ctr) : );
@@ -94,59 +94,59 @@ FASTSIMD_API FastSIMD::eLevel FastSIMD::CPUMaxSIMDLevel()
     }
 
 #if FASTSIMD_x86
-    int abcd[4] = { 0,0,0,0 }; // cpuid results
+    int abcd[4] = { 0,0,0,0 }; // cpuid 结果
 
 #if !FASTSIMD_64BIT
-    simdLevel = Level_Scalar; // default value
+    simdLevel = Level_Scalar; // 默认值
 
-    cpuid( abcd, 0 ); // call cpuid function 0
+    cpuid( abcd, 0 ); // 调用 cpuid 函数 0
     if ( abcd[0] == 0 )
-        return simdLevel; // no further cpuid function supported
+        return simdLevel; // 不支持更多 cpuid 函数
 
-    cpuid( abcd, 1 ); // call cpuid function 1 for feature flags
+    cpuid( abcd, 1 ); // 调用 cpuid 功能 1 以获取功能标志
     if ( (abcd[3] & (1 << 0)) == 0 )
-        return simdLevel; // no floating point
+        return simdLevel; // 不支持浮点
     if ( (abcd[3] & (1 << 23)) == 0 )
         return simdLevel; // no MMX
     if ( (abcd[3] & (1 << 15)) == 0 )
-        return simdLevel; // no conditional move
+        return simdLevel; // 不支持条件移动
     if ( (abcd[3] & (1 << 24)) == 0 )
         return simdLevel; // no FXSAVE
     if ( (abcd[3] & (1 << 25)) == 0 )
         return simdLevel; // no SSE
     simdLevel = Level_SSE;
-    // 1: SSE supported
+    // 1：支持 SSE
 
     if ( (abcd[3] & (1 << 26)) == 0 )
         return simdLevel; // no SSE2
 #else
-    cpuid( abcd, 1 ); // call cpuid function 1 for feature flags
+    cpuid( abcd, 1 ); // 调用 cpuid 功能 1 以获取功能标志
 #endif
 
-    simdLevel = Level_SSE2; // default value for 64bit
-    // 2: SSE2 supported
+    simdLevel = Level_SSE2; // 64 位的默认值
+    // 2：支持 SSE2
 
     if ( (abcd[2] & (1 << 0)) == 0 )
         return simdLevel; // no SSE3
     simdLevel = Level_SSE3;
-    // 3: SSE3 supported
+    // 3：支持 SSE3
 
     if ( (abcd[2] & (1 << 9)) == 0 )
         return simdLevel; // no SSSE3
     simdLevel = Level_SSSE3;
-    // 4: SSSE3 supported
+    // 4：支持 SSSE3
 
     if ( (abcd[2] & (1 << 19)) == 0 )
         return simdLevel; // no SSE4.1
     simdLevel = Level_SSE41;
-    // 5: SSE4.1 supported
+    // 5：支持 SSE4.1
 
     if ( (abcd[2] & (1 << 23)) == 0 )
         return simdLevel; // no POPCNT
     if ( (abcd[2] & (1 << 20)) == 0 )
         return simdLevel; // no SSE4.2
     simdLevel = Level_SSE42;
-    // 6: SSE4.2 supported
+    // 6：支持 SSE4.2
 
     if ( (abcd[2] & (1 << 26)) == 0 )
         return simdLevel; // no XSAVE
@@ -157,34 +157,34 @@ FASTSIMD_API FastSIMD::eLevel FastSIMD::CPUMaxSIMDLevel()
 
     uint64_t osbv = xgetbv( 0 );
     if ( (osbv & 6) != 6 )
-        return simdLevel; // AVX not enabled in O.S.
+        return simdLevel; // 操作系统中未启用 AVX
     simdLevel = Level_AVX;
-    // 7: AVX supported
+    // 7：支持 AVX
 
-    cpuid( abcd, 7 ); // call cpuid leaf 7 for feature flags
+    cpuid( abcd, 7 ); // 调用 cpuid 叶子 7 以获取功能标志
     if ( (abcd[1] & (1 << 5)) == 0 )
         return simdLevel; // no AVX2
     simdLevel = Level_AVX2;
-    // 8: AVX2 supported
+    // 8：支持 AVX2
 
     if( (osbv & (0xE0)) != 0xE0 )
-        return simdLevel; // AVX512 not enabled in O.S.
+        return simdLevel; // 操作系统中未启用 AVX512
     if ( (abcd[1] & (1 << 16)) == 0 )
         return simdLevel; // no AVX512
-    cpuid( abcd, 0xD ); // call cpuid leaf 0xD for feature flags
+    cpuid( abcd, 0xD ); // 调用 cpuid leaf 0xD 获取功能标志
     if ( (abcd[0] & 0x60) != 0x60 )
         return simdLevel; // no AVX512
-    // 9: AVX512 supported
+    // 9：支持 AVX512
 
-    cpuid( abcd, 7 ); // call cpuid leaf 7 for feature flags
+    cpuid( abcd, 7 ); // 调用 cpuid 叶子 7 以获取功能标志
     if ( (abcd[1] & (1 << 31)) == 0 )
         return simdLevel; // no AVX512VL
-    // 10: AVX512VL supported
+    // 10：支持 AVX512VL
 
     if ( (abcd[1] & 0x40020000) != 0x40020000 )
-        return simdLevel; // no AVX512BW, AVX512DQ
+        return simdLevel; // 不支持 AVX512BW、AVX512DQ
     simdLevel = Level_AVX512;
-    // 11: AVX512BW & AVX512DQ supported
+    // 11：支持 AVX512BW 和 AVX512DQ
 #endif
 
 #if FASTSIMD_ARM

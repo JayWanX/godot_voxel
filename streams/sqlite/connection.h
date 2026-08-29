@@ -11,7 +11,7 @@ struct sqlite3_stmt;
 
 namespace voxel::sqlite {
 
-// One connection to the database, with our prepared statements
+// 一个连接到数据库的连接，带有我们的预编译语句
 class Connection {
 public:
 	static constexpr int VERSION_V0 = 0;
@@ -48,11 +48,11 @@ public:
 		return _db != nullptr;
 	}
 
-	// Returns the file path from SQLite
+	// 从 SQLite 返回文件路径
 	const char *get_file_path() const;
 
-	// Return the file path that was used to open the connection.
-	// You may use this one if you want determinism, as SQLite seems to globalize its path.
+	// 返回用于打开该连接的文件路径。
+	// 如果你想要确定性，可以使用这个，因为 SQLite 似乎会全局化其路径。
 	const char *get_opened_file_path() const {
 		return _opened_path.c_str();
 	}
@@ -60,10 +60,10 @@ public:
 	bool begin_transaction();
 	bool end_transaction();
 
-	// Rolls back a transaction that may still be active on this connection, and clears leftover error state on the
-	// transaction statements. Use this to recover a connection after `begin_transaction` or `end_transaction`
-	// failed, so it can be reused. Returns false if the connection could not be recovered, in which case it must not
-	// be reused. Safe to call when no transaction is active.
+	// 回滚可能仍在此连接上活跃的事务，并清除
+	// 事务语句上的残留错误状态。在 `begin_transaction` 或 `end_transaction`
+	// 失败后，可用此方法恢复连接以便复用。若连接无法恢复则返回 false，此时不得
+	// 复用它。在没有活动事务时调用也是安全的。
 	bool rollback_transaction();
 
 	bool save_block(const BlockLocation loc, const Span<const uint8_t> block_data, const BlockType type);

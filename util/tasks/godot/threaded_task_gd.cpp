@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// Using a decoupled pattern so we can do a few more safety checks for scripters
+// 使用解耦模式，以便为脚本编写者多做些安全检查
 class Voxel_ThreadedTaskInternal : public IThreadedTask {
 public:
 	Ref<Voxel_ThreadedTask> ref;
@@ -20,7 +20,7 @@ public:
 	}
 
 	void apply_result() override {
-		// Not exposed. Scripters may prefer to use a `completed` signal instead.
+		// 未暴露。脚本编写者可能更倾向于使用 `completed` 信号。
 		ref->mark_completed();
 	}
 

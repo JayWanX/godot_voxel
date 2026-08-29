@@ -33,23 +33,21 @@ private:
 
 	Box3i _box;
 	VoxelGenerator::ShaderOutput::Type _type;
-	// Span of the shared output buffer pertaining to results in this particular box.
+	// 此数据块对应的共享输出缓冲区的 span。
 	Span<const uint8_t> _bytes;
-	// This is the buffer that was directly downloaded from GPU. It is shared among multiple consumers, and should
-	// remain in memory until they are all done with it, so we hold a reference in every result. It is read-only
-	// to avoid CoW. This is done to avoid allocating individual buffers to pass around.
+	// 这是直接从 GPU 下载的缓冲区。它在多个消费者之间共享，须在它们全部用完之前一直保留在内存中，
+	// 因此在每个结果中都持有它的引用。它是只读的以避免写时复制（CoW）。这样做是为了避免分配单独的缓冲区来传递。
 	PackedByteArray _shared_bytes;
 };
 
-// Interface used for tasks that can spawn `GenerateBlockGPUTask`. It is required to return their results.
+// 用于可派生 `GenerateBlockGPUTask` 的任务的接口。它必须返回其结果。
 class IGeneratingVoxelsThreadedTask : public IThreadedTask {
 public:
-	// Called when the GPU task is complete.
+	// GPU 任务完成时调用。
 	virtual void set_gpu_results(StdVector<GenerateBlockGPUTaskResult> &&results) = 0;
 };
 
-// Generates a block of voxels on the GPU. Must be scheduled from a threaded task, which will be resumed when this one
-// finishes.
+// 在 GPU 上生成一个体素块。必须从某个线程任务中调度，当本任务完成后该线程任务会被恢复。
 class GenerateBlockGPUTask : public IGPUTask {
 public:
 	~GenerateBlockGPUTask();
@@ -59,18 +57,18 @@ public:
 	void prepare(GPUTaskContext &ctx) override;
 	void collect(GPUTaskContext &ctx) override;
 
-	// TODO Not sure if it's worth dealing with sub-boxes. That's only in case of partially-edited meshing blocks...
-	// this case doesn't sound common enough.
+	// TODO 不确定是否有必要处理子数据块。只有在部分编辑过的网格生成数据块时才会用到……
+	// 这种情况似乎并不常见。
 
-	// Boxes relative to the VoxelBuffer (not world voxel coordinates). They must not interesect.
+	// 相对于 VoxelBuffer 的数据块（不是世界体素坐标）。它们不能相交。
 	StdVector<Box3i> boxes_to_generate;
-	// Position of the lower corner of the VoxelBuffer in world voxel coordinates
+	// VoxelBuffer 左下角在世界体素坐标中的位置
 	Vector3i origin_in_voxels;
 	uint8_t lod_index = 0;
-	// Task for which the voxel data is for.
+	// 该体素数据所服务的任务。
 	IGeneratingVoxelsThreadedTask *consumer_task = nullptr;
 
-	// Base generator
+	// 基础生成器
 	std::shared_ptr<ComputeShader> generator_shader;
 	std::shared_ptr<ComputeShaderParameters> generator_shader_params;
 	std::shared_ptr<VoxelGenerator::ShaderOutputs> generator_shader_outputs;

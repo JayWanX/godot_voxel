@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGraphFunction" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Graph for generating or processing series of 3D values.
+		用于生成或处理一系列 3D 值的图形。
 	</brief_description>
 	<description>
-		Contains a graph that can be used to process series of values, such as voxel positions (when used as main function of a generator), or to be re-used into other graphs (like a sub-graph).
-		Currently this class only stores a graph, it cannot run actual processing on its own. It is usually embedded into another resource which then makes use of the graph in a specific way. 
-		To generate voxels with it, see [VoxelGeneratorGraph].
-		Nodes can be connected together from their outputs to the inputs of next nodes. Unconnected inputs can have default values or default implicit connections.
-		Nodes can also have "parameters" which are constants setup per node.
-		Nodes come in 3 main families: inputs (only have outputs), outputs (only have inputs), and others (which have both inputs and output to do some calculation).
-		Node types are identified with the enum [enum VoxelGraphFunction.NodeTypeID]. This enum shouldn't be used in persistent contexts (such as save files) as its values may change between versions.
-		Graphs can only process 32-bit floating point values.
-		Description of node types is present in the graph editor node dialog, or at [url]https://voxel-tools.readthedocs.io/en/latest/graph_nodes[/url].
+		包含一个可用于处理一系列值的图形，例如体素位置（当用作生成器的主函数时），或用于在其它图形中复用（如子图形）。
+		目前此类只存储图形，无法自行运行实际处理。它通常被嵌入到另一个资源中，由该资源以特定方式使用此图形。
+		要使用它生成体素，请参见 [VoxelGeneratorGraph]。
+		节点可以从其输出连接到下一个节点的输入。未连接的输入可以具有默认值或默认的隐式连接。
+		节点还可以具有“参数”，即每个节点配置的常量。
+		节点分为 3 大类：输入（只有输出）、输出（只有输入）以及其他（既有输入也有输出，用于进行某些计算）。
+		节点类型使用枚举 [enum VoxelGraphFunction.NodeTypeID] 标识。此枚举不应在持久化场景（如存档文件）中使用，因为其值可能在版本之间发生变化。
+		图形只能处理 32 位浮点值。
+		节点类型的描述位于图形编辑器的节点对话框中，或参见 [url]https://voxel-tools.readthedocs.io/en/latest/graph_nodes[/url]。
 	</description>
 	<tutorials>
 	</tutorials>
@@ -24,7 +24,7 @@
 			<param index="2" name="dst_node_id" type="int" />
 			<param index="3" name="dst_port_index" type="int" />
 			<description>
-				Connects the outputs of a node to the input of another node. Connecting a node to itself, or in a way that can lead it back to itself, is not supported.
+				将一个节点的输出连接到另一个节点的输入。不支持将节点连接到自身，或以某种方式使其回到自身。
 			</description>
 		</method>
 		<method name="can_connect" qualifiers="const">
@@ -34,13 +34,13 @@
 			<param index="2" name="dst_node_id" type="int" />
 			<param index="3" name="dst_port_index" type="int" />
 			<description>
-				Tests if two ports can be connected together.
+				测试两个端口是否能够连接在一起。
 			</description>
 		</method>
 		<method name="clear">
 			<return type="void" />
 			<description>
-				Removes all nodes from the graph. Input and output definitions will not be cleared.
+				从图形中移除所有节点。输入和输出定义不会被清除。
 			</description>
 		</method>
 		<method name="create_function_node">
@@ -49,7 +49,7 @@
 			<param index="1" name="position" type="Vector2" />
 			<param index="2" name="id" type="int" default="0" />
 			<description>
-				Creates a node based on an existing graph (creates a "sub-graph instance").
+				基于现有图形创建节点（创建"子图形实例"）。
 			</description>
 		</method>
 		<method name="create_node">
@@ -58,24 +58,24 @@
 			<param index="1" name="position" type="Vector2" />
 			<param index="2" name="id" type="int" default="0" />
 			<description>
-				Creates a graph node of a given type at a specific visual position.
-				The [code]position[/code] parameter does not affect how the graph will perform, however it helps organizing nodes.
-				An optional ID can be specified. If left to 0, the ID will be generated.
-				This function then returns the ID of the node, which may be useful to modify other properties of the node later.
+				在特定的可视位置创建给定类型的图形节点。
+				[code]position[/code] 参数不会影响图形的运行方式，但它有助于整理节点。
+				可以指定一个可选的 ID。如果保持为 0，则将自动生成 ID。
+				然后此函数返回节点的 ID，这可能有助于稍后修改节点的其它属性。
 			</description>
 		</method>
 		<method name="find_node_by_name" qualifiers="const">
 			<return type="int" />
 			<param index="0" name="name" type="StringName" />
 			<description>
-				Finds a node with the specified name and returns its ID. If the node is not found, returns 0.
+				查找具有指定名称的节点并返回其 ID。如果未找到节点，则返回 0。
 			</description>
 		</method>
 		<method name="get_connections" qualifiers="const">
 			<return type="Array" />
 			<description>
-				Gets an array describing all connections between nodes.
-				The array has the following format:
+				获取描述节点之间所有连接的数组。
+			该数组具有以下格式：
 				[codeblock]
 				[
 					{
@@ -106,21 +106,21 @@
 			<return type="Vector2" />
 			<param index="0" name="node_id" type="int" />
 			<description>
-				Get the position of the node in the graph editor.
+				获取节点在图形编辑器中的位置。
 			</description>
 		</method>
 		<method name="get_node_gui_size" qualifiers="const">
 			<return type="Vector2" />
 			<param index="0" name="node_id" type="int" />
 			<description>
-				Get the size of the node in the graph editor.
+				获取节点在图形编辑器中的大小。
 			</description>
 		</method>
 		<method name="get_node_ids" qualifiers="const">
 			<return type="PackedInt32Array" />
 			<description>
-				Get a list of IDs of all the nodes in the graph.
-				Note: the order in which IDs are returned is not guaranteed to be the same after nodes are added or removed.
+				获取图形中所有节点的 ID 列表。
+			注意：添加或移除节点后，ID 的返回顺序不保证保持不变。
 			</description>
 		</method>
 		<method name="get_node_input_index" qualifiers="const">
@@ -128,14 +128,14 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="input_name" type="String" />
 			<description>
-				Gets the input index of a node from the input's name.
+				根据输入的名称获取节点的输入索引。
 			</description>
 		</method>
 		<method name="get_node_name" qualifiers="const">
 			<return type="StringName" />
 			<param index="0" name="node_id" type="int" />
 			<description>
-				Gets the user-defined name of the node.
+				获取节点的用户自定义名称。
 			</description>
 		</method>
 		<method name="get_node_output_index" qualifiers="const">
@@ -143,7 +143,7 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="output_name" type="String" />
 			<description>
-				Gets the output index of a node from the output's name.
+				根据输出的名称获取节点的输出索引。
 			</description>
 		</method>
 		<method name="get_node_param" qualifiers="const">
@@ -151,50 +151,50 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="param_index" type="int" />
 			<description>
-				Get a parameter of a node. The parameter index corresponds to the position that parameter comes in when seen in the editor.
+				获取节点的参数。参数索引对应于该参数在编辑器中出现的位置。
 			</description>
 		</method>
 		<method name="get_node_type_count" qualifiers="const">
 			<return type="int" />
 			<description>
-				Get how many types of nodes exist in the graph system.
+				获取图形系统中存在多少种节点类型。
 			</description>
 		</method>
 		<method name="get_node_type_id" qualifiers="const">
 			<return type="int" enum="VoxelGraphFunction.NodeTypeID" />
 			<param index="0" name="node_id" type="int" />
 			<description>
-				Get the ID of the type of a node in the graph.
+				获取图形中节点类型的 ID。
 			</description>
 		</method>
 		<method name="get_node_type_info" qualifiers="const">
 			<return type="Dictionary" />
 			<param index="0" name="type_id" type="int" />
 			<description>
-				Gets information about a node type from [enum VoxelGraphFunction.NodeTypeID].
-				The returned data has this structure:
-				[codeblock]
-				{
-					"name": String,
-					"inputs": [
-						{"name": String},
-						...
-					],
-					"outputs": [
-						{"name": String},
-						...
-					],
-					"params": [
-						{
-							"name": String,
-							"type": int (Variant::Type),
-							"class_name": String,
-							"default_value": Variant
-						},
-						...
-					]
-				}
-				[/codeblock]
+				从 [enum VoxelGraphFunction.NodeTypeID] 获取关于节点类型的信息。
+			返回的数据具有以下结构：
+			[codeblock]
+			{
+				"name": String,
+				"inputs": [
+					{"name": String},
+					...
+				],
+				"outputs": [
+					{"name": String},
+					...
+				],
+				"params": [
+					{
+						"name": String,
+						"type": int (Variant::Type),
+						"class_name": String,
+						"default_value": Variant
+					},
+					...
+				]
+			}
+			[/codeblock]
 			</description>
 		</method>
 		<method name="paste_graph_with_pre_generated_ids">
@@ -203,9 +203,9 @@
 			<param index="1" name="node_ids" type="PackedInt32Array" />
 			<param index="2" name="gui_offset" type="Vector2" />
 			<description>
-				Copies nodes into another graph, and connections between them only.
-				Resources in node parameters will be duplicated if they don't have a file path.
-				If [code]node_ids[/code] is provided with non-zero size, defines the IDs copied nodes will have in the destination graph, in the same order as [method get_node_ids] from the source graph. The array must have the same size as the number of copied nodes and IDs must not already exist in the destination graph. If the array is empty, they will be generated instead.
+				将节点以及它们之间的连接复制到另一个图形中。
+			如果节点参数中的资源没有文件路径，它们将被复制。
+			如果提供了非零大小的 [code]node_ids[/code]，则定义复制的节点在目标图形中将具有的 ID，顺序与源图形的 [method get_node_ids] 相同。数组的大小必须与复制的节点数量相同，且 ID 不得已在目标图形中存在。如果数组为空，则将自动生成 ID。
 			</description>
 		</method>
 		<method name="remove_connection">
@@ -215,14 +215,14 @@
 			<param index="2" name="dst_node_id" type="int" />
 			<param index="3" name="dst_port_index" type="int" />
 			<description>
-				Removes an existing connection between two nodes of the graph.
+				移除图形中两个节点之间的现有连接。
 			</description>
 		</method>
 		<method name="remove_node">
 			<return type="void" />
 			<param index="0" name="node_id" type="int" />
 			<description>
-				Removes a node from the graph.
+				从图形中移除一个节点。
 			</description>
 		</method>
 		<method name="set_expression_node_inputs">
@@ -230,8 +230,8 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="names" type="PackedStringArray" />
 			<description>
-				Configures inputs for an Expression node. [code]names[/code] is the list of input names used in the expression.
-				If you create an Expression node from code, you should call this method afterwards.
+				为表达式节点配置输入。[code]names[/code] 是表达式中使用的输入名称列表。
+			如果你通过代码创建表达式节点，之后应调用此方法。
 			</description>
 		</method>
 		<method name="set_node_default_input">
@@ -240,7 +240,7 @@
 			<param index="1" name="input_index" type="int" />
 			<param index="2" name="value" type="Variant" />
 			<description>
-				Sets the value an input of a node will have when it is left unconnected.
+				设置节点输入在保持未连接时将具有的值。
 			</description>
 		</method>
 		<method name="set_node_default_input_by_name">
@@ -249,7 +249,7 @@
 			<param index="1" name="input_name" type="String" />
 			<param index="2" name="value" type="Variant" />
 			<description>
-				Sets the value an input of a node will have when it is left unconnected. The input is specified by its name as seen in the editor.
+				设置节点输入在保持未连接时将具有的值。输入通过其在编辑器中显示的名称来指定。
 			</description>
 		</method>
 		<method name="set_node_default_inputs_autoconnect">
@@ -257,8 +257,8 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="enabled" type="bool" />
 			<description>
-				Sets wether a node input with no inbound connection will automatically create a default connection when the graph is compiled.
-				This is only available on specific nodes (for example, 2D or 3D noise defaults to XYZ inputs). On other nodes, it has no effect.
+				设置没有入站连接的节点输入在图形编译时是否会自动创建默认连接。
+			这仅适用于特定节点（例如，2D 或 3D 噪声默认使用 XYZ 输入）。在其他节点上，它没有效果。
 			</description>
 		</method>
 		<method name="set_node_gui_position">
@@ -266,7 +266,7 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="position" type="Vector2" />
 			<description>
-				Sets the visual position of a node of the graph, as it will appear in the editor.
+				设置图形节点的可视位置，即它在编辑器中显示的位置。
 			</description>
 		</method>
 		<method name="set_node_gui_size">
@@ -274,7 +274,7 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="size" type="Vector2" />
 			<description>
-				Sets the visual size of a node of the graph, as it will appear in the editor.
+				设置图形节点的可视大小，即它在编辑器中显示的大小。
 			</description>
 		</method>
 		<method name="set_node_name">
@@ -282,7 +282,7 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="name" type="StringName" />
 			<description>
-				Sets a custom name for a node.
+				为节点设置自定义名称。
 			</description>
 		</method>
 		<method name="set_node_param">
@@ -291,7 +291,7 @@
 			<param index="1" name="param_index" type="int" />
 			<param index="2" name="value" type="Variant" />
 			<description>
-				Set a parameter of a node. The parameter index corresponds to the position that parameter comes in when seen in the editor.
+				设置节点的参数。参数索引对应于该参数在编辑器中显示的位置。
 			</description>
 		</method>
 		<method name="set_node_param_by_name">
@@ -300,7 +300,7 @@
 			<param index="1" name="param_name" type="String" />
 			<param index="2" name="value" type="Variant" />
 			<description>
-				Set a parameter of a node, using its name as it appears in the editor.
+				使用节点参数在编辑器中显示的名称来设置其参数。
 			</description>
 		</method>
 		<method name="set_node_param_null">
@@ -308,7 +308,7 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="param_index" type="int" />
 			<description>
-				Set a parameter of a node to null. This method only exists to workaround an issue with Godot's UndoRedo system. Prefer using [method set_node_param].
+				将节点的参数设置为 null。此方法仅用于规避 Godot 的 UndoRedo 系统的一个问题。建议使用 [method set_node_param]。
 			</description>
 		</method>
 	</methods>
@@ -321,7 +321,7 @@
 	<signals>
 		<signal name="compiled">
 			<description>
-				Emitted after the graph finished compiling, even if compiling failed.
+				图形编译完成后发出，即使编译失败也会发出。
 			</description>
 		</signal>
 		<signal name="node_name_changed">

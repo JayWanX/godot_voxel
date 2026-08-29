@@ -22,8 +22,8 @@
 
 namespace voxel {
 
-// Making types can get quite complicated, config files sound like a better solution compared to messing around in the
-// inspector, see how Minecraft defines their models: https://minecraft.wiki/w/Tutorials/Models
+// 制作类型可能会变得相当复杂，比起在检查器中折腾，配置文件听起来是更好的方案，
+// 看看 Minecraft 如何定义它们的模型：https://minecraft.wiki/w/Tutorials/Models
 
 VoxelBlockyType::VoxelBlockyType() {
 	_name = VoxelStringNames::get_singleton().unnamed;
@@ -32,7 +32,7 @@ VoxelBlockyType::VoxelBlockyType() {
 void VoxelBlockyType::set_unique_name(StringName p_name) {
 	if (p_name != _name) {
 		_name = p_name;
-		// Also set resource name, so Godot will use it in array inspector
+		// 同时设置资源名称，这样 Godot 会在数组检查器中使用它
 		set_name(p_name);
 		emit_changed();
 	}
@@ -159,12 +159,12 @@ void VoxelBlockyType::get_checked_attributes(StdVector<Ref<VoxelBlockyAttribute>
 				++i;
 				break;
 			} else {
-				// TODO This happens when an attribute contains an underscore in its name (which is legit!).
-				// This demonstrates we can't keep hacking property names for this... it becomes REALLY annoying to
-				// parse this. It's also really annoying for the user to recognize the names.
-				// We should make a custom editor for this, but by doing that, we would loose sub-inspectors...
-				// so the only way to keep a good Godot integration is to make an entirely dedicated editor for types,
-				// so THE (glorious singleton) Godot inspector can be visible at the same time to edit sub-resources...
+				// TODO 当属性名中包含下划线时会出现这种情况（下划线是合法的！）。
+				// 这说明我们不能再继续通过修改属性名来规避此问题... 解析这样的名称会变得非常烦人，
+				// 用户也很难识别这些名称。
+				// 我们应该为这种情况制作一个自定义编辑器，但这样做会丢失子检查器...
+				// 因此，要维持良好的 Godot 集成，唯一的方法是制作一个完全专用于类型的编辑器，
+				// 这样（光荣的）单例 Godot 检查器才能同时可见，用于编辑子资源...
 				VOXEL_PRINT_ERROR(format(
 						"Unexpected character at position {} when parsing variant property '{}'", i, property_name));
 				return false;
@@ -195,7 +195,7 @@ void VoxelBlockyType::set_variant(const VariantKey &key, Ref<VoxelBlockyModel> m
 
 	for (VariantData &vd : _variants) {
 		if (vd.key == key && vd.model != model) {
-			// TODO If the model is null, remove it from the list
+			// TODO 如果模型为 null，则将其从列表中移除
 			const bool changed = (vd.model != model);
 			vd.model = model;
 			if (changed) {
@@ -259,8 +259,8 @@ Ref<VoxelBlockyModel> VoxelBlockyType::get_variant(const VariantKey &key) const 
 	StdVector<VariantKey> keys;
 	generate_keys(attributes, keys, !_automatic_rotations);
 
-	// Only show variants if there are more than one. If there is only one, it's just the base model (or there is only
-	// one attribute and it's a rotation and automatic rotations are enabled).
+	// 只有存在多个变体时才显示变体。如果只有一个，那就只是基础模型（或者只有一个
+	// 属性，并且它是旋转且启用了自动旋转）。
 	if (keys.size() > 1) {
 		for (const VariantKey &key : keys) {
 			String property_name = "variants/";
@@ -280,10 +280,10 @@ Ref<VoxelBlockyModel> VoxelBlockyType::get_variant(const VariantKey &key) const 
 
 namespace {
 
-// Get automatic rotation transform to apply to a model when baking.
-// It is based on the assumption the base model is pre-rotated according to the default value of the rotation attribute
-// (which could be identity, most of the time). So we essentially need to obtain the transformation that goes from the
-// default rotation to others.
+// 获取在烘焙时应用到模型上的自动旋转变换。
+// 它基于这样的假设：基础模型已按照旋转属性的默认值预先旋转
+//（大多数时候可能是单位变换）。因此我们本质上需要获得从
+// 默认旋转到其他旋转的变换。
 math::OrthoBasis get_baking_rotation_ortho_basis(
 		Ref<VoxelBlockyAttribute> rotation_attribute,
 		unsigned int rotation_attribute_value
@@ -330,14 +330,13 @@ void VoxelBlockyType::bake(
 ) const {
 	VOXEL_PROFILE_SCOPE();
 
-	// Don't print warnings when used for previewing. It's ok to have momentarily invalid setups when the user is
-	// editing properties.
+	// 用于预览时不打印警告。用户在编辑属性时出现暂时无效的配置是可以接受的。
 	const bool print_warnings = (specific_key == nullptr);
 
 	StdVector<Ref<VoxelBlockyAttribute>> attributes;
 	gather_and_sort_attributes(_attributes, attributes);
 
-	// Find rotation attribute, if any
+	// 查找旋转属性（如果有）
 	Ref<VoxelBlockyAttribute> rotation_attribute;
 	unsigned int rotation_attribute_index = 0;
 	for (const Ref<VoxelBlockyAttribute> &attrib : attributes) {
@@ -350,7 +349,7 @@ void VoxelBlockyType::bake(
 
 	StdVector<VariantKey> keys;
 	if (specific_key != nullptr) {
-		// For previewing a single model
+		// 用于预览单个模型
 		keys.push_back(*specific_key);
 	} else {
 		generate_keys(attributes, keys, true);
@@ -366,35 +365,35 @@ void VoxelBlockyType::bake(
 
 		Ref<VoxelBlockyModel> model = get_variant(key);
 
-		// Note, model indices are not known at this stage. They will be known later when we update the ID map.
+		// 注意，模型索引在此阶段尚不可知。稍后当我们更新 ID 映射时才会知道。
 
 		blocky::ModelBakingContext model_baking_context{
 			baked_model, bake_tangents, material_indexer, indexed_fluids, baked_fluids
 		};
 
 		if (model.is_valid()) {
-			// Variant specified explicitely, just use it
+			// 显式指定的变体，直接使用它
 			model->bake(model_baking_context);
 
 		} else if (_automatic_rotations && rotation_attribute.is_valid()) {
-			// Not specified, but the type has a rotation attribute.
-			// Assume rotation. Rotate from default.
+			// 未指定，但类型具有旋转属性。
+			// 假定是旋转。从默认值旋转。
 
 			VOXEL_ASSERT_CONTINUE_MSG(
 					key.attribute_names[rotation_attribute_index] == rotation_attribute->get_attribute_name(), "Bug?"
 			);
 
-			// Pick reference model:
-			// The model with default rotation must have been assigned.
+			// 选择参考模型：
+			// 必须已分配具有默认旋转的模型。
 			VariantKey ref_key = key;
 			ref_key.attribute_values[rotation_attribute_index] = rotation_attribute->get_default_value();
 			Ref<VoxelBlockyModel> ref_model = get_variant(ref_key);
 			if (ref_model.is_null()) {
-				// If not, use base model...
+				// 如果没有，则使用基础模型……
 				if (_base_model.is_null()) {
 					if (print_warnings) {
-						// If base model is null... variant will be empty. Should be a configuration warning. If empty
-						// is really desired, VoxelBlockyModelEmpty should be used.
+						// 如果基础模型为 null……变体将为空。这应作为配置警告。如果确实
+						// 希望为空，应使用 VoxelBlockyModelEmpty。
 						WARN_PRINT(String("No model found for rotation variant ({0}) when baking {1} with name {2}. "
 										  "The model "
 										  "will be empty.")
@@ -405,7 +404,7 @@ void VoxelBlockyType::bake(
 				ref_model = _base_model;
 			}
 
-			// Apply rotation
+			// 应用旋转
 			const math::OrthoBasis trans_basis =
 					get_baking_rotation_ortho_basis(rotation_attribute, key.attribute_values[rotation_attribute_index]);
 			Ref<VoxelBlockyModel> temp_model = ref_model->duplicate();
@@ -413,7 +412,7 @@ void VoxelBlockyType::bake(
 			temp_model->bake(model_baking_context);
 
 		} else {
-			// No variant specified, use base model.
+			// 未指定变体，使用基础模型。
 			if (_base_model.is_valid()) {
 				_base_model->bake(model_baking_context);
 			} else if (print_warnings) {
@@ -511,7 +510,7 @@ Ref<Mesh> VoxelBlockyType::get_preview_mesh(const VariantKey &key) const {
 	blocky::MaterialIndexer material_indexer{ materials };
 	StdVector<VariantKey> keys;
 
-	// Assuming tangents are needed, which might not always be the case, but we won't waste much for just a preview
+	// 假定需要切线，虽然并不总是如此，但仅为一个预览不会浪费太多
 	const bool require_tangents = true;
 	StdVector<Ref<VoxelBlockyFluid>> indexed_fluids;
 	StdVector<blocky::BakedFluid> baked_fluids;
@@ -553,7 +552,7 @@ void VoxelBlockyType::gather_and_sort_attributes(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Gather non-null attributes
+	// 收集非空属性
 	for (const Ref<VoxelBlockyAttribute> &attrib : attributes_with_maybe_nulls) {
 		if (attrib.is_valid()) {
 			out_attributes.push_back(attrib);
@@ -568,9 +567,9 @@ void VoxelBlockyType::gather_and_sort_attributes(
 			}
 	);
 
-	// Sort attributes by name for determinism
-	// TODO Should we just consider attribute slots rather than an unordered variable-length list of attributes? Or
-	// require that the order of attributes matters? Adding a new attribute can mess up existing keys
+	// 按名称对属性排序以保证确定性
+	// TODO 我们是否应该只考虑属性槽位，而不是无序的可变长度属性列表？或者
+	// 要求属性的顺序有意义？新增属性可能会打乱现有的键
 	VoxelBlockyAttribute::sort_by_name(to_span(out_attributes));
 }
 
@@ -585,8 +584,8 @@ void VoxelBlockyType::generate_keys(
 		VOXEL_ASSERT_RETURN(attributes[i].is_valid());
 	}
 
-	// When `include_rotations` is false, rotation attributes may be considered having a single value, their
-	// default value. So we cache used values for each attribute.
+	// 当 `include_rotations` 为 false 时，旋转属性可被视为只有单个值，即它们的
+	// 默认值。因此我们为每个属性缓存使用的值。
 	FixedArray<Span<const uint8_t>, MAX_ATTRIBUTES> attributes_used_values;
 	FixedArray<uint8_t, MAX_ATTRIBUTES> attributes_default_values;
 	for (unsigned int i = 0; i < attributes.size(); ++i) {
@@ -599,25 +598,25 @@ void VoxelBlockyType::generate_keys(
 		}
 	}
 
-	// Get variant count
+	// 获取变体数量
 	unsigned int variant_count = 1;
 	for (unsigned int i = 0; i < attributes.size(); ++i) {
 		variant_count *= attributes_used_values[i].size();
 	}
 
-	// TODO Return combination count so we can check if it matches returned key count, and we can show feedback in the
-	// inspector using a dummy property as indicator.
+	// TODO 返回组合数量，以便我们检查它是否与返回的键数量匹配，
+	// 并能在检查器中通过一个占位属性显示反馈。
 	VOXEL_ASSERT_RETURN_MSG(variant_count < MAX_EDITING_VARIANTS, "Too many combinations");
 
 	StdVector<VariantKey> &keys = out_keys;
 	keys.resize(variant_count);
 
-	// Generate combinations
+	// 生成组合
 
 	FixedArray<unsigned int, VoxelBlockyType::MAX_ATTRIBUTES> key_uv;
 	fill(key_uv, 0u);
 
-	// Initialize first key
+	// 初始化第一个键
 	VoxelBlockyType::VariantKey key;
 	for (unsigned int i = 0; i < attributes.size(); ++i) {
 		const Ref<VoxelBlockyAttribute> &attrib = attributes[i];
@@ -628,7 +627,7 @@ void VoxelBlockyType::generate_keys(
 	for (unsigned int i = 0; i < keys.size(); ++i) {
 		keys[i] = key;
 
-		// Increment key
+		// 递增键
 		for (unsigned int j = 0; j < attributes.size(); ++j) {
 			++key_uv[j];
 
@@ -652,10 +651,10 @@ void VoxelBlockyType::generate_keys(StdVector<VariantKey> &out_keys, bool includ
 }
 
 void VoxelBlockyType::_on_attribute_changed() {
-	// We used to do this when attributes influenced the list of properties, not anymore
+	// 我们过去在属性影响属性列表时会这样做，现在不再需要了
 	// notify_property_list_changed();
 
-	// We do this solely as a mean to update custom controls...
+	// 我们这样做仅仅是为了更新自定义控件……
 	emit_changed();
 }
 
@@ -672,14 +671,14 @@ void VoxelBlockyType::_b_set_attributes(TypedArray<VoxelBlockyAttribute> attribu
 		return;
 	}
 
-	// Check differences. Note, we only check changes that could happen in the editor, so only attribute types and how
-	// many there are.
+	// 检查差异。注意，我们只检查编辑器中可能发生的变化，
+	// 因此只关注属性的类型和数量。
 	bool has_changes = false;
 	unsigned int found_attributes = 0;
 	for (int i = 0; i < attributes.size(); ++i) {
 		Ref<VoxelBlockyAttribute> attrib = attributes[i];
 		if (attrib.is_null()) {
-			// Null is allowed for the editor to work
+			// 允许为 null，以便编辑器正常工作
 			continue;
 		}
 		unsigned int existing_index;
@@ -687,7 +686,7 @@ void VoxelBlockyType::_b_set_attributes(TypedArray<VoxelBlockyAttribute> attribu
 			++found_attributes;
 			continue;
 		}
-		// New attribute
+		// 新属性
 		has_changes = true;
 	}
 	if (!has_changes && get_non_null_count(_attributes) != found_attributes) {
@@ -761,7 +760,7 @@ void VoxelBlockyType::_b_set_variant_models_data(Array data) {
 
 Array VoxelBlockyType::_b_get_variant_models_data() const {
 	VOXEL_PROFILE_SCOPE();
-	// Instead of just saving the constants of `_variants`, we only gather valid ones, and cleanup the others.
+	// 我们不是直接保存 `_variants` 的内容，而是只收集有效的变体，并清理其余的。
 
 	StdVector<Ref<VoxelBlockyAttribute>> attributes;
 	gather_and_sort_attributes(_attributes, attributes);
@@ -821,7 +820,7 @@ void VoxelBlockyType::_bind_methods() {
 			"get_attributes"
 	);
 
-	// This property is only for saving, not for direct use by scripts or inspector.
+	// 此属性仅用于保存，不供脚本或检查器直接使用。
 	ADD_PROPERTY(
 			PropertyInfo(
 					Variant::ARRAY,
@@ -829,7 +828,7 @@ void VoxelBlockyType::_bind_methods() {
 					PROPERTY_HINT_NONE,
 					"",
 					PROPERTY_USAGE_STORAGE
-							// But editor is required so we can insert a custom editor instead of the property
+							// 但需要编辑模式，这样我们可以插入自定义编辑器来代替该属性
 							| PROPERTY_USAGE_EDITOR
 			),
 			"_set_variant_models_data",

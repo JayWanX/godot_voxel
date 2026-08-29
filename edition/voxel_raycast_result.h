@@ -6,7 +6,7 @@
 
 namespace voxel {
 
-// This class exists only to make the script API nicer.
+// 这个类仅用于让脚本 API 更友好。
 class VoxelRaycastResult : public RefCounted {
 	GDCLASS(VoxelRaycastResult, RefCounted)
 public:

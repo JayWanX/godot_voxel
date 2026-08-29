@@ -3,10 +3,10 @@
 	<brief_description>
 	</brief_description>
 	<description>
-		Utility class allowing to reproduce simple move-and-slide logic using only voxel AABBs, similar to Minecraft physics. This class may only be used with blocky voxels.
-		Store an instance of it within a member variable of your script, and use it within [method Node._process] or [method Node._physics_process] (it works wherever you like).
+		工具类，允许仅使用体素 AABB 重现简单的移动-滑动逻辑，类似于 Minecraft 物理。此类只能用于方块风体素。
+		将其实例存储在脚本的成员变量中，并在 [method Node._process] 或 [method Node._physics_process] 中使用它（它可以在任何你喜欢的地方工作）。
 		[codeblock]
-		var motion = Vector3(0, 0, -10 * delta) # Move forward
+		var motion = Vector3(0, 0, -10 * delta) # 向前移动
 		motion = _box_mover.get_motion(get_translation(), motion, aabb, terrain_node)
 		global_translate(motion)
 		[/codeblock]
@@ -17,8 +17,8 @@
 		<method name="get_collision_mask" qualifiers="const">
 			<return type="int" />
 			<description>
-				Gets the collision mask used to detect collidable voxels.
-				This collision mask is specific to this collision system, and is defined in [member VoxelBlockyModel.collision_mask].
+				获取用于检测可碰撞体素的碰撞掩码。
+				此碰撞掩码特定于此碰撞系统，在 [member VoxelBlockyModel.collision_mask] 中定义。
 			</description>
 		</method>
 		<method name="get_max_step_height" qualifiers="const">
@@ -33,14 +33,14 @@
 			<param index="2" name="aabb" type="AABB" />
 			<param index="3" name="terrain" type="Node" />
 			<description>
-				Given a motion vector, returns a modified vector telling you by how much to move your character. This is similar to [method KinematicBody.move_and_slide], except you have to apply the movement.
+				给定运动向量，返回一个修改后的向量，告诉你应该移动角色多少。这类似于 [method KinematicBody.move_and_slide]，不同之处在于你需要自己应用该移动。
 			</description>
 		</method>
 		<method name="has_stepped_up" qualifiers="const">
 			<return type="bool" />
 			<description>
-				When step climbing is enabled, tells when the last call to [method get_motion] caused climbing to occur.
-				Climbing modifies the motion vector upwards so that the body is snapped on top of the step. This can have implications in character controller code, such as considering the character to be on the floor instead of having jumped.
+				启用台阶攀爬时，告知最后一次调用 [method get_motion] 是否发生了攀爬。
+				攀爬会将运动向量向上修改，使角色吸附在台阶顶部。这可能会对角色控制器代码产生影响，例如将角色视为站在地面上而不是发生了跳跃。
 			</description>
 		</method>
 		<method name="intersects" qualifiers="const">
@@ -48,37 +48,37 @@
 			<param index="0" name="aabb" type="AABB" />
 			<param index="1" name="terrain" type="Object" />
 			<description>
-				Tests if an axis-aligned box intersects with any voxel collision box.
-				Note: due to floating point precision, you might get false positives when testing against boxes that are touching voxels bounds. If this is undesired, you might want to shrink your AABB slightly.
+				测试轴对齐盒是否与任何体素碰撞盒相交。
+				注意：由于浮点精度，当测试的盒与体素边界接触时，你可能会得到误报。如果不希望这样，你可能需要略微缩小 AABB。
 			</description>
 		</method>
 		<method name="is_step_climbing_enabled" qualifiers="const">
 			<return type="bool" />
 			<description>
-				Tells if step climbing is enabled.
+				告知是否启用了台阶攀爬。
 			</description>
 		</method>
 		<method name="set_collision_mask">
 			<return type="void" />
 			<param index="0" name="mask" type="int" />
 			<description>
-				Sets the collision mask used to detect collidable voxels.
-				Only voxels sharing at least one bit between the masks will be detected.
-				This collision mask is specific to this collision system, and is defined in [member VoxelBlockyModel.collision_mask].
+				设置用于检测可碰撞体素的碰撞掩码。
+				只有两个掩码之间至少共享一个位的体素才会被检测到。
+				此碰撞掩码特定于此碰撞系统，在 [member VoxelBlockyModel.collision_mask] 中定义。
 			</description>
 		</method>
 		<method name="set_max_step_height">
 			<return type="void" />
 			<param index="0" name="height" type="float" />
 			<description>
-				Sets the maximum height that can be climbed like "stairs".
+				设置可像"楼梯"一样攀爬的最大高度。
 			</description>
 		</method>
 		<method name="set_step_climbing_enabled">
 			<return type="void" />
 			<param index="0" name="enabled" type="bool" />
 			<description>
-				When enabled, [method get_motion] will attempt to climb up small steps. This allows to implement Minecraft-like stairs.
+				启用后，[method get_motion] 将尝试攀爬较小的台阶。这允许实现类似 Minecraft 的楼梯。
 			</description>
 		</method>
 	</methods>

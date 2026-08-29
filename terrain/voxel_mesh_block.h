@@ -17,13 +17,13 @@ VOXEL_GODOT_FORWARD_DECLARE(class ConcavePolygonShape3D);
 
 namespace voxel {
 
-// Stores mesh and collider for one chunk of the rendered volume.
-// It doesn't store voxel data, because it may be using different block size, or different data structure.
-// IMPORTANT: This is not an abstract class. It exists to share common code between variants of it.
-// Only explicit instances are used, no virtuals.
+// 为一个渲染体积的数据块（chunk）存储网格和碰撞体。
+// 它不存储体素数据，因为可能使用不同的数据块大小或不同的数据结构。
+// 重要：这不是一个抽象类。它存在的目的是在它的各个变体之间共享公共代码。
+// 只使用显式实例，不使用虚函数。
 class VoxelMeshBlock : public NonCopyable {
 public:
-	Vector3i position; // In blocks
+	Vector3i position; // 以区块为单位
 
 protected:
 	VoxelMeshBlock(Vector3i bpos);
@@ -33,7 +33,7 @@ public:
 
 	void set_world(Ref<World3D> p_world);
 
-	// Visuals
+	// 视觉
 
 	void set_mesh(
 			Ref<Mesh> mesh,
@@ -45,16 +45,16 @@ public:
 	bool has_mesh() const;
 	void drop_mesh();
 
-	// Note, GIMode is not stored per block, it is a shared option so we provide it in several functions.
-	// Call this function only if the mesh block already exists and has not changed mesh
+	// 注意，GIMode 不按数据块存储，它是一个共享选项，因此在多个函数中提供。
+	// 仅当网格块已存在且网格未变化时才调用此函数
 	void set_gi_mode(GeometryInstance3D::GIMode mode);
 
-	// Note, ShadowCastingSetting is not stored per block, it is a shared option so we provide it in several functions.
-	// Call this function only if the mesh block already exists and has not changed mesh
+	// 注意，ShadowCastingSetting 不按数据块存储，它是一个共享选项，因此在多个函数中提供。
+	// 仅当网格块已存在且网格未变化时才调用此函数
 	void set_shadow_casting(RenderingServerEnums::ShadowCastingSetting setting);
 
-	// Note, render layers is not stored per block, it is a shared option so we provide it in several functions.
-	// Call this function only if the mesh block already exists and has not changed mesh
+	// 注意，渲染层不按数据块存储，它是一个共享选项，因此在多个函数中提供。
+	// 仅当网格块已存在且网格未变化时才调用此函数
 	void set_render_layers_mask(int mask);
 
 	void set_visible(bool visible);
@@ -63,7 +63,7 @@ public:
 	void set_parent_visible(bool parent_visible);
 	void set_parent_transform(const Transform3D &parent_transform);
 
-	// Collisions
+	// 碰撞
 
 	void set_collision_shape(Ref<Shape3D> shape, bool debug_collision, const Node3D *node, float margin);
 	bool has_collision_shape() const;
@@ -71,7 +71,7 @@ public:
 	void set_collision_mask(int mask);
 	void set_collision_margin(float margin);
 	void drop_collision();
-	// TODO Collision layer and mask
+	// TODO 碰撞层和碰撞掩码
 
 	void set_collision_enabled(bool enable);
 	bool is_collision_enabled() const;
@@ -93,7 +93,7 @@ protected:
 	voxel::godot::DirectStaticBody _static_body;
 	Ref<World3D> _world;
 
-	// Must match default value of `active`
+	// 必须与 `active` 的默认值一致
 	bool _visible = false;
 	bool _collision_enabled = false;
 

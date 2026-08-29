@@ -44,8 +44,8 @@ VoxelEngine::VoxelEngine(Config config) {
 	VOXEL_ASSERT(config.thread_count_minimum >= 1);
 	VOXEL_ASSERT(config.thread_count_ratio_over_max >= 0.f);
 
-	// Compute thread count for general pool.
-	// Note that the I/O thread counts as one used thread and will always be present.
+	// 计算通用线程池的线程数。
+	// 注意 I/O 线程算作一个已占用线程，并且始终存在。
 
 	const int maximum_thread_count =
 			math::max(hw_threads_hint - config.thread_count_margin_below_max, config.thread_count_minimum);
@@ -61,9 +61,9 @@ VoxelEngine::VoxelEngine(Config config) {
 	_general_thread_pool.set_thread_count(thread_count);
 	_general_thread_pool.set_priority_update_period(200);
 
-	// Init world
+	// 初始化世界
 	_world.shared_priority_dependency = make_shared_instance<PriorityDependency::ViewersData>();
-	// Give initial capacity to make invalidation less likely
+	// 提供初始容量以减少失效的可能性
 	_world.shared_priority_dependency->viewers.resize(64);
 
 	VOXEL_PRINT_VERBOSE(format("Size of LoadBlockDataTask: {}", sizeof(LoadBlockDataTask)));
@@ -74,11 +74,11 @@ VoxelEngine::VoxelEngine(Config config) {
 }
 
 VoxelEngine::~VoxelEngine() {
-	// The GDScriptLanguage singleton can get destroyed before ours, so any script referenced by tasks
-	// cannot be freed. To work this around, tasks are cleared when the scene tree autoload is destroyed.
-	// So normally there should not be any task left to clear here,
-	// but doing it anyways for correctness, it's how it should have been...
-	// See https://github.com/Voxel/godot_voxel/issues/189
+	// GDScriptLanguage 单例可能在我们之前被销毁，因此任务引用的任何脚本都无法被释放。
+	// 为绕开此问题，任务会在场景树自动加载被销毁时清除。
+	// 所以正常情况下这里不应还有任务需要清除，
+	// 但为了正确性还是执行清理，本就应该如此……
+	// 参见 https://github.com/Voxel/godot_voxel/issues/189
 	wait_and_clear_all_tasks(true);
 
 #ifdef VOXEL_ENABLE_GPU
@@ -91,14 +91,13 @@ static bool auto_detect_threaded_graphics_resource_building_support() {
 	VOXEL_ASSERT_RETURN_V(project != nullptr, false);
 
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 7
-	// A headless DisplayServer installs the dummy rasterizer
-	// (DisplayServerHeadless::create_func -> RasterizerDummy::make_current()), whose storage is not
-	// safe for concurrent access from multiple threads. The project's rendering_method/
-	// rendering_driver settings keep reporting their configured values in that case, so they
-	// cannot be used to detect it.
-	// This is a workaround for a Godot issue (the renderer is not thread-safe in headless mode):
+	// 无头（headless）DisplayServer 会安装哑光栅化器
+	// （DisplayServerHeadless::create_func -> RasterizerDummy::make_current()），其存储
+	// 不适合多线程并发访问。此时项目的 rendering_method/rendering_driver 设置
+	// 仍会报告其配置值，因此无法用它们来检测。
+	// 这是对 Godot 一个问题（渲染器在无头模式下非线程安全）的规避方案：
 	// https://github.com/godotengine/godot/issues/121949
-	// It can be removed once that is fixed in Godot itself.
+	// 一旦 Godot 自身修复了该问题，就可以移除这段代码。
 	const DisplayServer *display_server = DisplayServer::get_singleton();
 	if (display_server == nullptr || display_server->get_name() == "headless") {
 		return false;
@@ -174,11 +173,11 @@ VoxelEngine::VolumeCallbacks VoxelEngine::get_volume_callbacks(VolumeID volume_i
 
 void VoxelEngine::remove_volume(VolumeID volume_id) {
 	_world.volumes.remove(volume_id);
-	// TODO How to cancel meshing tasks?
+	// TODO 如何取消网格化任务？
 
 	if (_world.volumes.count() == 0) {
-		// To workaround https://github.com/Voxel/godot_voxel/issues/189
-		// When the last remaining volume got destroyed (as in game exit)
+		// 为绕开 https://github.com/Voxel/godot_voxel/issues/189
+		// 当最后一个体被销毁时（例如游戏退出时）
 		wait_and_clear_all_tasks(false);
 	}
 }
@@ -294,7 +293,7 @@ void VoxelEngine::push_async_tasks(Span<voxel::IThreadedTask *> tasks) {
 }
 
 void VoxelEngine::push_async_io_task(voxel::IThreadedTask *task) {
-	// I/O tasks run in serial because they usually can't run well in parallel due to locking shared resources.
+	// I/O 任务串行运行，因为它们通常因锁定共享资源而无法很好地并行运行。
 	_general_thread_pool.enqueue(task, true);
 }
 
@@ -324,19 +323,19 @@ void VoxelEngine::process() {
 			int64_t(StdDefaultAllocatorCounters::g_allocated - StdDefaultAllocatorCounters::g_deallocated)
 	);
 
-	// Receive generation and meshing results
+	// 接收生成和网格化结果
 	_general_thread_pool.dequeue_completed_tasks([](voxel::IThreadedTask *task) {
 		task->apply_result();
 		VOXEL_DELETE(task);
 	});
 
-	// Run this after dequeueing threaded tasks, because they can add some to this runner,
-	// which could in turn complete right away (we avoid 1-frame delays this way).
+	// 在出队线程任务后再运行此步骤，因为它们可能向此执行器添加任务，
+	// 这些任务又可能立即完成（这样可避免 1 帧的延迟）。
 	_time_spread_task_runner.process(_main_thread_time_budget_usec);
 
 	_progressive_task_runner.process();
 
-	// Update viewer dependencies
+	// 更新观察者依赖
 	sync_viewers_task_priority_data();
 
 #ifdef VOXEL_ENABLE_GPU
@@ -348,16 +347,15 @@ void VoxelEngine::sync_viewers_task_priority_data() {
 	const unsigned int viewer_count = _world.viewers.count();
 
 	if (viewer_count > _world.shared_priority_dependency->viewers.size()) {
-		// Invalidate, build a new one. Will be referenced by next tasks onwards.
+		// 失效并构建新实例。后续任务将引用它。
 
-		// One edge case of this is when there is a stockpile of existing tasks lasting for a long time (for example if
-		// the user has an extremely slow generator). Priority of those tasks will no longer be updated dynamically, so
-		// it's possible that some chunks will load at an odd pace. To workaround this, we can minimize the times this
-		// invalidation occurs by preallocating enough elements. Exceeding this capacity will make the issue come back,
-		// but it should be rare. Eventually, if a game requires using a lot of viewers, we may find a different
-		// strategy that doesn't involve iterating them all?
+		// 一个边缘情况是存在大量存活时间很长的任务堆积（例如用户使用了极慢的生成器）。
+		// 这些任务的优先级将不再动态更新，因此某些数据块可能以异常的速度加载。
+		// 为绕开此问题，我们可以通过预先分配足够多的元素来尽量减少这种失效发生的次数。
+		// 超出容量后该问题会重现，但应该很少见。如果某款游戏需要大量观察者，
+		// 我们也许能找到一种无需遍历全部观察者的不同策略？
 
-		// TODO We can avoid the invalidation by using an atomic size or memory barrier?
+		// TODO 能否通过使用原子大小或内存屏障来避免失效？
 		_world.shared_priority_dependency = make_shared_instance<PriorityDependency::ViewersData>();
 		_world.shared_priority_dependency->viewers.resize(viewer_count);
 	}
@@ -374,9 +372,9 @@ void VoxelEngine::sync_viewers_task_priority_data() {
 
 	dep.viewers_count = viewer_count;
 
-	// Cancel distance is increased because of two reasons:
-	// - Some volumes use a cubic area which has higher distances on their corners
-	// - Hysteresis is needed to reduce ping-pong
+	// 取消距离被增大出于两个原因：
+	// - 某些体使用立方体区域，其角落处的距离更大
+	// - 需要迟滞以避免来回切换
 	dep.highest_view_distance = max_distance * 2;
 }
 

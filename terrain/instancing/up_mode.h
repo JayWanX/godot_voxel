@@ -3,14 +3,14 @@
 
 namespace voxel {
 
-// Tells how to interpret where "upwards" is in the current volume
+// 说明如何解释当前体积中的“向上”方向
 enum UpMode : uint8_t {
-	// The world is a plane, so altitude is obtained from the Y coordinate and upwards is always toward +Y.
+	// 世界是一个平面，因此高度由 Y 坐标获得，向上始终朝向 +Y。
 	UP_MODE_POSITIVE_Y,
-	// The world is a sphere (planet), so altitude is obtained from distance to the origin (0,0,0),
-	// and upwards is the normalized vector from origin to current position.
+	// 世界是一个球体（行星），因此高度由到原点 (0,0,0) 的距离获得，
+	// 向上是从原点到当前位置的归一化向量。
 	UP_MODE_SPHERE,
-	// How many up modes there are
+	// 共有多少种向上模式
 	UP_MODE_COUNT
 };
 

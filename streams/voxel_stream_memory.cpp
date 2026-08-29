@@ -66,7 +66,7 @@ void VoxelStreamMemory::load_instance_blocks(Span<InstancesQueryData> out_blocks
 			q.result = VoxelStream::RESULT_BLOCK_NOT_FOUND;
 
 		} else {
-			// Copying is required since the cache has ownership on its data
+			// 需要复制，因为缓存拥有其数据的所有权
 			q.data = make_unique_instance<InstanceBlockData>();
 			it->second.copy_to(*q.data);
 		}
@@ -93,7 +93,7 @@ bool VoxelStreamMemory::supports_loading_all_blocks() const {
 }
 
 void VoxelStreamMemory::load_all_blocks(FullLoadingResult &result) {
-	// The return value couples instances and voxels, but our storage is decoupled, so it complicates things a bit
+	// 返回值将实例与体素耦合在一起，但我们的存储是解耦的，因此略微复杂一些
 	StdUnorderedMap<Vector3i, unsigned int> bpos_to_index;
 
 	for (unsigned int lod_index = 0; lod_index < _lods.size(); ++lod_index) {

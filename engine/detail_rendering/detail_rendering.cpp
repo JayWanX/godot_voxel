@@ -149,7 +149,7 @@ unsigned int prepare_triangles(
 		const Vector3f b = mesh_vertices[vi1];
 		const Vector3f c = mesh_vertices[vi2];
 		math::BakedIntersectionTriangleForFixedDirection baked_triangle;
-		// The triangle can be parallel to the direction
+		// 三角形可能与方向平行
 		if (baked_triangle.bake(a, b, c, direction)) {
 			baked_triangles[triangle_count] = baked_triangle;
 			++triangle_count;
@@ -202,8 +202,8 @@ void query_sdf_with_edits(
 	for (unsigned int query_index = 0; query_index < query_sdf_buffer.size(); ++query_index) {
 		const Vector3 posf(query_x_buffer[query_index], query_y_buffer[query_index], query_z_buffer[query_index]);
 
-		// TODO Optimize: broaden the amount of samples done at once to benefit more from bulk processing
-		// Attempting to evaluate multiple values at once when possible: 8 samples for cube of linear interpolation
+		// TODO 优化：一次处理的采样数量更多，以便更好地受益于批量处理
+		// 尽可能一次求多个值：对立方插值取 8 个采样点
 		FixedArray<float, 8> sd_samples;
 		FixedArray<float, 8> x_gen;
 		FixedArray<float, 8> y_gen;
@@ -216,19 +216,19 @@ void query_sdf_with_edits(
 		const Vector3i posi0 = math::floor_to_int(posf);
 		unsigned int i = 0;
 
-		// Gather 8 samples from edited voxels
+		// 从已编辑体素收集 8 个采样点
 		{
 			VOXEL_PROFILE_SCOPE();
 			for (int z = 0; z < 2; ++z) {
 				for (int y = 0; y < 2; ++y) {
 					for (int x = 0; x < 2; ++x) {
 						const Vector3i posi = posi0 + Vector3i(x, y, z);
-						// TODO Optimize: instead of locking for individual samples, lock the area with a spatial lock
-						//      (because we can't lock multiple blocks at once otherwise it causes deadlocks)
-						// TODO Optimize: the grid could be told to gather raw channels so we get direct access
-						//      (requires the former optimization)
+						// TODO 优化：与其为单个采样加锁，不如用空间锁锁定整个区域
+						//      （因为否则我们无法同时锁定多个数据块，否则会导致死锁）
+						// TODO 优化：可以让网格收集原始通道以便直接访问
+						//      （需要先完成前一项优化）
 						if (!grid.try_get_voxel_f(posi, sd_samples[i], channel)) {
-							// Not edited, add to the list of voxels to generate
+							// 未被编辑，加入待生成的体素列表
 							x_gen[gen_count] = posi.x;
 							y_gen[gen_count] = posi.y;
 							z_gen[gen_count] = posi.z;
@@ -241,8 +241,8 @@ void query_sdf_with_edits(
 			}
 		}
 
-		// Complete samples with generator. Note, these samples are not scaled since we are working with floats instead
-		// of encoded buffer values.
+		// 用生成器补齐采样点。注意，这些采样点未经缩放，因为我们处理的是浮点数
+		// 而非编码后的缓冲值。
 		if (gen_count > 0) {
 			VOXEL_PROFILE_SCOPE();
 			FixedArray<float, 8> gen_samples;
@@ -273,7 +273,7 @@ void query_sdf_with_edits(
 			}
 		}
 
-		// Interpolate
+		// 插值
 		const float sd_interp = math::interpolate_trilinear(
 				sd_samples[0],
 				sd_samples[1],
@@ -290,8 +290,8 @@ void query_sdf_with_edits(
 	}
 }
 
-// Maximum grid size in which edited blocks can be fetched inside a tile.
-// Beyond this size, there are too many cells to query so the algorithm will fallback to generator.
+// 可在 tile 内获取已编辑数据块的最大网格尺寸。
+// 超过此尺寸后，需要查询的单元格太多，算法将回退到生成器。
 static const unsigned int MAX_EDITED_BLOCKS_ACROSS = 8;
 
 bool try_query_edited_blocks(
@@ -303,8 +303,8 @@ bool try_query_edited_blocks(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Pad by 1 in case there are neighboring edited voxels. If not done, it creates a grid pattern following LOD0 block
-	// boundaries because samples near there assume there was no edited neighbors when interpolating
+	// 向外扩 1 个像素，以防存在相邻的已编辑体素。若不这样做，会在 LOD0 数据块
+	// 边界处形成网格状图案，因为插值时这些位置附近的采样点会假设没有已编辑的邻居
 	const Vector3i query_min_pos_i = math::floor_to_int(query_min_pos) - Vector3iUtil::create(1);
 	const Vector3i query_max_pos_i = math::ceil_to_int(query_max_pos) + Vector3iUtil::create(1);
 
@@ -312,16 +312,16 @@ bool try_query_edited_blocks(
 		const Box3i voxel_box = Box3i::from_min_max(query_min_pos_i, query_max_pos_i);
 		const Vector3i block_box_size = voxel_box.size >> constants::DEFAULT_BLOCK_SIZE_PO2;
 		const int64_t block_volume = Vector3iUtil::get_volume_u64(block_box_size);
-		// TODO Don't hardcode block size (even though for now I have no plan to make it configurable)
+		// TODO 不要硬编码数据块大小（尽管目前我还没有计划让其可配置）
 		if (block_volume > math::cubed(MAX_EDITED_BLOCKS_ACROSS)) {
-			// Box too big for quick sparse readings, won't handle edits. Fallback on generator.
-			// One way to speed this up would be to have an octree storing where edited data is.
-			// Or we would have to use the slowest query model, going through data structures for every voxel.
+			// 包围盒太大，无法快速稀疏读取，将不处理编辑。回退到生成器。
+			// 一种加速方法是使用八叉树存储已编辑数据的位置。
+			// 或者我们不得不使用最慢的查询模型，为每个体素遍历数据结构。
 			++skipped_count_due_to_high_volume;
 			return false;
 		}
 
-		// In case there are lots of potential queries to make, do a broad check using LOD mips.
+		// 在可能进行大量查询时，使用 LOD mip 做一次粗略检查。
 		if (block_volume <= 8 || voxel_data.has_blocks_with_voxels_in_area_broad_mip_test(voxel_box)) {
 			voxel_data.get_blocks_grid(grid, voxel_box, 0);
 		}
@@ -357,8 +357,8 @@ inline void query_sdf(
 
 	if (edited_voxel_data != nullptr) {
 #ifdef VOXEL_ENABLE_MODIFIERS
-		// Usually if there are edits, it means there is a modifier stack too. Could be optional, but currently no
-		// reason not to be there either.
+		// 通常如果有编辑，也意味着存在修改器堆栈。它本可以是可选的，但目前
+		// 也没有理由让它缺失。
 		VOXEL_ASSERT(modifiers != nullptr);
 #endif
 
@@ -376,9 +376,9 @@ inline void query_sdf(
 				query_max_pos
 		);
 	} else {
-		// Generator only.
+		// 仅使用生成器。
 
-		// Note, these samples are not scaled since we are working with floats instead of encoded buffer values.
+		// 注意，这些采样点未经缩放，因为我们处理的是浮点数而非编码后的缓冲值。
 		generator.generate_series(
 				query_x_buffer,
 				query_y_buffer,
@@ -405,8 +405,8 @@ inline void query_sdf(
 #endif
 }
 
-// For each non-empty cell of the mesh, choose an axis-aligned projection based on triangle normals in the cell.
-// Sample voxels inside the cell to compute a tile of world space normals from the SDF.
+// 对于网格的每个非空单元格，根据单元格中的三角形法线选择轴对齐投影。
+// 对单元格内的体素进行采样，从 SDF 计算一块世界空间法线 tile。
 void compute_detail_texture_data(
 		ICellIterator &cell_iterator,
 		Span<const Vector3f> mesh_vertices,
@@ -444,7 +444,7 @@ void compute_detail_texture_data(
 
 	if (voxel_data != nullptr &&
 		!voxel_data->has_blocks_with_voxels_in_area_broad_mip_test(Box3i(origin_in_voxels, size_in_voxels))) {
-		// Ignore edits completely
+		// 完全忽略编辑
 		voxel_data = nullptr;
 		if (edited_tiles_only) {
 			return;
@@ -455,14 +455,14 @@ void compute_detail_texture_data(
 
 	CurrentCellInfo cell_info;
 	for (unsigned int cell_index = 0; cell_iterator.next(cell_info); ++cell_index) {
-		// Re-use memory because it will be used a lot
+		// 复用内存，因为它会被频繁使用
 		static thread_local VoxelDataGrid tls_voxel_data_grid;
-		// Ensure cleanup references to voxel buffers
+		// 确保清理对体素缓冲的引用
 		ClearVoxelDataGridOnExit grid_clear_on_exit{ tls_voxel_data_grid };
 
 		const Vector3f cell_origin_world = to_vec3f(origin_in_voxels + cell_info.position * cell_size);
 
-		// In cases we only want tiles with edited voxels, check this early so we can skip the tile.
+		// 在只想要包含已编辑体素的 tile 时，尽早检查以便跳过该 tile。
 		const bool cell_has_edits = voxel_data != nullptr &&
 				try_query_edited_blocks(tls_voxel_data_grid,
 										*voxel_data,
@@ -497,7 +497,7 @@ void compute_detail_texture_data(
 		tls_tile_sample_triangle_index.clear();
 		tls_tile_sample_triangle_index.reserve(math::squared(tile_resolution));
 
-		// Each normal needs 4 samples:
+		// 每个法线需要 4 个采样点：
 		// (x,   y,   z  )
 		// (x+s, y,   z  )
 		// (x,   y+s, z  )
@@ -517,12 +517,12 @@ void compute_detail_texture_data(
 		tls_y_buffer.reserve(max_buffer_size);
 		tls_z_buffer.reserve(max_buffer_size);
 
-		// Optimize triangles
+		// 优化三角形
 		CellTriangles baked_triangles;
 		unsigned int triangle_count =
 				prepare_triangles(cell_info, direction, baked_triangles, mesh_vertices, mesh_indices);
 
-		// Compute triangle normals
+		// 计算三角形法线
 		FixedArray<Vector3f, CurrentCellInfo::MAX_TRIANGLES> triangle_normals;
 		for (unsigned int i = 0; i < triangle_count; ++i) {
 			const math::BakedIntersectionTriangleForFixedDirection &tri = baked_triangles[i];
@@ -530,18 +530,18 @@ void compute_detail_texture_data(
 			triangle_normals[i] = tri_normal;
 		}
 
-		// Fill query buffers
+		// 填充查询缓冲
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Compute positions");
 			for (unsigned int yi = 0; yi < tile_resolution; ++yi) {
 				for (unsigned int xi = 0; xi < tile_resolution; ++xi) {
-					// TODO Add bias to center differences when calculating the normals?
+					// TODO 计算法线时是否给中心差分添加偏移？
 					Vector3f pos000 = quad_origin_world;
-					// Casting to `int` here because even if the target is float, temporaries can be negative uints
+					// 此处转换为 `int`，因为即使目标是 float，临时值也可能是负的 uint
 					pos000[ax] += int(xi) * step;
 					pos000[ay] += int(yi) * step;
 
-					// Project to triangles
+					// 投影到三角形
 					const Vector3f ray_origin_world = pos000 - direction * cell_size;
 					const Vector3f ray_origin_mesh = ray_origin_world - to_vec3f(origin_in_voxels);
 					float nearest_hit_distance = 999999.f;
@@ -557,7 +557,7 @@ void compute_detail_texture_data(
 					}
 
 					if (hit_triangle_index == triangle_count) {
-						// Don't query if there is no triangle
+						// 如果没有三角形则不查询
 						continue;
 					}
 
@@ -598,7 +598,7 @@ void compute_detail_texture_data(
 			const VoxelModifierStack *modifiers = voxel_data != nullptr ? &voxel_data->get_modifiers() : nullptr;
 #endif
 
-			// Query voxel data
+			// 查询体素数据
 			query_sdf(
 					generator,
 					edits_grid,
@@ -618,7 +618,7 @@ void compute_detail_texture_data(
 		tls_tile_normals.clear();
 		tls_tile_normals.resize(math::squared(tile_resolution));
 
-		// Compute normals from SDF results
+		// 从 SDF 结果计算法线
 		{
 			VOXEL_PROFILE_SCOPE_NAMED("Compute normals");
 			VOXEL_ASSERT(tls_tile_sample_positions.size() == tls_tile_sample_triangle_index.size());
@@ -634,7 +634,7 @@ void compute_detail_texture_data(
 				const unsigned int bi010 = bi + 2;
 				const unsigned int bi001 = bi + 3;
 				bi += 4;
-				// TODO I wish this was solved https://github.com/godotengine/godot/issues/31608
+				// TODO 真希望这个问题已解决 https://github.com/godotengine/godot/issues/31608
 #ifdef DEBUG_ENABLED
 				VOXEL_ASSERT(bi000 < tls_sdf_buffer.size());
 				VOXEL_ASSERT(bi100 < tls_sdf_buffer.size());
@@ -648,9 +648,9 @@ void compute_detail_texture_data(
 
 				Vector3f normal = math::normalized(Vector3f(sd100 - sd000, sd010 - sd000, sd001 - sd000));
 
-				// Clamp normals if their dot product with triangle normal is higher than a threshold.
-				// This helps avoiding flipped normals on very low LODs because bias is very high. In the
-				// SolarSystem demo it can pick up caves from the surface which results in black spots.
+				// 如果法线与三角形法线的点积超过阈值，则限制法线方向。
+				// 这有助于在极低 LOD 下避免法线翻转，因为此时偏差非常大。在
+				// SolarSystem 演示中，它可能会从地表捕捉到洞穴，导致出现黑斑。
 				const Vector3f &tri_normal = triangle_normals[sample_tri_index];
 				const float tdot = math::dot(normal, tri_normal);
 				if (tdot < max_deviation_cosine) {
@@ -671,17 +671,17 @@ void compute_detail_texture_data(
 		}
 
 		for (unsigned int dilation_steps = 0; dilation_steps < 2; ++dilation_steps) {
-			// Fill up some pixels around triangle borders, to give some margin when sampling near them in shader
+			// 填充三角形边界周围的一些像素，以便在着色器中靠近边界采样时留出余量
 			dilate_normalmap(to_span(tls_tile_normals), Vector2i(tile_resolution, tile_resolution));
 		}
 
-		// Resizing as we go, because depending on settings we may have to skip some cells
+		// 边处理边调整大小，因为根据设置我们可能需要跳过某些单元格
 		const unsigned int tile_begin = normal_map_data.normals.size();
 		normal_map_data.normals.resize(
 				normal_map_data.normals.size() + math::squared(tile_resolution) * encoded_normal_size
 		);
 
-		// Encode normals
+		// 编码法线
 		if (octahedral_encoding) {
 			for (unsigned int i = 0; i < tls_tile_normals.size(); ++i) {
 				const unsigned int offset = tile_begin + i * encoded_normal_size;
@@ -703,7 +703,7 @@ void compute_detail_texture_data(
 	}
 
 	if (skipped_count_due_to_high_volume > 0) {
-		// Logging here to reduce spam
+		// 在此记录日志以减少刷屏
 		VOXEL_PRINT_VERBOSE(format(
 				"Virtual normalmaps: fell back on generator for {} tiles, box too big to render edited voxels (lod {})",
 				skipped_count_due_to_high_volume,
@@ -732,7 +732,7 @@ Ref<Image> store_lookup_to_image(const StdVector<DetailTextureData::Tile> &tiles
 
 		for (unsigned int tile_index = 0; tile_index < tiles.size(); ++tile_index) {
 			const DetailTextureData::Tile tile = tiles[tile_index];
-			// RG: tttttttt aatttttt
+			// RG 位布局：tttttttt aatttttt
 			const uint8_t r = tile_index & 0xff;
 			const uint8_t g = ((tile_index >> 8) & 0x3f) | (tile.axis << 6);
 #ifdef DEBUG_ENABLED
@@ -765,9 +765,9 @@ Vector<Ref<Image>> store_atlas_to_image_array(
 	const unsigned int pixel_size = octahedral_encoding ? 2 : 4;
 	const Image::Format format =
 			octahedral_encoding ? Image::FORMAT_RG8 :
-								// We don't use the alpha channel, but Godot would spam warnings about RGB8 not being
-								// supported by GPU. So we waste a bit of memory for now, which is unfortunate for a
-								// kind of texture stored in large numbers. Maybe one day it will be used for something.
+								// 我们并不使用 alpha 通道，但 Godot 会就 RGB8 不被 GPU 支持
+								// 反复发出警告。所以目前我们浪费一点内存，这对于
+								// 需要大量存储的纹理来说很不幸。也许有一天它会派上用场。
 			Image::FORMAT_RGBA8;
 	const unsigned int tile_size_in_pixels = math::squared(tile_resolution);
 	const unsigned int tile_size_in_bytes = tile_size_in_pixels * pixel_size;
@@ -804,9 +804,9 @@ Ref<Image> store_atlas_to_image(
 	const unsigned int pixel_size = octahedral_encoding ? 2 : 4;
 	const Image::Format format =
 			octahedral_encoding ? Image::FORMAT_RG8 :
-								// We don't use the alpha channel, but Godot would spam warnings about RGB8 not being
-								// supported by GPU. So we waste a bit of memory for now, which is unfortunate for a
-								// kind of texture stored in large numbers. Maybe one day it will be used for something.
+								// 我们并不使用 alpha 通道，但 Godot 会就 RGB8 不被 GPU 支持
+								// 反复发出警告。所以目前我们浪费一点内存，这对于
+								// 需要大量存储的纹理来说很不幸。也许有一天它会派上用场。
 			Image::FORMAT_RGBA8;
 	const unsigned int tile_size_in_pixels = math::squared(tile_resolution);
 	const unsigned int tile_size_in_bytes = tile_size_in_pixels * pixel_size;
@@ -855,7 +855,7 @@ DetailImages store_normalmap_data_to_images(
 	return images;
 }
 
-// Converts normalmap data into textures. They can be used in a shader to apply normals and obtain extra visual details.
+// 将法线贴图数据转换为纹理。它们可在着色器中用于应用法线并获得额外的视觉细节。
 DetailTextures store_normalmap_data_to_textures(const DetailImages &data) {
 	VOXEL_PROFILE_SCOPE();
 

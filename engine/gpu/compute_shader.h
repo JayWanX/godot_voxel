@@ -18,7 +18,7 @@ struct ComputeShaderInternal {
 	void clear(RenderingDevice &rd);
 	void load_from_glsl(RenderingDevice &rd, String source_text, String name);
 
-	// An invalid instance means the shader failed to compile
+	// 无效实例意味着着色器编译失败
 	inline bool is_valid() const {
 		return rid.is_valid();
 	}
@@ -26,7 +26,7 @@ struct ComputeShaderInternal {
 
 class ComputeShader;
 
-// See ComputeShaderResourceFactory
+// 参见 ComputeShaderResourceFactory
 struct ComputeShaderFactory {
 	ComputeShaderFactory() = delete;
 
@@ -37,17 +37,17 @@ struct ComputeShaderFactory {
 	static std::shared_ptr<ComputeShader> create_invalid();
 };
 
-// Thin RAII wrapper around compute shaders created with the `RenderingDevice` held inside `VoxelEngine`.
-// If the source can change at runtime, it may be passed around using shared pointers and a new instance may be created,
-// rather than clearing the old shader anytime, for thread-safety. A reference should be kept as long as a dispatch of
-// this shader is running on the graphics card.
+// 对使用 `VoxelEngine` 持有的 `RenderingDevice` 创建的计算着色器的轻量 RAII 封装。
+// 如果源码在运行时可能改变，可以通过共享指针传递，并创建新实例，
+// 而不是随时清空旧着色器，以保证线程安全。只要该着色器的一次派发
+// 仍在显卡上运行，就应保持其引用。
 class ComputeShader {
 public:
 	friend struct ComputeShaderFactory;
 
 	~ComputeShader();
 
-	// Only use on GPU task thread
+	// 仅在 GPU 任务线程上使用
 	RID get_rid() const;
 
 private:

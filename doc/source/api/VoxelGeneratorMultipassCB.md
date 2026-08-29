@@ -1,36 +1,36 @@
 # VoxelGeneratorMultipassCB
 
-Inherits: [VoxelGenerator](VoxelGenerator.md)
+继承自：[VoxelGenerator](VoxelGenerator.md)
 
 !!! warning
-    This class is marked as experimental. It is subject to likely change or possible removal in future versions. Use at your own discretion.
+    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
 
-Scriptable generator working on columns of blocks and multiple passes.
+基于脚本、按数据块列和多遍处理工作的生成器。
 
-## Description: 
+## 描述：
 
-This generator can be implemented with a script to generate terrain in columns of blocks instead of only block by block.
+此生成器可以用脚本实现，以数据块列的形式生成地形，而不仅仅是一个区块接一个区块地生成。
 
-It allows to use multiple passes, where every pass can access results of the previous ones, and allowing access to neighbor columns.
+它允许使用多遍处理，每一遍都可以访问之前各遍的结果，并允许访问相邻列。
 
-The height of columns is not infinite, but it is possible to define what generates above and below, using a single-pass per-block fallback.
+列的高度不是无限的，但可以通过每区块单遍的兜底方式定义上方和下方生成什么。
 
-It may only be used with [VoxelTerrain](VoxelTerrain.md).
+它只能与 [VoxelTerrain](VoxelTerrain.md) 一起使用。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                  | Name                                             | Default 
---------------------------------------------------------------------- | ------------------------------------------------ | --------
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [column_base_y_blocks](#i_column_base_y_blocks)  | -4      
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [column_height_blocks](#i_column_height_blocks)  | 8       
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [pass_count](#i_pass_count)                      | 1       
+类型                                                                    | 名称                                               | 默认值 
+--------------------------------------------------------------------- | ------------------------------------------------ | ----
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [column_base_y_blocks](#i_column_base_y_blocks)  | -4  
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [column_height_blocks](#i_column_height_blocks)  | 8   
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [pass_count](#i_pass_count)                      | 1   
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                                    | Signature                                                                                                                                                                                                             
+返回值                                                                                       | 函数签名                                                                                                                                                                                                                  
 ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [void](#)                                                                                 | [_generate_block_fallback](#i__generate_block_fallback) ( [VoxelBuffer](VoxelBuffer.md) out_buffer, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) origin_in_voxels ) virtual         
 [void](#)                                                                                 | [_generate_pass](#i__generate_pass) ( [VoxelToolMultipassGenerator](VoxelToolMultipassGenerator.md) voxel_tool, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) pass_index ) virtual             
@@ -40,61 +40,61 @@ Return                                                                          
 [void](#)                                                                                 | [set_pass_extent_blocks](#i_set_pass_extent_blocks) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) pass_index, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) extent )  
 <p></p>
 
-## Constants: 
+## 常量：
 
 - <span id="i_MAX_PASSES"></span>**MAX_PASSES** = **4**
 - <span id="i_MAX_PASS_EXTENT"></span>**MAX_PASS_EXTENT** = **2**
 
-## Property Descriptions
+## 属性描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_column_base_y_blocks"></span> **column_base_y_blocks** = -4
 
-Lowest altitude of columns, in blocks.
+列的最低高度，以区块为单位。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_column_height_blocks"></span> **column_height_blocks** = 8
 
-Height of columns, in blocks.
+列的高度，以区块为单位。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_pass_count"></span> **pass_count** = 1
 
-Number of passes columns will go through before being considered fully generated. More passes increases memory and processing cost.
+列在被视为完全生成之前需要经历的遍数。更多的遍数会增加内存和处理开销。
 
-## Method Descriptions
+## 方法描述
 
 ### [void](#)<span id="i__generate_block_fallback"></span> **_generate_block_fallback**( [VoxelBuffer](VoxelBuffer.md) out_buffer, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) origin_in_voxels ) 
 
-Called for every block to generate above or below the column-based region. For example you can decide to generate air above, and bedrock below.
+为基于列的区域上方或下方的每个区块调用。例如，你可以决定在上方生成空气，在下方生成基岩。
 
 ### [void](#)<span id="i__generate_pass"></span> **_generate_pass**( [VoxelToolMultipassGenerator](VoxelToolMultipassGenerator.md) voxel_tool, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) pass_index ) 
 
-Called once per pass for every column of blocks.
+对每个数据块列，每一遍调用一次。
 
-The passed `voxel_tool` must be used to get information about the area to generate, and fill/edit this area with voxels. Important: do not keep this object in a member variable for later re-use. You can only use it in the current call to this method.
+必须使用传入的 `voxel_tool` 获取要生成区域的信息，并用体素填充/编辑该区域。重要：不要将该对象保存在成员变量中以便后续复用。你只能在本次调用此方法时使用它。
 
-You may use `pass_index` to do something different in each pass. For example, 0 could be base ground with Perlin noise, 1 could plant trees and other structures.
+你可以使用 `pass_index` 在每一遍中执行不同的操作。例如，0 可以是使用 Perlin 噪声的基础地面，1 可以种植树木和其他结构。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i__get_used_channels_mask"></span> **_get_used_channels_mask**( ) 
 
-Use this to indicate which channels your generator will use. It returns a bitmask, so for example you may provide information like this: `(1 << channel1) | (1 << channel2)`
+使用此方法指示你的生成器将使用哪些通道。它返回一个位掩码，例如你可以提供这样的信息：`(1 << channel1) | (1 << channel2)`
 
 ### [VoxelBuffer[]](https://docs.godotengine.org/en/stable/classes/class_voxelbuffer[].html)<span id="i_debug_generate_test_column"></span> **debug_generate_test_column**( [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html) column_position_blocks ) 
 
-Testing method that will fully generate all blocks of a specific column, and returns them.
+测试方法，将完整生成特定列的所有区块并返回它们。
 
-This function doesn't use any threads and doesn't use the internal cache, so it will be very slow. However, it allows to test or debug your script more easily, using an isolated scene for example.
+此函数不使用任何线程，也不使用内部缓存，因此会非常慢。不过，它可以让你更轻松地测试或调试脚本，例如使用一个独立的场景。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_pass_extent_blocks"></span> **get_pass_extent_blocks**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) pass_index ) 
 
-Gets how many blocks a pass can access around it (note: a block is 16x16x16 voxels by default).
+获取某一遍可以访问其周围多少个区块（注意：默认情况下一个区块为 16x16x16 个体素）。
 
 ### [void](#)<span id="i_set_pass_extent_blocks"></span> **set_pass_extent_blocks**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) pass_index, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) extent ) 
 
-Sets how many blocks a pass can access around columns when they generate (note: a block is 16x16x16 voxels by default).
+设置某一遍在列生成时可以访问其周围多少个区块（注意：默认情况下一个区块为 16x16x16 个体素）。
 
-By design, the first pass is not allowed to access neighbors, so it will remain 0.
+按设计，第一遍不允许访问相邻区块，因此它将保持为 0。
 
-Following passes are designed to access at least 1 block away. Such passes don't support 0 because it would be the same as simply putting your logic in a previous pass.
+后续各遍设计为至少可以访问 1 个区块的距离。此类遍不支持 0，因为那等同于将你的逻辑直接放在上一遍中。
 
-Increasing extent will also increase the cost of the generator, both in memory and processing time, so it should be balanced with caution.
+增加范围也会增加生成器的开销，无论是内存还是处理时间，因此应谨慎权衡。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

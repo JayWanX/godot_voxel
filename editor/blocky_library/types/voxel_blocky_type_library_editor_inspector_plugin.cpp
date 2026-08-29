@@ -28,8 +28,8 @@ void VoxelBlockyTypeLibraryEditorInspectorPlugin::_voxel_parse_end(Object *p_obj
 					.bind(library)
 	);
 
-	// TODO I want to add this button at the end OF THE VoxelBlockyTypeLibrary PART OF THE INSPECTOR,
-	// NOT AT THE VERY BOTTOM... but how do I do that?
+	// TODO 我想把这个按钮放在检查器中 VoxelBlockyTypeLibrary 部分的末尾，
+	// 而不是最底部……但我该怎么做？
 	add_custom_control(button);
 }
 

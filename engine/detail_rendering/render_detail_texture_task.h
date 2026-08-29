@@ -14,16 +14,16 @@ namespace voxel {
 
 class RenderDetailTextureGPUTask;
 
-// Renders textures providing extra details to far away voxel meshes.
-// This is separate from the meshing task because it takes significantly longer to complete. It has different priority
-// so most of the time we can get the mesh earlier and affine later with the results.
+// 为远处的体素网格渲染提供额外细节的纹理。
+// 该任务与网格化任务分开，因为它耗时明显更长。它有单独的优先级，
+// 因此大多数情况下我们可以先拿到网格，稍后再用结果进行修正。
 class RenderDetailTextureTask : public IThreadedTask {
 public:
-	// Input
+	// 输入
 
 	UniquePtr<ICellIterator> cell_iterator;
-	// TODO Optimize: perhaps we could find a way to not copy mesh data? The only reason is because Godot wants a
-	// slightly different data structure potentially taking unnecessary doubles because it uses `Vector3`...
+	// TODO 优化：也许能想办法不复制网格数据？唯一的原因是 Godot 需要
+	// 稍微不同的数据结构，可能因为使用 `Vector3` 而产生不必要的重复占用……
 	StdVector<Vector3f> mesh_vertices;
 	StdVector<Vector3f> mesh_normals;
 	StdVector<int> mesh_indices;
@@ -34,10 +34,10 @@ public:
 	bool use_gpu = false;
 	DetailRenderingSettings detail_texture_settings;
 
-	// Output (to be assigned so it can be populated)
+	// 输出（待赋值，以便填充内容）
 	std::shared_ptr<DetailTextureOutput> output_textures;
 
-	// Identification
+	// 标识
 	Vector3i mesh_block_position;
 	VolumeID volume_id;
 	PriorityDependency priority_dependency;
@@ -51,7 +51,7 @@ public:
 	TaskPriority get_priority() override;
 	bool is_cancelled() override;
 
-	// This is exposed for testing
+	// 暴露给测试使用
 	RenderDetailTextureGPUTask *make_gpu_task();
 
 private:
@@ -63,7 +63,7 @@ private:
 
 #ifdef VOXEL_ENABLE_GPU
 
-// Performs final operations on the CPU after the GPU work is done
+// 在 GPU 工作完成后，在 CPU 上执行最终操作
 class RenderDetailTexturePass2Task : public IThreadedTask {
 public:
 	PackedByteArray atlas_data;

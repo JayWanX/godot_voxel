@@ -5,7 +5,7 @@
 
 namespace voxel {
 
-// 32-bit float Quaternion.
+// 32 位浮点精度四元数。
 struct Quaternionf {
 	union {
 		struct {

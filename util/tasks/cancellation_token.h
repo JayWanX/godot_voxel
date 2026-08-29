@@ -7,13 +7,13 @@
 
 namespace voxel {
 
-// Simple object shared between a task and the requester of the task. Allows the requester to cancel the task before it
-// runs or finishes.
+// 在任务与其请求者之间共享的简单对象。允许请求者在任务
+// 运行或完成前取消它。
 class TaskCancellationToken {
 public:
-	// TODO Could be optimized
-	// - Pointer to an atomic refcount?
-	// - Index into a [paged] pool of atomic ints?
+	// TODO 可以优化
+	// - 指向原子引用计数的指针？
+	// - 索引到一个（分页的）原子整数池中？
 
 	static TaskCancellationToken create() {
 		TaskCancellationToken token;

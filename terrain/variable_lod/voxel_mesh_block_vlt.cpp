@@ -32,11 +32,11 @@ VoxelMeshBlockVLT::VoxelMeshBlockVLT(const Vector3i bpos, unsigned int size, uns
 
 VoxelMeshBlockVLT::~VoxelMeshBlockVLT() {
 	if (_mesh_instance.is_valid()) {
-		// Make sure no material override is set, because it's possible the material will get destroyed before the mesh
-		// instance, which would cause errors in RenderingServer. Our thin wrapper does not take ownership of the
-		// material.
-		// TODO Eventually it would be better if we could just unref the material after having destroyed the mesh...
-		// VoxelMeshBlock inheritance isn't helping us here
+		// 确保未设置材质覆盖，因为材质有可能在网格
+		// 实例之前被销毁，这会导致 RenderingServer 出错。我们的薄封装不持有
+		// 材质的所有权。
+		// TODO 最终，如果能在销毁网格后直接取消材质引用会更好...
+		// VoxelMeshBlock 继承在此帮不上忙
 		_mesh_instance.set_material_override(Ref<Material>());
 	}
 
@@ -62,10 +62,10 @@ void VoxelMeshBlockVLT::set_mesh(
 		RenderingServerEnums::ShadowCastingSetting shadow_occluder_mode
 #endif
 ) {
-	// TODO Don't add mesh instance to the world if it's not visible.
-	// I suspect Godot is trying to include invisible mesh instances into the culling process,
-	// which is killing performance when LOD is used (i.e many meshes are in pool but hidden)
-	// This needs investigation.
+	// TODO 若不可见，则不要将网格实例添加到世界中。
+	// 我怀疑 Godot 试图将不可见的网格实例纳入剔除流程，
+	// 这在使用 LOD 时会严重损害性能（即许多网格在池中但被隐藏）
+	// 这需要调查。
 
 	if (shadow_occluder_mesh.is_null()) {
 		if (_shadow_occluder.is_valid()) {
@@ -81,8 +81,8 @@ void VoxelMeshBlockVLT::set_mesh(
 #else
 			_shadow_occluder.set_cast_shadows_setting(RenderingServerEnums::SHADOW_CASTING_SETTING_SHADOWS_ONLY);
 #endif
-			// TODO Should we hide it if shadow casting is off?
-			// TBH it would be even better for the user to simply turn these off in the mesher...
+			// TODO 若阴影投射关闭，是否应隐藏它？
+			// 老实说，让用户在网格化器中直接关闭这些会更好...
 			set_mesh_instance_visible(_shadow_occluder, _visible && _parent_visible);
 		}
 		_shadow_occluder.set_mesh(shadow_occluder_mesh);
@@ -90,7 +90,7 @@ void VoxelMeshBlockVLT::set_mesh(
 
 	if (mesh.is_valid()) {
 		if (!_mesh_instance.is_valid()) {
-			// Create instance if it doesn't exist
+			// 若实例不存在则创建
 			_mesh_instance.create();
 			_mesh_instance.set_interpolated(false);
 			_mesh_instance.set_gi_mode(gi_mode);
@@ -109,9 +109,9 @@ void VoxelMeshBlockVLT::set_mesh(
 #endif
 
 	} else {
-		// TODO We should no longer expect `set_mesh` to be called with a null mesh, instead we use `drop_visuals`
+		// TODO 我们不应再期望 `set_mesh` 以空网格被调用，取而代之使用 `drop_visuals`
 		if (_mesh_instance.is_valid()) {
-			// Delete instance if it exists
+			// 若实例存在则删除
 			_mesh_instance.destroy();
 		}
 	}
@@ -122,11 +122,11 @@ void VoxelMeshBlockVLT::set_mesh(
 
 void VoxelMeshBlockVLT::drop_visuals() {
 	if (_mesh_instance.is_valid()) {
-		// Make sure no material override is set, because it's possible the material will get destroyed before the mesh
-		// instance, which would cause errors in RenderingServer. Our thin wrapper does not take ownership of the
-		// material.
-		// TODO Eventually it would be better if we could just unref the material after having destroyed the mesh...
-		// VoxelMeshBlock inheritance isn't helping us here
+		// 确保未设置材质覆盖，因为材质有可能在网格
+		// 实例之前被销毁，这会导致 RenderingServer 出错。我们的薄封装不持有
+		// 材质的所有权。
+		// TODO 最终，如果能在销毁网格后直接取消材质引用会更好...
+		// VoxelMeshBlock 继承在此帮不上忙
 		_mesh_instance.set_material_override(Ref<Material>());
 	}
 	FreeMeshTask::try_add_and_destroy(_mesh_instance);
@@ -192,7 +192,7 @@ void VoxelMeshBlockVLT::set_transition_mesh(
 
 	if (mesh.is_valid()) {
 		if (!mesh_instance.is_valid()) {
-			// Create instance if it doesn't exist
+			// 若实例不存在则创建
 			mesh_instance.create();
 			mesh_instance.set_interpolated(false);
 			mesh_instance.set_gi_mode(gi_mode);
@@ -212,7 +212,7 @@ void VoxelMeshBlockVLT::set_transition_mesh(
 
 	} else {
 		if (mesh_instance.is_valid()) {
-			// Delete instance if it exists
+			// 若实例存在则删除
 			mesh_instance.destroy();
 		}
 	}
@@ -222,7 +222,7 @@ void VoxelMeshBlockVLT::set_world(Ref<World3D> p_world) {
 	if (_world != p_world) {
 		_world = p_world;
 
-		// To update world. I replaced visibility by presence in world because Godot 3 culling performance is horrible
+		// 用于更新世界。我用“存在于世界中”取代了可见性，因为 Godot 3 的剔除性能很差
 		_set_visible(_visible && _parent_visible);
 
 		if (_static_body.is_valid()) {
@@ -310,8 +310,8 @@ void VoxelMeshBlockVLT::set_transition_mask(uint8_t m) {
 	}
 	_transition_mask = m;
 	if (_shader_material.is_valid()) {
-		// TODO Needs translation here, because Cube:: tables use slightly different order...
-		// We may get rid of this once cube tables respects -x+x-y+y-z+z order
+		// TODO 此处需要重新映射，因为 Cube:: 表使用了略有不同的顺序...
+		// 一旦立方体表遵循 -x+x-y+y-z+z 的顺序，我们就可以去掉这个
 		uint8_t bits[Cube::SIDE_COUNT];
 		for (unsigned int dir = 0; dir < Cube::SIDE_COUNT; ++dir) {
 			bits[dir] = (m >> dir) & 1;
@@ -323,7 +323,7 @@ void VoxelMeshBlockVLT::set_transition_mask(uint8_t m) {
 		tm |= bits[Cube::SIDE_NEGATIVE_Z] << 4;
 		tm |= bits[Cube::SIDE_POSITIVE_Z] << 5;
 
-		// TODO Godot 4: we may replace this with a per-instance parameter so we can lift material access limitation
+		// TODO Godot 4：我们可以用每实例参数替换它，从而解除材质访问限制
 		_shader_material->set_shader_parameter(VoxelStringNames::get_singleton().u_transition_mask, tm);
 	}
 	for (int dir = 0; dir < Cube::SIDE_COUNT; ++dir) {
@@ -346,7 +346,7 @@ void VoxelMeshBlockVLT::set_parent_transform(const Transform3D &parent_transform
 	VOXEL_PROFILE_SCOPE();
 
 	if (_mesh_instance.is_valid() || _static_body.is_valid()) {
-		// TODO Optimize: could be optimized due to the basis being identity
+		// TODO 优化：由于基矩阵为单位矩阵，可以优化
 		const Transform3D local_transform(Basis(), _position_in_voxels);
 		const Transform3D world_transform = parent_transform * local_transform;
 
@@ -374,22 +374,22 @@ void VoxelMeshBlockVLT::set_parent_transform(const Transform3D &parent_transform
 void VoxelMeshBlockVLT::update_transition_mesh_transform(unsigned int side, const Transform3D &parent_transform) {
 	DirectMeshInstance &mi = _transition_mesh_instances[side];
 	if (mi.is_valid()) {
-		// TODO Optimize: could be optimized due to the basis being identity
+		// TODO 优化：由于基矩阵为单位矩阵，可以优化
 		const Transform3D local_transform(Basis(), _position_in_voxels);
 		const Transform3D world_transform = parent_transform * local_transform;
 		mi.set_transform(world_transform);
 	}
 }
 
-// Returns `true` when finished
+// 完成时返回 `true`
 bool VoxelMeshBlockVLT::update_fading(float speed) {
-	// TODO Should probably not be on the block directly?
-	// Because we may want to fade transition meshes only
+	// TODO 也许不应直接放在数据块上？
+	// 因为我们可能只想淡入淡出过渡网格
 
 	bool finished = false;
 
-	// x is progress in 0..1
-	// y is direction: 1 fades in, 0 fades out
+	// x 是进度，范围 0..1
+	// y 是方向：1 淡入，0 淡出
 	Vector2 p;
 
 	switch (fading_state) {
@@ -479,15 +479,15 @@ Ref<ArrayMesh> build_mesh(
 			mesh.instantiate();
 		}
 
-		// TODO Use `add_surface`, it's about 20% faster after measuring in Tracy (though we may see if Godot 4 expects
-		// the same)
+		// TODO 使用 `add_surface`，在 Tracy 中测量后大约快 20%（不过我们可以看看 Godot 4 是否
+		// 同样如此）
 		mesh->add_surface_from_arrays(primitive, arrays, Array(), Dictionary(), flags);
 		mesh->surface_set_material(surface_index, material);
-		// No multi-material supported yet
+		// 尚不支持多材质
 		++surface_index;
 	}
 
-	// Debug code to highlight vertex sharing
+	// 用于高亮顶点共享的调试代码
 	/*if (mesh->get_surface_count() > 0) {
 		Array wireframe_surface = generate_debug_seams_wireframe_surface(mesh, 0);
 		if (wireframe_surface.size() > 0) {

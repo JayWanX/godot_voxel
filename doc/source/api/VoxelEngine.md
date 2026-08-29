@@ -1,13 +1,17 @@
 # VoxelEngine
 
-Inherits: [Object](https://docs.godotengine.org/en/stable/classes/class_object.html)
+继承自：[Object](https://docs.godotengine.org/en/stable/classes/class_object.html)
 
-Singleton holding common settings and handling voxel processing tasks in background threads.
+保存通用设置并在后台线程中处理体素处理任务的单例。
 
-## Methods: 
+## 描述：
+
+体素引擎的单例。它在后台线程中运行体素处理任务（例如流式传输、网格化和生成），并保存通用设置，例如用于 `ThreadedTaskRunner` 的线程数。共享的线程池与内存池也由此管理。
+
+## 方法：
 
 
-Return                                                                              | Signature                                                                                                                 
+返回值                                                                                 | 函数签名                                                                                                                      
 ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------
 [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)  | [get_stats](#i_get_stats) ( ) const                                                                                       
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_thread_count](#i_get_thread_count) ( ) const                                                                         
@@ -23,13 +27,13 @@ Return                                                                          
 [void](#)                                                                           | [set_thread_count](#i_set_thread_count) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) count )    
 <p></p>
 
-## Method Descriptions
+## 方法描述
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_get_stats"></span> **get_stats**( ) 
 
-Gets debug information about shared voxel processing.
+获取有关共享体素处理的调试信息。
 
-The returned dictionary has the following structure:
+返回的字典具有以下结构：
 
 ```
 {
@@ -61,46 +65,46 @@ The returned dictionary has the following structure:
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_thread_count"></span> **get_thread_count**( ) 
 
-Returns the number of threads currently used internally by the `ThreadedTaskRunner`.
+返回 `ThreadedTaskRunner` 当前在内部使用的线程数。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_get_threaded_graphics_resource_building_enabled"></span> **get_threaded_graphics_resource_building_enabled**( ) 
 
-Tells if the voxel engine is able to create graphics resources from different threads. This will usually be true if the current renderer's thread model is safe or multi-threaded, but might also be false if the renderer would poorly benefit from this (such as legacy OpenGL).
+指示体素引擎是否能够从不同线程创建图形资源。如果当前渲染器的线程模型是安全的或多线程的，这通常为 true，但如果渲染器从中获益甚微（例如旧版 OpenGL），则可能为 false。
 
 ### [String](https://docs.godotengine.org/en/stable/classes/class_string.html)<span id="i_get_version_edition"></span> **get_version_edition**( ) 
 
-Tells the edition of the voxel engine, which is either of the following: `module`, `extension`
+告知体素引擎的版本类型，为以下之一：`module`、`extension`
 
 ### [String](https://docs.godotengine.org/en/stable/classes/class_string.html)<span id="i_get_version_git_hash"></span> **get_version_git_hash**( ) 
 
-Gets the Git hash that was used to compile the voxel engine.
+获取用于编译体素引擎的 Git 哈希。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_version_major"></span> **get_version_major**( ) 
 
-Gets the major version number of the voxel engine. For example, in `1.2.0`, `1` is the major version.
+获取体素引擎的主版本号。例如，在 `1.2.0` 中，`1` 是主版本号。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_version_minor"></span> **get_version_minor**( ) 
 
-Gets the minor version number of the voxel engine. For example, in `1.2.0`, `2` is the minor version.
+获取体素引擎的次版本号。例如，在 `1.2.0` 中，`2` 是次版本号。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_version_patch"></span> **get_version_patch**( ) 
 
-Gets the patch version number of the voxel engine. For example, in `1.2.0`, `0` is the patch version.
+获取体素引擎的修订版本号。例如，在 `1.2.0` 中，`0` 是修订版本号。
 
 ### [String](https://docs.godotengine.org/en/stable/classes/class_string.html)<span id="i_get_version_status"></span> **get_version_status**( ) 
 
-Gets the version status, which may be one of the following: `dev`, `release`
+获取版本状态，可能为以下之一：`dev`、`release`
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_get_version_v"></span> **get_version_v**( ) 
 
-Gets the major (x), minor (y) and patch (z) version numbers of the voxel engine as a single vector. May be useful for comparisons.
+将体素引擎的主版本号 (x)、次版本号 (y) 和修订版本号 (z) 作为一个向量获取。可用于版本比较。
 
 ### [void](#)<span id="i_run_tests"></span> **run_tests**( [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html) options ) 
 
-Runs internal unit tests. This function is only available if the voxel engine is compiled with `voxel_tests=true`.
+运行内部单元测试。仅当体素引擎以 `voxel_tests=true` 编译时，此函数才可用。
 
 ### [void](#)<span id="i_set_thread_count"></span> **set_thread_count**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) count ) 
 
-Sets the number of threads to be used internally by the `ThreadedTaskRunner`. Setting this can cause lagging, and it might take some time until the number of threads actually matches the given value.
+设置 `ThreadedTaskRunner` 在内部要使用的线程数。设置此值可能导致卡顿，并且可能需要一段时间，线程数才会真正与给定值一致。
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

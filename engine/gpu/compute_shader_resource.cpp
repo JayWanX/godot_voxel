@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/rd_texture_format.h"
 #include "../../util/godot/classes/rd_texture_view.h"
 #include "../../util/godot/classes/rendering_device.h"
-#include "../../util/godot/core/array.h" // for `varray`
+#include "../../util/godot/core/array.h" // 用于 `varray`
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 #include "../voxel_engine.h"
@@ -43,11 +43,11 @@ bool ComputeShaderResourceInternal::is_valid() const {
 // }
 
 bool image_to_normalized_rd_format(Image::Format image_format, RenderingDevice::DataFormat &out_rd_format) {
-	// TODO Setup swizzles for unused components
-	// but for now the module's internal shaders don't rely on that
+	// TODO 为未使用的分量设置 swizzle
+	// 但目前模块内部着色器并不依赖这一点
 
 	switch (image_format) {
-		// 8-bit formats
+		// 8 位格式
 		case Image::FORMAT_L8:
 		case Image::FORMAT_R8:
 			out_rd_format = RenderingDevice::DATA_FORMAT_R8_UNORM;
@@ -61,7 +61,7 @@ bool image_to_normalized_rd_format(Image::Format image_format, RenderingDevice::
 		case Image::FORMAT_RGBA8:
 			out_rd_format = RenderingDevice::DATA_FORMAT_R8G8B8A8_UNORM;
 			break;
-		// 16-bit float formats
+		// 16 位浮点格式
 		case Image::FORMAT_RH:
 			out_rd_format = RenderingDevice::DATA_FORMAT_R16_SFLOAT;
 			break;
@@ -74,7 +74,7 @@ bool image_to_normalized_rd_format(Image::Format image_format, RenderingDevice::
 		case Image::FORMAT_RGBAH:
 			out_rd_format = RenderingDevice::DATA_FORMAT_R16G16B16A16_SFLOAT;
 			break;
-		// 32-bit float formats
+		// 32 位浮点格式
 		case Image::FORMAT_RF:
 			out_rd_format = RenderingDevice::DATA_FORMAT_R32_SFLOAT;
 			break;
@@ -89,7 +89,7 @@ bool image_to_normalized_rd_format(Image::Format image_format, RenderingDevice::
 			break;
 		default:
 			return false;
-			// More formats may be added if we need them
+			// 如果需要，可以添加更多格式
 	}
 	return true;
 }
@@ -106,7 +106,7 @@ void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const
 
 	type = TYPE_TEXTURE_2D;
 
-	// Size can vary each time so we have to recreate the format...
+	// 尺寸每次都可能变化，因此必须重新创建格式……
 	Ref<RDTextureFormat> texture_format;
 	texture_format.instantiate();
 	texture_format->set_width(image.get_width());
@@ -117,7 +117,7 @@ void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const
 			RenderingDevice::TEXTURE_USAGE_CAN_COPY_FROM_BIT | RenderingDevice::TEXTURE_USAGE_SAMPLING_BIT
 	);
 	texture_format->set_texture_type(RenderingDevice::TEXTURE_TYPE_2D);
-	// TODO Do I need multisample if I want filtering?
+	// TODO 如果我想做过滤，需要多重采样吗？
 
 	Ref<RDTextureView> texture_view;
 	texture_view.instantiate();
@@ -148,7 +148,7 @@ void ComputeShaderResourceInternal::create_texture_2d(RenderingDevice &rd, const
 
 		for (unsigned int i = 0; i < width; ++i) {
 			const float t = curve_domain.min + curve_domain_range * (i / static_cast<float>(width));
-			// TODO Thread-safety: `sample_baked` can actually be a WRITING method! The baked cache is lazily created
+			// TODO 线程安全：`sample_baked` 实际上可能是写入方法！烘焙缓存是惰性创建的
 			wd[i] = curve.sample_baked(t);
 			// print_line(String("X: {0}, Y: {1}").format(varray(t, wd[i])));
 		}
@@ -242,7 +242,7 @@ void ComputeShaderResourceInternal::update_storage_buffer(RenderingDevice &rd, c
 // }
 
 void transform3d_to_mat4(const Transform3D &t, Span<float> dst) {
-	// Based on `material_storage.h`
+	// 基于 `material_storage.h`
 
 	dst[0] = t.basis.rows[0].x;
 	dst[1] = t.basis.rows[1].x;
@@ -261,7 +261,7 @@ void transform3d_to_mat4(const Transform3D &t, Span<float> dst) {
 	dst[14] = t.origin.z;
 	dst[15] = 1.f;
 
-	// This was based on DirectMultiMeshInstance BUT NO, we have to do the transposed way, because... who knows.
+	// 这是基于 DirectMultiMeshInstance 的，但不，我们必须使用转置的方式，因为……谁知道呢。
 
 	// dst[0] = t.basis.rows[0].x;
 	// dst[1] = t.basis.rows[1].x;
@@ -315,8 +315,8 @@ std::shared_ptr<ComputeShaderResource> ComputeShaderResourceFactory::create_text
 		const Vector3i size
 ) {
 	VOXEL_ASSERT(Vector3iUtil::is_valid_size(size));
-	// Note, this array is refcounted so we can pass it to the async queue. It is also what the RD expects so we
-	// minimize allocations for intermediate objects
+	// 注意，该数组是引用计数的，所以我们可以将其传递给异步队列。它也是 RD 所期望的，
+	// 这样我们可以尽量减少中间对象的分配
 	PackedByteArray pba;
 	pba.resize(sizeof(float) * Vector3iUtil::get_volume_u64(size));
 	uint8_t *pba_w = pba.ptrw();
@@ -363,7 +363,7 @@ void ComputeShaderResource::update_storage_buffer(
 }
 
 RID ComputeShaderResource::get_rid() const {
-	// TODO Assert that we are on the GPU tasks thread
+	// TODO 断言我们位于 GPU 任务线程上
 	return _internal.rid;
 }
 

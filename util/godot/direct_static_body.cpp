@@ -7,8 +7,8 @@
 namespace voxel::godot {
 
 DirectStaticBody::DirectStaticBody() {
-	// Nothing here. It is a thin RID wrapper,
-	// no calls to PhysicsServer3D are made until we called one of the functions.
+	// 这里什么都没有。它只是一个轻量的 RID 封装，
+	// 在调用某个函数之前不会对 PhysicsServer3D 发出任何调用。
 }
 
 DirectStaticBody::~DirectStaticBody() {
@@ -28,7 +28,7 @@ void DirectStaticBody::destroy() {
 		PhysicsServer3D &ps = *PhysicsServer3D::get_singleton();
 		free_physics_server_rid(ps, _body);
 		_body = RID();
-		// The shape need to be destroyed after the body
+		// 形状需要在刚体销毁之后销毁
 		_shape.unref();
 	}
 	if (_debug_mesh_instance.is_valid()) {
@@ -54,7 +54,7 @@ void DirectStaticBody::add_shape(Ref<Shape3D> shape) {
 	VOXEL_PROFILE_SCOPE();
 	ERR_FAIL_COND(!_body.is_valid());
 	PhysicsServer3D::get_singleton()->body_add_shape(_body, shape->get_rid(), Transform3D(), false);
-	// No use case for multishape yet
+	// 目前还没有多形状的使用场景
 	_shape = shape;
 
 	if (_debug_mesh_instance.is_valid()) {
@@ -99,7 +99,7 @@ void DirectStaticBody::set_shape_enabled(int shape_index, bool enabled) {
 }
 
 void DirectStaticBody::set_attached_object(const Object *obj) {
-	// Serves in high-level collision query results, `collider` will contain the attached object
+	// 用于高层级碰撞查询结果，`collider` 将包含附加的对象
 	ERR_FAIL_COND(!_body.is_valid());
 	PhysicsServer3D::get_singleton()->body_attach_object_instance_id(
 			_body, obj != nullptr ? obj->get_instance_id() : ObjectID()

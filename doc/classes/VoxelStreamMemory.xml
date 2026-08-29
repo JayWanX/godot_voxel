@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelStreamMemory" inherits="VoxelStream" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Keeps data into memory rather than writing it on disk.
+		将数据保存在内存中，而不是写入磁盘。
 	</brief_description>
 	<description>
-		This stream is mainly intented for testing purposes. It shouldn't be used as a proper saving system.
+		该数据流主要用于测试目的。它不应被用作正式的保存系统。
 	</description>
 	<tutorials>
 	</tutorials>
 	<members>
 		<member name="artificial_save_latency_usec" type="int" setter="set_artificial_save_latency_usec" getter="get_artificial_save_latency_usec" default="0">
-			Fakes long saving by making the calling thread sleep for some amount of time.
+			通过让调用线程休眠一段时间来模拟长时间保存。
 		</member>
 	</members>
 </class>

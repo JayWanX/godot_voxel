@@ -7,7 +7,7 @@
 
 namespace voxel {
 
-// STL's bitset is fixed size, and I don't want to depend on Boost
+// STL 的 bitset 大小固定，且我不想依赖 Boost
 class DynamicBitset {
 public:
 	inline unsigned int size() const {
@@ -15,7 +15,7 @@ public:
 	}
 
 	inline void resize_no_init(unsigned int size) {
-		// non-initializing resize (no guaranteed values)
+		// 不初始化的 resize（不保证值）
 		_bits.resize((size + 63) / 64);
 		_size = size;
 	}
@@ -26,7 +26,7 @@ public:
 	}
 
 	void fill(bool v) {
-		// Note: padding bits will also be set
+		// 注意：填充位也会被设置
 		uint64_t m = v ? 0xffffffffffffffff : 0;
 		for (auto it = _bits.begin(); it != _bits.end(); ++it) {
 			*it = m;

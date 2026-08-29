@@ -98,7 +98,7 @@ void register_sdf_nodes(Span<NodeType> types) {
 		t.inputs.push_back(NodeType::Port("x", 0.f, VoxelGraphFunction::AUTO_CONNECT_X));
 		t.inputs.push_back(NodeType::Port("y", 0.f, VoxelGraphFunction::AUTO_CONNECT_Y));
 		t.inputs.push_back(NodeType::Port("z", 0.f, VoxelGraphFunction::AUTO_CONNECT_Z));
-		// Having radius as param allows to connect it to a singe Constant node, which can also be used elsewhere
+		// 把半径作为参数，可以把它连接到单个 Constant 节点，该节点也可以在别处使用
 		t.inputs.push_back(NodeType::Port("radius", 1.f, VoxelGraphFunction::AUTO_CONNECT_NONE, false));
 		t.outputs.push_back(NodeType::Port("sdf"));
 		t.process_buffer_func = [](Runtime::ProcessBufferContext &ctx) {
@@ -231,7 +231,7 @@ void register_sdf_nodes(Span<NodeType> types) {
 					out.data[i] = math::sdf_smooth_union(a.data[i], b.data[i], params.smoothness);
 				}
 			} else {
-				// Fallback on hard-union, smooth union does not support zero smoothness
+				// 回退到硬并集（hard-union），平滑并集不支持零平滑度
 				for (uint32_t i = 0; i < out.size; ++i) {
 					out.data[i] = math::sdf_union(a.data[i], b.data[i]);
 				}
@@ -243,9 +243,9 @@ void register_sdf_nodes(Span<NodeType> types) {
 			const Params params = ctx.get_params<Params>();
 
 			if (params.smoothness > 0.0001f) {
-				// TODO Ideally we should be consistent in which kind of floats we use.
-				// Right now we should use `float` everywhere, eventually allowing to choose even if Godot is compiled
-				// with doubles, as not everything actually needs to be double
+				// TODO 理想情况下，我们应该统一使用哪种 float。
+				// 现在我们应该到处使用 `float`，最终甚至可以允许在 Godot 使用 double 编译时选择，
+				// 因为并不是所有东西真的需要 double
 				const math::SdfAffectingArguments args =
 						math::sdf_polynomial_smooth_union_side<real_t>(a, b, params.smoothness);
 				switch (args) {
@@ -335,7 +335,7 @@ void register_sdf_nodes(Span<NodeType> types) {
 					out.data[i] = math::sdf_smooth_subtract(a.data[i], b.data[i], params.smoothness);
 				}
 			} else {
-				// Fallback on hard-subtract, smooth subtract does not support zero smoothness
+				// 回退到硬差集（hard-subtract），平滑差集不支持零平滑度
 				for (uint32_t i = 0; i < out.size; ++i) {
 					out.data[i] = math::sdf_subtract(a.data[i], b.data[i]);
 				}
@@ -409,7 +409,7 @@ void register_sdf_nodes(Span<NodeType> types) {
 		t.params.push_back(NodeType::Param("max_value", Variant::FLOAT, 1.f));
 		t.params.push_back(NodeType::Param("fraction_period", Variant::FLOAT, 10.f));
 
-		// Matches an enum in editor code `VoxelGraphEditorNodePreview`
+		// 与编辑器代码 `VoxelGraphEditorNodePreview` 中的枚举一致
 		NodeType::Param mode_param("mode", Variant::INT, 0);
 		mode_param.enum_items.push_back("Greyscale");
 		mode_param.enum_items.push_back("SDF");

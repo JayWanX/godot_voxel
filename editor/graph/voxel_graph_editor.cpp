@@ -70,7 +70,7 @@ enum ToolbarMenuIDs {
 	MENU_REMOVE_CONNECTION
 };
 
-// Utilities
+// 工具函数
 namespace {
 
 NodePath to_node_path(const StringName &sn) {
@@ -196,12 +196,12 @@ VoxelGraphEditor::VoxelGraphEditor() {
 	_graph_edit = memnew(GraphEdit);
 	_graph_edit->set_anchors_preset(Control::PRESET_FULL_RECT);
 	_graph_edit->set_right_disconnects(true);
-	// TODO Performance: sorry, had to turn off AA because Godot's current implementation is incredibly slow.
-	// It slows down the editor a lot when a graph has lots of connections. Because despite Godot 4 now supporting
-	// 2D MSAA, it still relies on a fake AA method which generates more geometry and allocates
-	// memory (malloc) on the fly. See `RendererCanvasCull::canvas_item_add_polyline`.
-	// 2D MSAA also is only exposed in Project Settings, which does not apply to editor UIs... (and shouldn't, but there
-	// should be a setting in Editor Settings).
+	// TODO 性能：抱歉，不得不关闭抗锯齿，因为 Godot 当前的实现慢得惊人。
+	// 当图形有很多连线时会严重拖慢编辑器。因为尽管 Godot 4 现在支持
+	// 2D MSAA，它仍然依赖一种假的抗锯齿方法，会生成更多几何图形并即时
+	// 分配内存（malloc）。参见 `RendererCanvasCull::canvas_item_add_polyline`。
+	// 2D MSAA 也只在项目设置中暴露，不适用于编辑器 UI……（也不应该，但
+	// 应该在编辑器设置中提供该项设置）。
 	_graph_edit->set_connection_lines_antialiased(false);
 	_graph_edit->set_v_size_flags(Control::SIZE_EXPAND_FILL);
 	_graph_edit->connect("gui_input", callable_mp(this, &Self::_on_graph_edit_gui_input));
@@ -223,11 +223,11 @@ VoxelGraphEditor::VoxelGraphEditor() {
 	_node_dialog->connect(
 			VoxelGraphNodeDialog::SIGNAL_FILE_SELECTED, callable_mp(this, &Self::_on_node_dialog_file_selected)
 	);
-	// Initially the popup was meant to not appear as its own window in the taskbar, and close when clicking
-	// outside of it. At some point the latter stopped being a thing (?), causing the same issue as the VisualShader
-	// editor:
+	// 最初这个弹窗被设计为不在任务栏中显示为独立窗口，并在点击
+	// 外部时关闭。后来后者（点击外部关闭）不再生效（？），导致了与 VisualShader
+	// 编辑器相同的问题：
 	// https://github.com/godotengine/godot/issues/83805
-	// So for now we do the same fix, making it exclusive...
+	// 因此目前我们采用相同的修复方式，将其设为独占...
 	_node_dialog->set_exclusive(true);
 	add_child(_node_dialog);
 
@@ -257,9 +257,9 @@ void VoxelGraphEditor::set_generator(Ref<VoxelGeneratorGraph> generator) {
 	if (_generator.is_valid()) {
 		Ref<VoxelGraphFunction> graph = generator->get_main_function();
 
-		// Load a default preset when creating new graphs.
-		// Downside is, an empty graph cannot be seen. But Godot doesnt let us know if the resource has been created
-		// from the inspector or not, so we had to introduce a special boolean...
+		// 创建新图形时加载默认预设。
+		// 缺点是空的图形无法显示。但 Godot 不会告诉我们资源是从检查器
+		// 创建的还是不是，因此我们不得不引入一个特殊布尔值...
 		if (graph->get_nodes_count() == 0 && graph->can_load_default_graph()) {
 			_generator->load_plane_preset();
 		}
@@ -367,8 +367,8 @@ void VoxelGraphEditor::process(float delta) {
 		}
 	}
 
-	// I decided to do by polling to display some things on graph nodes, so all the code is here and there is no faffing
-	// around with signals.
+	// 我决定用轮询来在图形节点上显示一些内容，这样所有代码都在这里，无需
+	// 折腾各种信号。
 	if (_graph.is_valid() && is_visible_in_tree()) {
 		for (int child_node_index = 0; child_node_index < _graph_edit->get_child_count(); ++child_node_index) {
 			Node *node = _graph_edit->get_child(child_node_index);
@@ -399,7 +399,7 @@ inline String node_to_gui_name(uint32_t node_id) {
 }
 
 void VoxelGraphEditor::build_gui_from_graph() {
-	// Rebuild the entire graph GUI
+	// 重建整个图形 GUI
 
 	clear();
 
@@ -417,7 +417,7 @@ void VoxelGraphEditor::build_gui_from_graph() {
 		create_node_gui(node_id);
 	}
 
-	// Connections
+	// 连接
 
 	StdVector<ProgramGraph::Connection> all_connections;
 	graph.get_connections(all_connections);
@@ -437,10 +437,10 @@ void VoxelGraphEditor::build_gui_from_graph() {
 }
 
 void VoxelGraphEditor::create_node_gui(uint32_t node_id) {
-	// Build one GUI node
+	// 构建一个 GUI 节点
 
 	CRASH_COND(_graph.is_null());
-	// Checking because when creating a new node, UndoRedo methods carry on even if one fails
+	// 检查是因为创建新节点时，即使其中一个失败，UndoRedo 方法也会继续执行
 	ERR_FAIL_COND(_graph->has_node(node_id) == false);
 
 	const String ui_node_name = node_to_gui_name(node_id);
@@ -463,7 +463,7 @@ void VoxelGraphEditor::create_node_gui(uint32_t node_id) {
 }
 
 void remove_connections_from_and_to(GraphEdit &graph_edit, StringName node_name) {
-	// Get copy of connection list
+	// 获取连接列表的副本
 	StdVector<GraphEditConnection> connections;
 	get_graph_edit_connections(graph_edit, connections);
 
@@ -475,7 +475,7 @@ void remove_connections_from_and_to(GraphEdit &graph_edit, StringName node_name)
 }
 
 void VoxelGraphEditor::remove_node_gui(StringName gui_node_name) {
-	// Remove connections from the UI, because GraphNode doesn't do it...
+	// 从 UI 中移除连接，因为 GraphNode 不会自动处理...
 	remove_connections_from_and_to(*_graph_edit, gui_node_name);
 
 	Node *node_view = get_node_typed<Node>(*_graph_edit, to_node_path(gui_node_name));
@@ -483,7 +483,7 @@ void VoxelGraphEditor::remove_node_gui(StringName gui_node_name) {
 	memdelete(node_view);
 }
 
-// There is no API for this (and no internal function either), so like the implementation, I copy/pasted it
+// 没有用于此目的的 API（也没有内部函数），因此我像实现那样复制粘贴了它
 // static const GraphNode *get_graph_node_under_mouse(const GraphEdit *graph_edit) {
 // 	for (int i = graph_edit->get_child_count() - 1; i >= 0; i--) {
 // 		const GraphNode *gn = Object::cast_to<GraphNode>(graph_edit->get_child(i));
@@ -506,7 +506,7 @@ void VoxelGraphEditor::update_node_layout(uint32_t node_id) {
 	VoxelGraphEditorNode *view = get_node_typed<VoxelGraphEditorNode>(graph_edit, view_name);
 	ERR_FAIL_COND(view == nullptr);
 
-	// Remove all GUI connections going to the node
+	// 移除所有连接到该节点的 GUI 连接
 
 	StdVector<GraphEditConnection> old_connections;
 	get_graph_edit_connections(graph_edit, old_connections);
@@ -522,16 +522,16 @@ void VoxelGraphEditor::update_node_layout(uint32_t node_id) {
 		}
 	}
 
-	// Update node layout
+	// 更新节点布局
 
 	view->update_layout(**_graph);
 
-	// TODO What about output connections?
-	// Currently assuming there is always only one for expression nodes, therefore it might be ok?
+	// TODO 输出连接怎么办？
+	// 目前假设表达式节点总是只有一个输出，因此可能没问题？
 
-	// Add connections back by reading the graph
+	// 通过读取图形重新添加连接
 
-	// TODO Optimize: the graph stores an adjacency list, we could use that
+	// TODO 优化：图形存储了邻接表，我们可以利用它
 	StdVector<ProgramGraph::Connection> all_connections;
 	_graph->get_connections(all_connections);
 
@@ -590,7 +590,7 @@ void VoxelGraphEditor::_on_graph_edit_gui_input(Ref<InputEvent> event) {
 				_context_connection = get_graph_edit_closest_connection_at_point(*_graph_edit, menu_pos);
 
 				if (_context_connection.is_valid() || selected_nodes.size() > 0) {
-					// Show context menu
+					// 显示上下文菜单
 
 					const Vector2 global_pos =
 							_graph_edit->get_screen_position() + _graph_edit->get_local_mouse_position();
@@ -612,14 +612,14 @@ void VoxelGraphEditor::_on_graph_edit_gui_input(Ref<InputEvent> event) {
 					}
 
 					_context_menu->set_position(global_pos);
-					// VisualShaderEditor uses that, but it's not exposed. I don't know what it's used for.
+					// VisualShaderEditor 用了这个，但它没有暴露出来。我不知道它有什么用途。
 					// _context_menu->reset_size();
 					_context_menu->popup();
 
 				} else {
-					// Careful with how the position is computed, some users have multiple monitors but OSes handle it
-					// in different ways, either with two desktops or one expanded desktop. This affects mouse
-					// positions. I took example on context menus in `filesystem_dock.cpp`.
+					// 注意位置的计算方式，一些用户有多个显示器，但操作系统处理它们的方式
+					// 不同，要么是两个独立桌面，要么是一个扩展桌面。这会影响鼠标
+					// 位置。我参考了 `filesystem_dock.cpp` 中上下文菜单的做法。
 					_node_dialog->popup_at_screen_position(_graph_edit->get_screen_position() + mb->get_position());
 				}
 			}
@@ -656,7 +656,7 @@ void VoxelGraphEditor::_on_graph_edit_connection_request(
 			_graph->try_get_connection_to(ProgramGraph::PortLocation{ dst_node_id, uint32_t(to_slot) }, prev_src_port);
 
 	if (replacing) {
-		// Remove existing connection so we can replace with the new one
+		// 移除现有连接，以便用新连接替换
 		prev_src_node_name = node_to_gui_name(prev_src_port.node_id);
 		_undo_redo->add_do_method(
 				_graph.ptr(), "remove_connection", prev_src_port.node_id, prev_src_port.port_index, dst_node_id, to_slot
@@ -673,7 +673,7 @@ void VoxelGraphEditor::_on_graph_edit_connection_request(
 	_undo_redo->add_undo_method(_graph_edit, "disconnect_node", from_node_name, from_slot, to_node_name, to_slot);
 
 	if (replacing) {
-		// After undoing the connection we added, put back the connection we replaced
+		// 撤销我们添加的连接后，恢复被我们替换掉的连接
 		_undo_redo->add_undo_method(
 				_graph.ptr(), "add_connection", prev_src_port.node_id, prev_src_port.port_index, dst_node_id, to_slot
 		);
@@ -722,10 +722,10 @@ void VoxelGraphEditor::remove_connection(
 #if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_delete_nodes_request(TypedArray<StringName> node_names) {
 #endif
-	// The `node_names` argument is the result of Godot issue #61112. While it is less convenient than just getting
-	// the nodes themselves, it also has the downside of being always empty if you choose to not show "close" buttons
-	// on every graph node corner, even if you have nodes selected. That behavior was even documented. Go figure.
-	// So... I keep doing it the old way.
+	// `node_names` 参数是 Godot issue #61112 的结果。虽然它比直接获取
+	// 节点本身更方便，但它还有一个缺点：如果你选择不在每个图形节点的
+	// 角落显示“关闭”按钮，即使你选中了节点，它也始终是空的。这个行为甚至还有文档。真服了。
+	// 所以……我还是沿用老办法。
 	delete_selected_nodes();
 }
 
@@ -761,7 +761,7 @@ void VoxelGraphEditor::delete_selected_nodes() {
 			);
 		}
 
-		// Params undo
+		// 参数撤销
 		const size_t param_count = NodeTypeDB::get_singleton().get_type(node_type_id).params.size();
 		for (size_t j = 0; j < param_count; ++j) {
 			Variant param_value = _graph->get_node_param(node_id, j);
@@ -770,7 +770,7 @@ void VoxelGraphEditor::delete_selected_nodes() {
 
 		_undo_redo->add_undo_method(this, "create_node_gui", node_id);
 
-		// Connections undo
+		// 连接撤销
 		for (size_t j = 0; j < all_connections.size(); ++j) {
 			const ProgramGraph::Connection &con = all_connections[j];
 
@@ -866,7 +866,7 @@ void VoxelGraphEditor::_on_menu_id_pressed(int id) {
 			if (!shader_res.compilation.success) {
 				return;
 			}
-			// TODO Include uniforms in that version?
+			// TODO 在哪个版本中包含 uniform？
 			_shader_dialog->set_shader_code(to_godot(shader_res.code_utf8));
 			_shader_dialog->popup_centered();
 		} break;
@@ -879,13 +879,13 @@ void VoxelGraphEditor::_on_menu_id_pressed(int id) {
 }
 
 void VoxelGraphEditor::_on_graph_node_dragged(Vector2 from, Vector2 to, int id) {
-	// Note, this doesn't actually modify the graph through UndoRedo?
+	// 注意，这实际上并不会通过 UndoRedo 修改图形？
 	_undo_redo->create_action(VOXEL_TTR("Move nodes"));
 	_undo_redo->add_do_method(this, "set_node_position", id, to);
 	_undo_redo->add_undo_method(this, "set_node_position", id, from);
 	_undo_redo->commit_action();
-	// I haven't the faintest idea how VisualScriptEditor magically makes this work,
-	// neither using `create_action` nor `commit_action`.
+	// 我完全不知道 VisualScriptEditor 是怎么神奇地让这个工作起来的，
+	// 无论它用的是 `create_action` 还是 `commit_action`。
 }
 
 void VoxelGraphEditor::set_node_position(int id, Vector2 offset) {
@@ -894,8 +894,8 @@ void VoxelGraphEditor::set_node_position(int id, Vector2 offset) {
 	if (node_view != nullptr) {
 		node_view->set_position_offset(offset);
 	}
-	// We store GUI node positions independently from editor scale, to make the graph display the same regardless of
-	// monitor DPI, so we have to unapply it
+	// 我们将 GUI 节点位置独立于编辑器缩放来存储，以便图形无论显示器 DPI 如何都显示一致，
+	// 因此这里必须取消应用（缩放）
 	_graph->set_node_gui_position(id, offset / EDSCALE);
 }
 
@@ -907,7 +907,7 @@ void VoxelGraphEditor::_on_node_resize_request(Vector2 new_size, int node_id) {
 	VOXEL_ASSERT_RETURN(node_view != nullptr);
 	VOXEL_ASSERT_RETURN(_graph.is_valid());
 
-	// TODO Not sure if EDSCALE has to be unapplied in this case?
+	// TODO 不确定在这种情况下是否也要取消应用 EDSCALE？
 	_undo_redo->create_action(VOXEL_TTR("Resize Node"), UndoRedo::MERGE_ENDS);
 	_undo_redo->add_do_method(this, "set_node_size", node_id, new_size);
 	_undo_redo->add_do_method(_graph.ptr(), "set_node_gui_size", node_id, new_size);
@@ -922,37 +922,37 @@ void VoxelGraphEditor::set_node_size(int id, Vector2 size) {
 	if (node_view != nullptr) {
 		node_view->set_size(size);
 	}
-	// This function is used solely for the UI, since we should not pass node pointers directly to UndoRedo, they could
-	// have been deleted when the Undo action is called later
+	// 这个函数仅用于 UI，因为我们不应将节点指针直接传给 UndoRedo，稍后调用撤销操作时
+	// 它们可能已被删除
 	//_graph->set_node_gui_size(id, size / EDSCALE);
 }
 
 void VoxelGraphEditor::_on_graph_node_preview_gui_input(Ref<InputEvent> event) {
 	Ref<InputEventMouseMotion> mm = event;
 	if (mm.is_valid()) {
-		// Ctrl+Drag above any preview to pan around the area they render.
+		// 在任意预览上方 Ctrl+拖拽 可平移它们渲染的区域。
 		if (mm->is_command_or_control_pressed() && mm->get_button_mask().has_flag(VOXEL_GODOT_MouseButtonMask_MIDDLE)) {
 			const Vector2 rel = mm->get_relative();
 			set_preview_transform(_preview_offset - Vector2f(rel.x, -rel.y) * _preview_scale, _preview_scale);
 
-			// Prevent panning of GraphEdit
+			// 禁止 GraphEdit 平移
 			get_viewport()->set_input_as_handled();
 		}
 	}
 
 	Ref<InputEventMouseButton> mb = event;
 	if (mb.is_valid()) {
-		// Ctrl+Wheel above any preview to zoom in and out the area they render.
+		// 在任意预览上方按住 Ctrl+滚轮，可缩放其渲染区域。
 		if (mb->is_command_or_control_pressed()) {
 			const float base_factor = 1.1f;
 			if (mb->get_button_index() == VOXEL_GODOT_MouseButton_WHEEL_UP) {
 				set_preview_transform(_preview_offset, _preview_scale / base_factor);
-				// Prevent panning of GraphEdit
+				// 阻止 GraphEdit 平移
 				get_viewport()->set_input_as_handled();
 			}
 			if (mb->get_button_index() == VOXEL_GODOT_MouseButton_WHEEL_DOWN) {
 				set_preview_transform(_preview_offset, _preview_scale * base_factor);
-				// Prevent panning of GraphEdit
+				// 阻止 GraphEdit 平移
 				get_viewport()->set_input_as_handled();
 			}
 		}
@@ -963,7 +963,7 @@ void VoxelGraphEditor::set_preview_transform(Vector2f offset, float scale) {
 	if (offset != _preview_offset || scale != _preview_scale) {
 		_preview_offset = offset;
 		_preview_scale = scale;
-		// Update quickly
+		// 快速更新
 		if (_time_before_preview_update <= 0.f) {
 			_time_before_preview_update = 0.1f;
 		}
@@ -971,7 +971,7 @@ void VoxelGraphEditor::set_preview_transform(Vector2f offset, float scale) {
 }
 
 Vector2 get_graph_offset_from_mouse(const GraphEdit *graph_edit, const Vector2 local_mouse_pos) {
-	// TODO Ask for a method, or at least documentation about how it's done
+	// TODO 请求一个方法，或者至少提供关于如何实现它的文档
 	Vector2 offset = get_graph_edit_scroll_offset(*graph_edit) + local_mouse_pos;
 	if (is_graph_edit_using_snapping(*graph_edit)) {
 		const int snap = get_graph_edit_snapping_distance(*graph_edit);
@@ -983,7 +983,7 @@ Vector2 get_graph_offset_from_mouse(const GraphEdit *graph_edit, const Vector2 l
 }
 
 void VoxelGraphEditor::_on_node_dialog_node_selected(int id) {
-	// Create a base node type
+	// 创建基础节点类型
 
 	const Vector2 pos = get_graph_offset_from_mouse(_graph_edit, _click_position);
 	const uint32_t node_type_id = id;
@@ -1009,9 +1009,9 @@ void VoxelGraphEditor::_on_graph_edit_node_selected(Node *p_node) {
 #if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_node_deselected(Node *p_node) {
 #endif
-	// Just checking if nothing is selected _now_ is unreliable, because the user could have just selected another
-	// node, and I don't know when `GraphEdit` will update the `selected` flags in the current call stack.
-	// GraphEdit doesn't have an API giving us enough context to guess that, so have to rely on dirty workaround.
+	// 仅仅检查现在是否什么都没选中并不可靠，因为用户可能刚刚选中了另一个
+	// 节点，而且我不知道 `GraphEdit` 何时会在当前调用栈中更新 `selected` 标志。
+	// GraphEdit 没有提供足够上下文来判断这一点的 API，所以只能依靠这种粗糙的变通方法。
 	if (!_nothing_selected_check_scheduled) {
 		_nothing_selected_check_scheduled = true;
 		call_deferred("_check_nothing_selected");
@@ -1046,7 +1046,7 @@ void VoxelGraphEditor::update_previews(bool with_live_update) {
 
 	const uint64_t time_before = Time::get_singleton()->get_ticks_usec();
 
-	// VoxelGeneratorGraph has extra requirements to compile
+	// VoxelGeneratorGraph 编译时有额外的要求
 	const pg::CompilationResult result = _generator.is_valid() ? _generator->compile(true) : _graph->compile(true);
 
 	if (!result.success) {
@@ -1060,7 +1060,7 @@ void VoxelGraphEditor::update_previews(bool with_live_update) {
 		if (result.node_id >= 0) {
 			String node_view_path = node_to_gui_name(result.node_id);
 			VoxelGraphEditorNode *node_view = get_node_typed<VoxelGraphEditorNode>(*_graph_edit, node_view_path);
-			// If this happens then perhaps it got incorrectly remapped in case it's a node created by the compiler
+			// 如果发生这种情况，那么该节点可能是编译器创建的节点，被错误地重映射了
 			if (node_view != nullptr) {
 				node_view->set_modulate(Color(1, 0.3, 0.1));
 			} else {
@@ -1083,10 +1083,10 @@ void VoxelGraphEditor::update_previews(bool with_live_update) {
 		}
 	}
 
-	// We assume no other thread will try to modify the graph and compile something not good
+	// 我们假设没有其他线程会尝试修改图形并编译出不好的结果
 
-	// TODO Make slice previews work with arbitrary functions, when possible
-	// TODO Make range analysis previews work with arbitrary functions, when possible
+	// TODO 在可能的情况下，让切片预览支持任意函数
+	// TODO 在可能的情况下，让范围分析预览支持任意函数
 
 	update_slice_previews();
 
@@ -1098,21 +1098,21 @@ void VoxelGraphEditor::update_previews(bool with_live_update) {
 	VOXEL_PRINT_VERBOSE(format("Previews generated in {} us", time_taken));
 
 	if (_live_update_enabled && with_live_update) {
-		// TODO Use that hash to prevent full recompiling, because the `changed` now reports ANY changes, including
-		// those that don't require recompiling...
+		// TODO 使用该哈希来避免完全重新编译，因为 `changed` 现在会报告任何更改，包括
+		// 那些不需要重新编译的更改...
 
-		// Check if the graph changed in a way that actually changes the output,
-		// because re-generating all voxels is expensive.
-		// Note, sub-resouces can be involved, not just node connections and properties.
+		// 检查图形是否以实际影响输出的方式发生了变化，
+		// 因为重新生成所有体素代价高昂。
+		// 注意，涉及的可能是子资源，而不仅仅是节点连接和属性。
 		const uint64_t hash = _graph->get_output_graph_hash();
 
 		if (hash != _last_output_graph_hash) {
 			_last_output_graph_hash = hash;
 
-			// Not calling into `_voxel_node` directly because the editor could be pinned and the terrain not actually
-			// selected. In this situation the plugin may reset the node to null. But it is desirable for terrains
-			// using the current graph to update if they are in the edited scene, so this may be delegated to the editor
-			// plugin. There isn't enough context from here to do this cleanly.
+			// 不直接调用 `_voxel_node`，因为编辑器可能被固定，而地形实际上并未被
+			// 选中。在这种情况下，插件可能会将节点重置为 null。但对于使用了当前图形且
+			// 位于被编辑场景中的地形，我们希望它们能够更新，因此这可以委托给编辑器
+			// 插件。从这里无法获得足够的上下文来干净地完成这件事。
 			emit_signal(SIGNAL_REGENERATE_REQUESTED);
 		}
 	}
@@ -1125,7 +1125,7 @@ void VoxelGraphEditor::update_range_analysis_previews() {
 
 	const AABB aabb = _range_analysis_dialog->get_aabb();
 
-	// Compute actual ranges at outputs connected to preview nodes
+	// 计算连接到预览节点的输出端的实际范围
 	StdUnorderedMap<uint32_t, math::Interval> actual_ranges;
 	{
 		StdVector<VoxelGraphEditorNodePreviewInfo> slice_preview_infos = get_slice_previews();
@@ -1220,19 +1220,19 @@ void VoxelGraphEditor::update_range_analysis_previews() {
 			continue;
 		}
 
-		// Assume the node won't run for now
-		// TODO Would be nice if GraphEdit's minimap would take such coloring into account...
+		// 暂时假设该节点不会运行
+		// TODO 如果 GraphEdit 的小地图能考虑这种着色就好了...
 		node_view->set_modulate(greyed_out_color);
 
 		node_view->update_range_analysis_tooltips(adapter, state, actual_ranges);
 	}
 
-	// Highlight only nodes that will actually run.
-	// Note, some nodes can appear twice in this map due to internal expansion.
+	// 仅高亮那些实际会运行的节点。
+	// 注意，由于内部展开，某些节点可能在此映射中出现两次。
 	Span<const uint32_t> execution_map = VoxelGeneratorGraph::get_last_execution_map_debug_from_current_thread();
 	for (unsigned int i = 0; i < execution_map.size(); ++i) {
 		const uint32_t node_id = execution_map[i];
-		// Some returned nodes might not be in the user-facing graph because they get generated during compilation
+		// 某些返回的节点可能不在面向用户的图形中，因为它们是编译期间生成的
 		if (!_graph->has_node(node_id)) {
 			VOXEL_PRINT_VERBOSE(
 					format("Ignoring node {} from range analysis results, not present in user graph", node_id)
@@ -1273,7 +1273,7 @@ StdVector<VoxelGraphEditorNodePreviewInfo> VoxelGraphEditor::get_slice_previews(
 	GraphEditorAdapter adapter(_generator, _graph);
 	StdVector<VoxelGraphEditorNodePreviewInfo> previews;
 
-	// Gather preview nodes
+	// 收集预览节点
 	for (int i = 0; i < _graph_edit->get_child_count(); ++i) {
 		const VoxelGraphEditorNode *node = Object::cast_to<VoxelGraphEditorNode>(_graph_edit->get_child(i));
 		if (node == nullptr || node->get_preview() == nullptr) {
@@ -1284,13 +1284,13 @@ StdVector<VoxelGraphEditorNodePreviewInfo> VoxelGraphEditor::get_slice_previews(
 		dst.port_index = 0;
 		ProgramGraph::PortLocation src;
 		if (!_graph->try_get_connection_to(dst, src)) {
-			// Not connected?
+			// 未连接？
 			continue;
 		}
 		VoxelGraphEditorNodePreviewInfo info;
 		info.control = node->get_preview();
 		if (!adapter.try_get_output_port_address(src, info.address)) {
-			// Not part of the compiled result
+			// 不属于编译结果
 			continue;
 		}
 		info.node_id = dst.node_id;
@@ -1356,7 +1356,7 @@ void VoxelGraphEditor::profile() {
 
 	StdVector<NodeRatio> node_ratios;
 
-	// Deduplicate entries and get maximum
+	// 去重条目并获取最大值
 	float max_individual_time = 0.f;
 	for (const VoxelGeneratorGraph::NodeProfilingInfo &info : nodes_profiling_info) {
 		unsigned int i = 0;
@@ -1384,7 +1384,7 @@ void VoxelGraphEditor::profile() {
 	}
 
 	for (const NodeRatio &nr : node_ratios) {
-		// Some nodes generated during compilation aren't present in the user-facing graph
+		// 某些编译期间生成的节点不存在于面向用户的图形中
 		if (!_graph->has_node(nr.node_id)) {
 			VOXEL_PRINT_VERBOSE(format("Ignoring node {} from profiling results, not present in user graph", nr.node_id));
 			continue;
@@ -1398,7 +1398,7 @@ void VoxelGraphEditor::profile() {
 }
 
 void VoxelGraphEditor::update_preview_axes_menu() {
-	// Update menu state from current settings
+	// 根据当前设置更新菜单状态
 	ERR_FAIL_COND(_preview_axes_menu == nullptr);
 	ToolbarMenuIDs id;
 	switch (_node_preview_mode) {
@@ -1426,11 +1426,11 @@ void VoxelGraphEditor::hide_profiling_ratios() {
 }
 
 void VoxelGraphEditor::update_buttons_availability() {
-	// Some features are only available with a generator (for now)
+	// 某些功能目前仅在使用生成器时才可用（暂时如此）
 	// _debug_menu_button->set_disabled(_generator.is_null());
 	// _graph_menu_button->set_disabled(_generator.is_null());
 
-	// TODO Implement profiling on any graph
+	// TODO 在任意图形上实现性能分析
 	PopupMenu &menu = *_debug_menu_button->get_popup();
 	{
 		const int index = menu.get_item_index(MENU_PROFILE);
@@ -1520,9 +1520,9 @@ void VoxelGraphEditor::update_functions() {
 
 	StdVector<ProgramGraph::Connection> removed_connections;
 	_graph->update_function_nodes(&removed_connections);
-	// TODO This can mess with undo/redo and remove connections, but I'm not sure if it's worth dealing with it.
-	// A way to workaround it is to introduce a concept of "invalid ports", where function nodes keep their old ports
-	// until they are explicitely removed by an action of the user (and then come back if undone).
+	// TODO 这可能会干扰撤销/重做并移除连接，但我不确定是否值得处理它。
+	// 一种变通方法是引入“无效端口”的概念，让函数节点保留其旧端口，
+	// 直到用户通过某个操作显式移除它们（撤销后又会恢复）。
 
 	for (const ProgramGraph::Connection &con : removed_connections) {
 		const String from_node_name = node_to_gui_name(con.src.node_id);
@@ -1579,13 +1579,13 @@ void VoxelGraphEditor::paste_clipboard() {
 		return;
 	}
 
-	// We need to generate node IDs up-front to make Undo/Redo work
+	// 我们需要预先生成节点 ID，以便撤销/重做能够工作
 	PackedInt32Array pre_generated_ids;
 	for (unsigned int i = 0; i < _clipboard.graph->get_nodes_count(); ++i) {
 		pre_generated_ids.append(_graph->generate_node_id());
 	}
 
-	// Roughly center nodes to where the mouse is pointing
+	// 大致将节点居中到鼠标指向的位置
 	Vector2 gui_offset;
 	{
 		PackedInt32Array node_ids = _clipboard.graph->get_node_ids();
@@ -1634,7 +1634,7 @@ void VoxelGraphEditor::paste_clipboard() {
 
 void VoxelGraphEditor::create_node_gui_input_connections(int node_id) {
 	VOXEL_ASSERT_RETURN(_graph.is_valid());
-	// Assumes the node has no connections setup in GraphEdit. Quite specific to copy/paste.
+	// 假设该节点在 GraphEdit 中没有设置连接。这相当特定于复制/粘贴。
 
 	const uint32_t input_count = _graph->get_node_input_count(node_id);
 

@@ -54,7 +54,7 @@ public:
 	StringName _voxel_debug_vt_position;
 #endif
 
-	// Redeclared rather than referencing CoreStringNames for consistency.
+	// 为了保持一致性而重新声明，而不是引用 CoreStringNames。
 	StringName changed;
 	StringName frame_post_draw;
 

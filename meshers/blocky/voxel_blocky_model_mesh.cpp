@@ -38,7 +38,7 @@ void VoxelBlockyModelMesh::set_mesh(Ref<Mesh> mesh) {
 namespace {
 
 #ifdef TOOLS_ENABLED
-// Generate tangents based on UVs (won't be as good as properly imported tangents)
+// 基于 UV 生成切线（不会像正确导入的切线那样好）
 PackedFloat32Array generate_tangents_from_uvs(
 		const PackedVector3Array &positions,
 		const PackedVector3Array &normals,
@@ -261,8 +261,7 @@ void bake_mesh_geometry(
 		PackedVector2Array uvs = arrays[Mesh::ARRAY_TEX_UV];
 		PackedFloat32Array tangents = arrays[Mesh::ARRAY_TANGENT];
 
-		// Godot actually allows to create an ArrayMesh with invalid indices. We require valid indices for baking, so we
-		// have to check it.
+		// Godot 实际上允许创建带无效索引的 ArrayMesh。烘焙需要有效索引，所以我们必须检查它。
 		if (!validate_indices(to_span(indices), positions.size())) {
 			continue;
 		}
@@ -276,8 +275,8 @@ void bake_mesh_geometry(
 		// VOXEL_ASSERT_CONTINUE(positions.size() == tangents.size() * 4);
 
 		if (ortho_rotation != math::ORTHOGONAL_BASIS_IDENTITY_INDEX) {
-			// Move mesh to origin for easier rotation, since the baked mesh spans 0..1 instead of -0.5..0.5
-			// Note: the source mesh won't be modified due to CoW
+			// 将网格移到原点以便更容易旋转，因为烘焙的网格范围是 0..1 而非 -0.5..0.5
+			// 注意：由于写时复制（CoW），源网格不会被修改
 			add(positions, Vector3(-0.5, -0.5, -0.5));
 			rotate_mesh_arrays_ortho(positions, normals, tangents, ortho_rotation);
 			add(positions, Vector3(0.5, 0.5, 0.5));
@@ -304,17 +303,17 @@ void bake_mesh_geometry(
 			) {
 				const uint8_t m = get_sides(a, tolerance) & get_sides(b, tolerance) & get_sides(c, tolerance);
 				if (m == 0) {
-					// At least one of the points doesn't belong to a face
+					// 至少有一个点不属于某个面
 					return false;
 				}
 				for (unsigned int side = 0; side < Cube::SIDE_COUNT; ++side) {
 					if (m == (1 << side)) {
-						// All points belong to the same face
+						// 所有点都属于同一个面
 						out_side = (Cube::SideAxis)side;
 						return true;
 					}
 				}
-				// The triangle isn't in one face
+				// 该三角形不在一个面内
 				return false;
 			}
 		};
@@ -323,7 +322,7 @@ void bake_mesh_geometry(
 		const bool tangents_empty = (tangents.size() == 0);
 		if (tangents_empty && bake_tangents) {
 			if (uvs.size() == 0) {
-				// TODO Provide context where the model is used, they can't always be named
+				// TODO 提供模型使用位置的上下文，它们不能总是被命名
 				VOXEL_PRINT_ERROR(
 						format("Voxel model is missing tangents and UVs. The model won't be "
 							   "baked. You should consider providing a mesh with tangents, or at least UVs and "
@@ -344,18 +343,18 @@ void bake_mesh_geometry(
 #endif
 
 		if (uvs.size() == 0) {
-			// TODO Properly generate UVs if there arent any
+			// TODO 如果没有 UV，正确生成它们
 			uvs = PackedVector2Array();
 			uvs.resize(positions.size());
 		}
 
-		// Separate triangles belonging to faces of the cube
+		// 分离属于立方体面的三角形
 
 		BakedModel::Model &model = baked_data.model;
 
 		BakedModel::Surface &surface = model.surfaces[surface_index];
 		Ref<Material> material = materials[surface_index];
-		// Note, an empty material counts as "The default material".
+		// 注意，空材质计为"默认材质"。
 		surface.material_id = material_indexer.get_or_create_index(material);
 
 		FixedArray<StdUnorderedMap<int, int>, Cube::SIDE_COUNT> added_side_indices;
@@ -371,7 +370,7 @@ void bake_mesh_geometry(
 			if (L::get_triangle_side(
 						tri_positions[0], tri_positions[1], tri_positions[2], side, side_vertex_tolerance
 				)) {
-				// That triangle is on the face
+				// 该三角形在面上
 
 				BakedModel::SideSurface &side_surface = model.sides_surfaces[side][surface_index];
 
@@ -383,15 +382,15 @@ void bake_mesh_geometry(
 					const auto existing_dst_index_it = added_indices.find(src_index);
 
 					if (existing_dst_index_it == added_indices.end()) {
-						// Add new vertex
+						// 添加新顶点
 
 						side_surface.indices.push_back(next_side_index);
 						side_surface.positions.push_back(tri_positions[j]);
 						side_surface.uvs.push_back(to_vec2f(uvs[indices[i + j]]));
 
 						if (bake_tangents) {
-							// i is the first vertex of each triangle which increments by steps of 3.
-							// There are 4 floats per tangent.
+							// i 是每个三角形的第一个顶点，以 3 为步长递增。
+							// 每个切线有 4 个浮点数。
 							int ti = indices[i + j] * 4;
 							side_surface.tangents.push_back(tangents[ti]);
 							side_surface.tangents.push_back(tangents[ti + 1]);
@@ -403,13 +402,13 @@ void bake_mesh_geometry(
 						++next_side_index;
 
 					} else {
-						// Vertex was already added, just add index referencing it
+						// 顶点已添加，只需添加引用它的索引
 						side_surface.indices.push_back(existing_dst_index_it->second);
 					}
 				}
 
 			} else {
-				// That triangle is not on the face
+				// 该三角形不在面上
 
 				int next_regular_index = surface.positions.size();
 
@@ -424,8 +423,8 @@ void bake_mesh_geometry(
 						surface.uvs.push_back(to_vec2f(uvs[indices[i + j]]));
 
 						if (bake_tangents) {
-							// i is the first vertex of each triangle which increments by steps of 3.
-							// There are 4 floats per tangent.
+							// i 是每个三角形的第一个顶点，以 3 为步长递增。
+							// 每个切线有 4 个浮点数。
 							int ti = indices[i + j] * 4;
 							surface.tangents.push_back(tangents[ti]);
 							surface.tangents.push_back(tangents[ti + 1]);
@@ -462,8 +461,7 @@ void bake_mesh_geometry(
 		return;
 	}
 
-	// TODO Merge surfaces if they are found to have the same material (but still print a warning if their material is
-	// different or is null)
+	// TODO 如果发现表面具有相同材质则合并它们（但如果材质不同或为空，仍要打印警告）
 	const uint32_t src_surface_count = mesh->get_surface_count();
 	if (mesh->get_surface_count() > int(blocky::MAX_SURFACES)) {
 		VOXEL_PRINT_WARNING(
@@ -526,7 +524,7 @@ Ref<Mesh> VoxelBlockyModelMesh::get_preview_mesh() const {
 
 	Ref<Mesh> mesh = make_mesh_from_baked_data(baked_data, bake_tangents);
 
-	// In case of earlier failure, it's possible there are no materials at all.
+	// 如果之前失败过，可能根本没有材质。
 	if (materials.size() > 0) {
 		for (unsigned int surface_index = 0; surface_index < baked_data.model.surface_count; ++surface_index) {
 			const blocky::BakedModel::Surface &surface = baked_data.model.surfaces[surface_index];

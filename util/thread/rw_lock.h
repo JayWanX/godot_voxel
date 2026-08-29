@@ -12,8 +12,8 @@ namespace voxel {
 
 class RWLock {
 public:
-	// Lock the rwlock, block if locked for write by another thread.
-	// WARNING: cannot be locked twice by the same thread, it is undefined behavior.
+	// 锁定读写锁，若已被其他线程以写方式锁定则阻塞。
+	// 警告：同一线程不可锁定两次，否则属于未定义行为。
 	void read_lock() const {
 #ifdef VOXEL_PROFILE_RWLOCK
 		VOXEL_PROFILE_SCOPE();
@@ -21,17 +21,17 @@ public:
 		_mutex.lock_shared();
 	}
 
-	// Unlock the rwlock, let other threads continue
+	// 解锁读写锁，让其他线程继续
 	void read_unlock() const {
 		_mutex.unlock_shared();
 	}
 
-	// Attempt to lock the rwlock, returns `true` on success, `false` means it can't lock.
+	// 尝试锁定读写锁，成功返回 `true`，`false` 表示无法锁定。
 	bool read_try_lock() const {
 		return _mutex.try_lock_shared();
 	}
 
-	// Lock the rwlock, block if locked by someone else
+	// 锁定读写锁，若已被他人锁定则阻塞
 	void write_lock() {
 #ifdef VOXEL_PROFILE_RWLOCK
 		VOXEL_PROFILE_SCOPE();
@@ -39,12 +39,12 @@ public:
 		_mutex.lock();
 	}
 
-	// Unlock the rwlock, let other thwrites continue
+	// 解锁读写锁，让其他写入者继续
 	void write_unlock() {
 		_mutex.unlock();
 	}
 
-	// Attempt to lock the rwlock, returns `true` on success, `false` means it can't lock.
+	// 尝试锁定读写锁，成功返回 `true`，`false` 表示无法锁定。
 	bool write_try_lock() {
 		return _mutex.try_lock();
 	}

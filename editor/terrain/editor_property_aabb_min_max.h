@@ -8,7 +8,7 @@
 
 namespace voxel {
 
-// Alternative to the default AABB editor which presents it as a minimum and maximum point
+// 默认 AABB 编辑器的替代方案，将其呈现为最小点和最大点
 class Voxel_EditorPropertyAABBMinMax : public voxel::godot::Voxel_EditorProperty {
 	GDCLASS(Voxel_EditorPropertyAABBMinMax, voxel::godot::Voxel_EditorProperty);
 

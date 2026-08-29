@@ -6,8 +6,8 @@
 namespace voxel::godot {
 
 DirectMeshInstance::DirectMeshInstance() {
-	// Nothing here. It is a thin RID wrapper,
-	// no calls to RenderingServer are made until we called one of the functions.
+	// 此处无内容。它只是 RenderingServer 的 RID 薄封装，
+	// 在调用其中一个函数之前不会向 RenderingServer 发出任何调用。
 }
 
 DirectMeshInstance::DirectMeshInstance(DirectMeshInstance &&src) {
@@ -30,7 +30,7 @@ void DirectMeshInstance::create() {
 	ERR_FAIL_COND(_mesh_instance.is_valid());
 	RenderingServer &vs = *RenderingServer::get_singleton();
 	_mesh_instance = vs.instance_create();
-	vs.instance_set_visible(_mesh_instance, true); // TODO Is it needed?
+	vs.instance_set_visible(_mesh_instance, true); // TODO 是否需要？
 }
 
 void DirectMeshInstance::destroy() {
@@ -120,8 +120,8 @@ void DirectMeshInstance::set_render_layers_mask(int mask) {
 }
 
 void DirectMeshInstance::set_interpolated(const bool enabled) {
-	// This was added in Godot 4.4, then moved to the SceneTree in 4.5
-	// See https://github.com/godotengine/godot/pull/104269
+	// 该功能在 Godot 4.4 中加入，后在 4.5 中移到了 SceneTree
+	// 参见 https://github.com/godotengine/godot/pull/104269
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR == 4
 	RenderingServer &vs = *RenderingServer::get_singleton();
 	vs.instance_set_interpolated(_mesh_instance, enabled);

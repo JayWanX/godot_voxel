@@ -7,13 +7,13 @@
 
 namespace voxel {
 
-// Implement the generic interface to iterate voxel mesh cells, which can be used to compute virtual textures.
-// This one is optimized to gather results of the Transvoxel mesher, which comes with cell information out of the box.
+// 实现通用接口以迭代体素网格单元，可用于计算虚拟纹理。
+// 该实现针对收集 Transvoxel 网格生成器的结果进行了优化，其开箱即用地附带单元信息。
 class TransvoxelCellIterator : public ICellIterator {
 public:
 	TransvoxelCellIterator(Span<const transvoxel::CellInfo> p_cell_infos) :
 			_current_index(0), _triangle_begin_index(0) {
-		// Make a copy
+		// 制作副本
 		_cell_infos.resize(p_cell_infos.size());
 		for (unsigned int i = 0; i < p_cell_infos.size(); ++i) {
 			_cell_infos[i] = p_cell_infos[i];

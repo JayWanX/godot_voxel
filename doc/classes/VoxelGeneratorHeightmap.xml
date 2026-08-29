@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="VoxelGeneratorHeightmap" inherits="VoxelGenerator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Base class for several basic height-based generators.
+		多个基本高度生成器的基类。
 	</brief_description>
 	<description>
 	</description>
@@ -9,20 +9,20 @@
 	</tutorials>
 	<members>
 		<member name="channel" type="int" setter="set_channel" getter="get_channel" enum="VoxelBuffer.ChannelId" default="1">
-			Channel where voxels will be generated. If set to [constant VoxelBuffer.CHANNEL_SDF], voxels will be a signed distance field usable by smooth meshers. Otherwise, the value 1 will be set below ground, and the value 0 will be set above ground (blocky).
+			生成体素时使用的通道。如果设置为 [constant VoxelBuffer.CHANNEL_SDF]，体素将是可由平滑网格生成器使用的有符号距离场。否则，地面以下将设置为值 1，地面以上将设置为值 0（方块风）。
 		</member>
 		<member name="height_range" type="float" setter="set_height_range" getter="get_height_range" default="30.0">
-			Maximum distance between the lowest and highest surface points that can generate. 
-			NOTE: due to a bug in Godot's documentation tool, the default value shown here is not 30.0, but 200.0. This seems to be because one of the subclasses, [code]VoxelGeneratorWaves[/code], has a different default value, chosen for better practical results. This property also appears in some subclasses now, despite being defined in the base class.
+			可生成的最低与最高表面点之间的最大距离。 
+			注意：由于 Godot 文档工具的 bug，此处显示的默认值不是 30.0，而是 200.0。这似乎是因为其中一个子类 [code]VoxelGeneratorWaves[/code] 具有不同的默认值，该值是为了获得更好的实际效果而选择的。尽管该属性定义在基类中，现在它也出现在某些子类中。
 		</member>
 		<member name="height_start" type="float" setter="set_height_start" getter="get_height_start" default="-50.0">
-			Minimum height where the surface will generate.
+			表面生成的最小高度。
 		</member>
 		<member name="iso_scale" type="float" setter="set_iso_scale" getter="get_iso_scale" default="1.0">
-			Scale applied to the signed distance field when using a smooth terrain configuration.
+			使用平滑地形配置时应用于有符号距离场的缩放。
 		</member>
 		<member name="offset" type="Vector2i" setter="set_offset" getter="get_offset" default="Vector2i(0, 0)">
-			Offsets height generation along the X and Z axes.
+			沿 X 和 Z 轴偏移高度生成。
 		</member>
 	</members>
 </class>

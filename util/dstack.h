@@ -9,7 +9,7 @@
 #endif
 
 #ifdef VOXEL_DSTACK_ENABLED
-// Put this macro on top of each function you want to track in debug stack traces.
+// 将该宏放在你希望在调试堆栈跟踪中追踪的每个函数开头。
 #define VOXEL_DSTACK() voxel::dstack::Scope dstack_scope_##__LINE__(__FILE__, __LINE__, __FUNCTION__)
 #else
 #define VOXEL_DSTACK()
@@ -38,7 +38,7 @@ struct Frame {
 
 struct Info {
 public:
-	// Constructs a copy of the current stack gathered so far from VOXEL_DSTACK() calls
+	// 构造一个到目前为止从 VOXEL_DSTACK() 调用收集到的当前堆栈的副本
 	Info();
 	void to_string(FwdMutableStdString s) const;
 

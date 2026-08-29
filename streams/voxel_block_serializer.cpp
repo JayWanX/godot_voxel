@@ -22,7 +22,7 @@ const unsigned int BLOCK_TRAILING_MAGIC = 0x900df00d;
 const unsigned int BLOCK_TRAILING_MAGIC_SIZE = 4;
 const unsigned int BLOCK_METADATA_HEADER_SIZE = sizeof(uint32_t);
 
-// Temporary data buffers, re-used to reduce allocations
+// 临时数据缓冲区，重复使用以减少分配
 
 StdVector<uint8_t> &get_tls_metadata_tmp() {
 	thread_local StdVector<uint8_t> tls_metadata_tmp;
@@ -84,13 +84,13 @@ size_t get_metadata_size_in_bytes(const VoxelBuffer &buffer) {
 				"Invalid voxel metadata Z position"
 		);
 
-		size += 3 * sizeof(uint16_t); // Positions are stored as 3 unsigned shorts
+		size += 3 * sizeof(uint16_t); // 位置存储为 3 个无符号短整数
 		size += get_metadata_size_in_bytes(it->value);
 	}
 
-	// If no metadata is found at all, nothing is serialized, not even null.
-	// It spares 24 bytes (40 if real_t == double),
-	// and is backward compatible with saves made before introduction of metadata.
+	// 如果完全没有元数据，则什么都不序列化，连 null 也不会。
+	// 它节省了 24 字节（若 real_t == double 则为 40 字节），
+	// 并且与引入 metadata 之前保存的文件向后兼容。
 
 	const VoxelMetadata &block_meta = buffer.get_block_metadata();
 
@@ -138,7 +138,7 @@ void serialize_metadata(const VoxelMetadata &meta, MemoryWriterExistingBuffer &m
 	}
 }
 
-// The target buffer MUST have correct size. Recoverable errors must have been checked before.
+// 目标 buffer 必须具有正确的大小。可恢复的错误必须已事先检查。
 void serialize_metadata(Span<uint8_t> p_dst, const VoxelBuffer &buffer) {
 	ByteSpanWithPosition bs(p_dst, 0);
 	MemoryWriterExistingBuffer mw(bs, ENDIANNESS_LITTLE_ENDIAN);
@@ -150,7 +150,7 @@ void serialize_metadata(Span<uint8_t> p_dst, const VoxelBuffer &buffer) {
 	for (FlatMapMoveOnly<Vector3i, VoxelMetadata>::ConstIterator it = voxel_metadata.begin();
 		 it != voxel_metadata.end();
 		 ++it) {
-		// Serializing key as ushort because it's more than enough for a 3D dense array
+		// 将 key 序列化为 ushort，因为它对 3D 稠密数组来说绰绰有余
 		static_assert(
 				VoxelBuffer::MAX_SIZE <= std::numeric_limits<uint16_t>::max(),
 				"Maximum size exceeds serialization support"
@@ -192,7 +192,7 @@ bool deserialize_metadata(VoxelMetadata &meta, MemoryReader &mr) {
 						custom != nullptr, false, format("Could not deserialize custom metadata with type {}", type)
 				);
 
-				// Store in a temporary container so it auto-deletes in case of error
+				// 存储在临时容器中，这样出错时它会自动删除
 				VoxelMetadata temp;
 				temp.set_custom(type, custom);
 
@@ -218,7 +218,7 @@ bool deserialize_metadata(Span<const uint8_t> p_src, VoxelBuffer &buffer) {
 
 	typedef FlatMapMoveOnly<Vector3i, VoxelMetadata>::Pair Pair;
 	static thread_local StdVector<Pair> tls_pairs;
-	// Clear when exiting scope (including cases of error) so we don't store dangling Variants
+	// 在退出作用域时清空（包括出错的情况），这样我们就不会存储悬空的 Variant
 	ClearOnExit<StdVector<Pair>> clear_tls_pairs{ tls_pairs };
 
 	while (mr.pos < mr.data.size()) {
@@ -241,14 +241,14 @@ bool deserialize_metadata(Span<const uint8_t> p_src, VoxelBuffer &buffer) {
 		);
 	}
 
-	// Set all metadata at once, FlatMap is faster to initialize this way
+	// 一次性设置全部 metadata，以这种方式初始化 FlatMap 更快
 	buffer.clear_and_set_voxel_metadata(to_span(tls_pairs));
 
 	return true;
 }
 
 size_t get_size_in_bytes(const VoxelBuffer &buffer, size_t &metadata_size) {
-	// Version and size
+	// 版本与大小
 	size_t size = 1 * sizeof(uint8_t) + 3 * sizeof(uint16_t);
 
 	const Vector3i size_in_voxels = buffer.get_size();
@@ -257,7 +257,7 @@ size_t get_size_in_bytes(const VoxelBuffer &buffer, size_t &metadata_size) {
 		const VoxelBuffer::Compression compression = buffer.get_channel_compression(channel_index);
 		const VoxelBuffer::Depth depth = buffer.get_channel_depth(channel_index);
 
-		// For format value
+		// 对于 format 值
 		size += 1;
 
 		switch (compression) {
@@ -293,7 +293,7 @@ SerializeResult serialize(const VoxelBuffer &voxel_buffer) {
 	dst_data.clear();
 	metadata_tmp.clear();
 
-	// Cannot serialize an empty block
+	// 无法序列化空 block
 	ERR_FAIL_COND_V(Vector3iUtil::get_volume_u64(voxel_buffer.get_size()) == 0, SerializeResult(dst_data, false));
 
 	size_t expected_metadata_size = 0;
@@ -322,8 +322,8 @@ SerializeResult serialize(const VoxelBuffer &voxel_buffer) {
 	for (unsigned int channel_index = 0; channel_index < VoxelBuffer::MAX_CHANNELS; ++channel_index) {
 		const VoxelBuffer::Compression compression = voxel_buffer.get_channel_compression(channel_index);
 		const VoxelBuffer::Depth depth = voxel_buffer.get_channel_depth(channel_index);
-		// Low nibble: compression (up to 16 values allowed)
-		// High nibble: depth (up to 16 values allowed)
+		// 低半字节：压缩类型（最多允许 16 个值）
+		// 高半字节：深度（最多允许 16 个值）
 		const uint8_t fmt = static_cast<uint8_t>(compression) | (static_cast<uint8_t>(depth) << 4);
 		f.store_8(fmt);
 
@@ -362,19 +362,19 @@ SerializeResult serialize(const VoxelBuffer &voxel_buffer) {
 		}
 	}
 
-	// Metadata has more reasons to fail. If a recoverable error occurs prior to serializing,
-	// we just discard all metadata as if it was empty.
+	// metadata 更容易出错。如果在序列化之前发生可恢复的错误，
+	// 我们只需丢弃所有 metadata，就像它是空的一样。
 	if (expected_metadata_size > 0) {
 		f.store_32(expected_metadata_size);
 		metadata_tmp.resize(expected_metadata_size);
-		// This function brings me joy. </irony>
+		// 这个函数让我很开心。</irony>
 		serialize_metadata(to_span(metadata_tmp), voxel_buffer);
 		f.store_buffer(to_span(metadata_tmp));
 	}
 
 	f.store_32(BLOCK_TRAILING_MAGIC);
 
-	// Check out of bounds writing
+	// 检查越界写入
 	CRASH_COND(dst_data.size() != expected_data_size);
 
 	return SerializeResult(dst_data, true);
@@ -383,11 +383,11 @@ SerializeResult serialize(const VoxelBuffer &voxel_buffer) {
 namespace legacy {
 
 bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
-	// In v3, metadata was always a Godot Variant. In v4, metadata uses an independent format.
+	// 在 v3 中，metadata 始终是 Godot Variant。在 v4 中，metadata 使用独立的格式。
 
 #if defined(VOXEL_GODOT)
 
-	// Constants used at the time of this version
+	// 该版本时期所用的常量
 	const unsigned int channel_count = 8;
 	const unsigned int no_compression = 0;
 	const unsigned int uniform_compression = 1;
@@ -421,13 +421,13 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 
 	VOXEL_ASSERT(mr.pos <= mr.data.size());
 
-	// Copy everything up to beginning of metadata
+	// 复制到 metadata 开头为止的所有内容
 	dst.resize(mr.pos);
 	memcpy(dst.data(), p_data.data(), mr.pos);
-	// Set version
+	// 设置版本
 	dst[0] = 4;
 
-	// Convert metadata
+	// 转换 metadata
 
 	const size_t total_metadata_size = mr.data.size() - mr.pos;
 
@@ -436,7 +436,7 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 
 		struct L {
 			static bool convert_metadata_item(MemoryReader &mr, MemoryWriter &mw) {
-				// Read Variant
+				// 读取 Variant
 				Variant src_meta;
 				size_t read_length;
 				const bool decode_success = voxel::godot::decode_variant(
@@ -446,7 +446,7 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 				mr.pos += read_length;
 				VOXEL_ASSERT(mr.pos <= mr.data.size());
 
-				// Write v4 equivalent
+				// 写入等价的 v4 内容
 				VoxelMetadata dst_meta;
 				godot::VoxelMetadataVariant *custom = VOXEL_NEW(godot::VoxelMetadataVariant);
 				custom->data = src_meta;
@@ -482,11 +482,11 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 }
 
 bool migrate_v2_to_v3(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
-	// In v2, SDF data was using a legacy arbitrary formula to encode fixed-point numbers.
-	// In v3, it now uses inorm8 and inorm16.
-	// Serialized size does not change.
+	// 在 v2 中，SDF 数据使用旧的任意公式来编码定点数。
+	// 在 v3 中，它现在使用 inorm8 和 inorm16。
+	// 序列化后的大小不变。
 
-	// Constants used at the time of this version
+	// 该版本时期所用的常量
 	const unsigned int channel_count = 8;
 	const unsigned int sdf_channel_index = 2;
 	const unsigned int no_compression = 0;
@@ -535,7 +535,7 @@ bool migrate_v2_to_v3(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 						break;
 					case 2:
 					case 3:
-						// Depths above 16bit use floats, just skip them
+						// 深度大于 16 位的数据使用 float，直接跳过它们
 						mr.pos += voxel_size * volume;
 						break;
 				}
@@ -549,7 +549,7 @@ bool migrate_v2_to_v3(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 						break;
 					case 2:
 					case 3:
-						// Depths above 16bit use floats, just skip them
+						// 深度大于 16 位的数据使用 float，直接跳过它们
 						mr.pos += voxel_size;
 						break;
 				}
@@ -662,8 +662,8 @@ bool deserialize(Span<const uint8_t> p_data, VoxelBuffer &out_voxel_buffer) {
 						v = f.get_64();
 						break;
 					default:
-						// Fix uninitialized variable warning on Clang, even though it is not supposed to carry on after
-						// the switch
+						// 修复 Clang 上未初始化变量的警告，尽管它本不应在之后继续运行
+						// switch 语句
 						v = 0;
 						CRASH_NOW();
 				}
@@ -684,7 +684,7 @@ bool deserialize(Span<const uint8_t> p_data, VoxelBuffer &out_voxel_buffer) {
 		deserialize_metadata(to_span(metadata_tmp), out_voxel_buffer);
 	}
 
-	// Failure at this indicates file corruption
+	// 此处失败表明文件损坏
 	ERR_FAIL_COND_V_MSG(
 			f.get_32() != BLOCK_TRAILING_MAGIC, false, "At offset 0x" + String::num_int64(f.get_position() - 4, 16)
 	);

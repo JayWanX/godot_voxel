@@ -19,7 +19,7 @@ VOXEL_GODOT_FORWARD_DECLARE(class EditorQuickOpen)
 
 namespace voxel {
 
-// Dialog to pick a graph node type, with categories, search and descriptions
+// 用于选择图形节点类型的对话框，带有分类、搜索和描述
 class VoxelGraphNodeDialog : public ConfirmationDialog {
 	GDCLASS(VoxelGraphNodeDialog, ConfirmationDialog)
 public:
@@ -51,7 +51,7 @@ private:
 	static void _bind_methods();
 
 	enum SpecialIDs {
-		// Preceding IDs are node types
+		// 前面的 ID 都是节点类型
 		ID_FUNCTION_BROWSE = pg::VoxelGraphFunction::NODE_TYPE_COUNT,
 		ID_FUNCTION_QUICK_OPEN,
 		ID_MAX

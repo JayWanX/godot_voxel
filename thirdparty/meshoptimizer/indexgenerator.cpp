@@ -6,10 +6,10 @@
 
 MESHOPTIMIZER_VOXEL_NAMESPACE_BEGIN
 
-// This work is based on:
-// Matthias Teschner, Bruno Heidelberger, Matthias Mueller, Danat Pomeranets, Markus Gross. Optimized Spatial Hashing for Collision Detection of Deformable Objects. 2003
-// John McDonald, Mark Kilgard. Crack-Free Point-Normal Triangles using Adjacent Edge Normals. 2010
-// John Hable. Variable Rate Shading with Visibility Buffer Rendering. 2024
+// 此作品基于：
+// Matthias Teschner、Bruno Heidelberger、Matthias Mueller、Danat Pomeranets、Markus Gross。用于可变形物体碰撞检测的优化空间哈希。2003
+// John McDonald, Mark Kilgard. 使用相邻边法线的无裂缝点法向三角形. 2010
+// John Hable. 使用可见性缓冲区渲染的可变速率着色. 2024
 namespace meshopt
 {
 
@@ -103,17 +103,17 @@ struct VertexCustomHasher
 
 		unsigned int x = key[0], y = key[1], z = key[2];
 
-		// replace negative zero with zero
+		// 用零替换负零
 		x = (x == 0x80000000) ? 0 : x;
 		y = (y == 0x80000000) ? 0 : y;
 		z = (z == 0x80000000) ? 0 : z;
 
-		// scramble bits to make sure that integer coordinates have entropy in lower bits
+		// 打乱位，以确保整数坐标在低位中具有熵
 		x ^= x >> 17;
 		y ^= y >> 17;
 		z ^= z >> 17;
 
-		// Optimized Spatial Hashing for Collision Detection of Deformable Objects
+		// 用于可变形物体碰撞检测的优化空间哈希（Spatial Hashing）
 		return (x * 73856093) ^ (y * 19349663) ^ (z * 83492791);
 	}
 
@@ -143,7 +143,7 @@ struct EdgeHasher
 
 		const unsigned int m = 0x5bd1e995;
 
-		// MurmurHash64B finalizer
+		// MurmurHash64B 终结器
 		h1 ^= h2 >> 18;
 		h1 *= m;
 		h2 ^= h1 >> 22;
@@ -196,7 +196,7 @@ static T* hashLookup(T* table, size_t buckets, const Hash& hash, const T& key, c
 		if (hash.equal(item, key))
 			return &item;
 
-		// hash collision, quadratic probing
+		// 哈希冲突，使用二次探测（quadratic probing）
 		bucket = (bucket + probe + 1) & hashmod;
 	}
 
@@ -365,7 +365,7 @@ void meshopt_remapVertexBuffer(void* destination, const void* vertices, size_t v
 
 	meshopt_Allocator allocator;
 
-	// support in-place remap
+	// 支持原地重映射
 	if (destination == vertices)
 	{
 		unsigned char* vertices_copy = allocator.allocate<unsigned char>(vertex_count * vertex_size);
@@ -373,7 +373,7 @@ void meshopt_remapVertexBuffer(void* destination, const void* vertices, size_t v
 		vertices = vertices_copy;
 	}
 
-	// specialize the loop for common vertex sizes to ensure memcpy is compiled as an inlined intrinsic
+	// 针对常见顶点大小特化循环，确保 memcpy 被编译为内联内置函数
 	switch (vertex_size)
 	{
 	case 4:
@@ -478,7 +478,7 @@ void meshopt_generateAdjacencyIndexBuffer(unsigned int* destination, const unsig
 
 	static const int next[4] = {1, 2, 0, 1};
 
-	// build position remap: for each vertex, which other (canonical) vertex does it map to?
+	// 构建位置重映射：对于每个顶点，它映射到哪个其它（规范的）顶点？
 	unsigned int* remap = allocator.allocate<unsigned int>(vertex_count);
 	buildPositionRemap(remap, vertex_positions, vertex_count, vertex_positions_stride, allocator);
 
@@ -508,13 +508,13 @@ void meshopt_generateAdjacencyIndexBuffer(unsigned int* destination, const unsig
 			{
 				*entry = edge;
 
-				// store vertex opposite to the edge
+				// 存储与边相对的顶点
 				edge_vertex_table[entry - edge_table] = i2;
 			}
 		}
 	}
 
-	// build resulting index buffer: 6 indices for each input triangle
+	// 构建结果索引缓冲区：每个输入三角形 6 个索引
 	for (size_t i = 0; i < index_count; i += 3)
 	{
 		unsigned int patch[6];
@@ -525,7 +525,7 @@ void meshopt_generateAdjacencyIndexBuffer(unsigned int* destination, const unsig
 			unsigned int i1 = indices[i + next[e]];
 			assert(i0 < vertex_count && i1 < vertex_count);
 
-			// note: this refers to the opposite edge!
+			// 注意：这指的是对边！
 			unsigned long long edge = ((unsigned long long)i1 << 32) | i0;
 			unsigned long long* oppe = hashLookup(edge_table, edge_table_size, edge_hasher, edge, ~0ull);
 
@@ -549,7 +549,7 @@ void meshopt_generateTessellationIndexBuffer(unsigned int* destination, const un
 
 	static const int next[3] = {1, 2, 0};
 
-	// build position remap: for each vertex, which other (canonical) vertex does it map to?
+	// 构建位置重映射：对于每个顶点，它映射到哪个其它（规范的）顶点？
 	unsigned int* remap = allocator.allocate<unsigned int>(vertex_count);
 	buildPositionRemap(remap, vertex_positions, vertex_count, vertex_positions_stride, allocator);
 
@@ -576,7 +576,7 @@ void meshopt_generateTessellationIndexBuffer(unsigned int* destination, const un
 		}
 	}
 
-	// build resulting index buffer: 12 indices for each input triangle
+	// 构建结果索引缓冲区：每个输入三角形 12 个索引
 	for (size_t i = 0; i < index_count; i += 3)
 	{
 		unsigned int patch[12];
@@ -587,7 +587,7 @@ void meshopt_generateTessellationIndexBuffer(unsigned int* destination, const un
 			unsigned int i1 = indices[i + next[e]];
 			assert(i0 < vertex_count && i1 < vertex_count);
 
-			// note: this refers to the opposite edge!
+			// 注意：这指的是对边！
 			unsigned long long edge = ((unsigned long long)i1 << 32) | i0;
 			unsigned long long oppe = *hashLookup(edge_table, edge_table_size, edge_hasher, edge, ~0ull);
 
@@ -639,9 +639,9 @@ size_t meshopt_generateProvokingIndexBuffer(unsigned int* destination, unsigned 
 		unsigned int a = indices[i + 0], b = indices[i + 1], c = indices[i + 2];
 		assert(a < vertex_count && b < vertex_count && c < vertex_count);
 
-		// try to rotate triangle such that provoking vertex hasn't been seen before
+		// 尝试旋转三角形，使触发顶点此前未被见过
 		// if multiple vertices are new, prioritize the one with least valence
-		// this reduces the risk that a future triangle will have all three vertices seen
+		// 这降低未来某个三角形三个顶点都已见过的风险
 		unsigned int va = remap[a] == ~0u ? valence[a] : ~0u;
 		unsigned int vb = remap[b] == ~0u ? valence[b] : ~0u;
 		unsigned int vc = remap[c] == ~0u ? valence[c] : ~0u;
@@ -661,21 +661,21 @@ size_t meshopt_generateProvokingIndexBuffer(unsigned int* destination, unsigned 
 
 		unsigned int newidx = reorder_offset;
 
-		// now remap[a] = ~0u or all three vertices are old
-		// recording remap[a] makes it possible to remap future references to the same index, conserving space
+		// 此时 remap[a] = ~0u，或三个顶点都是旧的
+		// 记录 remap[a] 使未来对同一索引的引用可被重映射，从而节省空间
 		if (remap[a] == ~0u)
 			remap[a] = newidx;
 
-		// we need to clone the provoking vertex to get a unique index
+		// 需要克隆触发顶点以获得唯一索引
 		// if all three are used the choice is arbitrary since no future triangle will be able to reuse any of these
 		reorder[reorder_offset++] = a;
 
-		// note: first vertex is final, the other two will be fixed up in next pass
+		// 注意：第一个顶点是最终的，另外两个将在下一趟中修正
 		destination[i + 0] = newidx;
 		destination[i + 1] = b;
 		destination[i + 2] = c;
 
-		// update vertex valences for corner heuristic
+		// 为角点启发式更新顶点度数
 		valence[a]--;
 		valence[b]--;
 		valence[c]--;
@@ -690,8 +690,8 @@ size_t meshopt_generateProvokingIndexBuffer(unsigned int* destination, unsigned 
 
 		if (remap[index] == ~0u)
 		{
-			// we haven't seen the vertex before as a provoking vertex
-			// to maintain the reference to the original vertex we need to clone it
+			// 此前未将该顶点作为触发顶点见过
+			// 为保持对原始顶点的引用，需要克隆它
 			unsigned int newidx = reorder_offset;
 
 			remap[index] = newidx;

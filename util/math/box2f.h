@@ -7,7 +7,7 @@
 
 namespace voxel {
 
-// Axis-aligned 2D box using float coordinates
+// 使用浮点坐标的轴对齐二维包围盒
 class Box2f {
 public:
 	Vector2f min;
@@ -44,10 +44,10 @@ public:
 		max.y = math::clamp(max.y, lim.min.y, lim.max.y);
 	}
 
-	// Subtracts another box from the current box,
-	// then execute a function on a set of boxes representing the remaining area.
+	// 从当前包围盒中减去另一个包围盒，
+	// 然后对表示剩余区域的包围盒集合依次调用函数。
 	//
-	// For example, seen from 2D, a possible result would be:
+	// 例如，从二维视角看，可能的结果如下：
 	//
 	// o-----------o                 o-----o-----o
 	// | A         |                 | C1  | C2  |

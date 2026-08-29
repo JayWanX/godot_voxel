@@ -29,7 +29,7 @@ VoxelGeneratorMultipassCB::~VoxelGeneratorMultipassCB() {}
 
 VoxelGenerator::Result VoxelGeneratorMultipassCB::generate_block(VoxelQueryData input) {
 	if (input.lod > 0) {
-		// Not supported
+		// 不支持
 		return { false };
 	}
 
@@ -44,9 +44,9 @@ VoxelGenerator::Result VoxelGeneratorMultipassCB::generate_block(VoxelQueryData 
 		generate_block_fallback_script(input);
 
 	} else {
-		// Can't generate column chunks from here for now
-		// TODO Fallback on an expensive single-threaded dependency generation, which we might throw away after?
-		// Or trigger a threaded task and block here until it's done?
+		// 目前还无法从这里生成列数据块
+		// TODO 回退到昂贵的单线程依赖生成，之后可能丢弃？
+		// 或者触发一个线程任务并在这里阻塞直到它完成？
 		VOXEL_PRINT_ERROR("Not implemented");
 	}
 
@@ -62,7 +62,7 @@ void VoxelGeneratorMultipassCB::generate_block_fallback_script(VoxelQueryData &i
 		return;
 	}
 
-	// Create a temporary wrapper so Godot can pass it to scripts
+	// 创建一个临时包装器，以便 Godot 可以将其传递给脚本
 	Ref<godot::VoxelBuffer> buffer_wrapper(
 			memnew(godot::VoxelBuffer(static_cast<godot::VoxelBuffer::Allocator>(input.voxel_buffer.get_allocator())))
 	);
@@ -75,7 +75,7 @@ void VoxelGeneratorMultipassCB::generate_block_fallback_script(VoxelQueryData &i
 		GDVIRTUAL_CALL(_generate_block_fallback, buffer_wrapper, input.origin_in_voxels);
 	}
 
-	// The wrapper is discarded
+	// 包装器随后被丢弃
 	buffer_wrapper->get_buffer().move_to(input.voxel_buffer);
 }
 
@@ -162,7 +162,7 @@ void VoxelGeneratorMultipassCB::set_pass_extent_blocks(int pass_index, int new_e
 	re_initialize_column_refcounts();
 }
 
-// Internal
+// 内部
 
 std::shared_ptr<Internal> VoxelGeneratorMultipassCB::get_internal() const {
 	MutexLock mlock(_internal_mutex);
@@ -190,7 +190,7 @@ inline Vector2i to_vec2i_xz(Vector3i p) {
 
 Box2i to_box2i_in_height_range(Box3i box3, int min_y, int height) {
 	if (box3.position.y + box3.size.y <= min_y || box3.position.y >= min_y + height) {
-		// Empty box because it doesn't intersect the height range
+		// 空盒，因为它与高度范围不相交
 		return Box2i(to_vec2i_xz(box3.position), Vector2i());
 	}
 	return Box2i(to_vec2i_xz(box3.position), to_vec2i_xz(box3.size));
@@ -201,10 +201,10 @@ Box2i to_box2i_in_height_range(Box3i box3, int min_y, int height) {
 void VoxelGeneratorMultipassCB::generate_pass(PassInput input) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Note: must not access _internal from here, only use `input`
+	// 注意：不能从这里访问 _internal，只能使用 `input`
 
 	if (get_script() != Variant()) {
-		// TODO Cache it?
+		// TODO 缓存它？
 		Ref<VoxelToolMultipassGenerator> vt;
 		vt.instantiate();
 		vt->set_pass_input(input);
@@ -226,7 +226,7 @@ void VoxelGeneratorMultipassCB::generate_pass(PassInput input) {
 }
 
 void VoxelGeneratorMultipassCB::re_initialize_column_refcounts() {
-	// This should only be called following a map reset
+	// 此方法只应在地图重置后调用
 	VOXEL_ASSERT_RETURN_MSG(get_internal()->map.columns.size() == 0, "Bug!");
 
 	for (PairedViewer &pv : _paired_viewers) {
@@ -243,8 +243,8 @@ void VoxelGeneratorMultipassCB::process_viewer_diff(ViewerID id, Box3i p_request
 		}
 	}
 	if (paired_viewer == nullptr) {
-		// This viewer wasn't known to the generator before. Could mean it just got paired, or properties of the
-		// generator were changed (which can cause the generator's internal state and viewers to be reset)
+		// 该观察者之前不为生成器所知。可能意味着它刚刚被配对，或者生成器的
+		// 属性被更改（这可能导致生成器的内部状态和观察者被重置）
 		_paired_viewers.push_back(PairedViewer{ id, p_requested_box });
 
 	} else {
@@ -257,10 +257,10 @@ void VoxelGeneratorMultipassCB::process_viewer_diff(ViewerID id, Box3i p_request
 void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_box, Box3i p_prev_requested_box) {
 	VOXEL_DSTACK();
 	VOXEL_PROFILE_SCOPE();
-	// TODO Could run as a task similarly to threaded update of VLT
-	// However if we do that we need to make sure block requests dont end up cancelled due to no block being found
-	// to load... the easiest way I can think of, is to just run this in the same thread that triggers the requests,
-	// and that means moving VoxelTerrain's process to a thread as well.
+	// TODO 可以像 VLT 的线程化更新一样作为任务运行
+	// 但是如果我们这样做，需要确保数据块请求不会因为找不到可加载的数据块而最终被取消……
+	// 我能想到的最简单方法，就是让它在触发请求的同一线程中运行，
+	// 这也意味着要把 VoxelTerrain 的 process 移到一个线程上。
 
 	std::shared_ptr<Internal> internal = get_internal();
 
@@ -275,8 +275,8 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 	// println(format("R {} {} {} {} {}", requested_box_2d.pos.x, requested_box_2d.pos.y, requested_box_2d.size.x,
 	// 		requested_box_2d.size.y, Time::get_singleton()->get_ticks_usec()));
 
-	// Note: empty boxes should not be padded, they mean nothing is requested, so the padded request must also
-	// be empty.
+	// 注意：空盒不应被填充，它们表示没有请求任何内容，因此填充后的请求也必须
+	// 为空。
 	const Box2i load_requested_box =
 			requested_box_2d.is_empty() ? requested_box_2d : requested_box_2d.padded(total_extent);
 	const Box2i prev_load_requested_box =
@@ -289,7 +289,7 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 
 	BufferedTaskScheduler &task_scheduler = BufferedTaskScheduler::get_for_current_thread();
 
-	// Blocks to view
+	// 需要查看的数据块
 	const int column_height = internal->column_height_blocks;
 	load_requested_box.difference(prev_load_requested_box, [&map, column_height](Box2i new_box) {
 		{
@@ -310,19 +310,18 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 				column.viewers.add();
 			});
 
-			// TODO Implement loading tasks
+			// TODO 实现加载任务
 		}
 	});
 
-	// Blocks to unview
+	// 不再需要查看的数据块
 	prev_load_requested_box.difference(load_requested_box, [&map, &task_scheduler](Box2i old_box) {
 		VOXEL_PROFILE_SCOPE_NAMED("Leave box (locking)");
 
-		// TODO This can be a bottleneck if the generator is slow and a player teleports far away while columns are
-		// still generating. Could take a second of freezing.
-		// Not sure of the best approach to this. Delegate this somehow to generation tasks so the main thread is not
-		// affected? Use a coroutine that keeps continuing from here and retries to lock? This is tricky because we need
-		// symmetry when entering new chunks to ensure consistency, which is also done on the main thread earlier
+		// TODO 如果生成器较慢且玩家在列仍在生成时远距离传送，这可能会成为瓶颈。可能造成一秒的卡顿。
+		// 不确定最佳做法。是否以某种方式将其委托给生成任务，使主线程不受
+		// 影响？还是使用协程从这里继续并重试锁定？这很棘手，因为我们在进入新数据块时需要
+		// 对称性以确保一致性，而这此前也在主线程上完成
 		SpatialLock2D::Write swlock(map.spatial_lock, old_box);
 		MutexLock mlock(map.mutex);
 
@@ -332,7 +331,7 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 			old_box.for_each_cell_yx([&map, &task_scheduler](Vector2i cpos) {
 				auto it = map.columns.find(cpos);
 
-				// The block must be found because last time the block was in the loading area of the viewer.
+				// 数据块必然存在，因为上次该数据块位于观察者的加载区域内。
 				VOXEL_ASSERT(it != map.columns.end());
 				Column &column = it->second;
 
@@ -340,16 +339,16 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 				if (column.viewers.get() == 0) {
 					for (Block &block : column.blocks) {
 						if (block.final_pending_task != nullptr) {
-							// There was a pending generate task, resume it, but it should basically return a drop.
-							// (also because we are locking the map, that task must not run until we're done
-							// removing its target column)
+							// 有一个挂起的生成任务，恢复它，但它基本上应该返回一个丢弃结果。
+							// （另外，由于我们正在锁定地图，该任务必须等我们完成
+							// 移除其目标列之后才能运行）
 							task_scheduler.push_main_task(block.final_pending_task);
 							block.final_pending_task = nullptr;
 						}
 					}
 
-					// TODO Implement saving tasks
-					// We remove immediately for now
+					// TODO 实现保存任务
+					// 我们目前立即移除
 					map.columns.erase(it);
 					// println(format("U {} {} {} {} {}", 0, cpos.x, 0, cpos.y,
 					// Time::get_singleton()->get_ticks_usec()));
@@ -364,11 +363,11 @@ void VoxelGeneratorMultipassCB::process_viewer_diff_internal(Box3i p_requested_b
 void VoxelGeneratorMultipassCB::clear_cache() {
 	reset_internal([](const Internal &) {});
 
-	// We dont reset viewer refcounts, we assume they will be re-paired later by the caller.
+	// 我们不重置观察者引用计数，假设调用方稍后会重新配对它们。
 
 	// re_initialize_column_refcounts();
 
-	// This might lock up for a few seconds if the generator is busy
+	// 如果生成器繁忙，这可能锁定几秒钟
 	/*
 	Map &map = old_internal->map;
 	SpatialLock2D::Write swlock(map.spatial_lock, BoxBounds2i::from_everywhere());
@@ -380,7 +379,7 @@ void VoxelGeneratorMultipassCB::clear_cache() {
 		Column &column = it->second;
 
 		for (Block &block : column.blocks) {
-			// Kick tasks out of here
+			// 把任务从这里移出去
 			if (block.final_pending_task != nullptr) {
 				task_scheduler.push_main_task(block.final_pending_task);
 				block.final_pending_task = nullptr;
@@ -420,8 +419,8 @@ bool VoxelGeneratorMultipassCB::debug_try_get_column_states(StdVector<DebugColum
 	}
 
 	if (!map.spatial_lock.try_lock_read(BoxBounds2i::from_everywhere())) {
-		// Don't hang here on the main thread, while generating it's very likely the map is locked somewhere.
-		// We can poll this function regularly from a debug tool until locking succeeds.
+		// 不要在这里挂起主线程，生成期间地图很可能在某处被锁定。
+		// 我们可以从调试工具定期轮询此函数，直到锁定成功。
 		return false;
 	}
 	SpatialLock2D::UnlockReadOnScopeExit srlock(map.spatial_lock, BoxBounds2i::from_everywhere());
@@ -480,7 +479,7 @@ TypedArray<godot::VoxelBuffer> VoxelGeneratorMultipassCB::debug_generate_test_co
 	// 	}
 	// };
 	VOXEL_PROFILE_SCOPE();
-	// TODO Allow specifying a target pass? Currently this runs up to the final pass
+	// TODO 允许指定目标 pass？目前这会一直运行到最后一个 pass
 
 	std::shared_ptr<Internal> internal = get_internal();
 	VoxelGeneratorMultipassCB &generator = *this;
@@ -520,9 +519,9 @@ TypedArray<godot::VoxelBuffer> VoxelGeneratorMultipassCB::debug_generate_test_co
 						StdVector<Block *> ngrid;
 						ngrid.reserve(Vector2iUtil::get_area(nbox.size));
 
-						// Compose grid of blocks indexed as ZXY (index+1 goes up along Y).
-						// ZXY indexing is convenient here, since columns are indexed with YX (aka ZX, because Y in 2D
-						// is Z in 3D)
+						// 组成按 ZXY 索引的数据块网格（index+1 沿 Y 向上）。
+						// 这里 ZXY 索引很方便，因为列是按 YX 索引的（也就是 ZX，因为 2D 中的 Y
+						// 就是 3D 中的 Z）
 						nbox.for_each_cell_yx([&ngrid, &columns, grid_size](Vector2i cpos) {
 							const int src_loc = Vector2iUtil::get_yx_index(cpos, grid_size);
 							Column &column = columns[src_loc];
@@ -551,9 +550,9 @@ TypedArray<godot::VoxelBuffer> VoxelGeneratorMultipassCB::debug_generate_test_co
 						// }
 					}
 
-					// Skipping control fields on Column since we are doing this single-threaded in isolation. However
-					// if one day we migrate this to work directly on the cache, we will have to update them (that also
-					// means it will have race conditions)
+					// 由于我们是单线程隔离执行，因此跳过 Column 上的控制字段。然而
+					// 如果某天我们将其迁移为直接对缓存操作，就必须更新它们（这也
+					// 意味着会出现竞态条件）
 				}
 		);
 
@@ -567,7 +566,7 @@ TypedArray<godot::VoxelBuffer> VoxelGeneratorMultipassCB::debug_generate_test_co
 	Column &final_column = columns[final_column_loc];
 	// L::debug_print_blocks_with_stone(final_column, final_column_loc);
 
-	// Wrap up result for script API
+	// 为脚本 API 封装结果
 	TypedArray<godot::VoxelBuffer> column_ta;
 	column_ta.resize(final_column.blocks.size());
 	for (unsigned int i = 0; i < final_column.blocks.size(); ++i) {
@@ -581,7 +580,7 @@ TypedArray<godot::VoxelBuffer> VoxelGeneratorMultipassCB::debug_generate_test_co
 	return column_ta;
 }
 
-// BINDING LAND
+// 绑定区
 
 bool VoxelGeneratorMultipassCB::_set(const StringName &p_name, const Variant &p_value) {
 	const String property_name = p_name;
@@ -664,7 +663,7 @@ void VoxelGeneratorMultipassCB::_bind_methods() {
 	);
 
 #if defined(VOXEL_GODOT)
-	// TODO Test if GDVIRTUAL can print errors properly when GDScript fails inside a different thread.
+	// TODO 测试当 GDScript 在其它线程中失败时，GDVIRTUAL 是否能正确打印错误。
 	GDVIRTUAL_BIND(_generate_pass, "voxel_tool", "pass_index");
 	GDVIRTUAL_BIND(_generate_block_fallback, "out_buffer", "origin_in_voxels");
 	GDVIRTUAL_BIND(_get_used_channels_mask);

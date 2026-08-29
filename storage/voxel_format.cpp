@@ -15,7 +15,7 @@ VoxelFormat::VoxelFormat() {
 }
 
 void VoxelFormat::configure_buffer(VoxelBuffer &vb) const {
-	// Clear keeping size
+	// 清除但保留大小
 	if (vb.get_size() == Vector3i()) {
 		vb.clear(this);
 	} else {

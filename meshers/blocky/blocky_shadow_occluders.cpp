@@ -207,7 +207,7 @@ void classify_chunk_occlusion_from_voxels(
 				return false;
 			}
 			if (b0.transparency_index > 0 || b1.transparency_index > 0) {
-				// Either side is transparent
+				// 任一侧是透明的
 				return false;
 			}
 			if ((b0.model.full_sides_mask & side0_mask) == 0) {
@@ -337,19 +337,17 @@ void generate_shadow_occluders(
 ) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Data must be padded, hence the off-by-one
+	// 数据必须填充，因此存在偏一
 	const Vector3i min = Vector3iUtil::create(VoxelMesherBlocky::PADDING);
 	const Vector3i max = block_size - Vector3iUtil::create(VoxelMesherBlocky::PADDING);
 
-	// Not doing only positive sides, because it allows to self-contain the calculation in the chunk.
-	// Doing only positive sides requires to also do this when the main mesh is actually empty, which means we would end
-	// up with lots of useless occluders across all space instead of just near chunks that actually have meshes. That
-	// would in turn require to lookup neighbor chunks, which introduces dependencies that complicate multi-threading
-	// and sorting.
+	// 不只生成正方向侧面，因为这允许在数据块内自包含计算。
+	// 只生成正方向侧面要求在主网格实际为空时也执行此操作，这意味着
+	// 我们最终会在整个空间中生成大量无用的遮挡体，而不仅仅是在实际有网格的数据块附近。
+	// 这反过来又需要查找相邻数据块，从而引入依赖，使多线程和排序变得复杂。
 
-	// Rendering idea: instead of baking this into every mesh, batch all occluders into a single mesh? Then rebuild it
-	// at most once per frame if there was any change? Means we have to store occlusion info somewhere that is fast
-	// to access.
+	// 渲染思路：与其把遮挡体烘焙进每个网格，不如把所有遮挡体批量合并为一个网格？然后
+	// 在有任何变化时每帧至多重建一次？这意味着我们必须把遮挡信息存储在易于快速访问的地方。
 
 	bool positive_x;
 	bool positive_y;

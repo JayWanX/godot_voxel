@@ -65,7 +65,7 @@ bool VoxelBlockyTypeEditorInspectorPlugin::_voxel_parse_property(Object *p_objec
 	variant_list_editor->set_undo_redo(_undo_redo);
 	add_custom_control(variant_list_editor);
 
-	// Removes the property, the custom editor replaces it
+	// 移除该属性，由自定义编辑器取而代之
 	return true;
 }
 

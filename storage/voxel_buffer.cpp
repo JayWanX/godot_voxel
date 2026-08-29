@@ -83,9 +83,9 @@ const char *VoxelBuffer::get_channel_name(const ChannelId id) {
 	}
 }
 
-// Casted explicitly to avoid warning about narrowing conversion, the intent is to store all bits of the value
-// as-is in a type that can store them all. The interpretation of the type is meaningless (depends on its use). It
-// should be possible to cast it back to the actual type with no loss of data, as long as all bits are preserved.
+// 显式强制转换以避免关于窄化转换的警告，意图是按原样把值的所有位
+// 存储到能容纳它们的类型中。类型的解释无关紧要（取决于其用途）。只要
+// 所有位都被保留，就应该能够无损地转换回实际类型。
 static constexpr uint16_t DEFAULT_RAW_SDF_16BIT = uint16_t(snorm_to_s16(1.f));
 
 static constexpr uint16_t MIXEL4_DEFAULT_INDICES = mixel4::encode_indices_to_packed_u16(0, 1, 2, 3);
@@ -152,13 +152,13 @@ VoxelBuffer::~VoxelBuffer() {
 }
 
 void VoxelBuffer::init_channel_defaults() {
-	// By default the buffer is all COMPRESSION_UNIFORM, only one value represented in each channel.
+	// 默认情况下缓冲区全部为 COMPRESSION_UNIFORM，每个通道只表示一个值。
 
-	// Minecraft uses way more than 255 block types and there is room for eventual metadata such as rotation
+	// Minecraft 使用的方块类型远多于 255 种，并且为旋转等潜在的元数据留有余地
 	_channels[CHANNEL_TYPE].depth = DEFAULT_TYPE_CHANNEL_DEPTH;
 	_channels[CHANNEL_TYPE].defval = 0;
 
-	// 16-bit is better on average to handle large worlds
+	// 处理大型世界时，16 位平均效果更好
 	_channels[CHANNEL_SDF].depth = DEFAULT_SDF_CHANNEL_DEPTH;
 	_channels[CHANNEL_SDF].defval = DEFAULT_RAW_SDF_16BIT;
 
@@ -178,9 +178,9 @@ void VoxelBuffer::create(unsigned int sx, unsigned int sy, unsigned int sz, cons
 	VOXEL_DSTACK();
 	VOXEL_ASSERT_RETURN(sx <= MAX_SIZE && sy <= MAX_SIZE && sz <= MAX_SIZE);
 
-	// Always clear everything even if size doesn't change, because at least we want to start from default.
-	// If one day we really want some hypothetic performance trying to re-use previously allocated data,
-	// we could add a `create_no_reset` method.
+	// 即使尺寸不变也总是清除一切，因为我们至少想从默认值开始。
+	// 如果有一天真的想要某种试图复用已分配数据的假设性性能优化，
+	// 我们可以添加一个 `create_no_reset` 方法。
 	clear(new_format);
 
 #ifdef TOOLS_ENABLED
@@ -310,7 +310,7 @@ void VoxelBuffer::set_voxel(uint64_t value, int x, int y, int z, unsigned int ch
 
 	if (channel.compression == COMPRESSION_UNIFORM) {
 		if (channel.defval != value) {
-			// Allocate channel with same initial values as defval
+			// 使用与 defval 相同的初始值分配通道
 			VOXEL_ASSERT_RETURN(create_channel(channel_index, channel.defval));
 		} else {
 			do_set = false;
@@ -326,9 +326,9 @@ void VoxelBuffer::set_voxel(uint64_t value, int x, int y, int z, unsigned int ch
 
 		switch (channel.depth) {
 			case DEPTH_8_BIT:
-				// Note, if the value is negative, it may be in the range supported by int8_t.
-				// This use case might exist for SDF data, although it is preferable to use `set_voxel_f`.
-				// Similar for higher depths.
+				// 注意，如果值为负，它可能处于 int8_t 支持的范围内。
+				// 这种用例可能存在于 SDF 数据中，不过优先使用 `set_voxel_f`。
+				// 更高的位深同理。
 				channel.data[i] = value;
 				break;
 
@@ -367,11 +367,11 @@ void VoxelBuffer::fill(uint64_t defval, unsigned int channel_index) {
 	Channel &channel = _channels[channel_index];
 
 	if (channel.compression == COMPRESSION_UNIFORM) {
-		// Channel is already optimized and uniform
+		// 通道已优化且均匀
 		if (channel.defval == defval) {
-			// No change
+			// 无变化
 		} else {
-			// Just change default value
+			// 仅更改默认值
 			channel.defval = defval;
 		}
 		return;
@@ -420,7 +420,7 @@ void VoxelBuffer::fill_area(uint64_t defval, Vector3i min, Vector3i max, unsigne
 
 	Vector3iUtil::sort_min_max(min, max);
 	min = min.clamp(Vector3i(0, 0, 0), _size);
-	max = max.clamp(Vector3i(0, 0, 0), _size); // `_size` is included
+	max = max.clamp(Vector3i(0, 0, 0), _size); // `_size` 包含在内
 	const Vector3i area_size = max - min;
 	if (area_size.x == 0 || area_size.y == 0 || area_size.z == 0) {
 		return;
@@ -450,7 +450,7 @@ void VoxelBuffer::fill_area(uint64_t defval, Vector3i min, Vector3i max, unsigne
 
 			switch (channel.depth) {
 				case DEPTH_8_BIT:
-					// Fill row by row
+					// 逐行填充
 					memset(&channel.data[dst_ri], defval, area_size.y * sizeof(uint8_t));
 					break;
 
@@ -504,11 +504,11 @@ bool VoxelBuffer::is_uniform(unsigned int channel_index) const {
 
 bool VoxelBuffer::is_uniform(const Channel &channel) {
 	if (channel.compression == COMPRESSION_UNIFORM) {
-		// Channel has been optimized
+		// 通道已优化
 		return true;
 	}
 
-	// Channel isn't optimized, so must look at each voxel
+	// 通道未优化，因此必须逐个查看体素
 	switch (channel.depth) {
 		case DEPTH_8_BIT:
 			return is_uniform_b<uint8_t>(channel.data, channel.size_in_bytes);
@@ -588,7 +588,7 @@ void VoxelBuffer::copy_format(const VoxelBuffer &other) {
 }
 
 void VoxelBuffer::copy_channels_from(const VoxelBuffer &other) {
-	// Copy all channels, assuming sizes and formats match
+	// 复制所有通道，假设尺寸和格式匹配
 	for (unsigned int i = 0; i < MAX_CHANNELS; ++i) {
 		copy_channel_from(other, i);
 	}
@@ -605,7 +605,7 @@ void VoxelBuffer::copy_channel_from(const VoxelBuffer &other, unsigned int chann
 	VOXEL_ASSERT_RETURN(other_channel.depth == channel.depth);
 
 	if (other_channel.compression != COMPRESSION_UNIFORM) {
-		// Other is not uniform, make sure we allocate our channel
+		// 对方不均匀，确保我们分配自己的通道
 		if (channel.compression == COMPRESSION_UNIFORM) {
 			VOXEL_ASSERT_RETURN(create_channel_noinit(channel_index, _size));
 		}
@@ -617,14 +617,14 @@ void VoxelBuffer::copy_channel_from(const VoxelBuffer &other, unsigned int chann
 		memcpy(channel.data, other_channel.data, channel.size_in_bytes);
 
 	} else {
-		// Other is uniform, deallocate our channel too
+		// 对方均匀，也释放我们的通道
 		if (channel.compression != COMPRESSION_UNIFORM) {
 			delete_channel(channel_index);
 		}
 		channel.defval = other_channel.defval;
 	}
 
-	// Not really necessary since we already require depths to be equal?
+	// 其实并不必要，因为我们已经要求位深相等？
 	channel.depth = other_channel.depth;
 
 #ifdef DEV_ENABLED
@@ -632,7 +632,7 @@ void VoxelBuffer::copy_channel_from(const VoxelBuffer &other, unsigned int chann
 #endif
 }
 
-// TODO Disallow copying from overlapping areas of the same buffer
+// TODO 禁止从同一缓冲区的重叠区域复制
 void VoxelBuffer::copy_channel_from(
 		const VoxelBuffer &other,
 		Vector3i src_min,
@@ -651,14 +651,14 @@ void VoxelBuffer::copy_channel_from(
 
 	if (channel.compression == COMPRESSION_UNIFORM && other_channel.compression == COMPRESSION_UNIFORM &&
 		channel.defval == other_channel.defval) {
-		// No action needed
+		// 无需操作
 		return;
 	}
 
 	if (other_channel.compression != COMPRESSION_UNIFORM) {
 		if (channel.compression == COMPRESSION_UNIFORM) {
-			// Note, we do this even if the pasted data happens to be all the same value as our current channel.
-			// We assume that this case is not frequent enough to bother, and compression can happen later
+			// 注意，即使粘贴的数据碰巧与当前通道的值完全相同，我们也会执行此操作。
+			// 我们假设这种情况不够频繁，不值得处理，压缩可以稍后进行
 			VOXEL_ASSERT_RETURN(create_channel(channel_index, channel.defval));
 		}
 #ifdef DEV_ENABLED
@@ -671,15 +671,15 @@ void VoxelBuffer::copy_channel_from(
 		copy_3d_region_zxy(dst, _size, dst_min, src, other._size, src_min, src_max, item_size);
 
 	} else if (channel.defval != other_channel.defval) {
-		// Other is uniform, but we are not, and we copy an area so we can't assume to become uniform too.
+		// 对方均匀，但我们不均匀，而且我们复制的是一个区域，不能假设自己也会变得均匀。
 
-		// This logic is still required due to how source and destination regions can be specified.
-		// The actual size of the destination area must be determined from the source area, after it has been clipped.
+		// 由于源区域和目标区域的指定方式，这段逻辑仍然是必需的。
+		// 目标区域的实际大小必须根据裁剪后的源区域来确定。
 		Vector3iUtil::sort_min_max(src_min, src_max);
 		clip_copy_region(src_min, src_max, other._size, dst_min, _size);
 		const Vector3i area_size = src_max - src_min;
 		if (area_size.x <= 0 || area_size.y <= 0 || area_size.z <= 0) {
-			// Degenerate area, we'll not copy anything.
+			// 退化的区域，不复制任何内容。
 			return;
 		}
 		fill_area(other_channel.defval, dst_min, dst_min + area_size, channel_index);
@@ -730,7 +730,7 @@ bool VoxelBuffer::get_channel_as_bytes(unsigned int channel_index, Span<uint8_t>
 		slice = Span<uint8_t>(channel.data, 0, channel.size_in_bytes);
 		return true;
 	}
-	// TODO Could we just return `Span<uint8_t>(&channel.defval, 1)` alongside the `false` return?
+	// TODO 我们能否直接返回 `Span<uint8_t>(&channel.defval, 1)` 以及 `false` 返回值？
 	slice = Span<uint8_t>();
 	return false;
 }
@@ -744,7 +744,7 @@ bool VoxelBuffer::get_channel_as_bytes_read_only(unsigned int channel_index, Spa
 		slice = Span<const uint8_t>(channel.data, 0, channel.size_in_bytes);
 		return true;
 	}
-	// TODO Could we just return `Span<uint8_t>(&channel.defval, 1)` alongside the `false` return?
+	// TODO 我们能否直接返回 `Span<uint8_t>(&channel.defval, 1)` 以及 `false` 返回值？
 	slice = Span<const uint8_t>();
 	return false;
 }
@@ -752,7 +752,7 @@ bool VoxelBuffer::get_channel_as_bytes_read_only(unsigned int channel_index, Spa
 void VoxelBuffer::set_channel_from_bytes(const unsigned int channel_index, Span<const uint8_t> src) {
 	const Channel &channel = _channels[channel_index];
 	if (channel.compression == COMPRESSION_UNIFORM) {
-		// We don't init channel data to nullptr in the constructor so can't do that check
+		// 我们在构造函数中没有将通道数据初始化为 nullptr，因此无法做该检查
 		// #ifdef DEV_ENABLED
 		// 		VOXEL_ASSERT(channel.data == nullptr);
 		// #endif
@@ -774,7 +774,7 @@ bool VoxelBuffer::create_channel(int i, uint64_t defval) {
 }
 
 size_t VoxelBuffer::get_size_in_bytes_for_volume(Vector3i size, Depth depth) {
-	// Calculate appropriate size based on bit depth
+	// 根据位深计算合适的大小
 	const size_t volume = size.x * size.y * size.z;
 	const size_t bits = volume * get_depth_bit_count(depth);
 	const size_t size_in_bytes = (bits >> 3);
@@ -786,9 +786,9 @@ bool VoxelBuffer::create_channel_noinit(int i, Vector3i size) {
 	Channel &channel = _channels[i];
 	const size_t size_in_bytes = get_size_in_bytes_for_volume(size, channel.depth);
 	VOXEL_ASSERT_RETURN_V_MSG(size_in_bytes <= Channel::MAX_SIZE_IN_BYTES, false, "Buffer is too big");
-	VOXEL_ASSERT(channel.compression == COMPRESSION_UNIFORM); // The channel must not already be allocated
+	VOXEL_ASSERT(channel.compression == COMPRESSION_UNIFORM); // 通道必须尚未分配
 	channel.data = allocate_channel_data(size_in_bytes, _allocator);
-	VOXEL_ASSERT_RETURN_V(channel.data != nullptr, false); // Bad alloc?
+	VOXEL_ASSERT_RETURN_V(channel.data != nullptr, false); // 分配失败？
 	channel.compression = COMPRESSION_NONE;
 	channel.size_in_bytes = size_in_bytes;
 	return true;
@@ -801,8 +801,8 @@ void VoxelBuffer::delete_channel(int i) {
 
 void VoxelBuffer::delete_channel(Channel &channel, Allocator allocator) {
 	VOXEL_ASSERT_RETURN(channel.compression != COMPRESSION_UNIFORM);
-	// Don't use `_size` to obtain `data` byte count, since we could have changed `_size` up-front during a create().
-	// `size_in_bytes` reflects what is currently allocated inside `data`, regardless of anything else.
+	// 不要使用 `_size` 来获取 `data` 的字节数，因为在 create() 过程中我们可能已经提前更改了 `_size`。
+	// `size_in_bytes` 反映的是 `data` 内当前分配的内容，与其它任何东西无关。
 	free_channel_data(channel.data, channel.size_in_bytes, allocator);
 	channel.data = nullptr;
 	channel.compression = COMPRESSION_UNIFORM;
@@ -810,14 +810,14 @@ void VoxelBuffer::delete_channel(Channel &channel, Allocator allocator) {
 }
 
 void VoxelBuffer::downscale_to(VoxelBuffer &dst, Vector3i src_min, Vector3i src_max, Vector3i dst_min) const {
-	// TODO Align input to multiple of two
+	// TODO 将输入对齐到 2 的倍数
 
 	src_min = src_min.clamp(Vector3i(), _size - Vector3i(1, 1, 1));
 	src_max = src_max.clamp(Vector3i(), _size);
 
 	Vector3i dst_max = dst_min + ((src_max - src_min) >> 1);
 
-	// TODO This will be wrong if it overlaps the border?
+	// TODO 如果它跨越边界，这将是错误的？
 	dst_min = dst_min.clamp(Vector3i(), dst._size - Vector3i(1, 1, 1));
 	dst_max = dst_max.clamp(Vector3i(), dst._size);
 
@@ -827,11 +827,11 @@ void VoxelBuffer::downscale_to(VoxelBuffer &dst, Vector3i src_min, Vector3i src_
 
 		if (src_channel.compression == COMPRESSION_UNIFORM && dst_channel.compression == COMPRESSION_UNIFORM &&
 			src_channel.defval == dst_channel.defval) {
-			// No action needed
+			// 无需操作
 			continue;
 		}
 
-		// Nearest-neighbor downscaling
+		// 最近邻下采样
 
 		Vector3i pos;
 		for (pos.z = dst_min.z; pos.z < dst_max.z; ++pos.z) {
@@ -839,18 +839,18 @@ void VoxelBuffer::downscale_to(VoxelBuffer &dst, Vector3i src_min, Vector3i src_
 				for (pos.y = dst_min.y; pos.y < dst_max.y; ++pos.y) {
 					const Vector3i src_pos = src_min + ((pos - dst_min) << 1);
 
-					// TODO Remove check once it works
+					// TODO 一旦工作正常就移除检查
 					VOXEL_ASSERT(is_position_valid(src_pos.x, src_pos.y, src_pos.z));
 
 					uint64_t v;
 					if (src_channel.compression != COMPRESSION_UNIFORM) {
-						// TODO Optimized version?
+						// TODO 优化版本？
 						v = get_voxel(src_pos, channel_index);
 					} else {
 						v = src_channel.defval;
 					}
 
-					// TODO Could be optimized?
+					// TODO 可以优化？
 					dst.set_voxel(v, pos, channel_index);
 				}
 			}
@@ -868,7 +868,7 @@ bool VoxelBuffer::equals(const VoxelBuffer &p_other) const {
 		const Channel &other_channel = p_other._channels[channel_index];
 
 		if (channel.compression != other_channel.compression) {
-			// Note: they could still logically be equal if one channel contains uniform voxel memory.
+			// 注意：如果某个通道包含均匀的体素内存，它们在逻辑上仍然可能相等。
 			return false;
 		}
 
@@ -926,7 +926,7 @@ void VoxelBuffer::set_channel_depth(unsigned int channel_index, Depth new_depth)
 		return;
 	}
 	if (channel.compression != COMPRESSION_UNIFORM) {
-		// TODO Implement conversion and do it when specified
+		// TODO 实现转换并在指定时执行
 		WARN_PRINT("Changing VoxelBuffer depth with present data, this will reset the channel");
 		delete_channel(channel_index);
 	}
@@ -940,12 +940,12 @@ VoxelBuffer::Depth VoxelBuffer::get_channel_depth(unsigned int channel_index) co
 
 float VoxelBuffer::get_sdf_quantization_scale(Depth d) {
 	switch (d) {
-		// Normalized
+		// 归一化
 		case DEPTH_8_BIT:
 			return constants::QUANTIZED_SDF_8_BITS_SCALE;
 		case DEPTH_16_BIT:
 			return constants::QUANTIZED_SDF_16_BITS_SCALE;
-		// Direct
+		// 直接
 		default:
 			return 1.f;
 	}
@@ -1020,7 +1020,7 @@ Vector3i transform_channel(
 		const math::OrthoBasis &basis,
 		Vector3i &out_trans_origin
 ) {
-	// TODO Candidate for temp allocator
+	// TODO 临时分配器的候选者
 	StdVector<T> temp;
 	temp.resize(channel_data.size());
 	Span<T> temp_s = to_span(temp);
@@ -1095,7 +1095,7 @@ VoxelMetadata *VoxelBuffer::get_or_create_voxel_metadata(Vector3i pos) {
 	if (d != nullptr) {
 		return d;
 	}
-	// TODO Optimize: we know the key should not exist
+	// TODO 优化：我们知道键不应该存在
 	VoxelMetadata &meta = _voxel_metadata.insert_or_assign(pos, VoxelMetadata());
 	return &meta;
 }
@@ -1123,12 +1123,12 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 		const Variant key = it->key;
 		const Variant *args[2] = { &key, &it->value };
 		Callable::CallError err;
-		Variant retval; // We don't care about the return value, Callable API requires it
+		Variant retval; // 我们不关心返回值，但 Callable API 需要它
 		callback.call(args, 2, retval, err);
 
 		ERR_FAIL_COND_MSG(
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key)));
-		// TODO Can't provide detailed error because FuncRef doesn't give us access to the object
+		// TODO 无法提供详细的错误，因为 FuncRef 不让我们访问该对象
 		// ERR_FAIL_COND_MSG(err.error != Variant::CallError::CALL_OK, false,
 		// 		Variant::get_call_error_text(callback->get_object(), method_name, nullptr, 0, err));
 	}
@@ -1140,12 +1140,12 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Box3
 		const Variant key = pos;
 		const Variant *args[2] = { &key, &meta };
 		Callable::CallError err;
-		Variant retval; // We don't care about the return value, Callable API requires it
+		Variant retval; // 我们不关心返回值，但 Callable API 需要它
 		callback.call(args, 2, retval, err);
 
 		ERR_FAIL_COND_MSG(
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key)));
-		// TODO Can't provide detailed error because FuncRef doesn't give us access to the object
+		// TODO 无法提供详细的错误，因为 FuncRef 不让我们访问该对象
 		// ERR_FAIL_COND_MSG(err.error != Variant::CallError::CALL_OK, false,
 		// 		Variant::get_call_error_text(callback->get_object(), method_name, nullptr, 0, err));
 	});
@@ -1352,7 +1352,7 @@ void scale_and_store_sdf_if_modified(VoxelBuffer &voxels, Span<float> sdf, Span<
 			}
 		} break;
 
-			// Float formats don't need this, so they are still fully written.
+			// 浮点格式不需要这个，因此它们仍然会被完整写入。
 
 		case VoxelBuffer::DEPTH_32_BIT: {
 			Span<float> raw;
@@ -1466,7 +1466,7 @@ void paste_src_masked(
 	}
 }
 
-// Paste if the source is not a certain value, and the destination satisfies a predicate
+// 当源不为某个特定值且目标满足谓词时才粘贴
 template <typename FDstPredicate>
 void paste_src_masked_dst_predicate(
 		Span<const uint8_t> channels,
@@ -1483,7 +1483,7 @@ void paste_src_masked_dst_predicate(
 
 	for (const uint8_t channel : channels) {
 		if (channel == src_mask_channel && channel == dst_mask_channel) {
-			// Common path for blocky games
+			// 方块类游戏的常见路径
 			dst_buffer.read_write_action(
 					dst_box,
 					channel,

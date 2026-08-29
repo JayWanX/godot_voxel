@@ -4,7 +4,7 @@
 #include "../../meshers/voxel_mesher.h"
 #include "../../util/containers/std_vector.h"
 
-// Some common functions to vox importers
+// 提供给 vox 导入器的一些通用函数
 
 namespace voxel::magica {
 

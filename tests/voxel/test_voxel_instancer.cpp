@@ -28,7 +28,7 @@ void test_instance_data_serialization() {
 		}
 	};
 
-	// Create some example data
+	// 创建一些示例数据
 	InstanceBlockData src_data;
 	{
 		src_data.position_range = 30;
@@ -63,7 +63,7 @@ void test_instance_data_serialization() {
 	InstanceBlockData dst_data;
 	VOXEL_TEST_ASSERT(deserialize_instance_block_data(dst_data, to_span_const(serialized_data)));
 
-	// Compare blocks
+	// 比较数据块
 	VOXEL_TEST_ASSERT(src_data.layers.size() == dst_data.layers.size());
 	VOXEL_TEST_ASSERT(dst_data.position_range >= 0.f);
 	VOXEL_TEST_ASSERT(dst_data.position_range == src_data.position_range);
@@ -71,7 +71,7 @@ void test_instance_data_serialization() {
 	const float distance_error = math::max(src_data.position_range, InstanceBlockData::POSITION_RANGE_MINIMUM) /
 			float(InstanceBlockData::POSITION_RESOLUTION);
 
-	// Compare layers
+	// 比较层
 	for (unsigned int layer_index = 0; layer_index < dst_data.layers.size(); ++layer_index) {
 		const InstanceBlockData::LayerData &src_layer = src_data.layers[layer_index];
 		const InstanceBlockData::LayerData &dst_layer = dst_data.layers[layer_index];
@@ -93,7 +93,7 @@ void test_instance_data_serialization() {
 
 		const float rotation_error = 2.f / float(InstanceBlockData::SIMPLE_11B_V1_QUAT_RESOLUTION);
 
-		// Compare instances
+		// 比较实例
 		for (unsigned int instance_index = 0; instance_index < src_layer.instances.size(); ++instance_index) {
 			const InstanceBlockData::InstanceData &src_instance = src_layer.instances[instance_index];
 			const InstanceBlockData::InstanceData &dst_instance = dst_layer.instances[instance_index];
@@ -109,7 +109,7 @@ void test_instance_data_serialization() {
 			const Vector3 dst_scale = src_basis.get_scale();
 			VOXEL_TEST_ASSERT(src_scale.distance_to(dst_scale) <= scale_error);
 
-			// Had to normalize here because Godot doesn't want to give you a Quat if the basis is scaled (even
+			// 必须在此处归一化，因为若基（basis）被缩放，Godot 不会给你 Quat（即使
 			// uniformly)
 			const Quaternion src_rot = src_basis.orthonormalized().get_quaternion();
 			const Quaternion dst_rot = dst_basis.orthonormalized().get_quaternion();

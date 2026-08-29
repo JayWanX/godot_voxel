@@ -18,7 +18,7 @@ namespace voxel {
 namespace {
 const uint8_t FORMAT_VERSION = 3;
 
-// Version 2 is the same as version 3, except region files use version 3 of their specification.
+// 版本 2 与版本 3 相同，只是区域文件使用的是其规范的第 3 版。
 const uint8_t FORMAT_VERSION_LEGACY_2 = 2;
 
 const uint8_t FORMAT_VERSION_LEGACY_1 = 1;
@@ -26,7 +26,7 @@ const char *META_FILE_NAME = "meta.vxrm";
 
 } // namespace
 
-// Sorts a sequence without modifying it, returning a sorted list of pointers
+// 对一个序列进行排序但不修改它，返回排序后的指针列表
 template <typename T, typename Comparer_T>
 void get_sorted_indices(Span<T> sequence, Comparer_T comparer, StdVector<unsigned int> &out_sorted_indices) {
 	struct Compare {
@@ -50,7 +50,7 @@ VoxelStreamRegionFiles::VoxelStreamRegionFiles() {
 	_meta.version = FORMAT_VERSION;
 	_meta.block_size_po2 = 4;
 	_meta.region_size_po2 = 4;
-	_meta.sector_size = 512; // next_power_of_2(_meta.block_size.volume() / 10) // based on compression ratios
+	_meta.sector_size = 512; // next_power_of_2(_meta.block_size.volume() / 10) // 基于压缩比
 	// _meta.lod_count = 1;
 	fill(_meta.channel_depths, VoxelBuffer::DEFAULT_CHANNEL_DEPTH);
 	_meta.channel_depths[VoxelBuffer::CHANNEL_TYPE] = VoxelBuffer::DEFAULT_TYPE_CHANNEL_DEPTH;
@@ -74,9 +74,9 @@ void VoxelStreamRegionFiles::save_voxel_block(VoxelStream::VoxelQueryData &query
 void VoxelStreamRegionFiles::load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) {
 	VOXEL_PROFILE_SCOPE();
 
-	// In order to minimize opening/closing files, requests are grouped according to their region.
+	// 为了尽量减少文件的打开/关闭次数，请求会按照所属区域进行分组。
 
-	// Had to copy input to sort it, as some areas in the module break if they get responses in different order
+	// 必须复制输入以便排序，因为模块中某些部分在收到乱序响应时会出现问题
 	StdVector<unsigned int> sorted_block_indices;
 	BlockQueryComparator comparator;
 	comparator.self = this;
@@ -106,7 +106,7 @@ void VoxelStreamRegionFiles::load_voxel_blocks(Span<VoxelStream::VoxelQueryData>
 void VoxelStreamRegionFiles::save_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) {
 	VOXEL_PROFILE_SCOPE();
 
-	// Had to copy input to sort it, as some areas in the module break if they get responses in different order
+	// 必须复制输入以便排序，因为模块中某些部分在收到乱序响应时会出现问题
 	StdVector<unsigned int> sorted_block_indices;
 	BlockQueryComparator comparator;
 	comparator.self = this;
@@ -120,7 +120,7 @@ void VoxelStreamRegionFiles::save_voxel_blocks(Span<VoxelStream::VoxelQueryData>
 }
 
 int VoxelStreamRegionFiles::get_used_channels_mask() const {
-	// Assuming all, since that stream can store anything.
+	// 假定为全部通道，因为该流可以存储任何内容。
 	return VoxelBuffer::ALL_CHANNELS_MASK;
 }
 
@@ -138,12 +138,12 @@ VoxelStreamRegionFiles::EmergeResult VoxelStreamRegionFiles::_load_block(
 	}
 
 	if (!_meta_loaded) {
-		// TODO This is sub-optimal when loading a terrain from scratch when there hasn't been anything saved yet.
-		// It pretty much tries to open the file for every chunk, fails and then returns "OK_FALLBACK", but the
-		// repeated IO is wasting time
+		// TODO 当从零开始加载地形、且尚未保存任何内容时，这种做法并不理想。
+		// 它几乎会为每个区块都尝试打开文件、失败并返回“OK_FALLBACK”，但
+		// 反复的 IO 操作浪费了时间
 		const voxel::godot::FileResult load_res = load_meta();
 		if (load_res != voxel::godot::FILE_OK) {
-			// No block was ever saved
+			// 从未保存过任何区块
 			return EMERGE_OK_FALLBACK;
 		}
 	}
@@ -155,8 +155,8 @@ VoxelStreamRegionFiles::EmergeResult VoxelStreamRegionFiles::_load_block(
 	ERR_FAIL_COND_V(lod >= constants::MAX_LOD, EMERGE_FAILED);
 	ERR_FAIL_COND_V(block_size != out_buffer.get_size(), EMERGE_FAILED);
 
-	// Configure depths, as they might not be specified in old block data.
-	// Regions are expected to contain such depths, and use those in the buffer to know how much data to read.
+	// 配置通道深度，因为旧区块数据可能未指定它们。
+	// 区域应当包含这些深度信息，并据此在缓冲区中获知需要读取多少数据。
 	for (unsigned int channel_index = 0; channel_index < _meta.channel_depths.size(); ++channel_index) {
 		out_buffer.set_channel_depth(channel_index, _meta.channel_depths[channel_index]);
 	}
@@ -194,11 +194,11 @@ void VoxelStreamRegionFiles::_save_block(
 	ERR_FAIL_COND(_directory_path.is_empty());
 
 	if (!_meta_loaded) {
-		// If it's not loaded, always try to load meta file first if it exists already,
-		// because we could want to save blocks without reading any
+		// 如果尚未加载，总是先尝试加载元数据文件（如果它已存在），
+		// 因为我们可能希望在没有任何读取的情况下保存区块
 		FileResult load_res = load_meta();
 		if (load_res != FILE_OK && load_res != FILE_CANT_OPEN) {
-			// The file is present but there is a problem with it
+			// 文件存在但有问题
 			String meta_path = _directory_path.path_join(META_FILE_NAME);
 			ERR_PRINT(String("Could not read {0}: error {1}")
 							  .format(varray(meta_path, voxel::godot::to_string(load_res))));
@@ -207,7 +207,7 @@ void VoxelStreamRegionFiles::_save_block(
 	}
 
 	if (!_meta_saved) {
-		// First time we save the meta file, initialize it from the first block format
+		// 首次保存元数据文件时，以第一个区块的格式对其进行初始化
 		for (unsigned int i = 0; i < _meta.channel_depths.size(); ++i) {
 			_meta.channel_depths[i] = voxel_buffer.get_channel_depth(i);
 		}
@@ -215,7 +215,7 @@ void VoxelStreamRegionFiles::_save_block(
 		ERR_FAIL_COND(err != FILE_OK);
 	}
 
-	// Verify format
+	// 校验格式
 	const Vector3i block_size = Vector3iUtil::create(1 << _meta.block_size_po2);
 	ERR_FAIL_COND(voxel_buffer.get_size() != block_size);
 	for (unsigned int i = 0; i < voxel::VoxelBuffer::MAX_CHANNELS; ++i) {
@@ -297,7 +297,7 @@ voxel::godot::FileResult VoxelStreamRegionFiles::save_meta() {
 
 	const String json_string = JSON::stringify(d, "\t", true);
 
-	// Make sure the directory exists
+	// 确保目录存在
 	{
 		const Error err = check_directory_created_with_file_locker(_directory_path);
 		if (err != OK) {
@@ -339,12 +339,12 @@ void migrate_region_meta_data(Dictionary &data) {
 	}
 
 	if (data["version"] == Variant(real_t(FORMAT_VERSION_LEGACY_2))) {
-		// Nothing for the region forest, but indicates region files may be upgraded to v3.
+		// 区域森林本身无需改动，但表明区域文件可能被升级到 v3。
 		data["version"] = FORMAT_VERSION;
 	}
 
 	// if (data["version"] != Variant(real_t(FORMAT_VERSION))) {
-	//  TODO Throw error?
+	//  TODO 抛出错误？
 	// }
 }
 
@@ -355,7 +355,7 @@ voxel::godot::FileResult VoxelStreamRegionFiles::load_meta() {
 
 	ERR_FAIL_COND_V(_directory_path == "", FILE_CANT_OPEN);
 
-	// Ensure you cleanup previous world before loading another
+	// 在加载另一个世界之前，请确保已清理上一个世界
 	CRASH_COND(_region_cache.size() > 0);
 
 	const String meta_path = _directory_path.path_join(META_FILE_NAME);
@@ -372,8 +372,8 @@ voxel::godot::FileResult VoxelStreamRegionFiles::load_meta() {
 		json_string = get_as_text(**f);
 	}
 
-	// Note: I chose JSON purely for debugging purposes. This file is not meant to be edited by hand.
-	// World configuration changes may need a full converter.
+	// 注意：我选择 JSON 纯粹是为了方便调试。这个文件并非设计为由手工编辑。
+	// 世界配置的变更可能需要一个完整的转换器。
 
 	Ref<JSON> json;
 	json.instantiate();
@@ -449,8 +449,8 @@ String VoxelStreamRegionFiles::get_region_file_path(const Vector3i &region_pos, 
 }
 
 VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::get_region_from_cache(const Vector3i pos, int lod) const {
-	// A linear search might be better than a Map data structure,
-	// because it's unlikely to have more than about 10 regions cached at a time
+	// 线性搜索可能比 Map 数据结构更好，
+	// 因为同一时间缓存的区域不太会超过约 10 个
 	for (unsigned int i = 0; i < _region_cache.size(); ++i) {
 		CachedRegion *r = _region_cache[i];
 		if (r->position == pos && r->lod == lod) {
@@ -477,18 +477,18 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 	while (_region_cache.size() > _max_open_regions - 1) {
 		close_oldest_region();
 	}
-	// Not in cache, we'll have to open or create it
+	// 不在缓存中，我们必须打开或创建它
 
 	String fpath = get_region_file_path(region_pos, lod);
 
 	cached_region = VOXEL_NEW(CachedRegion);
 
-	// Configure format because we might have to create the file, and some old file versions don't embed format
+	// 配置格式，因为我们可能必须创建该文件，而且一些旧文件版本没有内嵌格式
 	{
 		RegionFormat format;
 		format.block_size_po2 = _meta.block_size_po2;
 		format.channel_depths = _meta.channel_depths;
-		// TODO Palette support
+		// TODO 调色板支持
 		format.has_palette = false;
 		format.region_size = Vector3iUtil::create(1 << _meta.region_size_po2);
 		format.sector_size = _meta.sector_size;
@@ -500,24 +500,24 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 
 	const Error err = cached_region->region.open(fpath, create_if_not_found);
 
-	// Things we could do for optimization:
-	// - Cache the fact the file doesn't exist, so we won't need to do a system call to actually check it every time.
-	// - No need to read the header again when it has been read once,
-	//   we assume no other process will modify region files.
+	// 我们可以为优化而做的一些事情：
+	// - 缓存文件不存在这一事实，这样就不必每次都通过系统调用来实际检查它。
+	// - 一旦读取过头部，就无需再次读取，
+	//   我们假设没有其他进程会修改区域文件。
 
 	if (err != OK) {
 		VOXEL_DELETE(cached_region);
 		if (create_if_not_found) {
-			// Could not create it apparently
+			// 显然无法创建它
 			ERR_PRINT(String("Could not open or create region file {0}, error: {1}").format(varray(fpath, err)));
 			return nullptr;
 		} else {
-			// Does not exist, it was probably expected
+			// 文件不存在，这可能是预期情况
 			return nullptr;
 		}
 	}
 
-	// Make sure it has correct format
+	// 确保它具有正确的格式
 	{
 		const RegionFormat &format = cached_region->region.get_format();
 		if (format.block_size_po2 != _meta.block_size_po2 //
@@ -530,7 +530,7 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 		}
 	}
 
-	// TODO Debug check to make sure we did not already cache it
+	// TODO 进行调试检查，确保我们尚未将其缓存
 	_region_cache.push_back(cached_region);
 
 	cached_region->file_exists = true;
@@ -539,13 +539,13 @@ VoxelStreamRegionFiles::CachedRegion *VoxelStreamRegionFiles::open_region(
 	return cached_region;
 }
 
-// TODO Get rid of to simplify?
+// TODO 是否应移除以简化代码？
 void VoxelStreamRegionFiles::close_region(CachedRegion *region) {
 	region->region.close();
 }
 
 void VoxelStreamRegionFiles::close_oldest_region() {
-	// Close region assumed to be the least recently used
+	// 关闭假定为最久未使用的区域
 
 	if (_region_cache.size() == 0) {
 		return;
@@ -589,12 +589,12 @@ Vector3i convert_block_coordinates(Vector3i pos, Vector3i old_size, Vector3i new
 void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 	using namespace voxel::godot;
 
-	// TODO Converting across different block sizes is untested.
-	// I wrote it because it would be too bad to loose large voxel worlds because of a setting change, so one day we may
-	// need it
+	// TODO 跨不同区块大小的转换尚未经过测试。
+	// 我写它是因为，由于设置改动而丢失大型体素世界实在太可惜，所以将来我们
+	// 可能会需要它
 
 	VOXEL_PRINT_VERBOSE("Converting region files");
-	// This can be a very long and slow operation. Better run this in a thread.
+	// 这可能是一个非常漫长缓慢的操作，最好在线程中运行它。
 
 	ERR_FAIL_COND(!_meta_saved);
 	ERR_FAIL_COND(!_meta_loaded);
@@ -603,10 +603,10 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 
 	Ref<VoxelStreamRegionFiles> old_stream;
 	old_stream.instantiate();
-	// Keep file cache to a minimum for the old stream, we'll query all blocks once anyways
+	// 为旧流将文件缓存保持在最小，反正我们只查询一次所有数据块
 	old_stream->_max_open_regions = MAX(1, FOPEN_MAX);
 
-	// Backup current folder by renaming it, leaving the current name vacant
+	// 通过重命名来备份当前文件夹，让当前名称空出来
 	{
 		// Error dir_open_err;
 		// Ref<DirAccess> da = open_directory(_directory_path + "/..", &dir_open_err);
@@ -648,7 +648,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 	StdVector<PositionAndLod> old_region_list;
 	Meta old_meta = old_stream->_meta;
 
-	// Get list of all regions from the old stream
+	// 从旧流获取所有区域的列表
 	{
 		for (unsigned int lod_index = 0; lod_index < constants::MAX_LOD; ++lod_index) {
 			const String lod_folder =
@@ -697,7 +697,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 
 	const Vector3i old_region_size = Vector3iUtil::create(1 << old_meta.region_size_po2);
 
-	// Read all blocks from the old stream and write them into the new one
+	// 从旧流读取所有数据块并写入新流
 
 	for (unsigned int i = 0; i < old_region_list.size(); ++i) {
 		PositionAndLod region_info = old_region_list[i];
@@ -721,7 +721,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 			voxel::VoxelBuffer new_block(voxel::VoxelBuffer::ALLOCATOR_POOL);
 			new_block.create(new_block_size.x, new_block_size.y, new_block_size.z);
 
-			// Load block from old stream
+			// 从旧流加载数据块
 			Vector3i block_rpos = old_region->region.get_block_position_from_index(j);
 			Vector3i block_pos = block_rpos + region_info.position * old_region_size;
 			VoxelStream::VoxelQueryData old_block_load_query{
@@ -732,7 +732,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 			};
 			old_stream->load_voxel_block(old_block_load_query);
 
-			// Save it in the new one
+			// 将其保存到新流中
 			if (old_block_size == new_block_size) {
 				VoxelStream::VoxelQueryData old_block_save_query{
 					old_block, //
@@ -745,12 +745,12 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 			} else {
 				Vector3i new_block_pos = convert_block_coordinates(block_pos, old_block_size, new_block_size);
 
-				// TODO Support any size? Assuming cubic blocks here
+				// TODO 是否支持任意尺寸？这里假定是立方体数据块
 				if (old_block_size.x < new_block_size.x) {
 					Vector3i ratio = new_block_size / old_block_size;
 					Vector3i rel = block_pos % ratio;
 
-					// Copy to a sub-area of one block
+					// 拷贝到一个数据块的子区域
 					VoxelStream::VoxelQueryData new_block_load_query{
 						new_block, new_block_pos, region_info.lod_index, RESULT_ERROR
 					};
@@ -771,7 +771,7 @@ void VoxelStreamRegionFiles::_convert_files(Meta new_meta) {
 					save_voxel_block(new_block_save_query);
 
 				} else {
-					// Copy to multiple blocks
+					// 拷贝到多个数据块
 					Vector3i area = new_block_size / old_block_size;
 					Vector3i rpos;
 
@@ -831,10 +831,10 @@ int VoxelStreamRegionFiles::get_sector_size() const {
 	return _meta.sector_size;
 }
 
-// TODO The following settings are hard to change.
-// If files already exist, these settings will be ignored.
-// To be applied, files either need to be wiped out or converted, which is a super-heavy operation.
-// This can be made easier by adding a button to the inspector to convert existing files just in case
+// TODO 以下设置很难更改。
+// 如果文件已存在，这些设置将被忽略。
+// 若要应用这些设置，文件要么需要被清除要么需要被转换，这是非常重的操作。
+// 可以通过在检查器中添加一个转换现有文件的按钮来让它更简单，以备不时之需
 
 void VoxelStreamRegionFiles::set_region_size_po2(int p_region_size_po2) {
 	{
@@ -899,16 +899,16 @@ void VoxelStreamRegionFiles::convert_files(Dictionary d) {
 
 		if (!_meta_loaded) {
 			if (load_meta() != voxel::godot::FILE_OK) {
-				// New stream, nothing to convert
+				// 新流，无需转换
 				_meta = meta;
 
 			} else {
-				// Just opened existing stream
+				// 刚刚打开了现有流
 				_convert_files(meta);
 			}
 
 		} else {
-			// That stream was previously used
+			// 该流之前被使用过
 			_convert_files(meta);
 		}
 	}

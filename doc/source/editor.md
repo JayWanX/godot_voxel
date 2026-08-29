@@ -1,52 +1,51 @@
-Editor
+编辑器
 ============
 
-Previewing in the editor
+在编辑器中预览
 ---------------------------
 
-![Screenshot of the editor](images/editor_preview_smooth_2d_noise_terrain.webp)
+![编辑器截图](images/editor_preview_smooth_2d_noise_terrain.webp)
 
-### Preview options
+### 预览选项
 
-Terrains with a generator or valid stream assigned to them are able to show up in the editor by default.
+分配了生成器或有效数据流的地形默认可以在编辑器中显示。
 
-If the generator or stream is providing a type of voxel data which is not supported by the mesher, nothing will show up. This is usually fixed by changing the mesher or its channel option, when available.
+如果生成器或数据流提供的体素数据类型不受网格生成器支持，则不会显示任何内容。这通常可以通过更换网格生成器或（如果可用）修改其通道选项来解决。
 
-The whole terrain can be told to re-mesh or re-load by using one of the options in the `Terrain` menu:
+可以通过 `Terrain` 菜单中的选项让整个地形重新生成网格或重新加载：
 
-![Re-generate menu](images/menu_regenerate.webp)
+![Re-generate 菜单](images/menu_regenerate.webp)
 
-#### Tool scripts
+#### 工具脚本<span id="tool-scripts"></span>
 
 !!! warning
-    Take extra caution with tool scripts on generators and streams.
+    在生成器和数据流上使用工具脚本时要格外小心。
 
-If you use a script on either [VoxelGeneratorScript](api/VoxelGeneratorScript.md) or [VoxelStreamScript](api/VoxelStreamScript.md), they will be executed in the editor if they are declared with tool mode (`@tool` in GDScript).
-However, alongside risks of tool mode, there is extra danger: if the script gets modified while it is still being run by a background thread in the editor, unpredictable bugs can happen. You have to make sure the script doesn't change while previewing this way, or that terrain finished loading (can be forced to a degree by closing the scene). Therefore tool mode should only be used temporarily during development.
-You can always test by running your game instead, with or without tool mode.
-This limitation is tracked in [issue177](https://github.com/Voxel/godot_voxel/issues/177).
-
-
-### Camera options
-
-In the editor, blocks will only load around the node's origin by default. If the volume is very big or uses LOD, it will not load further and concentrate detail at its center. You can override this by going in the `Terrain` menu and enabling `Stream follow camera`. This will make the terrain adapt its level of detail and blocks to be around the editor's camera, and will update as the camera moves. Turning off the option will freeze the terrain.
-
-![Stream follow camera menu](images/menu_stream_follow_camera.webp)
-
-This option exists for large volumes because they need to stream blocks in and out as you move around. While this is often done in a controlled manner in a game, in the editor the camera could be moving very fast without any restriction, which can demand much more work for the CPU.
-You can monitor the amount of ongoing tasks in the bottom panel, while the node is selected.
-
-The terrain also needs to be selected, partially because of [this](https://github.com/godotengine/godot-proposals/issues/1302)).
-
-Terrains can be very big, and sometimes Godot might prevent you from zooming out further. You can workaround this by increasing the editor's Camera `far` clip in the `View -> Settings` menu. That might slightly degrade visual quality if set too high, so you can also increase `near` clip to keep it balanced. These two numbers cannot be too far apart due to 32-bit float precision.
+如果你在 [VoxelGeneratorScript](api/VoxelGeneratorScript.md) 或 [VoxelStreamScript](api/VoxelStreamScript.md) 上使用脚本，并且脚本声明了工具模式（GDScript 中的 `@tool`），它们将在编辑器中执行。
+然而，除了工具模式本身的风险外，还有一个额外的危险：如果脚本在编辑器的后台线程仍在运行时被修改，可能会发生无法预料的 bug。你必须确保在以这种方式预览时脚本不会改变，或者确保地形已完成加载（在一定程度上可以通过关闭场景来强制实现）。因此，工具模式只应在开发期间临时使用。
+你始终可以改为运行你的游戏来进行测试，无论是否使用工具模式。
+此限制记录在 [issue177](https://github.com/Voxel/godot_voxel/issues/177) 中。
 
 
-Editing
+### 相机选项<span id="camera-options"></span>
+
+在编辑器中，数据块默认只会在节点原点周围加载。如果体积非常大或使用 LOD，它就不会继续加载更远的地方，而是将细节集中在中心。你可以进入 `Terrain` 菜单并启用 `Stream follow camera` 来覆盖此行为。这将使地形将其细节级别和数据块调整到编辑器相机周围，并随相机移动而更新。关闭该选项将冻结地形。
+
+![Stream follow camera 菜单](images/menu_stream_follow_camera.webp)
+
+该选项是为大型体积而设的，因为当你四处移动时，它们需要流式加载和卸载数据块。在游戏中这通常是以受控方式进行的，但在编辑器中，相机可能毫无限制地快速移动，这会给 CPU 带来更多负担。
+选中节点时，你可以在底部面板监控进行中的任务数量。
+
+地形也需要被选中，部分原因见[此](https://github.com/godotengine/godot-proposals/issues/1302))。
+
+地形可能非常大，有时 Godot 可能会阻止你继续缩小视野。你可以在 `View -> Settings` 菜单中增大编辑器的相机 `far` 裁剪面来解决这个问题。如果设置得过高，可能会略微降低视觉质量，因此你也可以增大 `near` 裁剪面来保持平衡。由于 32 位浮点精度的限制，这两个数值不能相差太大。
+
+
+编辑
 --------
 
-There are no tools to edit voxel volumes destructively in the Godot Editor yet. This feature might be implemented in the future.
+目前 Godot 编辑器中还没有对体素体积进行破坏性编辑的工具。此功能可能会在未来实现。
 
-It is possible to use non-destructive [modifiers](generators.md#modifiers), but they are limited.
+可以使用非破坏性的[修改器](generators.md#modifiers)，但它们的功能有限。
 
-Terrains can be fully edited in-game using scripts and [VoxelTool](scripting.md). It is also possible to create a script editor plugin to implement edition in a similar manner.
-
+地形可以在游戏中通过脚本和 [VoxelTool](scripting.md) 进行完整编辑。也可以创建脚本编辑器插件，以类似的方式实现编辑。

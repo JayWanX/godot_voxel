@@ -16,7 +16,7 @@ VoxelGeneratorScript::VoxelGeneratorScript() {}
 VoxelGenerator::Result VoxelGeneratorScript::generate_block(VoxelGenerator::VoxelQueryData input) {
 	Result result;
 
-	// Create a temporary wrapper so Godot can pass it to scripts
+	// 创建一个临时包装器，以便 Godot 可以把它传给脚本
 	Ref<godot::VoxelBuffer> buffer_wrapper(
 			memnew(godot::VoxelBuffer(static_cast<godot::VoxelBuffer::Allocator>(input.voxel_buffer.get_allocator())))
 	);
@@ -31,10 +31,10 @@ VoxelGenerator::Result VoxelGeneratorScript::generate_block(VoxelGenerator::Voxe
 		}
 	}
 
-	// The wrapper is discarded
+	// 包装器将被丢弃
 	buffer_wrapper->get_buffer().move_to(input.voxel_buffer);
 
-	// We may expose this to scripts the day it actually gets used
+	// 等到它真正被用到的那一天，我们可能会把它暴露给脚本
 	// if (ret.get_type() == Variant::DICTIONARY) {
 	// 	Dictionary d = ret;
 	// 	result.max_lod_hint = d.get("max_lod_hint", false);

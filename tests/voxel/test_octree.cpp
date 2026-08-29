@@ -21,7 +21,7 @@ void test_octree_update() {
 	Vector3 viewer_pos = Vector3(100, 50, 200);
 	const int octree_size = block_size << (lod_count - 1);
 
-	// Testing as an octree forest, as it is the way they are used in VoxelLodTerrain
+	// 以八叉树森林的方式测试，正如它们在 VoxelLodTerrain 中的用法
 	StdMap<Vector3i, LodOctree> octrees;
 	const Box3i viewer_box_voxels =
 			Box3i::from_center_extents(math::floor_to_int(viewer_pos), Vector3iUtil::create(view_distance));
@@ -101,7 +101,7 @@ void test_octree_update() {
 	VOXEL_TEST_ASSERT(initial_block_count > 0);
 	VOXEL_TEST_ASSERT(initial_block_count == initial_block_count_rec);
 
-	// Updates without moving
+	// 不移动的情况下进行更新
 	int created_block_count = 0;
 	int destroyed_block_count = 0;
 	for (int i = 0; i < 10; ++i) {
@@ -126,7 +126,7 @@ void test_octree_update() {
 
 		const int time_stay = profiling_clock.restart();
 
-		// Block count should not change
+		// 数据块数量不应改变
 		VOXEL_TEST_ASSERT(created_block_count == 0);
 		VOXEL_TEST_ASSERT(destroyed_block_count == 0);
 		print_line(String("Stay time: {0} us").format(varray(time_stay)));
@@ -166,7 +166,7 @@ void test_octree_find_in_box() {
 		// print_line(String("Lod count: {0}").format(varray(lods)));
 	}
 
-	// Build a fully populated octree with all its leaves at LOD0
+	// 构建一棵所有叶子节点都在 LOD0 的完整填充八叉树
 	LodOctree octree;
 	LodOctree::NoDestroyAction nda;
 	octree.create(lods, nda);
@@ -185,7 +185,7 @@ void test_octree_find_in_box() {
 
 	const Box3i full_box(Vector3i(), Vector3i(blocks_across, blocks_across, blocks_across));
 
-	// Build expected result
+	// 构建预期结果
 	full_box.for_each_cell([full_box, &expected_positions](Vector3i pos) {
 		Box3i area_box(pos - Vector3i(1, 1, 1), Vector3i(3, 3, 3));
 		area_box.clip(full_box);
@@ -198,7 +198,7 @@ void test_octree_find_in_box() {
 		});
 	});
 
-	// Get octree results
+	// 获取八叉树结果
 	int checksum = 0;
 	full_box.for_each_cell([&octree, &expected_positions, &checksum](Vector3i pos) {
 		const Box3i area_box(pos - Vector3i(1, 1, 1), Vector3i(3, 3, 3));
@@ -212,16 +212,16 @@ void test_octree_find_in_box() {
 				 &expected_area_positions,
 				 &checksum](Vector3i node_pos, int lod, const LodOctree::NodeData &node_data) {
 					auto insert_result = found_positions.insert(node_pos);
-					// Must be one of the expected positions
+					// 必须是预期位置之一
 					VOXEL_TEST_ASSERT(expected_area_positions.find(node_pos) != expected_area_positions.end());
-					// Must not be a duplicate
+					// 不得是重复的
 					VOXEL_TEST_ASSERT(insert_result.second == true);
 					checksum += node_data.state;
 				}
 		);
 	});
 
-	// Doing it again just to measure time
+	// 再次执行只是为了测量耗时
 	{
 		ProfilingClock profiling_clock;
 		int checksum2 = 0;

@@ -1,5 +1,5 @@
-// Only include this in the mesher to define it once.
-// It is only in a separate header because I wanted to split things out.
+// 只在网格生成器中包含一次以定义它。
+// 之所以单独放在一个头文件中，是因为我想拆分内容。
 
 #include "../../util/math/vector3f.h"
 #include "blocky_tint_sampler.h"
@@ -43,17 +43,17 @@ int get_side_sign(const VoxelBlockyModel::Side side) {
 	}
 }
 
-// Adds extra voxel side geometry on the sides of the chunk for every voxel exposed to air. This creates
-// "seams" that hide LOD cracks when meshes of different LOD are put next to each other.
-// This method doesn't require to access voxels of the child LOD. The downside is that it won't always hide all the
-// cracks, but the assumption is that it will do most of the time.
-// AO is not handled, and probably doesn't need to be
+// 为数据块侧面每个暴露于空气的体素添加额外的体素侧面几何体。这会在不同 LOD 的网格并排放置时
+// 形成"接缝"，用以隐藏 LOD 裂缝。
+// 该方法无需访问子 LOD 的体素。缺点是它不能总是隐藏所有裂缝，
+// 但假设是大多数情况下都能做到。
+// 未处理 AO，可能也不需要处理
 template <typename TModelID>
 void append_side_skirts(
 		Span<const TModelID> buffer,
 		const TintSampler tint_sampler,
 		const Vector3T<int> jump,
-		const int z, // Coordinate of the first or last voxel (not within the padded region)
+		const int z, // 第一个或最后一个体素的坐标（不在填充区域内）
 		const int size_x,
 		const int size_y,
 		const VoxelBlockyModel::Side side,
@@ -66,12 +66,11 @@ void append_side_skirts(
 	const int z_base = z * jump.z;
 	const int side_sign = get_side_sign(side);
 
-	// Buffers sent to chunk meshing have outer and inner voxels.
-	// Inner voxels are those that are actually being meshed.
-	// Outer voxels are not made part of the final mesh, but they exist to know how to occlude sides of inner voxels
-	// touching them.
+	// 发送到数据块网格化的缓冲区包含外层和内层体素。
+	// 内层体素是实际被网格化的体素。
+	// 外层体素不构成最终网格的一部分，但它们的存在是为了知道如何剔除与之接触的内层体素的侧面。
 
-	// For each outer voxel on the side of the chunk (using side-relative coordinates)
+	// 对于数据块侧面的每个外层体素（使用侧面相对坐标）
 	for (int x = pad; x < size_x - pad; ++x) {
 		for (int y = pad; y < size_y - pad; ++y) {
 			const int buffer_index = x * jump.x + y * jump.y + z_base;
@@ -81,7 +80,7 @@ void append_side_skirts(
 				continue;
 			}
 
-			// Check if the voxel is exposed to air
+			// 检查体素是否暴露于空气
 
 			const int nv0 = buffer[buffer_index - jump.x];
 			const int nv1 = buffer[buffer_index + jump.x];
@@ -92,35 +91,35 @@ void append_side_skirts(
 				continue;
 			}
 
-			// Check if the outer voxel occludes an inner voxel
-			// (this check is not actually accurate, maybe we'd have to do a full occlusion check using the library?)
+			// 检查外层体素是否遮挡了内层体素
+			// （这个检查实际上并不精确，也许必须使用库做完整的遮挡检查？）
 
 			const TModelID nv4 = buffer[buffer_index - side_sign * jump.z];
 			if (nv4 == AIR) {
 				continue;
 			}
 
-			// If it does, add geometry for the side of that inner voxel
+			// 如果是这样，为该内层体素的侧面添加几何体
 
 			const Vector3f pos = side_to_block_coordinates(Vector3f(x - pad, y - pad, z - (side_sign + 1)), side);
 
 			if (nv4 >= library.models.size()) {
-				// Bad ID, skip
+				// 无效 ID，跳过
 				continue;
 			}
 			const BakedModel &voxel_baked_data = library.models[nv4];
 
 			if (!voxel_baked_data.lod_skirts) {
-				// A typical issue is making an ocean:
-				// - Skirts will show up behind the water surface so it's not a good solution in that case.
-				// - If sea level does not line up at different LODs, then there will be LOD "cracks" anyways. I don't
-				// have a good solution for this. One way to workaround is to choose a sea level that lines up at every
-				// LOD (such as Y=0), and let the seams occur in other cases which are usually way less frequent.
-				// - Another way is to only reduce LOD resolution horizontally and not vertically, but that has a high
-				// memory cost on large distances, so not silver bullet.
-				// - Make water opaque when at large distances? If acceptable, this can be a good fix (Distant Horizons
-				// mod was doing this at some point) but either require custom shader or the ability to specify
-				// different models for different LODs in the library
+				// 一个典型问题是制作海洋：
+				// - 裙边会出现在水面之后，因此在这种情况下不是好方案。
+				// - 如果海平面在不同 LOD 下无法对齐，那么无论如何都会出现 LOD "裂缝"。对此我没有
+				// 好的解决方案。一种变通办法是选择在每个 LOD 下都能对齐的海平面（如 Y=0），
+				// 让接缝出现在通常少得多的情况下。
+				// - 另一种方法是在水平方向而非垂直方向降低 LOD 分辨率，但这在远距离下内存成本很高，
+				// 所以不是万灵药。
+				// - 在远距离时让水变得不透明？如果可以接受，这是一个不错的修复方式（Distant Horizons
+				// 模组曾这样做过），但要么需要自定义着色器，要么需要在库中为不同 LOD 指定
+				// 不同的模型
 				continue;
 			}
 
@@ -136,10 +135,10 @@ void append_side_skirts(
 				const BakedModel::SideSurface &side_surface = side_surfaces[surface_index];
 				const unsigned int vertex_count = side_surface.positions.size();
 
-				// TODO The following code is pretty much the same as the main meshing function.
-				// We should put it in common once blocky mesher features are merged (blocky fluids, shadows occluders).
-				// The baked occlusion part should be separated to run on top of color modulate.
-				// Index offsets might not need a vector after all.
+				// TODO 以下代码与主网格化函数几乎相同。
+				// 一旦 blocky 网格生成器的功能合并（blocky 流体、阴影遮挡体），我们应该将其抽到公共代码。
+				// 烘焙遮挡部分应分离出来，在颜色调制之上运行。
+				// 索引偏移量最终可能并不需要向量。
 
 				const unsigned int index_offset = arrays.positions.size();
 
@@ -210,7 +209,7 @@ void append_skirts(
 
 	const Vector3T<int> jump(size.y, 1, size.x * size.y);
 
-	// Shortcuts
+	// 快捷方式
 	StdVector<VoxelMesherBlocky::Arrays> &out = out_arrays_per_material;
 	constexpr VoxelBlockyModel::Side NEGATIVE_X = VoxelBlockyModel::SIDE_NEGATIVE_X;
 	constexpr VoxelBlockyModel::Side POSITIVE_X = VoxelBlockyModel::SIDE_POSITIVE_X;

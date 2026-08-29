@@ -10,7 +10,7 @@ namespace voxel {
 typedef Vector3T<int16_t> Vector3i16;
 
 inline size_t get_hash_st(const voxel::Vector3i16 &v) {
-	// TODO Optimization: benchmark this hash, I just wanted one that works
+	// TODO 优化：对该哈希进行基准测试，我当初只想要一个能用的
 	// static_assert(sizeof(voxel::Vector3i16) <= sizeof(uint64_t));
 	const uint64_t m = v.x | (static_cast<uint64_t>(v.y) << 16) | (static_cast<uint64_t>(v.z) << 32);
 	return std::hash<uint64_t>{}(m);

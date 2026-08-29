@@ -39,9 +39,9 @@ void VoxelBlockyTypeLibraryIDSDialog::set_library(Ref<VoxelBlockyTypeLibrary> li
 	PackedStringArray id_map;
 	StdVector<uint16_t> used_ids;
 
-	// We could update the ID Map every time this dialog opens, but that's technically a modification, and it means it
-	// is more likely for IDs to become unused while the user is in the process of editing things. So instead we use a
-	// special function that makes a copy of the current ID map and updates the copy.
+	// 我们可以在每次打开此对话框时更新 ID 映射，但严格来说那是一种修改，而且意味着用户
+	// 在编辑过程中 ID 更有可能变成未使用。因此我们改用
+	// 一个特殊函数：复制当前的 ID 映射并更新副本。
 	library->get_id_map_preview(id_map, used_ids);
 
 	_item_list->clear();
@@ -49,7 +49,7 @@ void VoxelBlockyTypeLibraryIDSDialog::set_library(Ref<VoxelBlockyTypeLibrary> li
 		const String name = id_map[i];
 		String item_name = String::num_int64(i) + ": " + name;
 
-		// Not optimized, will do when needed
+		// 未优化，需要时再优化
 		const bool used = contains(to_span_const(used_ids), uint16_t(i));
 
 		if (!used) {

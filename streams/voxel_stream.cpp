@@ -14,16 +14,16 @@ VoxelStream::VoxelStream() {}
 VoxelStream::~VoxelStream() {}
 
 void VoxelStream::load_voxel_block(VoxelQueryData &query_data) {
-	// Can be implemented in subclasses
+	// 可在子类中实现
 	query_data.result = RESULT_BLOCK_NOT_FOUND;
 }
 
 void VoxelStream::save_voxel_block(VoxelQueryData &query_data) {
-	// Can be implemented in subclasses
+	// 可在子类中实现
 }
 
 void VoxelStream::load_voxel_blocks(Span<VoxelQueryData> p_blocks) {
-	// Default implementation. May matter for some stream types to optimize loading.
+	// 默认实现。对某些数据流类型优化加载可能有用。
 	for (unsigned int i = 0; i < p_blocks.size(); ++i) {
 		load_voxel_block(p_blocks[i]);
 	}
@@ -38,19 +38,19 @@ void VoxelStream::save_voxel_blocks(Span<VoxelQueryData> p_blocks) {
 #ifdef VOXEL_ENABLE_INSTANCER
 
 bool VoxelStream::supports_instance_blocks() const {
-	// Can be implemented in subclasses
+	// 可在子类中实现
 	return false;
 }
 
 void VoxelStream::load_instance_blocks(Span<InstancesQueryData> out_blocks) {
-	// Can be implemented in subclasses
+	// 可在子类中实现
 	for (size_t i = 0; i < out_blocks.size(); ++i) {
 		out_blocks[i].result = RESULT_BLOCK_NOT_FOUND;
 	}
 }
 
 void VoxelStream::save_instance_blocks(Span<InstancesQueryData> p_blocks) {
-	// Can be implemented in subclasses
+	// 可在子类中实现
 }
 
 #endif
@@ -89,7 +89,7 @@ Box3i VoxelStream::get_supported_block_range() const {
 }
 
 void VoxelStream::flush() {
-	// Can be implemented in subclasses
+	// 可在子类中实现
 }
 
 void VoxelStream::set_compression_mode(const godot::VoxelBlockSerializer::Compression mode) {
@@ -104,7 +104,7 @@ bool VoxelStream::is_runnable() const {
 	return true;
 }
 
-// Binding land
+// 绑定部分
 
 VoxelStream::ResultCode VoxelStream::_b_load_voxel_block(
 		Ref<godot::VoxelBuffer> out_buffer,

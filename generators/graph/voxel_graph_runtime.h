@@ -19,7 +19,7 @@ class NodeTypeDB;
 struct CompilationResult {
 	bool success = false;
 	int node_id = -1;
-	int expanded_nodes_count = 0; // For testing and debugging
+	int expanded_nodes_count = 0; // 用于测试和调试
 	String message;
 
 	static CompilationResult make_success() {
@@ -37,64 +37,64 @@ struct CompilationResult {
 	}
 };
 
-// CPU VM to execute a voxel graph generator.
-// This is a more generic class implementing the core of a 3D expression processing system.
-// Some of the logic dedicated to voxel data is moved in other classes.
+// 用于执行体素图生成器的 CPU 虚拟机。
+// 这是一个更通用的类，实现了 3D 表达式处理系统的核心。
+// 一些专门处理体素数据的逻辑被移到其他类中。
 class Runtime {
 public:
 	static const unsigned int MAX_INPUTS = 8;
 	static const unsigned int MAX_OUTPUTS = 24;
 
 	struct BufferData {
-		// Owns the data.
+		// 拥有这些数据。
 		float *data = nullptr;
 		unsigned int capacity = 0;
 	};
 
-	// Contains values of a node output
+	// 包含节点输出的值
 	struct Buffer {
-		// Access to buffer data associated with this port. Must contain at least `size` values.
-		// This data is not owned by the port. Multiple ports can use the same buffer.
-		// TODO Consider wrapping this in debug mode. It is one of the rare cases I didnt do it.
-		// I spent an hour debugging memory corruption which originated from an overrun while accessing this data.
+		// 访问与此端口关联的缓冲区数据。必须至少包含 `size` 个值。
+		// 该数据不归端口所有。多个端口可以使用同一个缓冲区。
+		// TODO 考虑在调试模式下将其包装起来。这是我为数不多的没有这样做的情况之一。
+		// 我曾经花了一个小时调试内存损坏，其根源是访问此数据时发生了越界。
 		float *data = nullptr;
-		// This size is not the allocated count, it's an available count below capacity.
-		// All buffers have the same available count, size is here only for convenience.
+		// 此大小不是已分配的数量，而是低于容量的可用数量。
+		// 所有缓冲区具有相同的可用数量，size 仅是为了方便。
 		unsigned int size;
 		// unsigned int capacity;
-		// Constant value of the buffer, if it is a compile-time constant
+		// 缓冲区的常量值（如果是编译期常量）
 		float constant_value;
-		// Is the buffer holding a compile-time constant
+		// 该缓冲区是否持有编译期常量
 		bool is_constant;
-		// Is the buffer a user input/output
+		// 该缓冲区是否为用户输入/输出
 		bool is_binding = false;
-		// How many operations are using this buffer as input.
-		// This value is only relevant when using optimized execution mapping.
+		// 有多少操作将该缓冲区作为输入使用。
+		// 该值仅在使用优化的执行映射时相关。
 		uint16_t local_users_count;
-		// Index of the data in the pool of BufferData. This is mainly used for debugging.
+		// BufferData 池中数据的索引。主要用于调试。
 		uint16_t buffer_data_index;
 	};
 
-	// Contains a list of adresses to the operations to execute for a given query.
-	// If no local optimization is done, this can remain the same for any position lists.
-	// If local optimization is used, it may be recomputed before each query.
+	// 包含针对给定查询要执行的操作地址列表。
+	// 如果未进行本地优化，则对于任何位置列表，它都可以保持不变。
+	// 如果使用本地优化，它可能在每次查询前被重新计算。
 	struct ExecutionMap {
 		struct OperationInfo {
 			uint16_t address = 0;
-			// How many constant fills to execute before this operation.
+			// 在此操作之前要执行多少次常量填充。
 			uint16_t constant_fill_count = 0;
 		};
 
 		StdVector<OperationInfo> operations;
 
-		// Stores node IDs referring to the user-facing graph.
-		// Each index corresponds to operation indices.
-		// The same node can appear twice, because sometimes a user-facing node compiles as multiple nodes.
-		// It can also include some nodes not explicitely present in the user graph (like auto-inputs).
+		// 存储引用面向用户的图的节点 ID。
+		// 每个索引对应操作索引。
+		// 同一节点可能出现两次，因为有时面向用户的节点会编译为多个节点。
+		// 它还可能包含一些用户图中未显式存在的节点（如自动输入）。
 		StdVector<uint32_t> debug_nodes;
 
-		// Every operation before this index in the `operations` list will only depend on inputs tagged as "outer
-		// group". This is the index from which operations won't only depend on the outer group.
+		// `operations` 列表中此索引之前的每个操作将仅依赖于标记为"外部组"的输入。
+		// 从此索引开始的操作将不再仅依赖于外部组。
 		unsigned int inner_group_start_index = 0;
 
 		struct ConstantFill {
@@ -102,10 +102,10 @@ public:
 			float value = 0;
 		};
 
-		// List of buffers to fill with constants when using local optimization.
-		// This list must be read using an advancing cursor, that moves up by the amount specified in `OperationInfo`.
-		// Note, it is preferable to use this for dynamic optimizations. Compile-time constants should use pinned
-		// buffers, or better, single values.
+		// 使用本地优化时要填充常量的缓冲区列表。
+		// 必须使用前进的光标读取此列表，光标按 `OperationInfo` 中指定的数量前进。
+		// 注意，最好将其用于动态优化。编译期常量应使用固定的
+		// 缓冲区，或者更好的是单个值。
 		StdVector<ConstantFill> constant_fills;
 
 		void clear() {
@@ -116,8 +116,8 @@ public:
 		}
 	};
 
-	// Contains the data the program will modify while it runs.
-	// The same state can be re-used with multiple programs, but it should be prepared before doing that.
+	// 包含程序运行时将修改的数据。
+	// 同一状态可以与多个程序重用，但在此之前应该准备好。
 	class State {
 	public:
 		~State() {
@@ -125,19 +125,19 @@ public:
 		}
 
 		inline const Buffer &get_buffer(uint16_t address) const {
-			// TODO Just for convenience because STL bound checks aren't working in Godot 3
+			// TODO 只是为了方便，因为 STL 边界检查在 Godot 3 中不工作
 			CRASH_COND(address >= buffers.size());
 			return buffers[address];
 		}
 
 		inline const math::Interval get_range(uint16_t address) const {
-			// TODO Just for convenience because STL bound checks aren't working in Godot 3
+			// TODO 只是为了方便，因为 STL 边界检查在 Godot 3 中不工作
 			CRASH_COND(address >= buffers.size());
 			return ranges[address];
 		}
 
 		inline const math::Interval &get_range_const_ref(uint16_t address) const {
-			// TODO Just for convenience because STL bound checks aren't working in Godot 3
+			// TODO 只是为了方便，因为 STL 边界检查在 Godot 3 中不工作
 			VOXEL_ASSERT(address < buffers.size());
 			return ranges[address];
 		}
@@ -174,12 +174,12 @@ public:
 		}
 
 	private:
-		friend class Runtime; // TODO Why is friend needed? This class is nested inside
+		friend class Runtime; // TODO 为什么需要 friend？此类是嵌套在内部的
 
 		StdVector<math::Interval> ranges;
 		StdVector<Buffer> buffers;
 		StdVector<BufferData> buffer_datas;
-		// [execution_map_index] => microseconds
+		// [execution_map_index] => 微秒
 		StdVector<uint32_t> debug_profiler_times;
 
 		unsigned int buffer_size = 0;
@@ -187,14 +187,14 @@ public:
 	};
 
 	struct InputInfo {
-		// Note: the following buffer are allocated by the user.
-		// They are mapped temporarily into the same array of buffers inside `State`,
-		// so we won't need specific code to handle them. This requires knowing at which index they are reserved.
-		// They must be all assigned for the program to run correctly.
+		// 注意：以下缓冲区由用户分配。
+		// 它们被临时映射到 `State` 内部的同一个缓冲区数组中，
+		// 因此我们不需要特定代码来处理它们。这需要知道它们被保留在哪个索引处。
+		// 它们必须全部被赋值，程序才能正确运行。
 		unsigned int buffer_address = 0;
 	};
 
-	// Info about a terminal node of the graph
+	// 关于图终端节点的信息
 	struct OutputInfo {
 		unsigned int buffer_address;
 		unsigned int dependency_graph_node_index;
@@ -207,13 +207,13 @@ public:
 	void clear();
 	CompilationResult compile(const VoxelGraphFunction &function, bool debug);
 
-	// Call this before you use a state with generation functions.
-	// You need to call it once, until you want to use a different graph, buffer size or buffer count.
-	// If none of these change, you can keep re-using it.
+	// 在使用带生成函数的状态之前调用此方法。
+	// 只需调用一次，直到你想使用不同的图、缓冲区大小或缓冲区数量。
+	// 如果这些都不变，你可以继续重用。
 	void prepare_state(State &state, unsigned int buffer_size, bool with_profiling) const;
 
-	// Convenience for set generation with only one value
-	// TODO Evaluate needs for double-precision in pg::Runtime
+	// 用于仅有一个值的集合生成的便捷方法
+	// TODO 评估 pg::Runtime 中是否需要双精度
 	void generate_single(State &state, Span<const float> inputs, const ExecutionMap *execution_map) const;
 
 	void generate_set(
@@ -241,14 +241,14 @@ public:
 		return _program.outputs[i];
 	}
 
-	// Analyzes a specific region of inputs to find out what ranges of outputs we can expect.
-	// It can be used to speed up calls to `generate_set` thanks to execution mapping,
-	// so that operations can be optimized out if they don't contribute to the result.
+	// 分析输入的一个特定区域，以找出我们可以预期的输出范围。
+	// 它可以借助执行映射来加速对 `generate_set` 的调用，
+	// 以便在不影响结果的操作上可以跳过优化。
 	void analyze_range(State &state, Span<const math::Interval> p_inputs) const;
 
-	// Call this after `analyze_range` if you intend to actually generate a set or single values in the area.
-	// This allows to use the execution map optimization, until you choose another area.
-	// (i.e when using this, querying values outside of the analyzed area may be invalid)
+	// 如果打算在该区域实际生成一组值或单个值，则在 `analyze_range` 之后调用此方法。
+	// 这允许使用执行映射优化，直到你选择另一个区域。
+	// （即使用此方法时，查询分析区域之外的值可能是无效的）
 	void generate_optimized_execution_map(
 			const State &state,
 			ExecutionMap &execution_map,
@@ -256,12 +256,12 @@ public:
 			bool debug
 	) const;
 
-	// Convenience function to require all outputs
+	// 用于要求所有输出的便捷函数
 	void generate_optimized_execution_map(const State &state, ExecutionMap &execution_map, bool debug) const;
 
 	const ExecutionMap &get_default_execution_map() const;
 
-	// Gets the buffer address of a specific output port
+	// 获取特定输出端口的缓冲区地址
 	bool try_get_output_port_address(ProgramGraph::PortLocation port, uint16_t &out_address) const;
 
 	uint64_t get_program_hash() const;
@@ -272,7 +272,7 @@ public:
 		Span<const uint8_t> params;
 		if (params_size_in_words > 0) {
 			const size_t params_offset_in_words = operations[pc];
-			// Seek to aligned position where params start
+			// 定位到参数开始的对齐位置
 			pc += params_offset_in_words;
 			params = operations.sub(pc, params_size_in_words).reinterpret_cast_to<const uint8_t>();
 			pc += params_size_in_words;
@@ -324,7 +324,7 @@ public:
 		const Span<const uint8_t> _params;
 	};
 
-	// Functions usable by node implementations during execution
+	// 执行阶段节点实现可使用的函数
 	class ProcessBufferContext : public _ProcessContext {
 	public:
 		inline ProcessBufferContext(
@@ -341,10 +341,10 @@ public:
 		inline const Buffer &get_input(uint32_t i) const {
 			const uint32_t address = get_input_address(i);
 #ifdef DEBUG_ENABLED
-			// When using optimized execution mapping,
-			// If a buffer is marked as having no users during range analysis, then it should really not be used,
-			// because it won't be filled with relevant data. If it is still used,
-			// then the result can be completely different from what the range analysis predicted.
+			// 使用优化的执行映射时，
+			// 如果在范围分析期间缓冲区被标记为没有用户，那么它确实不应被使用，
+			// 因为它不会被填充相关数据。如果它仍被使用，
+			// 那么结果可能与范围分析预测的完全不同。
 			const Buffer &b = _buffers[address];
 			ERR_FAIL_COND_V_MSG(
 					_using_execution_map && !b.is_binding && b.local_users_count == 0,
@@ -360,7 +360,7 @@ public:
 			return _buffers[address];
 		}
 
-		// Different signature to force the coder to acknowledge the condition
+		// 使用不同的签名以强制编码者确认该条件
 		inline const Buffer &try_get_input(uint32_t i, bool &ignored) {
 			const uint32_t address = get_input_address(i);
 			const Buffer &b = _buffers[address];
@@ -373,7 +373,7 @@ public:
 		bool _using_execution_map;
 	};
 
-	// Functions usable by node implementations during range analysis
+	// 范围分析阶段节点实现可使用的函数
 	class RangeAnalysisContext : public _ProcessContext {
 	public:
 		inline RangeAnalysisContext(
@@ -424,42 +424,42 @@ private:
 	bool is_operation_constant(const State &state, uint16_t op_address) const;
 
 	struct BufferSpec {
-		// Index the buffer should be stored at
+		// 缓冲区应存储的索引
 		uint16_t address = 0;
-		// Index where the data of the buffer should be stored at.
-		// This can be the same for multiple buffer, unless pinned.
+		// 缓冲区数据应存储的索引。
+		// 除非固定，否则多个缓冲区可以相同。
 		uint16_t data_index = 0;
-		// How many nodes use this buffer as input
+		// 有多少节点将该缓冲区作为输入使用
 		uint16_t users_count = 0;
-		// Value of the compile-time constant, if any
+		// 编译期常量的值（如果有）
 		float constant_value = 0;
-		// Is the buffer constant at compile time
+		// 缓冲区在编译时是否为常量
 		bool is_constant = false;
-		// Is the buffer a user input/output
+		// 缓冲区是否为用户输入/输出
 		bool is_binding = false;
-		// Will be `true` only if `data_index` actually refers to something.
-		// Buffers without data are bindings or constants not requiring buffers.
+		// 仅当 `data_index` 实际引用某些内容时才为 `true`。
+		// 没有数据的缓冲区是绑定或不需要缓冲区的常量。
 		bool has_data = false;
-		// If true, the port will be assigned unique buffer data.
-		// If false, the port might share the same buffer data with other ports.
-		// TODO Rename `has_unique_data`?
+		// 如果为 true，端口将被分配唯一的缓冲区数据。
+		// 如果为 false，端口可能与其他端口共享相同的缓冲区数据。
+		// TODO 重命名为 `has_unique_data`？
 		bool is_pinned = false;
 	};
 
-	// Pre-processed, read-only graph used for runtime optimizations.
+	// 用于运行时优化的预处理只读图。
 	struct DependencyGraph {
 		struct Node {
 			uint16_t first_dependency;
 			uint16_t end_dependency;
 			uint16_t op_address;
 			bool is_input;
-			// Node ID from the expanded ProgramGraph (non user-provided, so may need remap)
+			// 展开后的 ProgramGraph 中的节点 ID（非用户提供，因此可能需要重映射）
 			uint32_t debug_node_id;
 		};
 
-		// Indexes to the `nodes` array
+		// 指向 `nodes` 数组的索引
 		StdVector<uint16_t> dependencies;
-		// Nodes in the same order they would be in the default execution map (but indexes may not match)
+		// 与默认执行映射中顺序相同的节点（但索引可能不匹配）
 		StdVector<Node> nodes;
 
 		inline void clear() {
@@ -468,48 +468,47 @@ private:
 		}
 	};
 
-	// Compiled program data.
-	// Remains constant and read-only after compilation.
+	// 编译后的程序数据。
+	// 编译后保持常量和只读。
 	struct Program {
-		// Serialized operations and arguments, aligned at minimum with uint16.
-		// They come up as series of:
+		// 序列化的操作和参数，至少以 uint16 对齐。
+		// 它们以如下系列出现：
 		//
 		// - uint16 opid
 		// - uint16 inputs[0..*]
 		// - uint16 outputs[0..*]
 		// - uint16 parameters_size
-		// - uint16 parameters_offset // how much to advance from here to reach the beginning of `parameters`
-		// - <optional padding>
-		// - T parameters, where T could be any struct
-		// - <optional padding to keep alignment with uint16>
+		// - uint16 parameters_offset // 从这里前进多少才能到达 `parameters` 的开头
+		// - <可选填充>
+		// - T parameters，其中 T 可以是任何结构体
+		// - <可选填充以保持与 uint16 对齐>
 		//
-		// They should be laid out in the same order they will be run in, although it's not absolutely required.
-		// It's better to have it ordered because memory access will be more predictable.
+		// 它们应该按运行顺序排列，尽管这不是绝对必需的。
+		// 按顺序排列更好，因为内存访问将更可预测。
 		StdVector<uint16_t> operations;
 
-		// Describes dependencies between operations. It is generated at compile time.
-		// It is used to perform dynamic optimization in case some operations can be predicted as constant.
+		// 描述操作之间的依赖关系。它在编译时生成。
+		// 它用于在某个操作可以预测为常量时执行动态优化。
 		DependencyGraph dependency_graph;
 
-		// List of indexes within `operations` describing which order they should be run into by default.
-		// It's used because sometimes we may want to override with a simplified execution map dynamically.
-		// When we don't, we use the default one so the code doesn't have to change.
+		// `operations` 内的索引列表，描述默认情况下它们应该按什么顺序运行。
+		// 它之所以存在，是因为有时我们可能想要动态地覆盖为简化的执行映射。
+		// 当我们不覆盖时，我们使用默认的，这样代码就不必改变。
 		ExecutionMap default_execution_map;
 
-		// Heap-allocated parameters data, when too large to fit in `operations`.
-		// We keep a reference to them so they can be freed when the program is cleared.
+		// 堆分配的参数数据，当太大而无法放入 `operations` 时使用。
+		// 我们持有对它们的引用，以便在程序被清除时释放。
 		StdVector<HeapResource> heap_resources;
 
-		// Heap-allocated parameters data, when too large to fit in `operations`.
-		// We keep a reference to them so they won't be freed until the program is cleared.
+		// 堆分配的参数数据，当太大而无法放入 `operations` 时使用。
+		// 我们持有对它们的引用，以便它们在程序被清除之前不会被释放。
 		StdVector<Ref<RefCounted>> ref_resources;
 
-		// Describes the list of buffers to prepare in `State` before the program can be run
+		// 描述在程序可以运行之前需要在 `State` 中准备的缓冲区列表
 		StdVector<BufferSpec> buffer_specs;
 
-		// Address in `operations` from which operations will start to not only depend on inputs tagged as "outer
-		// group". It is used to optimize away calculations that would otherwise be the same in planar terrain use
-		// cases.
+		// `operations` 中的地址，从此处开始的操作将不再仅依赖于标记为"外部
+		// 组"的输入。它用于优化掉在平面地形使用情况下会相同的计算。
 		uint32_t inner_group_start_op_index;
 
 		StdVector<InputInfo> inputs;
@@ -517,24 +516,24 @@ private:
 		FixedArray<OutputInfo, MAX_OUTPUTS> outputs;
 		unsigned int outputs_count = 0;
 
-		// Maximum amount of buffers this program will need to do a full run.
-		// Buffers are needed to hold values of arguments and outputs for each operation.
+		// 此程序完成一次完整运行所需的缓冲区最大数量。
+		// 缓冲区用于保存每个操作的参数和输出的值。
 		unsigned int buffer_count = 0;
-		// Maximum amount of buffer datas this program will need to do a full run.
+		// 此程序完成一次完整运行所需的缓冲区数据最大数量。
 		unsigned int buffer_data_count = 0;
 
-		// Associates a port from the expanded graph to its corresponding address within the compiled program.
-		// This is used for debugging intermediate values.
+		// 将展开图中的端口与其在编译程序中的相应地址关联起来。
+		// 这用于调试中间值。
 		StdUnorderedMap<ProgramGraph::PortLocation, uint16_t> output_port_addresses;
 
-		// If you have a port location from the original user graph, before querying `output_port_addresses`, remap
-		// it first, in case it got expanded to different nodes during compilation.
+		// 如果你有来自原始用户图的端口位置，在查询 `output_port_addresses` 之前，请先进行重映射，
+		// 以防它在编译期间被展开为不同的节点。
 		StdUnorderedMap<ProgramGraph::PortLocation, ProgramGraph::PortLocation> user_port_to_expanded_port;
 
-		// Associates expanded graph ID to user graph node IDs.
+		// 将展开图 ID 关联到用户图节点 ID。
 		StdUnorderedMap<uint32_t, uint32_t> expanded_node_id_to_user_node_id;
 
-		// Result of the last compilation attempt. The program should not be run if it failed.
+		// 上次编译尝试的结果。如果失败，则不应运行该程序。
 		CompilationResult compilation_result;
 
 		void clear() {

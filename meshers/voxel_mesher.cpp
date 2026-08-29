@@ -37,7 +37,7 @@ Ref<Mesh> VoxelMesher::build_mesh(
 #endif
 
 	if (additional_data.size() > 0) {
-		// This is mainly for testing purposes, or small-scale meshing.
+		// 这主要用于测试目的或小规模网格生成。
 		Ref<VoxelGenerator> generator = additional_data.get("generator", Variant());
 		input.generator = generator.ptr();
 		input.origin_in_voxels = additional_data.get("origin_in_voxels", Vector3i());
@@ -130,8 +130,7 @@ Ref<Mesh> VoxelMesher::build_mesh(
 			);
 
 			const DetailTextures textures = store_normalmap_data_to_textures(images);
-			// That should be in return value, but for now I just want this for testing with GDScript, so it gotta go
-			// somewhere
+			// 这些本应放在返回值里，但目前我只想用 GDScript 测试，所以暂时放在这里
 			mesh->set_meta(VoxelStringNames::get_singleton().voxel_normalmap_atlas, textures.atlas);
 			mesh->set_meta(VoxelStringNames::get_singleton().voxel_normalmap_lookup, textures.lookup);
 		}
@@ -161,12 +160,12 @@ void VoxelMesher::set_padding(int minimum, int maximum) {
 }
 
 Ref<Material> VoxelMesher::get_material_by_index(unsigned int i) const {
-	// May be implemented in some meshers
+	// 可能在部分网格生成器中实现
 	return Ref<Material>();
 }
 
 unsigned int VoxelMesher::get_material_index_count() const {
-	// May be implemented in some meshers
+	// 可能在部分网格生成器中实现
 	return 0;
 }
 
@@ -196,9 +195,9 @@ Ref<Mesh> VoxelMesher::_b_build_mesh(
 }
 
 void VoxelMesher::_bind_methods() {
-	// Shortcut if you want to generate a mesh directly from a fixed grid of voxels.
-	// Useful for testing the different meshers.
-	// TODO Have an object type to specify input
+	// 如果你想直接从固定体素网格生成网格的快捷方式。
+	// 对测试不同的网格生成器很有用。
+	// TODO 提供一个对象类型来指定输入
 	ClassDB::bind_method(
 			D_METHOD("build_mesh", "voxel_buffer", "materials", "additional_data"),
 			&VoxelMesher::_b_build_mesh,

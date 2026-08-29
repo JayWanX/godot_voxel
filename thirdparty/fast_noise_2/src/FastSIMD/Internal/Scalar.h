@@ -326,7 +326,7 @@ namespace FastSIMD
             return m ? a : b;
         }
 
-        // Min, Max
+        // Min、Max
 
         FS_INLINE static float32v Min_f32( float32v a, float32v b )
         {
@@ -382,7 +382,7 @@ namespace FastSIMD
             return abs( a );
         }
 
-        // Float math
+        // 浮点运算
 
         FS_INLINE static float32v Sqrt_f32( float32v a )
         {
@@ -404,7 +404,7 @@ namespace FastSIMD
             return a * a;
         }
 
-        // Floor, Ceil, Round
+        // Floor、Ceil、Round
 
         FS_INLINE static float32v Floor_f32( float32v a )
         {

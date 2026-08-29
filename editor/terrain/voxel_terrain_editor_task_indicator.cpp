@@ -14,9 +14,9 @@
 namespace voxel {
 
 VoxelTerrainEditorTaskIndicator::VoxelTerrainEditorTaskIndicator() {
-	// We use a scroll container so it doesn't prevent Godot from shrinking horizontally on small screens
+	// 我们使用滚动容器，这样在小屏幕上它不会阻止 Godot 在水平方向缩小
 
-	// We only want horizontal scrolling
+	// 我们只需要水平滚动
 	set_horizontal_scroll_mode(ScrollContainer::SCROLL_MODE_AUTO);
 	set_vertical_scroll_mode(ScrollContainer::SCROLL_MODE_DISABLED);
 
@@ -35,8 +35,8 @@ VoxelTerrainEditorTaskIndicator::VoxelTerrainEditorTaskIndicator() {
 void VoxelTerrainEditorTaskIndicator::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_THEME_CHANGED:
-			// Set a monospace font.
-			// Can't do this in constructor, fonts are not available then. Also the theme can change.
+			// 设置等宽字体。
+			// 不能在构造函数中做这件事，那时字体还不可用。而且主题也可能会改变。
 			for (unsigned int i = 0; i < _stats.size(); ++i) {
 				_stats[i].label->add_theme_font_override("font", get_theme_font("source", "EditorFonts"));
 			}
@@ -63,7 +63,7 @@ void VoxelTerrainEditorTaskIndicator::create_stat(StatID id, String short_name, 
 	Label *name_label = memnew(Label);
 	name_label->set_text(short_name);
 	name_label->set_tooltip_text(long_name);
-	name_label->set_mouse_filter(Control::MOUSE_FILTER_PASS); // Necessary for tooltip to work
+	name_label->set_mouse_filter(Control::MOUSE_FILTER_PASS); // 让工具提示正常工作所必需的
 	_box_container->add_child(name_label);
 	stat.label = memnew(Label);
 	stat.label->set_custom_minimum_size(Vector2(45 * EDSCALE, 0));
@@ -73,7 +73,7 @@ void VoxelTerrainEditorTaskIndicator::create_stat(StatID id, String short_name, 
 
 namespace {
 
-// TODO Optimize: format a local `std::string` and convert to `String` at the end to reduce allocations.
+// TODO 优化：先格式化局部的 `std::string`，最后再转换为 `String` 以减少分配。
 
 String with_commas(int64_t n) {
 	String res = "";
@@ -92,16 +92,16 @@ String with_commas(int64_t n) {
 	return res;
 }
 
-// There is `String::humanize_size` but:
-// 1) it is specifically for bytes, 2) it works on a 1024 base
-// This function allows any unit, and works on a base of 1000
+// 有 `String::humanize_size`，但是：
+// 1) 它专门针对字节，2) 它基于 1024
+// 这个函数允许任意单位，并且基于 1000
 String with_unit(int64_t n, const char *unit) {
 	String s = "";
 	if (n < 0) {
 		s += "-";
 		n = -n;
 	}
-	// TODO Perhaps use a for loop
+	// TODO 也许可以用 for 循环
 	if (n >= 1000'000'000'000) {
 		s += with_commas(n / 1000'000'000'000);
 		s += ".";

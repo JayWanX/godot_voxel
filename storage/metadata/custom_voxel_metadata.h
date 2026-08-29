@@ -5,25 +5,25 @@
 
 namespace voxel {
 
-// Base interface for custom data types.
+// 自定义数据类型的基础接口。
 class ICustomVoxelMetadata {
 public:
 	virtual ~ICustomVoxelMetadata() {}
 
-	// Gets how many bytes this metadata will occupy when serialized.
+	// 获取此元数据序列化后所占用的字节数。
 	virtual size_t get_serialized_size() const = 0;
 
-	// Serializes this metadata into `dst`. The size of `dst` will be equal or greater than the size returned by
-	// `get_serialized_size()`. Returns how many bytes were written.
+	// 将此元数据序列化到 `dst` 中。`dst` 的大小将等于或大于
+	// `get_serialized_size()` 返回的大小。返回写入的字节数。
 	virtual size_t serialize(Span<uint8_t> dst) const = 0;
 
-	// Deserializes this metadata from the given bytes.
-	// Returns `true` on success, `false` otherwise. `out_read_size` must be assigned to the number of bytes read.
+	// 从给定字节反序列化此元数据。
+	// 成功时返回 `true`，否则返回 `false`。`out_read_size` 必须赋值为读取的字节数。
 	virtual bool deserialize(Span<const uint8_t> src, uint64_t &out_read_size) = 0;
 
 	virtual ICustomVoxelMetadata *duplicate() = 0;
 
-	// Returns the type index used in metadata tagging (mainly used for debug checks)
+	// 返回元数据标记中使用的类型索引（主要用于调试检查）
 	virtual uint8_t get_type_index() const = 0;
 
 	virtual bool equals(const ICustomVoxelMetadata &other) const = 0;

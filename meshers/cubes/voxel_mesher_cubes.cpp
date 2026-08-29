@@ -16,13 +16,13 @@
 #include "../../util/godot/core/class_db.h"
 #endif
 
-// TODO Binary greedy mesher optimization
+// TODO 二分贪婪网格化优化
 // https://www.youtube.com/watch?v=qnGoGq7DWMc
 
 namespace voxel {
 
 namespace {
-// Table of indices for vertices of cube faces
+// 立方体面顶点的索引表
 // 2-----3
 // |     |
 // |     |
@@ -31,23 +31,23 @@ namespace {
 const uint8_t g_indices_lut[3][2][6] = {
 	// X
 	{
-			// Front
+			// 前
 			{ 0, 3, 2, 0, 1, 3 },
-			// Back
+			// 后
 			{ 0, 2, 3, 0, 3, 1 },
 	},
 	// Y
 	{
-			// Front
+			// 前
 			{ 0, 2, 3, 0, 3, 1 },
-			// Back
+			// 后
 			{ 0, 3, 2, 0, 1, 3 },
 	},
 	// Z
 	{
-			// Front
+			// 前
 			{ 0, 3, 2, 0, 1, 3 },
-			// Back
+			// 后
 			{ 0, 2, 3, 0, 3, 1 },
 	}
 };
@@ -61,19 +61,19 @@ const uint8_t g_face_axes_lut[Vector3iUtil::AXIS_COUNT][2] = {
 	{ Vector3i::AXIS_X, Vector3i::AXIS_Y }
 };
 
-// Not named `Side` because Godot already defines that in global space
+// 未命名为 `Side`，因为 Godot 已在全局空间中定义了它
 enum FaceSide {
 	FACE_SIDE_FRONT = 0,
 	FACE_SIDE_BACK,
-	FACE_SIDE_NONE // Either means there is no face, or it was consumed
+	FACE_SIDE_NONE // 要么表示没有面，要么表示该面已被消费
 };
 
 } // namespace
 
-// Returns:
-// 0 if alpha is zero,
-// 1 if alpha is neither zero neither max,
-// 2 if alpha is max
+// 返回：
+// 0 表示 alpha 为零，
+// 1 表示 alpha 既不为零也不为最大，
+// 2 表示 alpha 为最大
 inline uint8_t get_alpha_index(Color8 c) {
 	return (c.a == 0xff) + (c.a > 0);
 }
@@ -97,7 +97,7 @@ void build_voxel_mesh_as_simple_cubes(
 	const unsigned int row_size = block_size.y;
 	const unsigned int deck_size = block_size.x * row_size;
 
-	// Note: voxel buffers are indexed in ZXY order
+	// 注意：体素缓冲区按 ZXY 顺序索引
 	FixedArray<uint32_t, Vector3iUtil::AXIS_COUNT> neighbor_offset_d_lut;
 	neighbor_offset_d_lut[Vector3i::AXIS_X] = block_size.y;
 	neighbor_offset_d_lut[Vector3i::AXIS_Y] = 1;
@@ -106,14 +106,14 @@ void build_voxel_mesh_as_simple_cubes(
 	FixedArray<uint32_t, VoxelMesherCubes::MATERIAL_COUNT> index_offsets;
 	fill(index_offsets, uint32_t(0));
 
-	// For each axis
+	// 对每个轴
 	for (unsigned int za = 0; za < Vector3iUtil::AXIS_COUNT; ++za) {
 		const unsigned int xa = g_face_axes_lut[za][0];
 		const unsigned int ya = g_face_axes_lut[za][1];
 
-		// For each deck
+		// 对每一层
 		for (unsigned int d = min_pos[za] - VoxelMesherCubes::PADDING; d < (unsigned int)max_pos[za]; ++d) {
-			// For each cell of the deck, gather face info
+			// 对该层的每个单元，收集面信息
 			for (unsigned int fy = min_pos[ya]; fy < (unsigned int)max_pos[ya]; ++fy) {
 				for (unsigned int fx = min_pos[xa]; fx < (unsigned int)max_pos[xa]; ++fx) {
 					FixedArray<unsigned int, Vector3iUtil::AXIS_COUNT> pos;
@@ -130,7 +130,7 @@ void build_voxel_mesh_as_simple_cubes(
 					const Color8 color0 = color_func(raw_color0);
 					const Color8 color1 = color_func(raw_color1);
 
-					// TODO Change this
+					// TODO 修改这里
 					const uint8_t ai0 = get_alpha_index(color0);
 					const uint8_t ai1 = get_alpha_index(color1);
 
@@ -146,7 +146,7 @@ void build_voxel_mesh_as_simple_cubes(
 						side = FACE_SIDE_FRONT;
 					}
 
-					// Commit face to the mesh
+					// 将面提交到网格
 
 					const uint8_t material_index = color.a < 255;
 					VoxelMesherCubes::Arrays &arrays = out_arrays_per_material[material_index];
@@ -189,7 +189,7 @@ void build_voxel_mesh_as_simple_cubes(
 					arrays.positions.push_back(v2);
 					arrays.positions.push_back(v3);
 
-					// TODO Any way to not need Color anywhere? It's wasteful
+					// TODO 是否有办法在任何地方都不需要 Color？它很浪费
 					const Color colorf = color;
 					arrays.colors.push_back(colorf);
 					arrays.colors.push_back(colorf);
@@ -247,7 +247,7 @@ void build_voxel_mesh_as_greedy_cubes(
 	const unsigned int row_size = block_size.y;
 	const unsigned int deck_size = block_size.x * row_size;
 
-	// Note: voxel buffers are indexed in ZXY order
+	// 注意：体素缓冲区按 ZXY 顺序索引
 	FixedArray<uint32_t, Vector3iUtil::AXIS_COUNT> neighbor_offset_d_lut;
 	neighbor_offset_d_lut[Vector3i::AXIS_X] = block_size.y;
 	neighbor_offset_d_lut[Vector3i::AXIS_Y] = 1;
@@ -256,7 +256,7 @@ void build_voxel_mesh_as_greedy_cubes(
 	FixedArray<uint32_t, VoxelMesherCubes::MATERIAL_COUNT> index_offsets;
 	fill(index_offsets, uint32_t(0));
 
-	// For each axis
+	// 对每个轴
 	for (unsigned int za = 0; za < Vector3iUtil::AXIS_COUNT; ++za) {
 		const unsigned int xa = g_face_axes_lut[za][0];
 		const unsigned int ya = g_face_axes_lut[za][1];
@@ -264,13 +264,13 @@ void build_voxel_mesh_as_greedy_cubes(
 		const unsigned int mask_size_x = (max_pos[xa] - min_pos[xa]);
 		const unsigned int mask_size_y = (max_pos[ya] - min_pos[ya]);
 		const unsigned int mask_area = mask_size_x * mask_size_y;
-		// Using the vector as memory pool
+		// 将向量用作内存池
 		mask_memory_pool.resize(mask_area * sizeof(MaskValue));
 		Span<MaskValue> mask(reinterpret_cast<MaskValue *>(mask_memory_pool.data()), 0, mask_area);
 
-		// For each deck
+		// 对每一层
 		for (unsigned int d = min_pos[za] - VoxelMesherCubes::PADDING; d < (unsigned int)max_pos[za]; ++d) {
-			// For each cell of the deck, gather face info
+			// 对该层的每个单元，收集面信息
 			for (unsigned int fy = min_pos[ya]; fy < (unsigned int)max_pos[ya]; ++fy) {
 				for (unsigned int fx = min_pos[xa]; fx < (unsigned int)max_pos[xa]; ++fx) {
 					FixedArray<unsigned int, Vector3iUtil::AXIS_COUNT> pos;
@@ -321,7 +321,7 @@ void build_voxel_mesh_as_greedy_cubes(
 				}
 			};
 
-			// Greedy quads
+			// 贪婪四边形
 			for (unsigned int fy = 0; fy < mask_size_y; ++fy) {
 				for (unsigned int fx = 0; fx < mask_size_x; ++fx) {
 					const unsigned int mask_index = fx + fy * mask_size_x;
@@ -331,20 +331,20 @@ void build_voxel_mesh_as_greedy_cubes(
 						continue;
 					}
 
-					// Check if the next faces are the same along X
+					// 检查沿 X 方向的下一个面是否相同
 					unsigned int rx = fx + 1;
 					while (rx < mask_size_x && mask[rx + fy * mask_size_x] == m) {
 						++rx;
 					}
 
-					// Check if the next rows of faces are the same along Y
+					// 检查沿 Y 方向的下几行面是否相同
 					unsigned int ry = fy + 1;
 					while (ry < mask_size_y &&
 						   L::is_range_equal(mask, fx + ry * mask_size_x, rx + ry * mask_size_x, m)) {
 						++ry;
 					}
 
-					// Commit face to the mesh
+					// 将面提交到网格
 
 					const Color colorf = color_func(m.color);
 					const uint8_t material_index = colorf.a < 0.999f;
@@ -449,7 +449,7 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 	const unsigned int row_size = block_size.y;
 	const unsigned int deck_size = block_size.x * row_size;
 
-	// Note: voxel buffers are indexed in ZXY order
+	// 注意：体素缓冲区按 ZXY 顺序索引
 	FixedArray<uint32_t, Vector3iUtil::AXIS_COUNT> neighbor_offset_d_lut;
 	neighbor_offset_d_lut[Vector3i::AXIS_X] = block_size.y;
 	neighbor_offset_d_lut[Vector3i::AXIS_Y] = 1;
@@ -458,7 +458,7 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 	FixedArray<uint32_t, VoxelMesherCubes::MATERIAL_COUNT> index_offsets;
 	fill(index_offsets, uint32_t(0));
 
-	// For each axis
+	// 对每个轴
 	for (unsigned int za = 0; za < Vector3iUtil::AXIS_COUNT; ++za) {
 		const unsigned int xa = g_face_axes_lut[za][0];
 		const unsigned int ya = g_face_axes_lut[za][1];
@@ -466,16 +466,16 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 		const unsigned int mask_size_x = (max_pos[xa] - min_pos[xa]);
 		const unsigned int mask_size_y = (max_pos[ya] - min_pos[ya]);
 		const unsigned int mask_area = mask_size_x * mask_size_y;
-		// Using the vector as memory pool
+		// 将向量用作内存池
 		const unsigned int mask_memory_size = mask_area * sizeof(MaskValue);
 		mask_memory_pool.resize(mask_memory_size + mask_area * sizeof(Color8));
-		// `mask` and `colors` are grids covering one deck
+		// `mask` 和 `colors` 是覆盖一层（deck）的网格
 		Span<MaskValue> mask(reinterpret_cast<MaskValue *>(mask_memory_pool.data()), 0, mask_area);
 		Span<Color8> colors(reinterpret_cast<Color8 *>(mask_memory_pool.data() + mask_memory_size), 0, mask_area);
 
-		// For each deck
+		// 对每一层
 		for (unsigned int d = min_pos[za] - VoxelMesherCubes::PADDING; d < (unsigned int)max_pos[za]; ++d) {
-			// For each cell of the deck, gather face info
+			// 对该层的每个单元，收集面信息
 			for (unsigned int fy = min_pos[ya]; fy < (unsigned int)max_pos[ya]; ++fy) {
 				for (unsigned int fx = min_pos[xa]; fx < (unsigned int)max_pos[xa]; ++fx) {
 					FixedArray<unsigned int, Vector3iUtil::AXIS_COUNT> pos;
@@ -532,7 +532,7 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 				}
 			};
 
-			// Greedy quads
+			// 贪婪四边形
 			for (unsigned int fy = 0; fy < mask_size_y; ++fy) {
 				for (unsigned int fx = 0; fx < mask_size_x; ++fx) {
 					const unsigned int mask_index = fx + fy * mask_size_x;
@@ -542,20 +542,20 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 						continue;
 					}
 
-					// Check if the next faces are the same along X
+					// 检查沿 X 方向的下一个面是否相同
 					unsigned int rx = fx + 1;
 					while (rx < mask_size_x && mask[rx + fy * mask_size_x] == m) {
 						++rx;
 					}
 
-					// Check if the next rows of faces are the same along Y
+					// 检查沿 Y 方向的下几行面是否相同
 					unsigned int ry = fy + 1;
 					while (ry < mask_size_y &&
 						   L::is_range_equal(mask, fx + ry * mask_size_x, rx + ry * mask_size_x, m)) {
 						++ry;
 					}
 
-					// Commit face to the mesh
+					// 将面提交到网格
 
 					const uint8_t material_index = m.material_index;
 					VoxelMesherCubes::Arrays &arrays = out_arrays_per_material[material_index];
@@ -595,7 +595,7 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 
 					VoxelMesherCubes::GreedyAtlasData::ImageInfo image_info;
 					image_info.first_vertex_index = arrays.uvs.size();
-					arrays.uvs.resize(arrays.uvs.size() + 4); // Values will be assigned in a second pass
+					arrays.uvs.resize(arrays.uvs.size() + 4); // 值将在第二轮遍历中赋值
 
 					arrays.normals.push_back(n);
 					arrays.normals.push_back(n);
@@ -635,15 +635,15 @@ void build_voxel_mesh_as_greedy_cubes_atlased(
 								++i;
 							}
 						}
-						// TODO Actually that code only missed an offset to its destination for each row?
-						// Copy colors row by row
+						// TODO 实际上那段代码只是每行少了到目标位置的偏移？
+						// 逐行复制颜色
 						// memcpy(out_greedy_atlas_data.colors.data() + image_info.first_color_index,
 						// 		colors.data() + i0,
 						// 		image_info.size_x * sizeof(Color8));
 					}
 
-					// TODO Optimization: if colors are uniform, we could allocate a shared single pixel instead.
-					// This would reduce texture size and packing cost
+					// TODO 优化：如果颜色是均匀的，我们可以分配一个共享的单像素。
+					// 这样可以减小纹理尺寸和打包开销
 
 					image_info.surface_index = material_index;
 					out_greedy_atlas_data.images.push_back(image_info);
@@ -661,7 +661,7 @@ Ref<Image> make_greedy_atlas(
 	ERR_FAIL_COND_V(atlas_data.images.size() == 0, Ref<Image>());
 	VOXEL_PROFILE_SCOPE();
 
-	// Pack rectangles
+	// 打包矩形
 	StdVector<Vector2i> result_points;
 	Vector2i result_size;
 	{
@@ -691,7 +691,7 @@ Ref<Image> make_greedy_atlas(
 	// }
 	// debug_im->save_png("debug_atlas_packing.png");
 
-	// Update UVs
+	// 更新 UV
 	const Vector2f uv_scale(1.f / float(result_size.x), 1.f / float(result_size.y));
 	for (unsigned int i = 0; i < atlas_data.images.size(); ++i) {
 		const VoxelMesherCubes::GreedyAtlasData::ImageInfo &im = atlas_data.images[i];
@@ -709,20 +709,20 @@ Ref<Image> make_greedy_atlas(
 		surface.uvs[vi + 3] = (pos + Vector2f(im.size_x, im.size_y)) * uv_scale;
 	}
 
-	// Create image
+	// 创建图像
 	PackedByteArray im_data;
 	im_data.resize(result_size.x * result_size.y * sizeof(Color8));
 	{
 		Span<Color8> dst_data = Span<Color8>(reinterpret_cast<Color8 *>(im_data.ptrw()), result_size.x * result_size.y);
 
-		// For all rectangles
+		// 对所有矩形
 		for (unsigned int i = 0; i < atlas_data.images.size(); ++i) {
 			const VoxelMesherCubes::GreedyAtlasData::ImageInfo &im = atlas_data.images[i];
 			const Vector2i dst_pos = result_points[i];
 			Span<const Color8> src_data =
 					to_span_from_position_and_size(atlas_data.colors, im.first_color_index, im.size_x * im.size_y);
 
-			// Blit rectangle
+			// 拷贝矩形
 			for (unsigned int y = 0; y < im.size_y; ++y) {
 				for (unsigned int x = 0; x < im.size_x; ++x) {
 					const unsigned int src_i = x + y * im.size_x;
@@ -762,27 +762,27 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 
 	const VoxelBuffer &voxels = input.voxels;
 
-	// Iterate 3D padded data to extract voxel faces.
-	// This is the most intensive job in this class, so all required data should be as fit as possible.
+	// 遍历 3D 填充数据以提取体素面。
+	// 这是本类中开销最大的工作，因此所有所需数据都应尽量紧凑。
 
-	// The buffer we receive MUST be dense (i.e not compressed, and channels allocated).
-	// That means we can use raw pointers to voxel data inside instead of using the higher-level getters,
-	// and then save a lot of time.
+	// 我们接收的缓冲区必须是稠密的（即未压缩，且通道已分配）。
+	// 这意味着我们可以直接使用内部体素数据的原始指针，而无需使用高层 getter，
+	// 从而节省大量时间。
 
 	if (voxels.get_channel_compression(channel) == VoxelBuffer::COMPRESSION_UNIFORM) {
-		// All voxels have the same type.
-		// If it's all air, nothing to do. If it's all cubes, nothing to do either.
+		// 所有体素类型相同。
+		// 若全是空气，则无需处理；若全是立方体，同样无需处理。
 		return;
 
 	} else if (voxels.get_channel_compression(channel) != VoxelBuffer::COMPRESSION_NONE) {
-		// No other form of compression is allowed
+		// 不允许其他形式的压缩
 		ERR_PRINT("VoxelMesherCubes received unsupported voxel compression");
 		return;
 	}
 
 	Span<const uint8_t> raw_channel;
 	if (!voxels.get_channel_as_bytes_read_only(channel, raw_channel)) {
-		// Case supposedly handled before...
+		// 该情况应已在前面处理过...
 		ERR_PRINT("Something wrong happened");
 		return;
 	}
@@ -795,7 +795,7 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 		RWLockRead rlock(_parameters_lock);
 		params = _parameters;
 	}
-	// Note, we don't lock the palette because its data has fixed-size
+	// 注意，我们不锁定调色板，因为其数据大小固定
 
 	Ref<Image> atlas_image;
 
@@ -868,9 +868,9 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 			struct GetColorFromPalette {
 				VoxelColorPalette &palette;
 				Color8 operator()(uint64_t i) const {
-					// Note: even though this code may run in a thread, I'm not locking the palette at all because
-					// it stores colors in a fixed-size array, and reading the wrong color won't cause any serious
-					// problem. It's not supposed to change often in game anyways. If it does, better use shader mode.
+					// 注意：尽管此代码可能在线程中运行，我完全不锁定调色板，因为
+					// 它把颜色存储在大小固定的数组中，读错颜色不会造成严重
+					// 问题。它在游戏中本就不应频繁变化。如果确实如此，最好使用着色器模式。
 					return palette.get_color8(i);
 				}
 			};
@@ -937,7 +937,7 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 			struct GetIndexFromPalette {
 				VoxelColorPalette &palette;
 				Color8 operator()(uint64_t i) const {
-					// Still providing alpha because it allows to separate the opaque and transparent surfaces
+					// 仍然提供 alpha，因为它可以区分不透明和透明表面
 					return Color8(i, 0, 0, palette.get_color8(i).a);
 				}
 			};
@@ -991,8 +991,8 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 	}
 
 	if (input.lod_index > 0) {
-		// TODO This is very crude LOD, there will be cracks at the borders.
-		// One way would be to not cull faces on chunk borders if any neighbor face is air
+		// TODO 这是非常粗糙的 LOD，边界处会出现裂缝。
+		// 一种做法是：如果相邻面为空气，则不剔除数据块边界的面
 		const float lod_scale = 1 << input.lod_index;
 		for (unsigned int material_index = 0; material_index < cache.arrays_per_material.size(); ++material_index) {
 			Arrays &arrays = cache.arrays_per_material[material_index];
@@ -1002,7 +1002,7 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 		}
 	}
 
-	// TODO We could return a single byte array and use Mesh::add_surface down the line?
+	// TODO 我们是否可以直接返回单个字节数组，并在下游使用 Mesh::add_surface？
 
 	for (unsigned int material_index = 0; material_index < MATERIAL_COUNT; ++material_index) {
 		const Arrays &arrays = cache.arrays_per_material[material_index];
@@ -1045,7 +1045,7 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 			output.surfaces.push_back(surface);
 		}
 		//  else {
-		// 	// Empty
+		// 	// 空
 		// }
 	}
 
@@ -1053,7 +1053,7 @@ void VoxelMesherCubes::build(VoxelMesher::Output &output, const VoxelMesher::Inp
 	output.atlas_image = atlas_image;
 
 	// if (params.store_colors_in_texture) {
-	// 	// Don't compress UVs, they need to be precise. Not doing this causes noticeable offsets.
+	// 	// 不要压缩 UV，它们需要保持精确。不这样做会导致明显的偏移。
 	// 	output.compression_flags = Mesh::ARRAY_COMPRESS_FLAGS_BASE & ~Mesh::ARRAY_FORMAT_TEX_UV;
 	// }
 	// output.compression_flags = Mesh::ARRAY_COMPRESS_COLOR;
@@ -1159,13 +1159,13 @@ Ref<Mesh> VoxelMesherCubes::generate_mesh_from_image(Ref<Image> image, float vox
 			!image->is_compressed(), Ref<Mesh>(), format("Image format not supported: {}", image->get_format())
 	);
 
-	// Convert image
+	// 转换图像
 	VoxelBuffer voxels(VoxelBuffer::ALLOCATOR_DEFAULT);
 	voxels.set_channel_depth(VoxelBuffer::CHANNEL_COLOR, VoxelBuffer::DEPTH_32_BIT);
 	const int im_size_x = image->get_width();
 	const int im_size_y = image->get_height();
 
-	// Currently all meshers require pre-padded voxel data...
+	// 目前所有网格生成器都需要预先填充的体素数据...
 	voxels.create(
 			im_size_x + VoxelMesherCubes::PADDING * 2,
 			im_size_y + VoxelMesherCubes::PADDING * 2,
@@ -1180,7 +1180,7 @@ Ref<Mesh> VoxelMesherCubes::generate_mesh_from_image(Ref<Image> image, float vox
 					c.to_u32(),
 					Vector3i(
 							x + VoxelMesherCubes::PADDING,
-							// Flip Y axis, since Y goes up in world space, but Y goes down in Image space
+							// 翻转 Y 轴，因为世界空间中 Y 向上，而图像空间中 Y 向下
 							(im_size_y - 1 - y) + VoxelMesherCubes::PADDING,
 							VoxelMesherCubes::PADDING
 					),
@@ -1189,7 +1189,7 @@ Ref<Mesh> VoxelMesherCubes::generate_mesh_from_image(Ref<Image> image, float vox
 		}
 	}
 
-	// Build mesh
+	// 构建网格
 
 	Ref<VoxelMesherCubes> mesher;
 	mesher.instantiate();

@@ -1,77 +1,77 @@
 # VoxelViewer
 
-Inherits: [Node3D](https://docs.godotengine.org/en/stable/classes/class_node3d.html)
+继承自：[Node3D](https://docs.godotengine.org/en/stable/classes/class_node3d.html)
 
-Attach this as a child node of characters, so the voxel world will know where to load blocks around them.
+将此节点附加为角色的子节点，以便体素世界知道应在角色周围加载哪些数据块。
 
-If no viewer is present in the world, nothing will generate.
+如果世界中不存在观察者，则不会生成任何内容。
 
-## Description: 
+## 描述：
 
-The voxel world uses the position and options of all the [VoxelViewer](VoxelViewer.md) nodes to determine where to load blocks, and prioritize updates. For example, a voxel placed 100 units away from a player will have much lower priority than the modifications that player is doing when digging in front of them.
+体素世界使用所有 [VoxelViewer](VoxelViewer.md) 节点的位置和选项来确定在哪里加载体素数据块，并确定更新优先级。例如，放置在距玩家 100 单位的体素，其优先级将远低于玩家在面前挖掘时正在进行的修改。
 
-## Properties: 
+## 属性：
 
 
-Type                                                                      | Name                                                                       | Default 
-------------------------------------------------------------------------- | -------------------------------------------------------------------------- | --------
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [enabled_in_editor](#i_enabled_in_editor)                                  | false   
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [requires_collisions](#i_requires_collisions)                              | true    
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [requires_data_block_notifications](#i_requires_data_block_notifications)  | false   
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [requires_visuals](#i_requires_visuals)                                    | true    
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)      | [view_distance](#i_view_distance)                                          | 128     
-[float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [view_distance_vertical_ratio](#i_view_distance_vertical_ratio)            | 1.0     
+类型                                                                        | 名称                                                                         | 默认值   
+------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [enabled_in_editor](#i_enabled_in_editor)                                  | false 
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [requires_collisions](#i_requires_collisions)                              | true  
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [requires_data_block_notifications](#i_requires_data_block_notifications)  | false 
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)    | [requires_visuals](#i_requires_visuals)                                    | true  
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)      | [view_distance](#i_view_distance)                                          | 128   
+[float](https://docs.godotengine.org/en/stable/classes/class_float.html)  | [view_distance_vertical_ratio](#i_view_distance_vertical_ratio)            | 1.0   
 <p></p>
 
-## Methods: 
+## 方法：
 
 
-Return                                                                | Signature                                                                                                                  
+返回值                                                                   | 函数签名                                                                                                                       
 --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [get_network_peer_id](#i_get_network_peer_id) ( ) const                                                                    
 [void](#)                                                             | [set_network_peer_id](#i_set_network_peer_id) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id )  
 <p></p>
 
-## Property Descriptions
+## 属性描述
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_enabled_in_editor"></span> **enabled_in_editor** = false
 
-Sets whether this viewer will cause loading to occur in the editor. This is mainly intented for testing purposes.
+设置此观察者是否会在编辑器中引起加载。这主要用于测试目的。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_requires_collisions"></span> **requires_collisions** = true
 
-If set to `true`, the engine will generate classic collision shapes around this viewer.
+如果设置为 `true`，引擎将在此观察者周围生成经典碰撞形状。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_requires_data_block_notifications"></span> **requires_data_block_notifications** = false
 
-*(This property has no documentation)*
+*(此属性暂无文档)*
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_requires_visuals"></span> **requires_visuals** = true
 
-If set to `true`, the engine will generate meshes around this viewer. This may be enabled for the local player.
+如果设置为 `true`，引擎将在此观察者周围生成网格。此选项可为本地玩家启用。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_view_distance"></span> **view_distance** = 128
 
-How far should voxels generate around this viewer.
+此观察者周围应生成多远的体素。
 
-Note: the effective view distance may be limited by the terrain node.
+注意：实际视距可能受地形节点的限制。
 
-Note 2: when using [VoxelLodTerrain](VoxelLodTerrain.md), this distance essentially acts as a limit to how far the last LOD extends.
+注意 2：使用 [VoxelLodTerrain](VoxelLodTerrain.md) 时，此距离本质上相当于最后一个 LOD 延伸距离的限制。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_view_distance_vertical_ratio"></span> **view_distance_vertical_ratio** = 1.0
 
-Modifies vertical view distance to be a ratio of the [view_distance](VoxelViewer.md#i_view_distance) property. For example, if [view_distance](VoxelViewer.md#i_view_distance) is 100 and this property is 0.5, then horizontal view distance will be 100 and vertical view distance will be 50.
+将垂直视距修改为 [view_distance](VoxelViewer.md#i_view_distance) 属性的一定比例。例如，如果 [view_distance](VoxelViewer.md#i_view_distance) 为 100 且此属性为 0.5，则水平视距为 100，垂直视距为 50。
 
-This property has limitations: it is only implemented on [VoxelLodTerrain](VoxelLodTerrain.md) when using [VoxelLodTerrain.STREAMING_SYSTEM_CLIPBOX](VoxelLodTerrain.md#i_STREAMING_SYSTEM_CLIPBOX), and applies only to the last LOD, like view distance.
+此属性存在限制：仅在 [VoxelLodTerrain](VoxelLodTerrain.md) 使用 [VoxelLodTerrain.STREAMING_SYSTEM_CLIPBOX](VoxelLodTerrain.md#i_STREAMING_SYSTEM_CLIPBOX) 时实现，并且像视距一样，仅适用于最后一个 LOD。
 
-## Method Descriptions
+## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_network_peer_id"></span> **get_network_peer_id**( ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
 ### [void](#)<span id="i_set_network_peer_id"></span> **set_network_peer_id**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id ) 
 
-*(This method has no documentation)*
+*(此方法暂无文档)*
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

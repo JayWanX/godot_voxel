@@ -8,23 +8,23 @@
 namespace voxel::godot {
 
 Ref<ConcavePolygonShape3D> create_concave_polygon_shape(const Span<const Array> surfaces) {
-	// Faster version of Mesh::create_trimesh_shape(), because `create_trimesh_shape` creates a Trimesh internally along
-	// the way, which is super slow
-	// See https://github.com/Voxel/godot_voxel/issues/54
+	// 比 Mesh::create_trimesh_shape() 更快的版本，因为 `create_trimesh_shape` 在过程中会在内部创建
+	// 一个 Trimesh，那非常慢
+	// 参见 https://github.com/Voxel/godot_voxel/issues/54
 
 	VOXEL_PROFILE_SCOPE();
 
 	PackedVector3Array face_points;
 	int face_points_size = 0;
 
-	// find the correct size for face_points
+	// 找出 face_points 的正确大小
 	for (unsigned int i = 0; i < surfaces.size(); i++) {
 		const Array &surface_arrays = surfaces[i];
 		if (surface_arrays.size() == 0) {
-			// That surface is empty
+			// 该表面为空
 			continue;
 		}
-		// If the surface is not empty then it must have an expected amount of data arrays
+		// 如果表面非空，则它必须含有预期数量的数据数组
 		ERR_CONTINUE(surface_arrays.size() != Mesh::ARRAY_MAX);
 		PackedInt32Array indices = surface_arrays[Mesh::ARRAY_INDEX];
 		face_points_size += indices.size();
@@ -35,7 +35,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(const Span<const Array> 
 		return Ref<ConcavePolygonShape3D>();
 	}
 
-	// Deindex surfaces into a single one
+	// 将所有表面去索引化为一个
 	unsigned int face_points_offset = 0;
 	for (unsigned int i = 0; i < surfaces.size(); i++) {
 		const Array &surface_arrays = surfaces[i];
@@ -144,7 +144,7 @@ Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 	return shape;
 }
 
-// This variant may use a lower index count so a subset of the mesh is used to create the collision shape.
+// 此变体可以使用更少的索引数，从而用网格的一个子集来创建碰撞形状。
 Ref<ConcavePolygonShape3D> create_concave_polygon_shape(
 		const Array &surface_arrays,
 		const unsigned int vertex_count,

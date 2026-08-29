@@ -11,12 +11,12 @@
 namespace voxel {
 namespace strfuncs_detail {
 
-// Not a big implementation, only what I need.
+// 实现不大，只包含我需要的东西。
 template <typename T>
 std::string_view consume_next_format_placeholder(std::string_view fmt, TextWriter &w, const T &a) {
 	const size_t pi = fmt.find("{}");
 	if (pi == std::string_view::npos) {
-		// Too many arguments supplied?
+		// 提供的参数太多？
 		w << fmt << " [...]";
 		return "";
 	}

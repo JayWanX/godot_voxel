@@ -10,7 +10,7 @@
 #include "../../streams/load_all_blocks_data_task.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_set.h"
-#include "../../util/godot/classes/base_material_3d.h" // For property hint in release mode
+#include "../../util/godot/classes/base_material_3d.h" // 用于发布模式下的属性提示
 #include "../../util/godot/classes/camera_3d.h"
 #include "../../util/godot/classes/concave_polygon_shape_3d.h"
 #include "../../util/godot/classes/engine.h"
@@ -58,7 +58,7 @@ namespace {
 
 void remove_shader_material_from_block(VoxelMeshBlockVLT &block, ShaderMaterialPoolVLT &shader_material_pool) {
 	VOXEL_PROFILE_SCOPE();
-	// Recycle material
+	// 回收材质
 	Ref<ShaderMaterial> sm = block.get_shader_material();
 	if (sm.is_valid()) {
 		shader_material_pool.recycle(sm);
@@ -98,7 +98,7 @@ void copy_vlt_block_params(ShaderMaterial &src, ShaderMaterial &dst) {
 
 void VoxelLodTerrain::ApplyMeshUpdateTask::run(TimeSpreadTaskContext &ctx) {
 	if (!VoxelEngine::get_singleton().is_volume_valid(volume_id)) {
-		// The node can have been destroyed while this task was still pending
+		// 节点可能在此任务仍待处理时已被销毁
 		VOXEL_PRINT_VERBOSE("Cancelling ApplyMeshUpdateTask, volume_id is invalid");
 		return;
 	}
@@ -109,8 +109,8 @@ void VoxelLodTerrain::ApplyMeshUpdateTask::run(TimeSpreadTaskContext &ctx) {
 		RefCount &count = it->second;
 		count.remove();
 		if (count.get() > 0) {
-			// This is not the only main thread task queued for this block.
-			// Cancel it to avoid buildup.
+			// 这不是为此数据块排队的唯一主线程任务。
+			// 取消它以避免堆积。
 			return;
 		}
 		queued_tasks_in_lod.erase(it);
@@ -120,9 +120,8 @@ void VoxelLodTerrain::ApplyMeshUpdateTask::run(TimeSpreadTaskContext &ctx) {
 }
 
 VoxelLodTerrain::VoxelLodTerrain() {
-	// Note: don't do anything heavy in the constructor.
-	// Godot may create and destroy dozens of instances of all node types on startup,
-	// due to how ClassDB gets its default values.
+	// 注意：不要在构造函数中做任何繁重的工作。
+	// 由于 ClassDB 获取其默认值的方式，Godot 可能在启动时创建并销毁所有节点类型的数十个实例。
 
 	VOXEL_PRINT_VERBOSE("Construct VoxelLodTerrain");
 
@@ -134,15 +133,15 @@ VoxelLodTerrain::VoxelLodTerrain() {
 
 	set_notify_transform(true);
 
-	// Doing this to setup the defaults
+	// 这样做以设置默认值
 	set_process_callback(_process_callback);
 
-	// Infinite by default
+	// 默认无限大
 	_data->set_bounds(Box3i::from_center_extents(Vector3i(), Vector3iUtil::create(constants::MAX_VOLUME_EXTENT)));
 
-	// Mesh updates are spread over frames by scheduling them in a task runner of VoxelEngine,
-	// but instead of using a reception buffer we use a callback,
-	// because this kind of task scheduling would otherwise delay the update by 1 frame
+	// 网格更新通过在 VoxelEngine 的任务运行器中调度来分摊到各帧，
+	// 但我们不使用接收缓冲区，而是使用回调，
+	// 因为这种任务调度方式否则会使更新延迟 1 帧
 	VoxelEngine::VolumeCallbacks callbacks;
 	callbacks.data = this;
 	callbacks.mesh_output_callback = [](void *cb_data, VoxelEngine::BlockMeshOutput &ob) {
@@ -153,10 +152,10 @@ VoxelLodTerrain::VoxelLodTerrain() {
 		task->data = std::move(ob);
 		VoxelEngine::get_singleton().push_main_thread_time_spread_task(task);
 
-		// If two tasks are queued for the same mesh, cancel the old ones.
-		// This is for cases where creating the mesh is slower than the speed at which it is generated,
-		// which can cause a buildup that never seems to stop.
-		// This is at the expense of holes appearing until all tasks are done.
+		// 若同一网格排入了两个任务，则取消旧任务。
+		// 这适用于创建网格的速度慢于其生成速度的情况，
+		// 否则可能导致看似永不停歇的堆积。
+		// 代价是在所有任务完成之前会出现空洞。
 		StdUnorderedMap<Vector3i, RefCount> &queued_tasks_in_lod = self->_queued_main_thread_mesh_updates[ob.lod];
 		auto p = queued_tasks_in_lod.insert({ ob.position, RefCount(1) });
 		if (!p.second) {
@@ -177,8 +176,8 @@ VoxelLodTerrain::VoxelLodTerrain() {
 	_volume_id = VoxelEngine::get_singleton().add_volume(callbacks);
 	// VoxelEngine::get_singleton().set_volume_octree_lod_distance(_volume_id, get_lod_distance());
 
-	// TODO Being able to set a LOD smaller than the stream is probably a bad idea,
-	// Because it prevents edits from propagating up to the last one, they will be left out of sync
+	// TODO 能够设置比流更小的 LOD 可能不是个好主意，
+	// 因为它会阻止编辑向上传播到最后一层，导致它们不同步
 	set_lod_count(4);
 
 	set_lod_distance(48.f);
@@ -191,7 +190,7 @@ VoxelLodTerrain::~VoxelLodTerrain() {
 	_streaming_dependency->valid = false;
 	_meshing_dependency->valid = false;
 	VoxelEngine::get_singleton().remove_volume(_volume_id);
-	// Instancer can take care of itself
+	// 实例化器可以自行处理
 }
 
 Ref<Material> VoxelLodTerrain::get_material() const {
@@ -207,14 +206,14 @@ void VoxelLodTerrain::set_material(Ref<Material> p_material) {
 		return;
 	}
 
-	// TODO Update existing block surfaces
+	// TODO 更新现有数据块表面
 	_material = p_material;
 
 	Ref<ShaderMaterial> shader_material = p_material;
 	const unsigned int lod_count = get_lod_count();
 
 #ifdef TOOLS_ENABLED
-	// Create a fork of the default shader if a new empty ShaderMaterial is assigned
+	// 若分配了新的空 ShaderMaterial，则创建默认着色器的一个分叉
 	if (Engine::get_singleton()->is_editor_hint()) {
 		if (shader_material.is_valid() && shader_material->get_shader().is_null() && _mesher.is_valid()) {
 			Ref<ShaderMaterial> default_sm = _mesher->get_default_lod_material();
@@ -233,32 +232,32 @@ void VoxelLodTerrain::set_material(Ref<Material> p_material) {
 	update_shader_material_pool_template();
 
 	{
-		// Detect presence of lod_index usage in the shader
+		// 检测着色器中是否使用了 lod_index
 		Span<const StringName> uniforms = _shader_material_pool.get_cached_shader_uniforms();
 		_material_uses_lod_info = contains(uniforms, VoxelStringNames::get_singleton().u_voxel_lod_info);
 	}
 
-	// TODO Update when shader changes?
-	// TODO Update when material changes?
+	// TODO 着色器变化时更新？
+	// TODO 材质变化时更新？
 
-	// Update existing meshes
+	// 更新现有网格
 	if (shader_material.is_valid() && _shader_material_pool.get_template().is_valid()) {
 		for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 			VoxelMeshMap<VoxelMeshBlockVLT> &map = _mesh_maps_per_lod[lod_index];
 
 			map.for_each_block([this, lod_index, lod_count](VoxelMeshBlockVLT &block) { //
 				if (!block.has_mesh()) {
-					// No visuals loaded (collision only?)
+					// 未加载视觉（仅碰撞？）
 					return;
 				}
 				Ref<ShaderMaterial> sm = _shader_material_pool.allocate();
 				Ref<ShaderMaterial> prev_material = block.get_shader_material();
 				if (prev_material.is_valid()) {
 					VOXEL_ASSERT_RETURN(sm.is_valid());
-					// Each block can have specific shader parameters so we have to keep them
+					// 每个数据块可以有各自的着色器参数，因此我们必须保留它们
 					copy_vlt_block_params(**prev_material, **sm);
 				}
-				// Do after copy, because otherwise it would be overwritten by default value
+				// 在复制之后进行，否则会被默认值覆盖
 				if (_material_uses_lod_info) {
 					sm->set_shader_parameter(
 							VoxelStringNames::get_singleton().u_voxel_lod_info,
@@ -270,13 +269,13 @@ void VoxelLodTerrain::set_material(Ref<Material> p_material) {
 		}
 
 	} else {
-		// The material isn't ShaderMaterial, fallback. Will probably not work correctly with transition meshes
+		// 该材质不是 ShaderMaterial，回退。可能无法与过渡网格正常工作
 		for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 			VoxelMeshMap<VoxelMeshBlockVLT> &map = _mesh_maps_per_lod[lod_index];
 
 			map.for_each_block([&p_material](VoxelMeshBlockVLT &block) { //
 				if (!block.has_mesh()) {
-					// No visuals loaded (collision only?)
+					// 未加载视觉（仅碰撞？）
 					return;
 				}
 				block.set_material_override(p_material);
@@ -405,7 +404,7 @@ void VoxelLodTerrain::_on_stream_params_changed() {
 		// const int stream_block_size_po2 = _stream->get_block_size_po2();
 		//_set_block_size_po2(stream_block_size_po2);
 
-		// TODO We have to figure out streams that have a LOD requirement
+		// TODO 我们必须搞清楚具有 LOD 要求的流
 		// const int stream_lod_count = _stream->get_lod_count();
 		// _set_lod_count(min(stream_lod_count, get_lod_count()));
 
@@ -420,8 +419,8 @@ void VoxelLodTerrain::_on_stream_params_changed() {
 	}
 
 	reset_maps();
-	// TODO Size other than 16 is not really supported though.
-	// also this code isn't right, it doesn't update the other lods
+	// TODO 不过目前仅真正支持 16 之外的大小。
+	// 而且这段代码也不对，它不会更新其它 LOD
 	//_data->lods[0].map.create(p_block_size_po2, 0);
 
 	_data->set_format(get_internal_format());
@@ -436,7 +435,7 @@ void VoxelLodTerrain::_on_stream_params_changed() {
 	_update_data->wait_for_end_of_task();
 	_update_data->state.octree_streaming.force_update_octrees_next_update = true;
 
-	// The whole map might change, so make all area dirty
+	// 整个映射都可能变化，因此将所有区域标记为脏
 	const unsigned int lod_count = get_lod_count();
 	for (unsigned int i = 0; i < lod_count; ++i) {
 		VoxelLodTerrainUpdateData::Lod &lod = _update_data->state.lods[i];
@@ -448,11 +447,11 @@ void VoxelLodTerrain::_on_stream_params_changed() {
 }
 
 void VoxelLodTerrain::set_mesh_block_size(unsigned int mesh_block_size) {
-	// Mesh block size cannot be smaller than data block size, for now
+	// 目前网格数据块大小不能小于数据块大小
 	mesh_block_size = math::clamp(mesh_block_size, get_data_block_size(), constants::MAX_BLOCK_SIZE);
 
-	// Only these sizes are allowed at the moment. This stuff is still not supported in a generic way yet,
-	// some code still exploits the fact it's a multiple of data block size, for performance
+	// 目前只允许这些大小。这些内容尚未以通用方式支持，
+	// 某些代码仍利用其为数据块大小倍数的事实来提升性能
 	unsigned int po2;
 	switch (mesh_block_size) {
 		case 16:
@@ -472,19 +471,19 @@ void VoxelLodTerrain::set_mesh_block_size(unsigned int mesh_block_size) {
 
 	reset_mesh_maps();
 
-	//_update_data->wait_for_end_of_task(); // Done by reset_mesh_maps()
+	//_update_data->wait_for_end_of_task(); // 由 reset_mesh_maps() 完成
 	VOXEL_ASSERT(_update_data->task_is_complete);
 	_update_data->settings.mesh_block_size_po2 = po2;
 	_update_data->state.octree_streaming.force_update_octrees_next_update = true;
 
 #ifdef VOXEL_ENABLE_INSTANCER
-	// Doing this after because `on_mesh_block_exit` may use the old size
+	// 之后再这样做，因为 `on_mesh_block_exit` 可能使用旧大小
 	if (_instancer != nullptr) {
 		_instancer->set_mesh_block_size_po2(po2);
 	}
 #endif
 
-	// Update voxel bounds because block size change can affect octree size
+	// 更新体素边界，因为数据块大小变化可能影响八叉树大小
 	set_voxel_bounds(_data->get_bounds());
 }
 
@@ -526,13 +525,13 @@ void VoxelLodTerrain::set_mesh_block_visual_active(
 		return;
 	}
 
-	// TODO Shouldn't we switch colliders with `active` instead of `visible`?
+	// TODO 我们是否应该用 `active` 而非 `visible` 来切换碰撞体？
 	block.visual_active = active;
 
 	if (!with_fading) {
 		block.set_visible(active);
 
-		// Cancel fading if already in progress
+		// 若淡出已在进行中则取消
 		if (block.fading_state != VoxelMeshBlockVLT::FADING_NONE) {
 			block.fading_state = VoxelMeshBlockVLT::FADING_NONE;
 
@@ -544,9 +543,9 @@ void VoxelLodTerrain::set_mesh_block_visual_active(
 			}
 
 		} else if (active && _lod_fade_duration > 0.f) {
-			// WHen LOD fade is enabled, it is possible that a block is disabled with a fade out, but later has to be
-			// enabled without a fade-in (because behind the camera for example). In this case we have to reset the
-			// parameter. Otherwise, it would be active but invisible due to still being faded out.
+			// 启用 LOD 淡出时，数据块可能先以淡出方式禁用，但之后又必须
+			// 不经过淡入而启用（例如因为位于相机后方）。这种情况下我们必须重置该
+			// 参数。否则，它虽然处于激活状态，却会因仍处于淡出状态而不可见。
 			Ref<ShaderMaterial> mat = block.get_shader_material();
 			if (mat.is_valid()) {
 				mat->set_shader_parameter(VoxelStringNames::get_singleton().u_lod_fade, Vector2(0.0, 0.0));
@@ -557,8 +556,8 @@ void VoxelLodTerrain::set_mesh_block_visual_active(
 	}
 
 	VoxelMeshBlockVLT::FadingState fading_state;
-	// Initial progress has to be set too because it sometimes happens that a LOD must appear before its parent
-	// finished fading in. So the parent will have to fade out from solid with the same duration.
+	// 初始进度也必须设置，因为有时某个 LOD 必须在其父节点
+	// 完成淡入之前出现。因此父节点将以相同时长从不透明状态淡出。
 	float initial_progress;
 	if (active) {
 		block.set_visible(true);
@@ -572,7 +571,7 @@ void VoxelLodTerrain::set_mesh_block_visual_active(
 	if (block.fading_state != fading_state) {
 		if (block.fading_state == VoxelMeshBlockVLT::FADING_NONE) {
 			StdMap<Vector3i, VoxelMeshBlockVLT *> &fading_blocks = _fading_blocks_per_lod[lod_index];
-			// Must not have duplicates
+			// 不得有重复
 			ERR_FAIL_COND(fading_blocks.find(block.position) != fading_blocks.end());
 			fading_blocks.insert({ block.position, &block });
 		}
@@ -581,8 +580,8 @@ void VoxelLodTerrain::set_mesh_block_visual_active(
 	}
 }
 
-// Marks intersecting blocks in the area as modified, updates LODs and schedules remeshing.
-// The provided box must be at LOD0 coordinates.
+// 将区域内相交的数据块标记为已修改，更新 LOD 并安排重新网格化。
+// 提供的盒子必须位于 LOD0 坐标。
 void VoxelLodTerrain::post_edit_area(Box3i p_box, bool update_mesh) {
 	VOXEL_PROFILE_SCOPE();
 	{
@@ -604,8 +603,8 @@ void VoxelLodTerrain::post_edit_area(Box3i p_box, bool update_mesh) {
 #endif
 
 #ifdef TOOLS_ENABLED
-	// This is a workaround for a defect in the LegacyOctree streaming system:
-	// when no VoxelViewer is present, it still loads terrain, but some functionalities don't work properly.
+	// 这是对 LegacyOctree 流式系统中一个缺陷的变通方案：
+	// 当没有 VoxelViewer 时，它仍会加载地形，但某些功能无法正常工作。
 	if (get_streaming_system() == STREAMING_SYSTEM_LEGACY_OCTREE) {
 		if (VoxelEngine::get_singleton().get_viewer_count() == 0) {
 			VOXEL_PRINT_WARNING_ONCE(
@@ -620,7 +619,7 @@ void VoxelLodTerrain::post_edit_area(Box3i p_box, bool update_mesh) {
 void VoxelLodTerrain::post_edit_modifiers(Box3i p_voxel_box) {
 	// clear_cached_blocks_in_voxel_area(*_data, p_voxel_box);
 	_data->clear_cached_blocks_in_voxel_area(p_voxel_box);
-	// Not sure if it is worth re-caching these blocks. We may see about that in the future if performance is an issue.
+	// 不确定重新缓存这些数据块是否值得。若将来出现性能问题，我们可以再考虑。
 
 	MutexLock lock(_update_data->state.changed_generated_areas_mutex);
 	_update_data->state.changed_generated_areas.push_back(p_voxel_box);
@@ -648,7 +647,7 @@ void VoxelLodTerrain::push_async_edit(IThreadedTask *task, Box3i box, std::share
 
 Ref<VoxelTool> VoxelLodTerrain::get_voxel_tool() {
 	Ref<VoxelToolLodTerrain> vt(memnew(VoxelToolLodTerrain(this)));
-	// Set to most commonly used channel on this kind of terrain
+	// 设置为此类地形最常用的通道
 	vt->set_channel(voxel::VoxelBuffer::CHANNEL_SDF);
 	return vt;
 }
@@ -657,12 +656,12 @@ int VoxelLodTerrain::get_view_distance() const {
 	return _update_data->settings.view_distance_voxels;
 }
 
-// TODO Needs to be clamped dynamically, to avoid the user accidentally setting blowing up memory.
-// It used to be clamped to a hardcoded value, but now it may depend on LOD count and boundaries
+// TODO 需要动态钳制，以避免用户意外设置导致内存爆掉。
+// 它过去被钳制为硬编码值，但现在可能取决于 LOD 数量和边界
 void VoxelLodTerrain::set_view_distance(int p_distance_in_voxels) {
 	ERR_FAIL_COND(p_distance_in_voxels <= 0);
-	// Note: this is a hint distance, the terrain will attempt to have this radius filled with loaded voxels.
-	// It is possible for blocks to still load beyond that distance.
+	// 注意：这是一个提示距离，地形将尝试让该半径范围内充满已加载的体素。
+	// 数据块仍有可能在该距离之外加载。
 	_update_data->wait_for_end_of_task();
 	_update_data->settings.view_distance_voxels = p_distance_in_voxels;
 	_update_data->state.octree_streaming.force_update_octrees_next_update = true;
@@ -673,19 +672,19 @@ void VoxelLodTerrain::start_updater() {
 	if (blocky_mesher.is_valid()) {
 		Ref<VoxelBlockyLibraryBase> library = blocky_mesher->get_library();
 		if (library.is_valid()) {
-			// TODO Any way to execute this function just after the TRES resource loader has finished to load?
-			// VoxelLibrary should be baked ahead of time, like MeshLibrary
+			// TODO 有没有办法在 TRES 资源加载器完成加载后立即执行此函数？
+			// VoxelLibrary 应像 MeshLibrary 一样提前烘焙
 			library->bake();
 		}
 	}
 }
 
 void VoxelLodTerrain::stop_updater() {
-	// Invalidate pending tasks
+	// 使待处理任务失效
 	MeshingDependency::reset(_meshing_dependency, _mesher, get_generator());
 	// VoxelEngine::get_singleton().set_volume_mesher(_volume_id, Ref<VoxelMesher>());
 
-	// TODO We can still receive a few mesh delayed mesh updates after this. Is it a problem?
+	// TODO 在此之后我们仍可能收到一些延迟的网格更新。这是问题吗？
 	//_reception_buffers.mesh_output.clear();
 
 	_update_data->wait_for_end_of_task();
@@ -705,7 +704,7 @@ void VoxelLodTerrain::stop_updater() {
 			if (mesh_block.state == VoxelLodTerrainUpdateData::MESH_UPDATE_SENT) {
 				mesh_block.state = VoxelLodTerrainUpdateData::MESH_UPDATE_NOT_SENT;
 			}
-			// We cleared the list so we may clear this index
+			// 我们已经清除了列表，因此可以清除此索引
 			mesh_block.update_list_index = -1;
 		}
 	}
@@ -714,8 +713,8 @@ void VoxelLodTerrain::stop_updater() {
 void VoxelLodTerrain::start_streamer() {
 	if (is_full_load_mode_enabled()) {
 		if (get_stream().is_valid()) {
-			// TODO May want to defer this to be sure it's not done multiple times.
-			// This would be a side-effect of setting properties one by one, either by scene loader or by script
+			// TODO 也许需要推迟此操作以确保不会执行多次。
+			// 这将是逐个设置属性（无论是由场景加载器还是由脚本）产生的副作用
 
 			VOXEL_PRINT_VERBOSE(format("Request all blocks for volume {}", _volume_id));
 			VOXEL_ASSERT(_streaming_dependency != nullptr);
@@ -756,8 +755,8 @@ void VoxelLodTerrain::set_lod_distance(float p_lod_distance) {
 
 	_update_data->wait_for_end_of_task();
 
-	// Distance must be greater than a threshold,
-	// otherwise lods will decimate too fast and it will look messy
+	// 距离必须大于一个阈值，
+	// 否则 LOD 会衰减得太快，看起来会很杂乱
 	const float lod_distance =
 			math::clamp(p_lod_distance, constants::MINIMUM_LOD_DISTANCE, constants::MAXIMUM_LOD_DISTANCE);
 	_update_data->settings.lod_distance = lod_distance;
@@ -782,8 +781,8 @@ void VoxelLodTerrain::set_secondary_lod_distance(float p_lod_distance) {
 
 	_update_data->wait_for_end_of_task();
 
-	// Distance must be greater than a threshold,
-	// otherwise lods will decimate too fast and it will look messy
+	// 距离必须大于一个阈值，
+	// 否则 LOD 会衰减得太快，看起来会很杂乱
 	const float secondary_lod_distance =
 			math::clamp(p_lod_distance, constants::MINIMUM_LOD_DISTANCE, constants::MAXIMUM_LOD_DISTANCE);
 	_update_data->settings.secondary_lod_distance = secondary_lod_distance;
@@ -802,9 +801,9 @@ float VoxelLodTerrain::get_secondary_lod_distance() const {
 }
 
 void VoxelLodTerrain::get_lod_distances(Span<float> distances) {
-	// Get the distances in local coordinates where each LOD ends (not accounting for max view distance extension).
-	// Note that due to chunking adjustments, this may not be fully accurate. Actual chunks can appear further away.
-	// Initially used for VoxelInstancer.
+	// 获取每个 LOD 结束处的局部坐标距离（不计算最大视距扩展）。
+	// 注意，由于分块调整，这可能不完全准确。实际数据块可能出现得更远。
+	// 最初用于 VoxelInstancer。
 
 	VOXEL_ASSERT_RETURN(distances.size() > 0);
 
@@ -855,7 +854,7 @@ void VoxelLodTerrain::_set_lod_count(int p_lod_count) {
 		_queued_main_thread_mesh_updates[i].clear();
 	}
 
-	// Not entirely required, but changing LOD count at runtime is rarely needed
+	// 并非完全必需，但运行时更改 LOD 数量很少需要
 	reset_maps();
 }
 
@@ -864,9 +863,9 @@ void VoxelLodTerrain::on_format_changed() {
 }
 
 void VoxelLodTerrain::reset_maps() {
-	// Clears all blocks and reconfigures maps to account for new LOD count and block sizes
+	// 清除所有数据块并重新配置映射，以适配新的 LOD 数量和块大小
 
-	// Don't reset while streaming, the result can be dirty?
+	// 不要在流式传输期间重置，结果可能是脏的？
 	// CRASH_COND(_stream_thread != nullptr);
 
 	_update_data->wait_for_end_of_task();
@@ -890,7 +889,7 @@ void VoxelLodTerrain::reset_mesh_maps() {
 
 #ifdef VOXEL_ENABLE_INSTANCER
 		if (_instancer != nullptr) {
-			// Unload instances
+			// 卸载实例
 			VoxelInstancer *instancer = _instancer;
 			mesh_map.for_each_block([lod_index, instancer](VoxelMeshBlockVLT &block) {
 				instancer->on_mesh_block_exit(block.position, lod_index);
@@ -900,10 +899,10 @@ void VoxelLodTerrain::reset_mesh_maps() {
 
 		// mesh_map.for_each_block(BeforeUnloadMeshAction{ _shader_material_pool });
 
-		// Instance new maps if we have more lods, or clear them otherwise
+		// 若我们有更多 LOD 则实例化新映射，否则清除它们
 		if (lod_index < lod_count) {
 			mesh_map.clear();
-			// Reset view distance cache so blocks will be re-entered due to the difference
+			// 重置视距缓存，以便数据块因差异而重新进入
 			lod.last_view_distance_data_blocks = 0;
 			lod.last_view_distance_mesh_blocks = 0;
 		} else {
@@ -912,7 +911,7 @@ void VoxelLodTerrain::reset_mesh_maps() {
 
 		lod.mesh_map_state.map.clear();
 
-		// Clear temporal lists
+		// 清除临时列表
 		lod.mesh_blocks_to_activate_visuals.clear();
 		lod.mesh_blocks_to_deactivate_visuals.clear();
 		lod.mesh_blocks_to_activate_collision.clear();
@@ -923,7 +922,7 @@ void VoxelLodTerrain::reset_mesh_maps() {
 		_deferred_collision_updates_per_lod[lod_index].clear();
 	}
 
-	// Reset LOD octrees
+	// 重置 LOD 八叉树
 	LodOctree::NoDestroyAction nda;
 	for (StdMap<Vector3i, VoxelLodTerrainUpdateData::OctreeItem>::iterator it =
 				 state.octree_streaming.lod_octrees.begin();
@@ -933,10 +932,10 @@ void VoxelLodTerrain::reset_mesh_maps() {
 		item.octree.create(lod_count, nda);
 	}
 
-	// Reset previous state caches to force rebuilding the view area
+	// 重置先前的状态缓存以强制重建视图区域
 	state.octree_streaming.last_octree_region_box = Box3i();
 	state.octree_streaming.lod_octrees.clear();
-	// No need to care about refcounts, we drop everything anyways. Will pair it back on next process.
+	// 无需关心引用计数，我们反正会丢弃所有内容。将在下次处理时重新配对。
 	state.clipbox_streaming.paired_viewers.clear();
 	state.clipbox_streaming.loaded_data_blocks.clear();
 	state.clipbox_streaming.loaded_mesh_blocks.clear();
@@ -1042,23 +1041,23 @@ void VoxelLodTerrain::set_process_callback(ProcessCallback mode) {
 
 void VoxelLodTerrain::_notification(int p_what) {
 	switch (p_what) {
-		// TODO Should use NOTIFICATION_INTERNAL_PROCESS instead?
+		// TODO 是否应改用 NOTIFICATION_INTERNAL_PROCESS？
 		case NOTIFICATION_PROCESS:
 			if (_process_callback == PROCESS_CALLBACK_IDLE) {
-				// Can't do that in enter tree because Godot is "still setting up children".
-				// Can't do that in ready either because Godot says node state is locked.
-				// This hack is quite miserable.
+				// 不能在 enter tree 中执行，因为 Godot“仍在设置子节点”。
+				// 也不能在 ready 中执行，因为 Godot 表示节点状态已锁定。
+				// 这个临时方案相当糟糕。
 				VoxelEngineUpdater::ensure_existence(get_tree());
 				process(get_process_delta_time());
 			}
 			break;
 
-		// TODO Should use NOTIFICATION_INTERNAL_PHYSICS_PROCESS instead?
+		// TODO 是否应改用 NOTIFICATION_INTERNAL_PHYSICS_PROCESS？
 		case NOTIFICATION_PHYSICS_PROCESS:
 			if (_process_callback == PROCESS_CALLBACK_PHYSICS) {
-				// Can't do that in enter tree because Godot is "still setting up children".
-				// Can't do that in ready either because Godot says node state is locked.
-				// This hack is quite miserable.
+				// 不能在 enter tree 中执行，因为 Godot“仍在设置子节点”。
+				// 也不能在 ready 中执行，因为 Godot 表示节点状态已锁定。
+				// 这个临时方案相当糟糕。
 				VoxelEngineUpdater::ensure_existence(get_tree());
 				process(get_physics_process_delta_time());
 			}
@@ -1067,10 +1066,10 @@ void VoxelLodTerrain::_notification(int p_what) {
 #ifdef TOOLS_ENABLED
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 		case NOTIFICATION_ENTER_TREE:
-			// In the editor, auto-configure a default mesher, for convenience.
-			// Because Godot has a property hint to automatically instantiate a resource, but if that resource is
-			// abstract, it doesn't work... and it cannot be a default value because such practice was deprecated with a
-			// warning in Godot 4.
+			// 在编辑器中，为了方便自动配置一个默认网格化器。
+			// 因为 Godot 有自动实例化资源的属性提示，但如果该资源是
+			// 抽象的，它就不起作用……而且它不能是默认值，因为这种做法在 Godot 4 中已被弃用并
+			// 附带警告。
 			if (Engine::get_singleton()->is_editor_hint() && !get_mesher().is_valid()) {
 				Ref<VoxelMesherTransvoxel> mesher;
 				mesher.instantiate();
@@ -1139,8 +1138,8 @@ void VoxelLodTerrain::_notification(int p_what) {
 			// VoxelEngine::get_singleton().set_volume_transform(_volume_id, transform);
 
 			if (!is_inside_tree()) {
-				// The transform and other properties can be set by the scene loader,
-				// before we enter the tree
+				// 变换和其它属性可能由场景加载器设置，
+				// 早于我们进入场景树
 				return;
 			}
 
@@ -1164,10 +1163,10 @@ void VoxelLodTerrain::_notification(int p_what) {
 }
 
 Vector3 VoxelLodTerrain::get_local_viewer_pos() const {
-	// Pick this by default
+	// 默认选这个
 	Vector3 pos = _update_data->state.lods[0].last_viewer_data_block_pos << get_data_block_size_pow2();
 
-	// TODO Support for multiple viewers, this is a placeholder implementation
+	// TODO 支持多个观察者，这是一个占位实现
 	VoxelEngine::get_singleton().for_each_viewer( //
 			[&pos](ViewerID id, const VoxelEngine::Viewer &viewer) { //
 				pos = viewer.world_position;
@@ -1191,15 +1190,15 @@ void VoxelLodTerrain::process(float delta) {
 	_stats.dropped_block_meshs = 0;
 
 	if (get_lod_count() == 0) {
-		// If there isn't a LOD 0, there is nothing to load
+		// 如果没有 LOD 0，则没有需要加载的内容
 		return;
 	}
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 #ifdef VOXEL_ENABLE_GPU
-	// TODO It is currently not possible to fully compile those shaders on the fly in a thread.
-	// The GLSL functions of VoxelGenerator need to be thread-safe. Compiling should be safe, but getting the source
-	// code isn't. VoxelGeneratorGraph's shader generation is not thread-safe, because it accesses its graph.
+	// TODO 目前无法在线程中即时完整编译这些着色器。
+	// VoxelGenerator 的 GLSL 函数需要是线程安全的。编译应当是安全的，但获取源代码
+	// 则不是。VoxelGeneratorGraph 的着色器生成不是线程安全的，因为它会访问其图形。
 	if (get_normalmap_use_gpu()) {
 		Ref<VoxelGenerator> generator;
 		Ref<VoxelGenerator> generator_override = get_normalmap_generator_override();
@@ -1225,12 +1224,12 @@ void VoxelLodTerrain::process(float delta) {
 	}
 #endif
 
-	// Get block loading responses
-	// Note: if block loading is too fast, this can cause stutters.
-	// It should only happen on first load, though.
+	// 获取数据块加载响应
+	// 注意：若数据块加载过快，可能会导致卡顿。
+	// 不过这只应发生在首次加载时。
 	// process_block_loading_responses();
 
-	// TODO This could go into time spread tasks too
+	// TODO 这也可以放入时间分摊任务
 	process_deferred_collision_updates(VoxelEngine::get_singleton().get_main_thread_time_budget_usec());
 
 #ifdef TOOLS_ENABLED
@@ -1244,10 +1243,10 @@ void VoxelLodTerrain::process(float delta) {
 
 		apply_main_thread_update_tasks();
 
-		// Get viewer location in voxel space
+		// 获取观察者在体素空间中的位置
 		const Vector3 viewer_pos = get_local_viewer_pos();
 
-		// Copy viewers
+		// 复制观察者
 		{
 			VoxelLodTerrainUpdateData &update_data = *_update_data;
 			update_data.viewers.clear();
@@ -1258,7 +1257,7 @@ void VoxelLodTerrain::process(float delta) {
 			);
 		}
 
-		// TODO Optimization: pool tasks instead of allocating?
+		// TODO 优化：改用任务池而不是分配？
 		VoxelLodTerrainUpdateTask *task = VOXEL_NEW(VoxelLodTerrainUpdateTask(
 				_data,
 				_update_data,
@@ -1273,8 +1272,8 @@ void VoxelLodTerrain::process(float delta) {
 		_update_data->task_is_complete = false;
 
 		if (_threaded_update_enabled) {
-			// Schedule task at the end, so it is less likely to have contention with other logic than if it was done at
-			// the beginnning of `_process`
+			// 将任务调度在末尾，这样与其它逻辑的争用比在
+			// `_process` 开头执行时更小
 			VoxelEngine::get_singleton().push_async_task(task);
 
 		} else {
@@ -1285,25 +1284,25 @@ void VoxelLodTerrain::process(float delta) {
 		}
 	}
 
-	// Do it after we change mesh block states so materials are updated
+	// 在我们更改网格数据块状态之后再执行，以便材质得到更新
 	process_fading_blocks(delta);
 }
 
 void VoxelLodTerrain::apply_main_thread_update_tasks() {
 	VOXEL_PROFILE_SCOPE();
-	// Dequeue outputs of the threadable part of the update for actions taking place on the main thread
+	// 将更新中可线程化部分的输出出队，用于在主线程上执行的操作
 
 	CRASH_COND(_update_data->task_is_complete == false);
 
 	VoxelLodTerrainUpdateData::State &state = _update_data->state;
 
-	// Transitions and fading are visual things, in multiplayer servers they won't be used, so we can take a shortcut
-	// and use the camera for them.
+	// 过渡和淡出是视觉相关的东西，在多人在线服务器中不会被使用，因此我们可以走捷径
+	// 用相机来代替。
 	const LocalCameraInfo camera = get_local_camera_info();
 	const Transform3D volume_transform = get_global_transform();
 	const unsigned int lod_count = get_lod_count();
 
-	// Apply quick reloads
+	// 应用快速重载
 	for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 		VoxelLodTerrainUpdateData::Lod &lod = _update_data->state.lods[lod_index];
 		for (const VoxelLodTerrainUpdateData::QuickReloadingBlock &qrb : lod.quick_reloading_blocks) {
@@ -1312,7 +1311,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 				VoxelEngine::BlockDataOutput::TYPE_LOADED, //
 				qrb.voxels, //
 #ifdef VOXEL_ENABLE_INSTANCER
-				// TODO This doesn't work with VoxelInstancer because it unloads based on meshes...
+				// TODO 这不适用于 VoxelInstancer，因为它基于网格卸载……
 				nullptr, //
 #endif
 				qrb.position, //
@@ -1338,7 +1337,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 		for (unsigned int i = 0; i < lod.mesh_blocks_to_activate_visuals.size(); ++i) {
 			const Vector3i bpos = lod.mesh_blocks_to_activate_visuals[i];
 			VoxelMeshBlockVLT *block = mesh_map.get_block(bpos);
-			// Can be null if there is actually no surface at this location
+			// 若此位置实际上没有表面，则可能为空
 			if (block == nullptr) {
 				continue;
 			}
@@ -1348,7 +1347,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 				const Vector3 block_center = volume_transform.xform(
 						to_vec3(block->position * mesh_block_size + Vector3iUtil::create(mesh_block_size / 2))
 				);
-				// Don't start fading on blocks behind the camera
+				// 不要在位于相机后面的数据块上开始淡出
 				with_fading = camera.forward.dot(block_center - camera.position) > 0.0;
 			}
 			set_mesh_block_visual_active(*block, true, with_fading, lod_index);
@@ -1358,7 +1357,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 		for (unsigned int i = 0; i < lod.mesh_blocks_to_deactivate_visuals.size(); ++i) {
 			const Vector3i bpos = lod.mesh_blocks_to_deactivate_visuals[i];
 			VoxelMeshBlockVLT *block = mesh_map.get_block(bpos);
-			// Can be null if there is actually no surface at this location
+			// 若此位置实际上没有表面，则可能为空
 			if (block == nullptr) {
 				continue;
 			}
@@ -1368,7 +1367,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 				const Vector3 block_center = volume_transform.xform(
 						to_vec3(block->position * mesh_block_size + Vector3iUtil::create(mesh_block_size / 2))
 				);
-				// Don't start fading on blocks behind the camera
+				// 不要在位于相机后面的数据块上开始淡出
 				with_fading = camera.forward.dot(block_center - camera.position) > 0.0;
 			}
 			set_mesh_block_visual_active(*block, false, with_fading, lod_index);
@@ -1376,7 +1375,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 
 		for (const Vector3i bpos : lod.mesh_blocks_to_activate_collision) {
 			VoxelMeshBlockVLT *block = mesh_map.get_block(bpos);
-			// Can be null if there is actually no surface at this location
+			// 若此位置实际上没有表面，则可能为空
 			if (block == nullptr) {
 				continue;
 			}
@@ -1385,7 +1384,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 
 		for (const Vector3i bpos : lod.mesh_blocks_to_deactivate_collision) {
 			VoxelMeshBlockVLT *block = mesh_map.get_block(bpos);
-			// Can be null if there is actually no surface at this location
+			// 若此位置实际上没有表面，则可能为空
 			if (block == nullptr) {
 				continue;
 			}
@@ -1405,21 +1404,21 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 
 		for (const Vector3i bpos : lod.mesh_blocks_to_drop_visual) {
 			VoxelMeshBlockVLT *block = mesh_map.get_block(bpos);
-			// Can be null if there is actually no surface at this location
+			// 若该位置实际上没有表面，则可能为 null
 			if (block == nullptr) {
 				continue;
 			}
 			block->drop_visuals();
 			remove_shader_material_from_block(*block, _shader_material_pool);
-			// Also update the state in the threaded representation
+			// 同时更新线程化表示中的状态
 			auto it = lod.mesh_map_state.map.find(bpos);
 			if (it != lod.mesh_map_state.map.end()) {
 				it->second.visual_loaded = false;
 			}
-			// TODO When moving out of a region that already has collision-only viewers (causing the present visual-only
-			// unload), we may want to fade visuals the same way we do when the whole block is removed?
+			// TODO 当移出已具有仅碰撞观察者的区域（导致当前仅视觉部分
+			// 卸载）时，我们可能想以与整个数据块被移除时相同的方式淡出视觉？
 
-			// `drop_visual` will cancel fading if any
+			// `drop_visual` 将取消任何进行中的淡出
 			StdMap<Vector3i, VoxelMeshBlockVLT *> &fading_map = _fading_blocks_per_lod[lod_index];
 			fading_map.erase(bpos);
 		}
@@ -1442,24 +1441,24 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 			auto fading_block_it = fading_blocks_in_current_lod.find(bpos);
 
 			if (_lod_fade_duration > 0.f) {
-				// Trigger fading out if the block was visible.
-				// Since the mesh block is removed from the map, we have to create an independent instance.
-				// If we don't do that and the viewer moves quick enough (or has low enough LOD distance), it would
-				// cause flickering as removed meshes are not able to fade out when moving away from them (contrary to
-				// moving closer to them, because in that case they are not removed, just made invisible).
-				// Other approaches could be explored, such as marking the mesh as "pending removal" and actually
-				// removing it after a second or two, to allow fading to finish.
+				// 若数据块可见，则触发淡出。
+				// 由于网格数据块从映射中移除，我们必须创建一个独立实例。
+				// 若不这样做，且观察者移动得足够快（或 LOD 距离足够低），就会
+				// 导致闪烁，因为被移除的网格在远离它们时无法淡出（与
+				// 靠近它们相反，因为那种情况下它们并未被移除，只是被设为不可见）。
+				// 也可以探索其它方法，例如将网格标记为“待移除”并在
+				// 一两秒后真正移除，以便淡出完成。
 
-				// TODO It may be more efficient to just move the mesh instance from the block we are about to
-				// remove, rather than creating another
+				// TODO 直接移动待移除数据块中的网格实例可能更高效，
+				// 而不是再创建一个
 
 				const Vector3 block_center = volume_transform.xform(
 						to_vec3(bpos * mesh_block_size + Vector3iUtil::create(mesh_block_size / 2))
 				);
 
-				// Don't do fading for blocks behind the camera.
-				// TODO The block can extend by its size to be visible by the camera, even more if the camera is moving
-				// backwards. Perhaps we should take this into account.
+				// 不要对相机后方的数据块做淡出。
+				// TODO 数据块可以按自身大小延伸以被相机看到，若相机向后移动则更是如此。
+				// 也许我们应当考虑到这一点。
 				if (camera.forward.dot(block_center - camera.position) > 0.f) {
 					const VoxelMeshBlockVLT *mesh_block = mesh_map.get_block(bpos);
 
@@ -1473,28 +1472,28 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 
 							if (fading_block_it != fading_blocks_in_current_lod.end()) {
 								if (fading_block_it->second->fading_state == VoxelMeshBlockVLT::FADING_OUT) {
-									// The block was already fading out, take it from here
+									// 数据块已在淡出，从这里接续
 									item.progress = fading_block_it->second->fading_progress;
 								} else {
-									// The block was fading in: don't reverse from here.
-									// When a mesh is fading in, there is usually one or multiple others fading out,
-									// resulting in an proper opaque cross-fade. If we reverse fading of this mesh, we
-									// end up with two fading-out meshes: with discard-based fragment shaders, that
-									// means their pixels won't complement each other, causing a noticeable "noisy
-									// hole". So instead we fast-forward to full alpha and then fade out, complementing
-									// the eventually fading-in mesh that causes this (even though there might be
-									// another spurious fading-out mesh, it's better than seeing a hole).
-									// That situation occurs often with transition updates because they are at LOD
-									// borders.
+									// 数据块正在淡入：不要从这里反转。
+									// 当某个网格淡入时，通常有一个或多个其它网格在淡出，
+									// 形成正确的不透明交叉淡化。若我们反转该网格的淡化，就会
+									// 最终得到两个淡出的网格：使用基于 discard 的片元着色器时，
+									// 意味着它们的像素无法互补，会产生明显的“噪点
+									// 空洞”。因此我们改为快进到完全不透明再淡出，与
+									// 最终导致此情况的淡入网格互补（即使可能还有
+									// 另一个虚假的淡出网格，也比看到空洞好）。
+									// 这种情况常出现在过渡更新时，因为它们位于 LOD
+									// 边界。
 									item.progress = 1.f;
 								}
 							} else {
 								item.progress = 1.f;
 							}
 
-							// TODO Do we actually have to instantiate a material? We could just re-use the one from the
-							// block, since it gets removed and no change occurs in that material (contrary to
-							// transition mask changes)
+							// TODO 我们真的必须实例化一个材质吗？可以直接复用数据块中
+							// 的那个，因为它会被移除且该材质不会发生变化（与
+							// 过渡掩码变化不同）
 							item.shader_material = _shader_material_pool.allocate();
 							VOXEL_ASSERT(item.shader_material.is_valid());
 							voxel::godot::copy_shader_params(
@@ -1512,7 +1511,7 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 							);
 							item.mesh_instance.set_material_override(item.shader_material);
 							item.mesh_instance.set_world(*get_world_3d());
-							// TODO What if the terrain is hidden?
+							// TODO 若地形被隐藏怎么办？
 							item.mesh_instance.set_visible(true);
 
 							_fading_out_meshes.push_back(std::move(item));
@@ -1537,18 +1536,18 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 			debug_removed_blocks.insert(bpos);
 #endif
 			*/
-			// Blocks in the update queue will be cancelled in _process,
-			// because it's too expensive to linear-search all blocks for each block
+			// 更新队列中的数据块将在 _process 中被取消，
+			// 因为为每个数据块做线性搜索代价太高
 		}
 
 		for (unsigned int i = 0; i < lod.mesh_blocks_to_update_transitions.size(); ++i) {
 			const VoxelLodTerrainUpdateData::TransitionUpdate tu = lod.mesh_blocks_to_update_transitions[i];
 			VoxelMeshBlockVLT *block = mesh_map.get_block(tu.block_position);
-			// Can be null if there is actually no surface at this location
+			// 若该位置实际上没有表面，则可能为 null
 			if (block == nullptr) {
 				/*
 #ifdef DEBUG_ENABLED
-				// If the block was removed for a different reason then it is unexpected
+				// 若数据块因其它原因被移除，则属于意外情况
 				ERR_CONTINUE(debug_removed_blocks.find(tu.block_position) == debug_removed_blocks.end());
 #endif
 				VOXEL_PRINT_VERBOSE(String("Skipping TransitionUpdate at {0} lod {1}, block not found")
@@ -1560,12 +1559,12 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 			if (block->visual_active) {
 				Ref<ShaderMaterial> shader_material = block->get_shader_material();
 
-				// TODO Don't fade if the transition mask actually didnt change
-				// This can happen if multiple updates occur and then cancel out
+				// TODO 若过渡掩码实际上没变化，就不要淡出
+				// 这可能在多次更新发生并相互抵消时出现
 
-				// Fade stitching transitions to avoid cracks.
-				// This is done by triggering a fade-in on the block, while a copy of it fades out with the previous
-				// material settings. This causes a bit of overdraw, but LOD fading does anyways.
+				// 淡出缝合过渡以避免裂缝。
+				// 做法是对数据块触发淡入，同时它的一个副本以先前的
+				// 材质设置淡出。这会造成一些过度绘制，但 LOD 淡出本来也会这样。
 				if (_lod_fade_duration > 0.f && shader_material.is_valid() &&
 					activated_visual_blocks.find(block) == activated_visual_blocks.end() &&
 					tu.transition_mask != block->get_transition_mask()) {
@@ -1574,15 +1573,15 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 							to_vec3(block->position * mesh_block_size + Vector3iUtil::create(mesh_block_size / 2))
 					);
 
-					// Don't do fading for blocks behind the camera.
+					// 不要对相机后方的数据块做淡出。
 					if (camera.forward.dot(block_center - camera.position) > 0.f) {
 						FadingOutMesh item;
 
 						item.local_position = block->position * mesh_block_size;
 						item.progress = 1.f;
 
-						// Wayyyy too slow, initially because of https://github.com/godotengine/godot/issues/34741
-						// but also generally slow because of how `duplicate` is implemented
+						// 太太太慢了，最初是因为 https://github.com/godotengine/godot/issues/34741
+						// 但也普遍因 `duplicate` 的实现方式而缓慢
 						// item.shader_material = shader_material->duplicate(false);
 						item.shader_material = _shader_material_pool.allocate();
 						VOXEL_ASSERT(item.shader_material.is_valid());
@@ -1621,9 +1620,9 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 		lod.mesh_blocks_to_unload.clear();
 		lod.mesh_blocks_to_update_transitions.clear();
 
-	} // for each lod
+	} // 每个 LOD
 
-	// Remove completed async edits
+	// 移除已完成的异步编辑
 	unordered_remove_if(state.running_async_edits, [this](VoxelLodTerrainUpdateData::RunningAsyncEdit &e) {
 		if (e.tracker->is_complete()) {
 			if (e.tracker->has_next_tasks()) {
@@ -1631,10 +1630,10 @@ void VoxelLodTerrain::apply_main_thread_update_tasks() {
 			}
 			post_edit_area(
 					e.box,
-					// Assume the async edit modified voxels in a way it affects the mesh.
-					// Won't be the case if changed only metadata, but so far there is no use case for using an async
-					// edit to change metadata. Metadata is not even used often in smooth terrains (which
-					// VoxelLodTerrain is mostly for)
+					// 假设异步编辑以影响网格的方式修改了体素。
+					// 若只更改元数据则不会如此，但到目前为止还没有用异步
+					// 编辑更改元数据的用例。元数据在平滑地形中甚至不常用（
+					// VoxelLodTerrain 主要就是为此设计的）
 					true
 			);
 			return true;
@@ -1657,11 +1656,11 @@ void VoxelLodTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob
 	VOXEL_PROFILE_SCOPE();
 
 	if (ob.type == VoxelEngine::BlockDataOutput::TYPE_SAVED) {
-		// That's a save confirmation event.
-		// Note: in the future, if blocks don't get copied before being sent for saving,
-		// we will need to use block versioning to know when we can reset the `modified` flag properly
+		// 这是保存确认事件。
+		// 注意：将来，若数据块在发送保存前不被复制，
+		// 我们将需要使用块版本控制来知道何时可以正确重置 `modified` 标志
 
-		// TODO Now that's the case. Use version? Or just keep copying?
+		// TODO 现在就是这种情况。使用版本？还是继续复制？
 
 		if (ob.dropped) {
 			VOXEL_PRINT_ERROR(format("Could not save block {}", ob.position));
@@ -1669,14 +1668,13 @@ void VoxelLodTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob
 		} else if (ob.had_voxels) {
 			VoxelLodTerrainUpdateData::Lod &lod = _update_data->state.lods[ob.lod_index];
 			{
-				// TODO We could avoid locking if we defer this with a list, which we consume when the threaded update
-				// completes?
+				// TODO 若我们用列表推迟此操作（在线程化更新完成时消费），是否就能避免加锁？
 				MutexLock mlock(lod.unloaded_saving_blocks_mutex);
 
-				// TODO What if the version that was saved is older than the one we cached here?
-				// For that to be a problem, you'd have to edit a chunk, move away, move back in, edit it again, move
-				// away, and have the first save complete before the second. But we may consider adding version numbers,
-				// which requires adding block metadata
+				// TODO 若已保存的版本比我们缓存的旧怎么办？
+				// 要让这成为问题，你得编辑一个数据块、移开、再移回、再次编辑、再
+				// 移开，并让第一次保存先于第二次完成。但我们可以考虑添加版本号，
+				// 这需要添加块元数据
 				lod.unloaded_saving_blocks.erase(ob.position);
 			}
 
@@ -1691,18 +1689,18 @@ void VoxelLodTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob
 	}
 
 	if (ob.lod_index >= get_lod_count()) {
-		// That block was requested at a time where LOD was higher... drop it
+		// 该数据块在 LOD 较高时被请求……丢弃它
 		++_stats.dropped_block_loads;
 		return;
 	}
 
 	VoxelLodTerrainUpdateData::Lod &lod = _update_data->state.lods[ob.lod_index];
 	RefCount viewers;
-	// Initial load will be true when we requested data without specifying specific positions,
-	// so we wouldn't know which ones to expect. This is the case of full load mode.
+	// 当我们请求数据但未指定具体位置时，初始加载将为 true，
+	// 因此我们不知道会收到哪些。完全加载模式就是这种情况。
 	// if (!ob.initial_load) {
-	// Actually, in full load mode, we don't care about viewers and loading blocks, since everything should be loaded
-	// up-front. Blocks can also be received due to generation caching afterward, but we don't refcount them either.
+	// 实际上，在完全加载模式下，我们不关心观察者和加载中的数据块，因为一切都应
+	// 预先加载。之后由于生成缓存也可能收到数据块，但我们同样不对它们进行引用计数。
 	if (_data->is_streaming_enabled()) {
 		bool was_loading = false;
 		{
@@ -1714,7 +1712,7 @@ void VoxelLodTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob
 			}
 		}
 		if (!was_loading) {
-			// That block was not requested, or is no longer needed. drop it...
+			// 该数据块未被请求，或已不再需要。丢弃它……
 			VOXEL_PRINT_VERBOSE(
 					format("Ignoring block {} lod {}, it was not in loading blocks (terrain {})",
 						   ob.position,
@@ -1727,9 +1725,9 @@ void VoxelLodTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob
 	}
 
 	if (ob.dropped) {
-		// That block was dropped by the data loader thread, but we were still expecting it...
-		// This is most likely caused by the loader not keeping up with the speed at which the player is moving.
-		// We should recover with the removal from `loading_blocks` so it will be re-queried again later...
+		// 该数据块被数据加载线程丢弃，但我们仍在等待它……
+		// 这很可能是加载器跟不上玩家移动速度导致的。
+		// 我们应通过将其从 `loading_blocks` 中移除来恢复，这样稍后会被再次查询……
 
 		//				print_line(String("Received a block loading drop while we were still expecting it: lod{0} ({1},
 		//{2}, {3})") 								   .format(varray(ob.lod, ob.position.x, ob.position.y,
@@ -1744,23 +1742,23 @@ void VoxelLodTerrain::apply_data_block_response(VoxelEngine::BlockDataOutput &ob
 	block.viewers = viewers;
 
 	if (block.has_voxels() && block.get_voxels_const().get_size() != Vector3iUtil::create(_data->get_block_size())) {
-		// Voxel block size is incorrect, drop it
+		// 体素数据块大小不正确，丢弃它
 		VOXEL_PRINT_ERROR("Block is different from expected size");
 		++_stats.dropped_block_loads;
 		return;
 	}
 
 	const bool inserted = _data->try_set_block(ob.position, block);
-	// TODO Might not ignore these blocks in the future, see `VoxelTerrain`
+	// TODO 将来可能不忽略这些数据块，参见 `VoxelTerrain`
 	if (!inserted) {
 		++_stats.dropped_block_loads;
 		return;
 	}
 
 	{
-		// We have to do this after adding the block to the map, otherwise there would be a small period of time where
-		// the threaded update task could request the block again needlessly
-		// TODO In full load mode, this might be unnecessary, since it's not populated
+		// 我们必须先将数据块添加到映射中再执行此操作，否则会有一小段时间
+		// 线程更新任务可能不必要地再次请求该数据块
+		// TODO 在完全加载模式下，这可能是不必要的，因为它不会被填充
 		MutexLock lock(lod.loading_blocks_mutex);
 		lod.loading_blocks.erase(ob.position);
 	}
@@ -1804,27 +1802,27 @@ inline void set_block_collision_shape(
 }
 
 void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
-	// The following is done on the main thread because Godot doesn't really support everything done here.
-	// Building meshes can be done in the threaded task when using Vulkan, but not OpenGL.
-	// Setting up mesh instances might not be well threaded?
-	// Building collision shapes in threads efficiently is not supported.
+	// 以下工作在主线程上完成，因为 Godot 并不真正支持这里的所有操作。
+	// 使用 Vulkan 时网格构建可以在线程任务中完成，但 OpenGL 不行。
+	// 设置网格实例可能无法很好地线程化？
+	// 不支持在线程中高效构建碰撞体形状。
 	VOXEL_PROFILE_SCOPE();
 
-	// TODO This spams in the editor upon opening a project, when more than one scene was open with a terrain.
-	// I suspect this is because one scene opens, then another opens and takes precedence. This causes the first scene
-	// to be removed from the scene tree, yet it already has started loading so all mesh update results come up too
-	// late...
+	// TODO 在编辑器中打开项目时，若同时打开多个带地形的场景，会刷屏报错。
+	// 我怀疑这是因为一个场景打开后，另一个场景打开并占据优先。这导致第一个场景
+	// 被从场景树中移除，但它已经开始加载，因此所有网格更新结果来得太
+	// 晚……
 	ERR_FAIL_COND(!is_inside_tree());
 
 	CRASH_COND(_update_data == nullptr);
 	VoxelLodTerrainUpdateData &update_data = *_update_data;
 
 	if (ob.lod >= get_lod_count()) {
-		// Sorry, LOD configuration changed, drop that mesh
+		// 抱歉，LOD 配置已更改，丢弃该网格
 		++_stats.dropped_block_meshs;
 		return;
 	}
-	// There is a slim chance for some updates to come up just after setting the mesher to null. Avoids a crash.
+	// 将网格化器设为 null 后，有些更新仍有可能紧接着到来。避免崩溃。
 	if (_mesher.is_null()) {
 		++_stats.dropped_block_meshs;
 		return;
@@ -1842,13 +1840,13 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		RWLockRead rlock(lod.mesh_map_state.map_lock);
 		auto mesh_block_state_it = lod.mesh_map_state.map.find(ob.position);
 		if (mesh_block_state_it == lod.mesh_map_state.map.end()) {
-			// That block is no longer loaded in the update map, drop the result
+			// 该数据块在更新映射中已不再加载，丢弃结果
 			++_stats.dropped_block_meshs;
 			return;
 		}
 		if (ob.type == VoxelEngine::BlockMeshOutput::TYPE_DROPPED) {
-			// That block is loaded, but its meshing request was dropped.
-			// TODO Not sure what to do in this case, the code sending update queries has to be tweaked
+			// 该数据块已加载，但其网格化请求被丢弃。
+			// TODO 不确定这种情况下该如何处理，发送更新查询的代码需要调整
 			VOXEL_PRINT_VERBOSE("Received a block mesh drop while we were still expecting it");
 			++_stats.dropped_block_meshs;
 			return;
@@ -1858,10 +1856,10 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 
 		transition_mask = mesh_block_state.transition_mask;
 
-		// The update task could be running at the same time, so we need to do this atomically.
-		// The state can become "up to date" only if no other unsent update was pending.
+		// 更新任务可能同时运行，因此我们需要原子地执行此操作。
+		// 仅当没有其它未发送的更新挂起时，状态才能变为“最新”。
 		VoxelLodTerrainUpdateData::MeshState expected = VoxelLodTerrainUpdateData::MESH_UPDATE_SENT;
-		// TODO We need to separate visuals from collider
+		// TODO 我们需要将视觉效果与碰撞体分离
 		mesh_block_state.state.compare_exchange_strong(expected, VoxelLodTerrainUpdateData::MESH_UP_TO_DATE);
 		visual_active = mesh_block_state.visual_active;
 		collision_active = mesh_block_state.collision_active;
@@ -1870,19 +1868,19 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		collision_expected = mesh_block_state.collision_viewers.get() > 0;
 
 		if (visual_expected && ob.visual_was_required) {
-			// Mark visuals loaded for the streaming system to subdivide LODs.
-			// First mesh load? (note, no mesh being present counts as load too. Before that we would not know)
+			// 将视觉效果标记为已加载，供流式加载系统细分 LOD。
+			// 首次网格加载？（注意，没有网格也算作加载。在此之前我们无从知晓）
 			first_visual_load = (mesh_block_state.visual_loaded.exchange(true) == false);
 		}
 		if (collision_expected) {
-			// Mark collisions loaded for the streaming system to subdivide LODs.
-			// First mesh load? (note, no mesh being present counts as load too. Before that we would not know)
+			// 将碰撞体标记为已加载，供流式加载系统细分 LOD。
+			// 首次网格加载？（注意，没有网格也算作加载。在此之前我们无从知晓）
 			first_collision_load = (mesh_block_state.collision_loaded.exchange(true) == false);
 		}
 	}
 	if ((first_visual_load || first_collision_load) &&
 		_update_data->settings.streaming_system == VoxelLodTerrainUpdateData::STREAMING_SYSTEM_CLIPBOX) {
-		// Notify streaming system so it can subdivide LODs as they load
+		// 通知流式加载系统，以便它们在加载时细分 LOD
 		VoxelLodTerrainUpdateData::ClipboxStreamingState &cs = _update_data->state.clipbox_streaming;
 		MutexLock mlock(cs.loaded_mesh_blocks_mutex);
 		cs.loaded_mesh_blocks.push_back(
@@ -1891,8 +1889,8 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		);
 	}
 
-	// -------- Part where we invoke Godot functions ---------
-	// This part is not fully threadable.
+	// -------- 调用 Godot 函数的部分 ---------
+	// 这部分无法完全线程化。
 
 	VoxelMeshMap<VoxelMeshBlockVLT> &mesh_map = _mesh_maps_per_lod[ob.lod];
 	VoxelMeshBlockVLT *block = mesh_map.get_block(ob.position);
@@ -1902,16 +1900,16 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 	Ref<ArrayMesh> mesh;
 	Ref<ArrayMesh> shadow_occluder_mesh;
 	if (ob.visual_was_required && visual_expected) {
-		// TODO Candidate for temp allocator
+		// TODO 可作为临时分配器的候选
 		StdVector<uint16_t> material_indices;
 		if (ob.has_mesh_resource) {
-			// The mesh was already built as part of the threaded task
+			// 网格已作为线程任务的一部分构建完成
 			mesh = ob.mesh;
 			shadow_occluder_mesh = ob.shadow_occluder_mesh;
-			// It can be empty
+			// 它可能为空
 			material_indices = std::move(ob.mesh_material_indices);
 		} else {
-			// Can't build meshes in threads, do it here
+			// 无法在线程中构建网格，在此处执行
 			mesh = build_mesh(
 					to_span_const(ob.surfaces.surfaces),
 					mesh_data.primitive_type,
@@ -1930,13 +1928,13 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		}
 	}
 
-	// TODO We could simplify this by having a flag returned by MeshTask saying it's actually empty
+	// TODO 我们可以通过让 MeshTask 返回一个“实际为空”的标志来简化此逻辑
 	if (mesh.is_null() && voxel::is_mesh_empty(to_span(ob.surfaces.surfaces)) &&
 		ob.surfaces.collision_surface.indices.size() == 0) {
-		// The mesh is empty
+		// 网格为空
 		if (block != nullptr) {
-			// No surface anymore in this block, destroy it
-			// TODO Factor removal in a function, it's done in a few places
+			// 此数据块中不再有表面，销毁它
+			// TODO 将移除逻辑封装成函数，它在多处重复出现
 			mesh_map.remove_block(ob.position, BeforeUnloadMeshAction{ _shader_material_pool });
 
 #ifdef VOXEL_ENABLE_INSTANCER
@@ -1950,27 +1948,27 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		return;
 	}
 
-	// There is something in that block.
+	// 该数据块中有内容。
 
 	if (block == nullptr) {
-		// Create new block
+		// 创建新数据块
 		block = VOXEL_NEW(VoxelMeshBlockVLT(ob.position, get_mesh_block_size(), ob.lod));
 		mesh_map.set_block(ob.position, block);
 
 		block->set_world(get_world_3d());
 
 #ifdef VOXEL_ENABLE_INSTANCER
-		// TODO Need a more generic API for this kind of stuff
+		// TODO 这类操作需要更通用的 API
 
-		// Check whether this was "a first load" of any of the features that produces the mesh:
-		// We don't create MeshBlocks when loaded meshes turn out to be empty. But that means we can't just rely on
-		// `block == nullptr` to find out that it has loaded in. For example, the block being created could also be
-		// an area that just didn't have a mesh before, because voxels produced no surface there. So that made instances
-		// generating as we dig or build, which is unexpected.
+		// 检查这是否属于生成网格的任一特性的“首次加载”：
+		// 当加载的网格为空时，我们不会创建 MeshBlock。但这意味着我们不能仅依赖
+		// `block == nullptr` 来判断它是否已加载完成。例如，正在创建的数据块也可能
+		// 是之前没有网格的区域，因为那里的体素没有产生表面。所以这会导致实例
+		// 在我们挖掘或建造时生成，这是意料之外的。
 		const bool first_mesh_load = (first_visual_load || first_collision_load);
 
 		if (_instancer != nullptr && first_mesh_load && ob.surfaces.surfaces.size() > 0) {
-			// We would have to know if specific voxels got edited, or different from the generator
+			// 我们需要知道特定体素是否被编辑过，或与生成器输出不同
 			_instancer->on_mesh_block_enter(
 					ob.position,
 					ob.lod,
@@ -1993,16 +1991,16 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 	if (ob.visual_was_required && visual_expected) {
 		bool assign_material_after_mesh = false;
 
-		// We consider a block having a "rendering" mesh as having loaded visuals.
+		// 我们将拥有“渲染”网格的数据块视为已加载视觉效果。
 		if (!block->has_mesh()) {
-			// Setup visuals
+			// 设置视觉效果
 
 			block->visual_active = visual_active;
 			block->set_visible(visual_active);
 			// VOXEL_PRINT_VERBOSE(format("Created block pos {} lod {} time {}", ob.position, int(ob.lod),
 			// 		Time::get_singleton()->get_ticks_msec()));
 
-			// Lazy initialization
+			// 惰性初始化
 
 			// print_line(String("Adding block {0} at lod {1}").format(varray(eo.block_position.to_vec3(), eo.lod)));
 			// set_mesh_block_active(*block, false);
@@ -2011,14 +2009,14 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 			if (_shader_material_pool.get_template().is_valid() && block->get_shader_material().is_null()) {
 				VOXEL_PROFILE_SCOPE_NAMED("Add ShaderMaterial");
 
-				// Pooling shader materials is necessary for now, to avoid stuttering in the editor.
-				// Due to a signal used to keep the inspector up to date, even though these
-				// material copies will never be seen in the inspector
-				// See https://github.com/godotengine/godot/issues/34741
+				// 目前必须池化着色器材质，以避免在编辑器中卡顿。
+				// 这是由于用于保持检查器最新状态的信号所致，尽管这些
+				// 材质副本永远不会在检查器中看到
+				// 参见 https://github.com/godotengine/godot/issues/34741
 				Ref<ShaderMaterial> sm = _shader_material_pool.allocate();
 
 				if (sm.is_valid() && _material_uses_lod_info) {
-					// This is mainly for debugging purposes
+					// 这主要用于调试目的
 					const int lod_count = get_lod_count();
 					sm->set_shader_parameter(
 							VoxelStringNames::get_singleton().u_voxel_lod_info,
@@ -2026,8 +2024,8 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 					);
 				}
 
-				// Set individual shader material, because each block can have dynamic parameters,
-				// used to smooth seams without re-uploading meshes and allow to implement LOD fading
+				// 设置独立的着色器材质，因为每个数据块可以有动态参数，
+				// 用于在不重新上传网格的情况下平滑接缝，并允许实现 LOD 淡入淡出
 				block->set_shader_material(sm);
 
 			} else if (_material.is_valid()) {
@@ -2058,20 +2056,20 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		);
 
 		if (assign_material_after_mesh) {
-			// Do this after assigning the mesh when not using a ShaderMaterial.
-			// This is because we don't create a per-chunk material in this case, and so chunks don't hold it, so
-			// calling that before creating the mesh instance would not work.
+			// 在不使用 ShaderMaterial 时，请在分配网格之后再执行此操作。
+			// 这是因为这种情况下我们不会创建每个数据块的材质，因此数据块不持有它，
+			// 在创建网格实例之前调用它不会起作用。
 			block->set_material_override(_material);
 		}
 	}
 
-	// TODO Remove this eventually, we no longer use separate transition mesh instances
+	// TODO 最终移除这段代码，我们不再使用独立的过渡网格实例
 	if (!ob.has_mesh_resource) {
-		// Profiling has shown Godot takes as much time to build a transition mesh as the main mesh of a block, so
-		// because there are 6 transition meshes per block, we would spend about 80% of the time on these if we build
-		// them all. Which is counter-intuitive because transition meshes are tiny in comparison... (collision meshes
-		// still take 5x more time than building ALL rendering meshes but that's a different issue).
-		// Therefore I recommend combining them with the main mesh. This code might not do anything now.
+		// 性能分析显示 Godot 构建过渡网格与构建数据块主网格耗时相同，
+		// 因为每个数据块有 6 个过渡网格，如果我们全部构建，
+		// 大约 80% 的时间会花在这些网格上。这有违直觉，因为过渡网格相比之下非常小……（碰撞网格
+		// 仍比构建所有渲染网格多花 5 倍时间，但那是另一个问题）。
+		// 因此我建议将它们与主网格合并。这段代码现在可能不执行任何操作。
 		VOXEL_PROFILE_SCOPE_NAMED("Transition meshes");
 
 		for (unsigned int dir = 0; dir < mesh_data.transition_surfaces.size(); ++dir) {
@@ -2116,9 +2114,9 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		}
 	}
 
-	// This is done regardless in case a MeshInstance or collision body is created, because it will then set its
-	// position
-	// TODO Godot prevents this from working when outside of the scene tree!
+	// 无论是否创建了 MeshInstance 或碰撞体，都会执行此操作，因为随后会设置其
+	// 位置
+	// TODO 当不在场景树中时，Godot 会阻止此操作生效！
 	block->set_parent_transform(get_global_transform());
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
@@ -2126,11 +2124,11 @@ void VoxelLodTerrain::apply_mesh_update(VoxelEngine::BlockMeshOutput &ob) {
 		if (ob.detail_textures->valid) {
 			apply_detail_texture_update_to_block(*block, *ob.detail_textures, ob.lod);
 		} else {
-			// Textures aren't ready.
-			// To avoid a jarring transitions from "sharp" to "blurry", keep using parent texture if available.
-			// We could do this on many other levels (like propagating to children when a normalmap is assigned),
-			// but if we have to, it means the calculation is too expensive anyways,
-			// so it's usually better to tune it in the first place.
+			// 纹理尚未就绪。
+			// 为避免从“清晰”到“模糊”的突兀过渡，若父级纹理可用则继续使用它。
+			// 我们可以在很多其它层级上这样做（例如在分配法线贴图时传播给子节点），
+			// 但如果必须这样做，说明该计算无论如何都过于昂贵，
+			// 所以通常最好从一开始就调好它。
 			try_apply_parent_detail_texture_to_block(*block, ob.position, ob.lod);
 		}
 	}
@@ -2149,12 +2147,12 @@ void VoxelLodTerrain::apply_detail_texture_update(VoxelEngine::BlockDetailTextur
 	VoxelMeshMap<VoxelMeshBlockVLT> &mesh_map = _mesh_maps_per_lod[ob.lod_index];
 	VoxelMeshBlockVLT *block = mesh_map.get_block(ob.position);
 
-	// This can happen if:
-	// - Detail texture rendering results are handled before the first meshing results which have created the
-	//   block. In this case it will be applied when meshing results get handled, since the data is also shared with it.
-	// - The block was indeed unloaded early, so detail textures will have to be dropped.
-	// - The block's visuals were dropped as no viewers need them anymore, so detail textures will have to be dropped
-	//   too.
+	// 以下情况可能发生：
+	// - 细节纹理渲染结果在创建数据块的首次网格化结果之前被处理。
+	//   这种情况下，它会在处理网格化结果时被应用，因为数据也与其共享。
+	// - 数据块确实被提前卸载，因此细节纹理将不得不被丢弃。
+	// - 数据块的视觉效果因没有观察者需要而丢弃，因此细节纹理也不得不
+	//   被丢弃。
 	if (block == nullptr || !block->has_mesh()) {
 		// VOXEL_PRINT_VERBOSE(format("Ignored virtual texture update, block not found. pos {} lod {} time {}",
 		// ob.position, 		ob.lod_index, Time::get_singleton()->get_ticks_msec()));
@@ -2236,7 +2234,7 @@ void VoxelLodTerrain::try_apply_parent_detail_texture_to_block(
 		return;
 	}
 
-	// Only looking up one level for now
+	// 目前仅向上查找一层
 	const unsigned int parent_lod_index = lod_index + 1;
 	const VoxelMeshMap<VoxelMeshBlockVLT> &parent_map = _mesh_maps_per_lod[parent_lod_index];
 	const Vector3i parent_bpos = bpos >> 1;
@@ -2268,8 +2266,8 @@ void VoxelLodTerrain::apply_detail_texture_update_to_block(
 	DetailTextures normalmap_textures = ob.textures;
 
 	if (normalmap_textures.lookup.is_null()) {
-		// Textures couldn't be created in VRAM so far, do it now. (OpenGL/low-end?)
-		// TODO When this code path is required, use a time-spread task to reduce stalls
+		// 到目前为止纹理还无法在显存中创建，现在创建它。（OpenGL/低端设备？）
+		// TODO 当需要此代码路径时，使用时间分摊任务以减少停顿
 		DetailImages normalmap_images = ob.images;
 		normalmap_textures = store_normalmap_data_to_textures(normalmap_images);
 	}
@@ -2288,7 +2286,7 @@ void VoxelLodTerrain::apply_detail_texture_update_to_block(
 
 		if (!had_texture) {
 			if (_lod_fade_duration > 0.f) {
-				// Fade-in to reduce "popping" details
+				// 淡入以减少细节“弹出”
 				_fading_detail_textures.push_back(FadingDetailTexture{ block.position, lod_index, 0.f });
 				material->set_shader_parameter(sn.u_voxel_virtual_texture_fade, 0.f);
 			} else {
@@ -2296,13 +2294,13 @@ void VoxelLodTerrain::apply_detail_texture_update_to_block(
 			}
 		}
 
-		// We may set this again in case the material was using textures from the parent LOD as a temporary fallback
+		// 如果材质之前将父级 LOD 的纹理作为临时回退，可能需要再次设置此参数
 		const unsigned int tile_size =
 				get_detail_texture_tile_resolution_for_lod(_update_data->settings.detail_texture_settings, lod_index);
 		material->set_shader_parameter(sn.u_voxel_virtual_texture_tile_size, tile_size);
 	}
-	// If the material is not valid... well it means the user hasn't set up one, so all the hardwork of making these
-	// textures goes in the bin. That should be a warning in the editor.
+	// 如果材质无效……说明用户没有配置材质，那么制作这些纹理的所有努力都白费了。
+	// 编辑器里应该给出警告。
 
 	{
 		VoxelLodTerrainUpdateData::Lod &lod = _update_data->state.lods[lod_index];
@@ -2311,13 +2309,13 @@ void VoxelLodTerrain::apply_detail_texture_update_to_block(
 		if (mesh_block_state_it != lod.mesh_map_state.map.end()) {
 			VoxelLodTerrainUpdateData::DetailTextureState expected_dt_state =
 					VoxelLodTerrainUpdateData::DETAIL_TEXTURE_PENDING;
-			// If it was PENDING, set it to IDLE.
+			// 如果之前是 PENDING，则将其设置为 IDLE。
 			mesh_block_state_it->second.detail_texture_state.compare_exchange_strong(
 					expected_dt_state, VoxelLodTerrainUpdateData::DETAIL_TEXTURE_IDLE
 			);
-			// TODO If the mesh was modified again since, we need to schedule an extra update for the virtual texture to
-			// catch up. But for now I'm not sure if there is much value in doing so. It can get updated by the next
-			// edit. Scheduling an update from here isn't mildly inconvenient due to threading.
+			// TODO 如果网格之后又被修改，我们需要为虚拟纹理安排一次额外更新以使其追上。
+			// 但目前我不确定这样做有多大价值。它可以在下一次编辑时更新。
+			// 由于线程问题，从这里安排更新有些不便。
 		}
 	}
 
@@ -2330,7 +2328,7 @@ void VoxelLodTerrain::process_deferred_collision_updates(uint32_t timeout_msec) 
 	VOXEL_PROFILE_SCOPE();
 
 	const unsigned int lod_count = get_lod_count();
-	// TODO We may move this in a time spread task somehow, the timeout does not account for them so could take longer
+	// TODO 也许可以将其移到时间分摊任务中，超时不会考虑这些任务，因此可能耗时更长
 	const uint64_t then = get_ticks_msec();
 
 	for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
@@ -2342,7 +2340,7 @@ void VoxelLodTerrain::process_deferred_collision_updates(uint32_t timeout_msec) 
 			VoxelMeshBlockVLT *block = mesh_map.get_block(block_pos);
 
 			if (block == nullptr || block->deferred_collider_data == nullptr) {
-				// Block was unloaded or no longer needs a collision update
+				// 数据块已被卸载或不再需要碰撞体更新
 				unordered_remove(deferred_collision_updates, i);
 				--i;
 				continue;
@@ -2363,7 +2361,7 @@ void VoxelLodTerrain::process_deferred_collision_updates(uint32_t timeout_msec) 
 				--i;
 			}
 
-			// We always process at least one, then we check the timeout
+			// 我们始终至少处理一个，然后再检查超时
 			if (get_ticks_msec() - then >= timeout_msec) {
 				return;
 			}
@@ -2382,8 +2380,8 @@ void VoxelLodTerrain::abort_async_edits() {
 	}
 	state.pending_async_edits.clear();
 	state.running_async_edits.clear();
-	// Can't cancel edits which are already running on the thread pool,
-	// so the caller of this function must ensure none of them are running, or none will have an effect
+	// 无法取消已在线程池中运行的编辑，
+	// 因此此函数的调用方必须确保它们都没有在运行，否则它们将不会生效
 }
 
 void VoxelLodTerrain::process_fading_blocks(float delta) {
@@ -2400,7 +2398,7 @@ void VoxelLodTerrain::process_fading_blocks(float delta) {
 			while (it != fading_blocks.end()) {
 				VoxelMeshBlockVLT *block = it->second;
 				VOXEL_ASSERT(block != nullptr);
-				// The collection of fading blocks must only contain fading blocks. If this happens, it hints at a bug
+				// 淡出数据块集合中必须只包含正在淡出的数据块。若发生这种情况，则暗示有 bug
 				if (block->fading_state == VoxelMeshBlockVLT::FADING_NONE) {
 					ERR_PRINT("Unexpected non-fading block still referenced in fading blocks (bug?)");
 					it = fading_blocks.erase(it);
@@ -2410,7 +2408,7 @@ void VoxelLodTerrain::process_fading_blocks(float delta) {
 				const bool finished = block->update_fading(speed);
 
 				if (finished) {
-					// `erase` returns the next iterator
+					// `erase` 返回下一个迭代器
 					it = fading_blocks.erase(it);
 
 				} else {
@@ -2429,12 +2427,12 @@ void VoxelLodTerrain::process_fading_blocks(float delta) {
 			if (item.progress <= 0.f) {
 				FreeMeshTask::try_add_and_destroy(item.mesh_instance);
 				_shader_material_pool.recycle(item.shader_material);
-				// TODO Optimize: mesh instances destroyed here can be really slow due to materials...
-				// Profiling has shown that `RendererSceneCull::free` of a mesh instance
-				// leads to `RendererRD::MaterialStorage::_update_queued_materials()` to be called, which internally
-				// updates hundreds of materials (supposedly from every block). Can take 1ms for a single instance,
-				// while the rest of the work is barely 1%! Why is Godot doing this? I tried resetting the material like
-				// with blocks, but that didn't improve anything...
+				// TODO 优化：此处销毁的网格实例可能因材质而变得非常慢……
+				// 性能分析显示，网格实例的 `RendererSceneCull::free` 会调用
+				// `RendererRD::MaterialStorage::_update_queued_materials()`，它内部会更新数百个材质
+				// （推测来自每个数据块）。单个实例可能耗时 1ms，
+				// 而其余工作几乎只占 1%！为什么 Godot 会这样做？我尝试像数据块那样重置材质，
+				// 但没有改善……
 				// item.mesh_instance.set_material_override(Ref<Material>());
 				_fading_out_meshes[i] = std::move(_fading_out_meshes.back());
 				_fading_out_meshes.pop_back();
@@ -2488,7 +2486,7 @@ VoxelLodTerrain::LocalCameraInfo VoxelLodTerrain::get_local_camera_info() const 
 	}
 #ifdef TOOLS_ENABLED
 	if (Engine::get_singleton()->is_editor_hint()) {
-		// Falling back on the editor's camera
+		// 回退到编辑器的相机
 		info.position = godot::VoxelEngine::get_singleton()->get_editor_camera_position();
 		info.forward = godot::VoxelEngine::get_singleton()->get_editor_camera_direction();
 		return info;
@@ -2517,9 +2515,9 @@ void VoxelLodTerrain::set_instancer(VoxelInstancer *instancer) {
 }
 #endif
 
-// This function is primarily intended for editor use cases at the moment.
-// It will be slower than using the instancing generation events,
-// because it has to query VisualServer, which then allocates and decodes vertex buffers (assuming they are cached).
+// 此函数目前主要用于编辑器场景。
+// 它比使用实例化生成事件更慢，
+// 因为它必须查询 VisualServer，后者会分配并解码顶点缓冲区（假设它们已被缓存）。
 Array VoxelLodTerrain::get_mesh_block_surface(
 		const Vector3i block_pos,
 		const int lod_index,
@@ -2569,8 +2567,8 @@ VoxelData &VoxelLodTerrain::get_storage() const {
 void VoxelLodTerrain::save_all_modified_blocks(bool with_copy, std::shared_ptr<AsyncDependencyTracker> tracker) {
 	VOXEL_PROFILE_SCOPE();
 
-	// This is often called before quitting the game or forcing a global save.
-	// This could be part of the update task if async, but here we want it to be immediate.
+	// 这通常在退出游戏或强制全局保存之前调用。
+	// 若是异步的，它本可以是更新任务的一部分，但这里我们希望它是即时的。
 	_update_data->wait_for_end_of_task();
 
 	VoxelLodTerrainUpdateTask::flush_pending_lod_edits(_update_data->state, *_data, get_mesh_block_size());
@@ -2580,7 +2578,7 @@ void VoxelLodTerrain::save_all_modified_blocks(bool with_copy, std::shared_ptr<A
 
 	Ref<VoxelStream> stream = get_stream();
 	if (stream.is_valid()) {
-		// That may cause a stutter, so should be used when the player won't notice
+		// 这可能导致卡顿，因此应在玩家不会注意到时使用
 		_data->consume_all_modifications(blocks_to_save, with_copy);
 
 #ifdef VOXEL_ENABLE_INSTANCER
@@ -2590,24 +2588,24 @@ void VoxelLodTerrain::save_all_modified_blocks(bool with_copy, std::shared_ptr<A
 #endif
 	}
 
-	// And flush immediately
+	// 并立即刷新
 	VoxelLodTerrainUpdateTask::send_block_save_requests(
 			_volume_id,
 			to_span(blocks_to_save),
 			_streaming_dependency,
 			task_scheduler,
 			tracker,
-			// Require all data we just gathered to be written to disk if the stream uses a cache. So if the
-			// game crashes or gets killed after all tasks are done, data won't be lost.
+			// 若流使用缓存，要求我们刚收集的所有数据都写入磁盘。因此即使
+			// 所有任务完成后游戏崩溃或被终止，数据也不会丢失。
 			true
 	);
 
 	if (tracker != nullptr) {
-		// Using buffered count instead of `_blocks_to_save` because it can also contain tasks from VoxelInstancer
+		// 使用缓冲计数而不是 `_blocks_to_save`，因为它还可能包含来自 VoxelInstancer 的任务
 		tracker->set_count(task_scheduler.get_io_count());
 	}
 
-	// Schedule all tasks
+	// 调度所有任务
 	task_scheduler.flush();
 }
 
@@ -2625,16 +2623,16 @@ Dictionary VoxelLodTerrain::_b_get_statistics() const {
 	// 	deferred_collision_updates += _deferred_collision_updates_per_lod[lod_index].size();
 	// }
 
-	// Breakdown of information and time spent in _process and the update task.
+	// 拆解 _process 和更新任务中花费的信息与时间。
 
-	// Update task
+	// 更新任务
 	d["time_detect_required_blocks"] = _stats.time_detect_required_blocks;
 	d["time_io_requests"] = _stats.time_io_requests;
 	d["time_mesh_requests"] = _stats.time_mesh_requests;
 	d["time_update_task"] = _stats.time_update_task;
 	d["blocked_lods"] = _stats.blocked_lods;
 
-	// Process
+	// 处理
 	d["dropped_block_loads"] = _stats.dropped_block_loads;
 	d["dropped_block_meshs"] = _stats.dropped_block_meshs;
 
@@ -2646,7 +2644,7 @@ void VoxelLodTerrain::restart_stream() {
 }
 
 void VoxelLodTerrain::remesh_all_blocks() {
-	// Requests a new mesh for all mesh blocks, without dropping everything first
+	// 为所有网格数据块请求新网格，而不先移除所有内容
 	_update_data->wait_for_end_of_task();
 	const unsigned int lod_count = get_lod_count();
 	for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
@@ -2661,9 +2659,8 @@ void VoxelLodTerrain::remesh_all_blocks() {
 
 bool VoxelLodTerrain::is_area_meshed(const Box3i &box_in_voxels, unsigned int lod_index) const {
 	const Box3i box_in_blocks = box_in_voxels.downscaled(1 << (get_mesh_block_size_pow2() + lod_index));
-	// We have to check this separate map instead of the mesh map, because the mesh map will not contain blocks in areas
-	// that have no mesh (one reason is so it reduces the time it takes to update all mesh positions when the terrain is
-	// moved)
+	// 我们必须检查这个单独的映射而不是网格映射，因为网格映射不包含没有网格的区域中的
+	// 数据块（原因之一是这可以减少地形移动时更新所有网格位置所需的时间）
 	VoxelLodTerrainUpdateData::MeshMapState &mms = _update_data->state.lods[lod_index].mesh_map_state;
 	RWLockRead rlock(mms.map_lock);
 	return box_in_blocks.all_cells_match([&mms](Vector3i bpos) {
@@ -2705,13 +2702,13 @@ void VoxelLodTerrain::set_voxel_bounds(Box3i p_box) {
 
 	const int octree_size = get_mesh_block_size() << (get_lod_count() - 1);
 
-	// Clamp smallest size
-	// TODO If mesh block size is set AFTER bounds, this will break when small bounds are used...
+	// 限制最小尺寸
+	// TODO 如果在设置边界之后再设置网格数据块大小，使用较小的边界时会出问题……
 	bounds_in_voxels.size = math::max(bounds_in_voxels.size, Vector3iUtil::create(octree_size));
 
-	// Round to octree size
+	// 取整到八叉树尺寸
 	bounds_in_voxels = bounds_in_voxels.snapped(octree_size);
-	// Can't have a smaller region than one octree
+	// 区域不能小于一个八叉树
 	for (unsigned i = 0; i < Vector3iUtil::AXIS_COUNT; ++i) {
 		if (bounds_in_voxels.size[i] < octree_size) {
 			bounds_in_voxels.size[i] = octree_size;
@@ -2735,9 +2732,9 @@ void VoxelLodTerrain::set_lod_fade_duration(float seconds) {
 	_lod_fade_duration = math::clamp(seconds, 0.f, 1.f);
 
 	if (_lod_fade_duration == 0.f) {
-		// Make sure all mesh blocks have a material with no fading. Otherwise, if they previously faded out and fading
-		// is turned off later, they will not be visible when shown again since the shader might still receive faded out
-		// parameters, while fading logic won't run.
+		// 确保所有网格数据块都使用没有淡出的材质。否则，如果它们之前已淡出而之后又关闭了
+		// 淡出功能，当再次显示时它们将不可见，因为着色器可能仍会接收到淡出后的参数，
+		// 而淡出逻辑不会再运行。
 		for (unsigned int lod_index = 0; lod_index < _mesh_maps_per_lod.size(); ++lod_index) {
 			VoxelMeshMap<VoxelMeshBlockVLT> &mesh_map = _mesh_maps_per_lod[lod_index];
 			mesh_map.for_each_block([](VoxelMeshBlockVLT &mesh_block) { //
@@ -2900,7 +2897,7 @@ void VoxelLodTerrain::get_configuration_warnings(PackedStringArray &warnings) co
 
 	Ref<VoxelMesher> mesher = get_mesher();
 
-	// Material
+	// 材质
 	Ref<ShaderMaterial> shader_material = _material;
 	if (shader_material.is_valid() && shader_material->get_shader().is_null()) {
 		warnings.append(VOXEL_TTR("The assigned {0} has no shader").format(varray(ShaderMaterial::get_class_static())));
@@ -2921,14 +2918,14 @@ void VoxelLodTerrain::get_configuration_warnings(PackedStringArray &warnings) co
 #endif
 
 	if (mesher.is_valid()) {
-		// LOD support in mesher
+		// 网格化器中的 LOD 支持
 		if (!mesher->supports_lod()) {
 			warnings.append(VOXEL_TTR("The assigned mesher ({0}) does not support level of detail (LOD), results may be "
 								   "unexpected.")
 									.format(varray(mesher->get_class())));
 		}
 
-		// LOD support in shader
+		// 着色器中的 LOD 支持
 		if (_material.is_valid() && mesher->get_default_lod_material().is_valid()) {
 			if (shader_material.is_null()) {
 				warnings.append(
@@ -2953,7 +2950,7 @@ void VoxelLodTerrain::get_configuration_warnings(PackedStringArray &warnings) co
 			}
 		}
 
-		// LOD fading
+		// LOD 淡入淡出
 		if (get_lod_fade_duration() > 0.f) {
 			if (shader_material.is_null()) {
 				warnings.append(String("Lod fading is enabled but it requires a {0} to render properly.")
@@ -2983,7 +2980,7 @@ void VoxelLodTerrain::get_configuration_warnings(PackedStringArray &warnings) co
 #endif
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
-			// Detail textures
+			// 细节纹理
 			if (is_normalmap_enabled()) {
 				if (!generator->supports_series_generation()) {
 					warnings.append(
@@ -3008,7 +3005,7 @@ void VoxelLodTerrain::get_configuration_warnings(PackedStringArray &warnings) co
 						FixedArray<StringName, 2> expected_uniforms;
 						expected_uniforms[0] = VoxelStringNames::get_singleton().u_voxel_normalmap_atlas;
 						expected_uniforms[1] = VoxelStringNames::get_singleton().u_voxel_cell_lookup;
-						// There is more but they are not absolutely required for the shader to be made working
+						// 还有更多，但并非使着色器工作所必需
 
 						const String missing_uniforms = get_missing_uniform_names(to_span(expected_uniforms), **shader);
 
@@ -3059,7 +3056,7 @@ AABB VoxelLodTerrain::_b_get_voxel_bounds() const {
 	return AABB(b.position, b.size);
 }
 
-// DEBUG LAND
+// DEBUG 区域
 
 Array VoxelLodTerrain::debug_raycast_mesh_block(Vector3 world_origin, Vector3 world_direction) const {
 	const Transform3D world_to_local = get_global_transform().affine_inverse();
@@ -3154,7 +3151,7 @@ Dictionary VoxelLodTerrain::debug_get_mesh_block_info(Vector3 fbpos, int lod_ind
 		visual_active = block->visual_active;
 		collision_active = block->is_collision_enabled();
 		d["transition_mask"] = block->get_transition_mask();
-		// This can highlight possible bugs between the current state and what it should be
+		// 这可以突出当前状态与应有状态之间的潜在 bug
 		d["recomputed_transition_mask"] = recomputed_transition_mask;
 	}
 
@@ -3191,9 +3188,9 @@ Array VoxelLodTerrain::debug_get_octrees_detailed() const {
 	//     Octree[8] or null
 	// ]
 	// State {
-	//     0: no block
-	//     1: no mesh
-	//     2: mesh
+	//     0: 无数据块
+	//     1: 无网格
+	//     2: 有网格
 	// }
 
 	struct L {
@@ -3340,9 +3337,9 @@ void VoxelLodTerrain::update_gizmos() {
 
 	using namespace voxel::godot;
 
-	// Hopefully this should not be skipped most of the time, because the task is started at the end of `_process`,
-	// and gizmos update before. So the task has about 16ms to complete. If it takes longer, it will skip.
-	// This allows us to avoid locking data structures.
+	// 希望大多数时候这不会被跳过，因为任务在 `_process` 结束时启动，
+	// 而 gizmos 在此之前更新。因此任务大约有 16ms 完成。如果耗时更长，它就会被跳过。
+	// 这样可以避免锁定数据结构。
 	if (_update_data->task_is_complete == false) {
 		return;
 	}
@@ -3356,7 +3353,7 @@ void VoxelLodTerrain::update_gizmos() {
 	const unsigned int lod_count = get_lod_count();
 	const int mesh_block_size = get_mesh_block_size();
 
-	// Octree bounds
+	// 八叉树边界
 	if (debug_get_draw_flag(DEBUG_DRAW_OCTREE_BOUNDS)) {
 		const int octree_size = 1 << LodOctree::get_octree_size_po2(get_mesh_block_size_pow2(), get_lod_count());
 		const Basis local_octree_basis = Basis().scaled(Vector3(octree_size, octree_size, octree_size));
@@ -3368,7 +3365,7 @@ void VoxelLodTerrain::update_gizmos() {
 		}
 	}
 
-	// Volume bounds
+	// 体积边界
 	if (debug_get_draw_flag(DEBUG_DRAW_VOLUME_BOUNDS)) {
 		const Box3i bounds_in_voxels = get_voxel_bounds();
 		const float bounds_in_voxels_len = Vector3(bounds_in_voxels.size).length();
@@ -3383,8 +3380,8 @@ void VoxelLodTerrain::update_gizmos() {
 		}
 	}
 
-	// Octree nodes
-	// That can be expensive to draw
+	// 八叉树节点
+	// 绘制可能很昂贵
 	if (debug_get_draw_flag(DEBUG_DRAW_OCTREE_NODES)) {
 		const float lod_count_f = lod_count;
 
@@ -3403,8 +3400,8 @@ void VoxelLodTerrain::update_gizmos() {
 				const Vector3i voxel_pos = mesh_block_size * ((node_pos << lod_index) + block_offset_lod0);
 				const Transform3D local_transform(Basis().scaled(Vector3(size, size, size)), voxel_pos);
 				const Transform3D t = parent_transform * local_transform;
-				// Squaring because lower lod indexes are more interesting to see, so we give them more contrast.
-				// Also this might be better with sRGB?
+				// 平方处理是因为较低 LOD 索引更值得关注，因此我们给它们更多对比度。
+				// 另外，使用 sRGB 可能会更好？
 				const float g = math::squared(math::max(1.f - float(lod_index) / lod_count_f, 0.f));
 				dr.draw_box(t, Color8(255, uint8_t(g * 254.f), 0, 255));
 			});
@@ -3425,8 +3422,8 @@ void VoxelLodTerrain::update_gizmos() {
 					const Vector3i voxel_pos = mesh_block_size * (bpos << lod_index);
 					const Transform3D local_transform(Basis().scaled(Vector3(size, size, size)), voxel_pos);
 					const Transform3D t = parent_transform * local_transform;
-					// Squaring because lower lod indexes are more interesting to see, so we give them more contrast.
-					// Also this might be better with sRGB?
+					// 平方处理是因为较低 LOD 索引更值得关注，因此我们给它们更多对比度。
+					// 另外，使用 sRGB 可能会更好？
 					const float g = math::squared(math::max(1.f - float(lod_index) / lod_count_f, 0.f));
 					dr.draw_box(t, Color8(255, uint8_t(g * 254.f), 0, 255));
 				}
@@ -3449,7 +3446,7 @@ void VoxelLodTerrain::update_gizmos() {
 				} else if (block.has_collision_shape()) {
 					color = Color8(255, 0, 0, 255);
 				} else {
-					// Zombie block? A block with no visual and no collision should not persist in the map
+					// 僵尸数据块？没有视觉也没有碰撞体的数据块不应保留在映射中
 					color = Color8(0, 0, 0, 255);
 				}
 				const Vector3i voxel_pos = block.position * lod_block_size;
@@ -3508,13 +3505,13 @@ void VoxelLodTerrain::update_gizmos() {
 		}
 	}
 
-	// Edited blocks
+	// 已编辑的数据块
 	if (debug_get_draw_flag(DEBUG_DRAW_EDITED_BLOCKS) && _edited_blocks_gizmos_lod_index < lod_count) {
 		const int data_block_size = get_data_block_size() << _edited_blocks_gizmos_lod_index;
 		const Basis basis(Basis().scaled(Vector3(data_block_size, data_block_size, data_block_size)));
 
-		// Note, if this causes too much contention somehow, we could get away with not locking spatial lock, dirty
-		// reads of block flags should not hurt since they are only drawn every frame for debugging
+		// 注意，如果这导致过多的锁竞争，我们可以不对 spatial lock 加锁，因为数据块标志
+		// 只是每帧为调试而绘制，脏读不会造成影响
 		_data->for_each_block_at_lod_r(
 				[&dr, parent_transform, data_block_size, basis](const Vector3i &bpos, const VoxelDataBlock &block) {
 					if (block.is_edited()) {
@@ -3551,7 +3548,7 @@ void VoxelLodTerrain::update_gizmos() {
 		}
 	}
 
-	// Debug updates
+	// 调试更新
 	for (unsigned int i = 0; i < _debug_mesh_update_items.size();) {
 		DebugMeshUpdateItem &item = _debug_mesh_update_items[i];
 
@@ -3600,7 +3597,7 @@ void VoxelLodTerrain::update_gizmos() {
 	}
 
 #ifdef VOXEL_ENABLE_MODIFIERS
-	// Modifiers
+	// 修改器
 	if (debug_get_draw_flag(DEBUG_DRAW_MODIFIER_BOUNDS)) {
 		const VoxelModifierStack &modifiers = _data->get_modifiers();
 		modifiers.for_each_modifier([&dr](const VoxelModifier &modifier) {
@@ -3616,7 +3613,7 @@ void VoxelLodTerrain::update_gizmos() {
 
 #endif
 
-// This copies at multiple LOD levels to debug mips
+// 在多个 LOD 级别复制，用于调试 mip 层级
 Array VoxelLodTerrain::_b_debug_print_sdf_top_down(Vector3i center, Vector3i extents) {
 	ERR_FAIL_COND_V(!math::is_valid_size(extents), Array());
 
@@ -3683,7 +3680,7 @@ Node3D *VoxelLodTerrain::convert_to_nodes(const BitField<NodeConversionFlags> fl
 	for (unsigned int lod_index = 0; lod_index < lod_count; ++lod_index) {
 		const VoxelMeshMap<VoxelMeshBlockVLT> &mesh_map = _mesh_maps_per_lod[lod_index];
 
-		// Split LODs under specific parents to make the scene easier to inspect
+		// 在特定父节点下拆分 LOD，使场景更易于检查
 		Node3D *lod_node = memnew(Node3D);
 		lod_node->set_name(String("LOD{0}").format(varray(lod_index)));
 		root->add_child(lod_node);
@@ -3791,12 +3788,12 @@ bool VoxelLodTerrain::_b_is_area_meshed(AABB aabb, int lod_index) const {
 void VoxelLodTerrain::_bind_methods() {
 	using Self = VoxelLodTerrain;
 
-	// Material
+	// 材质
 
 	ClassDB::bind_method(D_METHOD("set_material", "material"), &Self::set_material);
 	ClassDB::bind_method(D_METHOD("get_material"), &Self::get_material);
 
-	// Bounds
+	// 边界
 
 	ClassDB::bind_method(D_METHOD("set_view_distance", "distance_in_voxels"), &Self::set_view_distance);
 	ClassDB::bind_method(D_METHOD("get_view_distance"), &Self::get_view_distance);
@@ -3804,7 +3801,7 @@ void VoxelLodTerrain::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_voxel_bounds"), &Self::_b_set_voxel_bounds);
 	ClassDB::bind_method(D_METHOD("get_voxel_bounds"), &Self::_b_get_voxel_bounds);
 
-	// Collisions
+	// 碰撞体
 
 	ClassDB::bind_method(D_METHOD("get_generate_collisions"), &Self::get_generate_collisions);
 	ClassDB::bind_method(D_METHOD("set_generate_collisions", "enabled"), &Self::set_generate_collisions);
@@ -3838,7 +3835,7 @@ void VoxelLodTerrain::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_secondary_lod_distance", "lod_distance"), &Self::set_secondary_lod_distance);
 	ClassDB::bind_method(D_METHOD("get_secondary_lod_distance"), &Self::get_secondary_lod_distance);
 
-	// Misc
+	// 其它
 
 	ClassDB::bind_method(
 			D_METHOD("voxel_to_data_block_position", "voxel_position", "lod_index"), &Self::voxel_to_data_block_position
@@ -3851,7 +3848,7 @@ void VoxelLodTerrain::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("is_area_meshed", "area_in_voxels", "lod_index"), &Self::_b_is_area_meshed);
 
-	// Normalmaps
+	// 法线贴图
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 	ClassDB::bind_method(D_METHOD("set_normalmap_enabled", "enabled"), &Self::set_normalmap_enabled);
@@ -3898,7 +3895,7 @@ void VoxelLodTerrain::_bind_methods() {
 #endif
 #endif
 
-	// Advanced
+	// 高级
 
 	ClassDB::bind_method(D_METHOD("get_mesh_block_size"), &Self::get_mesh_block_size);
 	ClassDB::bind_method(D_METHOD("set_mesh_block_size"), &Self::set_mesh_block_size);
@@ -3926,7 +3923,7 @@ void VoxelLodTerrain::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_cache_generated_blocks", "enabled"), &Self::set_cache_generated_blocks);
 	ClassDB::bind_method(D_METHOD("get_cache_generated_blocks"), &Self::get_cache_generated_blocks);
 
-	// Debug
+	// 调试
 
 	ClassDB::bind_method(D_METHOD("get_statistics"), &Self::_b_get_statistics);
 
@@ -4086,7 +4083,7 @@ void VoxelLodTerrain::_bind_methods() {
 
 	ADD_GROUP("Debug Drawing", "debug_");
 
-	// Debug drawing is not persistent
+	// 调试绘制不是持久的
 
 	ADD_PROPERTY(
 			PropertyInfo(Variant::BOOL, "debug_draw_enabled", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR),

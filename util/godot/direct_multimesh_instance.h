@@ -15,7 +15,7 @@ VOXEL_GODOT_FORWARD_DECLARE(class Material);
 
 namespace voxel::godot {
 
-// Thin wrapper around VisualServer multimesh instance API
+// VisualServer multimesh 实例 API 的轻量封装
 class DirectMultiMeshInstance : public voxel::NonCopyable {
 public:
 	DirectMultiMeshInstance();

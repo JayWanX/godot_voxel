@@ -8,15 +8,15 @@
 
 namespace voxel {
 
-// Scans a grid of binary values and returns another grid
-// where all contiguous islands are labelled with a unique ID.
-// It is based on a two-pass version of Connected-Component-Labeling.
+// 扫描一个二值网格并返回另一个网格，
+// 其中所有相连的连通块都被标记为一个唯一的 ID。
+// 它基于连通分量标记（Connected-Component-Labeling）的两遍算法。
 //
-// In the first pass we scan the grid to identify connected chunks by giving them temporary IDs,
-// and marking equivalent ones if two chunks touch.
-// In the second pass, we replace IDs with consecutive ones starting from 1, which are more convenient to use.
+// 在第一遍中，我们扫描网格，通过为它们分配临时 ID 来识别相连的区块，
+// 如果两个区块相接触，则将它们标记为等价。
+// 在第二遍中，我们将 ID 替换为从 1 开始的连续编号，这样使用起来更方便。
 //
-// See https://en.wikipedia.org/wiki/Connected-component_labeling
+// 参见 https://en.wikipedia.org/wiki/Connected-component_labeling
 //
 class IslandFinder {
 public:
@@ -38,8 +38,8 @@ public:
 		Vector3i pos;
 		for (pos.z = 0; pos.z < box.size.z; ++pos.z) {
 			for (pos.x = 0; pos.x < box.size.x; ++pos.x) {
-				// TODO I initially wrote this algorithm in ZYX order, but translated to ZXY when porting to C++.
-				// `left` means `top`, and `top` means `left`.
+				// TODO 我最初按 ZYX 顺序编写该算法，移植到 C++ 时改成了 ZXY。
+				// `left` 表示 `top`，而 `top` 表示 `left`。
 				left_label = 0;
 
 				for (pos.y = 0; pos.y < box.size.y; ++pos.y) {
@@ -60,10 +60,10 @@ public:
 							top_label = 0;
 						}
 
-						// TODO This soup of ifs is the first that worked for me, but there must be a way to simplify
+						// TODO 这一堆 if 是我第一个能用的写法，但一定有办法可以简化
 
 						if (left_label == 0 && top_label == 0 && back_label == 0) {
-							// TODO Make the algorithm return instead, it's hard for the caller to handle it otherwise
+							// TODO 让算法改为返回值，否则调用方很难处理
 							CRASH_COND(next_unique_label >= MAX_ISLANDS);
 							_equivalences[next_unique_label] = 0;
 							label = next_unique_label;
@@ -173,7 +173,7 @@ private:
 		}
 	}
 
-	// Makes sure equivalences go straight to the label without transitive links
+	// 确保等价关系直接指向标签，而不经传递链接
 	void flatten_equivalences() {
 		for (int i = 1; i < MAX_ISLANDS; ++i) {
 			int e = _equivalences[i];
@@ -189,23 +189,23 @@ private:
 		}
 	}
 
-	// Make sure labels obtained from equivalences are sequential and start from 1.
-	// Returns total label count.
+	// 确保从等价关系中得到的标签是连续的，并从 1 开始。
+	// 返回标签总数。
 	int compact_labels(int equivalences_count) {
 		int next_label = 1;
 		for (int i = 1; i < equivalences_count; ++i) {
 			const int e = _equivalences[i];
 			if (e == 0) {
-				// That label has no equivalent, give it an index
+				// 该标签无等价项，为其分配一个索引
 				_equivalences[i] = next_label;
 				next_label += 1;
 			} else {
-				// That label has an equivalent, give it that index instead
+				// 该标签有等价项，改为分配那个索引
 				int e2 = _equivalences[e];
 				_equivalences[i] = e2;
 			}
 		}
-		// We started from 1, but end with what would have been the next ID, so we subtract 1 to obtain the count
+		// 我们从 1 开始，但结束于本应是下一个 ID 的值，因此减去 1 以得到总数
 		return next_label - 1;
 	}
 

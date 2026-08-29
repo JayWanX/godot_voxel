@@ -1,34 +1,34 @@
 # VoxelGeneratorScript
 
-Inherits: [VoxelGenerator](VoxelGenerator.md)
+继承自：[VoxelGenerator](VoxelGenerator.md)
 
-Base class for custom generators defined with a script.
+使用脚本定义的自定义生成器的基类。
 
-## Description: 
+## 描述：
 
-Important: this engine makes heavy use of threads. Generators will run in one of them, so make sure you don't access the scene tree or other unsafe APIs from within a generator.
+重要：此引擎大量使用线程。生成器将在其中一个线程中运行，因此请确保不要在生成器内部访问场景树或其他不安全的 API。
 
-## Methods: 
+## 方法：
 
 
-Return                                                                | Signature                                                                                                                                                                                                                                                             
+返回值                                                                   | 函数签名                                                                                                                                                                                                                                                                  
 --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [void](#)                                                             | [_generate_block](#i__generate_block) ( [VoxelBuffer](VoxelBuffer.md) out_buffer, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) origin_in_voxels, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod ) virtual 
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)  | [_get_used_channels_mask](#i__get_used_channels_mask) ( ) virtual const                                                                                                                                                                                               
 <p></p>
 
-## Method Descriptions
+## 方法描述
 
 ### [void](#)<span id="i__generate_block"></span> **_generate_block**( [VoxelBuffer](VoxelBuffer.md) out_buffer, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) origin_in_voxels, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod ) 
 
-`out_buffer`: Buffer in which to populate voxel data. It will never be `null` and will have the requested size. It is only valid for this function, do not store it anywhere after the end. Note: this buffer can have any non-empty size, but some assumptions can be made depending on which terrain node you're using. [VoxelTerrain](VoxelTerrain.md) will always request blocks of size 16x16x16, but [VoxelLodTerrain](VoxelLodTerrain.md) can request blocks of different sizes.
+`out_buffer`：用于填充体素数据的缓冲区。它永远不会是 `null`，并且具有请求的大小。它仅在此函数内有效，切勿在函数结束后将其存储在任何地方。注意：此缓冲区可以具有任何非空尺寸，但根据你使用的地形节点，可以做一些假设。[VoxelTerrain](VoxelTerrain.md) 总是请求 16x16x16 大小的区块，但 [VoxelLodTerrain](VoxelLodTerrain.md) 可以请求不同大小的区块。
 
-`origin_in_voxels`: Coordinates of the lower corner of the box to generate, relative to LOD0. The size of the box is known from `out_buffer`.
+`origin_in_voxels`：要生成的盒体下角坐标，相对于 LOD0。盒体的大小可从 `out_buffer` 得知。
 
-`lod`: Level of detail index to use for this block. It can be ignored if you don't use LOD. This may be used as a power of two, telling how big is one voxel. For example, if you use a loop to fill the buffer using noise, you should sample that noise at steps of 2^lod, starting from `origin_in_voxels` (in code you can use `1 << lod` for fast computation, instead of `pow(2, lod)`). You may want to separate variables that iterate the coordinates in `out_buffer` and variables used to generate voxel values in space.
+`lod`：用于此区块的细节级别索引。如果不使用 LOD 可以忽略它。它可以用作 2 的幂，表示一个体素有多大。例如，如果你使用循环配合噪声填充缓冲区，应从 `origin_in_voxels` 开始以 2^lod 的步长采样噪声（在代码中你可以使用 `1 << lod` 进行快速计算，而不是 `pow(2, lod)`）。你可能希望将迭代 `out_buffer` 中坐标的变量与用于在空间中生成体素值的变量分开。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i__get_used_channels_mask"></span> **_get_used_channels_mask**( ) 
 
-Use this to indicate which channels your generator will use. It returns a bitmask, so for example you may provide information like this: `(1 << channel1) | (1 << channel2)`
+使用此方法指示你的生成器将使用哪些通道。它返回一个位掩码，例如你可以提供这样的信息：`(1 << channel1) | (1 << channel2)`
 
-_Generated on Aug 20, 2026_
+_生成于 2026-08-28_

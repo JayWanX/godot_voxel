@@ -7,10 +7,10 @@
 
 namespace voxel {
 
-// Shared dependency needed by some asynchronous tasks.
-// It may be passed with a shared_ptr.
-// Pointers inside should not change. If they do, a new instance will be made and old ones will be marked invalid,
-// rather than risking a bad pointer read or having to use (many) mutexes.
+// 某些异步任务所需的共享依赖。
+// 可通过 shared_ptr 传递。
+// 内部的指针不应改变。如果发生变化，将创建新实例并将旧实例标记为无效，
+// 而不是冒读坏指针的风险，或不得不使用（大量）互斥锁。
 struct MeshingDependency {
 	Ref<VoxelMesher> mesher;
 	Ref<VoxelGenerator> generator;

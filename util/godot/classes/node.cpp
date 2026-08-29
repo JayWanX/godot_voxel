@@ -72,7 +72,7 @@ void set_node_auto_translate_mode(Node &node, const AutoTranslateMode mode) {
 			control->set_auto_translate(false);
 			break;
 		default:
-			// Can't do
+			// 无法处理
 			return;
 	}
 #endif

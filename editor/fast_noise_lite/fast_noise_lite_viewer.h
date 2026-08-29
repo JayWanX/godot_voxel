@@ -5,7 +5,7 @@
 #include "../../util/godot/macros.h"
 #include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
 
-// Required in header for virtual method declarations.
+// 头文件中需要用到虚方法声明，因此必须包含此头文件。
 #include "../../util/godot/classes/input_event.h"
 
 VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)

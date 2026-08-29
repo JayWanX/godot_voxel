@@ -9,15 +9,15 @@
 
 namespace voxel::godot {
 
-// `(ref1 = ref2).is_valid()` does not work because Ref<T> does not implement an `operator=` returning the value.
-// So instead we can write it as `try_get_as(ref2, ref1)`
+// `(ref1 = ref2).is_valid()` 不起作用，因为 Ref<T> 没有实现返回值的 `operator=`。
+// 所以我们可以改写为 `try_get_as(ref2, ref1)`
 template <typename From_T, typename To_T>
 inline bool try_get_as(const Ref<From_T> &from, Ref<To_T> &to) {
 	to = from;
 	return to.is_valid();
 }
 
-// To allow using Ref<T> as key in Godot's HashMap
+// 允许把 Ref<T> 用作 Godot HashMap 的键
 template <typename T>
 struct RefHasher {
 	static _FORCE_INLINE_ uint32_t hash(const Ref<T> &v) {
@@ -29,7 +29,7 @@ struct RefHasher {
 
 namespace std {
 
-// For Ref<T> keys in std::unordered_map, hashed by pointer, not by content
+// 供 Ref<T> 作为 std::unordered_map 的键使用，按指针而非内容哈希
 template <typename T>
 struct hash<Ref<T>> {
 	inline size_t operator()(const Ref<T> &v) const {

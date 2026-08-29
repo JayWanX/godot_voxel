@@ -25,7 +25,7 @@ void free_rendering_device_rid(RenderingDevice &rd, RID rid) {
 
 Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShaderSource &p_source, bool p_allow_cache) {
 #if defined(VOXEL_GODOT)
-	// This is a copy of `RenderingDevice::_shader_compile_spirv_from_source` because it's private
+	// 这是 `RenderingDevice::_shader_compile_spirv_from_source` 的副本，因为它是私有的
 
 	Ref<RDShaderSPIRV> bytecode;
 	bytecode.instantiate();
@@ -49,7 +49,7 @@ Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShade
 
 PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSPIRV &p_spirv, String name) {
 #if defined(VOXEL_GODOT)
-	// This is a copy of `RenderingDevice::_shader_compile_binary_from_spirv` because it's private.
+	// 这是 `RenderingDevice::_shader_compile_binary_from_spirv` 的副本，因为它是私有的。
 
 	Vector<RenderingDevice::ShaderStageSPIRVData> stage_data;
 	for (int i = 0; i < RD::SHADER_STAGE_MAX; i++) {
@@ -89,7 +89,7 @@ RID texture_create(
 		const TypedArray<PackedByteArray> &p_data
 ) {
 #if defined(VOXEL_GODOT)
-	// This is a partial re-implementation of `RenderingDevice::_texture_create` because it's private
+	// 这是 `RenderingDevice::_texture_create` 的部分重新实现，因为它是私有的
 
 	Vector<Vector<uint8_t>> data;
 	for (int i = 0; i < p_data.size(); i++) {
@@ -98,7 +98,7 @@ RID texture_create(
 		data.push_back(byte_slice);
 	}
 
-	// Can't access `base` from `RDTextureFormat` because it's private, so I have to re-make it here by hand...
+	// 无法从 `RDTextureFormat` 访问 `base`，因为它是私有的，所以我只能在这里手动重建……
 	RenderingDevice::TextureFormat tf;
 	tf.width = p_format.get_width();
 	tf.height = p_format.get_height();
@@ -110,7 +110,7 @@ RID texture_create(
 	tf.usage_bits = p_format.get_usage_bits();
 	tf.format = p_format.get_format();
 
-	// Can't access `base` from `RDTextureView` because it's private, so I have to re-make it here by hand...
+	// 无法从 `RDTextureView` 访问 `base`，因为它是私有的，所以我只能在这里手动重建……
 	RenderingDevice::TextureView tv;
 	tv.format_override = p_view.get_format_override();
 	tv.swizzle_r = p_view.get_swizzle_r();
@@ -126,7 +126,7 @@ RID texture_create(
 RID uniform_set_create(RenderingDevice &rd, Array uniforms, RID shader, int shader_set) {
 	VOXEL_PROFILE_SCOPE();
 #if defined(VOXEL_GODOT)
-	// Can't access the version of that method taking an `Array` because it is private...
+	// 无法访问那个接收 `Array` 的该方法版本，因为它是私有的……
 	return rd.call(SNAME("uniform_set_create"), uniforms, shader, shader_set);
 
 #endif
@@ -134,7 +134,7 @@ RID uniform_set_create(RenderingDevice &rd, Array uniforms, RID shader, int shad
 
 RID sampler_create(RenderingDevice &rd, const RDSamplerState &sampler_state) {
 #if defined(VOXEL_GODOT)
-	// Can't access the version of that method taking an `RDSamplerState` object because it is private...
+	// 无法访问那个接收 `RDSamplerState` 对象的该方法版本，因为它是私有的……
 
 	// return rd.call(SNAME("sampler_create"), sampler_state_ref);
 
@@ -169,15 +169,15 @@ Error update_storage_buffer(
 ) {
 #if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 2
 
-	// Godot versions up to 4.2 required to pass barrier options.
-	// At some point in development of 4.3, a render graph was added, which removed the need for this parameter.
+	// Godot 4.2 及之前的版本要求传递屏障选项。
+	// 在 4.3 的开发过程中，加入了渲染图（render graph），从而移除了这个参数的需求。
 	// https://github.com/godotengine/godot/pull/84976
 
 #if defined(VOXEL_GODOT)
 	return rd.buffer_update(rid, offset, size, pba.ptr(), RenderingDevice::BARRIER_MASK_ALL_BARRIERS);
 #endif
 
-#else // Godot 4.3 and later
+#else // Godot 4.3 及更高版本
 
 #if defined(VOXEL_GODOT)
 	return rd.buffer_update(rid, offset, size, pba.ptr());

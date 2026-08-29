@@ -32,10 +32,10 @@ private:
 	static void _bind_methods();
 
 	MenuButton *_menu_button = nullptr;
-	// Using an ObjectID for referencing, necause it's a neverending struggle to keep checking pointer validity.
-	// When closing a scene while the node is selected, Godot will call `make_visible(false)` and `edit(null)` AFTER
-	// having deleted all the nodes, which means this plugin will be left with a dangling pointer when it's time to
-	// turn off the node's debug drawing feature...
+	// 使用 ObjectID 来引用，因为不断检查指针有效性是一场无休止的挣扎。
+	// 在选中节点时关闭场景，Godot 会在删除了所有节点之后才调用 `make_visible(false)` 和 `edit(null)`，
+	// 这意味着到需要
+	// 关闭节点调试绘制功能的时候，本插件会留下一个悬空指针...
 	ObjectID _instancer_object_id = ObjectID();
 	VoxelInstancerStatView *_stat_view = nullptr;
 };
