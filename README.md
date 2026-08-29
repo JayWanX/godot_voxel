@@ -35,11 +35,9 @@ Voxel Tools 是一个用于在 [Godot Engine](https://godotengine.org/) 4.x 中�
 
 ## 获取方式
 
-Voxel Tools 以 **Godot 模块**的形式打包进自定义构建与导出模板中，有以下获取途径：
+本仓库不提供预编译版本，请以 **Godot 模块**方式自行构建：
 
-1. **预编译版本**：从 [Releases](https://github.com/Voxel/godot_voxel/releases) 下载正式版（命名如 `Godot 4.x.x + Voxel Tools 1.x.x`）。
-2. **开发版**：从 [GitHub Actions](https://github.com/Voxel/godot_voxel/actions) 下载最新构建（需要 GitHub 账号），包含最新的功能与修复。
-3. **自行构建**：将本目录放入 Godot 源码树的 `godot/modules/voxel` 下，重新编译 Godot。完整步骤参见 [开发文档](doc/source/development.md)。
+将本目录放入 Godot 源码树的 `godot/modules/voxel` 下，重新编译 Godot。完整步骤参见 [开发文档](doc/source/development.md)。
 
 导出游戏时需要对应的自定义导出模板，否则场景无法正常打开。详细说明参见 [获取 Voxel Tools](doc/source/getting_the_module.md)。
 

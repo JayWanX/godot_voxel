@@ -224,8 +224,6 @@
 
 节点通过 ID 标识，因此你应该为你想要访问的节点命名，以便可以使用 `find_node_by_name` 获取它们的 ID。
 
-太阳系演示中的示例：[https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306](https://github.com/Voxel/solar_system_demo/blob/1ec891db22b41a842d48ca0c0b1c4c7c9157f6bc/solar_system/solar_system_setup.gd#L306)
-
 
 自定义生成器
 -----------------
@@ -306,7 +304,7 @@
 
 与其他生成器不同，`VoxelGeneratorMultipassCB` 允许你将生成组织为多个遍次，在这些遍次中可以访问相邻区块。它还以列的方式工作，因此你可以访问世界的完整垂直区段。像跨区块边界放置结构这样的事情可以直接实现。
 
-你可以[在这个 issue](https://github.com/Voxel/godot_voxel/issues/545) 中找到早期设计信息。
+你可以在这个 issue 中找到早期设计信息。
 
 
 ### 世界模型
@@ -430,7 +428,7 @@ a a a a a a a a a
 - 主列外部的可达距离是有限的。它可以增大，但很快就会变得昂贵。如果你需要延伸到更远的地方来放置横跨数十个区块的巨型结构，你可能需要考虑不同的方法。例如，预先（或以确定性的方式）生成“蓝图”，并在其与列相交时逐步光栅化其中的部分。
 - 同一个生成器实例不能在地形之间共享。如果你需要在两个地形上使用同一个生成器，请制作副本。
 - 实现并不理想。`VoxelTerrain` 非常通用，适用于无限的立方体区块，而该生成器需要不同的约束才能良好运行。因此，如果完全重写地形并专门针对这种列结构，可以避免一些开销。之所以没有这样做，是因为它会降低可配置性、破坏兼容性并耗费开发时间。
-- 目前，列缓存不会被保存，这与 [issue 545](https://github.com/Voxel/godot_voxel/issues/545) 中描述的不同。因此，如果游戏重启，一些列及其相邻列可能会被要求重新生成（如果数据块没有保存在 `VoxelStream` 中）。可以通过使用 `VoxelStream.save_generator_output` 保存已生成的数据块来缓解这个问题。一般来说，不要指望 `VoxelGenerator` 对给定区块只调用一次，因为在一些边缘情况下它可能会被再次调用。生成器应该是确定性的，并且不能有竞态条件。
+- 目前，列缓存不会被保存，这与 issue 545 中描述的不同。因此，如果游戏重启，一些列及其相邻列可能会被要求重新生成（如果数据块没有保存在 `VoxelStream` 中）。可以通过使用 `VoxelStream.save_generator_output` 保存已生成的数据块来缓解这个问题。一般来说，不要指望 `VoxelGenerator` 对给定区块只调用一次，因为在一些边缘情况下它可能会被再次调用。生成器应该是确定性的，并且不能有竞态条件。
 
 
 修改器<span id="modifiers"></span>

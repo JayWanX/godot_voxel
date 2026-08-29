@@ -199,7 +199,7 @@ for tree in trees:
     # ...
 ```
 
-这种方法已在[这个演示](https://github.com/Voxel/voxelgame/blob/2fa552abfdf52c688bbec27edd676018a31373e0/project/blocky_game/generator/generator.gd#L144)中实现，尽管代码略有不同。
+这种方法已在这个演示中实现，尽管代码略有不同。
 
 这种方法也用于 Voronoi 噪声（在 FastNoiseLite 中也称为细胞噪声），以生成无缝的单元格。
 

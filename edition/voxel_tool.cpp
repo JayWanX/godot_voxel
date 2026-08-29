@@ -375,7 +375,6 @@ void VoxelTool::smooth_sphere(Vector3 sphere_center, float sphere_radius, int bl
 
 void VoxelTool::grow_sphere(Vector3 sphere_center, float sphere_radius, float strength) {
 	// TODO：未来可能更倾向于使用额外的 “GROW”/“SHRINK” 体素工具模式来替代。
-	// 参见：https://github.com/Voxel/godot_voxel/pull/594
 	VOXEL_PROFILE_SCOPE();
 	VOXEL_ASSERT_RETURN(sphere_radius >= 0.01f);
 

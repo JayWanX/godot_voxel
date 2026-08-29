@@ -24,7 +24,7 @@
 如果你在 [VoxelGeneratorScript](api/VoxelGeneratorScript.md) 或 [VoxelStreamScript](api/VoxelStreamScript.md) 上使用脚本，并且脚本声明了工具模式（GDScript 中的 `@tool`），它们将在编辑器中执行。
 然而，除了工具模式本身的风险外，还有一个额外的危险：如果脚本在编辑器的后台线程仍在运行时被修改，可能会发生无法预料的 bug。你必须确保在以这种方式预览时脚本不会改变，或者确保地形已完成加载（在一定程度上可以通过关闭场景来强制实现）。因此，工具模式只应在开发期间临时使用。
 你始终可以改为运行你的游戏来进行测试，无论是否使用工具模式。
-此限制记录在 [issue177](https://github.com/Voxel/godot_voxel/issues/177) 中。
+此限制记录在 issue177 中。
 
 
 ### 相机选项<span id="camera-options"></span>

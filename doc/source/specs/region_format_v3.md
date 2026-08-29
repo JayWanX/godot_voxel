@@ -5,7 +5,7 @@
 
 区域文件允许以适合频繁流式加载和局部编辑的格式保存大型固定尺寸的 3D 体素体量。
 此格式的灵感来自 [Seed of Andromeda](https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game) 和 Minecraft。
-它由 `VoxelStreamRegionFiles` 使用，实现在[此 C++ 文件](https://github.com/Voxel/godot_voxel/blob/master/streams/region/voxel_stream_region_files.cpp)中
+它由 `VoxelStreamRegionFiles` 使用，实现在此 C++ 文件中
 
 存在两种用例：
 - 独立区域：固定尺寸的体素体量

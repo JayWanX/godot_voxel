@@ -4,7 +4,7 @@
 本页将提供一些关于项目内部结构以及如何编译它的信息。
 如果你想参与贡献，或者为你的游戏编写自定义 C++ 代码以获得更好的性能，这可能会很有用。
 
-源代码可以在 [Github](https://github.com/Voxel/godot_voxel) 上找到。
+源代码可以在本仓库中找到。
 
 !!! note
     本文档指的是模块开发。该项目主要是作为模块进行开发的。
@@ -25,7 +25,7 @@
 
 #### 添加 Voxel Tools
 
-1. 下载或克隆 [Voxel Tools](https://github.com/Voxel/godot_voxel) 仓库。如果你想让更新构建变得容易，请使用 Git 克隆该仓库（推荐）。
+1. 下载或克隆 Voxel Tools 仓库。如果你想让更新构建变得容易，请使用 Git 克隆该仓库（推荐）。
 1. 默认情况下，模块的 `master` 分支应与 Godot 最新的稳定分支兼容。模块还有"快照"分支，它们是在特定 Godot 版本发布时创建的（例如 `godot4.0`），但不会再更新。
 1. 将 Voxel Tools 目录放到你的 Godot 源码树中，即 `godot/modules` 目录内。
 1. 将 Voxel Tools 文件夹重命名为 `voxel`。完成后，文件（例如 README.md）应位于 `godot/modules/voxel` 中。**这很重要！**
@@ -70,7 +70,7 @@ TODO: 使用官方导出模板时，我们到哪里可以获得应使用的确�
 
 或者，你可以[构建你自己的 Godot 导出模板](https://docs.godotengine.org/en/stable/engine_details/development/compiling/compiling_for_web.html#compiling-for-the-web)，使用你选择的 Emscripten 版本。
 
-可能还有一些其他注意事项：[https://github.com/Voxel/godot_voxel/issues/745](https://github.com/Voxel/godot_voxel/issues/745)
+可能还有一些其他注意事项。
 
 
 贡献
@@ -422,7 +422,7 @@ Godot 和体素模块除了使用 STL 的容器类型外，都使用各自的容
 !!! note
     这些构建是实验性的，当 Godot 4.6 发布并提供更好的 Tracy 支持后，它们将被重新设计。
 
-在 [Github Actions](https://github.com/Voxel/godot_voxel/actions/workflows/windows.yml) 上提供集成了该模块和 Tracy 的 Godot 构建，适用于 Windows。要下载的文件名称中会包含 `tracy`。注意，你需要一个 Github 帐户才能下载。
+在 Github Actions 上提供集成了该模块和 Tracy 的 Godot 构建，适用于 Windows。要下载的文件名称中会包含 `tracy`。注意，你需要一个 Github 帐户才能下载。
 
 !!! warning
     这些构建在启动时立即开始记录数据。*包括项目管理器和编辑器*。这会占用大量内存（仅启动编辑器就 2 Gb）。如果你只想对游戏进行性能分析，请[使用命令行](https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html#command-line-tutorial)直接使用你的游戏启动该 Godot 构建，或者直接把可执行文件放到你项目的根目录并启动它。
@@ -563,7 +563,7 @@ env_yourmodule.Append(CPPDEFINES = [
 ])
 ```
 
-TODO：自从实现了[编译出特性](https://github.com/Voxel/godot_voxel/issues/746)之后，你需要定义更多的预处理器符号，因为你可能想要 `#include` 那些期望它们被定义或不定义的体素引擎头文件。目前没有帮助工具来做这件事，因此你必须在 `CPPDEFINES` 数组中手动添加它们。参见[宏列表](#features)。
+TODO：自从实现了编译出特性之后，你需要定义更多的预处理器符号，因为你可能想要 `#include` 那些期望它们被定义或不定义的体素引擎头文件。目前没有帮助工具来做这件事，因此你必须在 `CPPDEFINES` 数组中手动添加它们。参见[宏列表](#features)。
 
 !!! note
     虽然 API 文档涵盖了你在 C++ 中也会找到的函数，但内部代码有时只有注释。它们没有在外部记录，也没有计划这样做。建议查看头文件，了解暴露了什么、使用哪些命名空间等。你也可以阅读 `.cpp` 文件中的现有代码，看看某些东西是如何使用的。

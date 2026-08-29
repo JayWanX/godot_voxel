@@ -8,7 +8,7 @@
 
 区域文件允许以适合在各个方向频繁流式加载的格式保存大型 3D 体素体量。  
 此格式的灵感来自 https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game  
-它由 `VoxelStreamRegionFiles` 实现，可在 https://github.com/Voxel/godot_voxel/blob/master/streams/voxel_stream_region_files.cpp 找到
+它由 `VoxelStreamRegionFiles` 实现，其实现位于本模块的 C++ 源文件中。
 
 
 坐标空间

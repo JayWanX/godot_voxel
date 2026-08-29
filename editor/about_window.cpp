@@ -187,7 +187,6 @@ void VoxelAboutWindow::popup_singleton() {
 }
 
 VoxelAboutWindow::VoxelAboutWindow() {
-	// 借助 https://github.com/Voxel/godot_scene_code_converter 生成
 
 	set_title(VOXEL_TTR("About Voxel Tools"));
 	// set_resizable(true); // TODO 如何设置 Window 是否可调整大小？
@@ -218,8 +217,6 @@ VoxelAboutWindow::VoxelAboutWindow() {
 	// About
 	String about_text = L"[b]Version:[/b] {version}\n"
 						"[b]Author:[/b] Marc Gilleron\n"
-						"[b]Repository:[/b] [url]https://github.com/Voxel/godot_voxel[/url]\n"
-						"[b]Issue tracker:[/b] [url]https://github.com/Voxel/godot_voxel/issues[/url]\n"
 						"[b]Git hash:[/b] {git_hash}\n"
 						"\n"
 						"[b]Gold supporters:[/b]\n"

@@ -12,7 +12,7 @@
 
 #### 正式版
 
-版本可在 [https://github.com/Voxel/godot_voxel/releases](https://github.com/Voxel/godot_voxel/releases) 获取。
+版本可在 GitHub Releases 页面获取。
 模块版本通常以 `Godot 4.x.x + Voxel Tools 1.x.x` 为前缀命名。
 
 本项目遵循持续开发周期，因此“正式版”只是开发版本的快照。由于从 Github Actions 下载最新开发版本需要 Github 账号，为了方便起见发布了正式版。
@@ -26,12 +26,6 @@
 !!! note
 	你需要一个 Github 账号才能从 Github Actions 下载构建产物。否则链接将无法使用。
 
-选择你的平台：
-
-- [Windows 版本](https://github.com/Voxel/godot_voxel/actions/workflows/windows.yml)
-- [Linux 版本](https://github.com/Voxel/godot_voxel/actions/workflows/linux.yml)
-- [MacOS 版本](https://github.com/Voxel/godot_voxel/actions/workflows/macos.yml)
-
 然后点击带有绿色勾选标记的最新成功构建：
 
 ![构建列表截图，最新的成功构建已用绿色圆圈标出](images/ci_builds_latest_link.webp)
@@ -42,12 +36,12 @@
 
 如果有多个可下载的构建产物，名称中包含 `editor` 的即为编辑器版本。
 
-这些版本对应于 [更新日志](https://github.com/Voxel/godot_voxel/blob/master/CHANGELOG.md) 中描述的 `master` 版本。
+这些版本对应于更新日志中描述的 `master` 版本。
 除非另有说明，它们使用 Godot 最新的稳定版本分支（例如撰写本文时的 `4.7`）而非 `master` 构建。
 每次提交推送到主分支时都会构建新版本，其他开发者提交 Pull Request 时也会构建，所以要留意你选择的是哪一个。
 
 !!! note
-	Mono 构建（C# 支持）[也有提供](https://github.com/Voxel/godot_voxel/actions/workflows/mono.yml)，但它们不再开箱即用。更多信息请参阅 [C# 支持](#c-and-module-defined-classes)。
+	Mono 构建（C# 支持）也有提供，但它们不再开箱即用。更多信息请参阅 [C# 支持](#c-and-module-defined-classes)。
 
 
 ### 自行构建

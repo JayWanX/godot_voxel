@@ -162,7 +162,7 @@ void vertex() {
 }
 ```
 
-导致这段代码的研究 issue：[Issue #2](https://github.com/Voxel/godot_voxel/issues/2)
+导致这段代码的研究 issue：Issue #2
 
 
 纹理
@@ -186,7 +186,7 @@ void vertex() {
 
 下面是一个支持两种材质的着色器，例如顶部为草、侧面为岩石，每种材质都有三平面映射的 albedo、normal 和 AO 贴图，然后根据它们的法线是朝向正上方还是侧面来混合在一起。
 
-你可以在[演示](https://github.com/Voxel/voxelgame)中找到可运行的示例，或者查看[着色器](https://github.com/Voxel/voxelgame/blob/godot4/project/smooth_terrain/transvoxel_terrain.gdshader)本身（三平面函数定义在 https://github.com/Voxel/voxelgame/blob/godot4/project/smooth_terrain/shaders/triplanar.gdshaderinc）。
+你可以在演示中找到可运行的示例，或者查看着色器本身（三平面函数定义在 `triplanar.gdshaderinc` 中）。
 
 在着色器参数中，添加你的两张 albedo 贴图，以及可选的 normal 和 AO 贴图。然后调整 `AB Mix 1` 和 `AB Mix 2` 滑块，以调整顶部和侧面的混合方式。其他设置应该不言自明。下面的截图还添加了一点雾和远景景深。
 
@@ -270,7 +270,7 @@ voxel_tool.do_sphere(hit_position, radius)
 
 也可以使用特殊输出在 `VoxelGeneratorGraph` 中生成它，但仍然需要一点数学计算来产生有效数据。
 
-另请参阅这个[绘制演示](https://github.com/Voxel/voxelgame/tree/master/project/smooth_materials)。
+另请参阅这个绘制演示。
 
 
 ### 网格数据

@@ -10,7 +10,6 @@ namespace voxel::godot {
 Ref<ConcavePolygonShape3D> create_concave_polygon_shape(const Span<const Array> surfaces) {
 	// 比 Mesh::create_trimesh_shape() 更快的版本，因为 `create_trimesh_shape` 在过程中会在内部创建
 	// 一个 Trimesh，那非常慢
-	// 参见 https://github.com/Voxel/godot_voxel/issues/54
 
 	VOXEL_PROFILE_SCOPE();
 

@@ -35,7 +35,7 @@ Blocky 地形
 
 模型有几种类型。其中一种简单的是 `VoxelBlockyModelCube`，它在各面渲染带有指定纹理的立方体。
 
-对于 `VoxelMesherBlocky`，建议使用纹理图集，以便复用材质并减少绘制调用次数。你可以创建一张包含所有体素可能用到的瓦片的纹理。例如，下面这张来自 [blocky game](https://github.com/Voxel/voxelgame/tree/master/project/blocky_game) 演示项目的图集：
+对于 `VoxelMesherBlocky`，建议使用纹理图集，以便复用材质并减少绘制调用次数。你可以创建一张包含所有体素可能用到的瓦片的纹理。例如，下面这张来自 blocky game 演示项目的图集：
 
 ![blocky game 演示中使用的图集](images/blocky_game_atlas.webp)
 
@@ -146,7 +146,7 @@ TODO 示例场景
 - 最大水位数量有限制（参见 [VoxelBlockyModelFluid](api/VoxelBlockyModelFluid.md) API）
 - 最大流体数量有限制（参见 [VoxelBlockyLibraryBase](api/VoxelBlockyLibraryBase.md) API）
 - 流体体素顶面的法线保持不变，就像它是平坦的一样。只有角点位置会被移动。因此，顶面的明暗不会随坡度变化。出于性能原因，目前尚未实现这一点，直到找到快速方法为止（注意：Minecraft 似乎也做了同样的选择）。
-- 目前不会生成背面。在 Minecraft 中，水实际上同时有背面和正面，在某些边缘情况下它们会被不同地剔除。目前引擎不区分这两者。人们常尝试的解决办法是在水材质中完全禁用背面剔除，但这可能导致其他问题。更多详情参见 [issue 621](https://github.com/Voxel/godot_voxel/issues/621)
+- 目前不会生成背面。在 Minecraft 中，水实际上同时有背面和正面，在某些边缘情况下它们会被不同地剔除。目前引擎不区分这两者。人们常尝试的解决办法是在水材质中完全禁用背面剔除，但这可能导致其他问题。更多详情参见 issue 621
 
 
 ### 体素模型 ID 的使用
@@ -225,7 +225,7 @@ TODO 示例场景
 --------------------------------
 
 !!! warning
-	此功能是实验性的，可能存在 bug、缺少部分内容，并且可能随时间变化。它提出了一种为游戏组织模型的方式，并自动化了一些事情，但如果你希望按自己的方式处理，你仍然可以使用 `VoxelBlockyLibrary`。另请参阅 [Github 上对应的 issue](https://github.com/Voxel/godot_voxel/issues/506)。
+	此功能是实验性的，可能存在 bug、缺少部分内容，并且可能随时间变化。它提出了一种为游戏组织模型的方式，并自动化了一些事情，但如果你希望按自己的方式处理，你仍然可以使用 `VoxelBlockyLibrary`。另请参阅对应的 issue。
 
 存在一种替代库类型 `VoxelBlockyTypeLibrary`。它不是直接包含模型列表，而是包含 `VoxelBlockyType` 列表。类型更接近游戏中所谓的“方块类型”，并且这个系统的设计初衷是与 Minecraft 中方块的定义方式非常相似（灵感来自 https://docs.minecraftforge.net/en/1.19.2/blocks/states/）。
 
@@ -333,13 +333,13 @@ TODO
 
 在 Godot 中，基于网格的碰撞相当精确且功能丰富，但它有一些缺点：
 
-- 每次修改地形时都必须构建 Trimesh 碰撞形状，这[非常慢](https://github.com/Voxel/godot_voxel/issues/54)。
+- 每次修改地形时都必须构建 Trimesh 碰撞形状，这非常慢。
 - 物理引擎必须处理玩家附近的任意三角形，这无法利用特定情况，例如所有东西都是立方体
 - 有时你可能还想要一个更简单、更面向游戏的碰撞系统
 
 `VoxelBoxMover` 类提供了类似 Minecraft 的碰撞系统，可以像 `move_and_slide()` 那样使用。它更有限制性，但速度极快，并且不受隧穿效应影响。
 
-下面的代码展示了如何使用它，完整代码请参见 [blocky demo](https://github.com/Voxel/voxelgame/tree/master/project/blocky_terrain)。
+下面的代码展示了如何使用它，完整代码请参见 blocky demo。
 
 ```gdscript
 var box_mover = VoxelBoxMover.new()
@@ -401,4 +401,4 @@ if hit != null:
 - 创建你自己的 [C++ 模块](https://docs.godotengine.org/en/stable/engine_details/architecture/custom_modules_in_cpp.html)来创建你自己的网格生成器：无需修改体素模块，但你必须编译 Godot、继承基类 `VoxelMesher` 并实现其虚方法（查看引擎自身的网格生成器实现方式作为示例）。
 - 修改模块中现有的网格生成器，或从其中一个副本开始。
 
-虽然理论上我们可以为 GDScript 暴露一种继承 `VoxelMesher` 的方式，但脚本太慢，无法承担逐个多边形化每个体素的任务，而且 API 将采取什么形式还不清楚。一个开发分支 [mesher_script](https://github.com/Voxel/godot_voxel/tree/mesher_script) 试图实现这一点，但尚未准备好使用。
+虽然理论上我们可以为 GDScript 暴露一种继承 `VoxelMesher` 的方式，但脚本太慢，无法承担逐个多边形化每个体素的任务，而且 API 将采取什么形式还不清楚。一个开发分支 mesher_script 试图实现这一点，但尚未准备好使用。

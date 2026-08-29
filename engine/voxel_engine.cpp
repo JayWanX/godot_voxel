@@ -78,7 +78,6 @@ VoxelEngine::~VoxelEngine() {
 	// 为绕开此问题，任务会在场景树自动加载被销毁时清除。
 	// 所以正常情况下这里不应还有任务需要清除，
 	// 但为了正确性还是执行清理，本就应该如此……
-	// 参见 https://github.com/Voxel/godot_voxel/issues/189
 	wait_and_clear_all_tasks(true);
 
 #ifdef VOXEL_ENABLE_GPU
@@ -176,7 +175,7 @@ void VoxelEngine::remove_volume(VolumeID volume_id) {
 	// TODO 如何取消网格化任务？
 
 	if (_world.volumes.count() == 0) {
-		// 为绕开 https://github.com/Voxel/godot_voxel/issues/189
+		// 为绕开该问题
 		// 当最后一个体被销毁时（例如游戏退出时）
 		wait_and_clear_all_tasks(false);
 	}

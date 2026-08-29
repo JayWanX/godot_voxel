@@ -1336,7 +1336,6 @@ void test_voxel_graph_sphere_on_plane() {
 
 #ifdef VOXEL_ENABLE_FAST_NOISE_2
 
-// https://github.com/Voxel/godot_voxel/issues/427
 void test_voxel_graph_issue427() {
 	Ref<VoxelGeneratorGraph> graph;
 	graph.instantiate();

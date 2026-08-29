@@ -36,4 +36,4 @@ Godot 的通用 3D [导航系统](https://docs.godotengine.org/en/stable/tutoria
 模块的 `navigation` 分支尝试实现动态导航网格系统，但它存在性能问题，尚未达到生产可用。
 截至撰写本文时，它并未得到积极开发（最终可能会有变动）。如果你想使用它，可以将其检出并根据你的需求进行调整。
 
-另请参阅 [issue 610](https://github.com/Voxel/godot_voxel/issues/610)。
+另请参阅 issue 610。

@@ -454,7 +454,7 @@ void uninitialize_voxel_module(ModuleInitializationLevel p_level) {
 		// 此时，GDScript 模块已经将 GDScriptLanguage::singleton 置空！！
 		// 这意味着无法释放仍被 VoxelEngine 引用的脚本。而这种情况确实可能发生，因为
 		// 用户可以编写自定义生成器，它们在子线程中运行，而这些线程托管在引擎的
-		// 单例中……参见 https://github.com/Voxel/godot_voxel/issues/189
+		// 单例中……
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 		VoxelMesherTransvoxel::free_static_resources();

@@ -6,8 +6,6 @@
 
 既然你的 Godot Engine 已经内置了体素支持，你可以下载其中一个演示项目并开始试用：
 
-- [Voxel 基础演示](https://github.com/Voxel/voxelgame)
-- [Voxel 太阳系演示](https://github.com/Voxel/solar_system_demo)
 - [TinmanJuggernaut 的 fps_demo](https://github.com/tinmanjuggernaut/voxelgame)
 
 视频
