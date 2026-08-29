@@ -1,4 +1,4 @@
-Blocky terrains
+Blocky 地形
 =====================
 
 本页更详细地介绍方块地形，即类 Minecraft 或由立方体构成的地形。

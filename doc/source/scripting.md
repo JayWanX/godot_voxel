@@ -146,7 +146,7 @@ func _generate_block(out_buffer : VoxelBuffer, origin_in_voxels : Vector3i, lod 
 				out_buffer.set_voxel_f(signed_distance, rx, ry, rz, channel)
 ```
 
-对于有符号距离场，负值表示"内部"，而正值表示"外部"。输出*梯度*也很重要，而不是仅仅把体素设置为 1 或 0。这就是为什么我们不能在这里使用 `fill`。实际上你还需要使用噪声和真正的 SDF 函数。参见[有符号距离场](smooth_terrain.md/#signed-distance-fields)。
+对于有符号距离场，负值表示"内部"，而正值表示"外部"。输出*梯度*也很重要，而不是仅仅把体素设置为 1 或 0。这就是为什么我们不能在这里使用 `fill`。实际上你还需要使用噪声和真正的 SDF 函数。参见[有符号距离场](smooth_terrain.md/#sdf)。
 
 还可以进一步优化，例如，如果你知道传入的区块足够远，不会与任何出现地表特征的区域相交，你可以提前返回并输出 `fill_f(100.0)`。这相当于说"这里只有空气，而且远离一切"。类似地，你可以做 `fill_f(-100.0)` 来表示"这个区块里只有物质，而且远离任何表面"。
 

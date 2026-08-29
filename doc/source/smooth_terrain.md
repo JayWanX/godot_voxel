@@ -1,4 +1,4 @@
-Smooth terrains
+Smooth 地形
 ===================
 
 可以使用有符号距离场和 `VoxelMesherTransvoxel` 来处理外观平滑的地形。
