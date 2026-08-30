@@ -28,7 +28,8 @@
 			<return type="Mesh" />
 			<param index="0" name="mesh_lod_index" type="int" />
 			<description>
-			</description>
+			获取指定 LOD 索引对应的网格。
+		</description>
 		</method>
 		<method name="set_collider_group_names">
 			<return type="void" />
@@ -42,19 +43,22 @@
 			<param index="0" name="mesh" type="Mesh" />
 			<param index="1" name="mesh_lod_index" type="int" />
 			<description>
-			</description>
+			设置指定 LOD 索引对应的网格。
+		</description>
 		</method>
 		<method name="setup_from_template">
 			<return type="void" />
 			<param index="0" name="node" type="Node" />
 			<description>
-			</description>
+			从模板节点应用设置。
+		</description>
 		</method>
 	</methods>
 	<members>
 		<member name="_mesh_lod_distance_ratios" type="PackedFloat32Array" setter="_set_mesh_lod_distance_ratios" getter="_get_mesh_lod_distance_ratios" default="PackedFloat32Array(0.2, 0.35, 0.6, 1)">
 		</member>
 		<member name="cast_shadow" type="int" setter="set_cast_shadows_setting" getter="get_cast_shadows_setting" enum="RenderingServer.ShadowCastingSetting" default="1">
+			阴影投射的设置。
 		</member>
 		<member name="collision_distance" type="float" setter="set_collision_distance" getter="get_collision_distance" default="-1.0">
 			当大于 0 且配置了碰撞体时，提示可创建碰撞体的距离下限。这允许在保持较高视觉视距的同时减少碰撞体的数量。
@@ -62,33 +66,46 @@
 			注意：实例化器按区块为单位创建/移除碰撞体，因此该距离是与到区块的距离比较，而非与单个实例比较。
 		</member>
 		<member name="collision_layer" type="int" setter="set_collision_layer" getter="get_collision_layer" default="1">
+			生成碰撞体的碰撞层。
 		</member>
 		<member name="collision_mask" type="int" setter="set_collision_mask" getter="get_collision_mask" default="1">
+			生成碰撞体的碰撞掩码。
 		</member>
 		<member name="collision_shapes" type="Array" setter="set_collision_shapes" getter="get_collision_shapes" default="[]">
 			由 [CollisionShape] 和 [Transform3D] 交替组成的列表。先出现形状，随后是其相对于实例的局部变换。在编辑器中设置碰撞形状时，可能需要改用场景。
 		</member>
 		<member name="gi_mode" type="int" setter="set_gi_mode" getter="get_gi_mode" enum="GeometryInstance3D.GIMode" default="1">
+			网格的全局光照模式。
 		</member>
 		<member name="hide_beyond_max_lod" type="bool" setter="set_hide_beyond_max_lod" getter="get_hide_beyond_max_lod" default="false">
+			超出最大 LOD 时是否隐藏网格。
 		</member>
 		<member name="material_override" type="Material" setter="set_material_override" getter="get_material_override">
+			网格的材质覆盖。
 		</member>
 		<member name="mesh" type="Mesh" setter="_set_mesh_lod0" getter="_get_mesh_lod0">
+			用于 LOD 0 的网格。
 		</member>
 		<member name="mesh_lod0_distance_ratio" type="float" setter="_set_mesh_lod0_distance_ratio" getter="_get_mesh_lod0_distance_ratio" default="0.2">
+			LOD 0 网格的切换距离比例。
 		</member>
 		<member name="mesh_lod1" type="Mesh" setter="_set_mesh_lod1" getter="_get_mesh_lod1">
+			用于 LOD 1 的网格。
 		</member>
 		<member name="mesh_lod1_distance_ratio" type="float" setter="_set_mesh_lod1_distance_ratio" getter="_get_mesh_lod1_distance_ratio" default="0.35">
+			LOD 1 网格的切换距离比例。
 		</member>
 		<member name="mesh_lod2" type="Mesh" setter="_set_mesh_lod2" getter="_get_mesh_lod2">
+			用于 LOD 2 的网格。
 		</member>
 		<member name="mesh_lod2_distance_ratio" type="float" setter="_set_mesh_lod2_distance_ratio" getter="_get_mesh_lod2_distance_ratio" default="0.6">
+			LOD 2 网格的切换距离比例。
 		</member>
 		<member name="mesh_lod3" type="Mesh" setter="_set_mesh_lod3" getter="_get_mesh_lod3">
+			用于 LOD 3 的网格。
 		</member>
 		<member name="mesh_lod3_distance_ratio" type="float" setter="_set_mesh_lod3_distance_ratio" getter="_get_mesh_lod3_distance_ratio" default="1.0">
+			LOD 3 网格的切换距离比例。
 		</member>
 		<member name="removal_behavior" type="int" setter="set_removal_behavior" getter="get_removal_behavior" enum="VoxelInstanceLibraryMultiMeshItem.RemovalBehavior" default="0">
 			指定实例被移除时应发生什么。如果它们应当变成包含动画或逻辑的更复杂对象，这会很有用。
@@ -97,6 +114,7 @@
 			当 [member removal_behavior] 设置为 [constant REMOVAL_BEHAVIOR_INSTANTIATE] 时使用的场景。
 		</member>
 		<member name="render_layer" type="int" setter="set_render_layer" getter="get_render_layer" default="1">
+			网格的渲染层。
 		</member>
 		<member name="scene" type="PackedScene" setter="set_scene" getter="get_scene">
 			用作配置而非手动属性的场景。它需要具备特定的节点结构才能被支持。参见 [url]https://voxel-tools.readthedocs.io/en/latest/instancing/#setting-up-a-multimesh-item-from-a-scene[/url]

@@ -13,35 +13,41 @@
 			<param index="0" name="id" type="int" />
 			<param index="1" name="item" type="VoxelInstanceLibraryItem" />
 			<description>
-			</description>
+			以指定 ID 添加项目。
+		</description>
 		</method>
 		<method name="clear">
 			<return type="void" />
 			<description>
-			</description>
+			清空所有项目。
+		</description>
 		</method>
 		<method name="find_item_by_name" qualifiers="const">
 			<return type="int" />
 			<param index="0" name="name" type="String" />
 			<description>
-			</description>
+			按名称查找项目 ID，未找到时返回 -1。
+		</description>
 		</method>
 		<method name="get_all_item_ids" qualifiers="const">
 			<return type="PackedInt32Array" />
 			<description>
-			</description>
+			获取所有项目的 ID 列表。
+		</description>
 		</method>
 		<method name="get_item" qualifiers="const">
 			<return type="VoxelInstanceLibraryItem" />
 			<param index="0" name="id" type="int" />
 			<description>
-			</description>
+			获取指定 ID 的项目。
+		</description>
 		</method>
 		<method name="remove_item">
 			<return type="void" />
 			<param index="0" name="id" type="int" />
 			<description>
-			</description>
+			移除指定 ID 的项目。
+		</description>
 		</method>
 	</methods>
 	<members>

@@ -13,13 +13,15 @@
 		<method name="get_voxel_texture_filter_mask" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取体素材质过滤掩码。
+		</description>
 		</method>
 		<method name="set_voxel_texture_filter_mask">
 			<return type="void" />
 			<param index="0" name="mask" type="int" />
 			<description>
-			</description>
+			设置体素材质过滤掩码。
+		</description>
 		</method>
 	</methods>
 	<members>

@@ -11,11 +11,13 @@
 			<return type="int" />
 			<param index="0" name="v" type="Vector3" />
 			<description>
-			</description>
+			从方向向量获取对应的方向取值。
+		</description>
 		</method>
 	</methods>
 	<members>
 		<member name="horizontal_only" type="bool" setter="set_horizontal_only" getter="is_horizontal_only" default="false">
+			该属性是否仅保留水平方向。
 		</member>
 	</members>
 	<constants>

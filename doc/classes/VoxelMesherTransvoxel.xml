@@ -23,16 +23,22 @@
 			计算行进立方体单元时，顶点可能被放置在单元边的任意位置，包括非常靠近角点的位置。这可能导致非常细或非常小的三角形，对某些物理引擎来说尤其是个问题。此边距是与角点的最小距离，低于该距离的顶点将被钳制到该距离。增大此值可能会降低网格质量并引入细小的脊线。此属性不能低于 0（此时不发生钳制），也不能高于 0.5（此时不发生插值，因为顶点总是被放置在边的中间）。
 		</member>
 		<member name="mesh_optimization_enabled" type="bool" setter="set_mesh_optimization_enabled" getter="is_mesh_optimization_enabled" default="false">
+			是否启用网格优化。
 		</member>
 		<member name="mesh_optimization_error_threshold" type="float" setter="set_mesh_optimization_error_threshold" getter="get_mesh_optimization_error_threshold" default="0.005">
+			网格优化的允许误差阈值。
 		</member>
 		<member name="mesh_optimization_target_ratio" type="float" setter="set_mesh_optimization_target_ratio" getter="get_mesh_optimization_target_ratio" default="0.0">
+			网格优化的目标占比。
 		</member>
 		<member name="textures_ignore_air_voxels" type="bool" setter="set_textures_ignore_air_voxels" getter="get_textures_ignore_air_voxels" default="false">
+			纹素计算是否忽略空气体素。
 		</member>
 		<member name="texturing_mode" type="int" setter="set_texturing_mode" getter="get_texturing_mode" enum="VoxelMesherTransvoxel.TexturingMode" default="0">
+			纹理采样的模式。
 		</member>
 		<member name="transitions_enabled" type="bool" setter="set_transitions_enabled" getter="get_transitions_enabled" default="true">
+			是否启用不同 LOD 之间的过渡网格。
 		</member>
 	</members>
 	<constants>

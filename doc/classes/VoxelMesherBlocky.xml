@@ -13,14 +13,16 @@
 			<return type="bool" />
 			<param index="0" name="side" type="int" enum="VoxelMesherBlocky.Side" />
 			<description>
-			</description>
+			获取指定侧面是否作为阴影遮挡体。
+		</description>
 		</method>
 		<method name="set_shadow_occluder_side">
 			<return type="void" />
 			<param index="0" name="side" type="int" enum="VoxelMesherBlocky.Side" />
 			<param index="1" name="enabled" type="bool" />
 			<description>
-			</description>
+			设置指定侧面是否作为阴影遮挡体。
+		</description>
 		</method>
 	</methods>
 	<members>
@@ -28,6 +30,7 @@
 			此网格生成器将使用的模型库。如果你在没有地形的情况下使用网格生成器，请确保在构建网格之前调用 [method VoxelBlockyLibraryBase.bake]，否则结果将为空或已过时。
 		</member>
 		<member name="occlusion_darkness" type="float" setter="set_occlusion_darkness" getter="get_occlusion_darkness" default="0.8">
+			相邻体素遮挡产生的阴影暗度。
 		</member>
 		<member name="occlusion_enabled" type="bool" setter="set_occlusion_enabled" getter="get_occlusion_enabled" default="true">
 			启用烘焙的环境光遮蔽。要渲染它，你需要一个应用顶点颜色的材质。

@@ -10,7 +10,8 @@
 		<method name="get_rotation_attribute" qualifiers="const">
 			<return type="VoxelBlockyAttribute" />
 			<description>
-			</description>
+			获取旋转属性（若存在）。
+		</description>
 		</method>
 		<method name="set_variant_model">
 			<return type="void" />
@@ -26,10 +27,13 @@
 		<member name="_variant_models_data" type="Array" setter="_set_variant_models_data" getter="_get_variant_models_data" default="[]">
 		</member>
 		<member name="attributes" type="VoxelBlockyAttribute[]" setter="set_attributes" getter="get_attributes" default="[]">
+			该类型可用的属性列表。
 		</member>
 		<member name="base_model" type="VoxelBlockyModel" setter="set_base_model" getter="get_base_model">
+			该类型的基础模型。
 		</member>
 		<member name="unique_name" type="StringName" setter="set_unique_name" getter="get_unique_name" default="&amp;&quot;unnamed&quot;">
+			类型的唯一名称。
 		</member>
 	</members>
 	<constants>

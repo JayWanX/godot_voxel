@@ -11,7 +11,8 @@
 		<method name="is_key_cache_enabled" qualifiers="const">
 			<return type="bool" />
 			<description>
-			</description>
+			键缓存是否启用。
+		</description>
 		</method>
 		<method name="set_key_cache_enabled">
 			<return type="void" />

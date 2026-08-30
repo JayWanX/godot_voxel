@@ -24,7 +24,8 @@
 		<method name="get_max_step_height" qualifiers="const">
 			<return type="float" />
 			<description>
-			</description>
+			获取可攀爬的最大台阶高度。
+		</description>
 		</method>
 		<method name="get_motion">
 			<return type="Vector3" />

@@ -19,12 +19,14 @@
 		<method name="get_block_size" qualifiers="const">
 			<return type="Vector3" />
 			<description>
-			</description>
+			获取此数据流提供的数据块大小。
+		</description>
 		</method>
 		<method name="get_used_channels_mask" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取此数据流中可用的通道掩码。
+		</description>
 		</method>
 		<method name="load_voxel_block">
 			<return type="int" enum="VoxelStream.ResultCode" />

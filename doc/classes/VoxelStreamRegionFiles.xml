@@ -14,23 +14,28 @@
 			<return type="void" />
 			<param index="0" name="new_settings" type="Dictionary" />
 			<description>
-			</description>
+			将旧格式的区域文件转换为新元数据格式。
+		</description>
 		</method>
 		<method name="get_region_size" qualifiers="const">
 			<return type="Vector3" />
 			<description>
-			</description>
+			获取区域大小（以数据块数为单位）。
+		</description>
 		</method>
 	</methods>
 	<members>
 		<member name="block_size_po2" type="int" setter="set_block_size_po2" getter="get_block_size_po2" default="4">
+			数据块大小的对数值。
 		</member>
 		<member name="directory" type="String" setter="set_directory" getter="get_directory" default="&quot;&quot;">
 			保存数据的目录。
 		</member>
 		<member name="region_size_po2" type="int" setter="set_region_size_po2" getter="get_region_size_po2" default="4">
+			区域大小的对数值。
 		</member>
 		<member name="sector_size" type="int" setter="set_sector_size" getter="get_sector_size" default="512">
+			区域文件中的扇区大小（字节）。
 		</member>
 	</members>
 </class>

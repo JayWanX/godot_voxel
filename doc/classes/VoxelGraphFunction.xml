@@ -94,13 +94,15 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="input_index" type="int" />
 			<description>
-			</description>
+			获取指定节点输入端口的默认值。
+		</description>
 		</method>
 		<method name="get_node_default_inputs_autoconnect" qualifiers="const">
 			<return type="bool" />
 			<param index="0" name="node_id" type="int" />
 			<description>
-			</description>
+			节点的默认输入是否自动连接。
+		</description>
 		</method>
 		<method name="get_node_gui_position" qualifiers="const">
 			<return type="Vector2" />

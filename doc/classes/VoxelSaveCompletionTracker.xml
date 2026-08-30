@@ -11,22 +11,26 @@
 		<method name="get_remaining_tasks" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取剩余任务数。
+		</description>
 		</method>
 		<method name="get_total_tasks" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取任务总数。
+		</description>
 		</method>
 		<method name="is_aborted" qualifiers="const">
 			<return type="bool" />
 			<description>
-			</description>
+			保存过程是否已中止。
+		</description>
 		</method>
 		<method name="is_complete" qualifiers="const">
 			<return type="bool" />
 			<description>
-			</description>
+			所有任务是否已完成。
+		</description>
 		</method>
 	</methods>
 </class>

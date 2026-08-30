@@ -24,6 +24,7 @@
 			该条目将生成的地形区块的 LOD 索引。索引越高，在观察者周围生成的区域越广，但由于使用更低细节层级的网格，精度也会更低。建议将较大的对象（大树、巨石）放在较高的 LOD 索引上生成，将较小的对象（草、小石头）放在较低的 LOD 索引上生成。
 		</member>
 		<member name="name" type="String" setter="set_item_name" getter="get_item_name" default="&quot;&quot;">
+			项目的名称，可用于按名称查找项目。
 		</member>
 		<member name="persistent" type="bool" setter="set_persistent" getter="is_persistent" default="false">
 			若未启用，只要生成器条件满足，条目就总会生成：例如，如果你挖了一个洞，它会移除地表的草，但如果你离开该区域再回来，草会在洞内重新生成。

@@ -404,7 +404,8 @@
 			<param index="1" name="pos" type="Vector3i" />
 			<param index="2" name="channel" type="int" default="0" />
 			<description>
-			</description>
+			以 Vector3i 坐标设置指定通道的体素值。
+		</description>
 		</method>
 		<method name="update_3d_texture_from_sdf_zxy" qualifiers="const">
 			<return type="void" />

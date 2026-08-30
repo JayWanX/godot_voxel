@@ -8,6 +8,7 @@
 	</tutorials>
 	<members>
 		<member name="horizontal_only" type="bool" setter="set_horizontal_roll_enabled" getter="is_horizontal_roll_enabled" default="false">
+			旋转是否仅允许水平方向。
 		</member>
 	</members>
 </class>

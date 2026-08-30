@@ -13,13 +13,15 @@
 		<method name="get_network_peer_id" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取通过网络访问此观察者的对等体 ID。
+		</description>
 		</method>
 		<method name="set_network_peer_id">
 			<return type="void" />
 			<param index="0" name="id" type="int" />
 			<description>
-			</description>
+			设置通过网络访问此观察者的对等体 ID。
+		</description>
 		</method>
 	</methods>
 	<members>
@@ -30,6 +32,7 @@
 			如果设置为 [code]true[/code]，引擎将在此观察者周围生成经典碰撞形状。
 		</member>
 		<member name="requires_data_block_notifications" type="bool" setter="set_requires_data_block_notifications" getter="is_requiring_data_block_notifications" default="false">
+			观察者是否需要数据块进入通知。
 		</member>
 		<member name="requires_visuals" type="bool" setter="set_requires_visuals" getter="is_requiring_visuals" default="true">
 			如果设置为 [code]true[/code]，引擎将在此观察者周围生成网格。此选项可为本地玩家启用。

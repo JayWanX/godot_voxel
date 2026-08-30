@@ -11,6 +11,7 @@
 	</tutorials>
 	<members>
 		<member name="blur_enabled" type="bool" setter="set_blur_enabled" getter="is_blur_enabled" default="false">
+			是否启用图像模糊。
 		</member>
 		<member name="height_range" type="float" setter="set_height_range" getter="get_height_range" overrides="VoxelGeneratorHeightmap" default="200.0" />
 		<member name="image" type="Image" setter="set_image" getter="get_image">

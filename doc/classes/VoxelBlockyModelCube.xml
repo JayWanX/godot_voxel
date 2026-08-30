@@ -12,14 +12,16 @@
 			<return type="Vector2i" />
 			<param index="0" name="side" type="int" enum="VoxelBlockyModel.Side" />
 			<description>
-			</description>
+			获取指定侧面的贴图坐标。
+		</description>
 		</method>
 		<method name="set_tile">
 			<return type="void" />
 			<param index="0" name="side" type="int" enum="VoxelBlockyModel.Side" />
 			<param index="1" name="position" type="Vector2i" />
 			<description>
-			</description>
+			设置指定侧面的贴图坐标。
+		</description>
 		</method>
 	</methods>
 	<members>
@@ -31,6 +33,7 @@
 		<member name="height" type="float" setter="set_height" getter="get_height" default="1.0">
 		</member>
 		<member name="mesh_ortho_rotation_index" type="int" setter="set_mesh_ortho_rotation_index" getter="get_mesh_ortho_rotation_index" default="0">
+			网格正交旋转的索引。
 		</member>
 	</members>
 </class>

@@ -10,6 +10,7 @@
 	</tutorials>
 	<members>
 		<member name="scene" type="PackedScene" setter="set_scene" getter="get_scene">
+			用作模型的场景。
 		</member>
 	</members>
 </class>

@@ -36,18 +36,21 @@
 			<param index="0" name="center" type="Vector3" />
 			<param index="1" name="radius" type="float" />
 			<description>
-			</description>
+			异步执行球形编辑。
+		</description>
 		</method>
 		<method name="get_raycast_binary_search_iterations" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取射线检测的二分搜索迭代次数。
+		</description>
 		</method>
 		<method name="get_voxel_f_interpolated" qualifiers="const">
 			<return type="float" />
 			<param index="0" name="position" type="Vector3" />
 			<description>
-			</description>
+			读取指定位置插值后的浮点体素值。
+		</description>
 		</method>
 		<method name="run_blocky_random_tick">
 			<return type="void" />
@@ -90,7 +93,8 @@
 			<param index="2" name="isolevel" type="float" />
 			<param index="3" name="sdf_scale" type="float" />
 			<description>
-			</description>
+			用网格 SDF 印章雕刻地形。
+		</description>
 		</method>
 	</methods>
 </class>

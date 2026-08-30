@@ -133,7 +133,8 @@
 		<method name="get_data_block_region_extent" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取数据块区域范围。
+		</description>
 		</method>
 		<method name="get_data_block_size" qualifiers="const">
 			<return type="int" />
@@ -144,12 +145,14 @@
 		<method name="get_normalmap_generator_override" qualifiers="const">
 			<return type="VoxelGenerator" />
 			<description>
-			</description>
+			获取用于生成法线贴图的生成器覆盖。
+		</description>
 		</method>
 		<method name="get_normalmap_generator_override_begin_lod_index" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取生成器覆盖生效的起始 LOD 索引。
+		</description>
 		</method>
 		<method name="get_process_callback" qualifiers="const">
 			<return type="int" enum="VoxelLodTerrain.ProcessCallback" />
@@ -201,13 +204,15 @@
 			<return type="void" />
 			<param index="0" name="generator_override" type="VoxelGenerator" />
 			<description>
-			</description>
+			设置用于生成法线贴图的生成器覆盖。
+		</description>
 		</method>
 		<method name="set_normalmap_generator_override_begin_lod_index">
 			<return type="void" />
 			<param index="0" name="lod_index" type="int" />
 			<description>
-			</description>
+			设置生成器覆盖生效的起始 LOD 索引。
+		</description>
 		</method>
 		<method name="set_process_callback">
 			<return type="void" />
@@ -254,32 +259,46 @@
 			编辑后更新碰撞体之前要等待多长时间，单位为毫秒。碰撞体生成开销较大，因此目的是使其平滑化。
 		</member>
 		<member name="debug_draw_active_mesh_blocks" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制当前活动的网格数据块。
 		</member>
 		<member name="debug_draw_active_visual_and_collision_blocks" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制当前活动的可视与碰撞数据块。
 		</member>
 		<member name="debug_draw_edit_boxes" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制编辑区域的方盒。
 		</member>
 		<member name="debug_draw_edited_blocks" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制已编辑的数据块。
 		</member>
 		<member name="debug_draw_enabled" type="bool" setter="debug_set_draw_enabled" getter="debug_is_draw_enabled" default="false">
+			是否启用调试绘制。
 		</member>
 		<member name="debug_draw_loaded_visual_and_collision_blocks" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制已加载的可视与碰撞数据块。
 		</member>
 		<member name="debug_draw_mesh_updates" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制网格更新的区域。
 		</member>
 		<member name="debug_draw_modifier_bounds" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制修改器的边界。
 		</member>
 		<member name="debug_draw_octree_bounds" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制八叉树节点的边界。
 		</member>
 		<member name="debug_draw_octree_nodes" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制八叉树节点。
 		</member>
 		<member name="debug_draw_shadow_occluders" type="bool" setter="debug_set_draw_shadow_occluders" getter="debug_get_draw_shadow_occluders" default="false">
+			调试绘制阴影遮挡体。
 		</member>
 		<member name="debug_draw_viewer_clipboxes" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制程序化编辑的裁剪盒。
 		</member>
 		<member name="debug_draw_volume_bounds" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制生成的地形体积边界。
 		</member>
 		<member name="debug_draw_voxel_metadata" type="bool" setter="debug_set_draw_flag" getter="debug_get_draw_flag" default="false">
+			调试绘制体素元数据。
 		</member>
 		<member name="full_load_mode_enabled" type="bool" setter="set_full_load_mode_enabled" getter="is_full_load_mode_enabled" default="false">
 			如果启用，数据流式加载将被关闭，所有体素数据将从 [member VoxelNode.stream] 加载到内存中。
@@ -316,6 +335,7 @@
 			此功能需要使用特定的着色器，请查阅在线文档或示例获取更多信息。
 		</member>
 		<member name="normalmap_max_deviation_degrees" type="int" setter="set_normalmap_max_deviation_degrees" getter="get_normalmap_max_deviation_degrees" default="60">
+			根据相机角度计算法线贴图时允许的最大偏离角度（度）。
 		</member>
 		<member name="normalmap_octahedral_encoding_enabled" type="bool" setter="set_octahedral_normal_encoding" getter="get_octahedral_normal_encoding" default="false">
 			启用法线贴图的八面体压缩，可将远处法线贴图造成的内存使用减少约 33%，但对视觉质量有一定影响。你的着色器可能需要相应修改以解码它们。

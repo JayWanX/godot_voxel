@@ -10,22 +10,26 @@
 		<method name="get_attribute_name" qualifiers="const">
 			<return type="StringName" />
 			<description>
-			</description>
+			获取属性名称。
+		</description>
 		</method>
 		<method name="get_default_value" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取属性的默认取值。
+		</description>
 		</method>
 		<method name="get_value_count" qualifiers="const">
 			<return type="int" />
 			<description>
-			</description>
+			获取取值范围的大小。注意：这实际上是最大值加一，并非取值的总个数。
+		</description>
 		</method>
 		<method name="is_rotation" qualifiers="const">
 			<return type="bool" />
 			<description>
-			</description>
+			该属性是否表示旋转。
+		</description>
 		</method>
 	</methods>
 	<constants>

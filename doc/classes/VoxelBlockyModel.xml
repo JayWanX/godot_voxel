@@ -35,7 +35,8 @@
 			<param index="0" name="axis" type="int" enum="Vector3i.Axis" />
 			<param index="1" name="clockwise" type="bool" />
 			<description>
-			</description>
+			将模型绕指定轴旋转 90 度。
+		</description>
 		</method>
 		<method name="set_material_override">
 			<return type="void" />
