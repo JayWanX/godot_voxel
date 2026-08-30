@@ -24,16 +24,22 @@ public:
 
 	VoxelBlockyType();
 
+	// 类型的唯一名称
 	void set_unique_name(StringName p_name);
 	StringName get_unique_name() const;
 
+	// 基础模型，未指定变体时的默认模型
 	void set_base_model(Ref<VoxelBlockyModel> model);
 	Ref<VoxelBlockyModel> get_base_model() const;
 
+	// 该类型的所有属性
 	Span<const Ref<VoxelBlockyAttribute>> get_attributes() const;
+	// 按名称获取属性
 	Ref<VoxelBlockyAttribute> get_attribute_by_name(const StringName &attrib_name) const;
+	// 获取旋转属性（若存在）
 	Ref<VoxelBlockyAttribute> get_rotation_attribute() const;
 
+	// 获取过滤掉空项后的有效属性列表
 	void get_checked_attributes(StdVector<Ref<VoxelBlockyAttribute>> &out_attribs) const;
 
 	// 标识类型的一个模型变体，即它拥有的属性及其值。
@@ -64,6 +70,7 @@ public:
 	void set_variant(const VariantKey &key, Ref<VoxelBlockyModel> model);
 	Ref<VoxelBlockyModel> get_variant(const VariantKey &key) const;
 
+	// 烘焙该类型的所有模型变体
 	void bake(
 			StdVector<blocky::BakedModel> &out_models,
 			StdVector<VariantKey> &out_keys,
@@ -78,8 +85,10 @@ public:
 	void get_configuration_warnings(PackedStringArray &out_warnings) const;
 #endif
 
+	// 获取指定变体的编辑器预览网格
 	Ref<Mesh> get_preview_mesh(const VariantKey &key) const;
 
+	// 生成所有可能的模型变体键
 	void generate_keys(StdVector<VariantKey> &out_keys, bool include_rotations) const;
 
 private:

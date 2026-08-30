@@ -30,38 +30,51 @@ public:
 	VoxelMesherTransvoxel();
 	~VoxelMesherTransvoxel();
 
+	// 将体素数据构建成网格
 	void build(VoxelMesher::Output &output, const VoxelMesher::Input &input) override;
+	// 为指定方向构建过渡网格，用于平滑相邻 LOD 之间的接缝
 	Ref<ArrayMesh> build_transition_mesh(Ref<godot::VoxelBuffer> voxels, int direction);
 
+	// 网格生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 网格生成器是否生成碰撞表面
 	bool is_generating_collision_surface() const override;
 
+	// 纹理处理方式
 	void set_texturing_mode(TexturingMode mode);
 	TexturingMode get_texturing_mode() const;
 
+	// 是否忽略空气体素上的纹理
 	void set_textures_ignore_air_voxels(const bool enable);
 	bool get_textures_ignore_air_voxels() const;
 
+	// 是否启用网格优化
 	void set_mesh_optimization_enabled(bool enabled);
 	bool is_mesh_optimization_enabled() const;
 
+	// 网格优化的误差阈值
 	void set_mesh_optimization_error_threshold(float threshold);
 	float get_mesh_optimization_error_threshold() const;
 
+	// 网格优化的目标三角形削减比例
 	void set_mesh_optimization_target_ratio(float ratio);
 	float get_mesh_optimization_target_ratio() const;
 
+	// 是否生成过渡网格
 	void set_transitions_enabled(bool enable);
 	bool get_transitions_enabled() const;
 
+	// 边缘钳制边距，用于避免生成过于细小的三角形
 	void set_edge_clamp_margin(float margin);
 	float get_edge_clamp_margin() const;
 
+	// 获取默认的 LOD 材质
 	Ref<ShaderMaterial> get_default_lod_material() const override;
 
 	// 内部
 
+	// 加载与释放共享的静态资源
 	static void load_static_resources();
 	static void free_static_resources();
 

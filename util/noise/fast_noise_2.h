@@ -101,96 +101,127 @@ public:
 
 	FastNoise2();
 
+	// SIMD 级别
 	SIMDLevel get_simd_level() const;
+	// 获取 SIMD 级别的名称（C 字符串）
 	static const char *get_simd_level_name_c_str(SIMDLevel level);
+	// 获取 SIMD 级别的名称
 	static String get_simd_level_name(SIMDLevel level);
 
+	// 随机种子
 	void set_seed(int seed);
 	int get_seed() const;
 
+	// 噪声类型
 	void set_noise_type(NoiseType type);
 	NoiseType get_noise_type() const;
 
+	// 周期（频率的倒数）
 	void set_period(float p);
 	float get_period() const;
 
 	// 分形
 
+	// 分形类型
 	void set_fractal_type(FractalType type);
 	FractalType get_fractal_type() const;
 
+	// 分形倍频程数
 	void set_fractal_octaves(int octaves);
 	int get_fractal_octaves() const;
 
+	// 分形点隙（lacunarity）
 	void set_fractal_lacunarity(float lacunarity);
 	float get_fractal_lacunarity() const;
 
+	// 分形增益
 	void set_fractal_gain(float gain);
 	float get_fractal_gain() const;
 
+	// 乒乓（ping-pong）强度
 	void set_fractal_ping_pong_strength(float s);
 	float get_fractal_ping_pong_strength() const;
 
 	// 梯田修饰器
 
+	// 是否启用梯田修饰
 	void set_terrace_enabled(bool enable);
 	bool is_terrace_enabled() const;
 
+	// 梯田倍率
 	void set_terrace_multiplier(float m);
 	float get_terrace_multiplier() const;
 
+	// 梯田阶跃的平滑度
 	void set_terrace_smoothness(float s);
 	float get_terrace_smoothness() const;
 
 	// 重映射
 
+	// 是否启用输出值重映射
 	void set_remap_enabled(bool enabled);
 	bool is_remap_enabled() const;
 
+	// 重映射输入最小值
 	void set_remap_input_min(float min_value);
 	float get_remap_input_min() const;
 
+	// 重映射输入最大值
 	void set_remap_input_max(float max_value);
 	float get_remap_input_max() const;
 
+	// 重映射输出最小值
 	void set_remap_output_min(float min_value);
 	float get_remap_output_min() const;
 
+	// 重映射输出最大值
 	void set_remap_output_max(float max_value);
 	float get_remap_output_max() const;
 
 	// 细胞
 
+	// 细胞距离函数
 	void set_cellular_distance_function(CellularDistanceFunction cdf);
 	CellularDistanceFunction get_cellular_distance_function() const;
 
+	// 细胞返回值类型
 	void set_cellular_return_type(CellularReturnType rt);
 	CellularReturnType get_cellular_return_type() const;
 
+	// 细胞抖动
 	void set_cellular_jitter(float jitter);
 	float get_cellular_jitter() const;
 
+	// 细胞索引 0
 	void set_cellular_index0(int i);
 	int get_cellular_index0() const;
 
+	// 细胞索引 1
 	void set_cellular_index1(int i);
 	int get_cellular_index1() const;
 
 	// 杂项
 
+	// 编码的节点树数据
 	void set_encoded_node_tree(String data);
 	String get_encoded_node_tree() const;
 
+	// 根据当前参数重建内部噪声生成器
 	void update_generator();
+	// 内部生成器是否构造成功
 	bool is_valid() const;
 
 	// 查询
 	// TODO 双精度支持。FastNoise2 还没有，所以现在全部使用 `float`。
 
+	// 采样单个坐标点的 2D 噪声
 	float get_noise_2d_single(Vector2 pos) const;
+	// 采样单个坐标点的 3D 噪声
 	float get_noise_3d_single(Vector3 pos) const;
 
+	// 逐个坐标批量采样 2D 噪声，结果写入 dst
 	void get_noise_2d_series(Span<const float> src_x, Span<const float> src_y, Span<float> dst) const;
+	// 逐个坐标批量采样 3D 噪声，结果写入 dst
 	void get_noise_3d_series(
 			Span<const float> src_x,
 			Span<const float> src_y,
@@ -198,13 +229,18 @@ public:
 			Span<float> dst
 	) const;
 
+	// 采样二维矩形网格区域的噪声，结果写入 dst
 	void get_noise_2d_grid(Vector2 origin, Vector2i size, Span<float> dst) const;
+	// 采样三维立方网格区域的噪声，结果写入 dst
 	void get_noise_3d_grid(Vector3 origin, Vector3i size, Span<float> dst) const;
 
+	// 采样可平铺的 2D 网格噪声
 	void get_noise_2d_grid_tileable(Vector2i size, Span<float> dst) const;
 
+	// 生成噪声图像
 	void generate_image(Ref<Image> image, bool tileable) const;
 
+	// 获取输出的数值范围区间估计
 	math::Interval get_estimated_output_range() const;
 
 private:

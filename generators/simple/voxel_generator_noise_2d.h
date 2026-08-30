@@ -19,18 +19,23 @@ public:
 	VoxelGeneratorNoise2D();
 	~VoxelGeneratorNoise2D();
 
+	// 用于生成高度图的 2D 噪声源
 	void set_noise(Ref<Noise> noise);
 	Ref<Noise> get_noise() const;
 
+	// 用于调整高度值的曲线
 	void set_curve(Ref<Curve> curve);
 	Ref<Curve> get_curve() const;
 
+	// 生成单个数据块的体素数据
 	Result generate_block(VoxelGenerator::VoxelQueryData input) override;
 
+	// 支持批量序列生成
 	bool supports_series_generation() const override {
 		return true;
 	}
 
+	// 批量生成体素值序列
 	void generate_series(
 			Span<const float> positions_x,
 			Span<const float> positions_y,

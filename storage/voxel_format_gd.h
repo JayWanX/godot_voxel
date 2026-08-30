@@ -10,12 +10,17 @@ namespace voxel::godot {
 class VoxelFormat : public Resource {
 	GDCLASS(VoxelFormat, Resource)
 public:
+	// 设置通道的位深
 	void set_channel_depth(const VoxelBuffer::ChannelId channel_index, const VoxelBuffer::Depth depth);
+	// 获取通道的位深
 	VoxelBuffer::Depth get_channel_depth(const VoxelBuffer::ChannelId channel_index) const;
 
+	// 按此格式配置缓冲区的通道位深
 	void configure_buffer(Ref<VoxelBuffer> buffer) const;
+	// 按此格式创建配置好的缓冲区
 	Ref<VoxelBuffer> create_buffer(const Vector3i size) const;
 
+	// 获取内部格式数据
 	voxel::VoxelFormat get_internal() const {
 		return _internal;
 	}

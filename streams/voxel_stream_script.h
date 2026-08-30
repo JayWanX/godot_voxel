@@ -13,11 +13,15 @@ namespace voxel {
 class VoxelStreamScript : public VoxelStream {
 	GDCLASS(VoxelStreamScript, VoxelStream)
 public:
+	// 加载单个体素数据块，调用脚本的 _load_voxel_block
 	void load_voxel_block(VoxelStream::VoxelQueryData &q) override;
+	// 保存单个体素数据块，调用脚本的 _save_voxel_block
 	void save_voxel_block(VoxelStream::VoxelQueryData &q) override;
 
+	// 获取此数据流中可用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 提示数据流的函数是否可以调用（脚本已定义至少一个钩子函数）
 	bool is_runnable() const override;
 
 protected:

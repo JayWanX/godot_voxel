@@ -20,20 +20,26 @@ public:
 	VoxelGeneratorHeightmap();
 	~VoxelGeneratorHeightmap();
 
+	// 生成数据所在的通道
 	void set_channel(VoxelBuffer::ChannelId p_channel);
 	VoxelBuffer::ChannelId get_channel() const;
 
+	// 获取生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 高度起始值
 	void set_height_start(float start);
 	float get_height_start() const;
 
+	// 高度范围
 	void set_height_range(float range);
 	float get_height_range() const;
 
+	// 等值面（isolevel）缩放
 	void set_iso_scale(float iso_scale);
 	float get_iso_scale() const;
 
+	// 高度图偏移
 	void set_offset(const Vector2i offset);
 	Vector2i get_offset() const;
 

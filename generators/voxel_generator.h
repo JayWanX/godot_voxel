@@ -64,6 +64,7 @@ public:
 		uint32_t lod;
 	};
 
+	// 生成单个数据块的体素数据
 	virtual Result generate_block(VoxelQueryData input);
 
 	struct BlockTaskParams {
@@ -88,14 +89,17 @@ public:
 	// 请求它的 volume。
 	virtual IThreadedTask *create_block_task(const BlockTaskParams &params) const;
 
+	// 是否支持单点采样生成
 	virtual bool supports_single_generation() const {
 		return false;
 	}
 
+	// 是否支持批量序列生成
 	virtual bool supports_series_generation() const {
 		return false;
 	}
 
+	// 是否支持 LOD
 	virtual bool supports_lod() const {
 		return true;
 	}
@@ -103,6 +107,7 @@ public:
 	// TODO 不确定这个 API 在性能方面是否合适
 	virtual VoxelSingleValue generate_single(Vector3i pos, unsigned int channel);
 
+	// 批量生成体素值序列
 	virtual void generate_series(
 			Span<const float> positions_x,
 			Span<const float> positions_y,
@@ -120,6 +125,7 @@ public:
 	// GPU 支持
 	// 该支持的工作方式是提供着色器及参数，使其能够产生与 CPU 版本生成器相同的结果。
 
+	// 是否支持 GPU 着色器生成
 	virtual bool supports_shaders() const {
 		return false;
 	}
@@ -151,13 +157,20 @@ public:
 		StdVector<ShaderOutput> outputs;
 	};
 
+	// 获取生成器对应的着色器源码
 	virtual bool get_shader_source(ShaderSourceData &out_data) const;
+	// 获取细节渲染用的着色器
 	std::shared_ptr<ComputeShader> get_detail_rendering_shader();
+	// 获取细节渲染用的着色器参数
 	std::shared_ptr<ComputeShaderParameters> get_detail_rendering_shader_parameters();
+	// 获取数据块渲染用的着色器
 	std::shared_ptr<ComputeShader> get_block_rendering_shader();
 	// TODO 这些参数难道不应该按每种着色器类型分别共享吗？
+	// 获取数据块渲染用的着色器参数
 	std::shared_ptr<ComputeShaderParameters> get_block_rendering_shader_parameters();
+	// 获取数据块渲染用的着色器输出描述
 	std::shared_ptr<ShaderOutputs> get_block_rendering_shader_outputs();
+	// 编译所有着色器
 	void compile_shaders();
 	// 若有已编译的着色器则将其丢弃，以便在再次需要时重新编译
 	void invalidate_shaders();
@@ -182,6 +195,7 @@ public:
 	// 取消配对时应发送一个空 box 作为当前 box。
 	virtual void process_viewer_diff(ViewerID viewer_id, Box3i p_requested_box, Box3i p_prev_requested_box);
 
+	// 清空内部缓存
 	virtual void clear_cache();
 
 	// 提示流（stream）的函数是否可以调用。主要用于脚本实现的情况，以避免
@@ -191,6 +205,7 @@ public:
 	// 编辑器
 
 #ifdef TOOLS_ENABLED
+	// 获取编辑器中显示的操作警告
 	virtual void get_configuration_warnings(PackedStringArray &out_warnings) const {}
 #endif
 

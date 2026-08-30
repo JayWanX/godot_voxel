@@ -9,6 +9,7 @@ namespace voxel {
 class VoxelInstanceLibrarySceneItem : public VoxelInstanceLibraryItem {
 	GDCLASS(VoxelInstanceLibrarySceneItem, VoxelInstanceLibraryItem)
 public:
+	// 用作实例的场景
 	void set_scene(Ref<PackedScene> scene);
 	Ref<PackedScene> get_scene() const;
 

@@ -77,50 +77,65 @@ public:
 
 	// 属性
 
+	// 噪声类型
 	void set_noise_type(NoiseType type);
 	NoiseType get_noise_type() const;
 
+	// 随机种子
 	void set_seed(int seed);
 	int get_seed() const;
 
+	// 周期（频率的倒数）
 	void set_period(float p);
 	float get_period() const;
 
+	// 域扭曲噪声源
 	void set_warp_noise(Ref<Voxel_FastNoiseLiteGradient> warp_noise);
 	Ref<Voxel_FastNoiseLiteGradient> get_warp_noise() const;
 
+	// 分形类型
 	void set_fractal_type(FractalType type);
 	FractalType get_fractal_type() const;
 
+	// 分形倍频程数
 	void set_fractal_octaves(int octaves);
 	int get_fractal_octaves() const;
 
+	// 分形点隙（lacunarity）
 	void set_fractal_lacunarity(float lacunarity);
 	float get_fractal_lacunarity() const;
 
+	// 分形增益
 	void set_fractal_gain(float gain);
 	float get_fractal_gain() const;
 
+	// 分形乒乓（ping-pong）强度
 	void set_fractal_ping_pong_strength(float s);
 	float get_fractal_ping_pong_strength() const;
 
+	// 分形加权强度（加权分形求和）
 	void set_fractal_weighted_strength(float s);
 	float get_fractal_weighted_strength() const;
 
+	// 细胞距离函数
 	void set_cellular_distance_function(CellularDistanceFunction cdf);
 	CellularDistanceFunction get_cellular_distance_function() const;
 
+	// 细胞返回值类型
 	void set_cellular_return_type(CellularReturnType rt);
 	CellularReturnType get_cellular_return_type() const;
 
+	// 细胞抖动
 	void set_cellular_jitter(float jitter);
 	float get_cellular_jitter() const;
 
+	// 3D 旋转类型
 	void set_rotation_type_3d(RotationType3D type);
 	RotationType3D get_rotation_type_3d() const;
 
 	// 查询
 
+	// 采样单个 2D 坐标的噪声（含域扭曲）
 	inline float get_noise_2d(real_t x, real_t y) const {
 		if (_warp_noise.is_valid()) {
 			_warp_noise->warp_2d(x, y);
@@ -128,6 +143,7 @@ public:
 		return _fn.GetNoise(x, y);
 	}
 
+	// 采样单个 3D 坐标的噪声（含域扭曲）
 	inline float get_noise_3d(real_t x, real_t y, real_t z) const {
 		if (_warp_noise.is_valid()) {
 			_warp_noise->warp_3d(x, y, z);
@@ -140,14 +156,17 @@ public:
 
 	// 内部
 
+	// 不做域扭曲，直接采样 2D 噪声
 	inline float get_noise_2d_unwarped(const real_t x, const real_t y) const {
 		return _fn.GetNoise(x, y);
 	}
 
+	// 不做域扭曲，直接采样 3D 噪声
 	inline float get_noise_3d_unwarped(const real_t x, const real_t y, const real_t z) const {
 		return _fn.GetNoise(x, y, z);
 	}
 
+	// 获取底层 FastNoiseLite 实例的引用
 	const ::fast_noise_lite::FastNoiseLite &get_noise_internal() const {
 		return _fn;
 	}

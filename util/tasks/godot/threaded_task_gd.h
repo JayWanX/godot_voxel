@@ -12,8 +12,11 @@ class Voxel_ThreadedTaskInternal;
 class Voxel_ThreadedTask : public RefCounted {
 	GDCLASS(Voxel_ThreadedTask, RefCounted)
 public:
+	// 在指定线程上运行任务
 	void run(int thread_index);
+	// 获取任务优先级
 	int get_priority();
+	// 任务是否已取消
 	bool is_cancelled();
 
 	// 内部

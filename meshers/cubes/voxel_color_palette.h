@@ -15,16 +15,20 @@ public:
 
 	VoxelColorPalette();
 
+	// 设置或获取指定索引的颜色
 	void set_color(int index, Color color);
 	Color get_color(int index) const;
 
+	// 获取或设置全部颜色
 	PackedColorArray get_colors() const;
 	void set_colors(PackedColorArray colors);
 
+	// 清空调色板
 	void clear();
 
 	// 内部
 
+	// 以紧凑格式设置或获取颜色
 	inline void set_color8(uint8_t i, Color8 c) {
 		_colors[i] = c;
 	}

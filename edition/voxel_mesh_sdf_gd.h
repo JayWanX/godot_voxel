@@ -40,24 +40,31 @@ public:
 	bool is_baked() const;
 	bool is_baking() const;
 
+	// SDF 网格单元数量（分辨率）
 	int get_cell_count() const;
 	void set_cell_count(int cc);
 
+	// 包围盒边距比例
 	float get_margin_ratio() const;
 	void set_margin_ratio(float mr);
 
+	// 烘焙模式
 	BakeMode get_bake_mode() const;
 	void set_bake_mode(BakeMode mode);
 
+	// 分区细分数量
 	int get_partition_subdiv() const;
 	void set_partition_subdiv(int subdiv);
 
+	// 是否修复边界符号
 	void set_boundary_sign_fix_enabled(bool enable);
 	bool is_boundary_sign_fix_enabled() const;
 
+	// 用于烘焙的网格
 	void set_mesh(Ref<Mesh> mesh);
 	Ref<Mesh> get_mesh() const;
 
+	// 同步烘焙 SDF
 	void bake();
 
 // 使用任务系统的线程异步烘焙 SDF。
@@ -75,6 +82,7 @@ public:
 	// 获取模型带内边距的包围盒。这对有符号距离的一致性很重要。
 	AABB get_aabb() const;
 
+	// 获取带边距包围盒的最小 / 最大角点位置
 	inline Vector3f get_aabb_min_pos() const {
 		return _min_pos;
 	}
@@ -83,9 +91,11 @@ public:
 	}
 
 	#ifdef VOXEL_ENABLE_GPU
+	// 获取 GPU 计算资源
 	std::shared_ptr<ComputeShaderResource> get_gpu_resource();
 	#endif
 
+	// 调试：检查网格的 SDF 数据
 	Array debug_check_sdf(Ref<Mesh> mesh);
 
 private:

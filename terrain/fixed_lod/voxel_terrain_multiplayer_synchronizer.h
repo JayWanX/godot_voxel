@@ -21,9 +21,12 @@ class VoxelTerrainMultiplayerSynchronizer : public Node {
 public:
 	VoxelTerrainMultiplayerSynchronizer();
 
+	// 当前实例是否为服务器
 	bool is_server() const;
 
+	// 向指定对等体发送数据块
 	void send_block(int viewer_peer_id, const VoxelDataBlock &data_block, Vector3i bpos);
+	// 向客户端发送指定区域的数据
 	void send_area(Box3i voxel_box);
 
 #ifdef TOOLS_ENABLED

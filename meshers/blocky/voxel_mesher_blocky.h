@@ -23,12 +23,15 @@ public:
 	VoxelMesherBlocky();
 	~VoxelMesherBlocky();
 
+	// 模型库，将体素值映射为模型
 	void set_library(Ref<VoxelBlockyLibraryBase> library);
 	Ref<VoxelBlockyLibraryBase> get_library() const;
 
+	// 阴影遮挡的暗度
 	void set_occlusion_darkness(float darkness);
 	float get_occlusion_darkness() const;
 
+	// 是否启用阴影遮挡
 	void set_occlusion_enabled(bool enable);
 	bool get_occlusion_enabled() const;
 
@@ -42,8 +45,10 @@ public:
 		SIDE_COUNT
 	};
 
+	// 指定侧面是否作为阴影遮挡体
 	void set_shadow_occluder_side(Side side, bool enabled);
 	bool get_shadow_occluder_side(Side side) const;
+	// 以位掩码形式返回所有阴影遮挡侧面
 	uint8_t get_shadow_occluder_mask() const;
 
 	enum TintMode {
@@ -52,9 +57,11 @@ public:
 		TINT_MODE_COUNT = blocky::TintSampler::MODE_COUNT
 	};
 
+	// 顶点着色模式
 	TintMode get_tint_mode() const;
 	void set_tint_mode(const TintMode new_mode);
 
+	// 将体素数据构建成网格
 	void build(VoxelMesher::Output &output, const VoxelMesher::Input &input) override;
 
 	// TODO: Resource::duplicate() 无法被覆写。
@@ -63,12 +70,15 @@ public:
 	//
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
 
+	// 网格生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 网格生成器是否支持 LOD
 	bool supports_lod() const override {
 		return true;
 	}
 
+	// 获取指定索引的材质及其数量
 	Ref<Material> get_material_by_index(unsigned int index) const override;
 	unsigned int get_material_index_count() const override;
 
@@ -96,6 +106,7 @@ public:
 	void get_configuration_warnings(PackedStringArray &out_warnings) const override;
 #endif
 
+	// 网格生成器是否生成碰撞表面
 	bool is_generating_collision_surface() const override {
 		return true;
 	}

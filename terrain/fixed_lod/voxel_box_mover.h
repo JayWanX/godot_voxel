@@ -15,6 +15,7 @@ class VoxelMesher;
 class VoxelBoxMover : public RefCounted {
 	GDCLASS(VoxelBoxMover, RefCounted)
 public:
+	// 计算物体在世界空间移动后的位置，并处理与地形的碰撞
 	Vector3 get_motion(
 			const Vector3 pos_world,
 			const Vector3 motion_world,
@@ -24,6 +25,7 @@ public:
 			const VoxelMesher &mesher
 	);
 
+	// 判断给定的 AABB 是否与地形相交
 	bool intersects(
 			const AABB aabb_world,
 			const VoxelData &terrain_data,
@@ -31,17 +33,21 @@ public:
 			const VoxelMesher &mesher
 	) const;
 
+	// 碰撞掩码
 	void set_collision_mask(uint32_t mask);
 	inline uint32_t get_collision_mask() const {
 		return _collision_mask;
 	}
 
+	// 是否启用台阶攀爬
 	void set_step_climbing_enabled(bool enable);
 	bool is_step_climbing_enabled() const;
 
+	// 可攀爬的最大台阶高度
 	void set_max_step_height(float height);
 	float get_max_step_height() const;
 
+	// 最近一次移动是否发生了攀爬
 	bool has_stepped_up() const;
 
 private:

@@ -13,27 +13,33 @@ class VoxelInstancerRigidBody : public RigidBody3D {
 public:
 	VoxelInstancerRigidBody();
 
+	// 设置所在数据块位置
 	void set_data_block_position(Vector3i data_block_position) {
 		_data_block_position = data_block_position;
 	}
 
+	// 设置渲染块索引
 	void set_render_block_index(unsigned int render_block_index) {
 		_render_block_index = render_block_index;
 	}
 
+	// 设置实例索引
 	void set_instance_index(int instance_index) {
 		_instance_index = instance_index;
 	}
 
+	// 附加到实例化器
 	void attach(VoxelInstancer *parent) {
 		_parent = parent;
 	}
 
+	// 分离并销毁刚体
 	void detach_and_destroy() {
 		_parent = nullptr;
 		queue_free();
 	}
 
+	// 获取对应的库项目 ID
 	int get_library_item_id() const;
 
 	// 注意，为此刚体必须切换到凸形
@@ -41,6 +47,7 @@ public:
 	// 	//...
 	// }
 
+	// 释放刚体并通知实例化器
 	void queue_free_and_notify_instancer();
 
 protected:

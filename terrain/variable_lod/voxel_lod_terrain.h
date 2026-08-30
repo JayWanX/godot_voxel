@@ -38,30 +38,39 @@ public:
 	VoxelLodTerrain();
 	~VoxelLodTerrain();
 
+	// 用于网格的默认材质
 	Ref<Material> get_material() const;
 	void set_material(Ref<Material> p_material);
 
+	// 流：负责数据的加载与保存
 	Ref<VoxelStream> get_stream() const override;
 	void set_stream(Ref<VoxelStream> p_stream) override;
 
+	// 用于生成地形数据的生成器
 	Ref<VoxelGenerator> get_generator() const override;
 	void set_generator(Ref<VoxelGenerator> p_stream) override;
 
+	// 负责网格化的网格器
 	Ref<VoxelMesher> get_mesher() const override;
 	void set_mesher(Ref<VoxelMesher> p_mesher) override;
 
+	// 以体素为单位的观察距离
 	int get_view_distance() const;
 	void set_view_distance(int p_distance_in_voxels);
 
+	// LOD 之间的距离，以体素为单位
 	void set_lod_distance(float p_lod_distance);
 	float get_lod_distance() const;
 
+	// 第二 LOD 之间的距离，以体素为单位
 	void set_secondary_lod_distance(float p_lod_distance);
 	float get_secondary_lod_distance() const;
 
+	// LOD 层级数量
 	void set_lod_count(int p_lod_count);
 	int get_lod_count() const;
 
+	// 是否生成碰撞体
 	void set_generate_collisions(bool enabled);
 	bool get_generate_collisions() const;
 
@@ -69,71 +78,90 @@ public:
 	void set_collision_lod_count(int lod_count);
 	int get_collision_lod_count() const;
 
+	// 碰撞层
 	void set_collision_layer(int layer);
 	int get_collision_layer() const;
 
+	// 碰撞掩码
 	void set_collision_mask(int mask);
 	int get_collision_mask() const;
 
+	// 碰撞边距
 	void set_collision_margin(float margin);
 	float get_collision_margin() const;
 
+	// 数据块和网格块的区域范围
 	int get_data_block_region_extent() const;
 	int get_mesh_block_region_extent() const;
 
+	// 体素坐标转换为数据块/网格块坐标
 	Vector3i voxel_to_data_block_position(Vector3 vpos, int lod_index) const;
 	Vector3i voxel_to_mesh_block_position(Vector3 vpos, int lod_index) const;
 
+	// 数据块大小，以 2 的幂表示，以及实际大小
 	unsigned int get_data_block_size_pow2() const;
 	unsigned int get_data_block_size() const;
 	// void set_data_block_size_po2(unsigned int p_block_size_po2);
 
+	// 网格块大小，以 2 的幂表示，以及实际大小
 	unsigned int get_mesh_block_size_pow2() const;
 	unsigned int get_mesh_block_size() const;
 	void set_mesh_block_size(unsigned int mesh_block_size);
 
+	// 全量加载模式：一次性加载数据范围内的全部块
 	void set_full_load_mode_enabled(bool enabled);
 	bool is_full_load_mode_enabled() const;
 
+	// 是否启用多线程更新
 	void set_threaded_update_enabled(bool enabled);
 	bool is_threaded_update_enabled() const;
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
+	// 是否生成法线贴图（仅平滑网格化可用）
 	void set_normalmap_enabled(bool enable);
 	bool is_normalmap_enabled() const;
 
+	// 是否使用八面体法线编码
 	void set_octahedral_normal_encoding(bool enable);
 	bool get_octahedral_normal_encoding() const;
 
+	// 法线贴图平铺分辨率范围
 	void set_normalmap_tile_resolution_min(int resolution);
 	int get_normalmap_tile_resolution_min() const;
 
 	void set_normalmap_tile_resolution_max(int resolution);
 	int get_normalmap_tile_resolution_max() const;
 
+	// 开始生成法线贴图的 LOD 索引
 	void set_normalmap_begin_lod_index(int lod_index);
 	int get_normalmap_begin_lod_index() const;
 
+	// 法线最大允许偏差角度，单位为度
 	void set_normalmap_max_deviation_degrees(int angle);
 	int get_normalmap_max_deviation_degrees() const;
 
+	// 用于生成法线贴图的生成器覆盖
 	void set_normalmap_generator_override(Ref<VoxelGenerator> generator_override);
 	Ref<VoxelGenerator> get_normalmap_generator_override() const;
 
+	// 生成器覆盖生效的起始 LOD 索引
 	void set_normalmap_generator_override_begin_lod_index(int lod_index);
 	int get_normalmap_generator_override_begin_lod_index() const;
 
 #ifdef VOXEL_ENABLE_GPU
+	// 法线贴图是否使用 GPU 计算
 	void set_normalmap_use_gpu(bool enabled);
 	bool get_normalmap_use_gpu() const;
 #endif
 #endif
 
 #ifdef VOXEL_ENABLE_GPU
+	// 生成器是否使用 GPU
 	void set_generator_use_gpu(const bool enabled);
 	bool get_generator_use_gpu() const;
 #endif
 
+	// 是否缓存已生成的块
 	void set_cache_generated_blocks(bool enabled);
 	bool get_cache_generated_blocks() const;
 
@@ -152,9 +180,11 @@ public:
 		return _data->get_bounds();
 	}
 
+	// 碰撞更新延迟，单位毫秒
 	void set_collision_update_delay(int delay_msec);
 	int get_collision_update_delay() const;
 
+	// LOD 淡入淡出持续时间，单位秒
 	void set_lod_fade_duration(float seconds);
 	float get_lod_fade_duration() const;
 
@@ -174,6 +204,7 @@ public:
 		return _process_callback;
 	}
 
+	// 获取用于编辑地形的工具
 	Ref<VoxelTool> get_voxel_tool() override;
 
 	struct Stats {
@@ -194,11 +225,14 @@ public:
 		uint32_t time_update_task = 0;
 	};
 
+	// 获取更新统计信息
 	const Stats &get_stats() const;
 
+	// 重启流，重新网格化所有块
 	void restart_stream() override;
 	void remesh_all_blocks() override;
 
+	// 判断指定区域在给定 LOD 下是否已生成网格
 	bool is_area_meshed(const Box3i &box_in_voxels, unsigned int lod_index) const;
 
 	enum StreamingSystem : uint8_t { //
@@ -207,16 +241,21 @@ public:
 	};
 
 	// 这是临时的，以便在新系统改进过程中不破坏现有项目，并允许逐步过渡。
+	// 流式加载系统（旧八叉树或剪裁盒）
 	StreamingSystem get_streaming_system() const;
 	void set_streaming_system(StreamingSystem v);
 
+	// 将地形转换为普通节点
 	Node3D *convert_to_nodes(const BitField<NodeConversionFlags> flags) const override;
 
 	// 调试
 
+	// 对网格块进行射线检测
 	Array debug_raycast_mesh_block(Vector3 world_origin, Vector3 world_direction) const;
+	// 获取数据块 / 网格块信息
 	Dictionary debug_get_data_block_info(Vector3 fbpos, int lod_index) const;
 	Dictionary debug_get_mesh_block_info(Vector3 fbpos, int lod_index) const;
+	// 获取八叉树节点位置
 	Array debug_get_octree_positions() const;
 	Array debug_get_octrees_detailed() const;
 
@@ -237,19 +276,24 @@ public:
 		DEBUG_DRAW_FLAGS_COUNT = 12
 	};
 
+	// 是否启用调试绘制
 	void debug_set_draw_enabled(bool enabled);
 	bool debug_is_draw_enabled() const;
 
+	// 设置 / 查询调试绘制标志
 	void debug_set_draw_flag(DebugDrawFlag flag_index, bool enabled);
 	bool debug_get_draw_flag(DebugDrawFlag flag_index) const;
 
+	// 是否绘制阴影遮挡物
 	void debug_set_draw_shadow_occluders(bool enable);
 	bool debug_get_draw_shadow_occluders() const;
 
 #ifdef TOOLS_ENABLED
+	// 按位掩码批量设置调试绘制标志
 	void debug_set_draw_flags(uint32_t mask);
 #endif
 
+	// 导出地形为节点或场景文件
 	Node3D *debug_dump_as_nodes(bool include_instancer) const;
 	Error debug_dump_as_scene(String fpath, bool include_instancer) const;
 
@@ -262,6 +306,7 @@ public:
 	// 内部
 
 #ifdef VOXEL_ENABLE_INSTANCER
+	// 设置实例化器
 	void set_instancer(VoxelInstancer *instancer);
 #endif
 
@@ -272,6 +317,7 @@ public:
 		return _streaming_dependency;
 	}
 
+	// 获取网格块的表面数据
 	Array get_mesh_block_surface(
 			const Vector3i block_pos,
 			const int lod_index,
@@ -279,14 +325,17 @@ public:
 			int &col_index_max
 	) const;
 
+	// 获取指定 LOD 下已网格化的块位置
 	void get_meshed_block_positions_at_lod(int lod_index, StdVector<Vector3i> &out_positions) const;
 
+	// 获取地形数据存储
 	VoxelData &get_storage() const override;
 
 	inline std::shared_ptr<VoxelData> get_storage_shared() const {
 		return _data;
 	}
 
+	// 获取各 LOD 之间的距离
 	void get_lod_distances(Span<float> distances);
 
 	void on_format_changed() override;

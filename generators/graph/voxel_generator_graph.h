@@ -42,49 +42,66 @@ public:
 	VoxelGeneratorGraph();
 	~VoxelGeneratorGraph();
 
+	// 清空图，恢复默认状态
 	void clear();
+	// 加载默认的平面预置图
 	void load_plane_preset();
 
+	// 获取主函数图
 	Ref<pg::VoxelGraphFunction> get_main_function() const;
 
 	// 性能调优（高级）
 
+	// 是否启用优化执行图（跳过不影响最终结果的节点）
 	bool is_using_optimized_execution_map() const;
 	void set_use_optimized_execution_map(bool use);
 
+	// SDF 裁剪阈值
 	float get_sdf_clip_threshold() const;
 	void set_sdf_clip_threshold(float t);
 
+	// 是否启用块内细分生成
 	void set_use_subdivision(bool use);
 	bool is_using_subdivision() const;
 
+	// 细分尺寸
 	void set_subdivision_size(int size);
 	int get_subdivision_size() const;
 
+	// 是否显示被裁剪的块（调试用）
 	void set_debug_clipped_blocks(bool enabled);
 	bool is_debug_clipped_blocks() const;
 
+	// 是否启用 XZ 坐标缓存
 	void set_use_xz_caching(bool enabled);
 	bool is_using_xz_caching() const;
 
+	// 纹理输出格式模式
 	void set_texture_mode(const TextureMode mode);
 	TextureMode get_texture_mode() const;
 
 	// VoxelGenerator 实现
 
+	// 获取生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 生成单个数据块的体素数据
 	Result generate_block(VoxelGenerator::VoxelQueryData input) override;
+	// 生成整个宽块（broad block）的体素数据
 	bool generate_broad_block(VoxelGenerator::VoxelQueryData input) override;
 	// float generate_single(const Vector3i &position);
+	// 支持单点采样生成
 	bool supports_single_generation() const override {
 		return true;
 	}
+	// 支持批量序列生成
 	bool supports_series_generation() const override {
 		return true;
 	}
+	// 生成单个坐标点的体素值
 	VoxelSingleValue generate_single(Vector3i position, unsigned int channel) override;
 
+	// 批量生成体素值序列
 	void generate_series(
 			Span<const float> positions_x,
 			Span<const float> positions_y,
@@ -99,19 +116,27 @@ public:
 
 	// 工具
 
+	// 将生成的数据烘焙为球体凹凸贴图
 	void bake_sphere_bumpmap(Ref<Image> im, float ref_radius, float min_height, float max_height);
+	// 将生成的数据烘焙为球体法线贴图
 	void bake_sphere_normalmap(Ref<Image> im, float ref_radius, float strength);
 
+	// 对 SDF 做约简的射线投射，粗略定位表面位置
 	float raycast_sdf_approx(const Vector3 ray_origin, const Vector3 ray_end, const float stride) const;
 
+	// 从 SDF 生成图像
 	void generate_image_from_sdf(Ref<Image> image, const Transform3D transform, const Vector2 size);
 
 	// 内部
 
+	// 编译图，debug 为 true 时输出调试信息
 	pg::CompilationResult compile(bool debug);
+	// 图是否已成功编译
 	bool is_good() const;
 
+	// 批量生成无 SDF 输入的一批噪声值
 	void generate_set(Span<const float> in_x, Span<const float> in_y, Span<const float> in_z);
+	// 批量生成带 SDF 输入的一批噪声值
 	void generate_series(
 			Span<const float> in_x,
 			Span<const float> in_y,
@@ -121,11 +146,15 @@ public:
 
 	// 返回当前线程中最后一次使用的生成器的状态
 	static const pg::Runtime::State &get_last_state_from_current_thread();
+	// 获取当前线程上一次的执行图调试数据
 	static Span<const uint32_t> get_last_execution_map_debug_from_current_thread();
 
+	// 获取指定输出端口的运行时地址
 	bool try_get_output_port_address(ProgramGraph::PortLocation port, uint32_t &out_address) const;
+	// 获取 SDF 输出端口的运行时地址
 	int get_sdf_output_port_address() const;
 
+	// 是否存在纹理输出
 	bool has_texture_output() const;
 
 #ifdef VOXEL_ENABLE_GPU
@@ -136,11 +165,13 @@ public:
 		return true;
 	}
 
+	// 获取 GPU 生成所需的着色器源码
 	bool get_shader_source(ShaderSourceData &out_data) const override;
 #endif
 
 	// 调试
 
+	// 分析指定范围内的输出范围区间
 	math::Interval debug_analyze_range(Vector3i min_pos, Vector3i max_pos, bool optimize_execution_map) const;
 
 	struct NodeProfilingInfo {
@@ -148,13 +179,16 @@ public:
 		uint32_t microseconds;
 	};
 
+	// 测量每个体素生成耗时（微秒）
 	float debug_measure_microseconds_per_voxel(bool singular, StdVector<NodeProfilingInfo> *node_profiling_info);
 
+	// 加载波浪演示预置图
 	void debug_load_waves_preset();
 
 	// 编辑器
 
 #ifdef TOOLS_ENABLED
+	// 获取编辑器中显示的操作警告
 	void get_configuration_warnings(PackedStringArray &out_warnings) const override;
 #endif
 

@@ -14,13 +14,17 @@ class VoxelBlockyTypeLibrary : public VoxelBlockyLibraryBase {
 public:
 	static constexpr unsigned int MAX_TYPES = 65536;
 
+	// 清空所有类型
 	void clear() override;
+	// 加载默认类型
 	void load_default() override;
+	// 烘焙所有类型
 	void bake() override;
 #ifdef TOOLS_ENABLED
 	void get_configuration_warnings(PackedStringArray &out_warnings) const override;
 #endif
 
+	// 获取类型默认模型的索引
 	int get_model_index_default(StringName type_name) const;
 
 	// 快捷方式，无需指定属性名称。
@@ -49,6 +53,7 @@ public:
 	//
 	int get_model_index_with_attributes(StringName type_name, Dictionary attribs_dict) const;
 
+	// 按名称获取类型
 	Ref<VoxelBlockyType> get_type_from_name(StringName p_name) const;
 
 	// 返回的数组有两个元素：
@@ -57,12 +62,17 @@ public:
 	//   在 Dictionary 中将 StringName 转换为 String），值是该属性当前的整数值。
 	Array get_type_name_and_attributes_from_model_index(int i) const;
 
+	// 从字符串数组加载 ID 映射
 	bool load_id_map_from_string_array(PackedStringArray array);
+	// 将 ID 映射序列化为字符串数组
 	PackedStringArray serialize_id_map_to_string_array() const;
 
+	// 从 JSON 字符串加载 ID 映射
 	bool load_id_map_from_json(String array);
+	// 将 ID 映射序列化为 JSON 字符串
 	String serialize_id_map_to_json() const;
 
+	// 获取 ID 映射预览及已使用的 ID
 	void get_id_map_preview(PackedStringArray &out_ids, StdVector<uint16_t> &used_ids) const;
 
 private:

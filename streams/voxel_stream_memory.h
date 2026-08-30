@@ -19,25 +19,38 @@ namespace voxel {
 class VoxelStreamMemory : public VoxelStream {
 	GDCLASS(VoxelStreamMemory, VoxelStream)
 public:
+	// 批量加载体素数据块
 	void load_voxel_blocks(Span<VoxelQueryData> p_blocks) override;
+	// 批量保存体素数据块
 	void save_voxel_blocks(Span<VoxelQueryData> p_blocks) override;
+	// 加载单个体素数据块
 	void load_voxel_block(VoxelQueryData &query_data) override;
+	// 保存单个体素数据块
 	void save_voxel_block(VoxelQueryData &query_data) override;
 
 #ifdef VOXEL_ENABLE_INSTANCER
+	// 是否支持实例块数据
 	bool supports_instance_blocks() const override;
+	// 批量加载实例块数据
 	void load_instance_blocks(Span<InstancesQueryData> out_blocks) override;
+	// 批量保存实例块数据
 	void save_instance_blocks(Span<InstancesQueryData> p_blocks) override;
 #endif
 
+	// 是否支持一次性加载所有数据块
 	bool supports_loading_all_blocks() const override;
+	// 一次性加载所有数据块
 	void load_all_blocks(FullLoadingResult &result) override;
 
+	// 获取此数据流中可用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 获取数据块的细节层级（LOD）数量
 	int get_lod_count() const override;
 
+	// 设置人为保存延迟（微秒），用于模拟慢速存储以进行测试
 	void set_artificial_save_latency_usec(int usec);
+	// 获取人为保存延迟（微秒）
 	int get_artificial_save_latency_usec() const;
 
 private:

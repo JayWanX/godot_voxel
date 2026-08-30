@@ -21,9 +21,11 @@ public:
 
 	VoxelBlockyAttributeDirection();
 
+	// 是否仅限水平方向
 	void set_horizontal_only(bool h);
 	bool is_horizontal_only() const;
 
+	// 从方向向量获取对应的方向取值
 	int from_vec3(Vector3 v) const;
 
 private:

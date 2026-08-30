@@ -12,11 +12,16 @@ namespace voxel {
 class VoxelSaveCompletionTracker : public RefCounted {
 	GDCLASS(VoxelSaveCompletionTracker, RefCounted)
 public:
+	// 创建追踪器，包装一个异步任务依赖追踪器
 	static Ref<VoxelSaveCompletionTracker> create(std::shared_ptr<AsyncDependencyTracker> tracker);
 
+	// 所有任务是否已完成
 	bool is_complete() const;
+	// 是否已中止
 	bool is_aborted() const;
+	// 任务总数
 	int get_total_tasks() const;
+	// 剩余任务数
 	int get_remaining_tasks() const;
 
 private:

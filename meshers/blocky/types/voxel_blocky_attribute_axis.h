@@ -13,9 +13,11 @@ public:
 
 	VoxelBlockyAttributeAxis();
 
+	// 是否仅限水平方向的轴
 	void set_horizontal_only(bool h);
 	bool is_horizontal_only() const;
 
+	// 从方向向量获取对应的轴取值
 	int from_vec3(Vector3 v) const;
 
 private:

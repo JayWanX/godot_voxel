@@ -14,11 +14,14 @@ public:
 	VoxelGeneratorWaves();
 	~VoxelGeneratorWaves();
 
+	// 生成单个数据块的体素数据
 	Result generate_block(VoxelGenerator::VoxelQueryData input) override;
 
+	// 波浪图案的大小
 	Vector2 get_pattern_size() const;
 	void set_pattern_size(Vector2 size);
 
+	// 波浪图案的偏移
 	Vector2 get_pattern_offset() const;
 	void set_pattern_offset(Vector2 offset);
 

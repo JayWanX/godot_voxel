@@ -11,6 +11,7 @@ class VoxelBlockyAttributeRotation : public VoxelBlockyAttribute {
 public:
 	VoxelBlockyAttributeRotation();
 
+	// 是否启用水平滚动旋转
 	void set_horizontal_roll_enabled(bool enable);
 	bool is_horizontal_roll_enabled() const;
 

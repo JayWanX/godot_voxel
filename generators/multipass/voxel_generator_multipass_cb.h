@@ -37,10 +37,12 @@ public:
 	// 供参考，Minecraft 为 24 个数据块高（384 个体素）
 	static constexpr int MAX_COLUMN_HEIGHT_BLOCKS = 32;
 
+	// 由 pass 数量计算子 pass 数量
 	static inline int get_subpass_count_from_pass_count(int pass_count) {
 		return pass_count * 2 - 1;
 	}
 
+	// 由子 pass 索引计算所在 pass 索引
 	static inline int get_pass_index_from_subpass(int subpass_index) {
 		return (subpass_index + 1) / 2;
 	}
@@ -48,13 +50,17 @@ public:
 	VoxelGeneratorMultipassCB();
 	~VoxelGeneratorMultipassCB();
 
+	// 是否支持 LOD
 	bool supports_lod() const override {
 		return false;
 	}
 
+	// 生成单个数据块的体素数据
 	Result generate_block(VoxelQueryData input) override;
+	// 获取生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 创建用于异步生成数据块的任务
 	IThreadedTask *create_block_task(const VoxelGenerator::BlockTaskParams &params) const override;
 
 	// 在数据块网格上执行一次 pass。
@@ -70,15 +76,19 @@ public:
 	// 将因此产生一些差异。
 	virtual void generate_pass(VoxelGeneratorMultipassCBStructs::PassInput input);
 
+	// pass 数量
 	int get_pass_count() const;
 	void set_pass_count(int pass_count);
 
+	// 列的基础 Y 坐标（数据块为单位）
 	int get_column_base_y_blocks() const;
 	void set_column_base_y_blocks(int new_y);
 
+	// 列的高度（数据块为单位）
 	int get_column_height_blocks() const;
 	void set_column_height_blocks(int new_height);
 
+	// 指定 pass 的扩展范围（数据块为单位）
 	int get_pass_extent_blocks(int pass_index) const;
 	void set_pass_extent_blocks(int pass_index, int new_extent);
 
@@ -88,6 +98,7 @@ public:
 
 	// 内部
 
+	// 获取内部状态
 	std::shared_ptr<VoxelGeneratorMultipassCBStructs::Internal> get_internal() const;
 
 	// 当观察者与地形配对、移动或解除配对时必须调用。
@@ -96,13 +107,16 @@ public:
 	// 解除配对时应发送一个空盒子作为当前盒子。
 	void process_viewer_diff(ViewerID viewer_id, Box3i p_requested_box, Box3i p_prev_requested_box) override;
 
+	// 清空内部缓存
 	void clear_cache() override;
 
+	// 当前配置是否可运行
 	bool is_runnable() const override;
 
 	// 编辑器
 
 #ifdef TOOLS_ENABLED
+	// 获取编辑器中显示的操作警告
 	void get_configuration_warnings(PackedStringArray &out_warnings) const override;
 #endif
 
@@ -112,6 +126,7 @@ public:
 		uint8_t viewer_count;
 	};
 
+	// 尝试获取各列当前的子 pass 与观察者状态（调试用）
 	bool debug_try_get_column_states(StdVector<DebugColumnState> &out_states);
 
 protected:

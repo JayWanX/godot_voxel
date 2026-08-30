@@ -17,12 +17,15 @@ public:
 	VoxelGeneratorImage();
 	~VoxelGeneratorImage();
 
+	// 作为高度图来源的图像
 	void set_image(Ref<Image> im);
 	Ref<Image> get_image() const;
 
+	// 是否启用图像模糊
 	void set_blur_enabled(bool enable);
 	bool is_blur_enabled() const;
 
+	// 生成单个数据块的体素数据
 	Result generate_block(VoxelGenerator::VoxelQueryData input) override;
 
 private:

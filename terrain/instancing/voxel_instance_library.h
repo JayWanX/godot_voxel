@@ -25,15 +25,22 @@ public:
 
 	~VoxelInstanceLibrary();
 
+	// 获取下一个可用 ID
 	int get_next_available_id();
+	// 添加项目
 	void add_item(int p_id, Ref<VoxelInstanceLibraryItem> item);
+	// 移除项目
 	void remove_item(int p_id);
+	// 清空所有项目
 	void clear();
+	// 按名称查找项目 ID
 	int find_item_by_name(String p_name) const;
+	// 项目数量
 	int get_item_count() const;
 
 	// 内部
 
+	// 获取指定 ID 的项目
 	const VoxelInstanceLibraryItem *get_item_const(int id) const;
 	VoxelInstanceLibraryItem *get_item(int id);
 
@@ -69,6 +76,7 @@ public:
 		return -1;
 	}
 
+	// 添加或移除项目变更监听器
 	void add_listener(IInstanceLibraryItemListener *listener);
 	void remove_listener(IInstanceLibraryItemListener *listener);
 
@@ -84,6 +92,7 @@ public:
 		unsigned int id;
 	};
 
+	// 获取指定 LOD 的打包项目列表
 	void get_packed_items_at_lod(StdVector<PackedItem> &out_items, unsigned int lod_index) const;
 
 protected:

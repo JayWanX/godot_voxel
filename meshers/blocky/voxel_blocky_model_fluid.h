@@ -14,16 +14,20 @@ public:
 
 	VoxelBlockyModelFluid();
 
+	// 关联的流体配置
 	void set_fluid(Ref<VoxelBlockyFluid> fluid);
 	Ref<VoxelBlockyFluid> get_fluid() const;
 
+	// 液位等级
 	void set_level(int level);
 	int get_level() const;
 
 	bool is_empty() const override;
 
+	// 烘焙模型到上下文
 	void bake(blocky::ModelBakingContext &ctx) const override;
 
+	// 获取编辑器预览网格
 	Ref<Mesh> get_preview_mesh() const override;
 
 #ifdef TOOLS_ENABLED

@@ -19,11 +19,15 @@ public:
 	VoxelBlockyLibrary();
 	~VoxelBlockyLibrary();
 
+	// 加载默认模型
 	void load_default() override;
+	// 清空所有模型
 	void clear() override;
 
+	// 烘焙所有模型
 	void bake() override;
 
+	// 从资源名称获取对应的模型索引
 	int get_model_index_from_resource_name(String resource_name) const;
 
 	// 返回所添加模型索引的便捷方法

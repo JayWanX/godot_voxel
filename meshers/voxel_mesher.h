@@ -76,6 +76,7 @@ public:
 		Ref<Image> atlas_image;
 	};
 
+	// 检查表面数组是否为空
 	static bool is_mesh_empty(const StdVector<Output::Surface> &surfaces);
 
 	// 该方法可以同时从多个线程调用。请确保成员变量受保护或是线程局部的。

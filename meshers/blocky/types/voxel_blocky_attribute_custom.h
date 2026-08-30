@@ -10,9 +10,13 @@ class VoxelBlockyAttributeCustom : public VoxelBlockyAttribute {
 public:
 	VoxelBlockyAttributeCustom();
 
+	// 属性名称
 	void set_attribute_name(StringName p_name);
+	// 属性可取值的数量
 	void set_value_count(int count);
+	// 设置指定取值的名称
 	void set_value_name(int index, StringName p_name);
+	// 默认取值
 	void set_default_value(int v);
 
 	// 不那样暴露旋转，因为目前我们还无法自动化处理（以轨道为例，

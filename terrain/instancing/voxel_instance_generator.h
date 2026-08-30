@@ -72,98 +72,128 @@ public:
 			Ref<VoxelGenerator> voxel_generator
 	);
 
+	// 实例密度
 	void set_density(float d);
 	float get_density() const;
 
+	// 实例生成方式
 	void set_emit_mode(EmitMode mode);
 	EmitMode get_emit_mode() const;
 
+	// 位置随机抖动量
 	void set_jitter(const float p_jitter);
 	float get_jitter() const;
 
+	// 三角形面积阈值
 	void set_triangle_area_threshold(const float p_threshold);
 	float get_triangle_area_threshold() const;
 
+	// 实例垂直对齐程度
 	void set_vertical_alignment(float valign);
 	float get_vertical_alignment() const;
 
+	// 缩放范围
 	void set_min_scale(float min_scale);
 	float get_min_scale() const;
 
 	void set_max_scale(float max_scale);
 	float get_max_scale() const;
 
+	// 缩放值的分布方式
 	void set_scale_distribution(Distribution distribution);
 	Distribution get_scale_distribution() const;
 
 	// TODO 添加缩放曲线，现实生活中小物件远多于大物件
 
+	// 沿法线方向的偏移量
 	void set_offset_along_normal(float offset);
 	float get_offset_along_normal() const;
 
+	// 允许生成实例的最小坡度
 	void set_min_slope_degrees(float p_degrees);
 	float get_min_slope_degrees() const;
 
+	// 允许生成实例的最大坡度
 	void set_max_slope_degrees(float p_degrees);
 	float get_max_slope_degrees() const;
 
+	// 坡度最小值的衰减角度
 	void set_min_slope_falloff_degrees(float p_degrees);
 	float get_min_slope_falloff_degrees() const;
 
+	// 坡度最大值的衰减角度
 	void set_max_slope_falloff_degrees(float p_degrees);
 	float get_max_slope_falloff_degrees() const;
 
+	// 允许生成实例的最小高度
 	void set_min_height(float h);
 	float get_min_height() const;
 
+	// 允许生成实例的最大高度
 	void set_max_height(float h);
 	float get_max_height() const;
 
+	// 高度最小值的衰减范围
 	void set_min_height_falloff(float f);
 	float get_min_height_falloff() const;
 
+	// 高度最大值的衰减范围
 	void set_max_height_falloff(float f);
 	float get_max_height_falloff() const;
 
+	// 是否随机垂直翻转
 	void set_random_vertical_flip(bool flip);
 	bool get_random_vertical_flip() const;
 
+	// 是否随机旋转
 	void set_random_rotation(bool enabled);
 	bool get_random_rotation() const;
 
+	// 用于控制实例分布的噪声
 	void set_noise(Ref<Noise> noise);
 	Ref<Noise> get_noise() const;
 
+	// 用于控制实例分布的噪声图
 	void set_noise_graph(Ref<pg::VoxelGraphFunction> func);
 	Ref<pg::VoxelGraphFunction> get_noise_graph() const;
 
+	// 噪声采样维度
 	void set_noise_dimension(Dimension dim);
 	Dimension get_noise_dimension() const;
 
+	// 噪声衰减
 	void set_noise_falloff(const float p_falloff);
 	float get_noise_falloff() const;
 
+	// 噪声阈值
 	void set_noise_threshold(const float threshold);
 	float get_noise_threshold() const;
 
+	// 噪声对缩放的影响量
 	void set_noise_on_scale(float amount);
 	float get_noise_on_scale() const;
 
+	// 是否启用体素材质过滤
 	void set_voxel_material_filter_enabled(bool enabled);
 	bool is_voxel_material_filter_enabled() const;
 
+	// 体素材质过滤掩码
 	void set_voxel_material_filter_mask(const uint32_t mask);
 	uint32_t get_voxel_material_filter_mask() const;
 
+	// 体素材质过滤阈值
 	void set_voxel_material_filter_threshold(const float p_threshold);
 	float get_voxel_material_filter_threshold() const;
 
+	// 是否吸附到生成器的 SDF
 	void set_snap_to_generator_sdf_enabled(bool enabled);
 	bool get_snap_to_generator_sdf_enabled() const;
 
+	// SDF 吸附的搜索距离
 	void set_snap_to_generator_sdf_search_distance(float new_distance);
 	float get_snap_to_generator_sdf_search_distance() const;
 
+	// SDF 吸附的采样次数
 	void set_snap_to_generator_sdf_sample_count(int new_sample_count);
 	int get_snap_to_generator_sdf_sample_count() const;
 

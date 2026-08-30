@@ -14,9 +14,12 @@ class VoxelGeneratorScript : public VoxelGenerator {
 public:
 	VoxelGeneratorScript();
 
+	// 生成单个数据块的体素数据
 	Result generate_block(VoxelGenerator::VoxelQueryData input) override;
+	// 获取生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 当前配置是否可运行
 	bool is_runnable() const override;
 
 protected:

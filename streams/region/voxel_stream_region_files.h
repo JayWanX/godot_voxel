@@ -25,32 +25,50 @@ public:
 	VoxelStreamRegionFiles();
 	~VoxelStreamRegionFiles();
 
+	// 加载单个体素数据块
 	void load_voxel_block(VoxelStream::VoxelQueryData &query) override;
+	// 保存单个体素数据块
 	void save_voxel_block(VoxelStream::VoxelQueryData &query) override;
 
+	// 批量加载体素数据块
 	void load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) override;
+	// 批量保存体素数据块
 	void save_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) override;
 
+	// 获取此数据流中可用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 获取存储目录路径
 	String get_directory() const;
+	// 设置存储目录路径
 	void set_directory(String dirpath);
 
+	// 获取区域大小（数据块数，Vector3i 形式）
 	Vector3i get_region_size() const;
+	// 获取区域大小（Vector3 形式，用于脚本）
 	Vector3 get_region_size_v() const;
+	// 获取区域大小的以 2 为底的对数
 	int get_region_size_po2() const;
 
+	// 获取扇区大小
 	int get_sector_size() const;
 
+	// 获取数据块大小的以 2 为底的对数
 	int get_block_size_po2() const override;
+	// 获取数据块的细节层级（LOD）数量
 	int get_lod_count() const override;
 
+	// 设置数据块大小的以 2 为底的对数
 	void set_block_size_po2(int p_block_size_po2);
+	// 设置区域大小的以 2 为底的对数
 	void set_region_size_po2(int p_region_size_po2);
+	// 设置扇区大小
 	void set_sector_size(int p_sector_size);
 
+	// 将旧格式的区域文件转换为新元数据格式
 	void convert_files(Dictionary d);
 
+	// 强制将待处理数据写入文件系统
 	void flush() override;
 
 protected:

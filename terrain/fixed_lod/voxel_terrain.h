@@ -44,70 +44,88 @@ public:
 	VoxelTerrain();
 	~VoxelTerrain();
 
+	// 流：负责数据的加载与保存
 	void set_stream(Ref<VoxelStream> p_stream) override;
 	Ref<VoxelStream> get_stream() const override;
 
+	// 用于生成地形数据的生成器
 	void set_generator(Ref<VoxelGenerator> p_generator) override;
 	Ref<VoxelGenerator> get_generator() const override;
 
+	// 负责网格化的网格器
 	void set_mesher(Ref<VoxelMesher> mesher) override;
 	Ref<VoxelMesher> get_mesher() const override;
 
+	// 数据块大小，以 2 的幂表示，以及实际大小
 	unsigned int get_data_block_size_pow2() const;
 	inline unsigned int get_data_block_size() const {
 		return 1 << get_data_block_size_pow2();
 	}
 	// void set_data_block_size_po2(unsigned int p_block_size_po2);
 
+	// 网格块大小，以 2 的幂表示，以及实际大小
 	unsigned int get_mesh_block_size_pow2() const;
 	inline unsigned int get_mesh_block_size() const {
 		return 1 << get_mesh_block_size_pow2();
 	}
 	void set_mesh_block_size(unsigned int p_block_size);
 
+	// 编辑后通知地形更新相应区域
 	void post_edit_voxel(Vector3i pos);
 	void post_edit_area(Box3i box_in_voxels, bool update_mesh);
 
+	// 是否生成碰撞体
 	void set_generate_collisions(bool enabled);
 	bool get_generate_collisions() const {
 		return _generate_collisions;
 	}
 
+	// 碰撞层
 	void set_collision_layer(int layer);
 	int get_collision_layer() const;
 
+	// 碰撞掩码
 	void set_collision_mask(int mask);
 	int get_collision_mask() const;
 
+	// 碰撞边距
 	void set_collision_margin(float margin);
 	float get_collision_margin() const;
 
+	// 最大观察距离，以体素为单位
 	int get_max_view_distance() const;
 	void set_max_view_distance(int distance_in_voxels);
 
+	// 是否启用数据块进入通知
 	void set_block_enter_notification_enabled(bool enable);
 	bool is_block_enter_notification_enabled() const;
 
+	// 是否启用区域编辑通知
 	void set_area_edit_notification_enabled(bool enable);
 	bool is_area_edit_notification_enabled() const;
 
+	// 是否自动加载观察者周围的块
 	void set_automatic_loading_enabled(bool enable);
 	bool is_automatic_loading_enabled() const;
 
+	// 覆盖默认的网格材质
 	void set_material_override(Ref<Material> material);
 	Ref<Material> get_material_override() const;
 
 #ifdef VOXEL_ENABLE_GPU
+	// 生成器是否使用 GPU
 	void set_generator_use_gpu(bool enabled);
 	bool get_generator_use_gpu() const;
 #endif
 
+	// 获取地形数据存储
 	VoxelData &get_storage() const override;
 
 	std::shared_ptr<VoxelData> get_storage_shared() const {
 		return _data;
 	}
 
+	// 获取用于编辑地形的工具
 	Ref<VoxelTool> get_voxel_tool() override;
 
 	// 在给定位置创建或覆盖任何已有的数据块数据。
@@ -115,11 +133,14 @@ public:
 	// 如果本地没有观察者在范围内，数据将不会被应用，该函数返回 `false`。
 	bool try_set_block_data(Vector3i position, std::shared_ptr<VoxelBuffer> &voxel_data);
 
+	// 是否存在指定位置的数据块
 	bool has_data_block(Vector3i position) const;
 
+	// 地形数据范围的边界框
 	void set_bounds(Box3i box);
 	Box3i get_bounds() const;
 
+	// 重启流，重新网格化所有块
 	void restart_stream() override;
 	void remesh_all_blocks() override;
 
@@ -138,6 +159,7 @@ public:
 		uint32_t time_request_blocks_to_update = 0;
 	};
 
+	// 获取更新统计信息
 	const Stats &get_stats() const;
 
 	// struct BlockToSave {
@@ -157,20 +179,25 @@ public:
 		DEBUG_DRAW_FLAGS_COUNT = 3
 	};
 
+	// 是否启用调试绘制
 	void debug_set_draw_enabled(bool enabled);
 	bool debug_is_draw_enabled() const;
 
+	// 设置 / 查询调试绘制标志
 	void debug_set_draw_flag(DebugDrawFlag flag_index, bool enabled);
 	bool debug_get_draw_flag(DebugDrawFlag flag_index) const;
 
+	// 是否绘制阴影遮挡物
 	void debug_set_draw_shadow_occluders(bool enable);
 	bool debug_get_draw_shadow_occluders() const;
 
 	// 内部
 
 #ifdef VOXEL_ENABLE_INSTANCER
+	// 设置实例化器
 	void set_instancer(VoxelInstancer *instancer);
 #endif
+	// 获取已网格化的块位置及其网格表面数据
 	void get_meshed_block_positions(StdVector<Vector3i> &out_positions) const;
 	Array get_mesh_block_surface(Vector3i block_pos) const;
 
@@ -182,8 +209,10 @@ public:
 		return _streaming_dependency;
 	}
 
+	// 获取指定区域内的观察者 ID 列表
 	void get_viewers_in_area(StdVector<ViewerID> &out_viewer_ids, Box3i voxel_box) const;
 
+	// 多人在线同步器
 	void set_multiplayer_synchronizer(VoxelTerrainMultiplayerSynchronizer *synchronizer);
 	const VoxelTerrainMultiplayerSynchronizer *get_multiplayer_synchronizer() const;
 

@@ -11,26 +11,33 @@ namespace voxel {
 class VoxelInstanceLibraryItem : public Resource {
 	GDCLASS(VoxelInstanceLibraryItem, Resource)
 public:
+	// 项目名称
 	void set_item_name(String p_name);
 	String get_item_name() const;
 
+	// 项目所在的 LOD 索引
 	void set_lod_index(int lod);
 	int get_lod_index() const;
 
+	// 实例生成器
 	void set_generator(Ref<VoxelInstanceGenerator> generator);
 	Ref<VoxelInstanceGenerator> get_generator() const;
 
+	// 是否持久化保存实例
 	void set_persistent(bool persistent);
 	bool is_persistent() const;
 
+	// 漂浮 SDF 阈值
 	float get_floating_sdf_threshold() const;
 	void set_floating_sdf_threshold(const float new_threshold);
 
+	// 漂浮 SDF 沿法线的偏移量
 	float get_floating_sdf_offset_along_normal() const;
 	void set_floating_sdf_offset_along_normal(const float new_offset);
 
 	// 内部
 
+	// 添加或移除项目变更监听器
 	void add_listener(IInstanceLibraryItemListener *listener, int id);
 	void remove_listener(IInstanceLibraryItemListener *listener, int id);
 

@@ -29,37 +29,52 @@ public:
 	// 那么剩余的数据将会被写入数据库 B。
 	// 典型的用例是在游戏启动时设置此路径，并在本次会话结束前不再更改它。
 	void set_database_path(String path);
+	// 获取数据库文件路径
 	String get_database_path() const;
 
+	// 加载单个体素数据块
 	void load_voxel_block(VoxelStream::VoxelQueryData &q) override;
+	// 保存单个体素数据块
 	void save_voxel_block(VoxelStream::VoxelQueryData &q) override;
 
+	// 批量加载体素数据块
 	void load_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) override;
+	// 批量保存体素数据块
 	void save_voxel_blocks(Span<VoxelStream::VoxelQueryData> p_blocks) override;
 
 #ifdef VOXEL_ENABLE_INSTANCER
+	// 是否支持实例块数据
 	bool supports_instance_blocks() const override;
+	// 批量加载实例块数据
 	void load_instance_blocks(Span<VoxelStream::InstancesQueryData> out_blocks) override;
+	// 批量保存实例块数据
 	void save_instance_blocks(Span<VoxelStream::InstancesQueryData> p_blocks) override;
 #endif
 
+	// 是否支持一次性加载所有数据块
 	bool supports_loading_all_blocks() const override {
 		return true;
 	}
+	// 一次性加载所有数据块
 	void load_all_blocks(FullLoadingResult &result) override;
 
+	// 获取此数据流中可用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 强制将待处理数据写入数据库
 	void flush() override;
-	// 若刷新未完成则返回 false。此时，如果事务无法启动，缓存的数据块会被保留，
+	// 刷新缓存，若刷新未完成则返回 false。此时，如果事务无法启动，缓存的数据块会被保留，
 	// 但如果提交本身失败，它们则会丢失。
 	bool flush_cache();
 
-	// 如果保存的数据非常稀疏（例如只保存被编辑过的数据块），这可能会改善查询性能。
+	// 设置键缓存是否启用。如果保存的数据非常稀疏（例如只保存被编辑过的数据块），这可能会改善查询性能。
 	void set_key_cache_enabled(bool enable);
+	// 获取键缓存是否启用
 	bool is_key_cache_enabled() const;
 
+	// 获取此数据流支持的数据块坐标范围
 	Box3i get_supported_block_range() const override;
+	// 获取数据块的细节层级（LOD）数量
 	int get_lod_count() const override;
 
 	enum CoordinateFormat {
@@ -70,11 +85,15 @@ public:
 		COORDINATE_FORMAT_COUNT
 	};
 
+	// 设置新建数据库时优先使用的坐标格式
 	void set_preferred_coordinate_format(CoordinateFormat format);
+	// 获取新建数据库时优先使用的坐标格式
 	CoordinateFormat get_preferred_coordinate_format() const;
 
+	// 获取现有数据库当前实际使用的坐标格式
 	CoordinateFormat get_current_coordinate_format();
 
+	// 将本数据流中的数据块复制到另一个 SQLite 数据流
 	bool copy_blocks_to_other_sqlite_stream(Ref<VoxelStreamSQLite> dst_stream);
 
 private:

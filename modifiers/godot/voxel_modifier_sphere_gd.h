@@ -9,6 +9,7 @@ class VoxelModifierSphere : public VoxelModifier {
 	GDCLASS(VoxelModifierSphere, VoxelModifier);
 
 public:
+	// 球体半径
 	float get_radius() const;
 	void set_radius(float r);
 

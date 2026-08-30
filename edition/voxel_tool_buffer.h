@@ -11,8 +11,11 @@ public:
 	VoxelToolBuffer() {}
 	VoxelToolBuffer(Ref<godot::VoxelBuffer> vb);
 
+	// 检查指定区域是否可编辑
 	bool is_area_editable(const Box3i &box) const override;
+	// 将缓冲区中的体素粘贴到指定位置
 	void paste(Vector3i p_pos, const VoxelBuffer &src, uint8_t channels_mask) override;
+	// 按掩码粘贴缓冲区中的体素
 	void paste_masked(
 			Vector3i p_pos,
 			Ref<godot::VoxelBuffer> p_voxels,
@@ -21,6 +24,7 @@ public:
 			uint64_t mask_value
 	) override;
 
+	// 按掩码粘贴，仅写入可写列表中的位置
 	void paste_masked_writable_list(
 			Vector3i pos,
 			Ref<godot::VoxelBuffer> p_voxels,
@@ -31,9 +35,11 @@ public:
 			PackedInt32Array dst_writable_list
 	) override;
 
+	// 读取 / 写入指定位置的体素元数据
 	void set_voxel_metadata(const Vector3i pos, const Variant &meta) override;
 	Variant get_voxel_metadata(const Vector3i pos) const override;
 
+	// 执行球 / 盒 / 路径编辑
 	void do_sphere(Vector3 center, float radius) override;
 	void do_box(Vector3i begin, Vector3i end) override;
 	void do_path(Span<const Vector3> positions, Span<const float> radii) override;

@@ -46,40 +46,49 @@ public:
 
 	// 属性
 
+	// 设置模型颜色
 	void set_color(Color color);
 	_FORCE_INLINE_ Color get_color() const {
 		return _color;
 	}
 
+	// 设置或获取指定表面的材质覆盖，并查询是否存在覆盖
 	void set_material_override(int index, Ref<Material> material);
 	Ref<Material> get_material_override(int index) const;
 	bool has_material_override() const;
 
+	// 指定表面是否启用网格碰撞
 	void set_mesh_collision_enabled(int surface_index, bool enabled);
 	bool is_mesh_collision_enabled(int surface_index) const;
 
+	// 透明度索引，用于相邻体素的面剔除判定
 	void set_transparency_index(int i);
 	int get_transparency_index() const {
 		return _transparency_index;
 	}
 
+	// 是否剔除相邻体素的面
 	void set_culls_neighbors(bool cn);
 	bool get_culls_neighbors() const {
 		return _culls_neighbors;
 	}
 
+	// 碰撞掩码
 	void set_collision_mask(uint32_t mask);
 	inline uint32_t get_collision_mask() const {
 		return _collision_mask;
 	}
 
+	// 碰撞包围盒的数量
 	unsigned int get_collision_aabb_count() const;
 	void set_collision_aabb(unsigned int i, AABB aabb);
 	void set_collision_aabbs(Span<const AABB> aabbs);
 
+	// 是否参与随机刻更新
 	void set_random_tickable(bool rt);
 	bool is_random_tickable() const;
 
+	// 标签掩码，用于与其它系统交互
 	void set_tags_mask(const uint32_t mask);
 	uint32_t get_tags_mask() const;
 
@@ -87,17 +96,21 @@ public:
 	virtual void get_configuration_warnings(PackedStringArray &out_warnings) const;
 #endif
 
+	// 网格的正交旋转索引
 	void set_mesh_ortho_rotation_index(int i);
 	int get_mesh_ortho_rotation_index() const;
 
+	// 是否生成 LOD 裙边
 	void set_lod_skirts_enabled(bool rt);
 	bool get_lod_skirts_enabled() const;
 
 	//------------------------------------------
 	// 仅供内部使用的属性
 
+	// 该模型是否为空
 	virtual bool is_empty() const;
 
+	// 烘焙模型到上下文
 	virtual void bake(blocky::ModelBakingContext &ctx) const;
 
 	Span<const AABB> get_collision_aabbs() const {
@@ -122,13 +135,17 @@ public:
 		return _legacy_properties;
 	}
 
+	// 从其它模型复制基础属性
 	void copy_base_properties_from(const VoxelBlockyModel &src);
 
+	// 获取编辑器预览网格
 	virtual Ref<Mesh> get_preview_mesh() const;
 
+	// 将模型旋转 90 度
 	void rotate_90(math::Axis axis, bool clockwise);
 	void rotate_ortho(math::OrthoBasis ortho_basis);
 
+	// 从烘焙数据生成网格
 	static Ref<Mesh> make_mesh_from_baked_data(const blocky::BakedModel &baked_data, bool tangents_enabled);
 
 	static Ref<Mesh> make_mesh_from_baked_data(

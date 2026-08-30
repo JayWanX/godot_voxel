@@ -71,32 +71,40 @@ public:
 
 	// 属性
 
+	// 实例的"向上"方向
 	void set_up_mode(UpMode mode);
 	UpMode get_up_mode() const;
 
+	// 实例库
 	void set_library(Ref<VoxelInstanceLibrary> library);
 	Ref<VoxelInstanceLibrary> get_library() const;
 
+	// 每帧用于网格 LOD 更新的预算
 	int get_mesh_lod_update_budget_microseconds() const;
 	void set_mesh_lod_update_budget_microseconds(const int p_micros);
 
+	// 每帧用于碰撞更新的预算
 	int get_collision_update_budget_microseconds() const;
 	void set_collision_update_budget_microseconds(const int p_micros);
 
+	// 是否启用淡入淡出
 	void set_fading_enabled(const bool enabled);
 	bool get_fading_enabled() const;
 
+	// 淡入淡出时长
 	void set_fading_duration(const float fading);
 	float get_fading_duration() const;
 
 	// 操作
 
+	// 保存所有已修改的数据块
 	void save_all_modified_blocks(
 			BufferedTaskScheduler &tasks,
 			std::shared_ptr<AsyncDependencyTracker> tracker,
 			bool with_flush
 	);
 
+	// 移除球体内的实例
 	void remove_instances_in_sphere(const Vector3 p_center, const float p_radius);
 
 	enum NodeConversionFlags {
@@ -105,12 +113,14 @@ public:
 		NODE_CONVERSION_INCLUDE_MATERIAL_OVERRIDES = 1 << 2
 	};
 
+	// 将实例转换为场景节点
 	Node3D *convert_to_nodes(const uint32_t flags) const;
 
 	// 事件处理程序
 
 	// void on_data_block_loaded(Vector3i grid_position, unsigned int lod_index, UniquePtr<InstanceBlockData>
 	// instances);
+	// 网格块进入视口时的回调
 	void on_mesh_block_enter(
 			const Vector3i render_grid_position,
 			const unsigned int lod_index,
@@ -118,32 +128,46 @@ public:
 			const int32_t vertex_range_end,
 			const int32_t index_range_end
 	);
+	// 网格块退出视口时的回调
 	void on_mesh_block_exit(const Vector3i render_grid_position, const unsigned int lod_index);
+	// 体素区域被编辑时的回调
 	void on_area_edited(Box3i p_voxel_box);
+	// 刚体被移除时的回调
 	void on_body_removed(Vector3i data_block_position, unsigned int render_block_index, unsigned int instance_index);
+	// 场景实例被移除时的回调
 	void on_scene_instance_removed(
 			Vector3i data_block_position,
 			unsigned int render_block_index,
 			unsigned int instance_index
 	);
+	// 场景实例被修改时的回调
 	void on_scene_instance_modified(Vector3i data_block_position, unsigned int render_block_index);
+	// 数据块被保存时的回调
 	void on_data_block_saved(Vector3i data_grid_position, unsigned int lod_index);
 
 	// 内部属性
 
+	// 设置网格块与数据块尺寸
 	void set_mesh_block_size_po2(unsigned int p_mesh_block_size_po2);
 	void set_data_block_size_po2(unsigned int p_data_block_size_po2);
+	// 从父节点更新网格 LOD 距离
 	void update_mesh_lod_distances_from_parent();
 
+	// 从渲染块索引获取库项目 ID
 	int get_library_item_id_from_render_block_index(unsigned render_block_index) const;
 
 	// 调试
 
+	// 数据块数量
 	int debug_get_block_count() const;
+	// 统计各图层的实例数量
 	void debug_get_instance_counts(StdUnorderedMap<uint32_t, uint32_t> &counts_per_layer) const;
+	// 将实例导出为场景文件
 	void debug_dump_as_scene(String fpath) const;
+	// 将实例导出为节点树
 	Node *debug_dump_as_nodes() const;
 
+	// 是否启用调试绘制
 	void debug_set_draw_enabled(bool enabled);
 	bool debug_is_draw_enabled() const;
 
@@ -153,9 +177,11 @@ public:
 		DEBUG_DRAW_FLAGS_COUNT
 	};
 
+	// 设置或获取调试绘制标志
 	void debug_set_draw_flag(DebugDrawFlag flag_index, bool enabled);
 	bool debug_get_draw_flag(DebugDrawFlag flag_index) const;
 
+	// 获取指定位置的块调试信息
 	Dictionary debug_get_block_infos(const Vector3 world_position, const int item_id);
 
 	// 编辑器

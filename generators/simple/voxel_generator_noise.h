@@ -18,20 +18,26 @@ public:
 	VoxelGeneratorNoise();
 	~VoxelGeneratorNoise();
 
+	// 生成数据所在的通道
 	void set_channel(VoxelBuffer::ChannelId p_channel);
 	VoxelBuffer::ChannelId get_channel() const;
 
+	// 获取生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 用于生成地形的噪声源
 	void set_noise(Ref<FastNoiseLite> noise);
 	Ref<FastNoiseLite> get_noise() const;
 
+	// 高度起始值
 	void set_height_start(real_t y);
 	real_t get_height_start() const;
 
+	// 高度范围
 	void set_height_range(real_t hrange);
 	real_t get_height_range() const;
 
+	// 生成单个数据块的体素数据
 	Result generate_block(VoxelGenerator::VoxelQueryData input) override;
 
 private:

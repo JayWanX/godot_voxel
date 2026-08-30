@@ -40,14 +40,18 @@ public:
 	VoxelMesherCubes();
 	~VoxelMesherCubes();
 
+	// 将体素数据构建成网格
 	void build(VoxelMesher::Output &output, const VoxelMesher::Input &input) override;
 
+	// 是否启用贪心网格化
 	void set_greedy_meshing_enabled(bool enable);
 	bool is_greedy_meshing_enabled() const;
 
+	// 体素颜色解释方式
 	void set_color_mode(ColorMode mode);
 	ColorMode get_color_mode() const;
 
+	// 使用的调色板
 	void set_palette(Ref<VoxelColorPalette> palette);
 	Ref<VoxelColorPalette> get_palette() const;
 
@@ -55,8 +59,10 @@ public:
 	// 这会导致性能下降，甚至可能出现意外行为
 	// 	Ref<Resource> duplicate(bool p_subresources = false) const override;
 
+	// 网格生成器使用的通道掩码
 	int get_used_channels_mask() const override;
 
+	// 是否将颜色存入纹理
 	void set_store_colors_in_texture(bool enable);
 	bool get_store_colors_in_texture() const;
 
@@ -64,10 +70,12 @@ public:
 		return true;
 	}
 
+	// 设置或获取指定索引的材质
 	void set_material_by_index(Materials id, Ref<Material> material);
 	Ref<Material> get_material_by_index(unsigned int i) const override;
 	unsigned int get_material_index_count() const override;
 
+	// 从图像生成体素网格
 	static Ref<Mesh> generate_mesh_from_image(Ref<Image> image, float voxel_size);
 
 	// 结构体

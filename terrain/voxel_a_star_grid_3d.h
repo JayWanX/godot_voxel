@@ -62,16 +62,21 @@ public:
 	// 目前只是基础实现。未来可能需要更多的配置和自定义。
 	// 另外，它不会在查询之间缓存数据。
 
+	// 设置寻路使用的地形
 	void set_terrain(VoxelTerrain *node);
 
+	// 寻路区域范围
 	void set_region(Box3i region);
 	Box3i get_region();
 
+	// 同步寻路，返回路径体素坐标数组
 	TypedArray<Vector3i> find_path(Vector3i from_position, Vector3i to_position);
 
+	// 异步寻路及其状态查询
 	void find_path_async(Vector3i from_position, Vector3i to_position);
 	bool is_running_async() const;
 
+	// 调试：获取寻路过程中访问过的位置
 	TypedArray<Vector3i> debug_get_visited_positions() const;
 
 private:

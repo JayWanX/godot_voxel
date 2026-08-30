@@ -16,16 +16,19 @@ namespace voxel {
 class VoxelInstanceComponent : public Node {
 	GDCLASS(VoxelInstanceComponent, Node)
 public:
+	// 标记实例已被修改
 	void mark_modified() {
 		ERR_FAIL_COND(_instancer == nullptr);
 		_instancer->on_scene_instance_modified(_data_block_position, _render_block_index);
 	}
 
+	// 从实例化器分离，不标记移除
 	void detach() {
 		ERR_FAIL_COND_MSG(_instancer == nullptr, "Already detached");
 		_instancer = nullptr;
 	}
 
+	// 附加到实例化器
 	void attach(VoxelInstancer *instancer) {
 		ERR_FAIL_COND_MSG(_instancer != nullptr, "Already attached");
 		_instancer = instancer;
@@ -44,6 +47,7 @@ public:
 		_instancer = nullptr;
 	}
 
+	// 序列化实例状态
 	Variant serialize_state() {
 		// TODO 脚本
 		return Variant();
@@ -54,18 +58,22 @@ public:
 		return Variant();
 	}
 
+	// 设置实例索引
 	void set_instance_index(int instance_index) {
 		_instance_index = instance_index;
 	}
 
+	// 设置所在数据块位置
 	void set_data_block_position(Vector3i data_block_position) {
 		_data_block_position = data_block_position;
 	}
 
+	// 设置渲染块索引
 	void set_render_block_index(unsigned int render_block_index) {
 		_render_block_index = render_block_index;
 	}
 
+	// 在节点中查找组件
 	static VoxelInstanceComponent *find_in(Node *root) {
 		ERR_FAIL_COND_V(root == nullptr, nullptr);
 		for (int i = 0; i < root->get_child_count(); ++i) {

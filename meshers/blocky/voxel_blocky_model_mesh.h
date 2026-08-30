@@ -9,19 +9,24 @@ namespace voxel {
 class VoxelBlockyModelMesh : public VoxelBlockyModel {
 	GDCLASS(VoxelBlockyModelMesh, VoxelBlockyModel)
 public:
+	// 作为视觉效果的网格
 	void set_mesh(Ref<Mesh> mesh);
 	Ref<Mesh> get_mesh() const {
 		return _mesh;
 	}
 
+	// 烘焙模型到上下文
 	void bake(blocky::ModelBakingContext &ctx) const override;
 	bool is_empty() const override;
 
+	// 获取编辑器预览网格
 	Ref<Mesh> get_preview_mesh() const override;
 
+	// 侧面顶点容差，用于邻居侧面剔除判定
 	void set_side_vertex_tolerance(float tolerance);
 	float get_side_vertex_tolerance() const;
 
+	// 是否启用侧面镂空
 	void set_side_cutout_enabled(bool enabled);
 	bool is_side_cutout_enabled() const;
 

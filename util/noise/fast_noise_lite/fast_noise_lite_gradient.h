@@ -45,41 +45,53 @@ public:
 
 	Voxel_FastNoiseLiteGradient();
 
+	// 噪声类型
 	void set_noise_type(NoiseType type);
 	NoiseType get_noise_type() const;
 
+	// 随机种子
 	void set_seed(int seed);
 	int get_seed() const;
 
+	// 周期（频率的倒数）
 	void set_period(float p);
 	float get_period() const;
 
+	// 振幅
 	void set_amplitude(float amp);
 	float get_amplitude() const;
 
+	// 分形类型
 	void set_fractal_type(FractalType type);
 	FractalType get_fractal_type() const;
+	// 获取底层分形类型（FastNoise 枚举）
 	_FastNoise::FractalType get_fractal_type_fnl() const;
 
+	// 分形倍频程数
 	void set_fractal_octaves(int octaves);
 	int get_fractal_octaves() const;
 
+	// 分形点隙（lacunarity）
 	void set_fractal_lacunarity(float lacunarity);
 	float get_fractal_lacunarity() const;
 
+	// 分形增益
 	void set_fractal_gain(float gain);
 	float get_fractal_gain() const;
 
+	// 3D 旋转类型
 	void set_rotation_type_3d(RotationType3D type);
 	RotationType3D get_rotation_type_3d() const;
 
 	// 这些是内联的，以确保内联真正发生。如果它们直接绑定到脚本 API，
 	// 就意味着它们需要有地址，那样我就不确定它们还能不能内联了？
 
+	// 对 2D 坐标执行域扭曲
 	inline void warp_2d(real_t &x, real_t &y) const {
 		return _fn.DomainWarp(x, y);
 	}
 
+	// 对 3D 坐标执行域扭曲
 	inline void warp_3d(real_t &x, real_t &y, real_t &z) const {
 		return _fn.DomainWarp(x, y, z);
 	}

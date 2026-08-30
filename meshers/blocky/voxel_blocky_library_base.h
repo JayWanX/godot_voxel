@@ -23,6 +23,7 @@ public:
 
 	static constexpr uint32_t NULL_INDEX = 0xFFFFFFFF;
 
+	// 是否生成切线数据
 	bool get_bake_tangents() const {
 		return _bake_tangents;
 	}
@@ -30,9 +31,12 @@ public:
 
 	//
 
+	// 加载默认模型
 	virtual void load_default();
+	// 清空所有模型
 	virtual void clear();
 
+	// 烘焙所有模型
 	virtual void bake();
 
 	//-------------------------
@@ -45,7 +49,9 @@ public:
 		return _baked_data_rw_lock;
 	}
 
+	// 获取指定索引的材质
 	Ref<Material> get_material_by_index(unsigned int index) const;
+	// 材质数量
 	unsigned int get_material_index_count() const;
 
 #ifdef TOOLS_ENABLED

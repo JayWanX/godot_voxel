@@ -12,6 +12,7 @@ namespace voxel {
 class VoxelViewer : public Node3D {
 	GDCLASS(VoxelViewer, Node3D)
 public:
+	// 用于触发其位置周围体素节点加载的观察者
 	VoxelViewer();
 
 	// 以世界空间单位表示的距离
@@ -19,23 +20,29 @@ public:
 	unsigned int get_view_distance() const;
 	// TODO 碰撞距离
 
+	// 垂直方向的观察距离比例
 	void set_view_distance_vertical_ratio(float p_ratio);
 	float get_view_distance_vertical_ratio() const;
 
 	// TODO 增加一个在编辑器中运行的选项，可能对测试有用？
 
+	// 是否要求生成网格
 	void set_requires_visuals(bool enabled);
 	bool is_requiring_visuals() const;
 
+	// 是否要求生成碰撞体
 	void set_requires_collisions(bool enabled);
 	bool is_requiring_collisions() const;
 
+	// 是否要求数据块进入通知
 	void set_requires_data_block_notifications(bool enabled);
 	bool is_requiring_data_block_notifications() const;
 
+	// 通过网络访问该观察者的对等体 ID
 	void set_network_peer_id(int id);
 	int get_network_peer_id() const;
 
+	// 是否在编辑器中生效
 	void set_enabled_in_editor(bool enable);
 	bool is_enabled_in_editor() const;
 

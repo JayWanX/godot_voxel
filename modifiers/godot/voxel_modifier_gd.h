@@ -23,16 +23,20 @@ public:
 
 	VoxelModifier();
 
+	// 修改操作（添加或移除体素）
 	void set_operation(Operation op);
 	Operation get_operation() const;
 
+	// 平滑度
 	void set_smoothness(float s);
 	float get_smoothness() const;
 
 #ifdef TOOLS_ENABLED
 #if defined(VOXEL_GODOT)
+	// 获取编辑器中显示的操作警告
 	PackedStringArray get_configuration_warnings() const override;
 #endif
+	// 获取编辑器中显示的操作警告
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif
 

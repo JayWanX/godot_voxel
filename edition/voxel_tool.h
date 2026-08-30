@@ -34,35 +34,46 @@ public:
 
 	VoxelTool();
 
+	// 编辑时使用的体素值
 	void set_value(uint64_t val);
 	uint64_t get_value() const;
 
+	// 编辑使用的体素通道
 	void set_channel(VoxelBuffer::ChannelId p_channel);
 	VoxelBuffer::ChannelId get_channel() const;
 
+	// 编辑模式（添加 / 移除 / 设置 / 纹理绘制）
 	void set_mode(Mode mode);
 	Mode get_mode() const;
 
+	// 擦除时使用的体素值
 	void set_eraser_value(uint64_t value);
 	uint64_t get_eraser_value() const;
 
+	// 读取指定位置的体素值（整数 / 浮点）
 	uint64_t get_voxel(Vector3i pos) const;
 	float get_voxel_f(Vector3i pos) const;
 
+	// 读取指定位置插值后的浮点体素值
 	virtual float get_voxel_f_interpolated(const Vector3 pos) const;
 
+	// SDF 缩放系数
 	float get_sdf_scale() const;
 	void set_sdf_scale(float s);
 
+	// 纹理索引
 	void set_texture_index(int ti);
 	int get_texture_index() const;
 
+	// 纹理不透明度
 	void set_texture_opacity(float opacity);
 	float get_texture_opacity() const;
 
+	// 纹理衰减范围
 	void set_texture_falloff(float falloff);
 	float get_texture_falloff() const;
 
+	// SDF 强度
 	void set_sdf_strength(float strength);
 	float get_sdf_strength() const;
 
@@ -80,9 +91,11 @@ public:
 	virtual void do_mesh(const VoxelMeshSDF &mesh_sdf, const Transform3D &transform, const float isolevel);
 #endif
 
+	// 用 SDF 印章擦除体素
 	void sdf_stamp_erase(Ref<godot::VoxelBuffer> stamp, Vector3i pos);
 	void sdf_stamp_erase(const VoxelBuffer &stamp, Vector3i pos);
 
+	// 将指定区域的体素复制到目标缓冲区
 	virtual void copy(
 			const Vector3i pos,
 			VoxelBuffer &dst,
@@ -96,9 +109,11 @@ public:
 			const bool with_metadata
 	) const;
 
+	// 将缓冲区中的体素粘贴到指定位置
 	virtual void paste(Vector3i pos, const VoxelBuffer &src, uint8_t channels_mask);
 	void paste(Vector3i pos, Ref<godot::VoxelBuffer> p_voxels, uint8_t channels_mask);
 
+	// 按掩码粘贴缓冲区中的体素
 	virtual void paste_masked(
 			Vector3i pos,
 			Ref<godot::VoxelBuffer> p_voxels,
@@ -107,6 +122,7 @@ public:
 			uint64_t mask_value
 	);
 
+	// 按掩码粘贴，仅写入可写列表中的位置
 	virtual void paste_masked_writable_list(
 			Vector3i pos,
 			Ref<godot::VoxelBuffer> p_voxels,
@@ -117,19 +133,24 @@ public:
 			PackedInt32Array dst_writable_list
 	);
 
+	// 平滑 / 增长球形区域
 	void smooth_sphere(Vector3 sphere_center, float sphere_radius, int blur_radius);
 	void grow_sphere(Vector3 sphere_center, float sphere_radius, float strength);
 
+	// 从指定位置沿方向对体素进行射线检测
 	virtual Ref<VoxelRaycastResult> raycast(Vector3 pos, Vector3 dir, float max_distance, uint32_t collision_mask);
 
+	// 是否计算射线命中的法线
 	void set_raycast_normal_enabled(bool enabled);
 
 	// 检查影响给定盒的编辑是否可以应用，无论是完全还是部分
 	virtual bool is_area_editable(const Box3i &box) const;
 
+	// 读取 / 写入指定位置的体素元数据
 	virtual void set_voxel_metadata(const Vector3i pos, const Variant &meta);
 	virtual Variant get_voxel_metadata(const Vector3i pos) const;
 
+	// 获取工具使用的数据格式
 	virtual VoxelFormat get_format() const;
 
 protected:

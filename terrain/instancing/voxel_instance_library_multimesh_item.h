@@ -69,56 +69,73 @@ public:
 
 	VoxelInstanceLibraryMultiMeshItem();
 
+	// 设置或获取指定 LOD 的网格
 	void set_mesh(Ref<Mesh> mesh, int mesh_lod_index);
 	Ref<Mesh> get_mesh(int mesh_lod_index) const;
 
+	// 设置或获取指定网格 LOD 的切换距离比例
 	void set_mesh_lod_distance_ratio(int mesh_lod_index, float ratio);
 	float get_mesh_lod_distance_ratio(int mesh_lod_index) const;
 
+	// 网格 LOD 的数量
 	int get_mesh_lod_count() const;
 
+	// 渲染层
 	void set_render_layer(int render_layer);
 	int get_render_layer() const;
 
+	// 材质覆盖
 	void set_material_override(Ref<Material> material);
 	Ref<Material> get_material_override() const;
 
+	// 阴影投射设置
 	void set_cast_shadows_setting(RenderingServerEnums::ShadowCastingSetting mode);
 	RenderingServerEnums::ShadowCastingSetting get_cast_shadows_setting() const;
 
+	// 全局光照模式
 	void set_gi_mode(GeometryInstance3D::GIMode mode);
 	GeometryInstance3D::GIMode get_gi_mode() const;
 
+	// 碰撞层
 	void set_collision_layer(int collision_layer);
 	int get_collision_layer() const;
 
+	// 碰撞掩码
 	void set_collision_mask(int collision_mask);
 	int get_collision_mask() const;
 
+	// 碰撞体所属的组
 	void set_collider_group_names(TypedArray<StringName> names);
 	TypedArray<StringName> get_collider_group_names() const;
 
 	#if defined(VOXEL_GODOT)
+	// 从模板节点应用设置
 	void setup_from_template(Node *root);
 #endif
 
+	// 用作模型的场景
 	void set_scene(Ref<PackedScene> scene);
 	Ref<PackedScene> get_scene() const;
 
+	// 超出最大 LOD 时是否隐藏
 	bool get_hide_beyond_max_lod() const;
 	void set_hide_beyond_max_lod(bool enabled);
 
+	// 实例被移除时的行为
 	void set_removal_behavior(const RemovalBehavior rb);
 	RemovalBehavior get_removal_behavior() const;
 
+	// 实例被移除时实例化的场景
 	void set_removal_scene(Ref<PackedScene> scene);
 	Ref<PackedScene> get_removal_scene() const;
 
+	// 碰撞体生效的距离
 	void set_collision_distance(const float distance);
 	float get_collision_distance() const;
 
 	// 内部
 
+	// 触发实例移除回调
 	void trigger_removal_callback(VoxelInstancer *instancer, const Transform3D &trans);
 
 	// 如果给项目分配了场景，则返回从场景转换而来的设置。
@@ -133,6 +150,7 @@ public:
 		return to_span(_mesh_lod_max_distance_ratios);
 	}
 
+	// 序列化或反序列化项目属性
 	Array serialize_multimesh_item_properties() const;
 	void deserialize_multimesh_item_properties(Array a);
 

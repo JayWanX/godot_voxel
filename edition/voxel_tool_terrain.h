@@ -16,7 +16,9 @@ public:
 	VoxelToolTerrain();
 	VoxelToolTerrain(VoxelTerrain *terrain);
 
+	// 检查指定区域是否可编辑
 	bool is_area_editable(const Box3i &box) const override;
+	// 对地形执行体素射线检测
 	Ref<VoxelRaycastResult> raycast(
 			Vector3 p_pos,
 			Vector3 p_dir,
@@ -24,9 +26,11 @@ public:
 			uint32_t p_collision_mask
 	) override;
 
+	// 读取 / 写入指定位置的体素元数据
 	void set_voxel_metadata(const Vector3i pos, const Variant &meta) override;
 	Variant get_voxel_metadata(const Vector3i pos) const override;
 
+	// 将指定区域的体素复制到目标缓冲区
 	void copy(
 			const Vector3i pos,
 			VoxelBuffer &dst,
@@ -34,8 +38,10 @@ public:
 			const bool with_metadata
 	) const override;
 
+	// 将缓冲区中的体素粘贴到指定位置
 	void paste(Vector3i pos, const VoxelBuffer &src, uint8_t channels_mask) override;
 
+	// 按掩码粘贴缓冲区中的体素
 	void paste_masked(
 			Vector3i pos,
 			Ref<godot::VoxelBuffer> p_voxels,
@@ -44,6 +50,7 @@ public:
 			uint64_t mask_value
 	) override;
 
+	// 按掩码粘贴，仅写入可写列表中的位置
 	void paste_masked_writable_list(
 			Vector3i pos,
 			Ref<godot::VoxelBuffer> p_voxels,
@@ -54,6 +61,7 @@ public:
 			PackedInt32Array dst_writable_list
 	) override;
 
+	// 执行盒 / 球 / 路径 / 网格编辑
 	void do_box(Vector3i begin, Vector3i end) override;
 	void do_sphere(Vector3 center, float radius) override;
 	void do_path(Span<const Vector3> positions, Span<const float> radii) override;
@@ -63,8 +71,10 @@ public:
 
 	// 专用 API
 
+	// 执行半球形编辑
 	void do_hemisphere(Vector3 center, float radius, Vector3 flat_direction, float smoothness);
 
+	// 在区域内运行方块随机刻
 	void run_blocky_random_tick(
 			const AABB voxel_area,
 			const int voxel_count,
@@ -73,8 +83,10 @@ public:
 			const uint32_t tags_mask
 	);
 
+	// 遍历区域内所有体素的元数据
 	void for_each_voxel_metadata_in_area(AABB voxel_area, const Callable &callback);
 
+	// 获取工具使用的数据格式
 	VoxelFormat get_format() const override;
 
 protected:

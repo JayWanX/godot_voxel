@@ -89,9 +89,12 @@ public:
 
 #ifdef VOXEL_ENABLE_INSTANCER
 	// TODO 将支持函数合并为带功能位掩码的单个 getter
+	// 是否支持实例块数据
 	virtual bool supports_instance_blocks() const;
 
+	// 加载多个实例块数据
 	virtual void load_instance_blocks(Span<InstancesQueryData> out_blocks);
+	// 保存多个实例块数据
 	virtual void save_instance_blocks(Span<InstancesQueryData> p_blocks);
 #endif
 
@@ -108,10 +111,12 @@ public:
 		StdVector<Block> blocks;
 	};
 
+	// 是否支持一次性加载所有数据块
 	virtual bool supports_loading_all_blocks() const {
 		return false;
 	}
 
+	// 一次性加载所有数据块
 	virtual void load_all_blocks(FullLoadingResult &result);
 
 	// 告知此数据流中可找到哪些通道。
@@ -128,6 +133,7 @@ public:
 	// 获取数据块可被查询的细节层级（LOD）数量。
 	virtual int get_lod_count() const;
 
+	// 获取此数据流支持的数据块坐标范围
 	virtual Box3i get_supported_block_range() const;
 
 	// 生成的数据块是否应立即保存？若不，它们将仅在修改后被保存。
@@ -143,7 +149,9 @@ public:
 	// 某些实现若无缓存，可能什么都不做。
 	virtual void flush();
 
+	// 设置压缩方式
 	void set_compression_mode(const godot::VoxelBlockSerializer::Compression mode);
+	// 获取压缩方式
 	godot::VoxelBlockSerializer::Compression get_compression_mode() const;
 
 	// 提示数据流的函数是否可以调用。主要用于脚本实现，以避免错误

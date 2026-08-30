@@ -43,12 +43,15 @@ public:
 
 	VoxelBlockyFluid();
 
+	// 流体材质
 	void set_material(Ref<Material> material);
 	Ref<Material> get_material() const;
 
+	// 向下流动时是否降低液面
 	void set_dip_when_flowing_down(bool enable);
 	bool get_dip_when_flowing_down() const;
 
+	// 烘焙流体数据
 	void bake(blocky::BakedFluid &baked_fluid, blocky::MaterialIndexer &materials) const;
 
 private:

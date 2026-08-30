@@ -11,8 +11,10 @@ class VoxelBlockyModelEmpty : public VoxelBlockyModel {
 public:
 	VoxelBlockyModelEmpty();
 
+	// 烘焙模型到上下文
 	void bake(blocky::ModelBakingContext &ctx) const override;
 
+	// 获取编辑器预览网格
 	Ref<Mesh> get_preview_mesh() const override;
 	bool is_empty() const override;
 

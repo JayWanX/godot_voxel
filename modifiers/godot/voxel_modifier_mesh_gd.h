@@ -10,13 +10,16 @@ class VoxelModifierMesh : public VoxelModifier {
 	GDCLASS(VoxelModifierMesh, VoxelModifier);
 
 public:
+	// 网格的 SDF 数据
 	void set_mesh_sdf(Ref<VoxelMeshSDF> mesh_sdf);
 	Ref<VoxelMeshSDF> get_mesh_sdf() const;
 
+	// 等值面（isolevel）
 	void set_isolevel(float isolevel);
 	float get_isolevel() const;
 
 #ifdef TOOLS_ENABLED
+	// 获取编辑器中显示的操作警告
 	void get_configuration_warnings(PackedStringArray &warnings) const override;
 #endif
 
