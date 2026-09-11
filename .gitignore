@@ -16,6 +16,7 @@
 
 doc/site/
 .trae/
+compile_commands.json
 
 shaders/dev/.godot/
 *.gen.glsl
