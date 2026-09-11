@@ -1,6 +1,8 @@
 
 # 这是以"模块(module)"方式构建此引擎的 SCons 入口脚本。
 # 它必须集成进 Godot 的源码树中才能运行，无法独立执行，详见根目录 `README`。
+# 注：Import / env / env_modules 均为 SCons 运行时注入的全局，整文件静默该误报。
+# pyright: reportUndefinedVariable = none
 
 # env：Godot 引擎编译主环境（含编译器、平台、目标等配置）。
 # env_modules：专用于引擎内置模块的编译环境。
