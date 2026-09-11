@@ -2,17 +2,17 @@
 #include "../../constants/voxel_string_names.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/godot/classes/object.h"
-#include "../../util/godot/core/array.h" // 供 `varray` 使用
+#include <core/variant/array.h>
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 #include "node_type_db.h"
+#include <core/variant/array.h> // 供 `varray` 使用
+#include <core/version.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 #include <algorithm>
+#include <core/object/callable_mp.h>
 
 namespace voxel::pg {
 

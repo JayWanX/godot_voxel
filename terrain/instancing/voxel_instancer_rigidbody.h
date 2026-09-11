@@ -1,7 +1,8 @@
 #ifndef VOXEL_INSTANCER_RIGIDBODY_H
 #define VOXEL_INSTANCER_RIGIDBODY_H
 
-#include "../../util/godot/classes/rigid_body_3d.h"
+#include <core/version.h>
+#include <scene/3d/physics/rigid_body_3d.h>
 #include "voxel_instancer.h"
 
 namespace voxel {

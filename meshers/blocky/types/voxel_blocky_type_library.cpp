@@ -1,10 +1,10 @@
 #include "voxel_blocky_type_library.h"
 #include "../../../constants/voxel_string_names.h"
 #include "../../../util/containers/container_funcs.h"
-#include "../../../util/godot/classes/json.h"
+#include <core/io/json.h>
 #include "../../../util/godot/classes/object.h"
-#include "../../../util/godot/classes/time.h"
-#include "../../../util/godot/core/array.h"
+#include <core/os/time.h>
+#include <core/variant/array.h>
 #include "../../../util/godot/core/string.h"
 #include "../../../util/godot/core/typed_array.h"
 #include "../../../util/profiling.h"

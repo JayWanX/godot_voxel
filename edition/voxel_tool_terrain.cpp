@@ -6,10 +6,11 @@
 #include "../storage/voxel_data.h"
 #include "../terrain/fixed_lod/voxel_terrain.h"
 #include "../util/godot/classes/ref_counted.h"
-#include "../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../util/godot/core/packed_arrays.h"
 #include "../util/math/conv.h"
 #include "raycast.h"
+#include <core/variant/array.h>
 
 using namespace voxel::godot;
 
@@ -334,7 +335,6 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 				rel_voxel_box, [&callback, block_origin](Vector3i rel_pos, const VoxelMetadata &meta) {
 					const Variant v = godot::get_as_variant(meta);
 					const Vector3i key = rel_pos + block_origin;
-#ifdef VOXEL_GODOT
 					const Variant key_v = key;
 					const Variant *args[2] = { &key_v, &v };
 					Callable::CallError err;
@@ -345,7 +345,6 @@ void VoxelToolTerrain::for_each_voxel_metadata_in_area(AABB voxel_area, const Ca
 							err.error != Callable::CallError::CALL_OK,
 							String("Callable failed at {0}").format(varray(key))
 					);
-#endif
 				}
 		);
 	});

@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_TYPED_ARRAY_H
 #define VOXEL_GODOT_TYPED_ARRAY_H
 
-#if defined(VOXEL_GODOT)
 #include <core/variant/typed_array.h>
-#endif
 
 #include "../../containers/span.h"
 #include <vector>
@@ -76,7 +74,6 @@ inline TypedArray<T> to_typed_array(Span<const Ref<T>> src) {
 	return array;
 }
 
-#if defined(VOXEL_GODOT)
 
 template <typename T>
 Vector<Ref<T>> to_ref_vector(const TypedArray<T> &typed_array) {
@@ -88,7 +85,6 @@ Vector<Ref<T>> to_ref_vector(const TypedArray<T> &typed_array) {
 	return refs;
 }
 
-#endif
 
 } // namespace voxel::godot
 

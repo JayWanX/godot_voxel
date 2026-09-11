@@ -1114,45 +1114,6 @@ void VoxelBuffer::clear_and_set_voxel_metadata(Span<FlatMapMoveOnly<Vector3i, Vo
 	_voxel_metadata.clear_and_insert(pairs);
 }
 
-/*#ifdef VOXEL_GODOT
-
-void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
-	ERR_FAIL_COND(callback.is_null());
-
-	for (FlatMap<Vector3i, Variant>::ConstIterator it = _voxel_metadata.begin(); it != _voxel_metadata.end(); ++it) {
-		const Variant key = it->key;
-		const Variant *args[2] = { &key, &it->value };
-		Callable::CallError err;
-		Variant retval; // 我们不关心返回值，但 Callable API 需要它
-		callback.call(args, 2, retval, err);
-
-		ERR_FAIL_COND_MSG(
-				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key)));
-		// TODO 无法提供详细的错误，因为 FuncRef 不让我们访问该对象
-		// ERR_FAIL_COND_MSG(err.error != Variant::CallError::CALL_OK, false,
-		// 		Variant::get_call_error_text(callback->get_object(), method_name, nullptr, 0, err));
-	}
-}
-
-void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Box3i box) const {
-	ERR_FAIL_COND(callback.is_null());
-	for_each_voxel_metadata_in_area(box, [&callback](Vector3i pos, Variant meta) {
-		const Variant key = pos;
-		const Variant *args[2] = { &key, &meta };
-		Callable::CallError err;
-		Variant retval; // 我们不关心返回值，但 Callable API 需要它
-		callback.call(args, 2, retval, err);
-
-		ERR_FAIL_COND_MSG(
-				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key)));
-		// TODO 无法提供详细的错误，因为 FuncRef 不让我们访问该对象
-		// ERR_FAIL_COND_MSG(err.error != Variant::CallError::CALL_OK, false,
-		// 		Variant::get_call_error_text(callback->get_object(), method_name, nullptr, 0, err));
-	});
-}
-
-#endif*/
-
 void VoxelBuffer::clear_voxel_metadata() {
 	_voxel_metadata.clear();
 }

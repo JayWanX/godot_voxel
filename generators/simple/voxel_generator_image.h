@@ -5,7 +5,7 @@
 #include "../../util/thread/rw_lock.h"
 #include "voxel_generator_heightmap.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Image)
+class Image;
 
 namespace voxel {
 

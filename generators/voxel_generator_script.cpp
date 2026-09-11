@@ -3,11 +3,10 @@
 #include "../storage/voxel_buffer_gd.h"
 #include "../util/godot/check_ref_ownership.h"
 #include "../util/godot/classes/engine.h"
-#include "../util/godot/classes/script.h"
+#include <core/object/script_language.h>
+#include <core/object/script_language.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

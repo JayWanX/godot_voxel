@@ -1,6 +1,7 @@
 #include "aabb.h"
 #include "../../io/text_writer.h"
 #include "../../math/vector3.h"
+#include <core/math/vector3.h>
 
 namespace voxel {
 

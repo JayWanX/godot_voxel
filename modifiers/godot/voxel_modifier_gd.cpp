@@ -1,8 +1,9 @@
 #include "voxel_modifier_gd.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/io/log.h"
 #include "../../util/math/conv.h"
 #include "../voxel_modifier_sdf.h"
+#include <core/variant/array.h>
 
 #ifdef TOOLS_ENABLED
 #include "../../util/godot/core/packed_arrays.h"
@@ -145,13 +146,11 @@ void VoxelModifier::_notification(int p_what) {
 
 #ifdef TOOLS_ENABLED
 
-#if defined(VOXEL_GODOT)
 PackedStringArray VoxelModifier::get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#endif
 
 void VoxelModifier::get_configuration_warnings(PackedStringArray &warnings) const {
 	if (_volume == nullptr) {

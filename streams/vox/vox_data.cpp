@@ -1,7 +1,8 @@
 #include "vox_data.h"
 #include "../../util/containers/std_unordered_set.h"
 #include "../../util/godot/classes/file_access.h"
-#include "../../util/godot/core/array.h"
+#include "../../util/math/vector3i.h"
+#include <core/variant/array.h>
 #include "../../util/io/log.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"

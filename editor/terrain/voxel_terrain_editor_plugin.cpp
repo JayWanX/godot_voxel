@@ -4,23 +4,27 @@
 #include "../../generators/voxel_generator.h"
 #include "../../terrain/fixed_lod/voxel_terrain.h"
 #include "../../terrain/variable_lod/voxel_lod_terrain.h"
-#include "../../util/godot/classes/camera_3d.h"
+#include <scene/3d/camera_3d.h>
 #include "../../util/godot/classes/editor_file_dialog.h"
-#include "../../util/godot/classes/editor_interface.h"
+#include <core/version.h>
+#include <editor/editor_interface.h>
 #include "../../util/godot/classes/editor_settings.h"
-#include "../../util/godot/classes/menu_button.h"
+#include <scene/gui/menu_button.h>
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/popup_menu.h"
+#include <scene/gui/popup_menu.h>
 #include "../../util/godot/core/keyboard.h"
 #include "../../util/godot/core/string.h"
 #include "../about_window.h"
 #include "../camera_cache.h"
 #include "../graph/voxel_graph_node_inspector_wrapper.h"
 #include "voxel_terrain_editor_task_indicator.h"
+#include <scene/3d/camera_3d.h>
+#include <editor/plugins/editor_plugin.h>
+#include <scene/gui/menu_button.h>
+#include <scene/gui/popup_menu.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

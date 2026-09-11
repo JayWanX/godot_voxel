@@ -3,9 +3,10 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/classes/array_mesh.h"
 #include "../../util/godot/classes/object.h"
-#include "../../util/godot/classes/point_mesh.h"
-#include "../../util/godot/classes/surface_tool.h"
-#include "../../util/godot/core/array.h"
+#include <core/version.h>
+#include <scene/resources/3d/primitive_meshes.h>
+#include <scene/resources/surface_tool.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/godot/core/string.h"
 #include "../../util/math/conv.h"

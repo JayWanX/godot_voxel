@@ -1,11 +1,9 @@
 #ifndef VOXEL_GODOT_OBJECT_H
 #define VOXEL_GODOT_OBJECT_H
 
-#if defined(VOXEL_GODOT)
 #include <core/object/object.h>
 // `GDCLASS` 宏在继承 `Object` 时无法编译，除非同时包含 `class_db.h`
 #include <core/object/class_db.h>
-#endif
 
 #include "../../containers/std_vector.h"
 

@@ -1,8 +1,6 @@
 #include "threaded_task_gd.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

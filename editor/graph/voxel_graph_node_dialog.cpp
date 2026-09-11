@@ -3,34 +3,42 @@
 #include "../../generators/graph/node_type_db.h"
 #include "../../util/containers/std_unordered_set.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/display_server.h"
+#include <servers/display/display_server.h>
 #include "../../util/godot/classes/editor_file_dialog.h"
 #include "../../util/godot/classes/editor_quick_open.h"
-#include "../../util/godot/classes/font.h"
+#include <editor/editor_node.h>
+#include <scene/resources/font.h>
 #include "../../util/godot/classes/input_event_key.h"
-#include "../../util/godot/classes/label.h"
-#include "../../util/godot/classes/line_edit.h"
+#include <scene/gui/label.h>
+#include <scene/gui/line_edit.h>
 #include "../../util/godot/classes/object.h"
-#include "../../util/godot/classes/rich_text_label.h"
-#include "../../util/godot/classes/tree.h"
+#include <scene/gui/rich_text_label.h>
+#include <scene/gui/tree.h>
 #include "../../util/godot/classes/tree_item.h"
-#include "../../util/godot/classes/v_box_container.h"
-#include "../../util/godot/classes/v_split_container.h"
-#include "../../util/godot/core/array.h"
+#include <scene/gui/box_container.h>
+#include <scene/gui/split_container.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/keyboard.h"
 #include "../../util/godot/core/string.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "graph_nodes_doc_data.h"
+#include <servers/display/display_server.h>
+#include <scene/resources/font.h>
+#include <scene/gui/label.h>
+#include <scene/gui/line_edit.h>
+#include <scene/gui/rich_text_label.h>
+#include <scene/gui/tree.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/split_container.h>
+#include <core/variant/array.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
-#include <editor/editor_node.h>
-#endif
 
-#include "../../util/godot/core/callable_mp.h"
 
-#endif
 
 namespace voxel {
 
@@ -176,15 +184,6 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 	add_child(_function_file_dialog);
 
 	// TODO 用直接在对话框中列出项目函数来取代 QuickOpen
-#ifdef VOXEL_GODOT
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-	_function_quick_open_dialog = memnew(EditorQuickOpen);
-	_function_quick_open_dialog->connect(
-			"quick_open", callable_mp(this, &VoxelGraphNodeDialog::on_function_quick_open_dialog_quick_open)
-	);
-	add_child(_function_quick_open_dialog);
-#endif
-#endif
 
 	// 在这个编辑器中，分类来自文档，可能与内部节点分类无关。
 	// 它们服务于不同的目的。
@@ -223,7 +222,6 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 				item.id = ID_FUNCTION_BROWSE;
 				_items.push_back(item);
 			}
-#ifdef VOXEL_GODOT
 			{
 				Item item;
 				item.name = VOXEL_TTR("Quick Open Custom Function...");
@@ -232,7 +230,6 @@ VoxelGraphNodeDialog::VoxelGraphNodeDialog() {
 				item.id = ID_FUNCTION_QUICK_OPEN;
 				_items.push_back(item);
 			}
-#endif
 			continue;
 		}
 
@@ -386,19 +383,12 @@ void VoxelGraphNodeDialog::on_tree_item_activated() {
 		voxel::godot::popup_file_dialog(*_function_file_dialog);
 
 	} else if (id == ID_FUNCTION_QUICK_OPEN) {
-#ifdef VOXEL_GODOT
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-		// 快速打开函数节点
-		_function_quick_open_dialog->popup_dialog(pg::VoxelGraphFunction::get_class_static());
-#else
 		Vector<StringName> base_types;
 		base_types.append(pg::VoxelGraphFunction::get_class_static());
 		EditorQuickOpenDialog *quick_open_dialog = EditorNode::get_singleton()->get_quick_open_dialog();
 		quick_open_dialog->popup_dialog(
 				base_types, callable_mp(this, &VoxelGraphNodeDialog::on_function_quick_open_dialog_item_selected)
 		);
-#endif
-#endif
 
 	} else {
 		WARN_PRINT(String("Unknown ID {} picked in {}").format(varray(id, get_class())));
@@ -445,24 +435,13 @@ void VoxelGraphNodeDialog::on_function_file_dialog_file_selected(String fpath) {
 	hide();
 }
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-void VoxelGraphNodeDialog::on_function_quick_open_dialog_quick_open() {
-#ifdef VOXEL_GODOT
-	String fpath = _function_quick_open_dialog->get_selected();
-	on_function_quick_open_dialog_item_selected(fpath);
-#endif
-}
-
-#endif
 
 void VoxelGraphNodeDialog::on_function_quick_open_dialog_item_selected(String fpath) {
-#ifdef VOXEL_GODOT
 	if (fpath.is_empty()) {
 		return;
 	}
 	emit_signal(SIGNAL_FILE_SELECTED, fpath);
 	hide();
-#endif
 }
 
 void VoxelGraphNodeDialog::on_description_label_meta_clicked(Variant meta) {

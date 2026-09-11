@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_VARIANT_H
 #define VOXEL_GODOT_VARIANT_H
 
-#if defined(VOXEL_GODOT)
 #include <core/variant/variant.h>
-#endif
 
 #include "../../containers/span.h"
 

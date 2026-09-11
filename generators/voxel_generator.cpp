@@ -2,8 +2,8 @@
 #include "../constants/voxel_string_names.h"
 #include "../shaders/shaders.h"
 #include "../storage/voxel_buffer_gd.h"
-#include "../util/godot/core/array.h" // 用于 `varray`
-#include "../util/godot/core/class_db.h"
+#include <core/variant/array.h>
+#include <core/object/class_db.h>
 #include "../util/profiling.h"
 #include "generate_block_task.h"
 

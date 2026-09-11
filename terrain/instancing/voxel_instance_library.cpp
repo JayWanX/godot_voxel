@@ -3,10 +3,8 @@
 #include "../../util/profiling.h"
 #include "voxel_instance_library_item.h"
 #include <algorithm>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 
 namespace voxel {

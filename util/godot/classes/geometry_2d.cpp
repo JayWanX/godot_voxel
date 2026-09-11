@@ -7,7 +7,6 @@ namespace voxel::godot {
 void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r_result, Vector2i &r_size) {
 	VOXEL_PROFILE_SCOPE();
 
-#if defined(VOXEL_GODOT)
 
 	Vector<Vector2i> sizes;
 	sizes.resize(p_sizes.size());
@@ -21,7 +20,6 @@ void geometry_2d_make_atlas(Span<const Vector2i> p_sizes, StdVector<Vector2i> &r
 	r_result.resize(result.size());
 	memcpy(r_result.data(), result.ptr(), result.size() * sizeof(Vector2i));
 
-#endif
 }
 
 void geometry_2d_clip_polygons( //
@@ -29,14 +27,12 @@ void geometry_2d_clip_polygons( //
 		const PackedVector2Array &polygon_b, //
 		StdVector<PackedVector2Array> &output //
 ) {
-#if defined(VOXEL_GODOT)
 	Vector<Vector<Vector2>> result = Geometry2D::clip_polygons(polygon_a, polygon_b);
 	output.resize(result.size());
 	for (unsigned int i = 0; i < output.size(); ++i) {
 		output[i] = result[i];
 	}
 
-#endif
 }
 
 } // namespace voxel::godot

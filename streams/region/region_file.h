@@ -6,7 +6,7 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/classes/file_access.h"
 #include "../../util/math/color8.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../compressed_data.h"
 
 namespace voxel {

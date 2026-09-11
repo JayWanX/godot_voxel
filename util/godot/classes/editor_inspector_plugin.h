@@ -1,24 +1,18 @@
+#include <core/version.h>
 #ifndef VOXEL_GODOT_EDITOR_INSPECTOR_PLUGIN_H
 #define VOXEL_GODOT_EDITOR_INSPECTOR_PLUGIN_H
 
-#if defined(VOXEL_GODOT)
 
-#include "../core/version.h"
+#include <core/version.h>
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 4
-#include <editor/editor_inspector.h>
-#else
 #include <editor/inspector/editor_inspector.h>
-#endif
 
-#endif
 
 namespace voxel::godot {
 
 class Voxel_EditorInspectorPlugin : public EditorInspectorPlugin {
 	GDCLASS(Voxel_EditorInspectorPlugin, EditorInspectorPlugin)
 public:
-#if defined(VOXEL_GODOT)
 	bool can_handle(Object *p_object) override;
 	void parse_begin(Object *p_object) override;
 	void parse_end(Object *p_object) override;
@@ -32,7 +26,6 @@ public:
 			const BitField<PropertyUsageFlags> p_usage,
 			const bool p_wide = false
 	) override;
-#endif
 
 protected:
 	virtual bool _voxel_can_handle(const Object *p_object) const;

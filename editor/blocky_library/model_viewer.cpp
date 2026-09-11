@@ -1,14 +1,23 @@
 #include "model_viewer.h"
-#include "../../util/godot/classes/camera_3d.h"
-#include "../../util/godot/classes/directional_light_3d.h"
-#include "../../util/godot/classes/input_event_mouse_motion.h"
-#include "../../util/godot/classes/sub_viewport.h"
-#include "../../util/godot/classes/sub_viewport_container.h"
-#include "../../util/godot/classes/world_3d.h"
+#include <scene/3d/camera_3d.h>
+#include <scene/3d/light_3d.h>
+#include <core/input/input_event.h>
+#include <scene/main/viewport.h>
+#include <scene/gui/subviewport_container.h>
+#include <core/version.h>
+#include <scene/resources/3d/world_3d.h>
 #include "../../util/godot/core/mouse_button.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/math/funcs.h"
 #include "axes_3d_control.h"
+#include <scene/3d/camera_3d.h>
+#include <scene/3d/light_3d.h>
+#include <core/input/input_event.h>
+#include <scene/main/viewport.h>
+#include <scene/gui/subviewport_container.h>
+#include <scene/resources/3d/world_3d.h>
+#include <editor/themes/editor_scale.h>
 
 namespace voxel {
 
@@ -63,9 +72,7 @@ Node *Voxel_ModelViewer::get_viewer_root_node() const {
 	return _viewport;
 }
 
-#if defined(VOXEL_GODOT)
 void Voxel_ModelViewer::gui_input(const Ref<InputEvent> &p_event) {
-#endif
 	Ref<InputEventMouseMotion> mm = p_event;
 	if (mm.is_valid()) {
 		if (mm->get_button_mask().has_flag(VOXEL_GODOT_MouseButtonMask_MIDDLE)) {

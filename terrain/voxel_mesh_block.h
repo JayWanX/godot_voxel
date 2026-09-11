@@ -1,3 +1,4 @@
+#include <scene/resources/3d/world_3d.h>
 #ifndef VOXEL_MESH_BLOCK_H
 #define VOXEL_MESH_BLOCK_H
 
@@ -5,15 +6,16 @@
 #include "../meshers/voxel_mesher.h"
 #include "../util/containers/fixed_array.h"
 #include "../util/containers/span.h"
-#include "../util/godot/classes/world_3d.h"
+#include <core/version.h>
+#include <scene/resources/3d/world_3d.h>
 #include "../util/godot/direct_mesh_instance.h"
 #include "../util/godot/direct_static_body.h"
 #include "../util/ref_count.h"
 
 #include <atomic>
 
-VOXEL_GODOT_FORWARD_DECLARE(class Node3D);
-VOXEL_GODOT_FORWARD_DECLARE(class ConcavePolygonShape3D);
+class Node3D;
+class ConcavePolygonShape3D;
 
 namespace voxel {
 

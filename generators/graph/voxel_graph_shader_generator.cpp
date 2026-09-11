@@ -3,7 +3,7 @@
 #include "../../engine/gpu/compute_shader_resource.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_map.h"
-#include "../../util/godot/core/array.h" // 用于 `varray`
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"

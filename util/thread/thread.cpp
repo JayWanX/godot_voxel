@@ -1,16 +1,13 @@
 #include "thread.h"
 #include "../godot/classes/os.h"
 #include "../memory/memory.h"
-
-#if defined(VOXEL_GODOT)
 #include <core/os/thread.h>
-#endif
+
 
 #include <thread>
 
 namespace voxel {
 
-#if defined(VOXEL_GODOT)
 
 struct ThreadImpl {
 	::Thread thread;
@@ -42,7 +39,6 @@ void Thread::set_name(const char *name) {
 	::Thread::set_name(String(name));
 }
 
-#endif
 
 void Thread::sleep_usec(uint32_t microseconds) {
 	OS::get_singleton()->delay_usec(microseconds);

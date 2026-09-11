@@ -523,7 +523,6 @@ SCons 标志              | C++ 宏                       | 描述
 ### 其他宏
 
 - `MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE`：必须定义此宏以防止与 Godot 自带的 MeshOptimizer 版本冲突。参见 [https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624](https://github.com/zeux/meshoptimizer/issues/311#issuecomment-955750624)
-- `VOXEL_GODOT`：将此项目作为模块编译时必须定义。
 
 
 着色器
@@ -554,16 +553,6 @@ SCons 标志              | C++ 宏                       | 描述
 ```cpp
 #include <modules/voxel/storage/voxel_buffer.h>
 ```
-
-你还需要在你的 `SCsub` 文件中定义预处理器宏：
-
-```py
-env_yourmodule.Append(CPPDEFINES = [
-    'VOXEL_GODOT'
-])
-```
-
-TODO：自从实现了编译出特性之后，你需要定义更多的预处理器符号，因为你可能想要 `#include` 那些期望它们被定义或不定义的体素引擎头文件。目前没有帮助工具来做这件事，因此你必须在 `CPPDEFINES` 数组中手动添加它们。参见[宏列表](#features)。
 
 !!! note
     虽然 API 文档涵盖了你在 C++ 中也会找到的函数，但内部代码有时只有注释。它们没有在外部记录，也没有计划这样做。建议查看头文件，了解暴露了什么、使用哪些命名空间等。你也可以阅读 `.cpp` 文件中的现有代码，看看某些东西是如何使用的。

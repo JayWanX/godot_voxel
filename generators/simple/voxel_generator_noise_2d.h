@@ -7,8 +7,8 @@
 #include "../../util/thread/rw_lock.h"
 #include "voxel_generator_heightmap.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Curve)
-VOXEL_GODOT_FORWARD_DECLARE(class Noise)
+class Curve;
+class Noise;
 
 namespace voxel {
 

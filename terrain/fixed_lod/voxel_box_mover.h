@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/ref_counted.h"
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Node);
+class Node;
 
 namespace voxel {
 
@@ -51,9 +51,7 @@ public:
 	bool has_stepped_up() const;
 
 private:
-#if defined(VOXEL_GODOT)
 	Vector3 _b_get_motion(Vector3 p_pos, Vector3 p_motion, AABB p_aabb, Node *p_terrain_node);
-#endif
 
 	bool _b_intersects(AABB p_aabb, Object *p_terrain_node) const;
 

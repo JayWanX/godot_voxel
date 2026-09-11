@@ -3,10 +3,8 @@
 #include "../../storage/voxel_buffer_gd.h"
 #include "../../util/dstack.h"
 #include "vox_data.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_TRANSFORM_3D_H
 #define VOXEL_GODOT_TRANSFORM_3D_H
 
-#if defined(VOXEL_GODOT)
 #include <core/math/transform_3d.h>
-#endif
 
 namespace voxel {
 

@@ -1,10 +1,10 @@
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/core/array.h"
-#include "../../util/godot/core/print_string.h"
-#include "../../util/godot/core/random_pcg.h"
+#include <core/variant/array.h>
+#include <core/string/print_string.h>
+#include <core/math/random_pcg.h>
 #include "../../util/io/log.h"
 #include "../../util/math/funcs.h"
-#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "../../util/string/format.h"
 #include "../tests.h"
 

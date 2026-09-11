@@ -2,8 +2,8 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/errors.h"
 #include "../../util/godot/classes/file_access.h"
-#include "../../util/godot/classes/xml_parser.h"
-#include "../../util/godot/core/array.h"
+#include <core/io/xml_parser.h>
+#include <core/variant/array.h>
 #include <unordered_map>
 
 namespace voxel {

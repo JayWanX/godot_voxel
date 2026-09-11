@@ -3,9 +3,10 @@
 
 #include "../../generators/multipass/voxel_generator_multipass_cb.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/classes/control.h"
+#include <scene/gui/control.h>
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/classes/image_texture.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
 
 namespace voxel {
 

@@ -4,7 +4,7 @@
 #include "../storage/voxel_buffer_gd.h"
 #include "compressed_data.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class StreamPeer);
+class StreamPeer;
 
 namespace voxel::godot {
 

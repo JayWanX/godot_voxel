@@ -3,9 +3,7 @@
 
 #include "../../containers/span.h"
 
-#if defined(VOXEL_GODOT)
 #include <scene/resources/mesh.h>
-#endif
 
 namespace voxel::godot {
 

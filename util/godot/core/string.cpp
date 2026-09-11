@@ -28,7 +28,6 @@ PackedStringArray to_godot(const StdVector<StdString> &sv) {
 
 } // namespace voxel::godot
 
-VOXEL_GODOT_NAMESPACE_BEGIN
 
 voxel::TextWriter &operator<<(voxel::TextWriter &w, GodotStringWrapper s) {
 	const CharString cs = s.s.utf8();
@@ -37,4 +36,3 @@ voxel::TextWriter &operator<<(voxel::TextWriter &w, GodotStringWrapper s) {
 	return w;
 }
 
-VOXEL_GODOT_NAMESPACE_END

@@ -2,7 +2,7 @@
 #define VOXEL_MESHER_BLOCKY_H
 
 #include "../../util/godot/classes/mesh.h"
-#include "../../util/math/color.h"
+#include <core/math/color.h>
 #include "../../util/thread/rw_lock.h"
 #include "../voxel_mesher.h"
 #include "blocky_tint_sampler.h"

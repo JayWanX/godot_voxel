@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_RESOURCE_H
 #define VOXEL_GODOT_RESOURCE_H
 
-#if defined(VOXEL_GODOT)
 #include <core/io/resource.h>
-#endif
 
 namespace voxel::godot {
 
@@ -29,9 +27,7 @@ inline void get_resource_configuration_warnings(
 		String context = get_context_string_func();
 		for (int i = prev_size; i < current_size; ++i) {
 			const String w = context + warnings[i];
-#if defined(VOXEL_GODOT)
 			warnings.write[i] = w;
-#endif
 		}
 	}
 }

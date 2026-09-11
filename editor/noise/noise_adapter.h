@@ -6,6 +6,7 @@
 #endif
 #include "../../util/containers/span.h"
 #include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 
 namespace voxel {
 

@@ -1,6 +1,7 @@
 #include "fast_noise_lite_editor_plugin.h"
-#include "../../util/godot/classes/editor_interface.h"
-#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <modules/noise/fastnoise_lite.h>
 #include "../../util/noise/fast_noise_lite/fast_noise_lite_gradient.h"
 #include "../noise/noise_analysis_window.h"
 #include "fast_noise_lite_editor_inspector_plugin.h"

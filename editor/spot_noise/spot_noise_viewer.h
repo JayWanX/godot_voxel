@@ -1,11 +1,12 @@
+#include <scene/gui/control.h>
 #ifndef VOXEL_SPOT_NOISE_VIEWER_H
 #define VOXEL_SPOT_NOISE_VIEWER_H
 
-#include "../../util/godot/classes/control.h"
+#include <scene/gui/control.h>
 #include "../../util/godot/macros.h"
 #include "../../util/noise/spot_noise_gd.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
+class TextureRect;
 
 namespace voxel {
 

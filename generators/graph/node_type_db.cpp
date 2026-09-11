@@ -1,5 +1,5 @@
 #include "node_type_db.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/macros.h"
 #include "../../util/string/format.h"
 #include "image_range_grid.h"
@@ -10,6 +10,7 @@
 #include "nodes/math_ops.h"
 #include "nodes/math_vectors.h"
 #include "nodes/misc.h"
+#include <modules/noise/noise.h>
 #include "nodes/noise.h"
 #include "nodes/outputs.h"
 #include "nodes/sdf.h"

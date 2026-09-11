@@ -1,19 +1,15 @@
+#include <core/version.h>
+#include <core/input/shortcut.h>
 #ifndef VOXEL_GODOT_EDITOR_SETTINGS_H
 #define VOXEL_GODOT_EDITOR_SETTINGS_H
 
-#if defined(VOXEL_GODOT)
 
-#include "../core/version.h"
+#include <core/version.h>
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 4
-#include <editor/editor_settings.h>
-#else
 #include <editor/settings/editor_settings.h>
-#endif
 
-#endif
 
-#include "shortcut.h"
+#include <core/input/shortcut.h>
 
 namespace voxel::godot {
 

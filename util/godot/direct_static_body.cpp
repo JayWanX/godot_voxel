@@ -2,7 +2,8 @@
 #include "../profiling.h"
 #include "classes/array_mesh.h"
 #include "classes/physics_server_3d.h"
-#include "classes/world_3d.h"
+#include <core/version.h>
+#include <scene/resources/3d/world_3d.h>
 
 namespace voxel::godot {
 

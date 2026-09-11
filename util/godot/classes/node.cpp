@@ -1,9 +1,7 @@
 #include "node.h"
-#include "../core/version.h"
+#include <core/version.h>
+#include <core/version.h>
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR < 3
-#include "control.h"
-#endif
 
 namespace voxel::godot {
 
@@ -30,17 +28,14 @@ void set_nodes_owner_except_root(Node *root, Node *owner) {
 }
 
 void get_node_groups(const Node &node, StdVector<StringName> &out_groups) {
-#if defined(VOXEL_GODOT)
 	List<Node::GroupInfo> gi;
 	node.get_groups(&gi);
 	for (const Node::GroupInfo &g : gi) {
 		out_groups.push_back(g.name);
 	}
 
-#endif
 }
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
 Node::AutoTranslateMode to_godot_auto_translate_mode(const AutoTranslateMode voxel_mode) {
 	switch (voxel_mode) {
 		case AUTO_TRANSLATE_MODE_INHERIT:
@@ -54,28 +49,9 @@ Node::AutoTranslateMode to_godot_auto_translate_mode(const AutoTranslateMode vox
 			return Node::AUTO_TRANSLATE_MODE_INHERIT;
 	}
 }
-#endif
 
 void set_node_auto_translate_mode(Node &node, const AutoTranslateMode mode) {
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
 	node.set_auto_translate_mode(to_godot_auto_translate_mode(mode));
-#else
-	Control *control = Object::cast_to<Control>(&node);
-	if (control == nullptr) {
-		return;
-	}
-	switch (mode) {
-		case AUTO_TRANSLATE_MODE_ALWAYS:
-			control->set_auto_translate(true);
-			break;
-		case AUTO_TRANSLATE_MODE_DISABLED:
-			control->set_auto_translate(false);
-			break;
-		default:
-			// 无法处理
-			return;
-	}
-#endif
 }
 
 } // namespace voxel::godot

@@ -5,28 +5,30 @@
 #include "../../terrain/voxel_node.h"
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/canvas_item.h"
-#include "../../util/godot/classes/check_box.h"
-#include "../../util/godot/classes/control.h"
+#include <scene/main/canvas_item.h>
+#include <scene/gui/check_box.h>
+#include <scene/gui/control.h>
 #include "../../util/godot/classes/editor_file_dialog.h"
 #include "../../util/godot/classes/editor_quick_open.h"
 #include "../../util/godot/classes/graph_edit.h"
-#include "../../util/godot/classes/h_box_container.h"
-#include "../../util/godot/classes/input_event_mouse_button.h"
-#include "../../util/godot/classes/input_event_mouse_motion.h"
-#include "../../util/godot/classes/label.h"
-#include "../../util/godot/classes/menu_button.h"
+#include <scene/gui/box_container.h>
+#include <core/input/input_event.h>
+#include <core/input/input_event.h>
+#include <scene/gui/label.h>
+#include <scene/gui/menu_button.h>
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/option_button.h"
-#include "../../util/godot/classes/popup_menu.h"
+#include <scene/gui/option_button.h>
+#include <scene/gui/popup_menu.h>
 #include "../../util/godot/classes/resource_loader.h"
-#include "../../util/godot/classes/scene_tree.h"
-#include "../../util/godot/classes/time.h"
-#include "../../util/godot/classes/world_3d.h"
-#include "../../util/godot/core/array.h"
+#include <scene/main/scene_tree.h>
+#include <core/os/time.h>
+#include <core/version.h>
+#include <scene/resources/3d/world_3d.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/input_enums.h"
 #include "../../util/godot/core/mouse_button.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/io/log.h"
 #include "../../util/macros.h"
 #include "../../util/math/conv.h"
@@ -38,10 +40,24 @@
 #include "voxel_graph_editor_shader_dialog.h"
 #include "voxel_graph_node_dialog.h"
 #include "voxel_range_analysis_dialog.h"
+#include <scene/main/canvas_item.h>
+#include <scene/gui/check_box.h>
+#include <scene/gui/control.h>
+#include <scene/gui/box_container.h>
+#include <core/input/input_event.h>
+#include <core/input/input_event.h>
+#include <scene/gui/label.h>
+#include <scene/gui/menu_button.h>
+#include <scene/gui/option_button.h>
+#include <scene/gui/popup_menu.h>
+#include <scene/main/scene_tree.h>
+#include <core/os/time.h>
+#include <scene/resources/3d/world_3d.h>
+#include <core/variant/array.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 
@@ -719,9 +735,7 @@ void VoxelGraphEditor::remove_connection(
 	_undo_redo->commit_action();
 }
 
-#if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_delete_nodes_request(TypedArray<StringName> node_names) {
-#endif
 	// `node_names` 参数是 Godot issue #61112 的结果。虽然它比直接获取
 	// 节点本身更方便，但它还有一个缺点：如果你选择不在每个图形节点的
 	// 角落显示“关闭”按钮，即使你选中了节点，它也始终是空的。这个行为甚至还有文档。真服了。
@@ -999,16 +1013,12 @@ void VoxelGraphEditor::_on_node_dialog_node_selected(int id) {
 	_undo_redo->commit_action();
 }
 
-#if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_node_selected(Node *p_node) {
-#endif
 	VoxelGraphEditorNode *node = Object::cast_to<VoxelGraphEditorNode>(p_node);
 	emit_signal(SIGNAL_NODE_SELECTED, node->get_generator_node_id());
 }
 
-#if defined(VOXEL_GODOT)
 void VoxelGraphEditor::_on_graph_edit_node_deselected(Node *p_node) {
-#endif
 	// 仅仅检查现在是否什么都没选中并不可靠，因为用户可能刚刚选中了另一个
 	// 节点，而且我不知道 `GraphEdit` 何时会在当前调用栈中更新 `selected` 标志。
 	// GraphEdit 没有提供足够上下文来判断这一点的 API，所以只能依靠这种粗糙的变通方法。

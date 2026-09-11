@@ -1,6 +1,6 @@
 #include "region_file.h"
 #include "../../streams/voxel_block_serializer.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/io/log.h"
 #include "../../util/profiling.h"

@@ -5,7 +5,7 @@
 #include "../errors.h"
 #include "macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Node)
+class Node;
 
 namespace voxel::godot {
 

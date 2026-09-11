@@ -1,8 +1,7 @@
 #include "fast_noise_lite_gradient.h"
-#include "../../godot/core/array.h"
-#ifdef VOXEL_GODOT
-#include "../../godot/core/class_db.h"
-#endif
+#include <core/variant/array.h>
+#include <core/variant/array.h>
+#include <core/object/class_db.h>
 
 namespace voxel {
 

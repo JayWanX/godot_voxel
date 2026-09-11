@@ -4,9 +4,9 @@
 // #include "../../storage/voxel_buffer.h"
 #include "../../generators/graph/voxel_graph_function.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/classes/noise.h"
+#include <modules/noise/noise.h>
 #include "../../util/math/transform3f.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/thread/short_lock.h"
 #include "up_mode.h"
 

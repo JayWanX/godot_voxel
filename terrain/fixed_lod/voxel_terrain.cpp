@@ -13,16 +13,16 @@
 #include "../../streams/load_block_data_task.h"
 #include "../../streams/save_block_data_task.h"
 #include "../../util/containers/container_funcs.h"
-#include "../../util/godot/classes/base_material_3d.h" // 用于发布模式下的属性提示
+#include <scene/resources/material.h>
 #include "../../util/godot/classes/concave_polygon_shape_3d.h"
 #include "../../util/godot/classes/engine.h"
-#include "../../util/godot/classes/mesh_instance_3d.h"
-#include "../../util/godot/classes/multiplayer_api.h"
-#include "../../util/godot/classes/multiplayer_peer.h"
-#include "../../util/godot/classes/scene_tree.h"
-#include "../../util/godot/classes/script.h"
-#include "../../util/godot/classes/shader_material.h"
-#include "../../util/godot/core/array.h"
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/main/multiplayer_api.h>
+#include <scene/main/multiplayer_peer.h>
+#include <scene/main/scene_tree.h>
+#include <core/object/script_language.h>
+#include <scene/resources/material.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/macros.h"
 #include "../../util/math/conv.h"
@@ -33,6 +33,21 @@
 #include "../voxel_data_block_enter_info.h"
 #include "../voxel_save_completion_tracker.h"
 #include "voxel_terrain_multiplayer_synchronizer.h"
+#include <scene/resources/material.h> // 用于发布模式下的属性提示
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/main/multiplayer_api.h>
+#include <scene/main/multiplayer_peer.h>
+#include <scene/main/scene_tree.h>
+#include <core/object/script_language.h>
+#include <scene/resources/material.h>
+#include <core/variant/array.h>
+#define ADD_DEBUG_DRAW_FLAG(m_name, m_flag)                                                                            \
+	ADD_PROPERTYI(                                                                                                     \
+			PropertyInfo(Variant::BOOL, m_name, PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR),                        \
+			"debug_set_draw_flag",                                                                                     \
+			"debug_get_draw_flag",                                                                                     \
+			m_flag                                                                                                     \
+	);
 
 #ifdef TOOLS_ENABLED
 #include "../../meshers/transvoxel/voxel_mesher_transvoxel.h"
@@ -2482,10 +2497,8 @@ void VoxelTerrain::_bind_methods() {
 	);
 	ClassDB::bind_method(D_METHOD("debug_get_draw_shadow_occluders"), &Self::debug_get_draw_shadow_occluders);
 
-#ifdef VOXEL_GODOT
 	GDVIRTUAL_BIND(_on_data_block_entered, "info");
 	GDVIRTUAL_BIND(_on_area_edited, "area_origin", "area_size");
-#endif
 
 	ADD_GROUP("Bounds", "");
 

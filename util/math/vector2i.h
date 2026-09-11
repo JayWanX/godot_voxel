@@ -1,21 +1,20 @@
+#include <core/math/vector2i.h>
 #ifndef VOXEL_MATH_VECTOR2I_H
 #define VOXEL_MATH_VECTOR2I_H
 
 #include "../errors.h"
-#include "../godot/core/vector2i.h"
+#include <core/math/vector2i.h>
 #include "../godot/macros.h"
 #include "../hash_funcs.h"
 #include "../macros.h"
 #include "funcs.h"
 #include <functional> // 用于 std::hash
 
-VOXEL_GODOT_NAMESPACE_BEGIN
 
 inline Vector2i operator&(const Vector2i &a, int b) {
 	return Vector2i(a.x & b, a.y & b);
 }
 
-VOXEL_GODOT_NAMESPACE_END
 
 namespace voxel {
 

@@ -1,7 +1,7 @@
 #ifndef VOXEL_STREAM_SCRIPT_H
 #define VOXEL_STREAM_SCRIPT_H
 
-#include "../util/godot/core/gdvirtual.h"
+#include <core/object/gdvirtual.gen.h>
 #include "voxel_stream.h"
 
 

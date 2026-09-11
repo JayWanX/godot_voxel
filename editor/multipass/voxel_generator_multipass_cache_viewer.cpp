@@ -1,10 +1,11 @@
 #include "voxel_generator_multipass_cache_viewer.h"
 #include "../../constants/voxel_string_names.h"
 #include "../../engine/voxel_engine.h"
-#include "../../util/godot/classes/font.h"
-#include "../../util/godot/classes/time.h"
-#include "../../util/godot/core/array.h"
-#include "../../util/godot/editor_scale.h"
+#include <scene/resources/font.h>
+#include <core/os/time.h>
+#include <core/variant/array.h>
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/profiling.h"
 
 namespace voxel {

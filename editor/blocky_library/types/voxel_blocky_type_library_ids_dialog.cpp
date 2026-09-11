@@ -2,10 +2,11 @@
 #include "../../../util/containers/container_funcs.h"
 #include "../../../util/containers/std_vector.h"
 #include "../../../util/godot/classes/button.h"
-#include "../../../util/godot/classes/item_list.h"
-#include "../../../util/godot/classes/v_box_container.h"
+#include <scene/gui/item_list.h>
+#include <scene/gui/box_container.h>
 #include "../../../util/godot/core/string.h"
-#include "../../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 
 namespace voxel {
 

@@ -1,20 +1,20 @@
 #include "voxel_mesher_cubes.h"
 #include "../../storage/voxel_buffer.h"
 #include "../../util/godot/classes/array_mesh.h"
-#include "../../util/godot/classes/base_material_3d.h"
+#include <scene/resources/material.h>
 #include "../../util/godot/classes/geometry_2d.h"
 #include "../../util/godot/classes/image.h"
 #include "../../util/godot/classes/material.h"
-#include "../../util/godot/classes/shader_material.h"
+#include <scene/resources/material.h>
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/godot/core/string.h"
 #include "../../util/math/conv.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
+#include <scene/resources/material.h>
+#include <scene/resources/material.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 // TODO 二分贪婪网格化优化
 // https://www.youtube.com/watch?v=qnGoGq7DWMc

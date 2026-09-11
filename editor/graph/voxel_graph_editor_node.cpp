@@ -1,14 +1,16 @@
 #include "voxel_graph_editor_node.h"
 #include "../../generators/graph/node_type_db.h"
 #include "../../generators/graph/voxel_generator_graph.h"
-#include "../../util/godot/classes/h_box_container.h"
-#include "../../util/godot/classes/label.h"
+#include <scene/gui/box_container.h>
+#include <scene/gui/label.h>
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/style_box_empty.h"
-#include "../../util/godot/core/array.h"
+#include <scene/resources/style_box.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string_name.h"
-#include "../../util/godot/core/version.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <core/math/color.h>
 #include "../../util/math/color.h"
 #include "graph_editor_adapter.h"
 #include "voxel_graph_editor_node_preview.h"
@@ -23,7 +25,6 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 	VoxelGraphEditorNode *node_view = memnew(VoxelGraphEditorNode);
 	node_view->set_position_offset(graph.get_node_gui_position(node_id) * EDSCALE);
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 2
 	// 不要翻译标题，它显示的是节点的名称
 	{
 		Node *titlebar = node_view->get_titlebar_hbox();
@@ -33,7 +34,6 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 			VOXEL_PRINT_ERROR("Title bar is null?");
 		}
 	}
-#endif
 
 	node_view->update_title(graph, node_id);
 
@@ -57,13 +57,7 @@ VoxelGraphEditorNode *VoxelGraphEditorNode::create(const VoxelGraphFunction &gra
 
 	node_view->_is_comment = is_comment;
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 1
-	if (is_comment) {
-		node_view->set_comment(true);
-	}
-#else
 	// TODO GraphEdit 在 Godot 4.2 中正在重构，注释已不可用
-#endif
 
 	node_view->update_layout(graph);
 

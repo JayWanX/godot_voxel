@@ -1,3 +1,5 @@
+#include <scene/3d/camera_3d.h>
+#include <core/input/input_event.h>
 #ifndef VOXEL_TERRAIN_EDITOR_PLUGIN_H
 #define VOXEL_TERRAIN_EDITOR_PLUGIN_H
 
@@ -9,11 +11,11 @@
 #include "voxel_terrain_editor_inspector_plugin.h"
 
 // 这里必须包含头文件而不能前置声明，因其涉及虚方法的实现。
-#include "../../util/godot/classes/camera_3d.h"
-#include "../../util/godot/classes/input_event.h"
+#include <scene/3d/camera_3d.h>
+#include <core/input/input_event.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class MenuButton)
-VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
+class MenuButton;
+class EditorFileDialog;
 
 namespace voxel {
 

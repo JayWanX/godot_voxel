@@ -5,10 +5,10 @@
 #include "../streams/load_all_blocks_data_task.h"
 #include "../streams/load_block_data_task.h"
 #include "../streams/save_block_data_task.h"
-#include "../util/godot/classes/display_server.h"
+#include <servers/display/display_server.h>
 #include "../util/godot/classes/os.h"
 #include "../util/godot/classes/project_settings.h"
-#include "../util/godot/classes/rd_sampler_state.h"
+#include <servers/rendering/rendering_device_binds.h>
 #include "../util/godot/classes/rendering_server.h"
 #include "../util/io/log.h"
 #include "../util/macros.h"
@@ -89,7 +89,6 @@ static bool auto_detect_threaded_graphics_resource_building_support() {
 	const ProjectSettings *project = ProjectSettings::get_singleton();
 	VOXEL_ASSERT_RETURN_V(project != nullptr, false);
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 7
 	// 无头（headless）DisplayServer 会安装哑光栅化器
 	// （DisplayServerHeadless::create_func -> RasterizerDummy::make_current()），其存储
 	// 不适合多线程并发访问。此时项目的 rendering_method/rendering_driver 设置
@@ -101,7 +100,6 @@ static bool auto_detect_threaded_graphics_resource_building_support() {
 	if (display_server == nullptr || display_server->get_name() == "headless") {
 		return false;
 	}
-#endif
 
 	const voxel::godot::RenderThreadModel rendering_thread_model = voxel::godot::get_render_thread_model(*project);
 	const voxel::godot::RenderMethod rendering_method = voxel::godot::get_current_rendering_method();

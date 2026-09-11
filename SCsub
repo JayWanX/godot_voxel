@@ -35,11 +35,6 @@ if env_voxel["voxel_werror"]:
 # 收集模块所有需要编译的源文件路径，editor_build 控制是否包含编辑器专属代码。
 voxel_files = common.get_sources(env_voxel, env.editor_build)
 
-env_voxel.Append(CPPDEFINES=[
-	# 告诉与引擎无关的通用代码：我们正以 Godot"模块"形式编译。
-	"VOXEL_GODOT"
-])
-
 if env["voxel_sqlite"]:
 	env_sqlite = env_voxel.Clone()
 

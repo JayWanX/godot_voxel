@@ -1,11 +1,12 @@
+#include <core/templates/rid.h>
 #ifndef VOXEL_COMPUTE_SHADER_H
 #define VOXEL_COMPUTE_SHADER_H
 
-#include "../../util/godot/core/rid.h"
+#include <core/templates/rid.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/memory/memory.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice)
+class RenderingDevice;
 
 namespace voxel {
 

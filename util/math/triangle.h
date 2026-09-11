@@ -2,7 +2,7 @@
 #define VOXEL_TRIANGLE_H
 
 #include "vector2f.h"
-#include "vector3.h"
+#include <core/math/vector3.h>
 #include "vector3d.h"
 #include "vector3f.h"
 

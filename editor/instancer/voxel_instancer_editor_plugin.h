@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/editor_plugin.h"
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class MenuButton)
+class MenuButton;
 
 namespace voxel {
 

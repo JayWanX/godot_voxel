@@ -4,6 +4,7 @@
 #include "../containers/std_vector.h"
 #include "funcs.h"
 #include "vector2i.h"
+#include <core/math/vector2i.h>
 
 namespace voxel {
 

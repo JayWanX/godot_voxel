@@ -1,12 +1,13 @@
+#include <scene/gui/grid_container.h>
 #ifndef VOXEL_BLOCKY_TYPE_ATTRIBUTE_COMBINATION_SELECTOR_H
 #define VOXEL_BLOCKY_TYPE_ATTRIBUTE_COMBINATION_SELECTOR_H
 
 #include "../../../meshers/blocky/types/voxel_blocky_type.h"
 #include "../../../util/containers/std_vector.h"
-#include "../../../util/godot/classes/grid_container.h"
+#include <scene/gui/grid_container.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class OptionButton);
-VOXEL_GODOT_FORWARD_DECLARE(class Label);
+class OptionButton;
+class Label;
 
 namespace voxel {
 

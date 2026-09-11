@@ -1,9 +1,12 @@
 #include "voxel_blocky_library.h"
 #include "../../constants/voxel_string_names.h"
+#include <core/os/time.h>
+#include <core/variant/array.h>
+#include <core/object/class_db.h>
 
 
-#include "../../util/godot/classes/time.h"
-#include "../../util/godot/core/array.h"
+#include <core/os/time.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/io/log.h"
 #include "../../util/math/conv.h"
@@ -21,9 +24,6 @@
 #include "../../util/godot/classes/resource.h"
 #endif
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 #include <bitset>
 

@@ -1,15 +1,12 @@
 #ifndef VOXEL_GODOT_DICTIONARY_H
 #define VOXEL_GODOT_DICTIONARY_H
 
-#if defined(VOXEL_GODOT)
 #include <core/variant/dictionary.h>
-#endif
 
 namespace voxel::godot {
 
 template <typename T>
 inline bool try_get(const Dictionary &d, const Variant &key, T &out_value) {
-#if defined(VOXEL_GODOT)
 	const Variant *v = d.getptr(key);
 	if (v == nullptr) {
 		return false;
@@ -19,7 +16,6 @@ inline bool try_get(const Dictionary &d, const Variant &key, T &out_value) {
 	// 在它们之间静默转换。
 	out_value = *v;
 	return true;
-#endif
 }
 
 } // namespace voxel::godot

@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/editor_plugin.h"
 #include "voxel_instance_library_multimesh_item_inspector_plugin.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
+class EditorFileDialog;
 
 namespace voxel {
 
@@ -14,9 +14,7 @@ class VoxelInstanceLibraryMultiMeshItemEditorPlugin : public voxel::godot::Voxel
 public:
 	VoxelInstanceLibraryMultiMeshItemEditorPlugin();
 
-#if defined(VOXEL_GODOT)
 	void _on_update_from_scene_button_pressed(VoxelInstanceLibraryMultiMeshItem *item);
-#endif
 
 protected:
 	bool _voxel_handles(const Object *p_object) const override;

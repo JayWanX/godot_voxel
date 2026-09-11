@@ -5,10 +5,10 @@
 #include "../../util/godot/classes/editor_plugin.h"
 #include "voxel_instance_library_inspector_plugin.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Control)
-VOXEL_GODOT_FORWARD_DECLARE(class MenuButton)
-VOXEL_GODOT_FORWARD_DECLARE(class ConfirmationDialog)
-VOXEL_GODOT_FORWARD_DECLARE(class AcceptDialog)
+class Control;
+class MenuButton;
+class ConfirmationDialog;
+class AcceptDialog;
 
 namespace voxel {
 

@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_PROJECT_SETTINGS_H
 #define VOXEL_GODOT_PROJECT_SETTINGS_H
 
-#if defined(VOXEL_GODOT)
 #include <core/config/project_settings.h>
-#endif
 
 namespace voxel::godot {
 

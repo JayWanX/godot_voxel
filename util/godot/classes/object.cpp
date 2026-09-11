@@ -5,7 +5,6 @@
 namespace voxel::godot {
 
 void get_property_list(const Object &obj, StdVector<PropertyInfoWrapper> &out_properties) {
-#if defined(VOXEL_GODOT)
 	List<PropertyInfo> properties;
 	obj.get_property_list(&properties, false);
 	// 我本想使用 ConstIterator，因为我只读取该列表，但那是不可能的 :shrug:
@@ -17,7 +16,6 @@ void get_property_list(const Object &obj, StdVector<PropertyInfoWrapper> &out_pr
 		pi.usage = property.usage;
 		out_properties.push_back(pi);
 	}
-#endif
 }
 
 uint64_t get_deep_hash(const Object &obj, uint32_t property_usage, uint64_t hash) {
@@ -54,10 +52,8 @@ uint64_t get_deep_hash(const Object &obj, uint32_t property_usage, uint64_t hash
 #ifdef TOOLS_ENABLED
 
 void set_object_edited(Object &obj) {
-#if defined(VOXEL_GODOT)
 	obj.set_edited(true);
 
-#endif
 }
 
 #endif // TOOLS_ENABLED

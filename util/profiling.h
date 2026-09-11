@@ -1,17 +1,12 @@
+#include <core/version.h>
 #ifndef VOXEL_PROFILING_H
 #define VOXEL_PROFILING_H
 
-#if defined(VOXEL_GODOT)
-#include "godot/core/version.h"
 
-#if GODOT_VERSION_MAJOR >= 4 && GODOT_VERSION_MINOR >= 6
 // Godot 支持 Tracy，但没有定义全局预处理宏来让我们检测它，而是在
 // 生成的头文件中定义。这是为了避免重新编译整个引擎，因为并非每个文件都用到它。但这样一来，我们不得不
 // 包含那个头文件，无论是否启用了性能分析。
-#include "core/profiling/profiling.h"
-#endif
 
-#endif
 
 #if defined(TRACY_ENABLE)
 

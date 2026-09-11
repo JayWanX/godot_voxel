@@ -1,9 +1,9 @@
 #include "voxel_stream_region_files.h"
 #include "../../engine/voxel_engine.h"
 #include "../../util/godot/classes/directory.h"
-#include "../../util/godot/classes/json.h"
-#include "../../util/godot/classes/time.h"
-#include "../../util/godot/core/array.h"
+#include <core/io/json.h>
+#include <core/os/time.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/io/log.h"
 #include "../../util/math/box3i.h"

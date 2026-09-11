@@ -4,10 +4,9 @@
 #include "../util/godot/classes/node.h"
 #include "../util/math/conv.h"
 #include "../util/string/format.h"
+#include <core/object/callable_mp.h>
+#include <core/version.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

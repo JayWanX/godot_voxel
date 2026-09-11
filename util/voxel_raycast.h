@@ -1,11 +1,12 @@
 #ifndef VOXEL_VOXEL_RAYCAST_H
 #define VOXEL_VOXEL_RAYCAST_H
 
-#include "../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 // #include "../util/profiling.h"
 #include "errors.h"
 #include "math/conv.h"
 #include "math/vector3.h"
+#include <core/math/vector3.h>
 
 namespace voxel {
 

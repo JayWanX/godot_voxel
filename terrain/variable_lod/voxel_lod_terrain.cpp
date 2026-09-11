@@ -10,21 +10,21 @@
 #include "../../streams/load_all_blocks_data_task.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_set.h"
-#include "../../util/godot/classes/base_material_3d.h" // 用于发布模式下的属性提示
-#include "../../util/godot/classes/camera_3d.h"
+#include <scene/resources/material.h>
+#include <scene/3d/camera_3d.h>
 #include "../../util/godot/classes/concave_polygon_shape_3d.h"
 #include "../../util/godot/classes/engine.h"
-#include "../../util/godot/classes/mesh_instance_3d.h"
+#include <scene/3d/mesh_instance_3d.h>
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/packed_scene.h"
+#include <scene/resources/packed_scene.h>
 #include "../../util/godot/classes/resource_saver.h"
-#include "../../util/godot/classes/scene_tree.h"
-#include "../../util/godot/classes/script.h"
+#include <scene/main/scene_tree.h>
+#include <core/object/script_language.h>
 #include "../../util/godot/classes/shader.h"
-#include "../../util/godot/classes/viewport.h"
-#include "../../util/godot/core/array.h"
+#include <scene/main/viewport.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
-#include "../../util/math/color.h"
+#include <core/math/color.h>
 #include "../../util/math/conv.h"
 #include "../../util/profiling.h"
 #include "../../util/profiling_clock.h"
@@ -35,6 +35,23 @@
 #include "../free_mesh_task.h"
 #include "../voxel_save_completion_tracker.h"
 #include "voxel_lod_terrain_update_task.h"
+#include <scene/resources/material.h> // 用于发布模式下的属性提示
+#include <scene/3d/camera_3d.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/resources/packed_scene.h>
+#include <scene/main/scene_tree.h>
+#include <core/object/script_language.h>
+#include <scene/main/viewport.h>
+#include <core/variant/array.h>
+#include "../../util/math/color.h"
+#include <core/object/class_db.h>
+#define ADD_DEBUG_DRAW_FLAG(m_name, m_flag)                                                                            \
+	ADD_PROPERTYI(                                                                                                     \
+			PropertyInfo(Variant::BOOL, m_name, PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR),                        \
+			"debug_set_draw_flag",                                                                                     \
+			"debug_get_draw_flag",                                                                                     \
+			m_flag                                                                                                     \
+	);
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 #include "../../engine/detail_rendering/detail_rendering.h"
@@ -44,9 +61,6 @@
 #include "../instancing/voxel_instancer.h"
 #endif
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 #ifdef VOXEL_ENABLE_GPU
 #include "../../util/godot/classes/rendering_server.h"

@@ -1,12 +1,13 @@
+#include <scene/gui/box_container.h>
 #ifndef VOXEL_INSTANCE_LIBRARY_LIST_EDITOR_H
 #define VOXEL_INSTANCE_LIBRARY_LIST_EDITOR_H
 
 #include "../../terrain/instancing/voxel_instance_library.h"
-#include "../../util/godot/classes/h_box_container.h"
+#include <scene/gui/box_container.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class ItemList)
-VOXEL_GODOT_FORWARD_DECLARE(class ConfirmationDialog)
-VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
+class ItemList;
+class ConfirmationDialog;
+class EditorFileDialog;
 
 namespace voxel {
 

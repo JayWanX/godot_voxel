@@ -1,6 +1,6 @@
 #include "threaded_task_runner.h"
 #include "../dstack.h"
-#include "../godot/classes/time.h"
+#include <core/os/time.h>
 #include "../profiling.h"
 #include "../string/format.h"
 

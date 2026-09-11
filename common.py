@@ -6,9 +6,9 @@ def register_scons_options(env):
 
     env_vars = Variables()
 
-    env_vars.Add(BoolVariable("voxel_tests", 
+    env_vars.Add(BoolVariable("voxel_tests",
         "Build with tests for the voxel module, which will run on startup of the engine", False))
-    
+
     env_vars.Add(BoolVariable("voxel_smooth_meshing", "Build with smooth voxels meshing support", True))
     env_vars.Add(BoolVariable("voxel_modifiers", "Build with experimental modifiers support", True))
     env_vars.Add(BoolVariable("voxel_sqlite", "Build with SQLite save stream support", True))
@@ -17,7 +17,7 @@ def register_scons_options(env):
     env_vars.Add(BoolVariable("voxel_basic_generators", "Build with basic/example generators", True))
     env_vars.Add(BoolVariable("voxel_mesh_sdf", "Build with mesh voxelization support", True))
     env_vars.Add(BoolVariable("voxel_vox", "Build with support for loading .vox files", True))
-    
+
     env_vars.Add(BoolVariable("tracy", "Build with enabled Tracy Profiler integration", False))
     env_vars.Add(BoolVariable("voxel_fast_noise_2", "Build FastNoise2 support (x86-only)", True))
     env_vars.Add(BoolVariable("voxel_werror", "Explicitely enable warninngs as errors for module code only", False))
@@ -38,7 +38,7 @@ def get_sources(env, is_editor_build):
         # To prevent this clash we wrap the entire library within an additional namespace.
         "MESHOPTIMIZER_VOXEL_WRAP_LIBRARY_IN_NAMESPACE",
     ])
-    
+
     tests_enabled = env["voxel_tests"]
     smoosh_meshing_enabled = env["voxel_smooth_meshing"]
     modifiers_enabled = env["voxel_modifiers"]
@@ -51,10 +51,10 @@ def get_sources(env, is_editor_build):
 
     if not smoosh_meshing_enabled:
         modifiers_enabled = False
-    
+
     if not voxel_mesh_sdf_enabled:
         modifiers_enabled = False
-    
+
     sources = [
         "constants/*.cpp",
 
@@ -206,7 +206,7 @@ def get_sources(env, is_editor_build):
 
         sources += [
             "meshers/transvoxel/*.cpp",
-            
+
             "engine/detail_rendering/detail_rendering.cpp",
             "engine/detail_rendering/render_detail_texture_task.cpp",
 
@@ -225,14 +225,14 @@ def get_sources(env, is_editor_build):
                 sources += [
                     "tests/voxel/test_detail_rendering_gpu.cpp"
                 ]
-        
+
     if modifiers_enabled:
         env.Append(CPPDEFINES={"VOXEL_ENABLE_MODIFIERS": 1})
         sources += [
             "modifiers/*.cpp",
             "modifiers/godot/*.cpp",
         ]
-    
+
     if sqlite_enabled:
         env.Append(CPPDEFINES={"VOXEL_ENABLE_SQLITE": 1})
 
@@ -242,12 +242,12 @@ def get_sources(env, is_editor_build):
             # To fix it, let's indicate to SQLite it should not use this function, even if it is available.
             # https://stackoverflow.com/questions/20031597/error-c4996-received-when-compiling-sqlite-c-in-visual-studio-2013
             env.Append(CPPDEFINES={"SQLITE_WIN32_GETVERSIONEX": 0})
-        
+
         sources += ["streams/sqlite/*.cpp"]
-        
+
         if tests_enabled:
             sources += ["tests/voxel/test_stream_sqlite.cpp"]
-    
+
     if instancer_enabled:
         env.Append(CPPDEFINES={"VOXEL_ENABLE_INSTANCER": 1})
 
@@ -268,10 +268,10 @@ def get_sources(env, is_editor_build):
             "engine/gpu/*.cpp",
             "generators/generate_block_gpu_task.cpp",
         ]
-    
+
     if basic_generators_enabled:
         env.Append(CPPDEFINES={"VOXEL_ENABLE_BASIC_GENERATORS": 1})
-        
+
         sources += [
             "generators/simple/*.cpp",
         ]
@@ -286,7 +286,7 @@ def get_sources(env, is_editor_build):
 
         if is_editor_build:
             sources += ["editor/mesh_sdf/*.cpp"]
-        
+
         if tests_enabled:
             sources += ["tests/voxel/test_mesh_sdf.cpp"]
 
@@ -311,4 +311,3 @@ def get_sources(env, is_editor_build):
     sources = process_glob_paths(sources)
 
     return sources
-

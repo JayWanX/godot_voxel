@@ -8,13 +8,13 @@
 #include "../../storage/voxel_buffer.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/classes/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/core/random_pcg.h"
+#include <core/math/random_pcg.h>
 #include "../../util/io/std_string_text_writer.h"
 #include "../../util/math/conv.h"
 #include "../../util/math/sdf.h"
-#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "../../util/string/format.h"
 #include "../../util/string/std_string.h"
 #include "../../util/testing/test_macros.h"

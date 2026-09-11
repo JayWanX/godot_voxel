@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_MULTIMESH_H
 #define VOXEL_GODOT_MULTIMESH_H
 
-#if defined(VOXEL_GODOT)
 #include <scene/resources/multimesh.h>
-#endif
 
 namespace voxel::godot {
 

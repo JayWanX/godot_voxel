@@ -1,9 +1,7 @@
 #include "voxel_generator_waves.h"
 #include <cmath>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

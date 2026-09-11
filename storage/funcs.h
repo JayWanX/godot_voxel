@@ -3,6 +3,7 @@
 
 #include "../constants/voxel_constants.h"
 #include "../util/containers/span.h"
+#include "../util/math/vector3i.h"
 #include "../util/math/ortho_basis.h"
 #include <cstdint>
 

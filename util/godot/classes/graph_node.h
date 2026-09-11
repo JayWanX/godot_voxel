@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_GRAPH_NODE_H
 #define VOXEL_GODOT_GRAPH_NODE_H
 
-#if defined(VOXEL_GODOT)
 #include <scene/gui/graph_node.h>
-#endif
 
 namespace voxel::godot {
 

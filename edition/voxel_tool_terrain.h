@@ -1,7 +1,7 @@
 #ifndef VOXEL_TOOL_TERRAIN_H
 #define VOXEL_TOOL_TERRAIN_H
 
-#include "../util/godot/core/random_pcg.h"
+#include <core/math/random_pcg.h>
 #include "voxel_tool.h"
 
 namespace voxel {

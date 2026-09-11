@@ -1,16 +1,19 @@
+#include <scene/gui/dialogs.h>
+#include <core/math/random_pcg.h>
+#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
 #ifndef NOISE_ANALYSIS_WINDOW_H
 #define NOISE_ANALYSIS_WINDOW_H
 
-#include "../../util/godot/classes/accept_dialog.h"
-#include "../../util/godot/core/random_pcg.h"
+#include <scene/gui/dialogs.h>
+#include <core/math/random_pcg.h>
 #include "../../util/godot/macros.h"
-#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "noise_adapter.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
-VOXEL_GODOT_FORWARD_DECLARE(class LineEdit)
-VOXEL_GODOT_FORWARD_DECLARE(class ProgressBar)
-VOXEL_GODOT_FORWARD_DECLARE(class OptionButton)
+class SpinBox;
+class LineEdit;
+class ProgressBar;
+class OptionButton;
 
 namespace voxel {
 

@@ -3,12 +3,13 @@
 #include "../../meshers/cubes/voxel_mesher_cubes.h"
 #include "../../storage/voxel_buffer_gd.h"
 #include "../../streams/vox/vox_data.h"
-#include "../../util/godot/classes/image_texture.h"
-#include "../../util/godot/classes/mesh_instance_3d.h"
-#include "../../util/godot/classes/packed_scene.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/resources/packed_scene.h>
 #include "../../util/godot/classes/resource_saver.h"
-#include "../../util/godot/classes/standard_material_3d.h"
-#include "../../util/godot/core/array.h"
+#include <scene/resources/material.h>
+#include <core/variant/array.h>
 #include "../../util/profiling.h"
 #include "vox_import_funcs.h"
 

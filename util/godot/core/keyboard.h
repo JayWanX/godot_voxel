@@ -2,7 +2,6 @@
 #define VOXEL_GODOT_KEYBOARD_H
 
 
-#if defined(VOXEL_GODOT)
 #include <core/os/keyboard.h>
 
 
@@ -24,6 +23,5 @@ static const Key KEY_DOWN = Key::DOWN;
 static const Key KEY_ENTER = Key::ENTER;
 }; // namespace godot
 
-#endif
 
 #endif // VOXEL_GODOT_KEYBOARD_H

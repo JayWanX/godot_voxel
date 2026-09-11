@@ -1,3 +1,5 @@
+#include <scene/3d/node_3d.h>
+#include <core/version.h>
 #ifndef VOXEL_INSTANCER_H
 #define VOXEL_INSTANCER_H
 
@@ -7,7 +9,7 @@
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_unordered_set.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/classes/node_3d.h"
+#include <scene/3d/node_3d.h>
 #include "../../util/godot/direct_multimesh_instance.h"
 #include "../../util/math/box3i.h"
 #include "../../util/memory/memory.h"
@@ -15,7 +17,7 @@
 #include "up_mode.h"
 
 #ifdef TOOLS_ENABLED
-#include "../../util/godot/core/version.h"
+#include <core/version.h>
 #include "../../util/godot/debug_renderer.h"
 #endif
 
@@ -28,7 +30,7 @@
 // 消除。
 #define VOXEL_INSTANCER_USE_SPECIALIZED_FLOATING_INSTANCE_REMOVAL_IMPLEMENTATION
 
-VOXEL_GODOT_FORWARD_DECLARE(class PhysicsBody3D);
+class PhysicsBody3D;
 
 namespace voxel {
 
@@ -187,9 +189,7 @@ public:
 	// 编辑器
 
 #ifdef TOOLS_ENABLED
-#if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#endif
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif
 

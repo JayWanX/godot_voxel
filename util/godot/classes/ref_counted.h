@@ -3,9 +3,7 @@
 
 #include <functional>
 
-#if defined(VOXEL_GODOT)
 #include <core/object/ref_counted.h>
-#endif
 
 namespace voxel::godot {
 

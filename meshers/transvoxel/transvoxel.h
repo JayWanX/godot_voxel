@@ -3,10 +3,10 @@
 
 #include "../../storage/voxel_buffer.h"
 #include "../../util/containers/fixed_array.h"
-#include "../../util/math/color.h"
+#include <core/math/color.h>
 #include "../../util/math/vector2f.h"
 #include "../../util/math/vector3f.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 
 #include <vector>
 

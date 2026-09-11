@@ -1,11 +1,12 @@
+#include <core/math/random_pcg.h>
 #ifndef VOXEL_TOOL_LOD_TERRAIN_H
 #define VOXEL_TOOL_LOD_TERRAIN_H
 
-#include "../util/godot/core/random_pcg.h"
+#include <core/math/random_pcg.h>
 #include "../util/macros.h"
 #include "voxel_tool.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Node);
+class Node;
 
 namespace voxel {
 
@@ -56,10 +57,8 @@ public:
 	// 读取指定位置插值后的浮点体素值
 	float get_voxel_f_interpolated(Vector3 position) const override;
 
-	#if defined(VOXEL_GODOT)
 	// 分离漂浮的体素块（用于浮空方块物理）
 	Array separate_floating_chunks(AABB world_box, Node *parent_node);
-#endif
 
 #ifdef VOXEL_ENABLE_MESH_SDF
 	// 用网格 SDF 印章雕刻地形

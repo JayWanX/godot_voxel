@@ -1,7 +1,7 @@
 #include "transvoxel.h"
 #include "../../constants/cube_tables.h"
 #include "../../storage/mixel4.h"
-#include "../../util/godot/core/sort_array.h"
+#include <core/templates/sort_array.h>
 #include "../../util/math/conv.h"
 #include "../../util/math/funcs.h"
 #include "../../util/profiling.h"

@@ -29,10 +29,10 @@
 /*************************************************************************/
 // 添加 godot 命名空间封装，以适配模块构建
 
-#include "random_pcg.h"
+#include <core/math/random_pcg.h>
 
 #include "../../math/funcs.h"
-#include "../classes/time.h"
+#include <core/os/time.h>
 
 namespace godot {
 

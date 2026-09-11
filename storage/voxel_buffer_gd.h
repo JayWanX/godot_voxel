@@ -1,19 +1,20 @@
+#include <core/variant/array.h>
+#include "../util/math/vector3i.h"
 #ifndef VOXEL_BUFFER_GD_H
 #define VOXEL_BUFFER_GD_H
 
 #include "../util/godot/classes/image.h"
 #include "../util/godot/classes/ref_counted.h"
-#include "../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../util/godot/core/typed_array.h"
 #include "../util/macros.h"
-#include "../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "voxel_buffer.h"
 #include <cstdint>
 #include <memory>
 
 // 无法前向声明，因为我们会使用 Image::Format
-// VOXEL_GODOT_FORWARD_DECLARE(class Image)
-VOXEL_GODOT_FORWARD_DECLARE(class ImageTexture3D)
+class ImageTexture3D;
 
 namespace voxel {
 

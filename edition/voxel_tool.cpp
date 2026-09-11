@@ -1,4 +1,5 @@
 #include "voxel_tool.h"
+#include <core/object/class_db.h>
 
 #include "../storage/voxel_buffer_gd.h"
 #include "../storage/voxel_data.h"
@@ -9,9 +10,6 @@
 #include "../util/profiling.h"
 #include "funcs.h"
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 #ifdef VOXEL_ENABLE_MESH_SDF
 #include "voxel_mesh_sdf_gd.h"

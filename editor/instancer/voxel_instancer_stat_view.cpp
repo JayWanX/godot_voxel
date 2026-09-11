@@ -3,7 +3,7 @@
 #include "../../terrain/instancing/voxel_instance_library_item.h"
 #include "../../terrain/instancing/voxel_instancer.h"
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/tree.h"
+#include <scene/gui/tree.h>
 
 namespace voxel {
 

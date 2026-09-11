@@ -4,8 +4,8 @@
 #include "../../../util/godot/classes/editor_inspector_plugin.h"
 #include "../../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class EditorInterface);
-VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
+class EditorInterface;
+class EditorUndoRedoManager;
 
 namespace voxel {
 

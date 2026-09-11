@@ -1,13 +1,12 @@
 #include "voxel_instance_library_item.h"
 #include "../../constants/voxel_string_names.h"
 #include "voxel_instancer.h"
+#include <core/version.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 #include <algorithm>
+#include <core/object/callable_mp.h>
 
 namespace voxel {
 

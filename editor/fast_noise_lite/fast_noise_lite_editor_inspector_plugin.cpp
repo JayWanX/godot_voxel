@@ -1,5 +1,5 @@
 #include "fast_noise_lite_editor_inspector_plugin.h"
-#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "../../util/noise/fast_noise_lite/fast_noise_lite_gradient.h"
 
 namespace voxel {

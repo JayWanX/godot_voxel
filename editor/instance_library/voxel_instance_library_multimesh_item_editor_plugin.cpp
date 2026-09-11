@@ -1,13 +1,16 @@
 #include "voxel_instance_library_multimesh_item_editor_plugin.h"
-#include "../../util/godot/classes/control.h"
+#include <scene/gui/control.h>
 #include "../../util/godot/classes/editor_file_dialog.h"
-#include "../../util/godot/classes/editor_interface.h"
-#include "../../util/godot/classes/editor_undo_redo_manager.h"
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <editor/editor_undo_redo_manager.h>
 #include "../../util/godot/classes/resource_loader.h"
+#include <scene/gui/control.h>
+#include <editor/plugins/editor_plugin.h>
+#include <editor/editor_undo_redo_manager.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 
@@ -64,11 +67,9 @@ void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_notification(int p_what) {
 	}
 }
 
-#if defined(VOXEL_GODOT)
 void VoxelInstanceLibraryMultiMeshItemEditorPlugin::_on_update_from_scene_button_pressed(
 		VoxelInstanceLibraryMultiMeshItem *item
 ) {
-#endif
 	_item.reference_ptr(item);
 	ERR_FAIL_COND(_item.is_null());
 	voxel::godot::popup_file_dialog(*_open_scene_dialog);

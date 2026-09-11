@@ -4,9 +4,10 @@
 #include "../util/containers/dynamic_bitset.h"
 #include "../util/containers/span.h"
 #include "../util/containers/std_vector.h"
-#include "../util/godot/core/random_pcg.h"
+#include <core/math/random_pcg.h>
 #include "../util/profiling.h"
 #include "../util/string/format.h"
+#include <core/math/random_pcg.h>
 
 
 namespace voxel {
@@ -283,7 +284,6 @@ void run_blocky_random_tick(
 			&cb_self,
 			[](void *self, Vector3i pos, int64_t val) {
 				const CallbackData *cd = reinterpret_cast<const CallbackData *>(self);
-#ifdef VOXEL_GODOT
 				const Variant vpos = pos;
 				const Variant vv = val;
 				const Variant *args[2];
@@ -296,7 +296,6 @@ void run_blocky_random_tick(
 				// 我在引擎中找到的示例并不一致
 				ERR_FAIL_COND_V(error.error != Callable::CallError::CALL_OK, false);
 		// 失败时返回，我们不想看到错误刷屏
-#endif
 				return true;
 			}
 	);

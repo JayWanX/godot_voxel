@@ -1,9 +1,7 @@
 #include "voxel_blocky_attribute_direction.h"
 #include "../../../constants/voxel_string_names.h"
 #include "../../../util/math/ortho_basis.h"
-#ifdef VOXEL_GODOT
-#include "../../../util/godot/core/class_db.h"
-#endif
+#include <core/object/class_db.h>
 
 namespace voxel {
 

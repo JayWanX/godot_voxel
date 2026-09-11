@@ -5,8 +5,8 @@
 #include "../voxel_mesher.h"
 #include "transvoxel.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class ArrayMesh);
-VOXEL_GODOT_FORWARD_DECLARE(class ShaderMaterial);
+class ArrayMesh;
+class ShaderMaterial;
 
 namespace voxel {
 

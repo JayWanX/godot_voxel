@@ -1,15 +1,19 @@
 #include "spot_noise_viewer.h"
 #include "../../util/godot/classes/button.h"
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/classes/image_texture.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/texture_rect.h"
-#include "../../util/godot/editor_scale.h"
+#include <scene/gui/texture_rect.h>
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <scene/resources/texture.h>
+#include <scene/gui/texture_rect.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

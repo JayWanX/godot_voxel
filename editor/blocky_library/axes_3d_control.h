@@ -1,7 +1,7 @@
 #ifndef VOXEL_AXES_3D_CONTROL_H
 #define VOXEL_AXES_3D_CONTROL_H
 
-#include "../../util/godot/classes/control.h"
+#include <scene/gui/control.h>
 
 namespace voxel {
 

@@ -9,15 +9,14 @@
 #include "../util/profiling.h"
 #include "../util/tasks/godot/threaded_task_gd.h"
 #include "voxel_engine.h"
+#include <core/version.h>
 
 #ifdef VOXEL_TESTS
 #include "../tests/tests.h"
 #include "../util/testing/test_options.h"
+#include <core/object/callable_mp.h>
 #endif
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/callable_mp.h"
-#endif
 
 using namespace voxel::godot;
 

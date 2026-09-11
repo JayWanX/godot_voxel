@@ -28,7 +28,7 @@
 #include "gpu/gpu_task_runner.h"
 #endif
 
-VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice);
+class RenderingDevice;
 
 namespace voxel {
 

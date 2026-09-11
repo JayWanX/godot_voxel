@@ -7,7 +7,7 @@
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/core/aabb.h"
-#include "../../util/math/color.h"
+#include <core/math/color.h>
 #include "../../util/math/vector2f.h"
 #include "../../util/math/vector3f.h"
 

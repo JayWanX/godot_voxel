@@ -1,12 +1,13 @@
+#include <scene/gui/dialogs.h>
 #ifndef VOXEL_RANGE_ANALYSIS_DIALOG_H
 #define VOXEL_RANGE_ANALYSIS_DIALOG_H
 
-#include "../../util/godot/classes/accept_dialog.h"
+#include <scene/gui/dialogs.h>
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class CheckBox)
-VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
-VOXEL_GODOT_FORWARD_DECLARE(class GridContainer)
+class CheckBox;
+class SpinBox;
+class GridContainer;
 
 namespace voxel {
 

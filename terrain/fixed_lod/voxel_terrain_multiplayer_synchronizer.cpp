@@ -3,14 +3,18 @@
 #include "../../storage/voxel_buffer.h"
 #include "../../streams/voxel_block_serializer.h"
 #include "../../util/containers/container_funcs.h"
-#include "../../util/godot/classes/multiplayer_api.h"
-#include "../../util/godot/classes/multiplayer_peer.h"
-#include "../../util/godot/classes/scene_tree.h"
-#include "../../util/godot/core/array.h"
+#include <scene/main/multiplayer_api.h>
+#include <scene/main/multiplayer_peer.h>
+#include <scene/main/scene_tree.h>
+#include <core/variant/array.h>
 #include "../../util/io/serialization.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 #include "voxel_terrain.h"
+#include <scene/main/multiplayer_api.h>
+#include <scene/main/multiplayer_peer.h>
+#include <scene/main/scene_tree.h>
+#include <core/variant/array.h>
 
 #ifdef TOOLS_ENABLED
 #include "../../util/godot/core/packed_arrays.h"
@@ -241,13 +245,11 @@ void VoxelTerrainMultiplayerSynchronizer::_b_receive_area(PackedByteArray messag
 
 #ifdef TOOLS_ENABLED
 
-#if defined(VOXEL_GODOT)
 PackedStringArray VoxelTerrainMultiplayerSynchronizer::get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#endif
 
 void VoxelTerrainMultiplayerSynchronizer::get_configuration_warnings(PackedStringArray &warnings) const {
 	if (is_inside_tree()) {

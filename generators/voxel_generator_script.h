@@ -1,7 +1,7 @@
 #ifndef VOXEL_GENERATOR_SCRIPT_H
 #define VOXEL_GENERATOR_SCRIPT_H
 
-#include "../util/godot/core/gdvirtual.h"
+#include <core/object/gdvirtual.gen.h>
 #include "voxel_generator.h"
 
 

@@ -2,10 +2,10 @@
 #define VOXEL_CONV_H
 
 #include "../godot/core/transform_3d.h"
-#include "../godot/core/vector2.h"
-#include "../godot/core/vector2i.h"
-#include "../godot/core/vector3.h"
-#include "../godot/core/vector3i.h"
+#include <core/math/vector2.h>
+#include <core/math/vector2i.h>
+#include <core/math/vector3.h>
+#include <core/math/vector3i.h>
 #include "transform3f.h"
 #include "vector2f.h"
 #include "vector3d.h"

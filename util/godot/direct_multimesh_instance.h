@@ -10,8 +10,8 @@
 #include "classes/rendering_server.h"
 #include "macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class World3D);
-VOXEL_GODOT_FORWARD_DECLARE(class Material);
+class World3D;
+class Material;
 
 namespace voxel::godot {
 

@@ -1,7 +1,7 @@
 #ifndef PROFILING_CLOCK_H
 #define PROFILING_CLOCK_H
 
-#include "godot/classes/time.h"
+#include <core/os/time.h>
 
 namespace voxel {
 

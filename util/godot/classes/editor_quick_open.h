@@ -1,14 +1,8 @@
 #if !defined(VOXEL_GODOT_EDITOR_QUICK_OPEN_H)
 #define VOXEL_GODOT_EDITOR_QUICK_OPEN_H
 
-#if defined(VOXEL_GODOT)
 
-#if VERSION_MAJOR == 4 && VERSION_MINOR <= 3
-#include <editor/editor_quick_open.h>
-#else
 #include <editor/gui/editor_quick_open_dialog.h>
-#endif
 
-#endif // VOXEL_GODOT
 
 #endif // VOXEL_GODOT_EDITOR_QUICK_OPEN_H

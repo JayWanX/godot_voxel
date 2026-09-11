@@ -3,8 +3,8 @@
 
 #include "../../generators/voxel_generator.h"
 #include "../../streams/voxel_stream.h"
-#include "../../util/godot/core/array.h"
-#include "../../util/math/vector3i.h"
+#include <core/variant/array.h>
+#include <core/math/vector3i.h>
 #include "../../util/tasks/threaded_task.h"
 #include "instancer_task_output_queue.h"
 #include "up_mode.h"

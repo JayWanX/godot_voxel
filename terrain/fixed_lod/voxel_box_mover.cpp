@@ -445,9 +445,7 @@ bool VoxelBoxMover::intersects(
 	return voxel::intersects(to_span(potential_boxes), aabb);
 }
 
-#if defined(VOXEL_GODOT)
 Vector3 VoxelBoxMover::_b_get_motion(Vector3 pos, Vector3 motion, AABB aabb, Node *terrain_node) {
-#endif
 	ERR_FAIL_COND_V(terrain_node == nullptr, Vector3());
 	VoxelNode *terrain = Object::cast_to<VoxelNode>(terrain_node);
 	ERR_FAIL_COND_V(terrain == nullptr, Vector3());

@@ -2,7 +2,7 @@
 #define VOXEL_RAYCAST_RESULT_H
 
 #include "../util/godot/classes/ref_counted.h"
-#include "../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 
 namespace voxel {
 

@@ -4,7 +4,6 @@ namespace voxel::godot {
 namespace PackedByteArrayUtility {
 
 PackedByteArray compress(const PackedByteArray &self, const FileAccess::CompressionMode p_mode) {
-#if defined(VOXEL_GODOT)
 	PackedByteArray compressed;
 
 	if (self.size() > 0) {
@@ -18,7 +17,6 @@ PackedByteArray compress(const PackedByteArray &self, const FileAccess::Compress
 
 	return compressed;
 
-#endif
 }
 
 PackedByteArray decompress(
@@ -26,7 +24,6 @@ PackedByteArray decompress(
 		const int64_t buffer_size,
 		const FileAccess::CompressionMode p_mode
 ) {
-#if defined(VOXEL_GODOT)
 	PackedByteArray decompressed;
 	const Compression::Mode mode = static_cast<Compression::Mode>(p_mode);
 
@@ -45,7 +42,6 @@ PackedByteArray decompress(
 
 	return decompressed;
 
-#endif
 }
 
 } // namespace PackedByteArrayUtility

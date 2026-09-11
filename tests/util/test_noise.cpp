@@ -1,6 +1,6 @@
 #include "test_noise.h"
 #include "../../util/godot/core/packed_arrays.h"
-#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "../../util/noise/fast_noise_lite/fast_noise_lite_range.h"
 #include "../../util/noise/spot_noise_gd.h"
 #include "../../util/testing/test_macros.h"

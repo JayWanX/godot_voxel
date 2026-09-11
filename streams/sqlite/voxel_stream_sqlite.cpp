@@ -6,10 +6,8 @@
 #include "../../util/string/std_string.h"
 #include "../compressed_data.h"
 #include "connection.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 #include <string_view>
 #include <unordered_set>

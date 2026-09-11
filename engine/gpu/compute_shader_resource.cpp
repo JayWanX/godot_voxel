@@ -2,10 +2,11 @@
 #include "../../util/dstack.h"
 #include "../../util/godot/classes/curve.h"
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/classes/rd_texture_format.h"
-#include "../../util/godot/classes/rd_texture_view.h"
+#include "../../util/math/vector3i.h"
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
 #include "../../util/godot/classes/rendering_device.h"
-#include "../../util/godot/core/array.h" // 用于 `varray`
+#include <core/variant/array.h>
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 #include "../voxel_engine.h"

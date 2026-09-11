@@ -5,20 +5,21 @@
 #include "../../util/containers/container_funcs.h"
 #include "../../util/godot/classes/array_mesh.h"
 #include "../../util/godot/classes/engine.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/godot/core/packed_arrays.h"
-#include "../../util/godot/core/random_pcg.h"
+#include <core/math/random_pcg.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/math/conv.h"
 #include "../../util/math/triangle.h"
 #include "../../util/math/vector4f.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
+#include <core/variant/array.h>
+#include <core/math/random_pcg.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4701) // 使用了可能未初始化的局部变量。

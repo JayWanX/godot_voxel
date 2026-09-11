@@ -8,7 +8,7 @@
 #include "../../util/godot/classes/array_mesh.h"
 #include "../../util/godot/classes/rendering_server.h"
 #include "../../util/godot/classes/shader.h"
-#include "../../util/godot/classes/shader_material.h"
+#include <scene/resources/material.h>
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/math/conv.h"
 #include "../../util/profiling.h"

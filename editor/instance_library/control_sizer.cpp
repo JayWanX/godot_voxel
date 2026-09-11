@@ -1,10 +1,14 @@
 #include "control_sizer.h"
 #include "../../util/errors.h"
-#include "../../util/godot/classes/input_event_mouse_button.h"
-#include "../../util/godot/classes/input_event_mouse_motion.h"
+#include <core/input/input_event.h>
+#include <core/input/input_event.h>
 #include "../../util/godot/core/input_enums.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/math/funcs.h"
+#include <core/input/input_event.h>
+#include <core/input/input_event.h>
+#include <editor/themes/editor_scale.h>
 
 namespace voxel {
 
@@ -18,9 +22,7 @@ void Voxel_ControlSizer::set_target_control(Control *control) {
 	_target_control.set(control);
 }
 
-#ifdef VOXEL_GODOT
 void Voxel_ControlSizer::gui_input(const Ref<InputEvent> &p_event) {
-#endif
 
 	Ref<InputEventMouseButton> mb = p_event;
 	if (mb.is_valid()) {

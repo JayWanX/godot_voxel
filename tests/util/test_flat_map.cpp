@@ -1,7 +1,7 @@
 #include "test_flat_map.h"
 #include "../../util/containers/flat_map.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/core/random_pcg.h"
+#include <core/math/random_pcg.h>
 #include "../../util/testing/test_macros.h"
 
 namespace voxel::tests {

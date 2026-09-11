@@ -1,10 +1,8 @@
 #include "voxel_format_gd.h"
 #include "../constants/voxel_string_names.h"
 #include "../util/string/format.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 namespace voxel::godot {
 

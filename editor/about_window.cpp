@@ -2,21 +2,30 @@
 #include "../constants/version.gen.h"
 #include "../util/containers/container_funcs.h"
 #include "../util/godot/classes/button.h"
-#include "../util/godot/classes/h_box_container.h"
-#include "../util/godot/classes/h_split_container.h"
-#include "../util/godot/classes/item_list.h"
+#include <scene/gui/box_container.h>
+#include <scene/gui/split_container.h>
+#include <scene/gui/item_list.h>
 #include "../util/godot/classes/os.h"
-#include "../util/godot/classes/rich_text_label.h"
-#include "../util/godot/classes/tab_container.h"
-#include "../util/godot/classes/texture_rect.h"
-#include "../util/godot/classes/v_box_container.h"
-#include "../util/godot/core/array.h"
+#include <scene/gui/rich_text_label.h>
+#include <scene/gui/tab_container.h>
+#include <scene/gui/texture_rect.h>
+#include <scene/gui/box_container.h>
+#include <core/variant/array.h>
 #include "../util/godot/core/string.h"
-#include "../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/split_container.h>
+#include <scene/gui/item_list.h>
+#include <scene/gui/rich_text_label.h>
+#include <scene/gui/tab_container.h>
+#include <scene/gui/texture_rect.h>
+#include <scene/gui/box_container.h>
+#include <core/variant/array.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

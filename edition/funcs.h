@@ -1,3 +1,4 @@
+#include "../util/math/vector3.h"
 #ifndef VOXEL_EDITION_FUNCS_H
 #define VOXEL_EDITION_FUNCS_H
 
@@ -11,11 +12,11 @@
 #include "../util/math/box3f.h"
 #include "../util/math/conv.h"
 #include "../util/math/sdf.h"
-#include "../util/math/vector3.h"
+#include <core/math/vector3.h>
 #include "../util/profiling.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Callable);
-VOXEL_GODOT_FORWARD_DECLARE(class RandomPCG);
+class Callable;
+class RandomPCG;
 
 namespace voxel {
 

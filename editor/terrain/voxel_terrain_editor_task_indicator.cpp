@@ -1,15 +1,16 @@
 #include "voxel_terrain_editor_task_indicator.h"
 #include "../../engine/voxel_engine.h"
 #include "../../storage/voxel_memory_pool.h"
-#include "../../util/godot/classes/control.h"
-#include "../../util/godot/classes/font.h"
-#include "../../util/godot/classes/h_box_container.h"
-#include "../../util/godot/classes/label.h"
+#include <scene/gui/control.h>
+#include <scene/resources/font.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/label.h>
 #include "../../util/godot/classes/os.h"
-#include "../../util/godot/classes/v_separator.h"
-#include "../../util/godot/core/array.h"
+#include <scene/gui/separator.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 
 namespace voxel {
 

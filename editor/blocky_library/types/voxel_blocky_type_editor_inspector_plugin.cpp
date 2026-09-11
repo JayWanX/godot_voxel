@@ -1,7 +1,8 @@
 #include "voxel_blocky_type_editor_inspector_plugin.h"
 #include "../../../meshers/blocky/types/voxel_blocky_type.h"
-#include "../../../util/godot/classes/editor_interface.h"
-#include "../../../util/godot/classes/h_box_container.h"
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <scene/gui/box_container.h>
 #include "voxel_blocky_type_attribute_combination_selector.h"
 #include "voxel_blocky_type_variant_list_editor.h"
 #include "voxel_blocky_type_viewer.h"

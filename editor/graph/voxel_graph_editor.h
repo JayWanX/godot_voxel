@@ -1,10 +1,12 @@
+#include <scene/gui/control.h>
+#include <editor/editor_undo_redo_manager.h>
 #ifndef VOXEL_GRAPH_EDITOR_H
 #define VOXEL_GRAPH_EDITOR_H
 
 #include "../../generators/graph/voxel_generator_graph.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/classes/control.h"
-#include "../../util/godot/classes/editor_undo_redo_manager.h"
+#include <scene/gui/control.h>
+#include <editor/editor_undo_redo_manager.h>
 #include "../../util/godot/classes/graph_edit_connection.h"
 #include "../../util/godot/debug_renderer.h"
 #include "../../util/godot/object_weak_ref.h"
@@ -12,7 +14,6 @@
 #include "graph_preview_mode.h"
 #include "voxel_graph_editor_node_preview_info.h"
 
-VOXEL_GODOT_NAMESPACE_BEGIN
 class GraphEdit;
 class PopupMenu;
 class AcceptDialog;
@@ -22,7 +23,6 @@ class Label;
 class OptionButton;
 class CheckBox;
 class MenuButton;
-VOXEL_GODOT_NAMESPACE_END
 
 namespace voxel {
 
@@ -108,11 +108,9 @@ private:
 	void _on_graph_edit_connection_request(String from_node_name, int from_slot, String to_node_name, int to_slot);
 	void _on_graph_edit_disconnection_request(String from_node_name, int from_slot, String to_node_name, int to_slot);
 
-#if defined(VOXEL_GODOT)
 	void _on_graph_edit_delete_nodes_request(TypedArray<StringName> node_names);
 	void _on_graph_edit_node_selected(Node *p_node);
 	void _on_graph_edit_node_deselected(Node *p_node);
-#endif
 
 	void _on_menu_id_pressed(int id);
 	void _on_graph_node_dragged(Vector2 from, Vector2 to, int id);

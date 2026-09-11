@@ -3,7 +3,7 @@
 
 #include "../meshers/voxel_mesher.h"
 #include "../util/godot/core/transform_3d.h"
-#include "../util/godot/core/vector3.h"
+#include <core/math/vector3.h>
 #include "voxel_raycast_result.h"
 
 namespace voxel {

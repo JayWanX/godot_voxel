@@ -1,40 +1,25 @@
+#include <core/version.h>
 #ifndef VOXEL_GODOT_RENDERING_SERVER_H
 #define VOXEL_GODOT_RENDERING_SERVER_H
 
-#if defined(VOXEL_GODOT)
-#include "../core/version.h"
+#include <core/version.h>
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
-#include <servers/rendering_server.h>
-#else
 #include <servers/rendering/rendering_server.h>
-#endif
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 6
-using RenderingServerEnums = RenderingServer;
-#else
 // RenderingServer 的枚举现在位于一个名为 RenderingServerEnums 的独立命名空间中
 #include <servers/rendering/rendering_server_enums.h>
-#endif
 
-#endif
 
 #include "../../containers/std_vector.h"
 #include "../macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class ProjectSettings);
+class ProjectSettings;
 
 namespace voxel::godot {
 
 inline void free_rendering_server_rid(RenderingServer &rs, const RID &rid) {
-#if defined(VOXEL_GODOT)
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
-	rs.free(rid);
-#else
 	rs.free_rid(rid);
-#endif
 
-#endif
 }
 
 #ifdef VOXEL_ENABLE_GPU

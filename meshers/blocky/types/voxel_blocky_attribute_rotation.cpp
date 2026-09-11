@@ -1,9 +1,7 @@
 #include "voxel_blocky_attribute_rotation.h"
 #include "../../../constants/voxel_string_names.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

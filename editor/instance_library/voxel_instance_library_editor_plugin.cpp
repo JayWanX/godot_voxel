@@ -1,15 +1,17 @@
 #include "voxel_instance_library_editor_plugin.h"
 #include "../../terrain/instancing/voxel_instance_library_multimesh_item.h"
 #include "../../terrain/instancing/voxel_instance_library_scene_item.h"
-#include "../../util/godot/classes/box_mesh.h"
-#include "../../util/godot/classes/confirmation_dialog.h"
-#include "../../util/godot/classes/control.h"
-#include "../../util/godot/classes/editor_inspector.h"
-#include "../../util/godot/classes/editor_interface.h"
-#include "../../util/godot/classes/editor_undo_redo_manager.h"
+#include <core/version.h>
+#include <scene/resources/3d/primitive_meshes.h>
+#include <scene/gui/dialogs.h>
+#include <scene/gui/control.h>
+#include <editor/inspector/editor_inspector.h>
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <editor/editor_undo_redo_manager.h>
 #include "../../util/godot/classes/object.h"
 #include "../../util/godot/classes/resource_loader.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 
 namespace voxel {

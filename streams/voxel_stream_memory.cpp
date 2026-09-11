@@ -3,10 +3,8 @@
 #include "../util/containers/std_unordered_map.h"
 #include "../util/thread/thread.h"
 #include "instance_data.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

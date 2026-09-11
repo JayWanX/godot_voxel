@@ -4,18 +4,19 @@
 #include "../../streams/save_block_data_task.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/dstack.h"
-#include "../../util/godot/classes/camera_3d.h"
-#include "../../util/godot/classes/collision_shape_3d.h"
+#include <scene/3d/camera_3d.h>
+#include <core/version.h>
+#include <scene/3d/physics/collision_shape_3d.h>
 #include "../../util/godot/classes/engine.h"
-#include "../../util/godot/classes/mesh_instance_3d.h"
+#include <scene/3d/mesh_instance_3d.h>
 #include "../../util/godot/classes/multimesh.h"
 #include "../../util/godot/classes/node.h"
 #include "../../util/godot/classes/ref_counted.h"
 #include "../../util/godot/classes/resource_saver.h"
-#include "../../util/godot/classes/time.h"
-#include "../../util/godot/classes/viewport.h"
+#include <core/os/time.h>
+#include <scene/main/viewport.h>
 #include "../../util/godot/core/aabb.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/godot/core/basis.h"
 #include "../../util/math/conv.h"
 #include "../../util/profiling.h"
@@ -29,6 +30,13 @@
 #include "voxel_instance_library_multimesh_item.h"
 #include "voxel_instance_library_scene_item.h"
 #include "voxel_instancer_rigidbody.h"
+#include <scene/3d/camera_3d.h>
+#include <scene/3d/physics/collision_shape_3d.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <core/os/time.h>
+#include <scene/main/viewport.h>
+#include <core/variant/array.h>
+#include <scene/3d/multimesh_instance_3d.h>
 
 #ifdef TOOLS_ENABLED
 #include "../../editor/camera_cache.h"
@@ -36,7 +44,7 @@
 #endif
 
 // 仅用于调试目的，否则直接使用 RenderingServer
-#include "../../util/godot/classes/multimesh_instance_3d.h"
+#include <scene/3d/multimesh_instance_3d.h>
 
 #include <algorithm>
 
@@ -3255,13 +3263,11 @@ Dictionary VoxelInstancer::debug_get_block_infos(const Vector3 world_position, c
 
 #ifdef TOOLS_ENABLED
 
-#if defined(VOXEL_GODOT)
 PackedStringArray VoxelInstancer::get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#endif
 
 void VoxelInstancer::get_configuration_warnings(PackedStringArray &warnings) const {
 	if (_parent == nullptr) {

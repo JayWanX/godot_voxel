@@ -1,8 +1,9 @@
 #include "voxel_mesh_block.h"
 #include "../constants/voxel_string_names.h"
-#include "../util/godot/classes/collision_shape_3d.h"
+#include <core/version.h>
+#include <scene/3d/physics/collision_shape_3d.h>
 #include "../util/godot/classes/concave_polygon_shape_3d.h"
-#include "../util/godot/classes/node_3d.h"
+#include <scene/3d/node_3d.h>
 #include "../util/macros.h"
 #include "../util/profiling.h"
 #include "free_mesh_task.h"

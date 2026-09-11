@@ -1,12 +1,14 @@
+#include <scene/gui/control.h>
+#include <core/variant/variant.h>
 #ifndef VOXEL_CHART_VIEW_H
 #define VOXEL_CHART_VIEW_H
 
 #include "../../util/containers/span.h"
-#include "../../util/godot/classes/control.h"
-#include "../../util/godot/core/packed_vector2_array.h"
+#include <scene/gui/control.h>
+#include <core/variant/variant.h>
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Line2D)
+class Line2D;
 
 namespace voxel {
 

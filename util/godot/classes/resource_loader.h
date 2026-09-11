@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_RESOURCE_LOADER_H
 #define VOXEL_GODOT_RESOURCE_LOADER_H
 
-#if defined(VOXEL_GODOT)
 #include <core/io/resource_loader.h>
-#endif
 
 namespace voxel::godot {
 

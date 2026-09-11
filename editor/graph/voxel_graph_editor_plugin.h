@@ -8,7 +8,7 @@
 #include "../../util/macros.h"
 #include "voxel_graph_node_inspector_wrapper.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Button)
+class Button;
 
 namespace voxel {
 

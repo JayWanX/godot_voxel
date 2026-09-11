@@ -3,12 +3,11 @@
 #include "../../storage/voxel_buffer_gd.h"
 #include "../../util/containers/dynamic_bitset.h"
 #include "../../util/godot/core/packed_arrays.h"
-#include "../../util/math/vector3.h"
+#include <core/math/vector3.h>
 #include "../../util/string/format.h"
+#include "../../util/math/vector3.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

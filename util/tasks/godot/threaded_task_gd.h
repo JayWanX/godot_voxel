@@ -2,7 +2,7 @@
 #define VOXEL_THREADED_TASK_GD
 
 #include "../../godot/classes/ref_counted.h"
-#include "../../godot/core/gdvirtual.h"
+#include <core/object/gdvirtual.gen.h>
 #include "../threaded_task.h"
 
 namespace voxel {

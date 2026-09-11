@@ -1,9 +1,11 @@
+#include <core/math/vector3.h>
+#include <core/math/vector3i.h>
 #ifndef VOXEL_MATH_VECTOR3I_H
 #define VOXEL_MATH_VECTOR3I_H
 
 #include "../containers/span.h"
-#include "../godot/core/vector3.h"
-#include "../godot/core/vector3i.h"
+#include <core/math/vector3.h>
+#include <core/math/vector3i.h>
 #include "../godot/macros.h"
 #include "../hash_funcs.h"
 #include "../macros.h"
@@ -165,7 +167,6 @@ TextWriter &operator<<(TextWriter &w, const Vector3i &v);
 
 } // namespace voxel
 
-VOXEL_GODOT_NAMESPACE_BEGIN
 // 为避免不直观的重载解析编译错误，运算符重载应
 // 定义在其操作类型所在的同一命名空间内……即 Godot 的命名空间。
 // 编译器只会在参数的命名空间内查找重载（也就是 Koenig 查找，是吗？）。
@@ -194,7 +195,6 @@ inline Vector3i operator%(const Vector3i &a, int b) {
 	return Vector3i(a.x % b, a.y % b, a.z % b);
 }
 
-VOXEL_GODOT_NAMESPACE_END
 
 // 用于 Godot
 struct Vector3iHasher {

@@ -9,7 +9,7 @@
 #include "blocky_baked_library.h"
 #include <cstdint>
 
-VOXEL_GODOT_FORWARD_DECLARE(class Material);
+class Material;
 
 namespace voxel {
 

@@ -1,7 +1,7 @@
 #ifndef VOXEL_MATH_VECTOR3_H
 #define VOXEL_MATH_VECTOR3_H
 
-#include "../godot/core/vector3.h"
+#include <core/math/vector3.h>
 #include "funcs.h"
 
 // 三维向量，其分量为 32 位或 64 位浮点数，取决于 Godot 的编译方式。

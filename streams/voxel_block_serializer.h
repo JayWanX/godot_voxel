@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-VOXEL_GODOT_FORWARD_DECLARE(class FileAccess)
+class FileAccess;
 
 namespace voxel {
 

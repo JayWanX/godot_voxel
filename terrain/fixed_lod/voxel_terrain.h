@@ -6,7 +6,7 @@
 #include "../../storage/voxel_data.h"
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/core/gdvirtual.h"
+#include <core/object/gdvirtual.gen.h>
 #include "../../util/godot/memory.h"
 #include "../../util/math/box3i.h"
 #include "../voxel_data_block_enter_info.h"

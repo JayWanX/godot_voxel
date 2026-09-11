@@ -13,13 +13,11 @@ Span<const Color> editor_property_get_colors(EditorProperty &self) {
 	return to_span(s_colors);
 }
 
-#if defined(VOXEL_GODOT)
 
 void Voxel_EditorProperty::update_property() {
 	_voxel_update_property();
 }
 
-#endif
 
 void Voxel_EditorProperty::_set_read_only(bool p_read_only) {
 	_voxel_set_read_only(p_read_only);

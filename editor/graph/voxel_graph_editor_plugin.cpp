@@ -4,13 +4,15 @@
 #include "../../terrain/voxel_node.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/editor_interface.h"
-#include "../../util/godot/classes/editor_selection.h"
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <editor/editor_data.h>
 #include "../../util/godot/classes/node.h"
 #include "../../util/godot/classes/object.h"
 #include "../../util/godot/classes/resource_saver.h"
 #include "../../util/godot/core/string.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/string/format.h"
 #include "editor_property_text_change_on_submit.h"
 #include "voxel_graph_editor.h"
@@ -18,13 +20,15 @@
 #include "voxel_graph_editor_io_dialog.h"
 #include "voxel_graph_editor_window.h"
 #include "voxel_graph_function_inspector_plugin.h"
+#include <editor/plugins/editor_plugin.h>
+#include <editor/editor_data.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
 
 #include <editor/editor_node.h>
 #include <editor/gui/editor_bottom_panel.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

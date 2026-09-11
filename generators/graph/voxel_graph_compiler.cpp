@@ -2,7 +2,7 @@
 #include "../../util/containers/container_funcs.h"
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_unordered_set.h"
-#include "../../util/godot/core/array.h" // 用于 `varray`
+#include <core/variant/array.h>
 #include "../../util/macros.h"
 #include "../../util/profiling.h"
 #include "../../util/string/expression_parser.h"

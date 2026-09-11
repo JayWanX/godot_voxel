@@ -1,14 +1,13 @@
 #include "voxel_blocky_attribute.h"
 #include "../../../constants/voxel_string_names.h"
 #include "../../../util/containers/container_funcs.h"
-#include "../../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../../util/io/log.h"
 #include "../../../util/math/funcs.h"
 #include "../../../util/math/ortho_basis.h"
+#include <core/variant/array.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

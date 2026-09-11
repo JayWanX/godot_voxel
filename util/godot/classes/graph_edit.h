@@ -1,13 +1,12 @@
+#include <core/version.h>
 #ifndef VOXEL_GODOT_GRAPH_EDIT_H
 #define VOXEL_GODOT_GRAPH_EDIT_H
 
-#if defined(VOXEL_GODOT)
 #include <scene/gui/graph_edit.h>
-#endif
 
 #include "../../containers/std_vector.h"
 #include "../core/string_name.h"
-#include "../core/version.h"
+#include <core/version.h>
 #include "graph_edit_connection.h"
 
 namespace voxel::godot {

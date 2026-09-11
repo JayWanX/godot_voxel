@@ -1,20 +1,22 @@
 #include "voxel_blocky_model.h"
 #include "../../util/containers/container_funcs.h"
 #include "../../util/godot/classes/array_mesh.h"
-#include "../../util/godot/classes/base_material_3d.h"
-#include "../../util/godot/classes/shader_material.h"
-#include "../../util/godot/core/array.h"
+#include <scene/resources/material.h>
+#include <scene/resources/material.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/math/conv.h"
-#include "../../util/math/vector3.h"
+#include <core/math/vector3.h>
 #include "../../util/string/format.h"
 #include "blocky_material_indexer.h"
 #include "blocky_model_baking_context.h"
 #include "voxel_blocky_library.h"
+#include <scene/resources/material.h>
+#include <scene/resources/material.h>
+#include <core/variant/array.h>
+#include "../../util/math/vector3.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 // TODO 只是因为 MAX_MATERIALS 才需要……也许反转该依赖就够了
 #include "voxel_mesher_blocky.h"

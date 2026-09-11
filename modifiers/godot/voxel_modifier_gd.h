@@ -1,13 +1,15 @@
+#include <scene/3d/node_3d.h>
+#include <core/version.h>
 #ifndef VOXEL_MODIFIER_GD_H
 #define VOXEL_MODIFIER_GD_H
 
 #include "../../storage/voxel_data.h"
 #include "../../terrain/variable_lod/voxel_lod_terrain.h"
-#include "../../util/godot/classes/node_3d.h"
+#include <scene/3d/node_3d.h>
 #include "../voxel_modifier.h"
 
 #ifdef TOOLS_ENABLED
-#include "../../util/godot/core/version.h"
+#include <core/version.h>
 #endif
 
 namespace voxel::godot {
@@ -32,10 +34,8 @@ public:
 	float get_smoothness() const;
 
 #ifdef TOOLS_ENABLED
-#if defined(VOXEL_GODOT)
 	// 获取编辑器中显示的操作警告
 	PackedStringArray get_configuration_warnings() const override;
-#endif
 	// 获取编辑器中显示的操作警告
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif

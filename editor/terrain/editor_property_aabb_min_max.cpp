@@ -1,12 +1,14 @@
 #include "editor_property_aabb_min_max.h"
-#include "../../util/godot/classes/control.h"
-#include "../../util/godot/classes/grid_container.h"
-#include "../../util/godot/classes/label.h"
+#include <scene/gui/control.h>
+#include <scene/gui/grid_container.h>
+#include <scene/gui/label.h>
 #include "../../util/godot/classes/node.h"
+#include <scene/gui/control.h>
+#include <scene/gui/grid_container.h>
+#include <scene/gui/label.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

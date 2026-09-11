@@ -2,21 +2,29 @@
 #include "../constants/voxel_string_names.h"
 #include "../storage/voxel_buffer.h"
 #include "../util/godot/classes/array_mesh.h"
-#include "../util/godot/classes/collision_shape_3d.h"
-#include "../util/godot/classes/convex_polygon_shape_3d.h"
-#include "../util/godot/classes/mesh_instance_3d.h"
+#include <core/version.h>
+#include <scene/3d/physics/collision_shape_3d.h>
+#include <core/version.h>
+#include <scene/resources/3d/convex_polygon_shape_3d.h>
+#include <scene/3d/mesh_instance_3d.h>
 #include "../util/godot/classes/rendering_server.h"
-#include "../util/godot/classes/rigid_body_3d.h"
+#include <core/version.h>
+#include <scene/3d/physics/rigid_body_3d.h>
 #include "../util/godot/classes/shader.h"
-#include "../util/godot/classes/shader_material.h"
-#include "../util/godot/classes/timer.h"
+#include <scene/resources/material.h>
+#include <scene/main/timer.h>
 #include "../util/island_finder.h"
 #include "../util/profiling.h"
 #include "voxel_tool.h"
+#include <scene/3d/physics/collision_shape_3d.h>
+#include <scene/resources/3d/convex_polygon_shape_3d.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/3d/physics/physics_body_3d.h>
+#include <scene/resources/material.h>
+#include <scene/main/timer.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

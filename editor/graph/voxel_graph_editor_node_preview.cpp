@@ -1,7 +1,7 @@
 #include "voxel_graph_editor_node_preview.h"
 #include "../../generators/graph/voxel_graph_function.h"
 #include "../../util/godot/classes/shader.h"
-#include "../../util/godot/classes/texture_rect.h"
+#include <scene/gui/texture_rect.h>
 #include "graph_editor_adapter.h"
 
 namespace voxel {

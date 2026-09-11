@@ -5,7 +5,7 @@
 #include "../util/containers/span.h"
 #include "../util/containers/std_vector.h"
 #include "../util/math/vector3f.h"
-#include "../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../util/tasks/threaded_task.h"
 
 #include <atomic>

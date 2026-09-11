@@ -5,8 +5,8 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/classes/graph_node.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class ColorRect)
-VOXEL_GODOT_FORWARD_DECLARE(class Label)
+class ColorRect;
+class Label;
 
 namespace voxel {
 

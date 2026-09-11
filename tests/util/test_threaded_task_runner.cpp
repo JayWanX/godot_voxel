@@ -2,11 +2,11 @@
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/classes/os.h"
-#include "../../util/godot/classes/time.h"
-#include "../../util/godot/core/random_pcg.h"
+#include <core/os/time.h>
+#include <core/math/random_pcg.h>
 #include "../../util/io/log.h"
 #include "../../util/io/std_string_text_writer.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/memory/memory.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"

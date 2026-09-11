@@ -328,9 +328,7 @@ void VoxelToolLodTerrain::set_raycast_binary_search_iterations(int iterations) {
 	_raycast_binary_search_iterations = math::clamp(iterations, 0, 16);
 }
 
-#if defined(VOXEL_GODOT)
 Array VoxelToolLodTerrain::separate_floating_chunks(AABB world_box, Node *parent_node) {
-#endif
 	ERR_FAIL_COND_V(_terrain == nullptr, Array());
 	ERR_FAIL_COND_V(!math::is_valid_size(world_box.size), Array());
 	Ref<VoxelMesher> mesher = _terrain->get_mesher();

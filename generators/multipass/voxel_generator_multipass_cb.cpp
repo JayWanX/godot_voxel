@@ -4,16 +4,18 @@
 #include "../../util/dstack.h"
 #include "../../util/godot/check_ref_ownership.h"
 #include "../../util/godot/classes/engine.h"
-#include "../../util/godot/classes/script.h"
-#include "../../util/godot/classes/time.h"
-#include "../../util/godot/core/array.h"
+#include "../../util/math/vector2i.h"
+#include <core/object/script_language.h>
+#include <core/os/time.h>
+#include <core/variant/array.h>
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 #include "generate_block_multipass_cb_task.h"
+#include <core/object/script_language.h>
+#include <core/os/time.h>
+#include <core/variant/array.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 
@@ -662,12 +664,10 @@ void VoxelGeneratorMultipassCB::_bind_methods() {
 			&VoxelGeneratorMultipassCB::debug_generate_test_column
 	);
 
-#if defined(VOXEL_GODOT)
 	// TODO 测试当 GDScript 在其它线程中失败时，GDVIRTUAL 是否能正确打印错误。
 	GDVIRTUAL_BIND(_generate_pass, "voxel_tool", "pass_index");
 	GDVIRTUAL_BIND(_generate_block_fallback, "out_buffer", "origin_in_voxels");
 	GDVIRTUAL_BIND(_get_used_channels_mask);
-#endif
 
 	ADD_PROPERTY(
 			PropertyInfo(Variant::INT, "column_base_y_blocks"), "set_column_base_y_blocks", "get_column_base_y_blocks"

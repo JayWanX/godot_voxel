@@ -10,7 +10,7 @@
 // 调试
 // #define VOXEL_MESH_SDF_DEBUG_SLICES
 #ifdef VOXEL_MESH_SDF_DEBUG_SLICES
-#include "../util/math/color.h"
+#include <core/math/color.h>
 #include <core/io/image.h>
 #endif
 // #define VOXEL_MESH_SDF_DEBUG_BATCH

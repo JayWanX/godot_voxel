@@ -1,7 +1,8 @@
 #include "direct_multimesh_instance.h"
 #include "../profiling.h"
 #include "classes/material.h"
-#include "classes/world_3d.h"
+#include <core/version.h>
+#include <scene/resources/3d/world_3d.h>
 
 namespace voxel::godot {
 
@@ -114,10 +115,6 @@ void DirectMultiMeshInstance::set_gi_mode(GeometryInstance3D::GIMode mode) {
 void DirectMultiMeshInstance::set_interpolated(const bool enabled) {
 	// 这在 Godot 4.4 中添加，后来在 4.5 中移到了 SceneTree
 	// 参见 https://github.com/godotengine/godot/pull/104269
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR == 4
-	RenderingServer &vs = *RenderingServer::get_singleton();
-	vs.instance_set_interpolated(_multimesh_instance, enabled);
-#endif
 }
 
 void DirectMultiMeshInstance::operator=(DirectMultiMeshInstance &&src) {

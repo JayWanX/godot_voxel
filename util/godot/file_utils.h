@@ -1,7 +1,8 @@
+#include "../math/vector3i.h"
 #ifndef VOXEL_GODOT_FILE_UTILS_H
 #define VOXEL_GODOT_FILE_UTILS_H
 
-#include "../math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "classes/file_access.h"
 #include "core/string.h"
 

@@ -1,3 +1,6 @@
+#define VOXEL_GODOT_CHECK_REF_COUNT_DOES_NOT_CHANGE(m_ref)                                                                \
+	VOXEL_ASSERT(m_ref.is_valid());                                                                                       \
+	voxel::godot::CheckRefCountDoesNotChange VOXEL_CONCAT(ref_count_checker_, __LINE__)(__FUNCTION__, m_ref.ptr())
 #ifndef VOXEL_GODOT_CHECK_REF_OWNERSHIP_H
 #define VOXEL_GODOT_CHECK_REF_OWNERSHIP_H
 

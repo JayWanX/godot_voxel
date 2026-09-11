@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_GEOMETRY_INSTANCE_3D_H
 #define VOXEL_GODOT_GEOMETRY_INSTANCE_3D_H
 
-#if defined(VOXEL_GODOT)
 #include <scene/3d/visual_instance_3d.h>
-#endif
 
 namespace voxel::godot {
 

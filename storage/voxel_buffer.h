@@ -585,12 +585,6 @@ public:
 		_voxel_metadata.remove_if(predicate);
 	}
 
-	// #ifdef VOXEL_GODOT
-	// 	// TODO 移到别处
-	// 	void for_each_voxel_metadata(const Callable &callback) const;
-	// 	void for_each_voxel_metadata_in_area(const Callable &callback, Box3i box) const;
-	// #endif
-
 	void clear_voxel_metadata();
 	void clear_voxel_metadata_in_area(const Box3i box);
 	void copy_voxel_metadata_in_area(const VoxelBuffer &src_buffer, const Box3i src_box, const Vector3i dst_origin);

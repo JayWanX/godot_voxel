@@ -3,8 +3,8 @@
 #include "voxel_engine.h"
 
 // 执行 `Node *root = SceneTree::get_root()` 所需，Window* 为前置声明
-#include "../util/godot/classes/scene_tree.h"
-#include "../util/godot/classes/window.h"
+#include <scene/main/scene_tree.h>
+#include <scene/main/window.h>
 
 namespace voxel {
 

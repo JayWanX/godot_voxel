@@ -1,17 +1,25 @@
 #include "voxel_mesh_sdf_viewer.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/image_texture.h"
-#include "../../util/godot/classes/label.h"
-#include "../../util/godot/classes/scene_tree.h"
-#include "../../util/godot/classes/spin_box.h"
-#include "../../util/godot/classes/texture_rect.h"
-#include "../../util/godot/core/array.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
+#include <scene/gui/label.h>
+#include <scene/main/scene_tree.h>
+#include <scene/gui/spin_box.h>
+#include <scene/gui/texture_rect.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <scene/resources/texture.h>
+#include <scene/gui/label.h>
+#include <scene/main/scene_tree.h>
+#include <scene/gui/spin_box.h>
+#include <scene/gui/texture_rect.h>
+#include <core/variant/array.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

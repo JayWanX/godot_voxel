@@ -1,12 +1,12 @@
 #include "voxel_generator_noise.h"
 #include "../../constants/voxel_string_names.h"
-#include "../../util/godot/classes/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "../../util/math/funcs.h"
+#include <modules/noise/fastnoise_lite.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

@@ -4,8 +4,8 @@
 #include "../../util/containers/std_map.h"
 #include "../../util/containers/std_unordered_map.h"
 #include "../../util/containers/std_unordered_set.h"
-#include "../../util/godot/core/array.h"
-#include "../../util/godot/core/print_string.h"
+#include <core/variant/array.h>
+#include <core/string/print_string.h>
 #include "../../util/math/conv.h"
 #include "../../util/profiling_clock.h"
 #include "../../util/testing/test_macros.h"

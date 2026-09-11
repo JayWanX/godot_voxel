@@ -1,12 +1,13 @@
+#include <scene/gui/scroll_container.h>
 #ifndef VOXEL_TERRAIN_EDITOR_TASK_INDICATOR_H
 #define VOXEL_TERRAIN_EDITOR_TASK_INDICATOR_H
 
 #include "../../util/containers/fixed_array.h"
-#include "../../util/godot/classes/scroll_container.h"
+#include <scene/gui/scroll_container.h>
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Label)
-VOXEL_GODOT_FORWARD_DECLARE(class HBoxContainer)
+class Label;
+class HBoxContainer;
 
 namespace voxel {
 

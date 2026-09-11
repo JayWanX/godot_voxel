@@ -1,8 +1,9 @@
+#include <scene/resources/material.h>
 #ifndef VOXEL_GODOT_DEBUG_RENDERER_H
 #define VOXEL_GODOT_DEBUG_RENDERER_H
 
 #include "../containers/std_vector.h"
-#include "classes/standard_material_3d.h"
+#include <scene/resources/material.h>
 #include "direct_multimesh_instance.h"
 
 namespace voxel::godot {

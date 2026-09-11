@@ -1,3 +1,4 @@
+#include <core/variant/array.h>
 #ifndef VOXEL_GODOT_PACKED_ARRAYS_H
 #define VOXEL_GODOT_PACKED_ARRAYS_H
 
@@ -9,7 +10,7 @@
 
 #ifdef TOOLS_ENABLED
 #include "../macros.h"
-#include "array.h"
+#include <core/variant/array.h>
 #include "packed_string_array_fwd.h"
 #endif
 

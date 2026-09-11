@@ -1,15 +1,20 @@
 #include "voxel_graph_editor_shader_dialog.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/code_edit.h"
-#include "../../util/godot/classes/display_server.h"
-#include "../../util/godot/classes/h_box_container.h"
-#include "../../util/godot/classes/v_box_container.h"
+#include <scene/gui/code_edit.h>
+#include <servers/display/display_server.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/box_container.h>
 #include "../../util/godot/core/string.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <scene/gui/code_edit.h>
+#include <servers/display/display_server.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/box_container.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

@@ -6,7 +6,7 @@
 #include "direct_mesh_instance.h"
 #include "macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class World3D);
+class World3D;
 
 namespace voxel::godot {
 

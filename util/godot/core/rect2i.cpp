@@ -1,6 +1,7 @@
 #include "rect2i.h"
 #include "../../io/text_writer.h"
 #include "../../math/vector2i.h"
+#include <core/math/vector2i.h>
 
 namespace voxel {
 

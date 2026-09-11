@@ -2,7 +2,8 @@
 #include "../../math/conv.h"
 #include "../../profiling.h"
 #include "../core/packed_arrays.h"
-#include "collision_shape_3d.h"
+#include <core/version.h>
+#include <scene/3d/physics/collision_shape_3d.h>
 #include "mesh.h"
 
 namespace voxel::godot {

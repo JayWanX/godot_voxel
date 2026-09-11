@@ -1,10 +1,11 @@
+#include <scene/gui/dialogs.h>
 #ifndef VOXEL_BLOCKY_TYPE_LIBRARY_IDS_DIALOG_H
 #define VOXEL_BLOCKY_TYPE_LIBRARY_IDS_DIALOG_H
 
 #include "../../../meshers/blocky/types/voxel_blocky_type_library.h"
-#include "../../../util/godot/classes/accept_dialog.h"
+#include <scene/gui/dialogs.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class ItemList);
+class ItemList;
 
 namespace voxel {
 

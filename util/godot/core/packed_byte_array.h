@@ -1,11 +1,9 @@
 #ifndef VOXEL_GODOT_PACKED_BYTE_ARRAY_H
 #define VOXEL_GODOT_PACKED_BYTE_ARRAY_H
 
-#if defined(VOXEL_GODOT)
 #include <core/io/file_access.h>
 #include <core/variant/variant.h>
 
-#endif
 
 namespace voxel::godot {
 namespace PackedByteArrayUtility {

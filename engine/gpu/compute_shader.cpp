@@ -2,16 +2,19 @@
 #include "../../util/godot/classes/directory.h"
 #include "../../util/godot/classes/engine.h"
 #include "../../util/godot/classes/file_access.h"
-#include "../../util/godot/classes/rd_shader_source.h"
+#include <servers/rendering/rendering_device_binds.h>
 #include "../../util/godot/classes/rendering_server.h"
-#include "../../util/godot/core/array.h" // 供 `varray` 使用
+#include <core/variant/array.h>
 #include "../../util/godot/core/packed_arrays.h"
-#include "../../util/godot/core/print_string.h"
+#include <core/string/print_string.h>
 #include "../../util/godot/classes/project_settings.h"
 #include "../../util/io/log.h"
 #include "../../util/profiling.h"
 #include "../../util/string/format.h"
 #include "../voxel_engine.h"
+#include <servers/rendering/rendering_device_binds.h>
+#include <core/variant/array.h> // 供 `varray` 使用
+#include <core/string/print_string.h>
 
 namespace voxel {
 
@@ -39,9 +42,7 @@ namespace {
 
 String get_compute_shader_cache_base_dir() {
 	String base_dir;
-#if defined(VOXEL_GODOT)
 	base_dir = Engine::get_singleton()->get_shader_cache_path();
-#endif
 	if (base_dir.is_empty()) {
 		base_dir = "user://";
 	}

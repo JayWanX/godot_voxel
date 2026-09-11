@@ -1,30 +1,29 @@
 #include "rendering_device.h"
 #include "../../dstack.h"
 #include "../../profiling.h"
-#include "../core/version.h"
-#include "rd_sampler_state.h"
-#include "rd_shader_source.h"
-#include "rd_texture_format.h"
-#include "rd_texture_view.h"
-#include "rd_uniform.h"
+#include <core/version.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <core/version.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
 
 namespace voxel::godot {
 
 void free_rendering_device_rid(RenderingDevice &rd, RID rid) {
 	VOXEL_DSTACK();
 
-#if defined(VOXEL_GODOT)
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 5
-	rd.free(rid);
-#else
 	rd.free_rid(rid);
-#endif
 
-#endif
 }
 
 Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShaderSource &p_source, bool p_allow_cache) {
-#if defined(VOXEL_GODOT)
 	// 这是 `RenderingDevice::_shader_compile_spirv_from_source` 的副本，因为它是私有的
 
 	Ref<RDShaderSPIRV> bytecode;
@@ -44,11 +43,9 @@ Ref<RDShaderSPIRV> shader_compile_spirv_from_source(RenderingDevice &rd, RDShade
 	}
 	return bytecode;
 
-#endif
 }
 
 PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSPIRV &p_spirv, String name) {
-#if defined(VOXEL_GODOT)
 	// 这是 `RenderingDevice::_shader_compile_binary_from_spirv` 的副本，因为它是私有的。
 
 	Vector<RenderingDevice::ShaderStageSPIRVData> stage_data;
@@ -69,17 +66,12 @@ PackedByteArray shader_compile_binary_from_spirv(RenderingDevice &rd, RDShaderSP
 
 		RenderingDevice::ShaderStageSPIRVData sd;
 		sd.shader_stage = stage;
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 2
-		sd.spir_v = bytecode;
-#else
 		sd.spirv = bytecode;
-#endif
 		stage_data.push_back(sd);
 	}
 
 	return rd.shader_compile_binary_from_spirv(stage_data, name);
 
-#endif
 }
 
 RID texture_create(
@@ -88,7 +80,6 @@ RID texture_create(
 		RDTextureView &p_view,
 		const TypedArray<PackedByteArray> &p_data
 ) {
-#if defined(VOXEL_GODOT)
 	// 这是 `RenderingDevice::_texture_create` 的部分重新实现，因为它是私有的
 
 	Vector<Vector<uint8_t>> data;
@@ -120,20 +111,16 @@ RID texture_create(
 
 	return rd.texture_create(tf, tv, data);
 
-#endif
 }
 
 RID uniform_set_create(RenderingDevice &rd, Array uniforms, RID shader, int shader_set) {
 	VOXEL_PROFILE_SCOPE();
-#if defined(VOXEL_GODOT)
 	// 无法访问那个接收 `Array` 的该方法版本，因为它是私有的……
 	return rd.call(SNAME("uniform_set_create"), uniforms, shader, shader_set);
 
-#endif
 }
 
 RID sampler_create(RenderingDevice &rd, const RDSamplerState &sampler_state) {
-#if defined(VOXEL_GODOT)
 	// 无法访问那个接收 `RDSamplerState` 对象的该方法版本，因为它是私有的……
 
 	// return rd.call(SNAME("sampler_create"), sampler_state_ref);
@@ -157,7 +144,6 @@ RID sampler_create(RenderingDevice &rd, const RDSamplerState &sampler_state) {
 
 	return rd.sampler_create(ss);
 
-#endif
 }
 
 Error update_storage_buffer(
@@ -167,23 +153,9 @@ Error update_storage_buffer(
 		unsigned int size,
 		const PackedByteArray &pba
 ) {
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 2
 
-	// Godot 4.2 及之前的版本要求传递屏障选项。
-	// 在 4.3 的开发过程中，加入了渲染图（render graph），从而移除了这个参数的需求。
-	// https://github.com/godotengine/godot/pull/84976
-
-#if defined(VOXEL_GODOT)
-	return rd.buffer_update(rid, offset, size, pba.ptr(), RenderingDevice::BARRIER_MASK_ALL_BARRIERS);
-#endif
-
-#else // Godot 4.3 及更高版本
-
-#if defined(VOXEL_GODOT)
 	return rd.buffer_update(rid, offset, size, pba.ptr());
-#endif
 
-#endif
 }
 
 } // namespace voxel::godot

@@ -1,6 +1,6 @@
 #include "voxel_modifier_mesh_gd.h"
-#include "../../util/godot/core/array.h"
-#include "../../util/godot/core/callable_mp.h"
+#include <core/variant/array.h>
+#include <core/object/callable_mp.h>
 #include "../voxel_modifier_mesh.h"
 
 #ifdef TOOLS_ENABLED

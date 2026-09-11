@@ -2,10 +2,8 @@
 #include "../util/godot/classes/stream_peer.h"
 #include "../util/godot/core/packed_arrays.h"
 #include "voxel_block_serializer.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 using namespace voxel::godot;
 

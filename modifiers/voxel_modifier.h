@@ -2,7 +2,7 @@
 #define VOXEL_MODIFIER_H
 
 #include "../util/containers/fixed_array.h"
-#include "../util/godot/core/rid.h"
+#include <core/templates/rid.h>
 #include "../util/godot/core/transform_3d.h"
 #include "../util/math/vector3f.h"
 #include "../util/thread/rw_lock.h"

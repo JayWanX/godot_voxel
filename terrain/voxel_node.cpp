@@ -7,13 +7,12 @@
 #include "../meshers/voxel_mesher.h"
 #include "../storage/voxel_data.h"
 #include "../streams/voxel_stream.h"
-#include "../util/godot/classes/script.h"
+#include <core/object/script_language.h>
 #include "../util/godot/core/string.h"
+#include <core/object/script_language.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/callable_mp.h"
-#include "../util/godot/core/class_db.h"
-#endif
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 #include "../meshers/transvoxel/voxel_mesher_transvoxel.h"
@@ -21,6 +20,7 @@
 
 #ifdef TOOLS_ENABLED
 #include "../util/godot/core/packed_arrays.h"
+#include <core/object/callable_mp.h>
 #endif
 
 namespace voxel {
@@ -126,13 +126,11 @@ Node3D *VoxelNode::convert_to_nodes(const BitField<NodeConversionFlags> flags) c
 
 #ifdef TOOLS_ENABLED
 
-#if defined(VOXEL_GODOT)
 PackedStringArray VoxelNode::get_configuration_warnings() const {
 	PackedStringArray warnings;
 	get_configuration_warnings(warnings);
 	return warnings;
 }
-#endif
 
 static String channel_mask_to_string(const uint32_t mask) {
 	String s = "[";

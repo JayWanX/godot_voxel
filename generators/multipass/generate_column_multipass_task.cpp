@@ -4,7 +4,8 @@
 #include "../../storage/voxel_data.h"
 #include "../../util/containers/std_vector.h"
 #include "../../util/dstack.h"
-#include "../../util/godot/classes/time.h"
+#include "../../util/math/vector2i.h"
+#include <core/os/time.h>
 #include "../../util/string/format.h"
 
 namespace voxel {

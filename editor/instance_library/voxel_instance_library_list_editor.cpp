@@ -2,25 +2,37 @@
 #include "../../constants/voxel_string_names.h"
 #include "../../terrain/instancing/voxel_instance_library_multimesh_item.h"
 #include "../../terrain/instancing/voxel_instance_library_scene_item.h"
-#include "../../util/godot/classes/box_mesh.h"
+#include <core/version.h>
+#include <scene/resources/3d/primitive_meshes.h>
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/confirmation_dialog.h"
+#include <scene/gui/dialogs.h>
 #include "../../util/godot/classes/editor_file_dialog.h"
-#include "../../util/godot/classes/editor_interface.h"
-#include "../../util/godot/classes/editor_undo_redo_manager.h"
-#include "../../util/godot/classes/item_list.h"
-#include "../../util/godot/classes/menu_button.h"
-#include "../../util/godot/classes/popup_menu.h"
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <editor/editor_undo_redo_manager.h>
+#include <scene/gui/item_list.h>
+#include <scene/gui/menu_button.h>
+#include <scene/gui/popup_menu.h>
 #include "../../util/godot/classes/resource_loader.h"
-#include "../../util/godot/classes/v_box_container.h"
-#include "../../util/godot/core/array.h"
-#include "../../util/godot/editor_scale.h"
+#include <scene/gui/box_container.h>
+#include <core/variant/array.h>
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/profiling.h"
 #include "voxel_instance_library_editor_plugin.h"
+#include <scene/resources/3d/primitive_meshes.h>
+#include <scene/gui/dialogs.h>
+#include <editor/plugins/editor_plugin.h>
+#include <editor/editor_undo_redo_manager.h>
+#include <scene/gui/item_list.h>
+#include <scene/gui/menu_button.h>
+#include <scene/gui/popup_menu.h>
+#include <scene/gui/box_container.h>
+#include <core/variant/array.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

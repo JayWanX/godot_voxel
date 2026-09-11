@@ -1,10 +1,11 @@
+#include <core/templates/rid.h>
 #ifndef VOXEL_GPU_TASK_RUNNER_H
 #define VOXEL_GPU_TASK_RUNNER_H
 
 #include "../../util/containers/span.h"
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/core/packed_byte_array.h"
-#include "../../util/godot/core/rid.h"
+#include <core/templates/rid.h>
 #include "../../util/godot/macros.h"
 #include "../../util/macros.h"
 #include "../../util/thread/mutex.h"
@@ -16,7 +17,7 @@
 
 #include <atomic>
 
-VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice)
+class RenderingDevice;
 
 namespace voxel {
 

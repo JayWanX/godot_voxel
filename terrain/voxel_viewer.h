@@ -2,7 +2,7 @@
 #define VOXEL_VIEWER_H
 
 #include "../engine/ids.h"
-#include "../util/godot/classes/node_3d.h"
+#include <scene/3d/node_3d.h>
 #include "../util/math/vector2f.h"
 
 namespace voxel {

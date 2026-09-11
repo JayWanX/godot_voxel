@@ -4,9 +4,9 @@
 #include "../../engine/ids.h"
 #include "../../storage/voxel_buffer_gd.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/core/gdvirtual.h"
+#include <core/object/gdvirtual.gen.h>
 #include "../../util/math/box3i.h"
-#include "../../util/math/vector2i.h"
+#include <core/math/vector2i.h>
 #include "../../util/memory/memory.h"
 #include "../../util/ref_count.h"
 #include "../../util/thread/mutex.h"

@@ -1,3 +1,5 @@
+#include <scene/resources/packed_scene.h>
+#include <core/object/script_language.h>
 #ifndef VOXEL_INSTANCE_LIBRARY_MULTIMESH_ITEM_H
 #define VOXEL_INSTANCE_LIBRARY_MULTIMESH_ITEM_H
 
@@ -6,10 +8,10 @@
 #include "../../util/godot/classes/geometry_instance_3d.h"
 #include "../../util/godot/classes/material.h"
 #include "../../util/godot/classes/mesh.h"
-#include "../../util/godot/classes/packed_scene.h"
+#include <scene/resources/packed_scene.h>
 #include "../../util/godot/classes/rendering_server.h"
 #include "../../util/godot/classes/shape_3d.h"
-#include "../../util/godot/core/gdvirtual.h"
+#include <core/object/gdvirtual.gen.h>
 #include "voxel_instance_library_item.h"
 
 // 因为 GDVIRTUAL 我不得不包含它，否则会报窄化转换警告
@@ -108,10 +110,8 @@ public:
 	void set_collider_group_names(TypedArray<StringName> names);
 	TypedArray<StringName> get_collider_group_names() const;
 
-	#if defined(VOXEL_GODOT)
 	// 从模板节点应用设置
 	void setup_from_template(Node *root);
-#endif
 
 	// 用作模型的场景
 	void set_scene(Ref<PackedScene> scene);

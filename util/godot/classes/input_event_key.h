@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_INPUT_EVENT_KEY_H
 #define VOXEL_GODOT_INPUT_EVENT_KEY_H
 
-#if defined(VOXEL_GODOT)
 #include <core/input/input_event.h>
-#endif
 
 namespace voxel::godot {
 

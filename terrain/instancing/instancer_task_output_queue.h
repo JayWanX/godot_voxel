@@ -3,7 +3,7 @@
 
 #include "../../util/containers/std_vector.h"
 #include "../../util/math/transform3f.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/thread/mutex.h"
 #include <cstdint>
 

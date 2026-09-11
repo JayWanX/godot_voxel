@@ -1,8 +1,6 @@
 #include "voxel_color_palette.h"
 #include "../../util/containers/span.h"
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
+#include <core/object/class_db.h>
 
 namespace voxel {
 

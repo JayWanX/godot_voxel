@@ -2,10 +2,8 @@
 #include "../storage/voxel_buffer_gd.h"
 #include "../util/godot/core/string.h"
 #include "../util/string/format.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

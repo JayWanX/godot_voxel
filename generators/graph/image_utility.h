@@ -5,7 +5,7 @@
 #include "../../util/godot/macros.h"
 #include "../../util/math/interval.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Image);
+class Image;
 
 namespace voxel {
 

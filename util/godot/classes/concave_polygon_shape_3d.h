@@ -5,16 +5,10 @@
 #include "../../macros.h"
 #include "../../math/vector3f.h"
 
-#if defined(VOXEL_GODOT)
 #include <core/version.h>
 
-#if VERSION_MAJOR == 4 && VERSION_MINOR <= 2
-#include <scene/resources/concave_polygon_shape_3d.h>
-#else
 #include <scene/resources/3d/concave_polygon_shape_3d.h>
-#endif
 
-#endif
 
 namespace voxel::godot {
 

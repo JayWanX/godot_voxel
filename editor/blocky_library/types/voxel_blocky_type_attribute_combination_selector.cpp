@@ -1,12 +1,15 @@
 #include "voxel_blocky_type_attribute_combination_selector.h"
 #include "../../../constants/voxel_string_names.h"
-#include "../../../util/godot/classes/label.h"
-#include "../../../util/godot/classes/option_button.h"
-#include "../../../util/godot/editor_scale.h"
+#include <scene/gui/label.h>
+#include <scene/gui/option_button.h>
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <scene/gui/label.h>
+#include <scene/gui/option_button.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

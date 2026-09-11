@@ -2,7 +2,6 @@
 
 namespace voxel::godot {
 
-#if defined(VOXEL_GODOT)
 
 bool Voxel_EditorPlugin::handles(Object *p_object) const {
 	return _voxel_handles(p_object);
@@ -24,17 +23,10 @@ void Voxel_EditorPlugin::save_external_data() {
 	_voxel_save_external_data();
 }
 
-#if VERSION_MAJOR == 4 && VERSION_MINOR <= 3
-String Voxel_EditorPlugin::get_name() const {
-	return _voxel_get_plugin_name();
-}
-#else
 String Voxel_EditorPlugin::get_plugin_name() const {
 	return _voxel_get_plugin_name();
 }
-#endif
 
-#endif
 
 bool Voxel_EditorPlugin::_voxel_handles(const Object *p_object) const {
 	return false;

@@ -1,7 +1,6 @@
 #ifndef VOXEL_GODOT_MOUSE_BUTTON_H
 #define VOXEL_GODOT_MOUSE_BUTTON_H
 
-#if defined(VOXEL_GODOT)
 #include <core/input/input_enums.h>
 
 #define VOXEL_GODOT_MouseButton_NONE MouseButton::NONE
@@ -10,6 +9,5 @@
 #define VOXEL_GODOT_MouseButton_WHEEL_DOWN MouseButton::WHEEL_DOWN
 #define VOXEL_GODOT_MouseButtonMask_MIDDLE MouseButtonMask::MIDDLE
 
-#endif
 
 #endif // VOXEL_GODOT_MOUSE_BUTTON_H

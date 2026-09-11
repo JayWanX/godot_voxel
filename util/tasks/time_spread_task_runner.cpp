@@ -1,6 +1,6 @@
 #include "time_spread_task_runner.h"
 #include "../containers/std_vector.h"
-#include "../godot/classes/time.h"
+#include <core/os/time.h>
 #include "../memory/memory.h"
 #include "../profiling.h"
 

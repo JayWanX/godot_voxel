@@ -1,15 +1,18 @@
 #include "voxel_instance_library_multimesh_item.h"
 #include "../../constants/voxel_string_names.h"
-#include "../../util/godot/classes/collision_shape_3d.h"
-#include "../../util/godot/classes/mesh_instance_3d.h"
+#include <core/version.h>
+#include <scene/3d/physics/collision_shape_3d.h>
+#include <scene/3d/mesh_instance_3d.h>
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/physics_body_3d.h"
+#include <core/version.h>
+#include <scene/3d/physics/physics_body_3d.h>
 #include "../../util/godot/core/packed_arrays.h"
 #include "voxel_instancer.h"
+#include <scene/3d/physics/collision_shape_3d.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/3d/physics/physics_body_3d.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 
@@ -468,9 +471,7 @@ bool setup_from_template(Node *root, VoxelInstanceLibraryMultiMeshItem::Settings
 
 } // namespace
 
-#if defined(VOXEL_GODOT)
 void VoxelInstanceLibraryMultiMeshItem::setup_from_template(Node *root) {
-#endif
 	ERR_FAIL_COND(!voxel::setup_from_template(root, _manual_settings));
 	notify_listeners(IInstanceLibraryItemListener::CHANGE_VISUAL);
 }

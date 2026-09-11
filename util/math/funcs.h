@@ -1,11 +1,9 @@
+#include <core/math/math_funcs.h>
 #ifndef VOXEL_MATH_FUNCS_H
 #define VOXEL_MATH_FUNCS_H
 
 #include "../errors.h"
 
-#if defined(VOXEL_GODOT)
-#include <core/math/math_funcs.h>
-#endif
 
 #include "constants.h"
 #include <cmath>

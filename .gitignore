@@ -15,6 +15,7 @@
 *.ilk
 
 doc/site/
+.trae/
 
 shaders/dev/.godot/
 *.gen.glsl

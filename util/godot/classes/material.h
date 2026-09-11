@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_MATERIAL_H
 #define VOXEL_GODOT_MATERIAL_H
 
-#if defined(VOXEL_GODOT)
 #include <scene/resources/material.h>
-#endif
 
 namespace voxel::godot {
 

@@ -3,7 +3,7 @@
 
 #include "../util/containers/std_unordered_map.h"
 #include "../util/containers/std_vector.h"
-#include "../util/godot/core/sort_array.h"
+#include <core/templates/sort_array.h>
 #include "../util/math/box3i.h"
 #include "../util/math/vector3f.h"
 #include <limits>

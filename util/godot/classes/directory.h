@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_DIRECTORY_H
 #define VOXEL_GODOT_DIRECTORY_H
 
-#if defined(VOXEL_GODOT)
 #include <core/io/dir_access.h>
-#endif
 
 namespace voxel::godot {
 

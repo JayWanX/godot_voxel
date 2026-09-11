@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_ARRAY_MESH_H
 #define VOXEL_GODOT_ARRAY_MESH_H
 
-#if defined(VOXEL_GODOT)
 #include <scene/resources/mesh.h>
-#endif
 
 namespace voxel::godot {
 

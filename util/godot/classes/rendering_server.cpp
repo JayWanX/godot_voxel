@@ -2,13 +2,13 @@
 #include "../../errors.h"
 #include "../../string/format.h"
 #include "../core/string.h"
-#include "../core/version.h"
+#include <core/version.h>
 #include "project_settings.h"
+#include <core/version.h>
 
 namespace voxel::godot {
 
 void get_shader_parameter_list(const RID &shader_rid, StdVector<ShaderParameterInfo> &out_parameters) {
-#if defined(VOXEL_GODOT)
 	List<PropertyInfo> params;
 	RenderingServer::get_singleton()->get_shader_parameter_list(shader_rid, &params);
 	// 我本想使用 ConstIterator，因为我只读取该列表，但那是不可能的 :shrug:
@@ -20,11 +20,9 @@ void get_shader_parameter_list(const RID &shader_rid, StdVector<ShaderParameterI
 		out_parameters.push_back(pi);
 	}
 
-#endif
 }
 
 String get_current_rendering_method_name() {
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 	RenderingServer *rs = RenderingServer::get_singleton();
 	// `tests=yes` 时 RenderingServer 可能为 null。
 	VOXEL_ASSERT_RETURN_V(rs != nullptr, "");
@@ -32,17 +30,6 @@ String get_current_rendering_method_name() {
 	const String method_name = rs->get_current_rendering_method();
 	return method_name;
 
-#else
-	// 参见 https://github.com/godotengine/godot/pull/85430
-
-#if defined(VOXEL_GODOT)
-	OS *os = OS::get_singleton();
-	VOXEL_ASSERT_RETURN_V(os != nullptr, "");
-	return os->get_current_rendering_method();
-
-#endif
-
-#endif
 }
 
 RenderMethod get_current_rendering_method() {
@@ -63,7 +50,6 @@ RenderMethod get_current_rendering_method() {
 }
 
 String get_current_rendering_driver_name() {
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 	RenderingServer *rs = RenderingServer::get_singleton();
 	// `tests=yes` 时 RenderingServer 可能为 null。
 	VOXEL_ASSERT_RETURN_V(rs != nullptr, "");
@@ -71,17 +57,6 @@ String get_current_rendering_driver_name() {
 	const String driver_name = rs->get_current_rendering_driver_name();
 	return driver_name;
 
-#else
-	// 参见 https://github.com/godotengine/godot/pull/85430
-
-#if defined(VOXEL_GODOT)
-	OS *os = OS::get_singleton();
-	VOXEL_ASSERT_RETURN_V(os != nullptr, "");
-	return os->get_current_rendering_driver_name();
-
-#endif
-
-#endif
 }
 
 RenderDriverName get_current_rendering_driver() {

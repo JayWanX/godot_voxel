@@ -5,7 +5,7 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/core/variant.h"
 #include "../../util/hash_funcs.h"
-#include "../../util/math/vector2.h"
+#include <core/math/vector2.h>
 #include "../../util/non_copyable.h"
 #include "../../util/string/std_string.h"
 

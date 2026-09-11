@@ -1,11 +1,10 @@
+#include <core/version.h>
 #ifndef VOXEL_GODOT_EDITOR_IMPORT_PLUGIN_H
 #define VOXEL_GODOT_EDITOR_IMPORT_PLUGIN_H
 
-#if defined(VOXEL_GODOT)
 #include <editor/import/editor_import_plugin.h>
-#endif
 
-#include "../core/version.h"
+#include <core/version.h>
 
 #include "../../containers/std_vector.h"
 
@@ -21,7 +20,6 @@ struct ImportOptionWrapper {
 
 // 根据编译目标，为不同的等价字典类型暴露相同的接口。
 struct KeyValueWrapper {
-#if defined(VOXEL_GODOT)
 
 	const HashMap<StringName, Variant> &_map;
 
@@ -42,24 +40,20 @@ struct KeyValueWrapper {
 		return Variant();
 	}
 
-#endif
 };
 
 // 根据编译目标，为不同的等价字符串列表暴露相同的接口。
 struct StringListWrapper {
-#if defined(VOXEL_GODOT)
 	List<String> &_list;
 	inline void append(const String s) {
 		_list.push_back(s);
 	}
-#endif
 };
 
 // 封装 EditorImportPlugin，以隔离引擎 API 的差异。
 class Voxel_EditorImportPlugin : public EditorImportPlugin {
 	GDCLASS(Voxel_EditorImportPlugin, EditorImportPlugin)
 public:
-#if defined(VOXEL_GODOT)
 	String get_importer_name() const override;
 	String get_visible_name() const override;
 	void get_recognized_extensions(List<String> *p_extensions) const override;
@@ -77,9 +71,7 @@ public:
 	) const override;
 
 	Error import(
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 			ResourceUID::ID p_source_id,
-#endif
 			const String &p_source_file,
 			const String &p_save_path,
 			const HashMap<StringName, Variant> &p_options,
@@ -88,11 +80,8 @@ public:
 			Variant *r_metadata = nullptr
 	) override;
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
 	bool can_import_threaded() const override;
-#endif
 
-#endif
 
 protected:
 	// 这些方法只需实现一次，上面的封装负责转换。

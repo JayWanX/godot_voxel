@@ -1,19 +1,25 @@
 #include "fast_noise_lite_viewer.h"
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/classes/image_texture.h"
-#include "../../util/godot/classes/input_event_mouse_button.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
+#include <core/input/input_event.h>
 #include "../../util/godot/classes/node.h"
-#include "../../util/godot/classes/popup_menu.h"
-#include "../../util/godot/classes/texture_rect.h"
+#include <scene/gui/popup_menu.h>
+#include <scene/gui/texture_rect.h>
 #include "../../util/godot/core/mouse_button.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/string/format.h"
 #include "../noise/noise_analysis_window.h"
+#include <scene/resources/texture.h>
+#include <core/input/input_event.h>
+#include <scene/gui/popup_menu.h>
+#include <scene/gui/texture_rect.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 
@@ -94,9 +100,7 @@ void Voxel_FastNoiseLiteViewer::update_context_menu() {
 	}
 }
 
-#ifdef VOXEL_GODOT
 void Voxel_FastNoiseLiteViewer::gui_input(const Ref<InputEvent> &p_event) {
-#endif
 	if (_context_menu == nullptr) {
 		return;
 	}

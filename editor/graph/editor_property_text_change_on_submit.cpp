@@ -1,9 +1,9 @@
 #include "editor_property_text_change_on_submit.h"
-#include "../../util/godot/classes/line_edit.h"
+#include <scene/gui/line_edit.h>
+#include <scene/gui/line_edit.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

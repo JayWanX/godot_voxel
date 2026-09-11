@@ -1,10 +1,11 @@
+#include <scene/3d/camera_3d.h>
 #ifndef VOXEL_EDITOR_CAMERA_CACHE_H
 #define VOXEL_EDITOR_CAMERA_CACHE_H
 
-#include "../util/godot/classes/camera_3d.h"
+#include <scene/3d/camera_3d.h>
 #include "../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Camera3D);
+class Camera3D;
 
 namespace voxel::godot {
 

@@ -1,8 +1,8 @@
 #ifndef VOXEL_BLOCKY_TINT_SAMPLER_H
 #define VOXEL_BLOCKY_TINT_SAMPLER_H
 
-#include "../../util/math/color.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/color.h>
+#include <core/math/vector3i.h>
 
 namespace voxel {
 

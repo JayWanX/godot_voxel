@@ -1,7 +1,8 @@
 #include "direct_mesh_instance.h"
 #include "../profiling.h"
 #include "classes/material.h"
-#include "classes/world_3d.h"
+#include <core/version.h>
+#include <scene/resources/3d/world_3d.h>
 
 namespace voxel::godot {
 
@@ -122,10 +123,6 @@ void DirectMeshInstance::set_render_layers_mask(int mask) {
 void DirectMeshInstance::set_interpolated(const bool enabled) {
 	// 该功能在 Godot 4.4 中加入，后在 4.5 中移到了 SceneTree
 	// 参见 https://github.com/godotengine/godot/pull/104269
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR == 4
-	RenderingServer &vs = *RenderingServer::get_singleton();
-	vs.instance_set_interpolated(_mesh_instance, enabled);
-#endif
 }
 
 void DirectMeshInstance::operator=(DirectMeshInstance &&src) {

@@ -1,23 +1,15 @@
 #ifndef VOXEL_GODOT_BUTTON_H
 #define VOXEL_GODOT_BUTTON_H
 
-#if defined(VOXEL_GODOT)
 #include <core/version.h>
 #include <scene/gui/button.h>
-#endif
 
 namespace voxel::godot {
 
 inline void set_button_icon(Button &button, Ref<Texture2D> icon) {
-#if defined(VOXEL_GODOT)
 
-#if VERSION_MAJOR == 4 && VERSION_MINOR <= 3
-	button.set_icon(icon);
-#else
 	button.set_button_icon(icon);
-#endif
 
-#endif
 }
 
 } // namespace voxel::godot

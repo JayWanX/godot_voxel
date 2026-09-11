@@ -1,12 +1,13 @@
+#include <core/variant/array.h>
 #ifndef VOXEL_FLOATING_CHUNKS_H
 #define VOXEL_FLOATING_CHUNKS_H
 
 #include "../meshers/voxel_mesher.h"
-#include "../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../util/godot/core/transform_3d.h"
 #include "../util/math/box3i.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Node);
+class Node;
 
 namespace voxel {
 

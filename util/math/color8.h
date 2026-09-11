@@ -1,7 +1,7 @@
 #ifndef VOXEL_COLOR8_H
 #define VOXEL_COLOR8_H
 
-#include "color.h"
+#include <core/math/color.h>
 
 namespace voxel {
 

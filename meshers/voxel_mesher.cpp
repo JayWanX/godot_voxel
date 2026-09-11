@@ -4,13 +4,12 @@
 #include "../storage/voxel_buffer_gd.h"
 #include "../util/godot/classes/array_mesh.h"
 #include "../util/godot/classes/mesh.h"
-#include "../util/godot/classes/shader_material.h"
+#include <scene/resources/material.h>
 #include "../util/profiling.h"
 #include "transvoxel/transvoxel_cell_iterator.h"
+#include <scene/resources/material.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 #ifdef VOXEL_ENABLE_SMOOTH_MESHING
 #include "../engine/detail_rendering/detail_rendering.h"

@@ -1,17 +1,21 @@
+#include <scene/resources/texture.h>
+#include <scene/resources/material.h>
+#include <scene/gui/box_container.h>
 #ifndef VOXEL_GRAPH_EDITOR_NODE_PREVIEW_H
 #define VOXEL_GRAPH_EDITOR_NODE_PREVIEW_H
 
 #include "../../generators/graph/voxel_graph_runtime.h"
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/classes/image_texture.h"
-#include "../../util/godot/classes/shader_material.h"
-#include "../../util/godot/classes/v_box_container.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
+#include <scene/resources/material.h>
+#include <scene/gui/box_container.h>
 #include "../../util/macros.h"
 #include "../../util/math/vector2f.h"
 #include "graph_preview_mode.h"
 #include "voxel_graph_editor_node_preview_info.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
+class TextureRect;
 
 namespace voxel {
 

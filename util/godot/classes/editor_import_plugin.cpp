@@ -3,7 +3,6 @@
 
 namespace voxel::godot {
 
-#if defined(VOXEL_GODOT)
 
 String Voxel_EditorImportPlugin::get_importer_name() const {
 	return _voxel_get_importer_name();
@@ -68,9 +67,7 @@ bool Voxel_EditorImportPlugin::get_option_visibility(
 }
 
 Error Voxel_EditorImportPlugin::import(
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 4
 		ResourceUID::ID p_source_id,
-#endif
 		const String &p_source_file,
 		const String &p_save_path,
 		const HashMap<StringName, Variant> &p_options,
@@ -89,13 +86,10 @@ Error Voxel_EditorImportPlugin::import(
 	);
 }
 
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 3
 bool Voxel_EditorImportPlugin::can_import_threaded() const {
 	return _voxel_can_import_threaded();
 }
-#endif
 
-#endif
 
 String Voxel_EditorImportPlugin::_voxel_get_importer_name() const {
 	VOXEL_PRINT_ERROR("Method is not implemented");

@@ -8,7 +8,7 @@
 #include "../../util/godot/classes/ref_counted.h"
 #include "../../util/math/interval.h"
 #include "../../util/math/vector3f.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "program_graph.h"
 
 namespace voxel::pg {

@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_MEMORY_H
 #define VOXEL_GODOT_MEMORY_H
 
-#if defined(VOXEL_GODOT)
 #include <core/os/memory.h>
-#endif
 
 #include <memory>
 

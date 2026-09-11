@@ -1,4 +1,4 @@
-#include "vector3.h"
+#include <core/math/vector3.h>
 #include "../io/text_writer.h"
 
 namespace voxel {

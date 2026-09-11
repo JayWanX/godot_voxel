@@ -1,7 +1,10 @@
-#ifdef VOXEL_GODOT
-// 模块专用
 #include "register_types.h"
-#endif
+#include "util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <core/object/class_db.h>
+#include <scene/gui/control.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/2d/sprite_2d.h>
+// 模块专用
 
 #include "constants/voxel_string_names.h"
 #include "edition/voxel_tool.h"
@@ -46,7 +49,7 @@
 #include "util/godot/check_ref_ownership.h"
 #include "util/godot/string_names.h"
 #include "util/macros.h"
-#include "util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "util/noise/fast_noise_lite/fast_noise_lite_gradient.h"
 #include "util/noise/spot_noise_gd.h"
 #include "util/string/format.h"
@@ -101,11 +104,11 @@
 #include "util/godot/classes/engine.h"
 #include "util/godot/classes/os.h" // 用于获取命令行参数（get_command_line_arguments）
 #include "util/godot/classes/project_settings.h"
-#include "util/godot/core/class_db.h"
+#include <core/object/class_db.h>
 // 仅作为尺寸提醒
-#include "util/godot/classes/control.h"
-#include "util/godot/classes/mesh_instance_3d.h"
-#include "util/godot/classes/sprite_2d.h"
+#include <scene/gui/control.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/2d/sprite_2d.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef TOOLS_ENABLED
@@ -332,16 +335,13 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 
 		print_size_reminders();
 
-#ifdef VOXEL_GODOT
 		if (RenderingDevice::get_singleton() != nullptr) {
 			VOXEL_PRINT_VERBOSE(
 					format("TextureArray max layers: {}",
 						   RenderingDevice::get_singleton()->limit_get(RenderingDevice::LIMIT_MAX_TEXTURE_ARRAY_LAYERS))
 			);
 		}
-#endif
 
-#ifdef VOXEL_GODOT
 		// 与旧版本的兼容性
 		// ClassDB::add_compatibility_class("VoxelLibrary", "VoxelBlockyLibrary");
 		// ClassDB::add_compatibility_class("Voxel", "VoxelBlockyModel");
@@ -349,7 +349,6 @@ void initialize_voxel_module(ModuleInitializationLevel p_level) {
 		// 无法为此添加兼容类，因为新名称与旧名称无法区分。
 		// 不过这是一个抽象类，希望能因此不会出现在资源中
 		// ClassDB::add_compatibility_class("VoxelInstanceLibraryItemBase", "VoxelInstanceLibraryItem");
-#endif
 		// 在类注册完成后再初始化引擎。
 
 		voxel::godot::StringNames::create_singleton();

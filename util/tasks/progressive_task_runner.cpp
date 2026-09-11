@@ -1,6 +1,6 @@
 #include "progressive_task_runner.h"
 #include "../errors.h"
-#include "../godot/classes/time.h"
+#include <core/os/time.h>
 #include "../math/funcs.h"
 #include "../memory/memory.h"
 

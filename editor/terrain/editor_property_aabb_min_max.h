@@ -3,7 +3,8 @@
 
 #include "../../util/containers/fixed_array.h"
 #include "../../util/godot/classes/editor_property.h"
-#include "../../util/godot/classes/editor_spin_slider.h"
+#include <core/version.h>
+#include <editor/gui/editor_spin_slider.h>
 #include "../../util/macros.h"
 
 namespace voxel {

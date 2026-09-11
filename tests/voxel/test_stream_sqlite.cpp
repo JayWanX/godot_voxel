@@ -4,10 +4,10 @@
 #include "../../streams/sqlite/voxel_stream_sqlite.h"
 #include "../../streams/voxel_block_serializer_gd.h"
 #include "../../util/containers/container_funcs.h"
-#include "../../util/godot/core/random_pcg.h"
+#include <core/math/random_pcg.h>
 #include "../../util/godot/core/string.h"
 #include "../../util/math/conv.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/profiling.h"
 #include "../../util/profiling_clock.h"
 #include "../../util/string/format.h"

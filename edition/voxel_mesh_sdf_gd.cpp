@@ -3,16 +3,16 @@
 #include "../engine/voxel_engine_updater.h"
 #include "../storage/voxel_buffer_gd.h"
 #include "../util/dstack.h"
-#include "../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../util/godot/core/dictionary.h"
 #include "../util/godot/core/packed_arrays.h"
-#include "../util/math/color.h"
+#include <core/math/color.h>
 #include "../util/math/conv.h"
 #include "../util/profiling.h"
 #include "../util/string/format.h"
 #include "mesh_sdf.h"
 // 注册方法参数需显式定义类型
-#include "../util/godot/classes/scene_tree.h"
+#include <scene/main/scene_tree.h>
 
 using namespace voxel::godot;
 

@@ -1,18 +1,18 @@
 #include "voxel_blocky_model_fluid.h"
+#include <core/variant/array.h>
+#include <core/object/class_db.h>
+#include <core/version.h>
 // #include "../../util/godot/classes/object.h"
 // #include "../../util/string/format.h"
 #include "../../constants/voxel_string_names.h"
 #include "../../util/containers/container_funcs.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "blocky_fluids.h"
 #include "blocky_material_indexer.h"
 #include "blocky_model_baking_context.h"
 #include "voxel_blocky_library_base.h"
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

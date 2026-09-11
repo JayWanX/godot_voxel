@@ -11,7 +11,7 @@
 #include "../engine/gpu/compute_shader_resource.h"
 #endif
 
-VOXEL_GODOT_FORWARD_DECLARE(class SceneTree);
+class SceneTree;
 
 namespace voxel {
 

@@ -1,15 +1,16 @@
+#include <scene/gui/box_container.h>
 #ifndef VOXEL_BLOCKY_TYPE_VARIANT_LIST_EDITOR_H
 #define VOXEL_BLOCKY_TYPE_VARIANT_LIST_EDITOR_H
 
 #include "../../../meshers/blocky/types/voxel_blocky_type.h"
 #include "../../../util/containers/std_vector.h"
-#include "../../../util/godot/classes/v_box_container.h"
+#include <scene/gui/box_container.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class Label);
-VOXEL_GODOT_FORWARD_DECLARE(class EditorResourcePicker);
-VOXEL_GODOT_FORWARD_DECLARE(class GridContainer);
-VOXEL_GODOT_FORWARD_DECLARE(class EditorInterface);
-VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
+class Label;
+class EditorResourcePicker;
+class GridContainer;
+class EditorInterface;
+class EditorUndoRedoManager;
 
 namespace voxel {
 

@@ -4,7 +4,6 @@
 namespace voxel::godot {
 
 PackedStringArray get_recognized_extensions_for_type(const String &type_name) {
-#if defined(VOXEL_GODOT)
 	List<String> extensions_list;
 	ResourceLoader::get_recognized_extensions_for_type(type_name, &extensions_list);
 	PackedStringArray extensions_array;
@@ -13,13 +12,10 @@ PackedStringArray get_recognized_extensions_for_type(const String &type_name) {
 	}
 	return extensions_array;
 
-#endif
 }
 
 Ref<Resource> load_resource(const String &path) {
-#if defined(VOXEL_GODOT)
 	return ResourceLoader::load(path);
-#endif
 }
 
 } // namespace voxel::godot

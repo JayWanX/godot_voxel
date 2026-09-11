@@ -1,18 +1,26 @@
 #include "voxel_blocky_type_variant_list_editor.h"
 #include "../../../constants/voxel_string_names.h"
-#include "../../../util/godot/classes/color_rect.h"
-#include "../../../util/godot/classes/editor_inspector.h"
-#include "../../../util/godot/classes/editor_interface.h"
-#include "../../../util/godot/classes/editor_resource_picker.h"
-#include "../../../util/godot/classes/editor_undo_redo_manager.h"
-#include "../../../util/godot/classes/grid_container.h"
-#include "../../../util/godot/classes/label.h"
-#include "../../../util/godot/core/array.h"
+#include <scene/gui/color_rect.h>
+#include <editor/inspector/editor_inspector.h>
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <editor/inspector/editor_resource_picker.h>
+#include <editor/editor_undo_redo_manager.h>
+#include <scene/gui/grid_container.h>
+#include <scene/gui/label.h>
+#include <core/variant/array.h>
 #include "../../../util/godot/core/string.h"
+#include <scene/gui/color_rect.h>
+#include <editor/inspector/editor_inspector.h>
+#include <editor/plugins/editor_plugin.h>
+#include <editor/inspector/editor_resource_picker.h>
+#include <editor/editor_undo_redo_manager.h>
+#include <scene/gui/grid_container.h>
+#include <scene/gui/label.h>
+#include <core/variant/array.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

@@ -1,9 +1,10 @@
 #ifndef VOXEL_GRAPH_EDITOR_WINDOW_H
 #define VOXEL_GRAPH_EDITOR_WINDOW_H
 
-#include "../../util/godot/classes/accept_dialog.h"
+#include <scene/gui/dialogs.h>
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 
 namespace voxel {
 

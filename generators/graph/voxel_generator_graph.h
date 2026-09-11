@@ -1,3 +1,6 @@
+#include "../../util/math/vector2.h"
+#include "../../util/math/vector3.h"
+#include "../../util/math/vector3i.h"
 #ifndef VOXEL_GENERATOR_GRAPH_H
 #define VOXEL_GENERATOR_GRAPH_H
 
@@ -6,10 +9,10 @@
 #include "../../util/containers/std_vector.h"
 #include "../../util/godot/core/dictionary.h"
 #include "../../util/macros.h"
-#include "../../util/math/vector2.h"
-#include "../../util/math/vector3.h"
+#include <core/math/vector2.h>
+#include <core/math/vector3.h>
 #include "../../util/math/vector3f.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/thread/rw_lock.h"
 #include "../voxel_generator.h"
 #include "program_graph.h"
@@ -18,7 +21,7 @@
 
 #include <memory>
 
-VOXEL_GODOT_FORWARD_DECLARE(class Image)
+class Image;
 
 namespace voxel {
 

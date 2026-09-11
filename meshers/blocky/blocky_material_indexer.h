@@ -5,7 +5,7 @@
 #include "../../util/godot/classes/ref_counted.h"
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Material);
+class Material;
 
 namespace voxel::blocky {
 

@@ -1,4 +1,5 @@
-#include "../../../util/godot/classes/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
+#include <modules/noise/fastnoise_lite.h>
 #include "../../../util/noise/fast_noise_lite/fast_noise_lite.h"
 #include "../../../util/noise/fast_noise_lite/fast_noise_lite_range.h"
 #include "../../../util/noise/gd_noise_range.h"

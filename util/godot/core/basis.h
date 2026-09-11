@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_BASIS_H
 #define VOXEL_GODOT_BASIS_H
 
-#if defined(VOXEL_GODOT)
 #include <core/math/basis.h>
-#endif
 
 namespace voxel::godot::BasisUtility {
 

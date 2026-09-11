@@ -1,3 +1,5 @@
+#include <scene/3d/node_3d.h>
+#include <core/version.h>
 #ifndef VOXEL_NODE_H
 #define VOXEL_NODE_H
 
@@ -8,10 +10,10 @@
 #include "../storage/voxel_format_gd.h"
 #include "../streams/voxel_stream.h"
 #include "../util/godot/classes/geometry_instance_3d.h"
-#include "../util/godot/classes/node_3d.h"
+#include <scene/3d/node_3d.h>
 
 #ifdef TOOLS_ENABLED
-#include "../util/godot/core/version.h"
+#include <core/version.h>
 #endif
 
 namespace voxel {
@@ -76,9 +78,7 @@ public:
 	virtual Node3D *convert_to_nodes(const BitField<NodeConversionFlags> flags) const;
 
 #ifdef TOOLS_ENABLED
-#if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#endif
 	virtual void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif
 

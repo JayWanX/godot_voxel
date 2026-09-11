@@ -2,12 +2,11 @@
 #include "../containers/fixed_array.h"
 #include "../containers/std_vector.h"
 #include "../math/funcs.h"
-#include "../math/vector3.h"
+#include <core/math/vector3.h>
 #include <core/io/image.h>
+#include "../math/vector3.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

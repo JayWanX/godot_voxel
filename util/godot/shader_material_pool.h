@@ -3,7 +3,7 @@
 
 #include "../containers/span.h"
 #include "../containers/std_vector.h"
-#include "classes/shader_material.h"
+#include <scene/resources/material.h>
 
 namespace voxel::godot {
 

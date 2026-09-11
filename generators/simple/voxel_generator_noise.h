@@ -7,7 +7,7 @@
 #include "../../util/thread/rw_lock.h"
 #include "../voxel_generator.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class FastNoiseLite)
+class FastNoiseLite;
 
 namespace voxel {
 

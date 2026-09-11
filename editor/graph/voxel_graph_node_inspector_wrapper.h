@@ -4,7 +4,7 @@
 #include "../../generators/graph/voxel_generator_graph.h"
 #include "../../util/godot/classes/ref_counted.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager)
+class EditorUndoRedoManager;
 
 namespace voxel {
 

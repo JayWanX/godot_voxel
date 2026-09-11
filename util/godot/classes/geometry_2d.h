@@ -1,14 +1,14 @@
+#include "../../math/vector2i.h"
+#include <core/variant/variant.h>
 #ifndef VOXEL_GODOT_GEOMETRY_2D_H
 #define VOXEL_GODOT_GEOMETRY_2D_H
 
-#if defined(VOXEL_GODOT)
 #include <core/math/geometry_2d.h>
-#endif
 
 #include "../../containers/span.h"
 #include "../../containers/std_vector.h"
-#include "../../math/vector2i.h"
-#include "../core/packed_vector2_array.h"
+#include <core/math/vector2i.h>
+#include <core/variant/variant.h>
 
 namespace voxel::godot {
 

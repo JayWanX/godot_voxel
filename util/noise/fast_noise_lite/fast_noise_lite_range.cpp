@@ -1,6 +1,7 @@
 #include "fast_noise_lite_range.h"
-#include "../noise_range_utility.h"
 #include "fast_noise_lite.h"
+#include "../noise_range_utility.h"
+#include <modules/noise/fastnoise_lite.h>
 #include "fast_noise_lite_gradient.h"
 
 namespace voxel {

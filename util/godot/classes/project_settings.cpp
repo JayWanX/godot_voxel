@@ -10,7 +10,6 @@ void add_custom_project_setting(
 		Variant default_value,
 		bool requires_restart
 ) {
-#if defined(VOXEL_GODOT)
 	if (requires_restart) {
 		GLOBAL_DEF_RST(name, default_value);
 	} else {
@@ -18,7 +17,6 @@ void add_custom_project_setting(
 	}
 	ProjectSettings::get_singleton()->set_custom_property_info(PropertyInfo(type, name, hint, hint_string));
 
-#endif
 }
 
 } // namespace voxel::godot

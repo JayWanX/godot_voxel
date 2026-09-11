@@ -7,7 +7,7 @@
 #include "classes/rendering_server.h"
 #include "macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class World3D);
+class World3D;
 
 namespace voxel::godot {
 

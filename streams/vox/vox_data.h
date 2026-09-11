@@ -7,7 +7,7 @@
 #include "../../util/godot/core/basis.h"
 #include "../../util/godot/core/string.h"
 #include "../../util/math/color8.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/memory/memory.h"
 
 

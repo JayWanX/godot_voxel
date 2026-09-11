@@ -1,7 +1,7 @@
 #ifndef VOXEL_MATH_COLOR_H
 #define VOXEL_MATH_COLOR_H
 
-#include "../godot/core/color.h"
+#include <core/math/color.h>
 
 namespace voxel::math {
 

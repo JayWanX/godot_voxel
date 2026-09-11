@@ -4,14 +4,13 @@
 #include "../util/godot/classes/image.h"
 #include "../util/godot/classes/image_texture_3d.h"
 #include "../util/godot/core/packed_arrays.h"
-#include "../util/math/color.h"
+#include <core/math/color.h>
 #include "../util/memory/memory.h"
 #include "../util/string/format.h"
 #include "metadata/voxel_metadata_variant.h"
+#include "../util/math/color.h"
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 
@@ -685,7 +684,6 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 	for (auto it = metadata_map.begin(); it != metadata_map.end(); ++it) {
 		Variant v = get_as_variant(it->value);
 
-#if defined(VOXEL_GODOT)
 		// TODO 可考虑改用模板版本
 		const Variant key = it->key;
 		const Variant *args[2] = { &key, &v };
@@ -696,7 +694,6 @@ void VoxelBuffer::for_each_voxel_metadata(const Callable &callback) const {
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))
 		);
 
-#endif
 	}
 }
 
@@ -708,7 +705,6 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Vect
 	_buffer->for_each_voxel_metadata_in_area(box, [&callback](Vector3i rel_pos, const VoxelMetadata &meta) {
 		Variant v = get_as_variant(meta);
 
-#if defined(VOXEL_GODOT)
 		// TODO 可考虑改用模板版本
 		const Variant key = rel_pos;
 		const Variant *args[2] = { &key, &v };
@@ -719,7 +715,6 @@ void VoxelBuffer::for_each_voxel_metadata_in_area(const Callable &callback, Vect
 				err.error != Callable::CallError::CALL_OK, String("Callable failed at {0}").format(varray(key))
 		);
 
-#endif
 	});
 }
 

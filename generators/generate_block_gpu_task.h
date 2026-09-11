@@ -5,7 +5,7 @@
 #include "../engine/gpu/gpu_task_runner.h"
 #include "../generators/voxel_generator.h"
 #include "../util/containers/std_vector.h"
-#include "../util/godot/classes/rd_uniform.h"
+#include <servers/rendering/rendering_device_binds.h>
 #include "../util/math/box3i.h"
 #include "../util/memory/memory.h"
 #include "../util/tasks/threaded_task.h"

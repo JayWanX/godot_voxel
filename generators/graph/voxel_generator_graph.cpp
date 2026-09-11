@@ -6,7 +6,7 @@
 #include "../../util/godot/classes/engine.h"
 #include "../../util/godot/classes/image.h"
 #include "../../util/godot/classes/object.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/godot/core/string.h"
 #include "../../util/hash_funcs.h"
@@ -19,10 +19,10 @@
 #include "../../util/string/format.h"
 #include "node_type_db.h"
 #include "voxel_graph_function.h"
+#include <core/variant/array.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

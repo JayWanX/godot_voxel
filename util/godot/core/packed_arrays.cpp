@@ -3,7 +3,7 @@
 #include "../../profiling.h"
 
 #ifdef TOOLS_ENABLED
-#include "packed_string_array.h"
+#include <core/variant/variant.h>
 #endif
 
 namespace voxel::godot {

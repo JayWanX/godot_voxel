@@ -1,14 +1,13 @@
+#include <servers/rendering/rendering_device_binds.h>
 #ifndef VOXEL_GODOT_RENDERING_DEVICE_H
 #define VOXEL_GODOT_RENDERING_DEVICE_H
 
-#if defined(VOXEL_GODOT)
 #include <servers/rendering/rendering_device.h>
-#endif
 
 #include "../macros.h"
-#include "rd_shader_spirv.h"
+#include <servers/rendering/rendering_device_binds.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class RDShaderSource)
+class RDShaderSource;
 
 namespace voxel::godot {
 

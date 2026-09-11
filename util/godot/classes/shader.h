@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_SHADER_H
 #define VOXEL_GODOT_SHADER_H
 
-#if defined(VOXEL_GODOT)
 #include <scene/resources/shader.h>
-#endif
 
 #ifdef TOOLS_ENABLED
 

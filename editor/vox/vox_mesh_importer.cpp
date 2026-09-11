@@ -5,10 +5,11 @@
 #include "../../storage/voxel_memory_pool.h"
 #include "../../streams/vox/vox_data.h"
 #include "../../util/dstack.h"
-#include "../../util/godot/classes/image_texture.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
 #include "../../util/godot/classes/resource_saver.h"
-#include "../../util/godot/classes/standard_material_3d.h"
-#include "../../util/godot/core/array.h"
+#include <scene/resources/material.h>
+#include <core/variant/array.h>
 #include "../../util/macros.h"
 #include "../../util/math/conv.h"
 #include "../../util/memory/memory.h"

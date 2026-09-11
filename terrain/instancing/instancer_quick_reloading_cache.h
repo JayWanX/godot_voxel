@@ -2,7 +2,7 @@
 #define VOXEL_INSTANCER_QUICK_RELOADING_CACHE_H
 
 #include "../../util/containers/std_unordered_map.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/memory/memory.h"
 #include "../../util/thread/mutex.h"
 

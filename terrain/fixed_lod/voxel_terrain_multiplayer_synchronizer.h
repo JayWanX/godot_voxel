@@ -1,3 +1,4 @@
+#include <core/version.h>
 #ifndef VOXEL_NETWORK_TERRAIN_SYNC_H
 #define VOXEL_NETWORK_TERRAIN_SYNC_H
 
@@ -8,7 +9,7 @@
 #include "../../util/math/box3i.h"
 
 #ifdef TOOLS_ENABLED
-#include "../../util/godot/core/version.h"
+#include <core/version.h>
 #endif
 
 namespace voxel {
@@ -30,9 +31,7 @@ public:
 	void send_area(Box3i voxel_box);
 
 #ifdef TOOLS_ENABLED
-#if defined(VOXEL_GODOT)
 	PackedStringArray get_configuration_warnings() const override;
-#endif
 	void get_configuration_warnings(PackedStringArray &warnings) const;
 #endif
 

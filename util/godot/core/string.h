@@ -1,9 +1,8 @@
+#include <core/version.h>
 #ifndef VOXEL_GODOT_STRING_H
 #define VOXEL_GODOT_STRING_H
 
-#if defined(VOXEL_GODOT)
 #include <core/string/ustring.h>
-#endif
 
 #include "../../string/std_string.h"
 #include <string_view>
@@ -14,7 +13,7 @@
 #endif
 
 #include "../../containers/span.h"
-#include "../core/version.h"
+#include <core/version.h>
 #include "../macros.h"
 
 namespace voxel {
@@ -59,13 +58,7 @@ inline StdString to_std_string(const String &godot_string) {
 }
 
 inline Error parse_utf8(String &s, Span<const char> utf8) {
-#if defined(VOXEL_GODOT)
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR >= 5
 	return s.append_utf8(utf8.data(), utf8.size());
-#else
-	return s.parse_utf8(utf8.data(), utf8.size());
-#endif
-#endif
 }
 
 inline String ptr2s(const void *p) {
@@ -77,13 +70,12 @@ inline String ptr2s(const void *p) {
 // `TTR` 表示 "tools translate"（工具翻译），用于仅限编辑器的本地化消息。
 // Godot 在发布构建中不定义用于消息翻译的 TTR 宏。不过，本模块中有一些非编辑器
 // 代码会产生错误，而我们仍然希望它们能正常编译。
-#if defined(VOXEL_GODOT) && defined(TOOLS_ENABLED)
+#ifdef TOOLS_ENABLED
 #define VOXEL_TTR(msg) TTR(msg)
 #else
 #define VOXEL_TTR(msg) String(msg)
 #endif
 
-VOXEL_GODOT_NAMESPACE_BEGIN
 
 // `voxel::format()` 需要用到。
 // 我放弃了在这里漂亮地转换 Godot 的 String……它带有非显式的 `const char*` 构造函数，那会让
@@ -95,7 +87,6 @@ struct GodotStringWrapper {
 };
 voxel::TextWriter &operator<<(voxel::TextWriter &ss, GodotStringWrapper s);
 
-VOXEL_GODOT_NAMESPACE_END
 
 namespace std {
 

@@ -1,9 +1,7 @@
 #ifndef VOXEL_GODOT_AABB_H
 #define VOXEL_GODOT_AABB_H
 
-#if defined(VOXEL_GODOT)
 #include <core/math/aabb.h>
-#endif
 
 namespace voxel {
 

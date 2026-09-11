@@ -1,6 +1,7 @@
 #include "../godot/classes/os.h"
-#include "../godot/core/print_string.h"
+#include <core/string/print_string.h>
 #include "../string/format.h"
+#include <core/string/print_string.h>
 
 #ifdef VOXEL_DEBUG_LOG_FILE_ENABLED
 #include "../thread/mutex.h"
@@ -53,9 +54,7 @@ void print_line(const char *cstr) {
 	}
 #else
 
-#if defined(VOXEL_GODOT)
 	::print_line(cstr);
-#endif
 
 #endif
 }
@@ -65,9 +64,7 @@ void print_line(const FwdConstStdString &s) {
 }
 
 void print_warning(const char *message, const char *func, const char *file, int line) {
-#if defined(VOXEL_GODOT)
 	_err_print_error(func, file, line, message, false, ERR_HANDLER_WARNING);
-#endif
 }
 
 void print_warning(const FwdConstStdString &warning, const char *func, const char *file, int line) {

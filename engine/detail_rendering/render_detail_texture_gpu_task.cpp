@@ -1,10 +1,10 @@
 #include "render_detail_texture_gpu_task.h"
 #include "../../util/dstack.h"
-#include "../../util/godot/classes/rd_sampler_state.h"
-#include "../../util/godot/classes/rd_shader_spirv.h"
-#include "../../util/godot/classes/rd_texture_format.h"
-#include "../../util/godot/classes/rd_texture_view.h"
-#include "../../util/godot/classes/rd_uniform.h"
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
+#include <servers/rendering/rendering_device_binds.h>
 #include "../../util/godot/classes/rendering_device.h"
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/profiling.h"

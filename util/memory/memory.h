@@ -1,12 +1,10 @@
+#include <core/os/memory.h>
 #ifndef VOXEL_MEMORY_H
 #define VOXEL_MEMORY_H
 
 #include <memory>
 
 // 默认的 new 和 delete 运算符。
-#if defined(VOXEL_GODOT)
-
-#include <core/os/memory.h>
 
 // 使用 Godot 的分配器。
 #define VOXEL_NEW(t) memnew(t)
@@ -15,7 +13,6 @@
 #define VOXEL_REALLOC(p, size) memrealloc(p, size)
 #define VOXEL_FREE(p) memfree(p)
 
-#endif
 
 namespace voxel {
 

@@ -1,17 +1,19 @@
+#include <scene/gui/dialogs.h>
+#include <editor/editor_undo_redo_manager.h>
 #ifndef VOXEL_GRAPH_EDITOR_IO_DIALOG_H
 #define VOXEL_GRAPH_EDITOR_IO_DIALOG_H
 
 #include "../../generators/graph/voxel_graph_function.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/classes/confirmation_dialog.h"
-#include "../../util/godot/classes/editor_undo_redo_manager.h"
+#include <scene/gui/dialogs.h>
+#include <editor/editor_undo_redo_manager.h>
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class ItemList)
-VOXEL_GODOT_FORWARD_DECLARE(class LineEdit)
-VOXEL_GODOT_FORWARD_DECLARE(class OptionButton)
-VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
-VOXEL_GODOT_FORWARD_DECLARE(class Button)
+class ItemList;
+class LineEdit;
+class OptionButton;
+class SpinBox;
+class Button;
 
 namespace voxel {
 

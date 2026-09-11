@@ -1,12 +1,13 @@
+#include <scene/gui/box_container.h>
 #ifndef VOXEL_BLOCKY_MODEL_VIEWER_H
 #define VOXEL_BLOCKY_MODEL_VIEWER_H
 
 #include "../../meshers/blocky/voxel_blocky_model.h"
-#include "../../util/godot/classes/h_box_container.h"
+#include <scene/gui/box_container.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class Camera3D);
-VOXEL_GODOT_FORWARD_DECLARE(class MeshInstance3D);
-VOXEL_GODOT_FORWARD_DECLARE(class EditorUndoRedoManager);
+class Camera3D;
+class MeshInstance3D;
+class EditorUndoRedoManager;
 
 
 namespace voxel {
@@ -28,9 +29,7 @@ private:
 	void rotate_model_90(Vector3i::Axis axis);
 	void add_rotation_anim(Basis basis);
 
-#ifdef VOXEL_GODOT
 	void _notification(int p_what);
-#endif
 	void process(float delta);
 
 	void _on_model_changed();

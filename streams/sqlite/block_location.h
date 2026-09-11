@@ -4,7 +4,7 @@
 #include "../../constants/voxel_constants.h"
 #include "../../util/containers/fixed_array.h"
 #include "../../util/math/box3i.h"
-#include "../../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/string/conv.h"
 #include <limits>
 

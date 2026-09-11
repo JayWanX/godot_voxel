@@ -1,7 +1,8 @@
+#include <scene/gui/control.h>
 #ifndef VOXEL_GODOT_CONTROL_SIZER_H
 #define VOXEL_GODOT_CONTROL_SIZER_H
 
-#include "../../util/godot/classes/control.h"
+#include <scene/gui/control.h>
 #include "../../util/godot/object_weak_ref.h"
 
 namespace voxel {
@@ -14,9 +15,7 @@ public:
 
 	void set_target_control(Control *control);
 
-#ifdef VOXEL_GODOT
 	void gui_input(const Ref<InputEvent> &p_event) override;
-#endif
 
 private:
 	static void _bind_methods();

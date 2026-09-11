@@ -1,16 +1,17 @@
 #include "voxel_instance_library_multimesh_item_inspector_plugin.h"
 #include "../../terrain/instancing/voxel_instance_library_multimesh_item.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/label.h"
-#include "../../util/godot/core/array.h"
+#include <scene/gui/label.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/string.h"
 #include "voxel_instance_library_editor_plugin.h"
 #include "voxel_instance_library_multimesh_item_editor_plugin.h"
+#include <scene/gui/label.h>
+#include <core/variant/array.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

@@ -1,15 +1,18 @@
+#include <scene/gui/control.h>
+#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <core/input/input_event.h>
 #ifndef VOXEL_FAST_NOISE_LITE_VIEWER_H
 #define VOXEL_FAST_NOISE_LITE_VIEWER_H
 
-#include "../../util/godot/classes/control.h"
+#include <scene/gui/control.h>
 #include "../../util/godot/macros.h"
-#include "../../util/noise/fast_noise_lite/fast_noise_lite.h"
+#include <modules/noise/fastnoise_lite.h>
 
 // 头文件中需要用到虚方法声明，因此必须包含此头文件。
-#include "../../util/godot/classes/input_event.h"
+#include <core/input/input_event.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
-VOXEL_GODOT_FORWARD_DECLARE(class PopupMenu)
+class TextureRect;
+class PopupMenu;
 
 namespace voxel {
 
@@ -34,9 +37,7 @@ public:
 		_noise_analysis_window = win;
 	}
 
-#ifdef VOXEL_GODOT
 	void gui_input(const Ref<InputEvent> &p_event) override;
-#endif
 
 private:
 	void _on_noise_changed();

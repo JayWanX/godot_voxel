@@ -4,14 +4,13 @@
 #include "../util/dstack.h"
 #include "../util/godot/classes/file_access.h"
 #include "../util/io/serialization.h"
-#include "../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../util/profiling.h"
 #include "../util/string/format.h"
-
-#if defined(VOXEL_GODOT)
+#include "../util/math/vector3i.h"
 #include "../storage/metadata/voxel_metadata_factory.h"
 #include "../storage/metadata/voxel_metadata_variant.h"
-#endif
+
 
 #include <limits>
 
@@ -385,7 +384,6 @@ namespace legacy {
 bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 	// 在 v3 中，metadata 始终是 Godot Variant。在 v4 中，metadata 使用独立的格式。
 
-#if defined(VOXEL_GODOT)
 
 	// 该版本时期所用的常量
 	const unsigned int channel_count = 8;
@@ -477,7 +475,6 @@ bool migrate_v3_to_v4(Span<const uint8_t> p_data, StdVector<uint8_t> &dst) {
 		}
 	}
 
-#endif
 	return true;
 }
 

@@ -4,7 +4,7 @@
 #include "../godot/macros.h"
 #include "../math/interval.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Noise)
+class Noise;
 
 namespace voxel {
 

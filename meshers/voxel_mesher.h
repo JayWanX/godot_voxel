@@ -9,7 +9,7 @@
 #include "../util/godot/classes/mesh.h"
 #include "../util/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class ShaderMaterial)
+class ShaderMaterial;
 
 namespace voxel {
 

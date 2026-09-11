@@ -2,7 +2,7 @@
 #define CUBE_TABLES_H
 
 #include "../util/math/vector3f.h"
-#include "../util/math/vector3i.h"
+#include <core/math/vector3i.h>
 
 namespace voxel::Cube {
 

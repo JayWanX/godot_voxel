@@ -1,23 +1,35 @@
 #include "voxel_graph_editor_io_dialog.h"
 #include "../../generators/graph/node_type_db.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/grid_container.h"
-#include "../../util/godot/classes/h_box_container.h"
-#include "../../util/godot/classes/h_separator.h"
-#include "../../util/godot/classes/item_list.h"
-#include "../../util/godot/classes/label.h"
-#include "../../util/godot/classes/line_edit.h"
-#include "../../util/godot/classes/option_button.h"
-#include "../../util/godot/classes/spin_box.h"
-#include "../../util/godot/classes/v_box_container.h"
-#include "../../util/godot/classes/v_separator.h"
-#include "../../util/godot/core/array.h"
-#include "../../util/godot/editor_scale.h"
+#include <scene/gui/grid_container.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/separator.h>
+#include <scene/gui/item_list.h>
+#include <scene/gui/label.h>
+#include <scene/gui/line_edit.h>
+#include <scene/gui/option_button.h>
+#include <scene/gui/spin_box.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/separator.h>
+#include <core/variant/array.h>
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <scene/gui/grid_container.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/separator.h>
+#include <scene/gui/item_list.h>
+#include <scene/gui/label.h>
+#include <scene/gui/line_edit.h>
+#include <scene/gui/option_button.h>
+#include <scene/gui/spin_box.h>
+#include <scene/gui/box_container.h>
+#include <scene/gui/separator.h>
+#include <core/variant/array.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

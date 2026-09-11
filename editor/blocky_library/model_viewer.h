@@ -1,15 +1,17 @@
+#include <scene/gui/control.h>
+#include <core/input/input_event.h>
 #ifndef VOXEL_GODOT_MODEL_VIEWER_H
 #define VOXEL_GODOT_MODEL_VIEWER_H
 
-#include "../../util/godot/classes/control.h"
+#include <scene/gui/control.h>
 
 // 头文件中需要用到虚方法声明，因此必须包含此头文件。
-#include "../../util/godot/classes/input_event.h"
+#include <core/input/input_event.h>
 
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Camera3D);
-VOXEL_GODOT_FORWARD_DECLARE(class SubViewport);
+class Camera3D;
+class SubViewport;
 
 namespace voxel {
 
@@ -28,9 +30,7 @@ public:
 	// 要查看的内容可以作为该节点的子节点实例化
 	Node *get_viewer_root_node() const;
 
-#if defined(VOXEL_GODOT)
 	void gui_input(const Ref<InputEvent> &p_event) override;
-#endif
 
 private:
 	void update_camera();

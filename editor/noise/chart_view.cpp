@@ -1,8 +1,9 @@
 #include "chart_view.h"
-#include "../../util/godot/classes/font.h"
-#include "../../util/godot/classes/line_2d.h"
+#include <scene/resources/font.h>
+#include <scene/2d/line_2d.h>
 #include "../../util/godot/core/packed_arrays.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/godot/string_names.h"
 #include "../../util/math/funcs.h"
 

@@ -3,7 +3,7 @@
 #include "../engine/voxel_engine.h"
 #include "../util/godot/core/packed_arrays.h"
 #include "../util/math/conv.h"
-#include "../util/math/vector3.h"
+#include <core/math/vector3.h>
 #include "../util/profiling.h"
 
 namespace voxel {

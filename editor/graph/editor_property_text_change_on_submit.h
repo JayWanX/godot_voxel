@@ -4,7 +4,7 @@
 #include "../../util/godot/classes/editor_property.h"
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class LineEdit)
+class LineEdit;
 
 namespace voxel {
 

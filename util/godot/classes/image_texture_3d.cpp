@@ -14,11 +14,9 @@ Ref<ImageTexture3D> create_image_texture_3d(
 	Ref<ImageTexture3D> texture;
 	texture.instantiate();
 
-#if defined(VOXEL_GODOT)
 	Vector<Ref<Image>> images = to_ref_vector(p_data);
 	texture->create(p_format, resolution.x, resolution.y, resolution.z, p_mipmaps, images);
 
-#endif
 
 	return texture;
 }
@@ -26,11 +24,9 @@ Ref<ImageTexture3D> create_image_texture_3d(
 void update_image_texture_3d(ImageTexture3D &p_texture, const TypedArray<Image> p_data) {
 	VOXEL_PROFILE_SCOPE();
 
-#if defined(VOXEL_GODOT)
 	Vector<Ref<Image>> images = to_ref_vector(p_data);
 	p_texture.update(images);
 
-#endif
 }
 
 } // namespace voxel::godot

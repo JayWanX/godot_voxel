@@ -2,21 +2,28 @@
 #include "../../constants/voxel_string_names.h"
 #include "../../util/godot/classes/array_mesh.h"
 #include "../../util/godot/classes/button.h"
-#include "../../util/godot/classes/editor_undo_redo_manager.h"
-#include "../../util/godot/classes/mesh_instance_3d.h"
-#include "../../util/godot/classes/scene_tree.h"
-#include "../../util/godot/classes/standard_material_3d.h"
-#include "../../util/godot/classes/v_box_container.h"
-#include "../../util/godot/core/array.h"
+#include <editor/editor_undo_redo_manager.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/main/scene_tree.h>
+#include <scene/resources/material.h>
+#include <scene/gui/box_container.h>
+#include <core/variant/array.h>
 #include "../../util/godot/core/mouse_button.h"
 #include "../../util/godot/core/string.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "model_viewer.h"
+#include <editor/editor_undo_redo_manager.h>
+#include <scene/3d/mesh_instance_3d.h>
+#include <scene/main/scene_tree.h>
+#include <scene/resources/material.h>
+#include <scene/gui/box_container.h>
+#include <core/variant/array.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/class_db.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 
@@ -274,13 +281,11 @@ void VoxelBlockyModelViewer::add_rotation_anim(Basis basis) {
 	_rotation_anim_basis = basis * _rotation_anim_basis;
 }
 
-#ifdef VOXEL_GODOT
 void VoxelBlockyModelViewer::_notification(int p_what) {
 	if (p_what == NOTIFICATION_PROCESS) {
 		process(get_tree()->get_process_time());
 	}
 }
-#endif
 
 
 void VoxelBlockyModelViewer::process(float delta) {

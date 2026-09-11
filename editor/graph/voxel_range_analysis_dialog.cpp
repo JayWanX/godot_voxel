@@ -1,15 +1,21 @@
 #include "voxel_range_analysis_dialog.h"
-#include "../../util/godot/classes/check_box.h"
-#include "../../util/godot/classes/grid_container.h"
-#include "../../util/godot/classes/label.h"
-#include "../../util/godot/classes/spin_box.h"
-#include "../../util/godot/classes/v_box_container.h"
+#include <scene/gui/check_box.h>
+#include <scene/gui/grid_container.h>
+#include <scene/gui/label.h>
+#include <scene/gui/spin_box.h>
+#include <scene/gui/box_container.h>
 #include "../../util/godot/core/string.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
+#include <scene/gui/check_box.h>
+#include <scene/gui/grid_container.h>
+#include <scene/gui/label.h>
+#include <scene/gui/spin_box.h>
+#include <scene/gui/box_container.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

@@ -4,7 +4,8 @@
 #include "../../storage/voxel_data.h"
 #include "../../storage/voxel_data_grid.h"
 #include "../../util/godot/classes/image.h"
-#include "../../util/godot/classes/image_texture.h"
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
 #include "../../util/math/basis3f.h"
 #include "../../util/math/conv.h"
 #include "../../util/math/triangle.h"

@@ -5,14 +5,12 @@
 #include "../../util/math/triangle.h"
 #include "../../util/math/vector4f.h"
 #include "../../util/profiling.h"
+#include <core/object/class_db.h>
 // #include "../../util/string/format.h" // DEBUG
 #include "voxel_blocky_model.h"
 #include "voxel_mesher_blocky.h"
 #include <bitset>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 namespace voxel {
 

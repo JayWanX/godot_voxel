@@ -1,19 +1,21 @@
+#include <core/templates/rid.h>
+#include <core/math/vector3i.h>
 #ifndef VOXEL_COMPUTE_SHADER_RESOURCE_H
 #define VOXEL_COMPUTE_SHADER_RESOURCE_H
 
 #include "../../util/containers/span.h"
 #include "../../util/godot/classes/ref_counted.h"
 #include "../../util/godot/core/packed_byte_array.h"
-#include "../../util/godot/core/rid.h"
+#include <core/templates/rid.h>
 #include "../../util/godot/core/transform_3d.h"
-#include "../../util/godot/core/vector3i.h"
+#include <core/math/vector3i.h>
 #include "../../util/godot/macros.h"
 #include "../../util/macros.h"
 #include <memory>
 
-VOXEL_GODOT_FORWARD_DECLARE(class Image);
-VOXEL_GODOT_FORWARD_DECLARE(class Curve);
-VOXEL_GODOT_FORWARD_DECLARE(class RenderingDevice);
+class Image;
+class Curve;
+class RenderingDevice;
 
 namespace voxel {
 

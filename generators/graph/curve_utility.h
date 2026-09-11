@@ -6,7 +6,7 @@
 #include "../../util/godot/macros.h"
 #include "../../util/math/interval.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Curve)
+class Curve;
 
 namespace voxel {
 

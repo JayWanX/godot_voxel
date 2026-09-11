@@ -1,21 +1,18 @@
+#include <scene/gui/dialogs.h>
+#include <core/version.h>
 #ifndef VOXEL_GRAPH_NODE_DIALOG_H
 #define VOXEL_GRAPH_NODE_DIALOG_H
 
 #include "../../generators/graph/voxel_graph_function.h"
 #include "../../util/containers/std_vector.h"
-#include "../../util/godot/classes/confirmation_dialog.h"
-#include "../../util/godot/core/version.h"
+#include <scene/gui/dialogs.h>
+#include <core/version.h>
 #include "../../util/godot/macros.h"
 
-VOXEL_GODOT_FORWARD_DECLARE(class Tree);
-VOXEL_GODOT_FORWARD_DECLARE(class LineEdit);
-VOXEL_GODOT_FORWARD_DECLARE(class EditorFileDialog)
-VOXEL_GODOT_FORWARD_DECLARE(class RichTextLabel)
-#ifdef VOXEL_GODOT
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-VOXEL_GODOT_FORWARD_DECLARE(class EditorQuickOpen)
-#endif
-#endif
+class Tree;
+class LineEdit;
+class EditorFileDialog;
+class RichTextLabel;
 
 namespace voxel {
 
@@ -40,9 +37,6 @@ private:
 	void on_tree_item_selected();
 	void on_tree_nothing_selected();
 	void on_function_file_dialog_file_selected(String fpath);
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-	void on_function_quick_open_dialog_quick_open();
-#endif
 	void on_function_quick_open_dialog_item_selected(String fpath);
 	void on_description_label_meta_clicked(Variant meta);
 
@@ -70,11 +64,6 @@ private:
 	LineEdit *_filter_line_edit = nullptr;
 	RichTextLabel *_description_label = nullptr;
 	EditorFileDialog *_function_file_dialog = nullptr;
-#ifdef VOXEL_GODOT
-#if GODOT_VERSION_MAJOR == 4 && GODOT_VERSION_MINOR <= 3
-	EditorQuickOpen *_function_quick_open_dialog = nullptr;
-#endif
-#endif
 };
 
 } // namespace voxel

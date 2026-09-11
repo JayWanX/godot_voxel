@@ -2,7 +2,7 @@
 #include "../../constants/cube_tables.h"
 #include "../../storage/voxel_buffer.h"
 #include "../../util/containers/span.h"
-#include "../../util/godot/core/array.h"
+#include <core/variant/array.h>
 #include "../../util/godot/core/packed_arrays.h"
 #include "../../util/macros.h"
 #include "../../util/math/conv.h"
@@ -13,10 +13,11 @@
 #include "blocky_fluids_meshing_impl.h"
 #include "blocky_lod_skirts.h"
 #include "blocky_shadow_occluders.h"
+#include <core/variant/array.h>
+#include <core/object/class_db.h>
+#define ADD_SHADOW_OCCLUDER_PROPERTY(m_name, m_flag)                                                                   \
+	ADD_PROPERTYI(PropertyInfo(Variant::BOOL, m_name), "set_shadow_occluder_side", "get_shadow_occluder_side", m_flag);
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/class_db.h"
-#endif
 
 using namespace voxel::godot;
 

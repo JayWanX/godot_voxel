@@ -1,18 +1,25 @@
 #include "fast_noise_2_editor_plugin.h"
 #include "../../util/godot/classes/editor_inspector_plugin.h"
-#include "../../util/godot/classes/editor_interface.h"
-#include "../../util/godot/classes/image_texture.h"
-#include "../../util/godot/classes/popup_menu.h"
-#include "../../util/godot/classes/texture_rect.h"
-#include "../../util/godot/editor_scale.h"
+#include <core/version.h>
+#include <editor/editor_interface.h>
+#include <core/version.h>
+#include <scene/resources/image_texture.h>
+#include <scene/gui/popup_menu.h>
+#include <scene/gui/texture_rect.h>
+#include <core/version.h>
+#include <editor/themes/editor_scale.h>
 #include "../../util/noise/fast_noise_2.h"
 #include "../noise/noise_analysis_window.h"
+#include <editor/plugins/editor_plugin.h>
+#include <scene/resources/texture.h>
+#include <scene/gui/popup_menu.h>
+#include <scene/gui/texture_rect.h>
+#include <editor/themes/editor_scale.h>
+#include <core/version.h>
 
 #include <core/core_string_names.h>
+#include <core/object/callable_mp.h>
 
-#ifdef VOXEL_GODOT
-#include "../../util/godot/core/callable_mp.h"
-#endif
 
 namespace voxel {
 

@@ -2,31 +2,22 @@
 
 namespace voxel::godot {
 
-#if defined(VOXEL_GODOT)
 bool Voxel_EditorInspectorPlugin::can_handle(Object *p_object) {
-#endif
 	return _voxel_can_handle(p_object);
 }
 
-#if defined(VOXEL_GODOT)
 void Voxel_EditorInspectorPlugin::parse_begin(Object *p_object) {
-#endif
 	_voxel_parse_begin(p_object);
 }
 
-#if defined(VOXEL_GODOT)
 void Voxel_EditorInspectorPlugin::parse_end(Object *p_object) {
-#endif
 	_voxel_parse_end(p_object);
 }
 
-#if defined(VOXEL_GODOT)
 void Voxel_EditorInspectorPlugin::parse_group(Object *p_object, const String &p_group) {
-#endif
 	_voxel_parse_group(p_object, p_group);
 }
 
-#if defined(VOXEL_GODOT)
 bool Voxel_EditorInspectorPlugin::parse_property(
 		Object *p_object,
 		const Variant::Type p_type,
@@ -36,7 +27,6 @@ bool Voxel_EditorInspectorPlugin::parse_property(
 		const BitField<PropertyUsageFlags> p_usage,
 		const bool p_wide
 ) {
-#endif
 	return _voxel_parse_property(p_object, p_type, p_path, p_hint, p_hint_text, p_usage, p_wide);
 }
 

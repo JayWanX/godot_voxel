@@ -1,6 +1,6 @@
 #include "curve_utility.h"
 #include "../../util/godot/classes/curve.h"
-#include "../../util/math/vector2i.h"
+#include <core/math/vector2i.h>
 #include "../../util/string/format.h"
 
 namespace voxel {

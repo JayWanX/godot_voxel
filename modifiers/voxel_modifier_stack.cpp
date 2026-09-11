@@ -1,7 +1,7 @@
 #include "voxel_modifier_stack.h"
 #include "../edition/funcs.h"
 #include "../util/dstack.h"
-#include "../util/math/vector3.h"
+#include <core/math/vector3.h>
 #include "../util/profiling.h"
 
 namespace voxel {

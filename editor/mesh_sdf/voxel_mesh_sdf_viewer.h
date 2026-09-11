@@ -1,13 +1,14 @@
+#include <scene/gui/box_container.h>
 #ifndef VOXEL_MESH_SDF_VIEWER_H
 #define VOXEL_MESH_SDF_VIEWER_H
 
 #include "../../edition/voxel_mesh_sdf_gd.h"
-#include "../../util/godot/classes/v_box_container.h"
+#include <scene/gui/box_container.h>
 
-VOXEL_GODOT_FORWARD_DECLARE(class TextureRect)
-VOXEL_GODOT_FORWARD_DECLARE(class Button)
-VOXEL_GODOT_FORWARD_DECLARE(class SpinBox)
-VOXEL_GODOT_FORWARD_DECLARE(class Label)
+class TextureRect;
+class Button;
+class SpinBox;
+class Label;
 
 namespace voxel {
 

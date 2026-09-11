@@ -1,11 +1,11 @@
-#include "fast_noise_lite.h"
-#include "../../godot/core/array.h"
+#include <modules/noise/fastnoise_lite.h>
+#include <core/variant/array.h>
 #include "../../math/funcs.h"
+#include "fast_noise_lite.h"
+#include <core/variant/array.h>
+#include <core/object/callable_mp.h>
+#include <core/object/class_db.h>
 
-#ifdef VOXEL_GODOT
-#include "../../godot/core/callable_mp.h"
-#include "../../godot/core/class_db.h"
-#endif
 
 namespace voxel {
 
