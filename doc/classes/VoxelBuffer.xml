@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelBuffer" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelBuffer" inherits="RefCounted" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		存储体素数据的 3D 网格。
 	</brief_description>
@@ -53,9 +53,9 @@
 			<param index="4" name="channel" type="int" />
 			<description>
 				将另一个 [VoxelBuffer] 通道的子区域中的值复制到当前缓冲区的相同通道中，复制到特定位置。位深格式必须匹配。
-			如果区域的角表示负尺寸区域，它们将被重新排序。
-			如果坐标完全或部分超出边界，它们将被自动裁剪。
-			不支持在同一缓冲区中向重叠区域复制。这种情况下你可以使用一个中间缓冲区。
+				如果区域的角表示负尺寸区域，它们将被重新排序。
+				如果坐标完全或部分超出边界，它们将被自动裁剪。
+				不支持在同一缓冲区中向重叠区域复制。这种情况下你可以使用一个中间缓冲区。
 			</description>
 		</method>
 		<method name="copy_voxel_metadata_in_area">
@@ -66,9 +66,9 @@
 			<param index="3" name="dst_min_pos" type="Vector3i" />
 			<description>
 				将另一个 [VoxelBuffer] 子区域中的按体素元数据复制到当前缓冲区的特定位置。值将是浅拷贝。
-			如果区域的角表示负尺寸区域，它们将被重新排序。
-			如果坐标完全或部分超出边界，它们将被自动裁剪。
-			不支持在同一缓冲区中向重叠区域复制。这种情况下你可以使用一个中间缓冲区。
+				如果区域的角表示负尺寸区域，它们将被重新排序。
+				如果坐标完全或部分超出边界，它们将被自动裁剪。
+				不支持在同一缓冲区中向重叠区域复制。这种情况下你可以使用一个中间缓冲区。
 			</description>
 		</method>
 		<method name="create">
@@ -85,10 +85,10 @@
 			<param index="0" name="output_format" type="int" enum="Image.Format" />
 			<description>
 				从 SDF 通道创建 3D 纹理。
-			如果 [code]output_format[/code] 是 8 位像素格式，纹理将包含归一化的有符号距离，其中 0.5 为等值面，0 为表面下方最远处，1 为表面上方最远处。
-			仅支持 16 位 SDF 通道。
-			仅支持 [constant Image.FORMAT_R8] 和 [constant Image.FORMAT_L8] 输出格式。
-			注意：在着色器中采样此纹理时，需要使用 [code].yxz[/code] 对 3D 坐标进行 swizzle。这是体素的内部存储方式，此函数不会改变此约定。
+				如果 [code]output_format[/code] 是 8 位像素格式，纹理将包含归一化的有符号距离，其中 0.5 为等值面，0 为表面下方最远处，1 为表面上方最远处。
+				仅支持 16 位 SDF 通道。
+				仅支持 [constant Image.FORMAT_R8] 和 [constant Image.FORMAT_L8] 输出格式。
+				注意：在着色器中采样此纹理时，需要使用 [code].yxz[/code] 对 3D 坐标进行 swizzle。这是体素的内部存储方式，此函数不会改变此约定。
 			</description>
 		</method>
 		<method name="debug_print_sdf_y_slices" qualifiers="const">
@@ -96,7 +96,7 @@
 			<param index="0" name="scale" type="float" default="1.0" />
 			<description>
 				将 SDF 通道的内容渲染到图像中，蓝色渐变表示负值（表面以下），黄色渐变表示正值（表面以上）。每张图像对应缓冲区的一个 XZ 切片。
-			[code]scale[/code] 参数可用于通过缩放 SDF 来改变图像的对比度。
+				[code]scale[/code] 参数可用于通过缩放 SDF 来改变图像的对比度。
 			</description>
 		</method>
 		<method name="decompress_channel">
@@ -114,7 +114,7 @@
 			<param index="3" name="dst_min" type="Vector3i" />
 			<description>
 				生成此缓冲区缩小 2 倍的版本，不进行任何形式的插值（即使用最近邻）。
-			元数据不会被复制。
+				元数据不会被复制。
 			</description>
 		</method>
 		<method name="fill">
@@ -122,18 +122,18 @@
 			<param index="0" name="value" type="int" />
 			<param index="1" name="channel" type="int" default="0" />
 			<description>
-			用特定的原始值填充此缓冲区的一个通道。
-		</description>
-	</method>
-	<method name="fill_area">
+				用特定的原始值填充此缓冲区的一个通道。
+			</description>
+		</method>
+		<method name="fill_area">
 			<return type="void" />
 			<param index="0" name="value" type="int" />
 			<param index="1" name="min" type="Vector3i" />
 			<param index="2" name="max" type="Vector3i" />
 			<param index="3" name="channel" type="int" default="0" />
 			<description>
-			用特定的原始值填充此缓冲区中一个通道的某个区域。
-		</description>
+				用特定的原始值填充此缓冲区中一个通道的某个区域。
+			</description>
 		</method>
 		<method name="fill_area_f">
 			<return type="void" />
@@ -142,24 +142,24 @@
 			<param index="2" name="max" type="Vector3i" />
 			<param index="3" name="channel" type="int" />
 			<description>
-			用特定的 SDF 值填充此缓冲区中一个通道的某个区域。
-		</description>
+				用特定的 SDF 值填充此缓冲区中一个通道的某个区域。
+			</description>
 		</method>
 		<method name="fill_f">
 			<return type="void" />
 			<param index="0" name="value" type="float" />
 			<param index="1" name="channel" type="int" default="0" />
 			<description>
-			用特定的 SDF 值填充此缓冲区的一个通道。
-		</description>
+				用特定的 SDF 值填充此缓冲区的一个通道。
+			</description>
 		</method>
 		<method name="for_each_voxel_metadata" qualifiers="const">
 			<return type="void" />
 			<param index="0" name="callback" type="Callable" />
 			<description>
 				对此缓冲区中每个有关联元数据的体素执行一个函数。
-			函数的参数必须是 (position: Vector3i, metadata: Variant)。
-			重要提示：不允许在此函数内部插入新的元数据或移除元数据。
+				函数的参数必须是 (position: Vector3i, metadata: Variant)。
+				重要提示：不允许在此函数内部插入新的元数据或移除元数据。
 			</description>
 		</method>
 		<method name="for_each_voxel_metadata_in_area">
@@ -169,48 +169,48 @@
 			<param index="2" name="max_pos" type="Vector3i" />
 			<description>
 				在指定区域内，对此缓冲区中每个有关联元数据的体素执行一个函数。
-			重要提示：不允许在此函数内部插入新的元数据或移除元数据。
+				重要提示：不允许在此函数内部插入新的元数据或移除元数据。
 			</description>
 		</method>
 		<method name="get_allocator" qualifiers="const">
 			<return type="int" enum="VoxelBuffer.Allocator" />
 			<description>
-			获取此缓冲区使用的内存分配器。
-		</description>
+				获取此缓冲区使用的内存分配器。
+			</description>
 		</method>
 		<method name="get_block_metadata" qualifiers="const">
 			<return type="Variant" />
 			<description>
-			获取与此 [VoxelBuffer] 关联的元数据。
-		</description>
+				获取与此 [VoxelBuffer] 关联的元数据。
+			</description>
 		</method>
 		<method name="get_channel_as_byte_array" qualifiers="const">
 			<return type="PackedByteArray" />
 			<param index="0" name="channel_index" type="int" enum="VoxelBuffer.ChannelId" />
 			<description>
 				以未压缩的原始字节形式获取通道中的体素数据。有关数据格式的信息，请参见 [enum VoxelBuffer.Depth]。
-			注意：如果通道已压缩，它会在返回的数组中即时解压缩。如果你希望在这种情况下有不同的行为，请在调用此方法之前检查 [method get_channel_compression]。
+				注意：如果通道已压缩，它会在返回的数组中即时解压缩。如果你希望在这种情况下有不同的行为，请在调用此方法之前检查 [method get_channel_compression]。
 			</description>
 		</method>
 		<method name="get_channel_compression" qualifiers="const">
 			<return type="int" enum="VoxelBuffer.Compression" />
 			<param index="0" name="channel" type="int" />
 			<description>
-			获取指定通道使用的压缩模式。
-		</description>
+				获取指定通道使用的压缩模式。
+			</description>
 		</method>
 		<method name="get_channel_depth" qualifiers="const">
 			<return type="int" enum="VoxelBuffer.Depth" />
 			<param index="0" name="channel" type="int" />
 			<description>
-			获取指定通道使用的位深。
-		</description>
+				获取指定通道使用的位深。
+			</description>
 		</method>
 		<method name="get_size" qualifiers="const">
 			<return type="Vector3i" />
 			<description>
-			以体素为单位获取缓冲区的 3D 尺寸。
-		</description>
+				以体素为单位获取缓冲区的 3D 尺寸。
+			</description>
 		</method>
 		<method name="get_voxel" qualifiers="const">
 			<return type="int" />
@@ -236,8 +236,8 @@
 			<return type="Variant" />
 			<param index="0" name="pos" type="Vector3i" />
 			<description>
-			获取附加到此缓冲区中特定体素上的元数据。
-		</description>
+				获取附加到此缓冲区中特定体素上的元数据。
+			</description>
 		</method>
 		<method name="get_voxel_tool">
 			<return type="VoxelTool" />
@@ -348,7 +348,7 @@
 			<param index="0" name="meta" type="Variant" />
 			<description>
 				在此缓冲区上设置任意数据。旧数据会被替换。注意，这与按体素存储的元数据是分开的存储。
-			如果保存此 [VoxelBuffer]，这些元数据也会随体素一起保存，因此请确保数据支持序列化（即你不能在其中放入节点或任意对象）。
+				如果保存此 [VoxelBuffer]，这些元数据也会随体素一起保存，因此请确保数据支持序列化（即你不能在其中放入节点或任意对象）。
 			</description>
 		</method>
 		<method name="set_channel_depth">
@@ -395,7 +395,7 @@
 			<param index="1" name="value" type="Variant" />
 			<description>
 				在特定体素上附加任意数据。旧数据会被替换。传入 [code]null[/code] 将清除元数据。
-			如果保存此 [VoxelBuffer]，这些元数据也会随体素一起保存，因此请确保数据支持序列化（即你不能在其中放入节点或任意对象）。
+				如果保存此 [VoxelBuffer]，这些元数据也会随体素一起保存，因此请确保数据支持序列化（即你不能在其中放入节点或任意对象）。
 			</description>
 		</method>
 		<method name="set_voxel_v">
@@ -404,8 +404,8 @@
 			<param index="1" name="pos" type="Vector3i" />
 			<param index="2" name="channel" type="int" default="0" />
 			<description>
-			以 Vector3i 坐标设置指定通道的体素值。
-		</description>
+				以 Vector3i 坐标设置指定通道的体素值。
+			</description>
 		</method>
 		<method name="update_3d_texture_from_sdf_zxy" qualifiers="const">
 			<return type="void" />

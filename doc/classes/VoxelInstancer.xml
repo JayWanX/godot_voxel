@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelInstancer" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelInstancer" inherits="Node3D" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		在体素表面之上生成条目。
 	</brief_description>
@@ -13,56 +13,56 @@
 			<return type="void" />
 			<param index="0" name="fpath" type="String" />
 			<description>
-			将全部实例导出为一个场景文件。
-		</description>
+				将全部实例导出为一个场景文件。
+			</description>
 		</method>
 		<method name="debug_get_block_count" qualifiers="const">
 			<return type="int" />
 			<description>
-			获取数据块数量。
-		</description>
+				获取数据块数量。
+			</description>
 		</method>
 		<method name="debug_get_block_infos">
 			<return type="Dictionary" />
 			<param index="0" name="world_position" type="Vector3" />
 			<param index="1" name="item_id" type="int" />
 			<description>
-			获取指定位置的块调试信息。
-		</description>
+				获取指定位置的块调试信息。
+			</description>
 		</method>
 		<method name="debug_get_draw_flag" qualifiers="const">
 			<return type="bool" />
 			<param index="0" name="flag" type="int" enum="VoxelInstancer.DebugDrawFlag" />
 			<description>
-			获取调试绘制标志。
-		</description>
+				获取调试绘制标志。
+			</description>
 		</method>
 		<method name="debug_get_instance_counts" qualifiers="const">
 			<return type="Dictionary" />
 			<description>
-			统计各图层的实例数量。
-		</description>
+				统计各图层的实例数量。
+			</description>
 		</method>
 		<method name="debug_is_draw_enabled" qualifiers="const">
 			<return type="bool" />
 			<description>
-			调试绘制是否启用。
-		</description>
+				调试绘制是否启用。
+			</description>
 		</method>
 		<method name="debug_set_draw_enabled">
 			<return type="void" />
 			<param index="0" name="enabled" type="bool" />
 			<description>
-			设置是否启用调试绘制。
-		</description>
+				设置是否启用调试绘制。
+			</description>
 		</method>
 		<method name="debug_set_draw_flag">
 			<return type="void" />
 			<param index="0" name="flag" type="int" enum="VoxelInstancer.DebugDrawFlag" />
 			<param index="1" name="enabled" type="bool" />
 			<description>
-			设置调试绘制标志。
-		</description>
+				设置调试绘制标志。
+			</description>
 		</method>
 		<method name="remove_instances_in_sphere">
 			<return type="void" />

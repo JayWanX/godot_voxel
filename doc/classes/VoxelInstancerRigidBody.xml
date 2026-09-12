@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelInstancerRigidBody" inherits="RigidBody3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelInstancerRigidBody" inherits="RigidBody3D" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		为 [VoxelInstancer] 创建的每个可碰撞多网格实例生成的碰撞节点。
 	</brief_description>

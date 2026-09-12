@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelBlockyFluid" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelBlockyFluid" inherits="Resource" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		方块风流体的属性。
 	</brief_description>
@@ -9,7 +9,7 @@
 	<tutorials>
 	</tutorials>
 	<members>
-		<member name="dip_when_flowing_down" type="bool" is_experimental="true" setter="set_dip_when_flowing_down" getter="get_dip_when_flowing_down" default="false">
+		<member name="dip_when_flowing_down" type="bool" setter="set_dip_when_flowing_down" getter="get_dip_when_flowing_down" default="false">
 			启用后，如果给定流体系体素满足以下所有条件：
 			- 未达到最大液位
 			- 未被同类型流体的其他体素覆盖

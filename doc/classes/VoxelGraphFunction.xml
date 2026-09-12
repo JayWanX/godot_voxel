@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelGraphFunction" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelGraphFunction" inherits="Resource" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		用于生成或处理一系列 3D 值的图形。
 	</brief_description>
@@ -75,7 +75,7 @@
 			<return type="Array" />
 			<description>
 				获取描述节点之间所有连接的数组。
-			该数组具有以下格式：
+				该数组具有以下格式：
 				[codeblock]
 				[
 					{
@@ -94,15 +94,15 @@
 			<param index="0" name="node_id" type="int" />
 			<param index="1" name="input_index" type="int" />
 			<description>
-			获取指定节点输入端口的默认值。
-		</description>
+				获取指定节点输入端口的默认值。
+			</description>
 		</method>
 		<method name="get_node_default_inputs_autoconnect" qualifiers="const">
 			<return type="bool" />
 			<param index="0" name="node_id" type="int" />
 			<description>
-			节点的默认输入是否自动连接。
-		</description>
+				节点的默认输入是否自动连接。
+			</description>
 		</method>
 		<method name="get_node_gui_position" qualifiers="const">
 			<return type="Vector2" />
@@ -122,7 +122,7 @@
 			<return type="PackedInt32Array" />
 			<description>
 				获取图形中所有节点的 ID 列表。
-			注意：添加或移除节点后，ID 的返回顺序不保证保持不变。
+				注意：添加或移除节点后，ID 的返回顺序不保证保持不变。
 			</description>
 		</method>
 		<method name="get_node_input_index" qualifiers="const">
@@ -174,9 +174,9 @@
 			<param index="0" name="type_id" type="int" />
 			<description>
 				从 [enum VoxelGraphFunction.NodeTypeID] 获取关于节点类型的信息。
-			返回的数据具有以下结构：
-			[codeblock]
-			{
+				返回的数据具有以下结构：
+				[codeblock]
+				{
 				"name": String,
 				"inputs": [
 					{"name": String},
@@ -195,8 +195,8 @@
 					},
 					...
 				]
-			}
-			[/codeblock]
+				}
+				[/codeblock]
 			</description>
 		</method>
 		<method name="paste_graph_with_pre_generated_ids">
@@ -206,8 +206,8 @@
 			<param index="2" name="gui_offset" type="Vector2" />
 			<description>
 				将节点以及它们之间的连接复制到另一个图形中。
-			如果节点参数中的资源没有文件路径，它们将被复制。
-			如果提供了非零大小的 [code]node_ids[/code]，则定义复制的节点在目标图形中将具有的 ID，顺序与源图形的 [method get_node_ids] 相同。数组的大小必须与复制的节点数量相同，且 ID 不得已在目标图形中存在。如果数组为空，则将自动生成 ID。
+				如果节点参数中的资源没有文件路径，它们将被复制。
+				如果提供了非零大小的 [code]node_ids[/code]，则定义复制的节点在目标图形中将具有的 ID，顺序与源图形的 [method get_node_ids] 相同。数组的大小必须与复制的节点数量相同，且 ID 不得已在目标图形中存在。如果数组为空，则将自动生成 ID。
 			</description>
 		</method>
 		<method name="remove_connection">
@@ -233,7 +233,7 @@
 			<param index="1" name="names" type="PackedStringArray" />
 			<description>
 				为表达式节点配置输入。[code]names[/code] 是表达式中使用的输入名称列表。
-			如果你通过代码创建表达式节点，之后应调用此方法。
+				如果你通过代码创建表达式节点，之后应调用此方法。
 			</description>
 		</method>
 		<method name="set_node_default_input">
@@ -260,7 +260,7 @@
 			<param index="1" name="enabled" type="bool" />
 			<description>
 				设置没有入站连接的节点输入在图形编译时是否会自动创建默认连接。
-			这仅适用于特定节点（例如，2D 或 3D 噪声默认使用 XYZ 输入）。在其他节点上，它没有效果。
+				这仅适用于特定节点（例如，2D 或 3D 噪声默认使用 XYZ 输入）。在其他节点上，它没有效果。
 			</description>
 		</method>
 		<method name="set_node_gui_position">

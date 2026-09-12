@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelBlockyTypeLibrary" inherits="VoxelBlockyLibraryBase" is_experimental="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelBlockyTypeLibrary" inherits="VoxelBlockyLibraryBase" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 	</brief_description>
 	<description>
@@ -11,64 +11,64 @@
 			<return type="int" />
 			<param index="0" name="type_name" type="StringName" />
 			<description>
-			获取类型默认模型的索引。
-		</description>
+				获取类型默认模型的索引。
+			</description>
 		</method>
 		<method name="get_model_index_single_attribute" qualifiers="const">
 			<return type="int" />
 			<param index="0" name="type_name" type="StringName" />
 			<param index="1" name="attrib_value" type="Variant" />
 			<description>
-			无需指定属性名称即可按单一属性值获取模型索引。
-		</description>
+				无需指定属性名称即可按单一属性值获取模型索引。
+			</description>
 		</method>
 		<method name="get_model_index_with_attributes" qualifiers="const">
 			<return type="int" />
 			<param index="0" name="type_name" type="StringName" />
 			<param index="1" name="attribs_dict" type="Dictionary" />
 			<description>
-			从类型名称及其所有属性值获取模型索引。值可指定为整数、布尔值，或使用其名称。注意：此方法较慢，请考虑缓存结果。
-		</description>
+				从类型名称及其所有属性值获取模型索引。值可指定为整数、布尔值，或使用其名称。注意：此方法较慢，请考虑缓存结果。
+			</description>
 		</method>
 		<method name="get_type_from_name" qualifiers="const">
 			<return type="VoxelBlockyType" />
 			<param index="0" name="type_name" type="StringName" />
 			<description>
-			按名称获取类型。
-		</description>
+				按名称获取类型。
+			</description>
 		</method>
 		<method name="get_type_name_and_attributes_from_model_index" qualifiers="const">
 			<return type="Array" />
 			<param index="0" name="model_index" type="int" />
 			<description>
-			从模型索引获取完整限定的模型名称。返回的数组包含类型名称和属性字典。
-		</description>
+				从模型索引获取完整限定的模型名称。返回的数组包含类型名称和属性字典。
+			</description>
 		</method>
 		<method name="load_id_map_from_json">
 			<return type="bool" />
 			<param index="0" name="json" type="String" />
 			<description>
-			从 JSON 字符串加载 ID 映射，成功时返回 true。
-		</description>
+				从 JSON 字符串加载 ID 映射，成功时返回 true。
+			</description>
 		</method>
 		<method name="load_id_map_from_string_array">
 			<return type="bool" />
 			<param index="0" name="str_array" type="PackedStringArray" />
 			<description>
-			从字符串数组加载 ID 映射，成功时返回 true。
-		</description>
+				从字符串数组加载 ID 映射，成功时返回 true。
+			</description>
 		</method>
 		<method name="serialize_id_map_to_json" qualifiers="const">
 			<return type="String" />
 			<description>
-			将 ID 映射序列化为 JSON 字符串。
-		</description>
+				将 ID 映射序列化为 JSON 字符串。
+			</description>
 		</method>
 		<method name="serialize_id_map_to_string_array" qualifiers="const">
 			<return type="PackedStringArray" />
 			<description>
-			将 ID 映射序列化为字符串数组。
-		</description>
+				将 ID 映射序列化为字符串数组。
+			</description>
 		</method>
 	</methods>
 	<members>

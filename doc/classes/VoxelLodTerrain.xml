@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelLodTerrain" inherits="VoxelNode" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelLodTerrain" inherits="VoxelNode" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		使用可变细节层级的体素体积。
 	</brief_description>
@@ -133,8 +133,8 @@
 		<method name="get_data_block_region_extent" qualifiers="const">
 			<return type="int" />
 			<description>
-			获取数据块区域范围。
-		</description>
+				获取数据块区域范围。
+			</description>
 		</method>
 		<method name="get_data_block_size" qualifiers="const">
 			<return type="int" />
@@ -145,14 +145,14 @@
 		<method name="get_normalmap_generator_override" qualifiers="const">
 			<return type="VoxelGenerator" />
 			<description>
-			获取用于生成法线贴图的生成器覆盖。
-		</description>
+				获取用于生成法线贴图的生成器覆盖。
+			</description>
 		</method>
 		<method name="get_normalmap_generator_override_begin_lod_index" qualifiers="const">
 			<return type="int" />
 			<description>
-			获取生成器覆盖生效的起始 LOD 索引。
-		</description>
+				获取生成器覆盖生效的起始 LOD 索引。
+			</description>
 		</method>
 		<method name="get_process_callback" qualifiers="const">
 			<return type="int" enum="VoxelLodTerrain.ProcessCallback" />
@@ -204,15 +204,15 @@
 			<return type="void" />
 			<param index="0" name="generator_override" type="VoxelGenerator" />
 			<description>
-			设置用于生成法线贴图的生成器覆盖。
-		</description>
+				设置用于生成法线贴图的生成器覆盖。
+			</description>
 		</method>
 		<method name="set_normalmap_generator_override_begin_lod_index">
 			<return type="void" />
 			<param index="0" name="lod_index" type="int" />
 			<description>
-			设置生成器覆盖生效的起始 LOD 索引。
-		</description>
+				设置生成器覆盖生效的起始 LOD 索引。
+			</description>
 		</method>
 		<method name="set_process_callback">
 			<return type="void" />
@@ -239,7 +239,7 @@
 		</method>
 	</methods>
 	<members>
-		<member name="cache_generated_blocks" type="bool" setter="set_cache_generated_blocks" getter="get_cache_generated_blocks" default="false" is_experimental="true" experimental="">
+		<member name="cache_generated_blocks" type="bool" setter="set_cache_generated_blocks" getter="get_cache_generated_blocks" default="false" experimental="">
 			如果启用，流式加载地形时将在观察者周围的内存中保留生成的体素数据，即使它未被编辑。这可以加快对未编辑区域的体素查询，并允许 [member VoxelStream.save_generator_output] 工作，但会显著增加内存使用。
 			当启用 [member full_load_mode_enabled] 时，不支持此选项。
 		</member>
@@ -369,7 +369,7 @@
 			观察者可以拥有的最大距离。如果观察者的距离更大，它将被钳制。注意，这只是一个提示，不是精确的边界。地形可能在该距离内加载，但可以继续超出它，向上取整到最大 LOD 的数据块大小。
 			如果你的地形尺寸有限（如岛屿或星球），并希望将其保持在视野内，你可能希望将此值设置为非常大的数字。这主要用于需要限制的无限地形。
 		</member>
-		<member name="voxel_bounds" type="AABB" setter="set_voxel_bounds" getter="get_voxel_bounds" default="AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)">
+		<member name="voxel_bounds" type="AABB" setter="set_voxel_bounds" getter="get_voxel_bounds" default="AABB(-536870911, -536870911, -536870911, 1073741822, 1073741822, 1073741822)">
 			体积数据可以存在的边界（无论是否已加载），单位为体素。默认情况下，它是伪无限的。如果你制作星球、岛屿或某种竞技场，你可能希望选择有限尺寸。
 			注意，因为此体积使用带 LOD 的区块，这些边界将对齐到最近的区块边界。
 		</member>

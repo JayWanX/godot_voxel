@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelBlockyType" inherits="Resource" is_experimental="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelBlockyType" inherits="Resource" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 	</brief_description>
 	<description>
@@ -10,8 +10,8 @@
 		<method name="get_rotation_attribute" qualifiers="const">
 			<return type="VoxelBlockyAttribute" />
 			<description>
-			获取旋转属性（若存在）。
-		</description>
+				获取旋转属性（若存在）。
+			</description>
 		</method>
 		<method name="set_variant_model">
 			<return type="void" />

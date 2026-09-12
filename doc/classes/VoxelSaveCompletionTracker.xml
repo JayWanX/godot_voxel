@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelSaveCompletionTracker" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelSaveCompletionTracker" inherits="RefCounted" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		由某些异步函数返回的对象，用于跟踪进度和完成情况。
 	</brief_description>
@@ -11,26 +11,26 @@
 		<method name="get_remaining_tasks" qualifiers="const">
 			<return type="int" />
 			<description>
-			获取剩余任务数。
-		</description>
+				获取剩余任务数。
+			</description>
 		</method>
 		<method name="get_total_tasks" qualifiers="const">
 			<return type="int" />
 			<description>
-			获取任务总数。
-		</description>
+				获取任务总数。
+			</description>
 		</method>
 		<method name="is_aborted" qualifiers="const">
 			<return type="bool" />
 			<description>
-			保存过程是否已中止。
-		</description>
+				保存过程是否已中止。
+			</description>
 		</method>
 		<method name="is_complete" qualifiers="const">
 			<return type="bool" />
 			<description>
-			所有任务是否已完成。
-		</description>
+				所有任务是否已完成。
+			</description>
 		</method>
 	</methods>
 </class>

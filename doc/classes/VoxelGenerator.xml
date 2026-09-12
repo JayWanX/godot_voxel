@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelGenerator" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelGenerator" inherits="Resource" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		所有体素程序化生成器的基类。
 	</brief_description>
@@ -15,9 +15,9 @@
 			<param index="2" name="lod" type="int" />
 			<description>
 				在指定的世界区域内生成一块体素。
-			[code]out_buffer[/code]：用于生成体素数据的缓冲区。它不能为 [code]null[/code]，且必须具有非空的尺寸。
-			[code]origin_in_voxels[/code]：要生成的盒体下角坐标，相对于 LOD0。
-			[code]lod[/code]：用于此数据块的细节级别索引。某些生成器可能不支持 LOD，此时可将其保持为 0。在 LOD 0 时，传入缓冲区的每个单元格跨越 1 个空间单位；LOD 1 时为 2 个单位；LOD 2 时为 4 个单位，依此类推。
+				[code]out_buffer[/code]：用于生成体素数据的缓冲区。它不能为 [code]null[/code]，且必须具有非空的尺寸。
+				[code]origin_in_voxels[/code]：要生成的盒体下角坐标，相对于 LOD0。
+				[code]lod[/code]：用于此数据块的细节级别索引。某些生成器可能不支持 LOD，此时可将其保持为 0。在 LOD 0 时，传入缓冲区的每个单元格跨越 1 个空间单位；LOD 1 时为 2 个单位；LOD 2 时为 4 个单位，依此类推。
 			</description>
 		</method>
 	</methods>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelGeneratorScript" inherits="VoxelGenerator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelGeneratorScript" inherits="VoxelGenerator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		使用脚本定义的自定义生成器的基类。
 	</brief_description>
@@ -16,8 +16,8 @@
 			<param index="2" name="lod" type="int" />
 			<description>
 				[code]out_buffer[/code]：用于填充体素数据的缓冲区。它永远不会是 [code]null[/code]，并且具有请求的大小。它仅在此函数内有效，切勿在函数结束后将其存储在任何地方。注意：此缓冲区可以具有任何非空尺寸，但根据你使用的地形节点，可以做一些假设。[VoxelTerrain] 总是请求 16x16x16 大小的区块，但 [VoxelLodTerrain] 可以请求不同大小的区块。
-			[code]origin_in_voxels[/code]：要生成的盒体下角坐标，相对于 LOD0。盒体的大小可从 [code]out_buffer[/code] 得知。
-			[code]lod[/code]：用于此区块的细节级别索引。如果不使用 LOD 可以忽略它。它可以用作 2 的幂，表示一个体素有多大。例如，如果你使用循环配合噪声填充缓冲区，应从 [code]origin_in_voxels[/code] 开始以 2^lod 的步长采样噪声（在代码中你可以使用 [code]1 &lt;&lt; lod[/code] 进行快速计算，而不是 [code]pow(2, lod)[/code]）。你可能希望将迭代 [code]out_buffer[/code] 中坐标的变量与用于在空间中生成体素值的变量分开。
+				[code]origin_in_voxels[/code]：要生成的盒体下角坐标，相对于 LOD0。盒体的大小可从 [code]out_buffer[/code] 得知。
+				[code]lod[/code]：用于此区块的细节级别索引。如果不使用 LOD 可以忽略它。它可以用作 2 的幂，表示一个体素有多大。例如，如果你使用循环配合噪声填充缓冲区，应从 [code]origin_in_voxels[/code] 开始以 2^lod 的步长采样噪声（在代码中你可以使用 [code]1 &lt;&lt; lod[/code] 进行快速计算，而不是 [code]pow(2, lod)[/code]）。你可能希望将迭代 [code]out_buffer[/code] 中坐标的变量与用于在空间中生成体素值的变量分开。
 			</description>
 		</method>
 		<method name="_get_used_channels_mask" qualifiers="virtual const">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelInstanceLibraryMultiMeshItem" inherits="VoxelInstanceLibraryItem" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelInstanceLibraryMultiMeshItem" inherits="VoxelInstanceLibraryItem" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		使用 [MultiMesh] 渲染的实例化器模型。
 	</brief_description>
@@ -28,8 +28,8 @@
 			<return type="Mesh" />
 			<param index="0" name="mesh_lod_index" type="int" />
 			<description>
-			获取指定 LOD 索引对应的网格。
-		</description>
+				获取指定 LOD 索引对应的网格。
+			</description>
 		</method>
 		<method name="set_collider_group_names">
 			<return type="void" />
@@ -43,15 +43,15 @@
 			<param index="0" name="mesh" type="Mesh" />
 			<param index="1" name="mesh_lod_index" type="int" />
 			<description>
-			设置指定 LOD 索引对应的网格。
-		</description>
+				设置指定 LOD 索引对应的网格。
+			</description>
 		</method>
 		<method name="setup_from_template">
 			<return type="void" />
 			<param index="0" name="node" type="Node" />
 			<description>
-			从模板节点应用设置。
-		</description>
+				从模板节点应用设置。
+			</description>
 		</method>
 	</methods>
 	<members>

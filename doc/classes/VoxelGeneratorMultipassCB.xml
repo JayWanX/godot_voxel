@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelGeneratorMultipassCB" inherits="VoxelGenerator" is_experimental="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelGeneratorMultipassCB" inherits="VoxelGenerator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		基于脚本、按数据块列和多遍处理工作的生成器。
 	</brief_description>
@@ -26,8 +26,8 @@
 			<param index="1" name="pass_index" type="int" />
 			<description>
 				对每个数据块列，每一遍调用一次。
-			必须使用传入的 [code]voxel_tool[/code] 获取要生成区域的信息，并用体素填充/编辑该区域。重要：不要将该对象保存在成员变量中以便后续复用。你只能在本次调用此方法时使用它。
-			你可以使用 [code]pass_index[/code] 在每一遍中执行不同的操作。例如，0 可以是使用 Perlin 噪声的基础地面，1 可以种植树木和其他结构。
+				必须使用传入的 [code]voxel_tool[/code] 获取要生成区域的信息，并用体素填充/编辑该区域。重要：不要将该对象保存在成员变量中以便后续复用。你只能在本次调用此方法时使用它。
+				你可以使用 [code]pass_index[/code] 在每一遍中执行不同的操作。例如，0 可以是使用 Perlin 噪声的基础地面，1 可以种植树木和其他结构。
 			</description>
 		</method>
 		<method name="_get_used_channels_mask" qualifiers="virtual const">
@@ -41,7 +41,7 @@
 			<param index="0" name="column_position_blocks" type="Vector2i" />
 			<description>
 				测试方法，将完整生成特定列的所有区块并返回它们。
-			此函数不使用任何线程，也不使用内部缓存，因此会非常慢。不过，它可以让你更轻松地测试或调试脚本，例如使用一个独立的场景。
+				此函数不使用任何线程，也不使用内部缓存，因此会非常慢。不过，它可以让你更轻松地测试或调试脚本，例如使用一个独立的场景。
 			</description>
 		</method>
 		<method name="get_pass_extent_blocks" qualifiers="const">
@@ -57,9 +57,9 @@
 			<param index="1" name="extent" type="int" />
 			<description>
 				设置某一遍在列生成时可以访问其周围多少个区块（注意：默认情况下一个区块为 16x16x16 个体素）。
-			按设计，第一遍不允许访问相邻区块，因此它将保持为 0。
-			后续各遍设计为至少可以访问 1 个区块的距离。此类遍不支持 0，因为那等同于将你的逻辑直接放在上一遍中。
-			增加范围也会增加生成器的开销，无论是内存还是处理时间，因此应谨慎权衡。
+				按设计，第一遍不允许访问相邻区块，因此它将保持为 0。
+				后续各遍设计为至少可以访问 1 个区块的距离。此类遍不支持 0，因为那等同于将你的逻辑直接放在上一遍中。
+				增加范围也会增加生成器的开销，无论是内存还是处理时间，因此应谨慎权衡。
 			</description>
 		</method>
 	</methods>

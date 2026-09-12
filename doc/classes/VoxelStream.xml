@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelStream" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelStream" inherits="Resource" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		实现体素数据块的加载和保存，主要使用文件。
 	</brief_description>
@@ -19,14 +19,14 @@
 		<method name="get_block_size" qualifiers="const">
 			<return type="Vector3" />
 			<description>
-			获取此数据流提供的数据块大小。
-		</description>
+				获取此数据流提供的数据块大小。
+			</description>
 		</method>
 		<method name="get_used_channels_mask" qualifiers="const">
 			<return type="int" />
 			<description>
-			获取此数据流中可用的通道掩码。
-		</description>
+				获取此数据流中可用的通道掩码。
+			</description>
 		</method>
 		<method name="load_voxel_block">
 			<return type="int" enum="VoxelStream.ResultCode" />

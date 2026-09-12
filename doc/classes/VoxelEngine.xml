@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelEngine" inherits="Object" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelEngine" inherits="Object" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		保存通用设置并在后台线程中处理体素处理任务的单例。
 	</brief_description>
@@ -95,13 +95,6 @@
 			<return type="Vector3i" />
 			<description>
 				将体素引擎的主版本号 (x)、次版本号 (y) 和修订版本号 (z) 作为一个向量获取。可用于版本比较。
-			</description>
-		</method>
-		<method name="run_tests">
-			<return type="void" />
-			<param index="0" name="options" type="Dictionary" />
-			<description>
-				运行内部单元测试。仅当体素引擎以 `voxel_tests=true` 编译时，此函数才可用。
 			</description>
 		</method>
 		<method name="set_thread_count">

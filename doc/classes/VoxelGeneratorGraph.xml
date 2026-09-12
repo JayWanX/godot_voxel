@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="VoxelGeneratorGraph" inherits="VoxelGenerator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="VoxelGeneratorGraph" inherits="VoxelGenerator" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		基于图形的体素生成器。
 	</brief_description>
@@ -20,8 +20,8 @@
 			<param index="3" name="sdf_max" type="float" />
 			<description>
 				使用生成器产生的 SDF 输出（如果有）烘焙球形凹凸贴图（或高度图）。凹凸贴图使用全景投影。
-			[code]ref_radius[/code]：采样高度的球体半径。
-			[code]strength[/code]：生成法线的强度，默认为 1.0。
+				[code]ref_radius[/code]：采样高度的球体半径。
+				[code]strength[/code]：生成法线的强度，默认为 1.0。
 			</description>
 		</method>
 		<method name="bake_sphere_normalmap">
@@ -31,9 +31,9 @@
 			<param index="2" name="strength" type="float" />
 			<description>
 				使用生成器产生的 SDF 输出（如果有）烘焙球形法线贴图。法线贴图使用全景投影。假定生成器产生球形形状（如行星）。此类法线贴图可用于为使用此生成器的地形远距离视图添加更多细节。
-			[code]ref_radius[/code]：采样法线的球体半径。
-			[code]strength[/code]：生成法线的强度，默认为 1.0。
-			注意：另一种替代方案是与 [VoxelLodTerrain] 一起使用距离法线功能。
+				[code]ref_radius[/code]：采样法线的球体半径。
+				[code]strength[/code]：生成法线的强度，默认为 1.0。
+				注意：另一种替代方案是与 [VoxelLodTerrain] 一起使用距离法线功能。
 			</description>
 		</method>
 		<method name="clear">
@@ -46,21 +46,21 @@
 			<return type="Dictionary" />
 			<description>
 				编译图形以便用于生成数据块。
-			如果编译成功，返回结果为具有以下布局的字典：
-			[codeblock]
-			{
+				如果编译成功，返回结果为具有以下布局的字典：
+				[codeblock]
+				{
 				"success": true
-			}
-			[/codeblock]
-			如果编译失败，返回结果可能包含消息和可能导致问题的图形节点 ID：
-			[codeblock]
-			{
+				}
+				[/codeblock]
+				如果编译失败，返回结果可能包含消息和可能导致问题的图形节点 ID：
+				[codeblock]
+				{
 				"success": false,
 				"node_id": int,
 				"message": String
-			}
-			[/codeblock]
-			如果错误与特定节点无关，节点 ID 将为 -1。
+				}
+				[/codeblock]
+				如果错误与特定节点无关，节点 ID 将为 -1。
 			</description>
 		</method>
 		<method name="debug_analyze_range" qualifiers="const">
@@ -68,21 +68,21 @@
 			<param index="0" name="min_pos" type="Vector3" />
 			<param index="1" name="max_pos" type="Vector3" />
 			<description>
-			分析指定范围内的输出值范围区间。
-		</description>
+				分析指定范围内的输出值范围区间。
+			</description>
 		</method>
 		<method name="debug_load_waves_preset">
 			<return type="void" />
 			<description>
-			加载用于调试的波浪演示预置图。
-		</description>
+				加载用于调试的波浪演示预置图。
+			</description>
 		</method>
 		<method name="debug_measure_microseconds_per_voxel">
 			<return type="float" />
 			<param index="0" name="use_singular_queries" type="bool" />
 			<description>
-			测量每个体素生成所需的微秒数。
-		</description>
+				测量每个体素生成所需的微秒数。
+			</description>
 		</method>
 		<method name="generate_image_from_sdf">
 			<return type="void" />
@@ -91,7 +91,7 @@
 			<param index="2" name="size" type="Vector2" />
 			<description>
 				在以给定变换为中心、跨越其 X 和 Y 轴的平面内生成 SDF 数据，并将结果存储到图像的像素中。采样点以像素为中心。
-			图像最好采用 32 位浮点格式，并且不能压缩。
+				图像最好采用 32 位浮点格式，并且不能压缩。
 			</description>
 		</method>
 		<method name="get_main_function" qualifiers="const">
@@ -107,9 +107,9 @@
 			<param index="2" name="stride" type="float" />
 			<description>
 				沿射线生成值，以找到第一个 SDF &amp;lt 0.0 的位置，并返回沿射线的距离。如果未命中，则返回 -1.0。
-			这是近似值：返回值的误差范围最多为给定的步长。
-			距离越长，代价越高。
-			步长越小，代价越高但越精确。
+				这是近似值：返回值的误差范围最多为给定的步长。
+				距离越长，代价越高。
+				步长越小，代价越高但越精确。
 			</description>
 		</method>
 	</methods>
