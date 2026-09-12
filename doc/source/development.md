@@ -94,12 +94,16 @@ TODO: 使用官方导出模板时，我们到哪里可以获得应使用的确�
 
 要为类参考（API）做贡献，你可以像处理普通 Godot 模块或核心类那样，编辑 `doc/classes` 下的 XML 文件。
 
-更改 XML 文件后，可以使用 `doc/tools` 中的 `build.py` 脚本将其转换为对应的 Markdown 版本，使用此命令：
+更改 XML 文件后，使用跨项目共享工具 `D:/Code/Godot/tools/godot_docs_gen/build.py` 结合 `doc/docgen.yaml` 重新生成类 XML 并转换为对应的 Markdown 版本（在模块根运行）：
 ```
-python build.py -a
+python D:/Code/Godot/tools/godot_docs_gen/build.py -c doc/docgen.yaml -d
+python D:/Code/Godot/tools/godot_docs_gen/build.py -c doc/docgen.yaml -a
 ```
 
-`build.py` 还有其他参数可用于执行其他操作。如果你不带参数运行它，将打印帮助信息。
+生成 Markdown 后，用 `doc/tools` 中的 `mkdocs_update.py` 刷新 `mkdocs.yml` 的类列表：
+```
+python mkdocs_update.py
+```
 
 ### 图表节点文档
 

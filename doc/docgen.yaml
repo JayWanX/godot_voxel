@@ -1,0 +1,18 @@
+# Godot 模块 API 文档构建配置（跨项目通用构建工具 godot_docs_gen/build.py 使用）
+# 用法（在模块项目根执行，project_root 默认取当前工作目录）：
+#   python D:/Code/Godot/tools/godot_docs_gen/build.py -c doc/docgen.yaml -d [-a]
+#
+# 本模块刻意不配置 headers：voxel 的 doc/classes 保留上游 VoxelTools 手写的手工描述，
+# 无需从源码注释注入。共享工具在 doctool 之后无条件修正 schema 相对路径，
+# 故生成的 XML 与旧 doc/tools/build.py 的输出保持一致。
+
+# Godot 编辑器路径（已编译含本模块；doctool 导出类 XML 用）。可指定可执行文件或所在目录（自动检测），可被 -g 覆盖
+engine_bin_path: "D:/Code/Godot/sources_stable/godot-4.7.2-stable/bin"
+
+# 类 XML 输出/读取目录（相对 project_root，即当前工作目录）
+classes_dir: "doc/classes"
+# 共享工具无条件把 schemaLocation 修正为 ../class.xsd（即项目内 doc/class.xsd），
+# 与 voxel 原有 workflow 一致。
+
+# Markdown API 输出目录（相对 project_root）
+md_dir: "doc/source/api"
