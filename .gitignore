@@ -4,6 +4,8 @@
 *.log
 *.o
 *.obj
+*.os
+*.so
 *.pyc
 *.tmp
 *.dblite
@@ -14,6 +16,7 @@
 *.dll
 *.ilk
 
+__pycache__/
 doc/site/
 .trae/
 compile_commands.json
