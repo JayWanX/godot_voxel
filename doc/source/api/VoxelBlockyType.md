@@ -2,9 +2,6 @@
 
 继承自：[Resource](https://docs.godotengine.org/en/stable/classes/class_resource.html)
 
-!!! warning
-    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
-
 ## 属性：
 
 
@@ -37,21 +34,21 @@
 
 ### [VoxelBlockyAttribute[]](https://docs.godotengine.org/en/stable/classes/class_voxelblockyattribute[].html)<span id="i_attributes"></span> **attributes** = []
 
-*(此属性暂无文档)*
+该类型可用的属性列表。
 
 ### [VoxelBlockyModel](VoxelBlockyModel.md)<span id="i_base_model"></span> **base_model**
 
-*(此属性暂无文档)*
+该类型的基础模型。
 
 ### [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)<span id="i_unique_name"></span> **unique_name** = &"unnamed"
 
-*(此属性暂无文档)*
+类型的唯一名称。
 
 ## 方法描述
 
 ### [VoxelBlockyAttribute](VoxelBlockyAttribute.md)<span id="i_get_rotation_attribute"></span> **get_rotation_attribute**( ) 
 
-*(此方法暂无文档)*
+获取旋转属性（若存在）。
 
 ### [void](#)<span id="i_set_variant_model"></span> **set_variant_model**( [Array](https://docs.godotengine.org/en/stable/classes/class_array.html) key, [VoxelBlockyModel](VoxelBlockyModel.md) model ) 
 
@@ -59,4 +56,4 @@
 
 如果你有自动生成变体的属性（如旋转），你应仅为这些属性的默认值设置模型。其他模型将不会被保留。这是因为默认值将被用作参考来生成其他模型。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

@@ -11,20 +11,19 @@
 ## 方法：
 
 
-返回值                                                                                 | 函数签名                                                                                                                      
------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------
-[Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)  | [get_stats](#i_get_stats) ( ) const                                                                                       
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_thread_count](#i_get_thread_count) ( ) const                                                                         
-[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)              | [get_threaded_graphics_resource_building_enabled](#i_get_threaded_graphics_resource_building_enabled) ( ) const           
-[String](https://docs.godotengine.org/en/stable/classes/class_string.html)          | [get_version_edition](#i_get_version_edition) ( ) const                                                                   
-[String](https://docs.godotengine.org/en/stable/classes/class_string.html)          | [get_version_git_hash](#i_get_version_git_hash) ( ) const                                                                 
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_version_major](#i_get_version_major) ( ) const                                                                       
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_version_minor](#i_get_version_minor) ( ) const                                                                       
-[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_version_patch](#i_get_version_patch) ( ) const                                                                       
-[String](https://docs.godotengine.org/en/stable/classes/class_string.html)          | [get_version_status](#i_get_version_status) ( ) const                                                                     
-[Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)      | [get_version_v](#i_get_version_v) ( ) const                                                                               
-[void](#)                                                                           | [run_tests](#i_run_tests) ( [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html) options )  
-[void](#)                                                                           | [set_thread_count](#i_set_thread_count) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) count )    
+返回值                                                                                 | 函数签名                                                                                                                    
+----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------
+[Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)  | [get_stats](#i_get_stats) ( ) const                                                                                     
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_thread_count](#i_get_thread_count) ( ) const                                                                       
+[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)              | [get_threaded_graphics_resource_building_enabled](#i_get_threaded_graphics_resource_building_enabled) ( ) const         
+[String](https://docs.godotengine.org/en/stable/classes/class_string.html)          | [get_version_edition](#i_get_version_edition) ( ) const                                                                 
+[String](https://docs.godotengine.org/en/stable/classes/class_string.html)          | [get_version_git_hash](#i_get_version_git_hash) ( ) const                                                               
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_version_major](#i_get_version_major) ( ) const                                                                     
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_version_minor](#i_get_version_minor) ( ) const                                                                     
+[int](https://docs.godotengine.org/en/stable/classes/class_int.html)                | [get_version_patch](#i_get_version_patch) ( ) const                                                                     
+[String](https://docs.godotengine.org/en/stable/classes/class_string.html)          | [get_version_status](#i_get_version_status) ( ) const                                                                   
+[Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)      | [get_version_v](#i_get_version_v) ( ) const                                                                             
+[void](#)                                                                           | [set_thread_count](#i_set_thread_count) ( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) count )  
 <p></p>
 
 ## 方法描述
@@ -99,12 +98,8 @@
 
 将体素引擎的主版本号 (x)、次版本号 (y) 和修订版本号 (z) 作为一个向量获取。可用于版本比较。
 
-### [void](#)<span id="i_run_tests"></span> **run_tests**( [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html) options ) 
-
-运行内部单元测试。仅当体素引擎以 `voxel_tests=true` 编译时，此函数才可用。
-
 ### [void](#)<span id="i_set_thread_count"></span> **set_thread_count**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) count ) 
 
 设置 `ThreadedTaskRunner` 在内部要使用的线程数。设置此值可能导致卡顿，并且可能需要一段时间，线程数才会真正与给定值一致。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

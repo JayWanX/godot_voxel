@@ -19,18 +19,18 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_remaining_tasks"></span> **get_remaining_tasks**( ) 
 
-*(此方法暂无文档)*
+获取剩余任务数。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_total_tasks"></span> **get_total_tasks**( ) 
 
-*(此方法暂无文档)*
+获取任务总数。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_aborted"></span> **is_aborted**( ) 
 
-*(此方法暂无文档)*
+保存过程是否已中止。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_complete"></span> **is_complete**( ) 
 
-*(此方法暂无文档)*
+所有任务是否已完成。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

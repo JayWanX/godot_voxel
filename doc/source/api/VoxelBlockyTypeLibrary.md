@@ -2,9 +2,6 @@
 
 继承自：[VoxelBlockyLibraryBase](VoxelBlockyLibraryBase.md)
 
-!!! warning
-    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
-
 ## 属性：
 
 
@@ -38,44 +35,44 @@
 
 ### [VoxelBlockyType[]](https://docs.godotengine.org/en/stable/classes/class_voxelblockytype[].html)<span id="i_types"></span> **types** = []
 
-*(此属性暂无文档)*
+类型库中的类型列表。
 
 ## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_model_index_default"></span> **get_model_index_default**( [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) type_name ) 
 
-*(此方法暂无文档)*
+获取类型默认模型的索引。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_model_index_single_attribute"></span> **get_model_index_single_attribute**( [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) type_name, [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html) attrib_value ) 
 
-*(此方法暂无文档)*
+无需指定属性名称即可按单一属性值获取模型索引。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_model_index_with_attributes"></span> **get_model_index_with_attributes**( [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) type_name, [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html) attribs_dict ) 
 
-*(此方法暂无文档)*
+从类型名称及其所有属性值获取模型索引。值可指定为整数、布尔值，或使用其名称。注意：此方法较慢，请考虑缓存结果。
 
 ### [VoxelBlockyType](VoxelBlockyType.md)<span id="i_get_type_from_name"></span> **get_type_from_name**( [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) type_name ) 
 
-*(此方法暂无文档)*
+按名称获取类型。
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_get_type_name_and_attributes_from_model_index"></span> **get_type_name_and_attributes_from_model_index**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) model_index ) 
 
-*(此方法暂无文档)*
+从模型索引获取完整限定的模型名称。返回的数组包含类型名称和属性字典。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_load_id_map_from_json"></span> **load_id_map_from_json**( [String](https://docs.godotengine.org/en/stable/classes/class_string.html) json ) 
 
-*(此方法暂无文档)*
+从 JSON 字符串加载 ID 映射，成功时返回 true。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_load_id_map_from_string_array"></span> **load_id_map_from_string_array**( [PackedStringArray](https://docs.godotengine.org/en/stable/classes/class_packedstringarray.html) str_array ) 
 
-*(此方法暂无文档)*
+从字符串数组加载 ID 映射，成功时返回 true。
 
 ### [String](https://docs.godotengine.org/en/stable/classes/class_string.html)<span id="i_serialize_id_map_to_json"></span> **serialize_id_map_to_json**( ) 
 
-*(此方法暂无文档)*
+将 ID 映射序列化为 JSON 字符串。
 
 ### [PackedStringArray](https://docs.godotengine.org/en/stable/classes/class_packedstringarray.html)<span id="i_serialize_id_map_to_string_array"></span> **serialize_id_map_to_string_array**( ) 
 
-*(此方法暂无文档)*
+将 ID 映射序列化为字符串数组。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

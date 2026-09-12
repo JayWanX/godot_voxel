@@ -35,4 +35,4 @@
 
 流体所有状态所使用的材质。注意，流体的 UV 与普通模型不同，因此你可能需要一个 [ShaderMaterial](https://docs.godotengine.org/en/stable/classes/class_shadermaterial.html) 来处理流动动画。参见 [https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids](https://voxel-tools.readthedocs.io/en/latest/blocky_terrain/#fluids)
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

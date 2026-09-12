@@ -108,7 +108,7 @@
 
 ### [void](#)<span id="i_rotate_90"></span> **rotate_90**( [Axis](https://docs.godotengine.org/en/stable/classes/class_vector3i.html#enum-vector3i-axis) axis, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) clockwise ) 
 
-*(此方法暂无文档)*
+将模型绕指定轴旋转 90 度。
 
 ### [void](#)<span id="i_set_material_override"></span> **set_material_override**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) index, [Material](https://docs.godotengine.org/en/stable/classes/class_material.html) material ) 
 
@@ -122,4 +122,4 @@
 
 获取库烘焙时将应用到模型的 90 度旋转 ID。这是一个代表 24 种可能 90 度旋转之一的数字。你也可以使用 [rotate_90](VoxelBlockyModel.md#i_rotate_90)。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

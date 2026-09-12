@@ -2,9 +2,6 @@
 
 继承自：[RefCounted](https://docs.godotengine.org/en/stable/classes/class_refcounted.html)
 
-!!! warning
-    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
-
 允许在体素引擎线程池中运行自定义任务的抽象任务。
 
 ## 描述：
@@ -41,4 +38,4 @@
 
 在后台线程中运行任务逻辑。必须实现此方法。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

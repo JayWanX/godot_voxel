@@ -29,4 +29,4 @@
 
 `queue_free` 的替代方法，用于你不想在 [VoxelInstanceLibraryMultiMeshItem._on_instance_removed](VoxelInstanceLibraryMultiMeshItem.md#i__on_instance_removed) 中使用 `call_deferred` 在 [VoxelInstancer](VoxelInstancer.md) 下添加节点的情况。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

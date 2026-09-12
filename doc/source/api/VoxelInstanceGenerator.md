@@ -234,10 +234,10 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_voxel_texture_filter_mask"></span> **get_voxel_texture_filter_mask**( ) 
 
-*(此方法暂无文档)*
+获取体素材质过滤掩码。
 
 ### [void](#)<span id="i_set_voxel_texture_filter_mask"></span> **set_voxel_texture_filter_mask**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) mask ) 
 
-*(此方法暂无文档)*
+设置体素材质过滤掩码。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

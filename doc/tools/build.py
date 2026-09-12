@@ -21,15 +21,23 @@ import getopt
 import glob
 import os
 import platform
+import shutil
 from pathlib import Path
 
 SOURCES = "source"
 
 
-def update_classes_xml(custom_godot_path, godot_repo_root, verbose=False):
+def update_classes_xml(custom_godot_path, project_root, xml_path, verbose=False):
+    """运行 Godot doctool 更新类 XML，仅保留本模块（Voxel*）的类文档。
+
+    doctool 会把引擎全部模块的类文档按 modules/<m>/doc_classes 写到 --doctool
+    目标目录下，故用项目内临时目录承接输出，跑完仅把本模块的类 XML 合并回
+    classes_dir，其余全部丢弃。避免在项目根生成 modules/、platform/ 等残留目录，
+    也保证模块内类 XML 的 schema 相对路径（../../../doc/class.xsd）可稳定改写。
+    """
     godot_executable = custom_godot_path
     if godot_executable is None or godot_executable == "":
-        bindir = godot_repo_root / 'bin'
+        bindir = project_root / 'bin'
         godot_executable = find_godot(bindir)
         if godot_executable is None:
             print("Godot executable not found")
@@ -37,16 +45,66 @@ def update_classes_xml(custom_godot_path, godot_repo_root, verbose=False):
 
     if verbose:
         print("Found Godot at: %s" % godot_executable)
-    
-    # Dump XML files from Godot
-    args = [str(godot_executable), ' --doctool ', str(godot_repo_root)]
-    if verbose:
-        print("Running: ", args)
-    result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            universal_newlines=True)
-    if verbose:
-        print(result.stdout)
-        print("Disregard Godot's errors about files unless they are about Voxel*.")
+
+    # --doctool 必须作为独立参数（无前后空格），否则被当作位置参数而静默失败
+    scratch = project_root / ".doctool_tmp"
+    shutil.rmtree(scratch, ignore_errors=True)
+    scratch.mkdir(parents=True)
+
+    try:
+        args = [str(godot_executable), "--doctool", str(scratch)]
+        if verbose:
+            print("Running: ", args)
+        result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                universal_newlines=True)
+        if verbose:
+            print(result.stdout)
+            print("Disregard Godot's errors about files unless they are about Voxel*.")
+
+        # 从临时索引中仅保留本模块类 XML 并合并进 classes_dir
+        index_dir = scratch / "doc" / "classes"
+        if index_dir.is_dir():
+            _prune_to_doc_classes(index_dir, project_root)
+            xml_path.mkdir(parents=True, exist_ok=True)
+            for xml_path_file in index_dir.glob("*.xml"):
+                shutil.copy2(xml_path_file, xml_path / xml_path_file.name)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def _prune_to_doc_classes(index_dir, project_root):
+    """仅保留本模块的类 XML，删除 doctool 倾泻到临时目录的其它引擎类。[br]
+    [param index_dir] doctool 类 XML 临时目录[br]
+    [param project_root] 模块项目根（用于读取 config.py 的类清单）。
+    """
+    doc_classes = _get_doc_classes(project_root)
+    if not doc_classes:
+        return
+    keep_set = set(doc_classes)
+    for xml_file in index_dir.glob("*.xml"):
+        if xml_file.stem not in keep_set:
+            xml_file.unlink()
+
+
+def _get_doc_classes(project_root):
+    """从模块根 config.py 的 get_doc_classes() 静态解析本模块类清单（AST，不执行代码）。[br]
+    [param project_root] 模块项目根[br]
+    [return] 类名列表，未解析到返回空列表。
+    """
+    cfg_path = project_root / "config.py"
+    if not cfg_path.is_file():
+        return []
+    import ast
+    tree = ast.parse(cfg_path.read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == "get_doc_classes":
+            for stmt in node.body:
+                if isinstance(stmt, ast.Return) and isinstance(stmt.value, (ast.List, ast.Tuple)):
+                    names = [e.value for e in stmt.value.elts
+                             if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+                    if names:
+                        return names
+    return []
 
 
 def rewrite_class_schema(xml_path):
@@ -180,6 +238,7 @@ def main():
     godot_executable = ""
 
     godot_repo_root = my_path.parents[4]
+    voxel_root = my_path.parents[2]
     md_path = my_path.parents[1] / SOURCES / 'api'
     xml_path = my_path.parents[1] / 'classes'
     mkdocs_config_path = my_path.parents[1] / 'mkdocs.yml'
@@ -210,7 +269,7 @@ def main():
             godot_executable = arg
 
     if must_run_doctool:
-        update_classes_xml(godot_executable, godot_repo_root, verbose)
+        update_classes_xml(godot_executable, voxel_root, xml_path, verbose)
         rewrite_class_schema(xml_path)
         did_something = True
     

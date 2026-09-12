@@ -70,7 +70,7 @@
 
 ### [ShadowCastingSetting](https://docs.godotengine.org/en/stable/classes/class_renderingserver.html#enum-renderingserver-shadowcastingsetting)<span id="i_cast_shadow"></span> **cast_shadow** = 1
 
-*(此属性暂无文档)*
+阴影投射的设置。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_collision_distance"></span> **collision_distance** = -1.0
 
@@ -82,11 +82,11 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_layer"></span> **collision_layer** = 1
 
-*(此属性暂无文档)*
+生成碰撞体的碰撞层。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_mask"></span> **collision_mask** = 1
 
-*(此属性暂无文档)*
+生成碰撞体的碰撞掩码。
 
 ### [Array](https://docs.godotengine.org/en/stable/classes/class_array.html)<span id="i_collision_shapes"></span> **collision_shapes** = []
 
@@ -94,47 +94,47 @@
 
 ### [GIMode](https://docs.godotengine.org/en/stable/classes/class_geometryinstance3d.html#enum-geometryinstance3d-gimode)<span id="i_gi_mode"></span> **gi_mode** = 1
 
-*(此属性暂无文档)*
+网格的全局光照模式。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_hide_beyond_max_lod"></span> **hide_beyond_max_lod** = false
 
-*(此属性暂无文档)*
+超出最大 LOD 时是否隐藏网格。
 
 ### [Material](https://docs.godotengine.org/en/stable/classes/class_material.html)<span id="i_material_override"></span> **material_override**
 
-*(此属性暂无文档)*
+网格的材质覆盖。
 
 ### [Mesh](https://docs.godotengine.org/en/stable/classes/class_mesh.html)<span id="i_mesh"></span> **mesh**
 
-*(此属性暂无文档)*
+用于 LOD 0 的网格。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_mesh_lod0_distance_ratio"></span> **mesh_lod0_distance_ratio** = 0.2
 
-*(此属性暂无文档)*
+LOD 0 网格的切换距离比例。
 
 ### [Mesh](https://docs.godotengine.org/en/stable/classes/class_mesh.html)<span id="i_mesh_lod1"></span> **mesh_lod1**
 
-*(此属性暂无文档)*
+用于 LOD 1 的网格。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_mesh_lod1_distance_ratio"></span> **mesh_lod1_distance_ratio** = 0.35
 
-*(此属性暂无文档)*
+LOD 1 网格的切换距离比例。
 
 ### [Mesh](https://docs.godotengine.org/en/stable/classes/class_mesh.html)<span id="i_mesh_lod2"></span> **mesh_lod2**
 
-*(此属性暂无文档)*
+用于 LOD 2 的网格。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_mesh_lod2_distance_ratio"></span> **mesh_lod2_distance_ratio** = 0.6
 
-*(此属性暂无文档)*
+LOD 2 网格的切换距离比例。
 
 ### [Mesh](https://docs.godotengine.org/en/stable/classes/class_mesh.html)<span id="i_mesh_lod3"></span> **mesh_lod3**
 
-*(此属性暂无文档)*
+用于 LOD 3 的网格。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_mesh_lod3_distance_ratio"></span> **mesh_lod3_distance_ratio** = 1.0
 
-*(此属性暂无文档)*
+LOD 3 网格的切换距离比例。
 
 ### [RemovalBehavior](VoxelInstanceLibraryMultiMeshItem.md#enumerations)<span id="i_removal_behavior"></span> **removal_behavior** = REMOVAL_BEHAVIOR_NONE (0)
 
@@ -146,7 +146,7 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_render_layer"></span> **render_layer** = 1
 
-*(此属性暂无文档)*
+网格的渲染层。
 
 ### [PackedScene](https://docs.godotengine.org/en/stable/classes/class_packedscene.html)<span id="i_scene"></span> **scene**
 
@@ -166,7 +166,7 @@
 
 ### [Mesh](https://docs.godotengine.org/en/stable/classes/class_mesh.html)<span id="i_get_mesh"></span> **get_mesh**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) mesh_lod_index ) 
 
-*(此方法暂无文档)*
+获取指定 LOD 索引对应的网格。
 
 ### [void](#)<span id="i_set_collider_group_names"></span> **set_collider_group_names**( [StringName[]](https://docs.godotengine.org/en/stable/classes/class_stringname[].html) names ) 
 
@@ -174,10 +174,10 @@
 
 ### [void](#)<span id="i_set_mesh"></span> **set_mesh**( [Mesh](https://docs.godotengine.org/en/stable/classes/class_mesh.html) mesh, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) mesh_lod_index ) 
 
-*(此方法暂无文档)*
+设置指定 LOD 索引对应的网格。
 
 ### [void](#)<span id="i_setup_from_template"></span> **setup_from_template**( [Node](https://docs.godotengine.org/en/stable/classes/class_node.html) node ) 
 
-*(此方法暂无文档)*
+从模板节点应用设置。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

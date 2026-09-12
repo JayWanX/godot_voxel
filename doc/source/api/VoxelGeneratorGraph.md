@@ -123,31 +123,31 @@
 
 ```
 {
-	"success": true
+"success": true
 }
 ```
 如果编译失败，返回结果可能包含消息和可能导致问题的图形节点 ID：
 
 ```
 {
-	"success": false,
-	"node_id": int,
-	"message": String
+"success": false,
+"node_id": int,
+"message": String
 }
 ```
 如果错误与特定节点无关，节点 ID 将为 -1。
 
 ### [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)<span id="i_debug_analyze_range"></span> **debug_analyze_range**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) min_pos, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) max_pos ) 
 
-*(此方法暂无文档)*
+分析指定范围内的输出值范围区间。
 
 ### [void](#)<span id="i_debug_load_waves_preset"></span> **debug_load_waves_preset**( ) 
 
-*(此方法暂无文档)*
+加载用于调试的波浪演示预置图。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_debug_measure_microseconds_per_voxel"></span> **debug_measure_microseconds_per_voxel**( [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) use_singular_queries ) 
 
-*(此方法暂无文档)*
+测量每个体素生成所需的微秒数。
 
 ### [void](#)<span id="i_generate_image_from_sdf"></span> **generate_image_from_sdf**( [Image](https://docs.godotengine.org/en/stable/classes/class_image.html) im, [Transform3D](https://docs.godotengine.org/en/stable/classes/class_transform3d.html) transform, [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html) size ) 
 
@@ -169,4 +169,4 @@
 
 步长越小，代价越高但越精确。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

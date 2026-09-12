@@ -44,7 +44,7 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_requires_data_block_notifications"></span> **requires_data_block_notifications** = false
 
-*(此属性暂无文档)*
+观察者是否需要数据块进入通知。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_requires_visuals"></span> **requires_visuals** = true
 
@@ -68,10 +68,10 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_network_peer_id"></span> **get_network_peer_id**( ) 
 
-*(此方法暂无文档)*
+获取通过网络访问此观察者的对等体 ID。
 
 ### [void](#)<span id="i_set_network_peer_id"></span> **set_network_peer_id**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id ) 
 
-*(此方法暂无文档)*
+设置通过网络访问此观察者的对等体 ID。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

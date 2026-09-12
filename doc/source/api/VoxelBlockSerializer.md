@@ -82,4 +82,4 @@ VoxelBlockSerializer.deserialize_from_stream_peer(stream_peer_buffer, voxels, si
 
 将 [VoxelBuffer](VoxelBuffer.md) 的数据存储到 [StreamPeer](https://docs.godotengine.org/en/stable/classes/class_streampeer.html) 中。返回写入的字节数。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

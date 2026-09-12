@@ -59,7 +59,7 @@
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_occlusion_darkness"></span> **occlusion_darkness** = 0.8
 
-*(此属性暂无文档)*
+相邻体素遮挡产生的阴影暗度。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_occlusion_enabled"></span> **occlusion_enabled** = true
 
@@ -97,10 +97,10 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_get_shadow_occluder_side"></span> **get_shadow_occluder_side**( [Side](VoxelMesherBlocky.md#enumerations) side ) 
 
-*(此方法暂无文档)*
+获取指定侧面是否作为阴影遮挡体。
 
 ### [void](#)<span id="i_set_shadow_occluder_side"></span> **set_shadow_occluder_side**( [Side](VoxelMesherBlocky.md#enumerations) side, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-*(此方法暂无文档)*
+设置指定侧面是否作为阴影遮挡体。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

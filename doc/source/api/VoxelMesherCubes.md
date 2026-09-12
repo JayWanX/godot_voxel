@@ -78,4 +78,4 @@
 
 设置构建网格时将使用的其中一个材质。这等效于使用 [opaque_material](VoxelMesherCubes.md#i_opaque_material) 或 [transparent_material](VoxelMesherCubes.md#i_transparent_material)。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

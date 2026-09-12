@@ -44,26 +44,26 @@
 
 ### [void](#)<span id="i_add_item"></span> **add_item**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id, [VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md) item ) 
 
-*(此方法暂无文档)*
+以指定 ID 添加项目。
 
 ### [void](#)<span id="i_clear"></span> **clear**( ) 
 
-*(此方法暂无文档)*
+清空所有项目。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_find_item_by_name"></span> **find_item_by_name**( [String](https://docs.godotengine.org/en/stable/classes/class_string.html) name ) 
 
-*(此方法暂无文档)*
+按名称查找项目 ID，未找到时返回 -1。
 
 ### [PackedInt32Array](https://docs.godotengine.org/en/stable/classes/class_packedint32array.html)<span id="i_get_all_item_ids"></span> **get_all_item_ids**( ) 
 
-*(此方法暂无文档)*
+获取所有项目的 ID 列表。
 
 ### [VoxelInstanceLibraryItem](VoxelInstanceLibraryItem.md)<span id="i_get_item"></span> **get_item**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id ) 
 
-*(此方法暂无文档)*
+获取指定 ID 的项目。
 
 ### [void](#)<span id="i_remove_item"></span> **remove_item**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) id ) 
 
-*(此方法暂无文档)*
+移除指定 ID 的项目。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

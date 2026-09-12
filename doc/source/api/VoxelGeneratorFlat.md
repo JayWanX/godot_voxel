@@ -28,4 +28,4 @@
 
 如果 [channel](VoxelGeneratorFlat.md#i_channel) 设置为 [VoxelBuffer.CHANNEL_SDF](VoxelBuffer.md#i_CHANNEL_SDF) 以外的任何通道，此值将用于填充地面体素，而空气体素将设置为 0。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

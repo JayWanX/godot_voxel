@@ -20,6 +20,6 @@
 
 ### [PackedScene](https://docs.godotengine.org/en/stable/classes/class_packedscene.html)<span id="i_scene"></span> **scene**
 
-*(此属性暂无文档)*
+用作模型的场景。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

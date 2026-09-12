@@ -40,7 +40,7 @@ global_translate(motion)
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_get_max_step_height"></span> **get_max_step_height**( ) 
 
-*(此方法暂无文档)*
+获取可攀爬的最大台阶高度。
 
 ### [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html)<span id="i_get_motion"></span> **get_motion**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) pos, [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) motion, [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) aabb, [Node](https://docs.godotengine.org/en/stable/classes/class_node.html) terrain ) 
 
@@ -78,4 +78,4 @@ global_translate(motion)
 
 启用后，[get_motion](VoxelBoxMover.md#i_get_motion) 将尝试攀爬较小的台阶。这允许实现类似 Minecraft 的楼梯。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

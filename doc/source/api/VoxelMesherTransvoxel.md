@@ -51,27 +51,27 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_mesh_optimization_enabled"></span> **mesh_optimization_enabled** = false
 
-*(此属性暂无文档)*
+是否启用网格优化。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_mesh_optimization_error_threshold"></span> **mesh_optimization_error_threshold** = 0.005
 
-*(此属性暂无文档)*
+网格优化的允许误差阈值。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_mesh_optimization_target_ratio"></span> **mesh_optimization_target_ratio** = 0.0
 
-*(此属性暂无文档)*
+网格优化的目标占比。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_textures_ignore_air_voxels"></span> **textures_ignore_air_voxels** = false
 
-*(此属性暂无文档)*
+纹素计算是否忽略空气体素。
 
 ### [TexturingMode](VoxelMesherTransvoxel.md#enumerations)<span id="i_texturing_mode"></span> **texturing_mode** = TEXTURES_NONE (0)
 
-*(此属性暂无文档)*
+纹理采样的模式。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_transitions_enabled"></span> **transitions_enabled** = true
 
-*(此属性暂无文档)*
+是否启用不同 LOD 之间的过渡网格。
 
 ## 方法描述
 
@@ -79,4 +79,4 @@
 
 仅生成 Transvoxel 用于连接不同细节层级表面的网格部分。此方法主要用于测试目的。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

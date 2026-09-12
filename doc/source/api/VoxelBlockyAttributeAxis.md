@@ -2,9 +2,6 @@
 
 继承自：[VoxelBlockyAttribute](VoxelBlockyAttribute.md)
 
-!!! warning
-    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
-
 ## 属性：
 
 
@@ -35,12 +32,12 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_horizontal_only"></span> **horizontal_only** = false
 
-*(此属性暂无文档)*
+该属性是否仅保留水平方向。
 
 ## 方法描述
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_from_vec3"></span> **from_vec3**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) v ) 
 
-*(此方法暂无文档)*
+从方向向量获取对应的轴取值。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

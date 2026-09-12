@@ -194,25 +194,25 @@
 
 该数组具有以下格式：
 
-	```
-	[
-		{
-			"src_node_id": int,
-			"src_port_index": int,
-			"dst_node_id": int,
-			"dst_port_index": int
-		},
-		...
-	]
-	```
+```
+[
+	{
+		"src_node_id": int,
+		"src_port_index": int,
+		"dst_node_id": int,
+		"dst_port_index": int
+	},
+	...
+]
+```
 
 ### [Variant](https://docs.godotengine.org/en/stable/classes/class_variant.html)<span id="i_get_node_default_input"></span> **get_node_default_input**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) input_index ) 
 
-*(此方法暂无文档)*
+获取指定节点输入端口的默认值。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_get_node_default_inputs_autoconnect"></span> **get_node_default_inputs_autoconnect**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
-*(此方法暂无文档)*
+节点的默认输入是否自动连接。
 
 ### [Vector2](https://docs.godotengine.org/en/stable/classes/class_vector2.html)<span id="i_get_node_gui_position"></span> **get_node_gui_position**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) node_id ) 
 
@@ -260,24 +260,24 @@
 
 ```
 {
-	"name": String,
-	"inputs": [
-		{"name": String},
-		...
-	],
-	"outputs": [
-		{"name": String},
-		...
-	],
-	"params": [
-		{
-			"name": String,
-			"type": int (Variant::Type),
-			"class_name": String,
-			"default_value": Variant
-		},
-		...
-	]
+"name": String,
+"inputs": [
+	{"name": String},
+	...
+],
+"outputs": [
+	{"name": String},
+	...
+],
+"params": [
+	{
+		"name": String,
+		"type": int (Variant::Type),
+		"class_name": String,
+		"default_value": Variant
+	},
+	...
+]
 }
 ```
 
@@ -341,4 +341,4 @@
 
 将节点的参数设置为 null。此方法仅用于规避 Godot 的 UndoRedo 系统的一个问题。建议使用 [set_node_param](VoxelGraphFunction.md#i_set_node_param)。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

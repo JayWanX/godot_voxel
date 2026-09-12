@@ -340,10 +340,10 @@
 
 ### [void](#)<span id="i_set_voxel_v"></span> **set_voxel_v**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) value, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) pos, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) channel=0 ) 
 
-*(此方法暂无文档)*
+以 Vector3i 坐标设置指定通道的体素值。
 
 ### [void](#)<span id="i_update_3d_texture_from_sdf_zxy"></span> **update_3d_texture_from_sdf_zxy**( [ImageTexture3D](https://docs.godotengine.org/en/stable/classes/class_imagetexture3d.html) existing_texture ) 
 
 从 SDF 通道更新现有的 3D 纹理。更多信息请参见 [create_3d_texture_from_sdf_zxy](VoxelBuffer.md#i_create_3d_texture_from_sdf_zxy)。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

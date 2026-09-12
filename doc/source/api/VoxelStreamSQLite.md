@@ -47,7 +47,7 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_key_cache_enabled"></span> **is_key_cache_enabled**( ) 
 
-*(此方法暂无文档)*
+键缓存是否启用。
 
 ### [void](#)<span id="i_set_key_cache_enabled"></span> **set_key_cache_enabled**( [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
@@ -55,4 +55,4 @@
 
 必须在任何对 `load_voxel_block` 的调用之前（即在地形开始使用它之前）调用此方法，否则将无法正常工作。你可以使用脚本来完成此操作。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

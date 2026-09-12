@@ -4,9 +4,6 @@
 
 派生：[VoxelBlockyAttributeAxis](VoxelBlockyAttributeAxis.md), [VoxelBlockyAttributeCustom](VoxelBlockyAttributeCustom.md), [VoxelBlockyAttributeDirection](VoxelBlockyAttributeDirection.md), [VoxelBlockyAttributeRotation](VoxelBlockyAttributeRotation.md)
 
-!!! warning
-    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
-
 ## 方法：
 
 
@@ -26,18 +23,18 @@
 
 ### [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)<span id="i_get_attribute_name"></span> **get_attribute_name**( ) 
 
-*(此方法暂无文档)*
+获取属性名称。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_default_value"></span> **get_default_value**( ) 
 
-*(此方法暂无文档)*
+获取属性的默认取值。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_value_count"></span> **get_value_count**( ) 
 
-*(此方法暂无文档)*
+获取取值范围的大小。注意：这实际上是最大值加一，并非取值的总个数。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_rotation"></span> **is_rotation**( ) 
 
-*(此方法暂无文档)*
+该属性是否表示旋转。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

@@ -2,9 +2,6 @@
 
 继承自：[VoxelBlockyAttribute](VoxelBlockyAttribute.md)
 
-!!! warning
-    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
-
 ## 属性：
 
 
@@ -27,20 +24,20 @@
 
 ### [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html)<span id="i_attribute_name"></span> **attribute_name** = &""
 
-*(此属性暂无文档)*
+自定义属性的名称。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_default_value"></span> **default_value** = 0
 
-*(此属性暂无文档)*
+属性未映射时的默认取值。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_value_count"></span> **value_count** = 2
 
-*(此属性暂无文档)*
+属性取值的总数。
 
 ## 方法描述
 
 ### [void](#)<span id="i_set_value_name"></span> **set_value_name**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) value, [StringName](https://docs.godotengine.org/en/stable/classes/class_stringname.html) value_name ) 
 
-*(此方法暂无文档)*
+设置指定取值的名称。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

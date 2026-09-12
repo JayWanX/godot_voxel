@@ -87,38 +87,38 @@
 
 ### [void](#)<span id="i_debug_dump_as_scene"></span> **debug_dump_as_scene**( [String](https://docs.godotengine.org/en/stable/classes/class_string.html) fpath ) 
 
-*(此方法暂无文档)*
+将全部实例导出为一个场景文件。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_debug_get_block_count"></span> **debug_get_block_count**( ) 
 
-*(此方法暂无文档)*
+获取数据块数量。
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_debug_get_block_infos"></span> **debug_get_block_infos**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) world_position, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) item_id ) 
 
-*(此方法暂无文档)*
+获取指定位置的块调试信息。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_get_draw_flag"></span> **debug_get_draw_flag**( [DebugDrawFlag](VoxelInstancer.md#enumerations) flag ) 
 
-*(此方法暂无文档)*
+获取调试绘制标志。
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_debug_get_instance_counts"></span> **debug_get_instance_counts**( ) 
 
-*(此方法暂无文档)*
+统计各图层的实例数量。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_is_draw_enabled"></span> **debug_is_draw_enabled**( ) 
 
-*(此方法暂无文档)*
+调试绘制是否启用。
 
 ### [void](#)<span id="i_debug_set_draw_enabled"></span> **debug_set_draw_enabled**( [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-*(此方法暂无文档)*
+设置是否启用调试绘制。
 
 ### [void](#)<span id="i_debug_set_draw_flag"></span> **debug_set_draw_flag**( [DebugDrawFlag](VoxelInstancer.md#enumerations) flag, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-*(此方法暂无文档)*
+设置调试绘制标志。
 
 ### [void](#)<span id="i_remove_instances_in_sphere"></span> **remove_instances_in_sphere**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) center, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) radius ) 
 
 移除所有原点位于给定球体内的实例。坐标为相对于实例化器的局部坐标。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

@@ -34,7 +34,7 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_block_size_po2"></span> **block_size_po2** = 4
 
-*(此属性暂无文档)*
+数据块大小的对数值。
 
 ### [String](https://docs.godotengine.org/en/stable/classes/class_string.html)<span id="i_directory"></span> **directory** = ""
 
@@ -42,20 +42,20 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_region_size_po2"></span> **region_size_po2** = 4
 
-*(此属性暂无文档)*
+区域大小的对数值。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_sector_size"></span> **sector_size** = 512
 
-*(此属性暂无文档)*
+区域文件中的扇区大小（字节）。
 
 ## 方法描述
 
 ### [void](#)<span id="i_convert_files"></span> **convert_files**( [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html) new_settings ) 
 
-*(此方法暂无文档)*
+将旧格式的区域文件转换为新元数据格式。
 
 ### [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html)<span id="i_get_region_size"></span> **get_region_size**( ) 
 
-*(此方法暂无文档)*
+获取区域大小（以数据块数为单位）。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

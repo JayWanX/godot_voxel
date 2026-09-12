@@ -42,15 +42,15 @@
 
 ### [void](#)<span id="i_do_sphere_async"></span> **do_sphere_async**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) center, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) radius ) 
 
-*(此方法暂无文档)*
+异步执行球形编辑。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_raycast_binary_search_iterations"></span> **get_raycast_binary_search_iterations**( ) 
 
-*(此方法暂无文档)*
+获取射线检测的二分搜索迭代次数。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_get_voxel_f_interpolated"></span> **get_voxel_f_interpolated**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) position ) 
 
-*(此方法暂无文档)*
+读取指定位置插值后的浮点体素值。
 
 ### [void](#)<span id="i_run_blocky_random_tick"></span> **run_blocky_random_tick**( [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) area, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) voxel_count, [Callable](https://docs.godotengine.org/en/stable/classes/class_callable.html) callback, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) batch_count=16, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) tags_mask=4294967295 ) 
 
@@ -82,6 +82,6 @@
 ### [void](#)<span id="i_stamp_sdf"></span> **stamp_sdf**( [VoxelMeshSDF](VoxelMeshSDF.md) mesh_sdf, [Transform3D](https://docs.godotengine.org/en/stable/classes/class_transform3d.html) transform, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) isolevel, [float](https://docs.godotengine.org/en/stable/classes/class_float.html) sdf_scale ) 
 
 *此方法已弃用。 Use [VoxelTool.do_mesh](VoxelTool.md#i_do_mesh) instead.*
+用网格 SDF 印章雕刻地形。
 
-
-_生成于 2026-08-28_
+_生成于 2026-09-12_

@@ -2,9 +2,6 @@
 
 继承自：[RefCounted](https://docs.godotengine.org/en/stable/classes/class_refcounted.html)
 
-!!! warning
-    此类被标记为实验性。未来版本中可能发生变更或被移除。请自行判断使用风险。
-
 基于网格的 A* 寻路算法，适用于方块风体素地形。
 
 ## 描述：
@@ -81,4 +78,4 @@
 
 设置用于执行搜索的地形。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

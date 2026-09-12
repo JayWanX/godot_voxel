@@ -24,7 +24,7 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_blur_enabled"></span> **blur_enabled** = false
 
-*(此属性暂无文档)*
+是否启用图像模糊。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_height_range"></span> **height_range** = 200.0
 
@@ -33,4 +33,4 @@
 
 设置将用作高度图的图像。只会使用红色通道。最好使用采用 `RF` 或 `RH` 格式的图像，这些格式包含更高分辨率的高度。普通图像通常只有 8 位深度，会显得有方块感。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

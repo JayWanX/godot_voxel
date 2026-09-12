@@ -41,16 +41,16 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_mesh_ortho_rotation_index"></span> **mesh_ortho_rotation_index** = 0
 
-*(此属性暂无文档)*
+网格正交旋转的索引。
 
 ## 方法描述
 
 ### [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html)<span id="i_get_tile"></span> **get_tile**( [Side](VoxelBlockyModel.md#enumerations) side ) 
 
-*(此方法暂无文档)*
+获取指定侧面的贴图坐标。
 
 ### [void](#)<span id="i_set_tile"></span> **set_tile**( [Side](VoxelBlockyModel.md#enumerations) side, [Vector2i](https://docs.godotengine.org/en/stable/classes/class_vector2i.html) position ) 
 
-*(此方法暂无文档)*
+设置指定侧面的贴图坐标。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

@@ -45,7 +45,7 @@
 
 ### [String](https://docs.godotengine.org/en/stable/classes/class_string.html)<span id="i_name"></span> **name** = ""
 
-*(此属性暂无文档)*
+项目的名称，可用于按名称查找项目。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_persistent"></span> **persistent** = false
 
@@ -57,4 +57,4 @@
 
 另请参见 [https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence](https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence)
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

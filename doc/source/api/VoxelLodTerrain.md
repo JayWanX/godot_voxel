@@ -52,7 +52,7 @@
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [threaded_update_enabled](#i_threaded_update_enabled)                                              | false                                                                        
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [use_gpu_generation](#i_use_gpu_generation)                                                        | false                                                                        
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)            | [view_distance](#i_view_distance)                                                                  | 512                                                                          
-[AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)          | [voxel_bounds](#i_voxel_bounds)                                                                    | AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800) 
+[AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)          | [voxel_bounds](#i_voxel_bounds)                                                                    | AABB(-536870911, -536870911, -536870911, 1073741822, 1073741822, 1073741822) 
 <p></p>
 
 ## 方法：
@@ -144,59 +144,59 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_active_mesh_blocks"></span> **debug_draw_active_mesh_blocks** = false
 
-*(此属性暂无文档)*
+调试绘制当前活动的网格数据块。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_active_visual_and_collision_blocks"></span> **debug_draw_active_visual_and_collision_blocks** = false
 
-*(此属性暂无文档)*
+调试绘制当前活动的可视与碰撞数据块。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_edit_boxes"></span> **debug_draw_edit_boxes** = false
 
-*(此属性暂无文档)*
+调试绘制编辑区域的方盒。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_edited_blocks"></span> **debug_draw_edited_blocks** = false
 
-*(此属性暂无文档)*
+调试绘制已编辑的数据块。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_enabled"></span> **debug_draw_enabled** = false
 
-*(此属性暂无文档)*
+是否启用调试绘制。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_loaded_visual_and_collision_blocks"></span> **debug_draw_loaded_visual_and_collision_blocks** = false
 
-*(此属性暂无文档)*
+调试绘制已加载的可视与碰撞数据块。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_mesh_updates"></span> **debug_draw_mesh_updates** = false
 
-*(此属性暂无文档)*
+调试绘制网格更新的区域。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_modifier_bounds"></span> **debug_draw_modifier_bounds** = false
 
-*(此属性暂无文档)*
+调试绘制修改器的边界。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_octree_bounds"></span> **debug_draw_octree_bounds** = false
 
-*(此属性暂无文档)*
+调试绘制八叉树节点的边界。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_octree_nodes"></span> **debug_draw_octree_nodes** = false
 
-*(此属性暂无文档)*
+调试绘制八叉树节点。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_shadow_occluders"></span> **debug_draw_shadow_occluders** = false
 
-*(此属性暂无文档)*
+调试绘制阴影遮挡体。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_viewer_clipboxes"></span> **debug_draw_viewer_clipboxes** = false
 
-*(此属性暂无文档)*
+调试绘制程序化编辑的裁剪盒。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_volume_bounds"></span> **debug_draw_volume_bounds** = false
 
-*(此属性暂无文档)*
+调试绘制生成的地形体积边界。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_voxel_metadata"></span> **debug_draw_voxel_metadata** = false
 
-*(此属性暂无文档)*
+调试绘制体素元数据。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_full_load_mode_enabled"></span> **full_load_mode_enabled** = false
 
@@ -250,7 +250,7 @@ LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_normalmap_max_deviation_degrees"></span> **normalmap_max_deviation_degrees** = 60
 
-*(此属性暂无文档)*
+根据相机角度计算法线贴图时允许的最大偏离角度（度）。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_normalmap_octahedral_encoding_enabled"></span> **normalmap_octahedral_encoding_enabled** = false
 
@@ -298,7 +298,7 @@ LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子
 
 如果你的地形尺寸有限（如岛屿或星球），并希望将其保持在视野内，你可能希望将此值设置为非常大的数字。这主要用于需要限制的无限地形。
 
-### [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)<span id="i_voxel_bounds"></span> **voxel_bounds** = AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)
+### [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)<span id="i_voxel_bounds"></span> **voxel_bounds** = AABB(-536870911, -536870911, -536870911, 1073741822, 1073741822, 1073741822)
 
 体积数据可以存在的边界（无论是否已加载），单位为体素。默认情况下，它是伪无限的。如果你制作星球、岛屿或某种竞技场，你可能希望选择有限尺寸。
 
@@ -405,7 +405,7 @@ LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_data_block_region_extent"></span> **get_data_block_region_extent**( ) 
 
-*(此方法暂无文档)*
+获取数据块区域范围。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_data_block_size"></span> **get_data_block_size**( ) 
 
@@ -413,11 +413,11 @@ LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子
 
 ### [VoxelGenerator](VoxelGenerator.md)<span id="i_get_normalmap_generator_override"></span> **get_normalmap_generator_override**( ) 
 
-*(此方法暂无文档)*
+获取用于生成法线贴图的生成器覆盖。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_normalmap_generator_override_begin_lod_index"></span> **get_normalmap_generator_override_begin_lod_index**( ) 
 
-*(此方法暂无文档)*
+获取生成器覆盖生效的起始 LOD 索引。
 
 ### [ProcessCallback](VoxelLodTerrain.md#enumerations)<span id="i_get_process_callback"></span> **get_process_callback**( ) 
 
@@ -463,11 +463,11 @@ LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子
 
 ### [void](#)<span id="i_set_normalmap_generator_override"></span> **set_normalmap_generator_override**( [VoxelGenerator](VoxelGenerator.md) generator_override ) 
 
-*(此方法暂无文档)*
+设置用于生成法线贴图的生成器覆盖。
 
 ### [void](#)<span id="i_set_normalmap_generator_override_begin_lod_index"></span> **set_normalmap_generator_override_begin_lod_index**( [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod_index ) 
 
-*(此方法暂无文档)*
+设置生成器覆盖生效的起始 LOD 索引。
 
 ### [void](#)<span id="i_set_process_callback"></span> **set_process_callback**( [ProcessCallback](VoxelLodTerrain.md#enumerations) mode ) 
 
@@ -481,4 +481,4 @@ LOD 0 从观察者向外延伸多远。每个父级 LOD 的延伸距离是其子
 
 将体素位置转换为特定 LOD 索引的网格块位置。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

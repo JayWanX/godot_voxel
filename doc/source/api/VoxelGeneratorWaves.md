@@ -23,4 +23,4 @@
 
 波浪的长度。注意这仅控制 X 和 Z 轴方向上的长度。高度由 [VoxelGeneratorHeightmap.height_start](VoxelGeneratorHeightmap.md#i_height_start) 和 [VoxelGeneratorHeightmap.height_range](VoxelGeneratorHeightmap.md#i_height_range) 控制。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

@@ -12,7 +12,7 @@
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [area_edit_notification_enabled](#i_area_edit_notification_enabled)                  | false                                                                        
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [automatic_loading_enabled](#i_automatic_loading_enabled)                            | true                                                                         
 [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)          | [block_enter_notification_enabled](#i_block_enter_notification_enabled)              | false                                                                        
-[AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)          | [bounds](#i_bounds)                                                                  | AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800) 
+[AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)          | [bounds](#i_bounds)                                                                  | AABB(-536870911, -536870911, -536870911, 1073741822, 1073741822, 1073741822) 
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)            | [collision_layer](#i_collision_layer)                                                | 1                                                                            
 [float](https://docs.godotengine.org/en/stable/classes/class_float.html)        | [collision_margin](#i_collision_margin)                                              | 0.04                                                                         
 [int](https://docs.godotengine.org/en/stable/classes/class_int.html)            | [collision_mask](#i_collision_mask)                                                  | 1                                                                            
@@ -81,7 +81,7 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_area_edit_notification_enabled"></span> **area_edit_notification_enabled** = false
 
-*(此属性暂无文档)*
+区域被编辑时是否发送通知信号。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_automatic_loading_enabled"></span> **automatic_loading_enabled** = true
 
@@ -89,9 +89,9 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_block_enter_notification_enabled"></span> **block_enter_notification_enabled** = false
 
-*(此属性暂无文档)*
+数据块进入观察范围时是否发送通知信号。
 
-### [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)<span id="i_bounds"></span> **bounds** = AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)
+### [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html)<span id="i_bounds"></span> **bounds** = AABB(-536870911, -536870911, -536870911, 1073741822, 1073741822, 1073741822)
 
 定义地形允许存在体素的边界。如果使用无限世界生成器，数据块将仅在此区域内生成。区域外的所有内容都将保持为空。
 
@@ -99,35 +99,35 @@
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_layer"></span> **collision_layer** = 1
 
-*(此属性暂无文档)*
+碰撞层的层级。
 
 ### [float](https://docs.godotengine.org/en/stable/classes/class_float.html)<span id="i_collision_margin"></span> **collision_margin** = 0.04
 
-*(此属性暂无文档)*
+碰撞体的边缘裕量。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_collision_mask"></span> **collision_mask** = 1
 
-*(此属性暂无文档)*
+碰撞掩码的层级。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_enabled"></span> **debug_draw_enabled** = false
 
-*(此属性暂无文档)*
+是否启用调试绘制。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_shadow_occluders"></span> **debug_draw_shadow_occluders** = false
 
-*(此属性暂无文档)*
+调试绘制阴影遮挡体。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_visual_and_collision_blocks"></span> **debug_draw_visual_and_collision_blocks** = false
 
-*(此属性暂无文档)*
+调试绘制可视与碰撞数据块。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_volume_bounds"></span> **debug_draw_volume_bounds** = false
 
-*(此属性暂无文档)*
+调试绘制生成的地形体积边界。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_draw_voxel_metadata"></span> **debug_draw_voxel_metadata** = false
 
-*(此属性暂无文档)*
+调试绘制体素元数据。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_generate_collisions"></span> **generate_collisions** = true
 
@@ -139,7 +139,7 @@
 
 ### [Material](https://docs.godotengine.org/en/stable/classes/class_material.html)<span id="i_material_override"></span> **material_override**
 
-*(此属性暂无文档)*
+地形的材质覆盖。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_max_view_distance"></span> **max_view_distance** = 128
 
@@ -163,11 +163,11 @@
 
 ### [void](#)<span id="i__on_area_edited"></span> **_on_area_edited**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_origin, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_size ) 
 
-*(此方法暂无文档)*
+区域被编辑时触发的回调。
 
 ### [void](#)<span id="i__on_data_block_entered"></span> **_on_data_block_entered**( [VoxelDataBlockEnterInfo](VoxelDataBlockEnterInfo.md) info ) 
 
-*(此方法暂无文档)*
+数据块进入观察范围时触发的回调。
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_data_block_to_voxel"></span> **data_block_to_voxel**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) block_pos ) 
 
@@ -175,15 +175,15 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_debug_get_draw_flag"></span> **debug_get_draw_flag**( [DebugDrawFlag](VoxelTerrain.md#enumerations) flag_index ) 
 
-*(此方法暂无文档)*
+获取调试绘制标志。
 
 ### [void](#)<span id="i_debug_set_draw_flag"></span> **debug_set_draw_flag**( [DebugDrawFlag](VoxelTerrain.md#enumerations) flag_index, [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html) enabled ) 
 
-*(此方法暂无文档)*
+设置调试绘制标志。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_data_block_size"></span> **get_data_block_size**( ) 
 
-*(此方法暂无文档)*
+获取数据块大小。
 
 ### [Dictionary](https://docs.godotengine.org/en/stable/classes/class_dictionary.html)<span id="i_get_statistics"></span> **get_statistics**( ) 
 
@@ -207,11 +207,11 @@
 
 ### [PackedInt32Array](https://docs.godotengine.org/en/stable/classes/class_packedint32array.html)<span id="i_get_viewer_network_peer_ids_in_area"></span> **get_viewer_network_peer_ids_in_area**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_origin, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) area_size ) 
 
-*(此方法暂无文档)*
+获取指定区域内观察者的网络对等体 ID 列表。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_has_data_block"></span> **has_data_block**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) block_position ) 
 
-*(此方法暂无文档)*
+指定位置是否存在数据块。
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_is_area_meshed"></span> **is_area_meshed**( [AABB](https://docs.godotengine.org/en/stable/classes/class_aabb.html) area_in_voxels ) 
 
@@ -243,10 +243,10 @@
 
 ### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html)<span id="i_try_set_block_data"></span> **try_set_block_data**( [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) position, [VoxelBuffer](VoxelBuffer.md) voxels ) 
 
-*(此方法暂无文档)*
+在给定位置创建或覆盖任何已有的数据块数据。若本地没有观察者在范围内则返回 false。
 
 ### [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html)<span id="i_voxel_to_data_block"></span> **voxel_to_data_block**( [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html) voxel_pos ) 
 
-*(此方法暂无文档)*
+将体素坐标转换为数据块坐标。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_

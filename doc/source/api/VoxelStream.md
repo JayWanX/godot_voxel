@@ -60,11 +60,11 @@
 
 ### [Vector3](https://docs.godotengine.org/en/stable/classes/class_vector3.html)<span id="i_get_block_size"></span> **get_block_size**( ) 
 
-*(此方法暂无文档)*
+获取此数据流提供的数据块大小。
 
 ### [int](https://docs.godotengine.org/en/stable/classes/class_int.html)<span id="i_get_used_channels_mask"></span> **get_used_channels_mask**( ) 
 
-*(此方法暂无文档)*
+获取此数据流中可用的通道掩码。
 
 ### [ResultCode](VoxelStream.md#enumerations)<span id="i_load_voxel_block"></span> **load_voxel_block**( [VoxelBuffer](VoxelBuffer.md) out_buffer, [Vector3i](https://docs.godotengine.org/en/stable/classes/class_vector3i.html) block_position, [int](https://docs.godotengine.org/en/stable/classes/class_int.html) lod_index ) 
 
@@ -78,4 +78,4 @@
 
 `block_position`：指定 LOD 内以数据块坐标表示的区块位置。
 
-_生成于 2026-08-28_
+_生成于 2026-09-12_
