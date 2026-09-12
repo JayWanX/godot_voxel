@@ -1,0 +1,19 @@
+# Godot 模块 API 文档构建配置（跨项目通用构建工具 godot_docs_gen/build.py 使用）
+# 用法（在模块项目根执行，project_root 默认取当前工作目录）：
+# python D:/Code/Godot/tools/godot_docs_gen/build.py -c doc/docgen.yaml -d -a
+
+# Godot 编辑器路径（已编译含本模块；doctool 导出类 XML 用）。可指定可执行文件或所在目录（自动检测），可被 -g 覆盖
+engine_bin_path: "D:/Code/Godot/sources_stable/godot-4.7.2-stable/bin"
+
+# 本模块公开类清单无需声明：自动从模块根 config.py 的 get_doc_classes() 读取（AST 静态解析），
+# 用于裁剪 doc/classes 中 doctool 倾泻的其它引擎类 XML。
+
+# 类 XML 输出/读取目录（相对 project_root，即当前工作目录）
+classes_dir: "doc/classes"
+# class.xsd 由工具自动复制到项目内 doc/class.xsd，XML 引用该项目内副本，不引用项目外文件。
+
+# 注入注释的源文件 glob，多个用英文逗号分隔（相对 project_root）
+headers: "**/*.h"
+
+# Markdown API 输出目录（相对 project_root）
+md_dir: "doc/source/api"
