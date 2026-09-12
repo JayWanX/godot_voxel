@@ -49,6 +49,19 @@ def update_classes_xml(custom_godot_path, godot_repo_root, verbose=False):
         print("Disregard Godot's errors about files unless they are about Voxel*.")
 
 
+def rewrite_class_schema(xml_path):
+    # doctool 每次都会把 schemaLocation 写成 ../../../doc/class.xsd，
+    # 该相对路径面向“模块位于引擎源码 modules/ 下”的布局；
+    # 本模块位于 custom_modules/voxel，上溯三级越界无法解析，故统一改写为项目内副本。
+    for xml_file in xml_path.glob("*.xml"):
+        text = xml_file.read_text(encoding="utf-8")
+        fixed = text.replace(
+            'xsi:noNamespaceSchemaLocation="../../../doc/class.xsd"',
+            'xsi:noNamespaceSchemaLocation="../class.xsd"')
+        if fixed != text:
+            xml_file.write_text(fixed, encoding="utf-8")
+
+
 def find_godot(bindir): # bindir: Path
     # Match a filename like these
     # godot.windows.editor.dev.x86_64.exe
@@ -198,6 +211,7 @@ def main():
 
     if must_run_doctool:
         update_classes_xml(godot_executable, godot_repo_root, verbose)
+        rewrite_class_schema(xml_path)
         did_something = True
     
     if must_update_mkdocs_config:
