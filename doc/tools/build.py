@@ -22,6 +22,7 @@ import glob
 import os
 import platform
 import shutil
+import tempfile
 from pathlib import Path
 
 SOURCES = "source"
@@ -51,6 +52,19 @@ def update_classes_xml(custom_godot_path, project_root, xml_path, verbose=False)
     shutil.rmtree(scratch, ignore_errors=True)
     scratch.mkdir(parents=True)
 
+    # Godot doctool 会原地写回所有注册模块的 doc/classes（含兄弟模块），故先快照、跑完还原，
+    # 使本次 -d 只影响目标模块，避免污染同 <父目录> 下的其它模块（如 extensions/bytecode_compiler）。
+    siblings = list(_iter_sibling_doc_dirs(project_root))
+    snapshot_dirs = []
+    sibling_tmp = None
+    if siblings:
+        sibling_tmp = tempfile.mkdtemp(prefix="voxel_docs_siblings_")
+        for mod_root, cls_dir in siblings:
+            snapshot = Path(sibling_tmp) / mod_root.name / "classes"
+            if cls_dir.is_dir():
+                shutil.copytree(cls_dir, snapshot)
+            snapshot_dirs.append((mod_root, cls_dir, snapshot))
+
     try:
         args = [str(godot_executable), "--doctool", str(scratch)]
         if verbose:
@@ -69,7 +83,30 @@ def update_classes_xml(custom_godot_path, project_root, xml_path, verbose=False)
             for xml_path_file in index_dir.glob("*.xml"):
                 shutil.copy2(xml_path_file, xml_path / xml_path_file.name)
     finally:
+        # 还原兄弟模块（doctool 原地写回的所有已注册模块 doc/classes），使本次 -d 只影响目标模块
+        if sibling_tmp is not None:
+            for mod_root, cls_dir, snapshot in snapshot_dirs:
+                if verbose:
+                    print("Restore sibling module doc/classes: %s" % cls_dir)
+                shutil.rmtree(cls_dir, ignore_errors=True)
+                shutil.copytree(snapshot, cls_dir)
+            shutil.rmtree(sibling_tmp, ignore_errors=True)
         shutil.rmtree(scratch, ignore_errors=True)
+
+
+def _iter_sibling_doc_dirs(project_root):
+    """枚举与目标模块同目录的兄弟模块（含 config.py 与 doc/classes 的独立模块仓库）。[br]
+    [param project_root] 模块项目根[br]
+    [return] 兄弟模块 (module_root, doc_classes_dir) 生成器。
+    """
+    parent = project_root.parent
+    if not parent.is_dir():
+        return
+    for child in sorted(parent.iterdir()):
+        if child == project_root or not child.is_dir():
+            continue
+        if (child / "config.py").is_file() and (child / "doc" / "classes").is_dir():
+            yield child, child / "doc" / "classes"
 
 
 def _prune_to_doc_classes(index_dir, project_root):
