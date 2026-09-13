@@ -1,0 +1,9 @@
+; Engine configuration file.
+
+config_version=5
+
+[application]
+
+config/name="voxel 测试项目"
+run/main_scene="res://run_tests.tscn"
+config/features=PackedStringArray("4.7")
