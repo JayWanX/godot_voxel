@@ -91,6 +91,15 @@
 				注意：在着色器中采样此纹理时，需要使用 [code].yxz[/code] 对 3D 坐标进行 swizzle。这是体素的内部存储方式，此函数不会改变此约定。
 			</description>
 		</method>
+		<method name="create_buffer" qualifiers="static">
+			<return type="VoxelBuffer" />
+			<param index="0" name="size_x" type="int" />
+			<param index="1" name="size_y" type="int" />
+			<param index="2" name="size_z" type="int" />
+			<description>
+				创建并分配指定尺寸的缓冲区，等效于 [method create]。
+			</description>
+		</method>
 		<method name="debug_print_sdf_y_slices" qualifiers="const">
 			<return type="Image[]" />
 			<param index="0" name="scale" type="float" default="1.0" />

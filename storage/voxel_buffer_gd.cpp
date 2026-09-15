@@ -849,7 +849,20 @@ TypedArray<Image> VoxelBuffer::debug_print_sdf_y_slices(float scale) const {
 	return images;
 }
 
+Ref<VoxelBuffer> VoxelBuffer::create_buffer(int size_x, int size_y, int size_z) {
+	Ref<VoxelBuffer> buffer;
+	buffer.instantiate();
+	buffer->create(size_x, size_y, size_z);
+	return buffer;
+}
+
 void VoxelBuffer::_bind_methods() {
+	ClassDB::bind_static_method(
+			VoxelBuffer::get_class_static(),
+			D_METHOD("create_buffer", "size_x", "size_y", "size_z"),
+			&VoxelBuffer::create_buffer
+	);
+
 	ClassDB::bind_method(D_METHOD("create", "sx", "sy", "sz"), &VoxelBuffer::_b_create);
 
 	ClassDB::bind_method(D_METHOD("get_allocator"), &VoxelBuffer::get_allocator);

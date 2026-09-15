@@ -91,6 +91,10 @@ public:
 	// 由于 Godot 的限制，带参数的构造函数并不总能使用，因此采用变通方法
 	static Ref<VoxelBuffer> create_shared(std::shared_ptr<voxel::VoxelBuffer> &other);
 
+	// 创建并分配指定尺寸的缓冲区，等效于 new() 后调用 create()。
+	// 由于实例方法 create() 在 VoxelBuffer 中绑定了其它语义，静态工厂用 create_buffer 命名。
+	static Ref<VoxelBuffer> create_buffer(int size_x, int size_y, int size_z);
+
 	// 获取底层体素缓冲区引用，可用于直接读写
 	inline const voxel::VoxelBuffer &get_buffer() const {
 #ifdef DEBUG_ENABLED
