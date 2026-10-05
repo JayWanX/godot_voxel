@@ -57,4 +57,4 @@
 
 另请参见 [https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence](https://voxel-tools.readthedocs.io/en/latest/instancing/#persistence)
 
-_生成于 2026-09-12_
+_生成于 2026-10-05_

@@ -84,4 +84,4 @@
 *此方法已弃用。 Use [VoxelTool.do_mesh](VoxelTool.md#i_do_mesh) instead.*
 用网格 SDF 印章雕刻地形。
 
-_生成于 2026-09-12_
+_生成于 2026-10-05_

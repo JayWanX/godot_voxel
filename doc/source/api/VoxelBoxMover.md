@@ -78,4 +78,4 @@ global_translate(motion)
 
 启用后，[get_motion](VoxelBoxMover.md#i_get_motion) 将尝试攀爬较小的台阶。这允许实现类似 Minecraft 的楼梯。
 
-_生成于 2026-09-12_
+_生成于 2026-10-05_
